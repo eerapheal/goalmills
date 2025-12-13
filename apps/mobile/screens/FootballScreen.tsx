@@ -162,11 +162,6 @@ export function FootballScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>⚽ Football</Text>
-                <Text style={styles.headerSubtitle}>Live scores, fixtures & news</Text>
-            </View>
 
             <View>
                 {/* Tabs */}

@@ -44,11 +44,6 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            {/* App Header */}
-            <View style={styles.appHeader}>
-                <Text style={styles.appTitle}>⚡ GoalMills</Text>
-                <Text style={styles.appSubtitle}>Your Ultimate Sports Platform</Text>
-            </View>
 
             {/* Sport Category Tabs */}
             <SportTabs selectedSport={selectedSport} onSelectSport={setSelectedSport} />
