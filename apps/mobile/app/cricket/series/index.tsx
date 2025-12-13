@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketSeries } from '@goalmills/types';
@@ -26,26 +26,29 @@ export default function CricketSeriesListScreen() {
     }, []);
 
     const renderItem = ({ item }: { item: CricketSeries }) => (
-        <TouchableOpacity style={styles.card} onPress={() => { /* Navigate to series details if needed */ }}>
-            <View style={styles.header}>
-                <Text style={styles.seriesName}>{item.name}</Text>
-                <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{item.seriesType}</Text>
-                </View>
-            </View>
-            <View style={styles.details}>
-                <View style={styles.row}>
-                    <Ionicons name="calendar-outline" size={16} color={COLORS.textLight} />
-                    <Text style={styles.detailText}>
-                        {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
-                    </Text>
-                </View>
-                {item.country && (
-                    <View style={styles.row}>
-                        <Ionicons name="location-outline" size={16} color={COLORS.textLight} />
-                        <Text style={styles.detailText}>{item.country}</Text>
+        <TouchableOpacity style={styles.card} onPress={() => router.push(`/cricket/series/${item.id}`)}>
+            {item.image && <Image source={{ uri: item.image }} style={styles.cardImage} />}
+            <View style={styles.cardContent}>
+                <View style={styles.header}>
+                    <Text style={styles.seriesName}>{item.name}</Text>
+                    <View style={styles.badge}>
+                        <Text style={styles.badgeText}>{item.seriesType}</Text>
                     </View>
-                )}
+                </View>
+                <View style={styles.details}>
+                    <View style={styles.row}>
+                        <Ionicons name="calendar-outline" size={16} color={COLORS.textLight} />
+                        <Text style={styles.detailText}>
+                            {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
+                        </Text>
+                    </View>
+                    {item.country && (
+                        <View style={styles.row}>
+                            <Ionicons name="location-outline" size={16} color={COLORS.textLight} />
+                            <Text style={styles.detailText}>{item.country}</Text>
+                        </View>
+                    )}
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -96,10 +99,18 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderRadius: BORDER_RADIUS.md,
-        padding: SPACING.md,
         marginBottom: SPACING.sm,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
+        overflow: 'hidden',
+    },
+    cardImage: {
+        width: '100%',
+        height: 120,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    cardContent: {
+        padding: SPACING.md,
     },
     header: {
         flexDirection: 'row',

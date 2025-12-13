@@ -98,12 +98,12 @@ const mockSeries: CricketSeries[] = [
   { id: 3, name: 'IPL 2025', startDate: '2025-03-22', endDate: '2025-05-26', seriesType: 'T20', tournament: 'IPL', image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800' },
 ];
 
-const generateMockMatches = (count: number, status: string): CricketMatchInfo[] => {
+const generateMockMatches = (count: number, status: string, startId: number): CricketMatchInfo[] => {
   return Array.from({ length: count }).map((_, i) => {
     const homeTeam = mockTeams[i % mockTeams.length];
     const awayTeam = mockTeams[(i + 1) % mockTeams.length];
     return {
-      id: 100 + i,
+      id: startId + i,
       name: `${homeTeam.name} vs ${awayTeam.name}`,
       matchType: 'T20',
       status: status,
@@ -124,9 +124,9 @@ const generateMockMatches = (count: number, status: string): CricketMatchInfo[] 
   });
 };
 
-const mockLiveMatches = generateMockMatches(3, 'Live');
-const mockUpcomingMatches = generateMockMatches(5, 'Upcoming').map(m => ({ ...m, status: 'Upcoming', matchStarted: false, score: undefined }));
-const mockRecentMatches = generateMockMatches(5, 'Complete');
+const mockLiveMatches = generateMockMatches(3, 'Live', 100);
+const mockUpcomingMatches = generateMockMatches(5, 'Upcoming', 200).map(m => ({ ...m, status: 'Upcoming', matchStarted: false, score: undefined }));
+const mockRecentMatches = generateMockMatches(5, 'Complete', 300);
 
 class CricketApi implements CricbuzzAPIClient {
   private async simulateDelay() {

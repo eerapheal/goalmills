@@ -132,7 +132,11 @@ export function CricketScreen() {
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>🏆 Cricket Series</Text>
                         {seriesList.map((series) => (
-                            <View key={series.id} style={styles.seriesCard}>
+                            <Pressable
+                                key={series.id}
+                                style={({ pressed }) => [styles.seriesCard, pressed && styles.pressedTab]}
+                                onPress={() => router.push(`/cricket/series/${series.id}`)}
+                            >
                                 {series.image && <Image source={{ uri: series.image }} style={styles.seriesImage} />}
                                 <View style={styles.seriesInfo}>
                                     <Text style={styles.seriesName}>{series.name}</Text>
@@ -141,7 +145,7 @@ export function CricketScreen() {
                                     </Text>
                                     <Text style={styles.seriesType}>{series.seriesType} • {series.country || series.tournament}</Text>
                                 </View>
-                            </View>
+                            </Pressable>
                         ))}
                     </View>
                 );
