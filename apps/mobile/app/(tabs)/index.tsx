@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
 import { SportType } from '@goalmills/types';
-import { SportTabs } from '../components/SportTabs';
-import { FootballScreen } from '../screens/FootballScreen';
+import { SportTabs } from '../../components/SportTabs';
+import { FootballScreen } from '../../screens/FootballScreen';
 
 export default function HomeScreen() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
