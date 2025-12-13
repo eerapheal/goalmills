@@ -43,11 +43,10 @@ export default function HomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0e27] flex flex-col">
+        <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex flex-col">
             {/* App Header */}
-            <div className="px-4 pt-8 pb-4 bg-[#001f3f]/90 border-b-4 border-[#ffd700]">
-                <h1 className="text-3xl font-black text-white mb-1 tracking-wide">⚡ GoalMills</h1>
-                <p className="text-sm text-gray-300 font-semibold">Your Ultimate Sports Platform</p>
+            <div className="px-4 pt-2 pb-4 bg-[#001f3f]/90 border-b-4 border-[#ffd700] overflow-hidden whitespace-nowrap">
+                <p className="text-sm text-gray-300 font-semibold animate-marquee inline-block">Your Ultimate Sports Platform</p>
             </div>
 
             {/* Sport Category Tabs */}
