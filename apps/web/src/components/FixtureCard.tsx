@@ -2,6 +2,8 @@
 
 import { Fixture } from '@goalmills/types';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface FixtureCardProps {
     fixture: Fixture;
@@ -9,6 +11,7 @@ interface FixtureCardProps {
 }
 
 export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
+    const router = useRouter();
     const { fixture: fixtureData, league, teams, goals, score } = fixture;
     const isLive = ['1H', '2H', 'HT', 'ET', 'P'].includes(fixtureData.status.short);
     const isFinished = fixtureData.status.short === 'FT';
@@ -24,9 +27,17 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
 
+    const handleCardClick = () => {
+        if (onPress) {
+            onPress();
+        } else {
+            router.push(`/matches/${fixtureData.id}`);
+        }
+    };
+
     return (
         <div
-            onClick={onPress}
+            onClick={handleCardClick}
             className={`
                 group
                 glass-card rounded-xl p-5 mb-4 cursor-pointer relative overflow-hidden
@@ -41,14 +52,10 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             {/* League Header */}
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/5 relative z-10">
                 <div
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        // Use window.location or router push if Link component causes layout issues inside another clickable, 
-                        // but usually Link is fine if we stop propagation.
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                     className="flex items-center gap-3"
                 >
-                    <a href={`/leagues/${league.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <Link href={`/leagues/${league.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         <div className="p-1.5 bg-white/5 rounded-lg">
                             <Image src={league.logo} alt={league.name} width={20} height={20} className="w-5 h-5 object-contain" />
                         </div>
@@ -56,7 +63,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                             <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">{league.name}</span>
                             {league.round && <span className="text-[10px] text-text-muted">{league.round}</span>}
                         </div>
-                    </a>
+                    </Link>
                 </div>
                 {isLive && (
                     <div className="flex items-center gap-2 bg-accent-red/20 px-2.5 py-1 rounded-full border border-accent-red/20">
@@ -72,7 +79,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             {/* Match Info */}
             <div className="flex items-center justify-between relative z-10">
                 {/* Home Team */}
-                <a
+                <Link
                     href={`/teams/${teams.home.id}`}
                     onClick={(e) => e.stopPropagation()}
                     className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300 hover:opacity-80"
@@ -83,11 +90,12 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                     <p className={`text-sm sm:text-base font-bold text-center leading-tight ${teams.home.winner ? 'text-accent-green' : 'text-text-primary'}`}>
                         {teams.home.name}
                     </p>
-                </a>
+                </Link>
 
                 {/* Score/Time Center */}
-                <a
+                <Link
                     href={`/matches/${fixtureData.id}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="flex flex-col items-center justify-center min-w-[100px] px-2 hover:scale-105 transition-transform duration-300"
                 >
                     {isUpcoming ? (
@@ -116,10 +124,10 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                             </div>
                         </div>
                     )}
-                </a>
+                </Link>
 
                 {/* Away Team */}
-                <a
+                <Link
                     href={`/teams/${teams.away.id}`}
                     onClick={(e) => e.stopPropagation()}
                     className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300 hover:opacity-80"
@@ -130,20 +138,24 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                     <p className={`text-sm sm:text-base font-bold text-center leading-tight ${teams.away.winner ? 'text-accent-green' : 'text-text-primary'}`}>
                         {teams.away.name}
                     </p>
-                </a>
+                </Link>
             </div>
 
             {/* Footer / Venue */}
-            {fixtureData.venue.name && (
-                <div className="mt-5 pt-3 border-t border-white/5 flex items-center justify-center text-text-muted gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="text-[10px] sm:text-xs">
-                        {fixtureData.venue.name}
-                        {fixtureData.venue.city && <span> • {fixtureData.venue.city}</span>}
-                    </span>
+            {(fixtureData.venue.name || fixtureData.referee) && (
+                <div className="mt-5 pt-3 border-t border-white/5 flex flex-col items-center justify-center text-text-muted gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                    {fixtureData.venue.name && (
+                        <div className="flex items-center gap-1.5">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span className="text-[10px] sm:text-xs">
+                                {fixtureData.venue.name}
+                                {fixtureData.venue.city && <span> • {fixtureData.venue.city}</span>}
+                            </span>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

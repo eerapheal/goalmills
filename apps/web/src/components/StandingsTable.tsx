@@ -2,6 +2,7 @@
 
 import { Standing } from '@goalmills/types';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface StandingsTableProps {
     standings: Standing[];
@@ -47,14 +48,14 @@ export function StandingsTable({ standings }: StandingsTableProps) {
 
                         {/* Team */}
                         <div className="col-span-5 sm:col-span-6 pl-2 flex items-center min-w-0">
-                            <a href={`/teams/${standing.team.id}`} className="flex items-center min-w-0 hover:opacity-80 transition-opacity">
+                            <Link href={`/teams/${standing.team.id}`} className="flex items-center min-w-0 hover:opacity-80 transition-opacity">
                                 <div className="relative w-6 h-6 mr-3 shrink-0">
                                     <Image src={standing.team.logo} alt={standing.team.name} width={24} height={24} className="object-contain w-full h-full" />
                                 </div>
                                 <span className={`text-sm font-semibold truncate ${standing.rank <= 4 ? 'text-white' : 'text-text-primary'}`}>
                                     {standing.team.name}
                                 </span>
-                            </a>
+                            </Link>
                         </div>
 
                         {/* Stats */}

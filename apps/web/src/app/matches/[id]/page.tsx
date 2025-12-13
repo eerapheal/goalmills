@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Fixture, MatchEvent, Lineup } from '@goalmills/types';
 import { footballApi } from '../../../services/footballApi';
 
-type MatchTab = 'summary' | 'lineups' | 'stats';
+type MatchTab = 'summary' | 'lineups' | 'stats' | 'info';
 
 export default function MatchDetailsPage() {
     const params = useParams();
@@ -74,21 +75,21 @@ export default function MatchDetailsPage() {
             <div className="bg-gradient-to-b from-surface to-background border-b border-white/5 pt-8 pb-4 px-4">
                 <div className="max-w-4xl mx-auto">
                     {/* League Info */}
-                    <div className="flex items-center justify-center gap-2 mb-6 text-text-muted text-sm font-bold uppercase tracking-wider">
+                    <Link href={`/leagues/${league.id}`} className="flex items-center justify-center gap-2 mb-6 text-text-muted text-sm font-bold uppercase tracking-wider hover:text-white transition-colors">
                         <Image src={league.logo} alt={league.name} width={20} height={20} className="w-5 h-5 object-contain" />
                         <span>{league.name}</span>
                         {league.round && <span className="text-text-secondary">• {league.round}</span>}
-                    </div>
+                    </Link>
 
                     {/* Scoreboard */}
                     <div className="flex items-center justify-between">
                         {/* Home Team */}
-                        <div className="flex-1 flex flex-col items-center gap-4">
-                            <div className="relative w-20 h-20 sm:w-28 sm:h-28">
+                        <Link href={`/teams/${teams.home.id}`} className="flex-1 flex flex-col items-center gap-4 group hover:opacity-80 transition-opacity">
+                            <div className="relative w-20 h-20 sm:w-28 sm:h-28 group-hover:scale-105 transition-transform duration-300">
                                 <Image src={teams.home.logo} alt={teams.home.name} fill className="object-contain drop-shadow-xl" />
                             </div>
-                            <h2 className="text-xl sm:text-2xl font-bold text-white text-center">{teams.home.name}</h2>
-                        </div>
+                            <h2 className="text-xl sm:text-2xl font-bold text-white text-center group-hover:text-accent-green transition-colors">{teams.home.name}</h2>
+                        </Link>
 
                         {/* Score */}
                         <div className="flex flex-col items-center px-4 sm:px-12">
@@ -105,28 +106,12 @@ export default function MatchDetailsPage() {
                         </div>
 
                         {/* Away Team */}
-                        <div className="flex-1 flex flex-col items-center gap-4">
-                            <div className="relative w-20 h-20 sm:w-28 sm:h-28">
+                        <Link href={`/teams/${teams.away.id}`} className="flex-1 flex flex-col items-center gap-4 group hover:opacity-80 transition-opacity">
+                            <div className="relative w-20 h-20 sm:w-28 sm:h-28 group-hover:scale-105 transition-transform duration-300">
                                 <Image src={teams.away.logo} alt={teams.away.name} fill className="object-contain drop-shadow-xl" />
                             </div>
-                            <h2 className="text-xl sm:text-2xl font-bold text-white text-center">{teams.away.name}</h2>
-                        </div>
-                    </div>
-
-                    {/* Venue & Referee */}
-                    <div className="mt-8 pt-4 border-t border-white/5 flex flex-wrap justify-center gap-6 text-xs text-text-muted uppercase tracking-wider font-medium">
-                        {fixtureInfo.venue.name && (
-                            <div className="flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                <span>{fixtureInfo.venue.name}, {fixtureInfo.venue.city}</span>
-                            </div>
-                        )}
-                        {fixtureInfo.referee && (
-                            <div className="flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                <span>Ref: {fixtureInfo.referee}</span>
-                            </div>
-                        )}
+                            <h2 className="text-xl sm:text-2xl font-bold text-white text-center group-hover:text-accent-green transition-colors">{teams.away.name}</h2>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -135,7 +120,7 @@ export default function MatchDetailsPage() {
             <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-white/5">
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="flex justify-center gap-8">
-                        {(['summary', 'lineups', 'stats'] as const).map((tab) => (
+                        {(['summary', 'lineups', 'stats', 'info'] as const).map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -174,7 +159,9 @@ export default function MatchDetailsPage() {
                                                     </span>
                                                     <span className="text-xs text-text-muted">{event.detail}</span>
                                                 </div>
-                                                <div className="font-bold text-white text-sm">{event.player.name}</div>
+                                                <Link href={`/players/${event.player.id}`} className="font-bold text-white text-sm hover:text-secondary hover:underline transition-colors block">
+                                                    {event.player.name}
+                                                </Link>
                                                 {event.assist.name && <div className="text-xs text-text-secondary">Ast: {event.assist.name}</div>}
                                             </div>
                                         </div>
@@ -213,7 +200,9 @@ export default function MatchDetailsPage() {
                                                 {lineup.startXI.map((player) => (
                                                     <li key={player.player.id} className="flex items-center gap-3 text-sm">
                                                         <span className="w-6 text-center text-text-secondary font-mono text-xs">{player.player.number}</span>
-                                                        <span className="text-white font-medium">{player.player.name}</span>
+                                                        <Link href={`/players/${player.player.id}`} className="text-white font-medium hover:text-secondary hover:underline transition-colors">
+                                                            {player.player.name}
+                                                        </Link>
                                                         <span className="text-[10px] text-text-muted bg-white/5 px-1.5 rounded">{player.player.pos}</span>
                                                     </li>
                                                 ))}
@@ -224,9 +213,11 @@ export default function MatchDetailsPage() {
                                             <h4 className="text-xs font-bold text-text-muted uppercase mb-3">Substitutes</h4>
                                             <ul className="space-y-2">
                                                 {lineup.substitutes.map((player) => (
-                                                    <li key={player.player.id} className="flex items-center gap-3 text-sm opacity-70">
+                                                    <li key={player.player.id} className="flex items-center gap-3 text-sm opacity-70 hover:opacity-100 transition-opacity">
                                                         <span className="w-6 text-center text-text-secondary font-mono text-xs">{player.player.number}</span>
-                                                        <span className="text-text-primary">{player.player.name}</span>
+                                                        <Link href={`/players/${player.player.id}`} className="text-text-primary hover:text-secondary hover:underline transition-colors">
+                                                            {player.player.name}
+                                                        </Link>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -251,6 +242,34 @@ export default function MatchDetailsPage() {
                         <span className="text-4xl mb-4">📊</span>
                         <h3 className="text-xl font-bold text-white mb-2">Detailed Statistics</h3>
                         <p className="text-text-muted max-w-sm">Detailed match statistics like possession, shots, and passes are coming soon.</p>
+                    </div>
+                )}
+
+                {activeTab === 'info' && (
+                    <div className="animate-fade-in bg-surface/30 rounded-xl p-6 border border-white/5">
+                        <h3 className="text-xl font-bold text-white mb-6">Match Info</h3>
+                        <div className="space-y-4">
+                            <div className="flex justify-between py-3 border-b border-white/5">
+                                <span className="text-text-muted">Venue</span>
+                                <span className="text-white font-medium text-right">{fixtureInfo.venue.name}{fixtureInfo.venue.city ? `, ${fixtureInfo.venue.city}` : ''}</span>
+                            </div>
+                            <div className="flex justify-between py-3 border-b border-white/5">
+                                <span className="text-text-muted">Referee</span>
+                                <span className="text-white font-medium text-right">{fixtureInfo.referee || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between py-3 border-b border-white/5">
+                                <span className="text-text-muted">Date</span>
+                                <span className="text-white font-medium text-right">{new Date(fixtureInfo.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            </div>
+                            <div className="flex justify-between py-3 border-b border-white/5">
+                                <span className="text-text-muted">Kickoff</span>
+                                <span className="text-white font-medium text-right">{new Date(fixtureInfo.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div className="flex justify-between py-3">
+                                <span className="text-text-muted">League</span>
+                                <span className="text-white font-medium text-right">{league.name} - {league.round}</span>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
