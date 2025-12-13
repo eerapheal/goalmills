@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     liveContainer: {
-        borderColor: COLORS.danger,
+        borderColor: COLORS.yellow,
         borderWidth: 2,
-        backgroundColor: 'rgba(255, 65, 54, 0.1)',
+        backgroundColor: 'rgba(255, 215, 0, 0.1)',
     },
     header: {
         flexDirection: 'row',
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     liveBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.danger,
+        backgroundColor: COLORS.yellow,
         paddingHorizontal: SPACING.xs,
         paddingVertical: 2,
         borderRadius: BORDER_RADIUS.sm,
@@ -177,13 +177,13 @@ const styles = StyleSheet.create({
         width: 4,
         height: 4,
         borderRadius: 2,
-        backgroundColor: COLORS.background,
+        backgroundColor: COLORS.text,
         marginRight: 4,
     },
     liveText: {
         fontSize: 10,
         fontWeight: '700',
-        color: COLORS.background,
+        color: COLORS.text,
     },
     matchContainer: {
         flexDirection: 'row',

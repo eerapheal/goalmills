@@ -10,6 +10,7 @@ export const COLORS = {
   text: '#111111',
   textLight: '#7F8C8D',
   border: '#E0E0E0',
+  yellow: '#FF4136',
 };
 
 export const SPACING = {

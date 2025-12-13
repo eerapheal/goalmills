@@ -41,12 +41,12 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             className={`
                 group
                 glass-card rounded-lg p-3 mb-2 cursor-pointer relative overflow-hidden
-                ${isLive ? 'border-accent-red/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-white/5'}
+                ${isLive ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-white/5'}
             `}
         >
             {/* Live Indicator Background Effect */}
             {isLive && (
-                <div className="absolute top-0 right-0 w-24 h-24 bg-accent-red/10 blur-[40px] rounded-full -mr-12 -mt-12 pointer-events-none" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 blur-[40px] rounded-full -mr-12 -mt-12 pointer-events-none" />
             )}
 
             {/* League Header */}
@@ -61,12 +61,12 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                     </Link>
                 </div>
                 {isLive && (
-                    <div className="flex items-center gap-1.5 bg-accent-red/20 px-2 py-0.5 rounded-full border border-accent-red/20">
+                    <div className="flex items-center gap-1.5 bg-yellow-500/20 px-2 py-0.5 rounded-full border border-yellow-500/20">
                         <span className="relative flex h-1.5 w-1.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-red opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-red"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-yellow-500"></span>
                         </span>
-                        <span className="text-[9px] font-bold text-accent-red tracking-widest">LIVE</span>
+                        <span className="text-[9px] font-bold text-yellow-500 tracking-widest">LIVE</span>
                     </div>
                 )}
             </div>
