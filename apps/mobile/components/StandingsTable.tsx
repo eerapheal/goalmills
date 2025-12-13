@@ -30,10 +30,8 @@ export function StandingsTable({ standings }: StandingsTableProps) {
                 <Text style={[styles.headerCell, styles.rankCell]}>#</Text>
                 <Text style={[styles.headerCell, styles.teamCell]}>Team</Text>
                 <Text style={[styles.headerCell, styles.statCell]}>P</Text>
-                <Text style={[styles.headerCell, styles.statCell]}>W</Text>
-                <Text style={[styles.headerCell, styles.statCell]}>D</Text>
-                <Text style={[styles.headerCell, styles.statCell]}>L</Text>
                 <Text style={[styles.headerCell, styles.statCell]}>GD</Text>
+                <Text style={[styles.headerCell, styles.formCell]}>Form</Text>
                 <Text style={[styles.headerCell, styles.pointsCell]}>Pts</Text>
             </View>
 
@@ -66,9 +64,6 @@ export function StandingsTable({ standings }: StandingsTableProps) {
 
                     {/* Stats */}
                     <Text style={[styles.statCell, styles.statText]}>{standing.all.played}</Text>
-                    <Text style={[styles.statCell, styles.statText]}>{standing.all.win}</Text>
-                    <Text style={[styles.statCell, styles.statText]}>{standing.all.draw}</Text>
-                    <Text style={[styles.statCell, styles.statText]}>{standing.all.lose}</Text>
                     <Text
                         style={[
                             styles.statCell,
@@ -80,6 +75,20 @@ export function StandingsTable({ standings }: StandingsTableProps) {
                         {standing.goalsDiff > 0 ? '+' : ''}
                         {standing.goalsDiff}
                     </Text>
+                    
+                    {/* Form */}
+                    <View style={styles.formCell}>
+                        {standing.form?.split('').map((result, i) => (
+                            <View 
+                                key={i} 
+                                style={[
+                                    styles.matchDot, 
+                                    { backgroundColor: getFormColor(result) }
+                                ]} 
+                            />
+                        ))}
+                    </View>
+
                     <Text style={[styles.pointsCell, styles.points]}>{standing.points}</Text>
                 </View>
             ))}
@@ -223,5 +232,17 @@ const styles = StyleSheet.create({
     legendText: {
         fontSize: FONT_SIZES.xs,
         color: COLORS.textLight,
+    },
+    formCell: {
+        width: 50,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+    },
+    matchDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
     },
 });
