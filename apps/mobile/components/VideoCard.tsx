@@ -10,6 +10,8 @@ interface VideoCardProps {
 }
 
 export const VideoCard = ({ item, onPress }: VideoCardProps) => {
+    if (!item) return null;
+
     const formatViews = (views: number): string => {
         if (views >= 1000000) {
             return `${(views / 1000000).toFixed(1)}M`;

@@ -14,7 +14,7 @@ import { Fixture, Standing, BlogPost, VideoHighlight } from '@goalmills/types';
 import { footballApi } from '../services/footballApi';
 import { FixtureCard } from '../components/FixtureCard';
 import { StandingsTable } from '../components/StandingsTable';
-import { BlogCard } from '../components/BlogCard';
+import { NewsCard } from '../components/NewsCard';
 import { VideoCard } from '../components/VideoCard';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
@@ -140,7 +140,7 @@ export function FootballScreen() {
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>📰 Latest News</Text>
                         {blogPosts.map((post) => (
-                            <BlogCard key={post._id} post={post} />
+                            <NewsCard key={post._id} item={post} onPress={() => router.push(`/news/${post._id}`)} />
                         ))}
                     </View>
                 );
@@ -149,8 +149,8 @@ export function FootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>🎥 Video Highlights</Text>
-                        {videos.map((video) => (
-                            <VideoCard key={video.id} video={video} />
+                        {videos.filter(v => v).map((video) => (
+                            <VideoCard key={video.id} item={video} onPress={() => router.push(`/highlight/${video.id}`)} />
                         ))}
                     </View>
                 );
