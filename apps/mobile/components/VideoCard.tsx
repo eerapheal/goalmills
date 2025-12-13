@@ -1,13 +1,15 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, Image, Pressable, Dimensions } from 'react-native';
 import { VideoHighlight } from '@goalmills/types';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
+import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
+import { Ionicons } from '@expo/vector-icons';
 
 interface VideoCardProps {
-    video: VideoHighlight;
-    onPress?: () => void;
+    item: VideoHighlight;
+    onPress: () => void;
 }
 
-export function VideoCard({ video, onPress }: VideoCardProps) {
+export const VideoCard = ({ item, onPress }: VideoCardProps) => {
     const formatViews = (views: number): string => {
         if (views >= 1000000) {
             return `${(views / 1000000).toFixed(1)}M`;
@@ -24,125 +26,136 @@ export function VideoCard({ video, onPress }: VideoCardProps) {
             onPress={onPress}
         >
             <View style={styles.thumbnailContainer}>
-                <Image source={{ uri: video.thumbnail }} style={styles.thumbnail} />
+                <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} resizeMode="cover" />
+
                 <View style={styles.playOverlay}>
                     <View style={styles.playButton}>
-                        <Text style={styles.playIcon}>▶</Text>
+                        <Ionicons name="play" size={24} color="#fff" style={{ marginLeft: 2 }} />
                     </View>
                 </View>
+
                 <View style={styles.durationBadge}>
-                    <Text style={styles.duration}>{video.duration}</Text>
+                    <Text style={styles.durationText}>{item.duration}</Text>
                 </View>
             </View>
+
             <View style={styles.content}>
                 <Text style={styles.title} numberOfLines={2}>
-                    {video.title}
+                    {item.title}
                 </Text>
-                {video.description && (
+
+                {item.description ? (
                     <Text style={styles.description} numberOfLines={1}>
-                        {video.description}
+                        {item.description}
                     </Text>
-                )}
-                <View style={styles.meta}>
-                    <Text style={styles.views}>👁 {formatViews(video.views)} views</Text>
-                    {video.teams.length > 0 && (
-                        <Text style={styles.teams} numberOfLines={1}>
-                            {video.teams.join(' vs ')}
+                ) : null}
+
+                <View style={styles.footer}>
+                    <View style={styles.viewsContainer}>
+                        <Ionicons name="eye-outline" size={14} color="rgba(255,255,255,0.6)" />
+                        <Text style={styles.viewsText}>{formatViews(item.views)} views</Text>
+                    </View>
+
+                    {item.teams.length > 0 && (
+                        <Text style={styles.teamsText} numberOfLines={1}>
+                            {item.teams.join(' vs ')}
                         </Text>
                     )}
                 </View>
             </View>
         </Pressable>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: BORDER_RADIUS.lg,
+        borderRadius: 12,
         overflow: 'hidden',
-        marginBottom: SPACING.md,
+        marginBottom: SPACING.lg,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     pressed: {
-        opacity: 0.7,
+        opacity: 0.9,
         transform: [{ scale: 0.98 }],
     },
     thumbnailContainer: {
-        position: 'relative',
         width: '100%',
-        height: 200,
+        aspectRatio: 16 / 9,
+        position: 'relative',
     },
     thumbnail: {
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
     },
     playOverlay: {
         ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
     },
     playButton: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    playIcon: {
-        fontSize: 24,
-        color: COLORS.primary,
-        marginLeft: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
+        backdropFilter: 'blur(4px)', // works on web, ignored on native but fallback is fine
     },
     durationBadge: {
         position: 'absolute',
-        bottom: SPACING.sm,
-        right: SPACING.sm,
+        bottom: 8,
+        right: 8,
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        paddingHorizontal: SPACING.sm,
-        paddingVertical: 4,
-        borderRadius: BORDER_RADIUS.sm,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
     },
-    duration: {
-        fontSize: FONT_SIZES.xs,
-        fontWeight: '700',
-        color: COLORS.background,
+    durationText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: 'BOLD',
     },
     content: {
         padding: SPACING.md,
     },
     title: {
+        color: '#fff',
         fontSize: FONT_SIZES.md,
-        fontWeight: '700',
-        color: COLORS.background,
-        marginBottom: SPACING.xs,
-        lineHeight: 22,
+        fontWeight: 'bold',
+        marginBottom: 4,
+        lineHeight: 20,
     },
     description: {
+        color: 'rgba(255, 255, 255, 0.6)',
         fontSize: FONT_SIZES.sm,
-        color: COLORS.textLight,
         marginBottom: SPACING.sm,
     },
-    meta: {
+    footer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: 4,
     },
-    views: {
-        fontSize: FONT_SIZES.xs,
-        color: COLORS.textLight,
-        fontWeight: '600',
+    viewsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
     },
-    teams: {
-        fontSize: FONT_SIZES.xs,
+    viewsText: {
+        color: 'rgba(255, 255, 255, 0.6)',
+        fontSize: 11,
+    },
+    teamsText: {
         color: COLORS.secondary,
+        fontSize: 11,
         fontWeight: '600',
         flex: 1,
         textAlign: 'right',
-        marginLeft: SPACING.sm,
+        marginLeft: 10,
     },
 });

@@ -1,37 +1,88 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
-
-// Mock highlight data
-const highlightItems = [
-    { id: '1', title: 'Highlight of the Week', summary: 'Best moments from the matches...' },
-    { id: '2', title: 'Top Goal', summary: 'Spectacular strike...' },
-    { id: '3', title: 'Amazing Save', summary: 'Goalkeeper brilliance...' },
-];
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
+import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
+import { footballApi } from '../../../services/footballApi';
+import { VideoHighlight } from '@goalmills/types';
+import { VideoCard } from '../../../components/VideoCard';
 
 export default function HighlightScreen() {
+    const router = useRouter();
+    const [highlights, setHighlights] = useState<VideoHighlight[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadHighlights();
+    }, []);
+
+    const loadHighlights = async () => {
+        try {
+            const data = await footballApi.getVideoHighlights();
+            setHighlights(data);
+        } catch (error) {
+            console.error('Failed to load highlights:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePress = (id: string) => {
+        router.push(`/highlight/${id}`);
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, styles.center]}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Highlights</Text>
             <FlatList
-                data={highlightItems}
+                data={highlights}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <Link href={{ pathname: '/highlight/[id]', params: { id: item.id } }} asChild>
-                        <TouchableOpacity style={styles.item}>
-                            <Text style={styles.title}>{item.title}</Text>
-                            <Text style={styles.summary}>{item.summary}</Text>
-                        </TouchableOpacity>
-                    </Link>
+                    <VideoCard item={item} onPress={() => handlePress(item.id)} />
                 )}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={
+                    <View style={styles.header}>
+                        <Text style={styles.heading}>Highlights</Text>
+                        <Text style={styles.subheading}>Watch the best moments</Text>
+                    </View>
+                }
             />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-    heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 12, color: '#001f3f' },
-    item: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
-    title: { fontSize: 18, fontWeight: '600', color: '#001f3f' },
-    summary: { fontSize: 14, color: '#555' },
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.backgroundDark,
+    },
+    center: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    listContent: {
+        padding: SPACING.md,
+    },
+    header: {
+        marginBottom: SPACING.lg,
+        paddingHorizontal: SPACING.xs,
+    },
+    heading: {
+        fontSize: FONT_SIZES.xxl,
+        fontWeight: '900',
+        color: '#fff',
+        marginBottom: 4,
+    },
+    subheading: {
+        fontSize: FONT_SIZES.md,
+        color: COLORS.textLight,
+    },
 });

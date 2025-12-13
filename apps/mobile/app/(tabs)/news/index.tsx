@@ -1,36 +1,90 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
-
-// Mock news data
-const newsItems = [
-  { id: '1', title: 'GoalMills Launches New Feature', summary: 'We are excited to announce...' },
-  { id: '2', title: 'Championship Finals Recap', summary: 'An amazing showdown...' },
-  { id: '3', title: 'Player of the Week', summary: 'Highlighting top performer...' },
-];
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
+import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
+import { footballApi } from '../../../services/footballApi';
+import { BlogPost } from '@goalmills/types';
+import { NewsCard } from '../../../components/NewsCard';
 
 export default function NewsScreen() {
+  const router = useRouter();
+  const [news, setNews] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadNews();
+  }, []);
+
+  const loadNews = async () => {
+    try {
+      const data = await footballApi.getBlogPosts();
+      setNews(data);
+    } catch (error) {
+      console.error('Failed to load news:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePress = (id: string) => {
+    router.push(`/news/${id}`);
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>News</Text>
       <FlatList
-        data={newsItems}
-        keyExtractor={(item) => item.id}
+        data={news}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <Link href={{ pathname: '/news/[id]', params: { id: item.id } }} asChild>
-            <TouchableOpacity style={styles.item}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.summary}>{item.summary}</Text>
-            </TouchableOpacity>
-          </Link>
+          <NewsCard item={item} onPress={() => handlePress(item._id)} />
         )}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text style={styles.heading}>Latest News</Text>
+            <Text style={styles.subheading}>Stay updated with the football world</Text>
+          </View>
+        }
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 12, color: '#001f3f' },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.backgroundDark,
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContent: {
+    padding: SPACING.md,
+  },
+  header: {
+    marginBottom: SPACING.lg,
+    paddingHorizontal: SPACING.xs,
+  },
+  heading: {
+    fontSize: FONT_SIZES.xxl,
+    fontWeight: '900',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  subheading: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.textLight,
+  },
   item: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
   title: { fontSize: 18, fontWeight: '600', color: '#001f3f' },
   summary: { fontSize: 14, color: '#555' },

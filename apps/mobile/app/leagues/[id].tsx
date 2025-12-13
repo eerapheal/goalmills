@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
+import { useLocalSearchParams, Stack } from 'expo-router';
 import { footballApi } from '../../services/footballApi';
 import { League, Fixture, Standing } from '@goalmills/types';
 import { FixtureCard } from '../../components/FixtureCard';
 import { StandingsTable } from '../../components/StandingsTable';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 
 type Tab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -32,13 +33,7 @@ export default function LeagueDetails() {
                 const standingsData = await footballApi.getStandingsByLeague(Number(id));
                 setStandings(standingsData);
             } else {
-                // Fetch specific fixtures based on tab
-                // Note: The API doesn't perfectly support filtering by status AND league in one go in our mock, 
-                // so we fetch all by league and filter client side for better mock experience, 
-                // OR we use the specific methods if possible.
-                // footballApi.getFixturesByLeague fetches all for the league.
                 const allFixtures = await footballApi.getFixturesByLeague(Number(id));
-
                 let filtered: Fixture[] = [];
                 const now = Date.now() / 1000;
 
@@ -57,41 +52,57 @@ export default function LeagueDetails() {
         setLoading(false);
     };
 
-    if (!league) return <ActivityIndicator style={styles.center} />;
+    if (!league) return <ActivityIndicator style={styles.center} color={COLORS.primary} />;
 
     return (
         <View style={styles.container}>
-            <Stack.Screen options={{ title: league.name }} />
+            <Stack.Screen options={{
+                title: league.name,
+                headerStyle: { backgroundColor: '#001f3f' },
+                headerTintColor: '#fff',
+            }} />
 
             {/* Header */}
             <View style={styles.header}>
-                <Image source={{ uri: league.logo }} style={styles.logo} resizeMode="contain" />
-                <View>
+                <View style={styles.logoContainer}>
+                    <Image source={{ uri: league.logo }} style={styles.logo} resizeMode="contain" />
+                </View>
+                <View style={styles.headerInfo}>
                     <Text style={styles.title}>{league.name}</Text>
-                    <Text style={styles.subtitle}>{league.country} • {league.season}</Text>
+                    <View style={styles.subtitleRow}>
+                        <Image source={{ uri: league.flag }} style={styles.flag} resizeMode="cover" />
+                        <Text style={styles.subtitle}>{league.country} • {league.season}</Text>
+                    </View>
                 </View>
             </View>
 
             {/* Tabs */}
-            <View style={styles.tabs}>
-                {(['live', 'upcoming', 'results', 'standings'] as Tab[]).map((tab) => (
-                    <TouchableOpacity
-                        key={tab}
-                        style={[styles.tab, activeTab === tab && styles.activeTab]}
-                        onPress={() => setActiveTab(tab)}
-                    >
-                        <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+            <View style={styles.tabsContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContent}>
+                    {(['live', 'upcoming', 'results', 'standings'] as Tab[]).map((tab) => (
+                        <TouchableOpacity
+                            key={tab}
+                            style={[styles.tab, activeTab === tab && styles.activeTab]}
+                            onPress={() => setActiveTab(tab)}
+                        >
+                            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                                {tab.toUpperCase()}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
             </View>
 
             {/* Content */}
             {loading ? (
-                <ActivityIndicator style={{ marginTop: 20 }} />
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                </View>
             ) : (
-                <ScrollView contentContainerStyle={styles.content}>
+                <ScrollView
+                    contentContainerStyle={styles.content}
+                    showsVerticalScrollIndicator={false}
+                >
                     {activeTab === 'standings' ? (
                         <StandingsTable standings={standings} />
                     ) : (
@@ -100,7 +111,9 @@ export default function LeagueDetails() {
                                 <FixtureCard key={f.fixture.id} fixture={f} />
                             ))
                         ) : (
-                            <Text style={styles.emptyText}>No {activeTab} matches found</Text>
+                            <View style={styles.emptyContainer}>
+                                <Text style={styles.emptyText}>No {activeTab} matches found</Text>
+                            </View>
                         )
                     )}
                 </ScrollView>
@@ -110,35 +123,98 @@ export default function LeagueDetails() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f0f2f5' },
-    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.backgroundDark
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 20,
-        backgroundColor: 'white',
-        marginBottom: 8
-    },
-    logo: { width: 60, height: 60, marginRight: 16 },
-    title: { fontSize: 20, fontWeight: '700' },
-    subtitle: { color: '#666', marginTop: 4 },
-    tabs: {
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        paddingHorizontal: 8,
+        padding: SPACING.lg,
+        backgroundColor: 'rgba(0, 31, 63, 0.8)',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee'
+        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    logoContainer: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: SPACING.md,
+        padding: 5,
+    },
+    logo: {
+        width: 50,
+        height: 50
+    },
+    headerInfo: {
+        flex: 1,
+    },
+    title: {
+        fontSize: FONT_SIZES.xl,
+        fontWeight: '900',
+        color: '#fff',
+        marginBottom: 4,
+    },
+    subtitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    flag: {
+        width: 20,
+        height: 14,
+        marginRight: 6,
+        borderRadius: 2,
+    },
+    subtitle: {
+        color: COLORS.textLight,
+        fontSize: FONT_SIZES.md,
+        fontWeight: '500',
+    },
+    tabsContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    tabsContent: {
+        paddingHorizontal: SPACING.md,
     },
     tab: {
-        flex: 1,
-        paddingVertical: 12,
-        alignItems: 'center',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        marginRight: 4,
         borderBottomWidth: 2,
-        borderBottomColor: 'transparent'
+        borderBottomColor: 'transparent',
     },
-    activeTab: { borderBottomColor: '#007AFF' },
-    tabText: { color: '#666', fontWeight: '600' },
-    activeTabText: { color: '#007AFF' },
-    content: { padding: 8 },
-    emptyText: { textAlign: 'center', marginTop: 20, color: '#666' }
+    activeTab: {
+        borderBottomColor: COLORS.secondary,
+    },
+    tabText: {
+        color: COLORS.textLight,
+        fontWeight: '700',
+        fontSize: FONT_SIZES.sm,
+        letterSpacing: 0.5,
+    },
+    activeTabText: {
+        color: '#fff',
+    },
+    content: {
+        padding: SPACING.md,
+    },
+    emptyContainer: {
+        padding: SPACING.xl,
+        alignItems: 'center',
+    },
+    emptyText: {
+        color: COLORS.textLight,
+        fontSize: FONT_SIZES.md,
+        fontStyle: 'italic',
+    }
 });

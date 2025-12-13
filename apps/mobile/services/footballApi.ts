@@ -495,5 +495,17 @@ export const footballApi = {
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
     return generateMockEvents(fixtureId);
   },
+
+  // Get blog post by ID
+  getBlogPostById: async (id: string): Promise<BlogPost | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockBlogPosts.find((p) => p._id === id) || null;
+  },
+
+  // Get video highlight by ID
+  getVideoHighlightById: async (id: string): Promise<VideoHighlight | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockVideoHighlights.find((v) => v.id === id) || null;
+  },
 };
 
