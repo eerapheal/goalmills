@@ -1,12 +1,12 @@
 // Export shared utilities and constants
 export const COLORS = {
-  primary: '#001f3f', // Navy blue
+  primary: '#022a52ff', // Navy blue
   secondary: '#0074D9',
   success: '#2ECC40',
   warning: '#FF851B',
   danger: '#FF4136',
   background: '#FFFFFF',
-  backgroundDark: '#0a0a0a',
+  backgroundDark: '#010927ff',
   text: '#111111',
   textLight: '#7F8C8D',
   border: '#E0E0E0',

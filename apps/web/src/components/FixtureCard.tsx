@@ -40,38 +40,33 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             onClick={handleCardClick}
             className={`
                 group
-                glass-card rounded-xl p-5 mb-4 cursor-pointer relative overflow-hidden
+                glass-card rounded-lg p-3 mb-2 cursor-pointer relative overflow-hidden
                 ${isLive ? 'border-accent-red/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-white/5'}
             `}
         >
             {/* Live Indicator Background Effect */}
             {isLive && (
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent-red/10 blur-[50px] rounded-full -mr-16 -mt-16 pointer-events-none" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-accent-red/10 blur-[40px] rounded-full -mr-12 -mt-12 pointer-events-none" />
             )}
 
             {/* League Header */}
-            <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/5 relative z-10">
+            <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5 relative z-10">
                 <div
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-3"
+                    className="flex items-center gap-2"
                 >
-                    <Link href={`/leagues/${league.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        <div className="p-1.5 bg-white/5 rounded-lg">
-                            <Image src={league.logo} alt={league.name} width={20} height={20} className="w-5 h-5 object-contain" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">{league.name}</span>
-                            {league.round && <span className="text-[10px] text-text-muted">{league.round}</span>}
-                        </div>
+                    <Link href={`/leagues/${league.id}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <Image src={league.logo} alt={league.name} width={16} height={16} className="w-4 h-4 object-contain" />
+                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{league.name}</span>
                     </Link>
                 </div>
                 {isLive && (
-                    <div className="flex items-center gap-2 bg-accent-red/20 px-2.5 py-1 rounded-full border border-accent-red/20">
-                        <span className="relative flex h-2 w-2">
+                    <div className="flex items-center gap-1.5 bg-accent-red/20 px-2 py-0.5 rounded-full border border-accent-red/20">
+                        <span className="relative flex h-1.5 w-1.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-red opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-red"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-red"></span>
                         </span>
-                        <span className="text-[10px] font-bold text-accent-red tracking-widest">LIVE</span>
+                        <span className="text-[9px] font-bold text-accent-red tracking-widest">LIVE</span>
                     </div>
                 )}
             </div>
@@ -82,12 +77,12 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                 <Link
                     href={`/teams/${teams.home.id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300 hover:opacity-80"
+                    className="flex-1 flex flex-row items-center justify-start gap-2 group-hover:opacity-80 transition-opacity"
                 >
-                    <div className="relative w-12 h-12 sm:w-16 sm:h-16">
-                        <Image src={teams.home.logo} alt={teams.home.name} width={64} height={64} className="object-contain drop-shadow-lg w-full h-full" />
+                    <div className="relative w-7 h-7">
+                        <Image src={teams.home.logo} alt={teams.home.name} width={28} height={28} className="object-contain drop-shadow-lg w-full h-full" />
                     </div>
-                    <p className={`text-sm sm:text-base font-bold text-center leading-tight ${teams.home.winner ? 'text-accent-green' : 'text-text-primary'}`}>
+                    <p className={`text-sm font-bold truncate leading-tight ${teams.home.winner ? 'text-accent-green' : 'text-text-primary'}`}>
                         {teams.home.name}
                     </p>
                 </Link>
@@ -96,28 +91,26 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                 <Link
                     href={`/matches/${fixtureData.id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex flex-col items-center justify-center min-w-[100px] px-2 hover:scale-105 transition-transform duration-300"
+                    className="flex flex-col items-center justify-center min-w-[70px] px-1"
                 >
                     {isUpcoming ? (
                         <div className="flex flex-col items-center">
-                            <div className="bg-surfaceHighlight/50 backdrop-blur-md px-4 py-2 rounded-lg border border-white/5 mb-1">
-                                <span className="text-xl font-bold text-text-primary tracking-tight">{formatTime(fixtureData.date)}</span>
-                            </div>
-                            <span className="text-xs font-medium text-text-muted">{formatDate(fixtureData.date)}</span>
+                            <span className="text-base font-bold text-text-primary tracking-tight">{formatTime(fixtureData.date)}</span>
+                            <span className="text-[9px] font-medium text-text-muted">{formatDate(fixtureData.date)}</span>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center animate-fade-in">
-                            <div className="flex items-center gap-4 mb-1">
-                                <span className={`text-3xl sm:text-4xl font-extrabold tracking-tighter ${teams.home.winner ? 'text-text-primary' : 'text-text-secondary/80'}`}>
+                        <div className="flex flex-col items-center">
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <span className={`text-xl font-bold tracking-tight ${teams.home.winner ? 'text-text-primary' : 'text-text-secondary/80'}`}>
                                     {goals.home ?? 0}
                                 </span>
-                                <span className="text-xl font-light text-text-muted/50">:</span>
-                                <span className={`text-3xl sm:text-4xl font-extrabold tracking-tighter ${teams.away.winner ? 'text-text-primary' : 'text-text-secondary/80'}`}>
+                                <span className="text-sm font-light text-text-muted/50">-</span>
+                                <span className={`text-xl font-bold tracking-tight ${teams.away.winner ? 'text-text-primary' : 'text-text-secondary/80'}`}>
                                     {goals.away ?? 0}
                                 </span>
                             </div>
 
-                            <div className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase
+                            <div className={`text-[9px] font-bold tracking-wider uppercase
                                 ${isLive ? 'text-accent-red' : 'text-accent-green'}
                             `}>
                                 {isLive ? `${fixtureData.status.elapsed}'` : fixtureData.status.short}
@@ -130,34 +123,16 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                 <Link
                     href={`/teams/${teams.away.id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300 hover:opacity-80"
+                    className="flex-1 flex flex-row items-center justify-end gap-2 group-hover:opacity-80 transition-opacity"
                 >
-                    <div className="relative w-12 h-12 sm:w-16 sm:h-16">
-                        <Image src={teams.away.logo} alt={teams.away.name} width={64} height={64} className="object-contain drop-shadow-lg w-full h-full" />
-                    </div>
-                    <p className={`text-sm sm:text-base font-bold text-center leading-tight ${teams.away.winner ? 'text-accent-green' : 'text-text-primary'}`}>
+                    <p className={`text-sm font-bold text-right truncate leading-tight ${teams.away.winner ? 'text-accent-green' : 'text-text-primary'}`}>
                         {teams.away.name}
                     </p>
+                    <div className="relative w-7 h-7">
+                        <Image src={teams.away.logo} alt={teams.away.name} width={28} height={28} className="object-contain drop-shadow-lg w-full h-full" />
+                    </div>
                 </Link>
             </div>
-
-            {/* Footer / Venue */}
-            {(fixtureData.venue.name || fixtureData.referee) && (
-                <div className="mt-5 pt-3 border-t border-white/5 flex flex-col items-center justify-center text-text-muted gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                    {fixtureData.venue.name && (
-                        <div className="flex items-center gap-1.5">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span className="text-[10px] sm:text-xs">
-                                {fixtureData.venue.name}
-                                {fixtureData.venue.city && <span> • {fixtureData.venue.city}</span>}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            )}
         </div>
     );
 }

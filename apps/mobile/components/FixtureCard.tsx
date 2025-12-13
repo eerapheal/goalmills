@@ -50,16 +50,9 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                     }}
                 >
                     <Image source={{ uri: league.logo }} style={styles.leagueLogo} />
-                    <View style={styles.headerText}>
-                        <Text style={styles.leagueName} numberOfLines={1}>
-                            {league.name}
-                        </Text>
-                        {league.round && (
-                            <Text style={styles.round} numberOfLines={1}>
-                                {league.round}
-                            </Text>
-                        )}
-                    </View>
+                    <Text style={styles.leagueName} numberOfLines={1}>
+                        {league.name}
+                    </Text>
                 </Pressable>
                 {isLive && (
                     <View style={styles.liveBadge}>
@@ -73,14 +66,14 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             <View style={styles.matchContainer}>
                 {/* Home Team */}
                 <Pressable
-                    style={styles.teamContainer}
+                    style={[styles.teamContainer, styles.teamHome]}
                     onPress={(e) => {
                         e.stopPropagation();
                         handleTeamPress(teams.home.id);
                     }}
                 >
                     <Image source={{ uri: teams.home.logo }} style={styles.teamLogo} />
-                    <Text style={styles.teamName} numberOfLines={1}>
+                    <Text style={[styles.teamName, styles.textRight]} numberOfLines={1}>
                         {teams.home.name}
                     </Text>
                 </Pressable>
@@ -90,6 +83,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                     {isUpcoming ? (
                         <View style={styles.timeContainer}>
                             <Text style={styles.time}>{formatTime(fixtureData.date)}</Text>
+                            {/* Removed date to reduce height further as requested? Or keep it? User said "reduce height". Keeping date is minimal but maybe user wants super compact. I'll keep date for now as it wasn't explicitly asked to remove, unlike venue/round. */}
                             <Text style={styles.date}>{formatDate(fixtureData.date)}</Text>
                         </View>
                     ) : (
@@ -106,39 +100,24 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                             <Text style={styles.status}>
                                 {isLive ? `${fixtureData.status.elapsed}'` : fixtureData.status.short}
                             </Text>
-                            {(isLive || isFinished) && score.halftime.home !== null && (
-                                <Text style={styles.halftimeScore}>
-                                    HT: {score.halftime.home}-{score.halftime.away}
-                                </Text>
-                            )}
                         </View>
                     )}
                 </View>
 
                 {/* Away Team */}
                 <Pressable
-                    style={styles.teamContainer}
+                    style={[styles.teamContainer, styles.teamAway]}
                     onPress={(e) => {
                         e.stopPropagation();
                         handleTeamPress(teams.away.id);
                     }}
                 >
-                    <Image source={{ uri: teams.away.logo }} style={styles.teamLogo} />
-                    <Text style={styles.teamName} numberOfLines={1}>
+                    <Text style={[styles.teamName, styles.textLeft]} numberOfLines={1}>
                         {teams.away.name}
                     </Text>
+                    <Image source={{ uri: teams.away.logo }} style={styles.teamLogo} />
                 </Pressable>
             </View>
-
-            {/* Venue Info */}
-            {fixtureData.venue.name && (
-                <View style={styles.footer}>
-                    <Text style={styles.venue} numberOfLines={1}>
-                        📍 {fixtureData.venue.name}
-                        {fixtureData.venue.city && `, ${fixtureData.venue.city}`}
-                    </Text>
-                </View>
-            )}
         </Pressable>
     );
 }
@@ -147,8 +126,8 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderRadius: BORDER_RADIUS.lg,
-        padding: SPACING.md,
-        marginBottom: SPACING.md,
+        padding: SPACING.sm, // Reduced padding
+        marginBottom: SPACING.sm, // Reduced margin
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
@@ -164,46 +143,45 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.md,
-        paddingBottom: SPACING.sm,
+        justifyContent: 'space-between',
+        marginBottom: SPACING.sm,
+        paddingBottom: SPACING.xs,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255, 255, 255, 0.1)',
     },
-    leagueLogo: {
-        width: 24,
-        height: 24,
-        marginRight: SPACING.sm,
-    },
-    headerText: {
+    leagueInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
         flex: 1,
     },
-    leagueName: {
-        fontSize: FONT_SIZES.sm,
-        fontWeight: '600',
-        color: COLORS.background,
+    leagueLogo: {
+        width: 16, // Smaller header logo
+        height: 16,
+        marginRight: SPACING.xs,
     },
-    round: {
+    leagueName: {
         fontSize: FONT_SIZES.xs,
-        color: COLORS.textLight,
-        marginTop: 2,
+        fontWeight: '600',
+        color: COLORS.textLight, // Muted color for header
+        textTransform: 'uppercase',
     },
     liveBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: COLORS.danger,
-        paddingHorizontal: SPACING.sm,
-        paddingVertical: 4,
+        paddingHorizontal: SPACING.xs,
+        paddingVertical: 2,
         borderRadius: BORDER_RADIUS.sm,
     },
     liveDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
+        width: 4,
+        height: 4,
+        borderRadius: 2,
         backgroundColor: COLORS.background,
         marginRight: 4,
     },
     liveText: {
-        fontSize: FONT_SIZES.xs,
+        fontSize: 10,
         fontWeight: '700',
         color: COLORS.background,
     },
@@ -211,39 +189,52 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingVertical: SPACING.xs,
     },
     teamContainer: {
         flex: 1,
+        flexDirection: 'row', // Row layout
         alignItems: 'center',
+        gap: 8,
+    },
+    teamHome: {
+        justifyContent: 'flex-start',
+    },
+    teamAway: {
+        justifyContent: 'flex-end',
     },
     teamLogo: {
-        width: 48,
-        height: 48,
-        marginBottom: SPACING.xs,
+        width: 28, // Reduced size
+        height: 28,
     },
     teamName: {
         fontSize: FONT_SIZES.sm,
         fontWeight: '600',
         color: COLORS.background,
-        textAlign: 'center',
+        flex: 1, // Allow text to take space and truncate
+    },
+    textRight: {
+        textAlign: 'left', // Home team: Logo [Name ->] . Actually, standard is Logo Name. Name should align Left? No, adjacent to logo.
+    },
+    textLeft: {
+        textAlign: 'right', // Away team: [<- Name] Logo. Name should align Right.
     },
     scoreContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 80,
+        width: 70, // Fixed width to prevent jumping
     },
     timeContainer: {
         alignItems: 'center',
     },
     time: {
-        fontSize: FONT_SIZES.lg,
+        fontSize: FONT_SIZES.md,
         fontWeight: '700',
         color: COLORS.background,
     },
     date: {
-        fontSize: FONT_SIZES.xs,
+        fontSize: 10,
         color: COLORS.textLight,
-        marginTop: 2,
     },
     scoreBox: {
         alignItems: 'center',
@@ -253,7 +244,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     score: {
-        fontSize: 28,
+        fontSize: 20, // Smaller score
         fontWeight: '800',
         color: COLORS.background,
     },
@@ -261,35 +252,15 @@ const styles = StyleSheet.create({
         color: COLORS.success,
     },
     scoreSeparator: {
-        fontSize: FONT_SIZES.lg,
+        fontSize: FONT_SIZES.md,
         fontWeight: '600',
         color: COLORS.textLight,
-        marginHorizontal: SPACING.sm,
+        marginHorizontal: 4,
     },
     status: {
-        fontSize: FONT_SIZES.xs,
+        fontSize: 10,
         fontWeight: '600',
-        color: COLORS.textLight,
-        marginTop: 4,
-    },
-    halftimeScore: {
-        fontSize: FONT_SIZES.xs,
-        color: COLORS.textLight,
+        color: COLORS.success, // Use success color for status/minute
         marginTop: 2,
-    },
-    footer: {
-        marginTop: SPACING.sm,
-        paddingTop: SPACING.sm,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255, 255, 255, 0.1)',
-    },
-    leagueInfo: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    venue: {
-        fontSize: FONT_SIZES.xs,
-        color: COLORS.textLight,
     },
 });
