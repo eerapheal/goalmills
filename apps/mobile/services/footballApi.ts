@@ -294,17 +294,107 @@ export const mockVideoHighlights: VideoHighlight[] = [
   },
 ];
 
+// Mock Players
+export const mockPlayers = [
+  { id: 1, name: 'Marcus Rashford', team: 'Manchester United', position: 'Forward', number: 10, photo: 'https://media.api-sports.io/football/players/276.png' },
+  { id: 2, name: 'Bruno Fernandes', team: 'Manchester United', position: 'Midfielder', number: 8, photo: 'https://media.api-sports.io/football/players/18.png' },
+  { id: 3, name: 'Kevin De Bruyne', team: 'Manchester City', position: 'Midfielder', number: 17, photo: 'https://media.api-sports.io/football/players/629.png' },
+  { id: 4, name: 'Erling Haaland', team: 'Manchester City', position: 'Forward', number: 9, photo: 'https://media.api-sports.io/football/players/1100.png' },
+  { id: 5, name: 'Mohamed Salah', team: 'Liverpool', position: 'Forward', number: 11, photo: 'https://media.api-sports.io/football/players/306.png' },
+];
+
+// Generate Mock Match Events
+const generateMockEvents = (fixtureId: number): MatchEvent[] => {
+  return [
+    {
+      time: { elapsed: 14, extra: null },
+      team: mockTeams[0],
+      player: { id: 1, name: 'Rashford' },
+      assist: { id: 2, name: 'Fernandes' },
+      type: 'Goal',
+      detail: 'Normal Goal',
+      comments: null,
+    },
+    {
+      time: { elapsed: 32, extra: null },
+      team: mockTeams[1],
+      player: { id: 3, name: 'De Bruyne', },
+      assist: { id: null, name: null },
+      type: 'Card',
+      detail: 'Yellow Card',
+      comments: null,
+    },
+    {
+      time: { elapsed: 65, extra: null },
+      team: mockTeams[0],
+      player: { id: 5, name: 'Antony' },
+      assist: { id: 6, name: 'Casemiro' },
+      type: 'subst',
+      detail: 'Substitution',
+      comments: null,
+    },
+  ];
+};
+
+// Generate Mock Lineups
+const generateMockLineups = (homeTeam: Team, awayTeam: Team): Lineup[] => {
+  return [
+    {
+      team: homeTeam,
+      formation: '4-3-3',
+      startXI: Array(11).fill(null).map((_, i) => ({
+        player: { id: i, name: `${homeTeam.name} Player ${i + 1}`, number: i + 1, pos: 'M', grid: null },
+      })),
+      substitutes: Array(5).fill(null).map((_, i) => ({
+        player: { id: 20 + i, name: `${homeTeam.name} Sub ${i + 1}`, number: 20 + i, pos: 'F', grid: null },
+      })),
+      coach: { id: 100, name: 'Home Coach', photo: '' },
+    },
+    {
+      team: awayTeam,
+      formation: '4-4-2',
+      startXI: Array(11).fill(null).map((_, i) => ({
+        player: { id: i, name: `${awayTeam.name} Player ${i + 1}`, number: i + 1, pos: 'D', grid: null },
+      })),
+      substitutes: Array(5).fill(null).map((_, i) => ({
+        player: { id: 30 + i, name: `${awayTeam.name} Sub ${i + 1}`, number: 30 + i, pos: 'M', grid: null },
+      })),
+      coach: { id: 101, name: 'Away Coach', photo: '' },
+    },
+  ];
+};
+
 // API Functions
 export const footballApi = {
   // Get live fixtures
   getLiveFixtures: async (): Promise<Fixture[]> => {
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
-    return mockFixtures.filter((f) => 
+    const live = mockFixtures.filter((f) => 
       f.fixture.status.short === '1H' || 
       f.fixture.status.short === '2H' || 
       f.fixture.status.short === 'HT'
     );
+
+    // Sort by league rank (index in mockLeagues)
+    return live.sort((a, b) => {
+      const rankA = mockLeagues.findIndex(l => l.id === a.league.id);
+      const rankB = mockLeagues.findIndex(l => l.id === b.league.id);
+      return rankA - rankB;
+    });
   },
+
+  // Get players
+  getPlayers: async (): Promise<any[]> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockPlayers;
+  },
+
+  // Get player by ID
+  getPlayerById: async (id: number): Promise<any | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockPlayers.find(p => p.id === id) || null;
+  },
+
 
   // Get upcoming fixtures
   getUpcomingFixtures: async (limit = 10): Promise<Fixture[]> => {
@@ -379,4 +469,31 @@ export const footballApi = {
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
     return mockFixtures.find((f) => f.fixture.id === fixtureId) || null;
   },
+
+  // Get league by ID
+  getLeagueById: async (leagueId: number): Promise<League | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockLeagues.find((l) => l.id === leagueId) || null;
+  },
+
+  // Get team by ID
+  getTeamById: async (teamId: number): Promise<Team | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockTeams.find((t) => t.id === teamId) || null;
+  },
+
+  // Get lineups by fixture ID
+  getLineupsByFixtureId: async (fixtureId: number): Promise<Lineup[]> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    const fixture = mockFixtures.find((f) => f.fixture.id === fixtureId);
+    if (!fixture) return [];
+    return generateMockLineups(fixture.teams.home, fixture.teams.away);
+  },
+
+  // Get events by fixture ID
+  getEventsByFixtureId: async (fixtureId: number): Promise<MatchEvent[]> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return generateMockEvents(fixtureId);
+  },
 };
+

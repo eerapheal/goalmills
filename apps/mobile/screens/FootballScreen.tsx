@@ -8,6 +8,7 @@ import {
     ActivityIndicator,
     RefreshControl,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Fixture, Standing, BlogPost, VideoHighlight } from '@goalmills/types';
 import { footballApi } from '../services/footballApi';
@@ -19,6 +20,7 @@ import { VideoCard } from '../components/VideoCard';
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
 
 export function FootballScreen() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<FootballTab>('live');
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -166,34 +168,60 @@ export function FootballScreen() {
                 <Text style={styles.headerSubtitle}>Live scores, fixtures & news</Text>
             </View>
 
-            {/* Tabs */}
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.tabsContainer}
-                style={styles.tabsScrollView}
-            >
-                {tabs.map((tab) => (
-                    <Pressable
-                        key={tab.id}
-                        style={({ pressed }) => [
-                            styles.tab,
-                            activeTab === tab.id && styles.activeTab,
-                            pressed && styles.pressedTab,
-                        ]}
-                        onPress={() => setActiveTab(tab.id)}
-                    >
-                        <Text style={[styles.tabText, activeTab === tab.id && styles.activeTabText]}>
-                            {tab.label}
-                        </Text>
-                        {tab.count !== undefined && tab.count > 0 && (
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>{tab.count}</Text>
-                            </View>
-                        )}
-                    </Pressable>
-                ))}
-            </ScrollView>
+            <View>
+                {/* Tabs */}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.tabsContainer}
+                    style={styles.tabsScrollView}
+                >
+                    {tabs.map((tab) => (
+                        <Pressable
+                            key={tab.id}
+                            style={({ pressed }) => [
+                                styles.tab,
+                                activeTab === tab.id && styles.activeTab,
+                                pressed && styles.pressedTab,
+                            ]}
+                            onPress={() => setActiveTab(tab.id)}
+                        >
+                            <Text style={[styles.tabText, activeTab === tab.id && styles.activeTabText]}>
+                                {tab.label}
+                            </Text>
+                            {tab.count !== undefined && tab.count > 0 && (
+                                <View style={styles.badge}>
+                                    <Text style={styles.badgeText}>{tab.count}</Text>
+                                </View>
+                            )}
+                        </Pressable>
+                    ))}
+                </ScrollView>
+
+                {/* Quick Links */}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.quickLinksContainer}
+                    style={styles.quickLinksScrollView}
+                >
+                    {[
+                        { label: '🏆 Leagues', route: '/leagues' },
+                        { label: '👕 Teams', route: '/teams' },
+                        { label: '🌍 Regions', route: '/regions' },
+                        { label: '⚔️ Competitions', route: '/competitions' },
+                        { label: '🏃 Players', route: '/players' },
+                    ].map((link) => (
+                        <Pressable
+                            key={link.label}
+                            style={styles.quickLink}
+                            onPress={() => router.push(link.route as any)}
+                        >
+                            <Text style={styles.quickLinkText}>{link.label}</Text>
+                        </Pressable>
+                    ))}
+                </ScrollView>
+            </View>
 
             {/* Content */}
             <ScrollView
@@ -332,6 +360,29 @@ const styles = StyleSheet.create({
     },
     emptySubtext: {
         fontSize: FONT_SIZES.sm,
+        color: COLORS.textLight,
+    },
+    quickLinksScrollView: {
+        flexGrow: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    quickLinksContainer: {
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        gap: SPACING.sm,
+    },
+    quickLink: {
+        paddingHorizontal: SPACING.md,
+        paddingVertical: 6,
+        borderRadius: BORDER_RADIUS.md,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        marginRight: SPACING.xs,
+    },
+    quickLinkText: {
+        fontSize: FONT_SIZES.sm,
+        fontWeight: '600',
         color: COLORS.textLight,
     },
 });

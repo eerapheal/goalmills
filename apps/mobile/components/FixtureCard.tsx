@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Fixture } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, formatDate, formatTime } from '@goalmills/ui';
 
@@ -8,10 +9,27 @@ interface FixtureCardProps {
 }
 
 export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
+    const router = useRouter();
     const { fixture: fixtureData, league, teams, goals, score } = fixture;
     const isLive = ['1H', '2H', 'HT'].includes(fixtureData.status.short);
     const isFinished = fixtureData.status.short === 'FT';
     const isUpcoming = fixtureData.status.short === 'NS';
+
+    const handleMatchPress = () => {
+        if (onPress) {
+            onPress();
+        } else {
+            router.push(`/matches/${fixtureData.id}`);
+        }
+    };
+
+    const handleTeamPress = (teamId: number) => {
+        router.push(`/teams/${teamId}`);
+    };
+
+    const handleLeaguePress = (leagueId: number) => {
+        router.push(`/leagues/${leagueId}`);
+    };
 
     return (
         <Pressable
@@ -20,21 +38,29 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                 pressed && styles.pressed,
                 isLive && styles.liveContainer,
             ]}
-            onPress={onPress}
+            onPress={handleMatchPress}
         >
             {/* League Header */}
             <View style={styles.header}>
-                <Image source={{ uri: league.logo }} style={styles.leagueLogo} />
-                <View style={styles.headerText}>
-                    <Text style={styles.leagueName} numberOfLines={1}>
-                        {league.name}
-                    </Text>
-                    {league.round && (
-                        <Text style={styles.round} numberOfLines={1}>
-                            {league.round}
+                <Pressable
+                    style={styles.leagueInfo}
+                    onPress={(e) => {
+                        e.stopPropagation();
+                        handleLeaguePress(league.id);
+                    }}
+                >
+                    <Image source={{ uri: league.logo }} style={styles.leagueLogo} />
+                    <View style={styles.headerText}>
+                        <Text style={styles.leagueName} numberOfLines={1}>
+                            {league.name}
                         </Text>
-                    )}
-                </View>
+                        {league.round && (
+                            <Text style={styles.round} numberOfLines={1}>
+                                {league.round}
+                            </Text>
+                        )}
+                    </View>
+                </Pressable>
                 {isLive && (
                     <View style={styles.liveBadge}>
                         <View style={styles.liveDot} />
@@ -46,12 +72,18 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             {/* Match Info */}
             <View style={styles.matchContainer}>
                 {/* Home Team */}
-                <View style={styles.teamContainer}>
+                <Pressable
+                    style={styles.teamContainer}
+                    onPress={(e) => {
+                        e.stopPropagation();
+                        handleTeamPress(teams.home.id);
+                    }}
+                >
                     <Image source={{ uri: teams.home.logo }} style={styles.teamLogo} />
                     <Text style={styles.teamName} numberOfLines={1}>
                         {teams.home.name}
                     </Text>
-                </View>
+                </Pressable>
 
                 {/* Score/Time */}
                 <View style={styles.scoreContainer}>
@@ -84,12 +116,18 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                 </View>
 
                 {/* Away Team */}
-                <View style={styles.teamContainer}>
+                <Pressable
+                    style={styles.teamContainer}
+                    onPress={(e) => {
+                        e.stopPropagation();
+                        handleTeamPress(teams.away.id);
+                    }}
+                >
                     <Image source={{ uri: teams.away.logo }} style={styles.teamLogo} />
                     <Text style={styles.teamName} numberOfLines={1}>
                         {teams.away.name}
                     </Text>
-                </View>
+                </Pressable>
             </View>
 
             {/* Venue Info */}
@@ -244,6 +282,11 @@ const styles = StyleSheet.create({
         paddingTop: SPACING.sm,
         borderTopWidth: 1,
         borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    leagueInfo: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     venue: {
         fontSize: FONT_SIZES.xs,

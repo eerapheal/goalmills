@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Standing } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 
@@ -7,6 +8,8 @@ interface StandingsTableProps {
 }
 
 export function StandingsTable({ standings }: StandingsTableProps) {
+    const router = useRouter();
+
     const getFormColor = (result: string) => {
         switch (result) {
             case 'W':
@@ -51,12 +54,15 @@ export function StandingsTable({ standings }: StandingsTableProps) {
                     </View>
 
                     {/* Team */}
-                    <View style={styles.teamCell}>
+                    <Pressable
+                        style={styles.teamCell}
+                        onPress={() => router.push(`/teams/${standing.team.id}`)}
+                    >
                         <Image source={{ uri: standing.team.logo }} style={styles.teamLogo} />
                         <Text style={styles.teamName} numberOfLines={1}>
                             {standing.team.name}
                         </Text>
-                    </View>
+                    </Pressable>
 
                     {/* Stats */}
                     <Text style={[styles.statCell, styles.statText]}>{standing.all.played}</Text>
