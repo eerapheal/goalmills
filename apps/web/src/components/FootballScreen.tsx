@@ -7,6 +7,7 @@ import { FixtureCard } from '../components/FixtureCard';
 import { StandingsTable } from '../components/StandingsTable';
 import { BlogCard } from '../components/BlogCard';
 import { VideoCard } from '../components/VideoCard';
+import { getLeagueRank } from '../lib/utils';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
 
@@ -34,7 +35,7 @@ export function FootballScreen() {
                 footballApi.getVideoHighlights(),
             ]);
 
-            setLiveFixtures(live);
+            setLiveFixtures(live.sort((a, b) => getLeagueRank(a.league.id) - getLeagueRank(b.league.id)));
             setUpcomingFixtures(upcoming);
             setFinishedFixtures(finished);
             setStandings(standingsData);

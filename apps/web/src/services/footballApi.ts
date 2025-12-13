@@ -294,6 +294,67 @@ export const mockVideoHighlights: VideoHighlight[] = [
   },
 ];
 
+// Generate Mock Match Events
+const generateMockEvents = (fixtureId: number): MatchEvent[] => {
+  return [
+    {
+      time: { elapsed: 14, extra: null },
+      team: mockTeams[0],
+      player: { id: 1, name: 'Rashford' },
+      assist: { id: 2, name: 'Fernandes' },
+      type: 'Goal',
+      detail: 'Normal Goal',
+      comments: null,
+    },
+    {
+      time: { elapsed: 32, extra: null },
+      team: mockTeams[1],
+      player: { id: 3, name: 'De Bruyne', },
+      assist: { id: null, name: null },
+      type: 'Card',
+      detail: 'Yellow Card',
+      comments: null,
+    },
+    {
+      time: { elapsed: 65, extra: null },
+      team: mockTeams[0],
+      player: { id: 5, name: 'Antony' },
+      assist: { id: 6, name: 'Casemiro' },
+      type: 'subst',
+      detail: 'Substitution',
+      comments: null,
+    },
+  ];
+};
+
+// Generate Mock Lineups
+const generateMockLineups = (homeTeam: Team, awayTeam: Team): Lineup[] => {
+  return [
+    {
+      team: homeTeam,
+      formation: '4-3-3',
+      startXI: Array(11).fill(null).map((_, i) => ({
+        player: { id: i, name: `${homeTeam.name} Player ${i + 1}`, number: i + 1, pos: 'M', grid: null },
+      })),
+      substitutes: Array(5).fill(null).map((_, i) => ({
+        player: { id: 20 + i, name: `${homeTeam.name} Sub ${i + 1}`, number: 20 + i, pos: 'F', grid: null },
+      })),
+      coach: { id: 100, name: 'Home Coach', photo: '' },
+    },
+    {
+      team: awayTeam,
+      formation: '4-4-2',
+      startXI: Array(11).fill(null).map((_, i) => ({
+        player: { id: i, name: `${awayTeam.name} Player ${i + 1}`, number: i + 1, pos: 'D', grid: null },
+      })),
+      substitutes: Array(5).fill(null).map((_, i) => ({
+        player: { id: 30 + i, name: `${awayTeam.name} Sub ${i + 1}`, number: 30 + i, pos: 'M', grid: null },
+      })),
+      coach: { id: 101, name: 'Away Coach', photo: '' },
+    },
+  ];
+};
+
 // API Functions
 export const footballApi = {
   // Get live fixtures
@@ -378,5 +439,31 @@ export const footballApi = {
   getFixtureById: async (fixtureId: number): Promise<Fixture | null> => {
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
     return mockFixtures.find((f) => f.fixture.id === fixtureId) || null;
+  },
+
+  // Get league by ID
+  getLeagueById: async (leagueId: number): Promise<League | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockLeagues.find((l) => l.id === leagueId) || null;
+  },
+
+  // Get team by ID
+  getTeamById: async (teamId: number): Promise<Team | null> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return mockTeams.find((t) => t.id === teamId) || null;
+  },
+
+  // Get lineups by fixture ID
+  getLineupsByFixtureId: async (fixtureId: number): Promise<Lineup[]> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    const fixture = mockFixtures.find((f) => f.fixture.id === fixtureId);
+    if (!fixture) return [];
+    return generateMockLineups(fixture.teams.home, fixture.teams.away);
+  },
+
+  // Get events by fixture ID
+  getEventsByFixtureId: async (fixtureId: number): Promise<MatchEvent[]> => {
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+    return generateMockEvents(fixtureId);
   },
 };

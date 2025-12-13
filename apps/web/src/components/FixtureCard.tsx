@@ -40,14 +40,23 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
 
             {/* League Header */}
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/5 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-white/5 rounded-lg">
-                        <Image src={league.logo} alt={league.name} width={20} height={20} className="w-5 h-5 object-contain" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">{league.name}</span>
-                        {league.round && <span className="text-[10px] text-text-muted">{league.round}</span>}
-                    </div>
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Use window.location or router push if Link component causes layout issues inside another clickable, 
+                        // but usually Link is fine if we stop propagation.
+                    }}
+                    className="flex items-center gap-3"
+                >
+                    <a href={`/leagues/${league.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <div className="p-1.5 bg-white/5 rounded-lg">
+                            <Image src={league.logo} alt={league.name} width={20} height={20} className="w-5 h-5 object-contain" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">{league.name}</span>
+                            {league.round && <span className="text-[10px] text-text-muted">{league.round}</span>}
+                        </div>
+                    </a>
                 </div>
                 {isLive && (
                     <div className="flex items-center gap-2 bg-accent-red/20 px-2.5 py-1 rounded-full border border-accent-red/20">
@@ -63,17 +72,24 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
             {/* Match Info */}
             <div className="flex items-center justify-between relative z-10">
                 {/* Home Team */}
-                <div className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300">
+                <a
+                    href={`/teams/${teams.home.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300 hover:opacity-80"
+                >
                     <div className="relative w-12 h-12 sm:w-16 sm:h-16">
                         <Image src={teams.home.logo} alt={teams.home.name} width={64} height={64} className="object-contain drop-shadow-lg w-full h-full" />
                     </div>
                     <p className={`text-sm sm:text-base font-bold text-center leading-tight ${teams.home.winner ? 'text-accent-green' : 'text-text-primary'}`}>
                         {teams.home.name}
                     </p>
-                </div>
+                </a>
 
                 {/* Score/Time Center */}
-                <div className="flex flex-col items-center justify-center min-w-[100px] px-2">
+                <a
+                    href={`/matches/${fixtureData.id}`}
+                    className="flex flex-col items-center justify-center min-w-[100px] px-2 hover:scale-105 transition-transform duration-300"
+                >
                     {isUpcoming ? (
                         <div className="flex flex-col items-center">
                             <div className="bg-surfaceHighlight/50 backdrop-blur-md px-4 py-2 rounded-lg border border-white/5 mb-1">
@@ -100,17 +116,21 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
                             </div>
                         </div>
                     )}
-                </div>
+                </a>
 
                 {/* Away Team */}
-                <div className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300">
+                <a
+                    href={`/teams/${teams.away.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 flex flex-col items-center gap-3 group-hover:transform group-hover:scale-105 transition-transform duration-300 hover:opacity-80"
+                >
                     <div className="relative w-12 h-12 sm:w-16 sm:h-16">
                         <Image src={teams.away.logo} alt={teams.away.name} width={64} height={64} className="object-contain drop-shadow-lg w-full h-full" />
                     </div>
                     <p className={`text-sm sm:text-base font-bold text-center leading-tight ${teams.away.winner ? 'text-accent-green' : 'text-text-primary'}`}>
                         {teams.away.name}
                     </p>
-                </div>
+                </a>
             </div>
 
             {/* Footer / Venue */}
