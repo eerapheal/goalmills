@@ -1,0 +1,21 @@
+{
+  "name": "@goalmills/ui",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@goalmills/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "react": "^19.1.0",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  }
+}

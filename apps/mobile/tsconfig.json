@@ -1,0 +1,21 @@
+{
+  "extends": "../../packages/config/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["react"],
+    "paths": {
+      "@/*": [
+        "./"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

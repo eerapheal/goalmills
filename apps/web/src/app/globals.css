@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #020617;
+  --color-surface: #0f172a;
+  --color-surfaceHighlight: #1e293b;
+  
+  --color-primary: #3b82f6;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #60a5fa;
+
+  --color-secondary: #f59e0b;
+  --color-secondary-dark: #d97706;
+  --color-secondary-light: #fbbf24;
+
+  --color-accent-green: #10b981;
+  --color-accent-red: #ef4444;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+
+  --font-sans: "Inter", sans-serif;
+  --font-heading: "Inter", sans-serif;
+
+  --animate-fade-in: fadeIn 0.5s ease-out forwards;
+  --animate-slide-up: slideUp 0.5s ease-out forwards;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    0% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+}
+
+:root {
+  --background: #020617;
+  --foreground: #f8fafc;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  @apply antialiased;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-surface/70 backdrop-blur-md border border-white/10 shadow-lg;
+  }
+  
+  .glass-card {
+    @apply bg-surface/50 backdrop-blur-sm border border-white/5 hover:bg-surfaceHighlight/50 transition-all duration-300;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600;
+  }
+  
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-yellow-300;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
