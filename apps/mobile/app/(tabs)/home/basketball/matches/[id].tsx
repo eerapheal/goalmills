@@ -10,7 +10,10 @@ export default function BasketballMatchDetailsPage() {
     const [match, setMatch] = useState<BasketballEvent | null>(null);
     const [odds, setOdds] = useState<any>(null);
     const [h2hData, setH2HData] = useState<{ H2H: BasketballEvent[], firstTeamResults: BasketballEvent[], secondTeamResults: BasketballEvent[] } | null>(null);
+    const [lineups, setLineups] = useState<any>(null);
+    const [statistics, setStatistics] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedTab, setSelectedTab] = useState<'overview' | 'statistics' | 'lineups'>('overview');
 
     useEffect(() => {
         loadData();
@@ -52,6 +55,24 @@ export default function BasketballMatchDetailsPage() {
                     secondTeamId: Number(foundMatch.away_team_key)
                 });
                 setH2HData(h2hRes.result);
+
+                // Fetch Lineups
+                try {
+                    const lineupsRes = await basketballApi.getLineups({ matchId });
+                    setLineups(lineupsRes.result);
+                } catch (error) {
+                    console.error('Error loading lineups:', error);
+                }
+
+                // Fetch Statistics (only for finished or live matches)
+                if (foundMatch.event_status === 'Finished' || foundMatch.event_live === '1') {
+                    try {
+                        const statsRes = await basketballApi.getStatistics({ matchId });
+                        setStatistics(statsRes.result);
+                    } catch (error) {
+                        console.error('Error loading statistics:', error);
+                    }
+                }
             }
         } catch (error) {
             console.error('Error loading match details:', error);
@@ -117,6 +138,161 @@ export default function BasketballMatchDetailsPage() {
         );
     };
 
+    const renderStatistics = () => {
+        if (!statistics) {
+            return (
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>Statistics not available</Text>
+                </View>
+            );
+        }
+
+        return (
+            <ScrollView style={styles.tabContent}>
+                {/* Team Statistics */}
+                <View style={styles.statsCard}>
+                    <Text style={styles.sectionTitle}>Team Statistics</Text>
+                    {statistics.statistics.map((stat: any, index: number) => (
+                        <View key={index} style={styles.statRow}>
+                            <Text style={styles.statHome}>{stat.home}</Text>
+                            <Text style={styles.statType}>{stat.type}</Text>
+                            <Text style={styles.statAway}>{stat.away}</Text>
+                        </View>
+                    ))}
+                </View>
+
+                {/* Player Statistics */}
+                {statistics.player_statistics && (
+                    <>
+                        <View style={styles.statsCard}>
+                            <Text style={styles.sectionTitle}>{match?.event_home_team} Players</Text>
+                            <View style={styles.playerStatsHeader}>
+                                <Text style={[styles.playerStatsHeaderText, { flex: 2 }]}>Player</Text>
+                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>PTS</Text>
+                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>REB</Text>
+                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>AST</Text>
+                            </View>
+                            {statistics.player_statistics.home_team.map((player: any, index: number) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.playerStatsRow}
+                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
+                                >
+                                    <Text style={[styles.playerStatsText, { flex: 2 }]}>{player.player}</Text>
+                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_points}</Text>
+                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_total_rebounds}</Text>
+                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_assists}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <View style={styles.statsCard}>
+                            <Text style={styles.sectionTitle}>{match?.event_away_team} Players</Text>
+                            <View style={styles.playerStatsHeader}>
+                                <Text style={[styles.playerStatsHeaderText, { flex: 2 }]}>Player</Text>
+                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>PTS</Text>
+                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>REB</Text>
+                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>AST</Text>
+                            </View>
+                            {statistics.player_statistics.away_team.map((player: any, index: number) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.playerStatsRow}
+                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
+                                >
+                                    <Text style={[styles.playerStatsText, { flex: 2 }]}>{player.player}</Text>
+                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_points}</Text>
+                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_total_rebounds}</Text>
+                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_assists}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </>
+                )}
+            </ScrollView>
+        );
+    };
+
+    const renderLineups = () => {
+        if (!lineups) {
+            return (
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>Lineups not available</Text>
+                </View>
+            );
+        }
+
+        return (
+            <ScrollView style={styles.tabContent}>
+                {/* Home Team Lineup */}
+                <View style={styles.lineupsCard}>
+                    <Text style={styles.sectionTitle}>{match?.event_home_team}</Text>
+                    <Text style={styles.lineupSubtitle}>Starting Five</Text>
+                    {lineups.home_team.starting_lineups.map((player: any, index: number) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.lineupRow}
+                            onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
+                        >
+                            <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
+                            <Text style={styles.lineupName}>{player.player}</Text>
+                            <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
+                        </TouchableOpacity>
+                    ))}
+                    {lineups.home_team.substitutes.length > 0 && (
+                        <>
+                            <Text style={[styles.lineupSubtitle, { marginTop: 16 }]}>Substitutes</Text>
+                            {lineups.home_team.substitutes.map((player: any, index: number) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.lineupRow}
+                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
+                                >
+                                    <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
+                                    <Text style={styles.lineupName}>{player.player}</Text>
+                                    <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
+                </View>
+
+                {/* Away Team Lineup */}
+                <View style={styles.lineupsCard}>
+                    <Text style={styles.sectionTitle}>{match?.event_away_team}</Text>
+                    <Text style={styles.lineupSubtitle}>Starting Five</Text>
+                    {lineups.away_team.starting_lineups.map((player: any, index: number) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.lineupRow}
+                            onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
+                        >
+                            <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
+                            <Text style={styles.lineupName}>{player.player}</Text>
+                            <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
+                        </TouchableOpacity>
+                    ))}
+                    {lineups.away_team.substitutes.length > 0 && (
+                        <>
+                            <Text style={[styles.lineupSubtitle, { marginTop: 16 }]}>Substitutes</Text>
+                            {lineups.away_team.substitutes.map((player: any, index: number) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.lineupRow}
+                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
+                                >
+                                    <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
+                                    <Text style={styles.lineupName}>{player.player}</Text>
+                                    <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
+                </View>
+            </ScrollView>
+        );
+    };
+
     return (
         <ScrollView style={styles.container}>
             {/* Header */}
@@ -166,36 +342,60 @@ export default function BasketballMatchDetailsPage() {
             </View>
 
             {/* Odds */}
-            {renderOdds()}
+            {/* Tabs */}
+            <View style={styles.tabsContainer}>
+                {['overview', 'statistics', 'lineups'].map((tab) => (
+                    <TouchableOpacity
+                        key={tab}
+                        style={[styles.tabButton, selectedTab === tab && styles.activeTabButton]}
+                        onPress={() => setSelectedTab(tab as any)}
+                    >
+                        <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
-            {/* H2H */}
-            {h2hData && (
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Head to Head</Text>
-                    {h2hData.H2H.length > 0 ? (
-                        h2hData.H2H.map(h => (
-                            <BasketballMatchCard key={h.event_key} match={h} />
-                        ))
-                    ) : (
-                        <Text style={styles.emptyText}>No previous H2H matches.</Text>
-                    )}
-                </View>
-            )}
-
-            {/* Recent Form */}
-            {h2hData && (
+            {selectedTab === 'overview' && (
                 <>
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>{match.event_home_team} Recent Form</Text>
-                        {h2hData.firstTeamResults.map(h => <BasketballMatchCard key={h.event_key} match={h} />)}
-                    </View>
+                    {/* Odds */}
+                    {renderOdds()}
 
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>{match.event_away_team} Recent Form</Text>
-                        {h2hData.secondTeamResults.map(h => <BasketballMatchCard key={h.event_key} match={h} />)}
-                    </View>
+                    {/* H2H */}
+                    {h2hData && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Head to Head</Text>
+                            {h2hData.H2H.length > 0 ? (
+                                h2hData.H2H.map(h => (
+                                    <BasketballMatchCard key={h.event_key} match={h} />
+                                ))
+                            ) : (
+                                <Text style={styles.emptyText}>No previous H2H matches.</Text>
+                            )}
+                        </View>
+                    )}
+
+                    {/* Recent Form */}
+                    {h2hData && (
+                        <>
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>{match.event_home_team} Recent Form</Text>
+                                {h2hData.firstTeamResults.map(h => <BasketballMatchCard key={h.event_key} match={h} />)}
+                            </View>
+
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>{match.event_away_team} Recent Form</Text>
+                                {h2hData.secondTeamResults.map(h => <BasketballMatchCard key={h.event_key} match={h} />)}
+                            </View>
+                        </>
+                    )}
                 </>
             )}
+
+            {selectedTab === 'statistics' && renderStatistics()}
+
+            {selectedTab === 'lineups' && renderLineups()}
         </ScrollView>
     );
 }
@@ -373,5 +573,140 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontStyle: 'italic',
         padding: 16,
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        marginBottom: 16,
+        gap: 8,
+    },
+    tabButton: {
+        flex: 1,
+        paddingVertical: 10,
+        backgroundColor: '#1a1f3a',
+        borderRadius: 8,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#2a3150',
+    },
+    activeTabButton: {
+        backgroundColor: '#f59e0b',
+        borderColor: '#f59e0b',
+    },
+    tabText: {
+        color: '#8b92b0',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+    activeTabText: {
+        color: '#fff',
+    },
+    tabContent: {
+        flex: 1,
+    },
+    emptyContainer: {
+        padding: 32,
+        alignItems: 'center',
+    },
+    statsCard: {
+        backgroundColor: '#1a1f3a',
+        borderRadius: 16,
+        padding: 16,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#2a3150',
+    },
+    statRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#2a3150',
+    },
+    statHome: {
+        color: '#fff',
+        fontWeight: '700',
+        width: 40,
+        textAlign: 'center',
+    },
+    statType: {
+        color: '#8b92b0',
+        fontSize: 12,
+        flex: 1,
+        textAlign: 'center',
+        textTransform: 'uppercase',
+    },
+    statAway: {
+        color: '#fff',
+        fontWeight: '700',
+        width: 40,
+        textAlign: 'center',
+    },
+    playerStatsHeader: {
+        flexDirection: 'row',
+        paddingBottom: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#2a3150',
+        marginBottom: 8,
+    },
+    playerStatsHeaderText: {
+        color: '#8b92b0',
+        fontSize: 12,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    playerStatsRow: {
+        flexDirection: 'row',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#2a3150',
+    },
+    playerStatsText: {
+        color: '#fff',
+        fontSize: 13,
+        textAlign: 'center',
+    },
+    lineupsCard: {
+        backgroundColor: '#1a1f3a',
+        marginHorizontal: 16,
+        marginBottom: 16,
+        borderRadius: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#2a3150',
+    },
+    lineupSubtitle: {
+        color: '#f59e0b',
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 12,
+        textTransform: 'uppercase',
+    },
+    lineupRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#2a3150',
+    },
+    lineupNumber: {
+        color: '#f59e0b',
+        fontWeight: '700',
+        width: 30,
+        textAlign: 'center',
+    },
+    lineupName: {
+        color: '#fff',
+        flex: 1,
+        fontSize: 14,
+        marginLeft: 8,
+    },
+    lineupPosition: {
+        color: '#8b92b0',
+        fontSize: 12,
+        width: 30,
+        textAlign: 'center',
     },
 });

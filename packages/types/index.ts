@@ -796,6 +796,65 @@ export interface BasketballStatistic {
 export interface BasketballLineupPlayer {
   player: string;
   player_id: string;
+  player_number?: string;
+  player_position?: string;
+}
+
+export interface BasketballPlayer {
+  player_key: string;
+  player_name: string;
+  player_number?: string;
+  player_type?: string; // Guard, Forward, Center
+  player_age?: string;
+  player_match_played?: string;
+  player_goals?: string;
+  player_yellow_cards?: string;
+  player_red_cards?: string;
+  player_image?: string | null;
+  team_key?: string;
+  team_name?: string;
+  player_rating?: string;
+  player_assists?: string;
+  player_rebounds?: string;
+  player_blocks?: string;
+  player_steals?: string;
+  player_points_per_game?: string;
+  player_rebounds_per_game?: string;
+  player_assists_per_game?: string;
+  player_field_goal_percentage?: string;
+  player_three_point_percentage?: string;
+  player_free_throw_percentage?: string;
+}
+
+export interface BasketballPlayerDetailed extends BasketballPlayer {
+  player_height?: string;
+  player_weight?: string;
+  player_birthdate?: string;
+  player_birthplace?: string;
+  player_nationality?: string;
+  player_college?: string;
+  player_draft_year?: string;
+  player_draft_round?: string;
+  player_draft_pick?: string;
+  career_stats?: {
+    games_played: string;
+    points: string;
+    rebounds: string;
+    assists: string;
+    steals: string;
+    blocks: string;
+    field_goal_pct: string;
+    three_point_pct: string;
+    free_throw_pct: string;
+  };
+  season_stats?: {
+    season: string;
+    team: string;
+    games: string;
+    points_per_game: string;
+    rebounds_per_game: string;
+    assists_per_game: string;
+  }[];
 }
 
 export interface BasketballTeamLineup {
@@ -940,6 +999,24 @@ export interface BasketballTeamsResponse {
   result: BasketballTeam[];
 }
 
+export interface BasketballPlayersResponse {
+  success: 1;
+  result: BasketballPlayer[];
+}
+
+export interface BasketballLineupsResponse {
+  success: 1;
+  result: BasketballLineups;
+}
+
+export interface BasketballStatisticsResponse {
+  success: 1;
+  result: {
+    statistics: BasketballStatistic[];
+    player_statistics: BasketballPlayerStatistics;
+  };
+}
+
 export interface BasketballOddsResponse {
   success: 1;
   result: {
@@ -999,6 +1076,22 @@ export interface BasketballTeamsParams extends BasketballBaseParams {
   teamId?: number;
 }
 
+export interface BasketballPlayersParams extends BasketballBaseParams {
+  met: 'Players';
+  playerId?: number;
+  teamId?: number;
+}
+
+export interface BasketballLineupsParams extends BasketballBaseParams {
+  met: 'Lineups';
+  matchId: number;
+}
+
+export interface BasketballStatisticsParams extends BasketballBaseParams {
+  met: 'Statistics';
+  matchId: number;
+}
+
 export interface BasketballOddsParams extends BasketballBaseParams {
   met: 'Odds';
   from?: string; // yyyy-mm-dd
@@ -1044,6 +1137,21 @@ export interface BasketballAPIClient {
    * Get teams information
    */
   getTeams(params: Omit<BasketballTeamsParams, 'met'>): Promise<BasketballTeamsResponse>;
+
+  /**
+   * Get players information
+   */
+  getPlayers(params: Omit<BasketballPlayersParams, 'met'>): Promise<BasketballPlayersResponse>;
+
+  /**
+   * Get match lineups
+   */
+  getLineups(params: Omit<BasketballLineupsParams, 'met'>): Promise<BasketballLineupsResponse>;
+
+  /**
+   * Get match statistics
+   */
+  getStatistics(params: Omit<BasketballStatisticsParams, 'met'>): Promise<BasketballStatisticsResponse>;
 
   /**
    * Get pre-match odds for events
