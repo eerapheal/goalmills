@@ -26,7 +26,7 @@ export default function CricketTeamsListScreen() {
     }, []);
 
     const renderItem = ({ item }: { item: CricketTeam }) => (
-        <TouchableOpacity style={styles.card} onPress={() => router.push(`/cricket/teams/${item.id}`)}>
+        <TouchableOpacity style={styles.card} onPress={() => router.push(`/home/cricket/teams/${item.id}`)}>
             <Image source={{ uri: item.logo }} style={styles.logo} />
             <View style={styles.info}>
                 <Text style={styles.name}>{item.name}</Text>

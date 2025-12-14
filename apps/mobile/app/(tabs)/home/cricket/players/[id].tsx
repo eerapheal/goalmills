@@ -49,10 +49,10 @@ export default function CricketPlayerDetailsScreen() {
                 options={{
                     title: player.name,
                     headerStyle: { backgroundColor: COLORS.backgroundDark },
-                    headerTintColor: COLORS.text,
+                    headerTintColor: COLORS.background,
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+                            <Ionicons name="arrow-back" size={24} color={COLORS.background} />
                         </TouchableOpacity>
                     ),
                 }}
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: FONT_SIZES.lg,
         fontWeight: '700',
-        color: COLORS.text,
+        color: COLORS.background,
         marginBottom: SPACING.md,
     },
     row: {
