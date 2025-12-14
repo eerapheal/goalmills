@@ -428,4 +428,329 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+// Tennis Types
+
+// Base Types
+export interface TennisCountry {
+  country_key: number;
+  country_name: string;
+}
+
+export interface TennisLeague {
+  league_key: number | string;
+  league_name: string;
+  country_key: number | string;
+  country_name: string;
+  league_surface?: string;
+}
+
+export interface TennisPlayer {
+  player_key: number | string;
+  player_name: string;
+  player_country?: string;
+  player_bday?: string;
+  player_logo?: string | null;
+  stats?: TennisPlayerStats[];
+  tournaments?: TennisPlayerTournament[];
+}
+
+export interface TennisPlayerStats {
+  season: string;
+  type: 'singles' | 'doubles';
+  rank: string;
+  titles: string;
+  matches_won: string;
+  matches_lost: string;
+  hard_won: string;
+  hard_lost: string;
+  clay_won: string;
+  clay_lost: string;
+  grass_won: string;
+  grass_lost: string;
+}
+
+export interface TennisPlayerTournament {
+  name: string;
+  season: string;
+  type: 'singles' | 'doubles';
+  surface: string;
+  prize: string;
+}
+
+export interface TennisPoint {
+  number_point: string;
+  score: string;
+  break_point: string | null;
+  set_point: string | null;
+  match_point: string | null;
+}
+
+export interface TennisGame {
+  set_number: string;
+  number_game: string;
+  player_served: string;
+  serve_winner: string | null;
+  serve_lost: string | null;
+  score: string;
+  points: TennisPoint[];
+}
+
+export interface TennisScore {
+  score_first: string;
+  score_second: string;
+  score_set: string;
+}
+
+export interface TennisEvent {
+  event_key: number | string;
+  event_date: string;
+  event_time: string;
+  event_first_player: string;
+  first_player_key: number | string;
+  event_second_player: string;
+  second_player_key: number | string;
+  event_final_result: string;
+  event_game_result: string;
+  event_serve: string | null;
+  event_winner: string | null;
+  event_status: string;
+  country_name: string;
+  league_name: string;
+  league_key: number | string;
+  league_round: string;
+  league_season: string;
+  event_live: string;
+  event_first_player_logo: string | null;
+  event_second_player_logo: string | null;
+  event_qualification?: string;
+  pointbypoint?: TennisGame[];
+  scores?: TennisScore[];
+}
+
+export interface TennisStanding {
+  place: string;
+  player: string;
+  player_key: number | string;
+  league: 'ATP' | 'WTA';
+  movement: 'up' | 'down' | 'same';
+  country: string;
+  points: string;
+}
+
+export interface TennisBookmaker {
+  [bookmakerName: string]: string;
+}
+
+export interface TennisOddsMarket {
+  [outcome: string]: TennisBookmaker;
+}
+
+export interface TennisMatchOdds {
+  [marketName: string]: TennisOddsMarket;
+}
+
+export interface TennisLiveOdd {
+  odd_name: string;
+  suspended: 'Yes' | 'No';
+  type: string;
+  value: string;
+  handicap?: string;
+}
+
+export interface TennisLiveOddsEvent extends Omit<TennisEvent, 'pointbypoint' | 'scores'> {
+  live_odds: TennisLiveOdd[];
+}
+
+// API Response Types
+export interface TennisApiResponse<T> {
+  success: 0 | 1;
+  result: T;
+}
+
+export interface TennisCountriesResponse {
+  success: 1;
+  result: TennisLeague[];
+}
+
+export interface TennisLeaguesResponse {
+  success: 1;
+  result: TennisLeague[];
+}
+
+export interface TennisFixturesResponse {
+  success: 1;
+  result: TennisEvent[];
+}
+
+export interface TennisH2HResponse {
+  success: 1;
+  result: {
+    H2H: TennisEvent[];
+    firstTeamResults: TennisEvent[];
+    secondTeamResults: TennisEvent[];
+  };
+}
+
+export interface TennisLivescoreResponse {
+  success: 1;
+  result: TennisEvent[];
+}
+
+export interface TennisStandingsResponse {
+  success: 1;
+  result: TennisStanding[];
+}
+
+export interface TennisPlayersResponse {
+  success: 1;
+  result: TennisPlayer[];
+}
+
+export interface TennisOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: TennisMatchOdds;
+  };
+}
+
+export interface TennisLiveOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: TennisLiveOddsEvent;
+  };
+}
+
+// API Request Parameter Types
+export interface TennisBaseParams {
+  met: string;
+  APIkey?: string;
+}
+
+export interface TennisCountriesParams extends TennisBaseParams {
+  met: 'Countries';
+}
+
+export interface TennisLeaguesParams extends TennisBaseParams {
+  met: 'Leagues';
+  countryId?: number;
+}
+
+export interface TennisFixturesParams extends TennisBaseParams {
+  met: 'Fixtures';
+  from: string; // yyyy-mm-dd
+  to: string; // yyyy-mm-dd
+  timezone?: string;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+  playerId?: number;
+}
+
+export interface TennisH2HParams extends TennisBaseParams {
+  met: 'H2H';
+  firstPlayerId: number;
+  secondPlayerId: number;
+  timezone?: string;
+}
+
+export interface TennisLivescoreParams extends TennisBaseParams {
+  met: 'Livescore';
+  timezone?: string;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+export interface TennisStandingsParams extends TennisBaseParams {
+  met: 'Standings';
+  league: 'ATP' | 'WTA';
+}
+
+export interface TennisPlayersParams extends TennisBaseParams {
+  met: 'Players';
+  leagueId?: number;
+  playerId?: number;
+}
+
+export interface TennisOddsParams extends TennisBaseParams {
+  met: 'Odds';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+export interface TennisLiveOddsParams extends TennisBaseParams {
+  met: 'LiveOdds';
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+// API Client Interface
+export interface TennisAPIClient {
+  /**
+   * Get list of supported tennis tournaments types
+   */
+  getCountries(params: Omit<TennisCountriesParams, 'met'>): Promise<TennisCountriesResponse>;
+
+  /**
+   * Get list of supported tennis competitions/leagues
+   */
+  getLeagues(params: Omit<TennisLeaguesParams, 'met'>): Promise<TennisLeaguesResponse>;
+
+  /**
+   * Get tennis fixtures/events
+   */
+  getFixtures(params: Omit<TennisFixturesParams, 'met'>): Promise<TennisFixturesResponse>;
+
+  /**
+   * Get head to head results between two players
+   */
+  getH2H(params: Omit<TennisH2HParams, 'met'>): Promise<TennisH2HResponse>;
+
+  /**
+   * Get live tennis matches
+   */
+  getLivescore(params: Omit<TennisLivescoreParams, 'met'>): Promise<TennisLivescoreResponse>;
+
+  /**
+   * Get ATP or WTA standings
+   */
+  getStandings(params: Omit<TennisStandingsParams, 'met'>): Promise<TennisStandingsResponse>;
+
+  /**
+   * Get player information and statistics
+   */
+  getPlayers(params: Omit<TennisPlayersParams, 'met'>): Promise<TennisPlayersResponse>;
+
+  /**
+   * Get pre-match odds for events
+   */
+  getOdds(params: Omit<TennisOddsParams, 'met'>): Promise<TennisOddsResponse>;
+
+  /**
+   * Get live odds for ongoing events
+   */
+  getLiveOdds(params: Omit<TennisLiveOddsParams, 'met'>): Promise<TennisLiveOddsResponse>;
+}
+
+export type TennisEventStatus = 
+  | 'Finished' 
+  | 'Set 1' 
+  | 'Set 2' 
+  | 'Set 3' 
+  | 'Set 4' 
+  | 'Set 5' 
+  | string;
+
+export type TennisEventWinner = 'First Player' | 'Second Player' | null;
+
+export type TennisSurfaceType = 'Hard' | 'Clay' | 'Grass' | 'Hard (indoor)' | string;
+
+export type TennisMovement = 'up' | 'down' | 'same';
+
+export type TennisLeagueType = 'ATP' | 'WTA';
+
 export type SportType = 'football' | 'cricket' | 'tennis' | 'basketball' | 'baseball' | 'hockey';

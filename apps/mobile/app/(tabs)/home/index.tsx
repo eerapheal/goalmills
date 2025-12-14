@@ -5,6 +5,7 @@ import { SportType } from '@goalmills/types';
 import { SportTabs } from '../../../components/SportTabs';
 import { FootballScreen } from '../../../screens/FootballScreen';
 import { CricketScreen } from '../../../screens/CricketScreen';
+import { TennisScreen } from '../../../screens/TennisScreen';
 
 export default function HomeScreen() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -18,13 +19,14 @@ export default function HomeScreen() {
                 return <CricketScreen />;
 
             case 'tennis':
+                return <TennisScreen />;
+
             case 'basketball':
             case 'baseball':
             case 'hockey':
                 return (
                     <View style={styles.comingSoonContainer}>
                         <Text style={styles.comingSoonEmoji}>
-                            {selectedSport === 'tennis' && '🎾'}
                             {selectedSport === 'basketball' && '🏀'}
                             {selectedSport === 'baseball' && '⚾'}
                             {selectedSport === 'hockey' && '🏒'}
