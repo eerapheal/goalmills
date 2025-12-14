@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { SportType } from '@goalmills/types';
 import { SportTabs } from '../components/SportTabs';
 import { FootballScreen } from '../components/FootballScreen';
+import { CricketScreen } from '../components/CricketScreen';
 
 export default function HomePage() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -14,6 +15,8 @@ export default function HomePage() {
                 return <FootballScreen />;
 
             case 'cricket':
+                return <CricketScreen />;
+
             case 'tennis':
             case 'basketball':
             case 'baseball':
@@ -21,7 +24,6 @@ export default function HomePage() {
                 return (
                     <div className="flex-1 flex flex-col items-center justify-center p-8">
                         <span className="text-8xl mb-4">
-                            {selectedSport === 'cricket' && '🏏'}
                             {selectedSport === 'tennis' && '🎾'}
                             {selectedSport === 'basketball' && '🏀'}
                             {selectedSport === 'baseball' && '⚾'}

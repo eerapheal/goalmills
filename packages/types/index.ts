@@ -216,6 +216,8 @@ export interface CricketMatchInfo {
   seriesId: number;
   matchStarted: boolean;
   matchEnded: boolean;
+  isFeatured?: boolean;
+  importance?: number;
 }
 
 export interface CricketMatchScore {
@@ -368,6 +370,13 @@ export interface CricketSchedulesResponse {
   totalDays: number;
 }
 
+export interface GetCricketSeriesMatchesParams {
+  seriesId: number;
+  type?: 'all' | 'live' | 'recent' | 'upcoming';
+  page?: number;
+  limit?: number;
+}
+
 // API Client Interface
 export interface CricbuzzAPIClient {
   // Fixtures
@@ -383,11 +392,14 @@ export interface CricbuzzAPIClient {
   getDomesticSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
   getLeagueSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
   getWomenSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
+  getSeriesMatches(params: GetCricketSeriesMatchesParams): Promise<CricketLiveMatchResponse>;
   
   // Matches
   getLiveMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
   getRecentMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
   getUpcomingMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
+  getFeaturedMatches(limit?: number): Promise<CricketLiveMatchResponse>;
+  getImportantMatches(limit?: number): Promise<CricketLiveMatchResponse>;
   getMatchInfo(params: GetCricketMatchInfoParams): Promise<CricketMatchDetailResponse>;
   getMatchScoreboard(params: GetCricketScoreboardParams): Promise<CricketScoreboardResponse>;
   
