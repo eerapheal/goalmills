@@ -753,4 +753,365 @@ export type TennisMovement = 'up' | 'down' | 'same';
 
 export type TennisLeagueType = 'ATP' | 'WTA';
 
+// Basketball Types
+
+// Base Types
+export interface BasketballCountry {
+  country_key: string;
+  country_name: string;
+}
+
+export interface BasketballLeague {
+  league_key: string;
+  league_name: string;
+  country_key: string;
+  country_name: string;
+}
+
+export interface BasketballTeam {
+  team_key: string;
+  team_name: string;
+  team_logo: string | null;
+}
+
+export interface QuarterScore {
+  score_home: string;
+  score_away: string;
+}
+
+export interface BasketballScores {
+  '1stQuarter'?: QuarterScore[];
+  '2ndQuarter'?: QuarterScore[];
+  '3rdQuarter'?: QuarterScore[];
+  '4thQuarter'?: QuarterScore[];
+  'Overtime'?: QuarterScore[];
+}
+
+export interface BasketballStatistic {
+  type: string;
+  home: string;
+  away: string;
+}
+
+export interface BasketballLineupPlayer {
+  player: string;
+  player_id: string;
+}
+
+export interface BasketballTeamLineup {
+  starting_lineups: BasketballLineupPlayer[];
+  substitutes: BasketballLineupPlayer[];
+}
+
+export interface BasketballLineups {
+  home_team: BasketballTeamLineup;
+  away_team: BasketballTeamLineup;
+}
+
+export interface BasketballPlayerStatistic {
+  player: string;
+  player_id: string;
+  player_assists: string;
+  player_blocks: string;
+  player_defense_rebounds: string;
+  player_field_goals_attempts: string;
+  player_field_goals_made: string;
+  player_freethrows_goals_attempts: string;
+  player_freethrows_goals_made: string;
+  player_minutes: string;
+  player_offence_rebounds: string;
+  player_oncourt: 'True' | 'False';
+  player_personal_fouls: string;
+  player_plus_minus: string;
+  player_position: string;
+  player_points: string;
+  player_steals: string;
+  player_threepoint_goals_attempts: string;
+  player_threepoint_goals_made: string;
+  player_total_rebounds: string;
+  player_turnovers: string;
+}
+
+export interface BasketballPlayerStatistics {
+  home_team: BasketballPlayerStatistic[];
+  away_team: BasketballPlayerStatistic[];
+}
+
+export interface BasketballEvent {
+  event_key: string;
+  event_date: string;
+  event_time: string;
+  event_home_team: string;
+  home_team_key: string;
+  event_away_team: string;
+  away_team_key: string;
+  event_final_result: string;
+  event_quarter?: string;
+  event_status: string;
+  country_name: string;
+  league_name: string;
+  league_key: string;
+  league_round: string | null;
+  league_season: string;
+  event_live: string;
+  event_home_team_logo?: string | null;
+  event_away_team_logo?: string | null;
+  scores?: BasketballScores;
+  statistics?: BasketballStatistic[];
+  lineups?: BasketballLineups;
+  player_statistics?: BasketballPlayerStatistics;
+}
+
+export interface BasketballStanding {
+  standing_place: string;
+  standing_place_type: string;
+  standing_team: string;
+  standing_P: string;
+  standing_W: string;
+  standing_WO: string;
+  standing_L: string;
+  standing_LO: string;
+  standing_F: string;
+  standing_A: string;
+  standing_PCT: string;
+  team_key: string;
+  league_key: string;
+  league_season: string;
+  league_round: string;
+  standing_updated: string;
+}
+
+export interface BasketballBookmaker {
+  [bookmakerName: string]: string;
+}
+
+export interface BasketballOddsMarket {
+  [outcome: string]: BasketballBookmaker;
+}
+
+export interface BasketballMatchOdds {
+  [marketName: string]: BasketballOddsMarket;
+}
+
+// API Response Types
+export interface BasketballApiResponse<T> {
+  success: 0 | 1;
+  result: T;
+}
+
+export interface BasketballCountriesResponse {
+  success: 1;
+  result: BasketballCountry[];
+}
+
+export interface BasketballLeaguesResponse {
+  success: 1;
+  result: BasketballLeague[];
+}
+
+export interface BasketballFixturesResponse {
+  success: 1;
+  result: BasketballEvent[];
+}
+
+export interface BasketballH2HResponse {
+  success: 1;
+  result: {
+    H2H: BasketballEvent[];
+    firstTeamResults: BasketballEvent[];
+    secondTeamResults: BasketballEvent[];
+  };
+}
+
+export interface BasketballLivescoreResponse {
+  success: 1;
+  result: BasketballEvent[];
+}
+
+export interface BasketballStandingsResponse {
+  success: 1;
+  result: {
+    total: BasketballStanding[];
+  };
+}
+
+export interface BasketballTeamsResponse {
+  success: 1;
+  result: BasketballTeam[];
+}
+
+export interface BasketballOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: BasketballMatchOdds;
+  };
+}
+
+// API Request Parameter Types
+export interface BasketballBaseParams {
+  met: string;
+  APIkey?: string;
+}
+
+export interface BasketballCountriesParams extends BasketballBaseParams {
+  met: 'Countries';
+}
+
+export interface BasketballLeaguesParams extends BasketballBaseParams {
+  met: 'Leagues';
+  countryId?: number;
+}
+
+export interface BasketballFixturesParams extends BasketballBaseParams {
+  met: 'Fixtures';
+  from: string; // yyyy-mm-dd
+  to: string; // yyyy-mm-dd
+  timezone?: string;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+  teamId?: number;
+}
+
+export interface BasketballH2HParams extends BasketballBaseParams {
+  met: 'H2H';
+  firstTeamId: number;
+  secondTeamId: number;
+  timezone?: string;
+}
+
+export interface BasketballLivescoreParams extends BasketballBaseParams {
+  met: 'Livescore';
+  timezone?: string;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+export interface BasketballStandingsParams extends BasketballBaseParams {
+  met: 'Standings';
+  leagueId: number;
+}
+
+export interface BasketballTeamsParams extends BasketballBaseParams {
+  met: 'Teams';
+  leagueId?: number;
+  teamId?: number;
+}
+
+export interface BasketballOddsParams extends BasketballBaseParams {
+  met: 'Odds';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+// API Client Interface
+export interface BasketballAPIClient {
+  /**
+   * Get list of supported countries
+   */
+  getCountries(params: Omit<BasketballCountriesParams, 'met'>): Promise<BasketballCountriesResponse>;
+
+  /**
+   * Get list of supported leagues/competitions
+   */
+  getLeagues(params: Omit<BasketballLeaguesParams, 'met'>): Promise<BasketballLeaguesResponse>;
+
+  /**
+   * Get basketball fixtures/events
+   */
+  getFixtures(params: Omit<BasketballFixturesParams, 'met'>): Promise<BasketballFixturesResponse>;
+
+  /**
+   * Get head to head results between two teams
+   */
+  getH2H(params: Omit<BasketballH2HParams, 'met'>): Promise<BasketballH2HResponse>;
+
+  /**
+   * Get live basketball matches
+   */
+  getLivescore(params: Omit<BasketballLivescoreParams, 'met'>): Promise<BasketballLivescoreResponse>;
+
+  /**
+   * Get league standings
+   */
+  getStandings(params: Omit<BasketballStandingsParams, 'met'>): Promise<BasketballStandingsResponse>;
+
+  /**
+   * Get teams information
+   */
+  getTeams(params: Omit<BasketballTeamsParams, 'met'>): Promise<BasketballTeamsResponse>;
+
+  /**
+   * Get pre-match odds for events
+   */
+  getOdds(params: Omit<BasketballOddsParams, 'met'>): Promise<BasketballOddsResponse>;
+}
+
+// Utility Types
+export type BasketballEventStatus = 
+  | 'Finished' 
+  | 'Live'
+  | '1st Quarter' 
+  | '2nd Quarter' 
+  | '3rd Quarter' 
+  | '4th Quarter'
+  | 'Overtime'
+  | 'Halftime'
+  | 'Not Started'
+  | string;
+
+export type BasketballPlayerPosition = 
+  | 'PG' // Point Guard
+  | 'SG' // Shooting Guard
+  | 'SF' // Small Forward
+  | 'PF' // Power Forward
+  | 'C'  // Center
+  | string;
+
+export type BasketballStatisticType =
+  | 'Total Assists'
+  | 'Total Blocks'
+  | 'Total Rebounds'
+  | 'Total Steals'
+  | 'Total Turnovers'
+  | 'Field Goals Made'
+  | 'Field Goals Attempted'
+  | 'Three Point Made'
+  | 'Three Point Attempted'
+  | 'Free Throws Made'
+  | 'Free Throws Attempted'
+  | string;
+
+// Extended Types for Detailed Match Data
+export interface BasketballDetailedEvent extends BasketballEvent {
+  scores: BasketballScores;
+  statistics: BasketballStatistic[];
+  lineups: BasketballLineups;
+  player_statistics: BasketballPlayerStatistics;
+}
+
+// Helper type for odds markets
+export type BasketballOddsMarketType = 
+  | '3Way Result'
+  | 'Home/Away'
+  | 'Total'
+  | 'Handicap'
+  | 'First Half Result'
+  | 'Second Half Result'
+  | string;
+
+// Helper type for odds outcomes
+export type BasketballOddsOutcome = 
+  | 'Home'
+  | 'Away'
+  | 'Draw'
+  | 'Over'
+  | 'Under'
+  | string;
+
 export type SportType = 'football' | 'cricket' | 'tennis' | 'basketball' | 'baseball' | 'hockey';
+

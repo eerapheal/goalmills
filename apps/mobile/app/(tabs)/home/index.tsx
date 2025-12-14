@@ -6,6 +6,7 @@ import { SportTabs } from '../../../components/SportTabs';
 import { FootballScreen } from '../../../screens/FootballScreen';
 import { CricketScreen } from '../../../screens/CricketScreen';
 import { TennisScreen } from '../../../screens/TennisScreen';
+import BasketballScreen from '../../../screens/BasketballScreen';
 
 export default function HomeScreen() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -22,12 +23,13 @@ export default function HomeScreen() {
                 return <TennisScreen />;
 
             case 'basketball':
+                return <BasketballScreen />;
+
             case 'baseball':
             case 'hockey':
                 return (
                     <View style={styles.comingSoonContainer}>
                         <Text style={styles.comingSoonEmoji}>
-                            {selectedSport === 'basketball' && '🏀'}
                             {selectedSport === 'baseball' && '⚾'}
                             {selectedSport === 'hockey' && '🏒'}
                         </Text>
