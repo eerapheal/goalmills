@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
+import { footballApi } from '../../../../services/footballApi';
 import { League, Fixture, Standing } from '@goalmills/types';
-import { FixtureCard } from '../../components/FixtureCard';
-import { StandingsTable } from '../../components/StandingsTable';
+import { FixtureCard } from '../../../../components/FixtureCard';
+import { StandingsTable } from '../../../../components/StandingsTable';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 
 type Tab = 'live' | 'upcoming' | 'results' | 'standings';

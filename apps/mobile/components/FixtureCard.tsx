@@ -19,16 +19,16 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
         if (onPress) {
             onPress();
         } else {
-            router.push(`/matches/${fixtureData.id}`);
+            router.push(`/home/matches/${fixtureData.id}`);
         }
     };
 
     const handleTeamPress = (teamId: number) => {
-        router.push(`/teams/${teamId}`);
+        router.push(`/home/teams/${teamId}`);
     };
 
     const handleLeaguePress = (leagueId: number) => {
-        router.push(`/leagues/${leagueId}`);
+        router.push(`/home/leagues/${leagueId}`);
     };
 
     return (

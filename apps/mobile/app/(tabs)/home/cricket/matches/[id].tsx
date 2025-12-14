@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Touchable
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketMatchDetailResponse, CricketScoreboardResponse, CricketPlayer } from '@goalmills/types';
-import { cricketApi } from '../../../services/cricketApi';
+import { cricketApi } from '../../../../../services/cricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
 type Tab = 'scorecard' | 'info' | 'squads';
@@ -159,7 +159,7 @@ export default function CricketMatchDetailsScreen() {
                     <TouchableOpacity
                         key={player.id}
                         style={styles.playerRow}
-                        onPress={() => router.push(`/cricket/players/${player.id}`)}
+                        onPress={() => router.push(`/home/cricket/players/${player.id}`)}
                     >
                         <Image source={{ uri: player.image }} style={styles.playerImageSm} />
                         <View>
@@ -175,7 +175,7 @@ export default function CricketMatchDetailsScreen() {
                     <TouchableOpacity
                         key={player.id}
                         style={styles.playerRow}
-                        onPress={() => router.push(`/cricket/players/${player.id}`)}
+                        onPress={() => router.push(`/home/cricket/players/${player.id}`)}
                     >
                         <Image source={{ uri: player.image }} style={styles.playerImageSm} />
                         <View>
@@ -209,7 +209,7 @@ export default function CricketMatchDetailsScreen() {
                 <View style={styles.teamsContainer}>
                     <TouchableOpacity
                         style={styles.team}
-                        onPress={() => router.push(`/cricket/teams/${matchInfo.teamInfo[0].id}`)}
+                        onPress={() => router.push(`/home/cricket/teams/${matchInfo.teamInfo[0].id}`)}
                     >
                         <Image source={{ uri: matchInfo.teamInfo[0].logo }} style={styles.teamLogoMd} />
                         <Text style={styles.teamNameLg}>{matchInfo.teamInfo[0].shortName}</Text>
@@ -223,7 +223,7 @@ export default function CricketMatchDetailsScreen() {
                     <Text style={styles.vsText}>vs</Text>
                     <TouchableOpacity
                         style={styles.team}
-                        onPress={() => router.push(`/cricket/teams/${matchInfo.teamInfo[1].id}`)}
+                        onPress={() => router.push(`/home/cricket/teams/${matchInfo.teamInfo[1].id}`)}
                     >
                         <Image source={{ uri: matchInfo.teamInfo[1].logo }} style={styles.teamLogoMd} />
                         <Text style={styles.teamNameLg}>{matchInfo.teamInfo[1].shortName}</Text>

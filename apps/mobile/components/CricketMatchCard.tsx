@@ -22,7 +22,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
         if (onPress) {
             onPress();
         } else {
-            router.push(`/cricket/matches/${match.id}`);
+            router.push(`/home/cricket/matches/${match.id}`);
         }
     };
 
@@ -57,7 +57,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                     style={[styles.teamContainer, styles.teamHome]}
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/cricket/teams/${teamInfo[0].id}`);
+                        router.push(`/home/cricket/teams/${teamInfo[0].id}`);
                     }}
                 >
                     <Image source={{ uri: teamInfo[0].logo }} style={styles.teamLogo} />
@@ -90,7 +90,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                     style={[styles.teamContainer, styles.teamAway]}
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/cricket/teams/${teamInfo[1].id}`);
+                        router.push(`/home/cricket/teams/${teamInfo[1].id}`);
                     }}
                 >
                     <View style={[styles.teamInfo, { alignItems: 'flex-end' }]}>

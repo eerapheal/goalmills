@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, 
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketSeries, CricketMatchInfo } from '@goalmills/types';
-import { cricketApi } from '../../../services/cricketApi';
-import { CricketMatchCard } from '../../../components/CricketMatchCard';
+import { cricketApi } from '../../../../../services/cricketApi';
+import { CricketMatchCard } from '../../../../../components/CricketMatchCard';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CricketSeriesDetailsScreen() {

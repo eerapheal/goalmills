@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
+import { footballApi } from '../../../../services/footballApi';
 import { Fixture, MatchEvent, Lineup } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { SvgUri } from 'react-native-svg';
@@ -102,7 +102,7 @@ export default function MatchDetailsScreen() {
                                     ]}>{event.type}</Text>
                                     <Text style={styles.eventDetail}>{event.detail}</Text>
                                 </View>
-                                <TouchableOpacity onPress={() => router.push(`/players/${event.player.id}`)}>
+                                <TouchableOpacity onPress={() => router.push(`/home/players/${event.player.id}`)}>
                                     <Text style={styles.playerName}>{event.player.name}</Text>
                                 </TouchableOpacity>
                                 {event.assist.name && (
@@ -132,7 +132,7 @@ export default function MatchDetailsScreen() {
                                 <TouchableOpacity
                                     key={idx}
                                     style={styles.playerRow}
-                                    onPress={() => router.push(`/players/${player.player.id}`)}
+                                    onPress={() => router.push(`/home/players/${player.player.id}`)}
                                 >
                                     <Text style={styles.playerNumber}>{player.player.number}</Text>
                                     <Text style={styles.lineupPlayerName} numberOfLines={1}>{player.player.name}</Text>
@@ -147,7 +147,7 @@ export default function MatchDetailsScreen() {
                                 <TouchableOpacity
                                     key={idx}
                                     style={styles.playerRow}
-                                    onPress={() => router.push(`/players/${player.player.id}`)}
+                                    onPress={() => router.push(`/home/players/${player.player.id}`)}
                                 >
                                     <Text style={styles.playerNumber}>{player.player.number}</Text>
                                     <Text style={[styles.lineupPlayerName, styles.textMuted]} numberOfLines={1}>{player.player.name}</Text>
@@ -214,7 +214,7 @@ export default function MatchDetailsScreen() {
                     </View>
 
                     <View style={styles.scoreBoard}>
-                        <TouchableOpacity style={styles.teamCol} onPress={() => router.push(`/teams/${teams.home.id}`)}>
+                        <TouchableOpacity style={styles.teamCol} onPress={() => router.push(`/home/teams/${teams.home.id}`)}>
                             <Image source={{ uri: teams.home.logo }} style={styles.teamLogo} resizeMode="contain" />
                             <Text style={styles.teamName}>{teams.home.name}</Text>
                         </TouchableOpacity>
@@ -232,7 +232,7 @@ export default function MatchDetailsScreen() {
                             </View>
                         </View>
 
-                        <TouchableOpacity style={styles.teamCol} onPress={() => router.push(`/teams/${teams.away.id}`)}>
+                        <TouchableOpacity style={styles.teamCol} onPress={() => router.push(`/home/teams/${teams.away.id}`)}>
                             <Image source={{ uri: teams.away.logo }} style={styles.teamLogo} resizeMode="contain" />
                             <Text style={styles.teamName}>{teams.away.name}</Text>
                         </TouchableOpacity>

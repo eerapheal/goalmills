@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
+import { footballApi } from '../../../../services/footballApi';
 import { League } from '@goalmills/types';
 import { Stack } from 'expo-router';
 
@@ -34,7 +34,7 @@ export default function LeaguesScreen() {
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.item}
-                        onPress={() => router.push(`/leagues/${item.id}`)}
+                        onPress={() => router.push(`/home/leagues/${item.id}`)}
                     >
                         <Image source={{ uri: item.logo }} style={styles.logo} resizeMode="contain" />
                         <Text style={styles.name}>{item.name}</Text>

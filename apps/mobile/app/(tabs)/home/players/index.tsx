@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
-import { League } from '@goalmills/types';
-import { Stack } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
+import { footballApi } from '../../../../services/footballApi';
 
-export default function CompetitionsScreen() {
-    const [leagues, setLeagues] = useState<League[]>([]);
+// Mock Players type since we added it to api but maybe not types package
+interface MPlayer {
+    id: number;
+    name: string;
+    team: string;
+    position: string;
+    number: number;
+    photo: string;
+}
+
+export default function PlayersScreen() {
+    const [players, setPlayers] = useState<MPlayer[]>([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
-        footballApi.getLeagues().then((data) => {
-            setLeagues(data);
+        footballApi.getPlayers().then((data) => {
+            setPlayers(data);
             setLoading(false);
         });
     }, []);
@@ -27,18 +35,20 @@ export default function CompetitionsScreen() {
 
     return (
         <View style={styles.container}>
-            <Stack.Screen options={{ title: 'Competitions' }} />
+            <Stack.Screen options={{ title: 'Players' }} />
             <FlatList
-                data={leagues}
+                data={players}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.item}
-                        onPress={() => router.push(`/leagues/${item.id}`)}
+                        onPress={() => router.push(`/home/players/${item.id}`)}
                     >
-                        {/* Reusing league details for now as competitions are usually leagues */}
-                        <Image source={{ uri: item.logo }} style={styles.logo} resizeMode="contain" />
-                        <Text style={styles.name}>{item.name}</Text>
+                        <Image source={{ uri: item.photo }} style={styles.photo} resizeMode="cover" />
+                        <View>
+                            <Text style={styles.name}>{item.name}</Text>
+                            <Text style={styles.subtitle}>{item.team} • {item.position}</Text>
+                        </View>
                     </TouchableOpacity>
                 )}
             />
@@ -55,11 +65,9 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: 'white',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        marginHorizontal: 16,
-        marginVertical: 4,
-        borderRadius: 8,
+        borderBottomColor: '#eee'
     },
-    logo: { width: 40, height: 40, marginRight: 16 },
+    photo: { width: 50, height: 50, borderRadius: 25, marginRight: 16, backgroundColor: '#eee' },
     name: { fontSize: 16, fontWeight: '600', color: '#333' },
+    subtitle: { fontSize: 14, color: '#666' }
 });

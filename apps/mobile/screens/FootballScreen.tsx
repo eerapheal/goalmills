@@ -201,11 +201,11 @@ export function FootballScreen() {
                     style={styles.quickLinksScrollView}
                 >
                     {[
-                        { label: '🏆 Leagues', route: '/leagues' },
-                        { label: '👕 Teams', route: '/teams' },
-                        { label: '🌍 Regions', route: '/regions' },
-                        { label: '⚔️ Competitions', route: '/competitions' },
-                        { label: '🏃 Players', route: '/players' },
+                        { label: '🏆 Leagues', route: '/home/leagues' },
+                        { label: '👕 Teams', route: '/home/teams' },
+                        { label: '🌍 Regions', route: '/home/regions' },
+                        { label: '⚔️ Competitions', route: '/home/competitions' },
+                        { label: '🏃 Players', route: '/home/players' },
                     ].map((link) => (
                         <Pressable
                             key={link.label}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
+import { footballApi } from '../../../../services/footballApi';
 import { Team, Fixture } from '@goalmills/types';
-import { FixtureCard } from '../../components/FixtureCard';
+import { FixtureCard } from '../../../../components/FixtureCard';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 
 export default function TeamDetails() {

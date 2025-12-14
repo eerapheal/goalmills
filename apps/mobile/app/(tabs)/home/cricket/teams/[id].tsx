@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image, ActivityIndicator, Touchable
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketTeam, CricketPlayer } from '@goalmills/types';
-import { cricketApi } from '../../../services/cricketApi';
+import { cricketApi } from '../../../../../services/cricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CricketTeamDetailsScreen() {
@@ -65,7 +65,7 @@ export default function CricketTeamDetailsScreen() {
                         <TouchableOpacity
                             key={player.id}
                             style={styles.playerRow}
-                            onPress={() => router.push(`/cricket/players/${player.id}`)}
+                            onPress={() => router.push(`/home/cricket/players/${player.id}`)}
                         >
                             <Image source={{ uri: player.image }} style={styles.playerImage} />
                             <View style={styles.playerInfo}>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
+import { footballApi } from '../../../../services/footballApi';
 import { League } from '@goalmills/types';
 
 export default function RegionDetails() {
@@ -36,7 +36,7 @@ export default function RegionDetails() {
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.item}
-                        onPress={() => router.push(`/leagues/${item.id}`)}
+                        onPress={() => router.push(`/home/leagues/${item.id}`)}
                     >
                         <Text style={styles.name}>{item.name}</Text>
                     </TouchableOpacity>

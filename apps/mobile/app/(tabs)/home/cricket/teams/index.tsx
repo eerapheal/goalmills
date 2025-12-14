@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOp
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketTeam } from '@goalmills/types';
-import { cricketApi } from '../../../services/cricketApi';
+import { cricketApi } from '../../../../../services/cricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CricketTeamsListScreen() {

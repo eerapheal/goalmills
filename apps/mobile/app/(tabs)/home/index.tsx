@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
 import { SportType } from '@goalmills/types';
-import { SportTabs } from '../../components/SportTabs';
-import { FootballScreen } from '../../screens/FootballScreen';
-import { CricketScreen } from '../../screens/CricketScreen';
+import { SportTabs } from '../../../components/SportTabs';
+import { FootballScreen } from '../../../screens/FootballScreen';
+import { CricketScreen } from '../../../screens/CricketScreen';
 
 export default function HomeScreen() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: COLORS.secondary,
         marginBottom: SPACING.md,
+        textTransform: 'capitalize',
     },
     comingSoonSubtext: {
         fontSize: FONT_SIZES.md,
@@ -116,4 +117,3 @@ const styles = StyleSheet.create({
         lineHeight: 24,
     },
 });
-

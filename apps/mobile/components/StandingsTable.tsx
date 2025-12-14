@@ -54,7 +54,7 @@ export function StandingsTable({ standings }: StandingsTableProps) {
                     {/* Team */}
                     <Pressable
                         style={styles.teamCell}
-                        onPress={() => router.push(`/teams/${standing.team.id}`)}
+                        onPress={() => router.push(`/home/teams/${standing.team.id}`)}
                     >
                         <Image source={{ uri: standing.team.logo }} style={styles.teamLogo} />
                         <Text style={styles.teamName} numberOfLines={1}>
@@ -75,16 +75,16 @@ export function StandingsTable({ standings }: StandingsTableProps) {
                         {standing.goalsDiff > 0 ? '+' : ''}
                         {standing.goalsDiff}
                     </Text>
-                    
+
                     {/* Form */}
                     <View style={styles.formCell}>
                         {standing.form?.split('').map((result, i) => (
-                            <View 
-                                key={i} 
+                            <View
+                                key={i}
                                 style={[
-                                    styles.matchDot, 
+                                    styles.matchDot,
                                     { backgroundColor: getFormColor(result) }
-                                ]} 
+                                ]}
                             />
                         ))}
                     </View>

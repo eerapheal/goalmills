@@ -135,7 +135,7 @@ export function CricketScreen() {
                             <Pressable
                                 key={series.id}
                                 style={({ pressed }) => [styles.seriesCard, pressed && styles.pressedTab]}
-                                onPress={() => router.push(`/cricket/series/${series.id}`)}
+                                onPress={() => router.push(`/home/cricket/series/${series.id}`)}
                             >
                                 {series.image && <Image source={{ uri: series.image }} style={styles.seriesImage} />}
                                 <View style={styles.seriesInfo}>
@@ -215,10 +215,10 @@ export function CricketScreen() {
                     style={styles.quickLinksScrollView}
                 >
                     {[
-                        { label: '🏆 Series', route: '/cricket/series' },
-                        { label: '👕 Teams', route: '/cricket/teams' },
-                        { label: '🌍 ICC Rankings', route: '/cricket/rankings' },
-                        { label: '🏃 Players', route: '/cricket/players' },
+                        { label: '🏆 Series', route: '/home/cricket/series' },
+                        { label: '👕 Teams', route: '/home/cricket/teams' },
+                        { label: '🌍 ICC Rankings', route: '/home/cricket/rankings' },
+                        { label: '🏃 Players', route: '/home/cricket/players' },
                     ].map((link) => (
                         <Pressable
                             key={link.label}

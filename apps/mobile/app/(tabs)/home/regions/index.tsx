@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
+import { footballApi } from '../../../../services/footballApi';
 import { League } from '@goalmills/types';
 import { Stack } from 'expo-router';
 import { SvgUri } from 'react-native-svg';
@@ -52,7 +52,7 @@ export default function RegionsScreen() {
                         // I'll make a placeholder region details page or just not link yet 
                         // asking for clarification, but safer to link to a filter page.
                         // For now, let's link to a region details page.
-                        onPress={() => router.push({ pathname: '/regions/[id]', params: { id: item.name } })}
+                        onPress={() => router.push({ pathname: '/home/regions/[id]', params: { id: item.name } })}
                     >
                         {/* Svg might need care, using Image for simplicity if API returns png/svg that Image handles or SvgUri from react-native-svg */}
                         {/* The api returns .svg urls. react-native Image doesn't support svg directly usually without library. */}

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { footballApi } from '../../services/footballApi';
-import { Team } from '@goalmills/types';
+import { footballApi } from '../../../../services/footballApi';
+import { League } from '@goalmills/types';
 import { Stack } from 'expo-router';
 
-export default function TeamsScreen() {
-    const [teams, setTeams] = useState<Team[]>([]);
+export default function CompetitionsScreen() {
+    const [leagues, setLeagues] = useState<League[]>([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
-        footballApi.getTeams().then((data) => {
-            setTeams(data);
+        footballApi.getLeagues().then((data) => {
+            setLeagues(data);
             setLoading(false);
         });
     }, []);
@@ -27,19 +27,18 @@ export default function TeamsScreen() {
 
     return (
         <View style={styles.container}>
-            <Stack.Screen options={{ title: 'Teams' }} />
+            <Stack.Screen options={{ title: 'Competitions' }} />
             <FlatList
-                data={teams}
+                data={leagues}
                 keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                contentContainerStyle={styles.list}
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.item}
-                        onPress={() => router.push(`/teams/${item.id}`)}
+                        onPress={() => router.push(`/home/leagues/${item.id}`)}
                     >
+                        {/* Reusing league details for now as competitions are usually leagues */}
                         <Image source={{ uri: item.logo }} style={styles.logo} resizeMode="contain" />
-                        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                        <Text style={styles.name}>{item.name}</Text>
                     </TouchableOpacity>
                 )}
             />
@@ -50,20 +49,17 @@ export default function TeamsScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f2f5' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    list: { padding: 8 },
     item: {
-        flex: 1,
+        flexDirection: 'row',
         alignItems: 'center',
         padding: 16,
         backgroundColor: 'white',
-        margin: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        marginHorizontal: 16,
+        marginVertical: 4,
         borderRadius: 8,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
     },
-    logo: { width: 60, height: 60, marginBottom: 8 },
-    name: { fontSize: 14, fontWeight: '600', color: '#333', textAlign: 'center' },
+    logo: { width: 40, height: 40, marginRight: 16 },
+    name: { fontSize: 16, fontWeight: '600', color: '#333' },
 });
