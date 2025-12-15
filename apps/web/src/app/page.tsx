@@ -6,6 +6,7 @@ import { SportTabs } from '../components/SportTabs';
 import { FootballScreen } from '../components/FootballScreen';
 import { CricketScreen } from '../components/CricketScreen';
 import { TennisScreen } from '../components/TennisScreen';
+import { BasketballScreen } from '../components/BasketballScreen';
 
 export default function HomePage() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -22,12 +23,13 @@ export default function HomePage() {
                 return <TennisScreen />;
 
             case 'basketball':
+                return <BasketballScreen />;
+
             case 'baseball':
             case 'hockey':
                 return (
                     <div className="flex-1 flex flex-col items-center justify-center p-8">
                         <span className="text-8xl mb-4">
-                            {selectedSport === 'basketball' && '🏀'}
                             {selectedSport === 'baseball' && '⚾'}
                             {selectedSport === 'hockey' && '🏒'}
                         </span>
