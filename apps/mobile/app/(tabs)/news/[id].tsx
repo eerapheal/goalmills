@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
-import { footballApi } from '../../../services/footballApi';
+import { advancedFootballApi as footballApi } from '../../../services/advancedFootballApi';
 import { BlogPost } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
 

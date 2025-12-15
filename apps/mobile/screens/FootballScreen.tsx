@@ -11,7 +11,8 @@ import {
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Fixture, Standing, BlogPost, VideoHighlight } from '@goalmills/types';
-import { footballApi } from '../services/footballApi';
+import { advancedFootballApi } from '../services/advancedFootballApi';
+import { mapEventToFixture, mapStandingToStanding, mapVideoToHighlight } from '../utils/footballAdapters';
 import { FixtureCard } from '../components/FixtureCard';
 import { StandingsTable } from '../components/StandingsTable';
 import { NewsCard } from '../components/NewsCard';
@@ -35,21 +36,64 @@ export function FootballScreen() {
 
     const loadData = async () => {
         try {
-            const [live, upcoming, finished, standingsData, posts, videoData] = await Promise.all([
-                footballApi.getLiveFixtures(),
-                footballApi.getUpcomingFixtures(15),
-                footballApi.getFinishedFixtures(15),
-                footballApi.getStandingsByLeague(39), // Premier League
-                footballApi.getBlogPosts(),
-                footballApi.getVideoHighlights(),
+            // Calculate Dates for upcoming/finished
+            const today = new Date();
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+            const prevWeek = new Date(today);
+            prevWeek.setDate(today.getDate() - 7);
+
+            const [liveRes, upcomingRes, finishedRes, standingsRes, videoRes] = await Promise.all([
+                advancedFootballApi.getLivescore(),
+                advancedFootballApi.getFixtures({
+                    from: today.toISOString().split('T')[0],
+                    to: nextWeek.toISOString().split('T')[0]
+                }), // Logic inside API handles filtering or returning mock list
+                advancedFootballApi.getFixtures({
+                    from: prevWeek.toISOString().split('T')[0],
+                    to: today.toISOString().split('T')[0]
+                }),
+                advancedFootballApi.getStandings(152), // Premier League (152 in new system)
+                advancedFootballApi.getVideos(),
             ]);
 
-            setLiveFixtures(live);
-            setUpcomingFixtures(upcoming);
-            setFinishedFixtures(finished);
-            setStandings(standingsData);
-            setBlogPosts(posts);
-            setVideos(videoData);
+            // Process Live
+            if (liveRes.success) {
+                setLiveFixtures(liveRes.result.map(mapEventToFixture));
+            }
+
+            // Process Upcoming (Filter NS if needed)
+            if (upcomingRes.success) {
+                // Mock API returns mixed statuses, filter for NS
+                const upcoming = upcomingRes.result
+                    .filter(e => e.event_status === 'Not Started' || e.event_status === 'NS')
+                    .slice(0, 15)
+                    .map(mapEventToFixture);
+                setUpcomingFixtures(upcoming);
+            }
+
+            // Process Finished (Filter FT)
+            if (finishedRes.success) {
+                const finished = finishedRes.result
+                    .filter(e => e.event_status === 'Finished' || e.event_status === 'FT')
+                    .slice(0, 15)
+                    .map(mapEventToFixture);
+                setFinishedFixtures(finished);
+            }
+
+            // Process Standings
+            if (standingsRes.success) {
+                setStandings(standingsRes.result.total.map(mapStandingToStanding));
+            }
+
+            // Process Videos
+            if (videoRes.success) {
+                setVideos(videoRes.result.map(mapVideoToHighlight));
+            }
+
+            // News - advanced api doesn't have it yet
+            setBlogPosts([]);
+
         } catch (error) {
             console.error('Error loading football data:', error);
         } finally {

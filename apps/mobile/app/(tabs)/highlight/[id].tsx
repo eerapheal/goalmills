@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
-import { footballApi } from '../../../services/footballApi';
+import { advancedFootballApi } from '../../../services/advancedFootballApi';
+import { mapVideoToHighlight } from '../../../utils/footballAdapters';
 import { VideoHighlight } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -23,10 +24,19 @@ export default function HighlightDetail() {
 
     const loadVideoDetail = async () => {
         try {
-            const data = await footballApi.getVideoHighlightById(id);
-            setVideo(data);
+            const response = await advancedFootballApi.getVideos(Number(id));
+            if (response.success && response.result.length > 0) {
+                // The API returns an array, possibly with one item matching the ID or multiple. 
+                // If getVideos(id) filters by event_key correctly, we take the first one.
+                // However, advancedFootballApi mock actually returns a list even with ID if it matches event_key.
+                const videoData = response.result[0];
+                setVideo(mapVideoToHighlight(videoData));
+            } else {
+                setVideo(null);
+            }
         } catch (error) {
             console.error('Failed to load video detail:', error);
+            setVideo(null);
         } finally {
             setLoading(false);
         }

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { footballApi } from '../../../../services/footballApi';
+import { advancedFootballApi } from '../../../../services/advancedFootballApi';
+import { mapEventToFixture, mapEventToMatchEvents, mapLineupsToLineups } from '../../../../utils/footballAdapters';
 import { Fixture, MatchEvent, Lineup } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { SvgUri } from 'react-native-svg';
@@ -26,14 +27,19 @@ export default function MatchDetailsScreen() {
     const loadMatchData = async () => {
         try {
             const fixtureId = Number(id);
-            const [fixtureData, eventsData, lineupsData] = await Promise.all([
-                footballApi.getFixtureById(fixtureId),
-                footballApi.getEventsByFixtureId(fixtureId),
-                footballApi.getLineupsByFixtureId(fixtureId),
-            ]);
-            setFixture(fixtureData);
-            setEvents(eventsData);
-            setLineups(lineupsData);
+            // In advanced api, getting specific match by ID is done via getFixtures({ matchId })
+            const response = await advancedFootballApi.getFixtures({ matchId: fixtureId }); // matchId=fixtureId
+
+            if (response.success && response.result.length > 0) {
+                const event = response.result[0];
+
+                // Map the single event to all 3 data structures
+                setFixture(mapEventToFixture(event));
+                setEvents(mapEventToMatchEvents(event));
+                setLineups(mapLineupsToLineups(event));
+            } else {
+                console.error('Match not found');
+            }
         } catch (error) {
             console.error('Error loading match data:', error);
         } finally {

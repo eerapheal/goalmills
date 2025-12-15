@@ -33,6 +33,7 @@ import {
   FootballLineups,
   FootballCoach,
   FootballOfficial,
+  BlogPost,
 } from '@goalmills/types';
 
 // Mock Data - Countries
@@ -531,6 +532,67 @@ const mockOfficials: FootballOfficial[] = [
   { name: 'Clément Turpin', country: 'France', matches: 189, image: 'https://ui-avatars.com/api/?name=Clement+Turpin&background=random&size=200', yellowCards: 876, redCards: 54 },
 ];
 
+// Mock Data - Blog Posts
+const mockBlogPosts: BlogPost[] = [
+  {
+    _id: '1',
+    title: 'Manchester City Secure Premier League Title in Thrilling Finale',
+    excerpt: 'Pep Guardiola’s side came back from two goals down to beat Aston Villa and clinch the title on the final day of the season.',
+    content: 'Manchester City have been crowned 2023/24 Premier League champions after a dramatic final day victory over West Ham. Phil Foden scored twice early on to settle any nerves at the Etihad Stadium before Rodri sealed the win with a controlled finish.',
+    image: 'https://images.unsplash.com/photo-1629255655767-f26b528659d6?auto=format&fit=crop&q=80&w=1000',
+    author: 'James Ducker',
+    readTime: 5,
+    createdAt: new Date().toISOString(),
+    category: 'Premier League',
+  },
+  {
+    _id: '2',
+    title: 'Real Madrid King of Europe: The 15th UCL Title',
+    excerpt: 'Vinicius Jr and Dani Carvajal score as Real Madrid beat Borussia Dortmund to win the Champions League at Wembley.',
+    content: 'Real Madrid extended their record as the most successful club in European history by winning their 15th Champions League title with a 2-0 victory over Borussia Dortmund at Wembley. After a difficult first half where Dortmund missed several chances, Madrid showed their pedigree in the second half.',
+    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=1000',
+    author: 'Sid Lowe',
+    readTime: 7,
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    category: 'Champions League',
+  },
+  {
+    _id: '3',
+    title: 'Transfer News: Mbappe Finally Joins Real Madrid',
+    excerpt: 'The French superstar has officially signed a five-year contract with Los Blancos after years of speculation.',
+    content: 'Kylian Mbappe has completed his long-awaited move to Real Madrid, signing a five-year deal with the Spanish champions. The 25-year-old forward leaves Paris Saint-Germain as a free agent after his contract expired.',
+    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&q=80&w=1000',
+    author: 'Fabrizio Romano',
+    readTime: 4,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    category: 'Transfers',
+  },
+  {
+    _id: '4',
+    title: 'Euro 2024: England Squad Analysis',
+    excerpt: 'Gareth Southgate has named his final 26-man squad for the upcoming European Championship in Germany.',
+    content: 'England manager Gareth Southgate has finalized his squad for Euro 2024, making some bold calls by leaving out Marcus Rashford and Jordan Henderson. The squad features a wealth of attacking talent including Harry Kane, Phil Foden, Jude Bellingham, and Bukayo Saka.',
+    image: 'https://images.unsplash.com/photo-1543351611-58f69d7c1781?auto=format&fit=crop&q=80&w=1000',
+    author: 'Henry Winter',
+    readTime: 6,
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+    category: 'International',
+  },
+  {
+    _id: '5',
+    title: 'Tactical Analysis: How Xabi Alonso Transformed Leverkusen',
+    excerpt: 'An in-depth look at the tactics behind Bayer Leverkusen’s historic unbeaten Bundesliga season.',
+    content: 'Xabi Alonso has orchestrated one of the most remarkable seasons in European football history, leading Bayer Leverkusen to an undefeated Bundesliga title and the DFB-Pokal. His 3-4-2-1 system has been praised for its fluidity and defensive solidity.',
+    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=1000',
+    author: 'Michael Cox',
+    readTime: 8,
+    createdAt: new Date(Date.now() - 345600000).toISOString(),
+    category: 'Bundesliga',
+  },
+];
+
+
+
 // Delay simulation
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
 
@@ -960,5 +1022,21 @@ export const advancedFootballApi = {
       success: 1,
       result: mockOfficials,
     };
+  },
+
+  /**
+   * Get all blog posts
+   */
+  getBlogPosts: async (): Promise<BlogPost[]> => {
+    await delay(500);
+    return mockBlogPosts;
+  },
+
+  /**
+   * Get a blog post by ID
+   */
+  getBlogPostById: async (id: string): Promise<BlogPost | null> => {
+    await delay(500);
+    return mockBlogPosts.find((p) => p._id === id) || null;
   },
 };

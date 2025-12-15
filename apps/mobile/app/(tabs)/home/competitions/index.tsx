@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { footballApi } from '../../../../services/footballApi';
+import { advancedFootballApi } from '../../../../services/advancedFootballApi';
+import { mapLeagueToLeague } from '../../../../utils/footballAdapters';
 import { League } from '@goalmills/types';
 import { Stack } from 'expo-router';
 
@@ -11,8 +12,10 @@ export default function CompetitionsScreen() {
     const router = useRouter();
 
     useEffect(() => {
-        footballApi.getLeagues().then((data) => {
-            setLeagues(data);
+        advancedFootballApi.getLeagues().then((response) => {
+            if (response.success) {
+                setLeagues(response.result.map(mapLeagueToLeague));
+            }
             setLoading(false);
         });
     }, []);

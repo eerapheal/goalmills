@@ -23,7 +23,7 @@ import {
     FootballVideo,
 } from '@goalmills/types';
 import { advancedFootballApi } from '../services/advancedFootballApi';
-import { footballApi } from '../services/footballApi';
+// import { footballApi } from '../services/footballApi'; // Removed
 import { FootballMatchCard } from '../components/FootballMatchCard';
 import { NewsCard } from '../components/NewsCard';
 import { FootballVideoCard } from '../components/FootballVideoCard';
@@ -78,7 +78,7 @@ export function AdvancedFootballScreen() {
                 advancedFootballApi.getTopscorers(152),
                 advancedFootballApi.getLeagues(),
                 advancedFootballApi.getTeams(),
-                footballApi.getBlogPosts(),
+                advancedFootballApi.getBlogPosts(),
                 advancedFootballApi.getVideos(),
             ]);
 
