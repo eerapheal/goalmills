@@ -650,20 +650,76 @@ export const advancedFootballApi = {
   /**
    * Get video highlights for events
    */
-  getVideos: async (eventId: number): Promise<FootballVideosResponse> => {
+  getVideos: async (eventId?: number): Promise<FootballVideosResponse> => {
     await delay(500);
-    const videos: FootballVideo[] = [
+    const mockVideos: FootballVideo[] = [
       {
-        event_key: String(eventId),
-        video_title_full: 'Full Match Highlights',
-        video_title: 'Highlights',
-        video_url: 'https://www.youtube.com/watch?v=example',
+        event_key: '1000',
+        video_title_full: 'Manchester City 3-1 Manchester United | Premier League Highlights',
+        video_title: 'City vs United Highlights',
+        video_url: 'https://www.youtube.com/embed/4bTcYh_4Ykg?si=nyViewKNHgzUGF87',
+      },
+      {
+        event_key: '1001',
+        video_title_full: 'Arsenal 2-1 Liverpool | Last Minute Drama | Highlights',
+        video_title: 'Arsenal vs Liverpool',
+        video_url: 'https://www.youtube.com/embed/O4oQ-Qyv0PM?si=mZqe0dFz1-ykJbrh',
+      },
+      {
+        event_key: '1002',
+        video_title_full: 'Real Madrid 4-0 Barcelona | El Clásico Highlights',
+        video_title: 'El Clásico Highlights',
+        video_url: 'https://www.youtube.com/embed/UFjsE2Q97Hg?si=BJFmeTEtttMGDZG4',
+      },
+      {
+        event_key: '1003',
+        video_title_full: 'Bayern Munich 5-0 Dortmund | Der Klassiker Domination',
+        video_title: 'Bayern vs Dortmund',
+        video_url: 'https://www.youtube.com/embed/GgRSxSjtuDY?si=lrXfabyiCb3x0jEU',
+      },
+      {
+        event_key: '1004',
+        video_title_full: 'PSG 2-1 Marseille | Le Classique Highlights',
+        video_title: 'PSG vs Marseille',
+        video_url: 'https://www.youtube.com/embed/XGtFQXgTgzc?si=I42B_CXHBdekD2_6',
+      },
+      {
+        event_key: '1005',
+        video_title_full: 'Inter 1-0 Juventus | Serie A Highlights',
+        video_title: 'Inter vs Juventus',
+        video_url: 'https://www.youtube.com/embed/Gid2mMI0S2U?si=MaKvzX_oTJ_sUpvD',
+      },
+      {
+        event_key: '1006',
+        video_title_full: 'Chelsea 4-4 Leicester City | 8 Goal Thriller',
+        video_title: 'Chelsea vs Leicester',
+        video_url: 'https://www.youtube.com/embed/4bTcYh_4Ykg?si=nyViewKNHgzUGF87', // Reusing first video for remaining
+      },
+      {
+        event_key: '1007',
+        video_title_full: 'Tottenham 2-0 Aston Villa | Premier League',
+        video_title: 'Spurs vs Villa',
+        video_url: 'https://www.youtube.com/embed/O4oQ-Qyv0PM?si=mZqe0dFz1-ykJbrh', // Reusing second video for remaining
       },
     ];
 
+    let result = mockVideos;
+    if (eventId) {
+      result = mockVideos.filter((v) => v.event_key === String(eventId));
+      if (result.length === 0) {
+        // Return a generic video if specific event video not found in mock
+        result = [{
+             event_key: String(eventId),
+             video_title_full: 'Match Highlights',
+             video_title: 'Highlights',
+             video_url: 'https://www.youtube.com/watch?v=example_generic',
+        }];
+      }
+    }
+
     return {
       success: 1,
-      result: videos,
+      result: result,
     };
   },
 

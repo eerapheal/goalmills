@@ -7,7 +7,9 @@ import {
     Pressable,
     ActivityIndicator,
     RefreshControl,
+
     Image,
+    Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
@@ -18,13 +20,14 @@ import {
     FootballLeague,
     FootballTeam,
     BlogPost,
-    VideoHighlight,
+    FootballVideo,
 } from '@goalmills/types';
 import { advancedFootballApi } from '../services/advancedFootballApi';
 import { footballApi } from '../services/footballApi';
 import { FootballMatchCard } from '../components/FootballMatchCard';
 import { NewsCard } from '../components/NewsCard';
-import { VideoCard } from '../components/VideoCard';
+import { FootballVideoCard } from '../components/FootballVideoCard';
+import { VideoPlayerModal } from '../components/VideoPlayerModal';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'news' | 'videos';
 
@@ -43,7 +46,8 @@ export function AdvancedFootballScreen() {
     const [leagues, setLeagues] = useState<FootballLeague[]>([]);
     const [teams, setTeams] = useState<FootballTeam[]>([]);
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-    const [videos, setVideos] = useState<VideoHighlight[]>([]);
+    const [videos, setVideos] = useState<FootballVideo[]>([]);
+    const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
     const loadData = async () => {
         try {
@@ -63,7 +67,7 @@ export function AdvancedFootballScreen() {
                 leaguesRes,
                 teamsRes,
                 posts,
-                videoData,
+                videosRes,
             ] = await Promise.all([
                 advancedFootballApi.getLivescore(),
                 advancedFootballApi.getFixtures({
@@ -75,7 +79,7 @@ export function AdvancedFootballScreen() {
                 advancedFootballApi.getLeagues(),
                 advancedFootballApi.getTeams(),
                 footballApi.getBlogPosts(),
-                footballApi.getVideoHighlights(),
+                advancedFootballApi.getVideos(),
             ]);
 
             setLiveEvents(livescoreRes.result);
@@ -119,7 +123,7 @@ export function AdvancedFootballScreen() {
             setLeagues(leaguesRes.result);
             setTeams(teamsRes.result);
             setBlogPosts(posts);
-            setVideos(videoData);
+            setVideos(videosRes.result);
         } catch (error) {
             console.error('Error loading football data:', error);
         } finally {
@@ -148,6 +152,7 @@ export function AdvancedFootballScreen() {
     ];
 
     const renderStandingsTable = () => {
+        // ... existing implementation ...
         const getTeamLogo = (teamKey: string) => {
             const team = teams.find(t => t.team_key === teamKey);
             return team?.team_logo;
@@ -205,6 +210,7 @@ export function AdvancedFootballScreen() {
     };
 
     const renderTopscorers = () => {
+        // ... existing implementation ...
         const getTeamLogo = (teamKey: string) => {
             const team = teams.find(t => t.team_key === teamKey);
             return team?.team_logo;
@@ -250,6 +256,7 @@ export function AdvancedFootballScreen() {
             </View>
         );
     };
+
 
     const renderContent = () => {
         if (loading) {
@@ -333,10 +340,10 @@ export function AdvancedFootballScreen() {
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>🎥 Video Highlights</Text>
                         {videos.filter((v) => v).map((video) => (
-                            <VideoCard
-                                key={video.id}
-                                item={video}
-                                onPress={() => router.push(`/highlight/${video.id}`)}
+                            <FootballVideoCard
+                                key={video.event_key}
+                                video={video}
+                                onPress={() => video.video_url && setSelectedVideo(video.video_url)}
                             />
                         ))}
                     </View>
@@ -420,6 +427,12 @@ export function AdvancedFootballScreen() {
             >
                 {renderContent()}
             </ScrollView>
+
+            <VideoPlayerModal
+                visible={!!selectedVideo}
+                videoUrl={selectedVideo}
+                onClose={() => setSelectedVideo(null)}
+            />
         </View>
     );
 }

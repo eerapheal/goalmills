@@ -705,7 +705,7 @@ export interface FootballPlayersParams extends FootballBaseParams {
 
 export interface FootballVideosParams extends FootballBaseParams {
   met: 'Videos';
-  eventId: number;
+  eventId?: number;
 }
 
 export interface FootballOddsParams extends FootballBaseParams {
@@ -878,7 +878,6 @@ export interface FootballDetailedEvent extends FootballEvent {
   cards: FootballCard[];
   lineups: FootballLineups;
   statistics: FootballStatistic[];
-  lineups?: FootballLineups;
 }
 
 // Cricket Types
