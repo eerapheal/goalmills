@@ -151,32 +151,36 @@ const generateMockEvents = (): FootballEvent[] => {
     const htAwayGoals = isFinished || isLive ? Math.floor(awayGoals * 0.6) : 0;
 
     const goalscorers: FootballGoalScorer[] = [];
-    for (let g = 0; g < homeGoals; g++) {
-      goalscorers.push({
-        time: `${Math.floor(Math.random() * 90)}'`,
-        home_scorer: `Player ${g + 1}`,
-        score: `${g + 1} - ${awayGoals}`,
-        away_scorer: '',
-      });
-    }
-    for (let g = 0; g < awayGoals; g++) {
-      goalscorers.push({
-        time: `${Math.floor(Math.random() * 90)}'`,
-        home_scorer: '',
-        score: `${homeGoals} - ${g + 1}`,
-        away_scorer: `Player ${g + 1}`,
-      });
+    if (isFinished || isLive) {
+        for (let g = 0; g < homeGoals; g++) {
+        goalscorers.push({
+            time: `${Math.floor(Math.random() * 90)}'`,
+            home_scorer: `Player ${g + 1}`,
+            score: `${g + 1} - ${awayGoals}`,
+            away_scorer: '',
+        });
+        }
+        for (let g = 0; g < awayGoals; g++) {
+        goalscorers.push({
+            time: `${Math.floor(Math.random() * 90)}'`,
+            home_scorer: '',
+            score: `${homeGoals} - ${g + 1}`,
+            away_scorer: `Player ${g + 1}`,
+        });
+        }
     }
 
     const cards: FootballCard[] = [];
-    const numCards = Math.floor(Math.random() * 4);
-    for (let c = 0; c < numCards; c++) {
-      cards.push({
-        time: `${Math.floor(Math.random() * 90)}'`,
-        home_fault: Math.random() > 0.5 ? `Player ${c + 1}` : '',
-        card: Math.random() > 0.8 ? 'red card' : 'yellow card',
-        away_fault: Math.random() > 0.5 ? `Player ${c + 1}` : '',
-      });
+    if (isFinished || isLive) {
+        const numCards = Math.floor(Math.random() * 4);
+        for (let c = 0; c < numCards; c++) {
+        cards.push({
+            time: `${Math.floor(Math.random() * 90)}'`,
+            home_fault: Math.random() > 0.5 ? `Player ${c + 1}` : '',
+            card: Math.random() > 0.8 ? 'red card' : 'yellow card',
+            away_fault: Math.random() > 0.5 ? `Player ${c + 1}` : '',
+        });
+        }
     }
 
     const statistics: FootballStatistic[] = [
@@ -257,6 +261,69 @@ const generateMockEvents = (): FootballEvent[] => {
       lineups: isLive || isFinished ? lineups : undefined,
     });
   }
+
+  // Add explicit upcoming matches
+  const upcomingMatches = [
+      {
+          home: mockTeams[0], // Man Utd
+          away: mockTeams[2], // Liverpool
+          league: mockLeagues[0], // EPL
+          dateOffset: 2,
+          time: '20:00',
+      },
+      {
+          home: mockTeams[7], // Real Madrid
+          away: mockTeams[6], // Barcelona
+          league: mockLeagues[1], // La Liga
+          dateOffset: 3,
+          time: '21:00',
+      },
+      {
+          home: mockTeams[1], // Man City
+          away: mockTeams[3], // Arsenal
+          league: mockLeagues[0], // EPL
+          dateOffset: 4,
+          time: '17:30',
+      }
+  ];
+
+  upcomingMatches.forEach((match, index) => {
+      const date = new Date(now);
+      date.setDate(date.getDate() + match.dateOffset);
+      
+      events.push({
+          event_key: `upcoming-${index}`,
+          event_date: date.toISOString().split('T')[0],
+          event_time: match.time,
+          event_home_team: match.home.team_name,
+          home_team_key: match.home.team_key,
+          event_away_team: match.away.team_name,
+          away_team_key: match.away.team_key,
+          event_halftime_result: '',
+          event_final_result: '',
+          event_ft_result: '',
+          event_penalty_result: '',
+          event_status: 'Not Started',
+          country_name: match.league.country_name,
+          league_name: match.league.league_name,
+          league_key: match.league.league_key,
+          league_round: 'Round 20',
+          league_season: '2024/2025',
+          event_live: '0',
+          event_stadium: `${match.home.team_name} Stadium`,
+          event_referee: '',
+          home_team_logo: match.home.team_logo,
+          away_team_logo: match.away.team_logo,
+          league_logo: match.league.league_logo,
+          country_logo: match.league.country_logo,
+          event_home_formation: '',
+          event_away_formation: '',
+          goalscorers: [],
+          cards: [],
+          statistics: [],
+          lineups: undefined,
+      });
+  });
 
   return events.sort((a, b) => {
     const dateA = new Date(`${a.event_date} ${a.event_time}`);
