@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
 import { SportType } from '@goalmills/types';
 import { SportTabs } from '../../../components/SportTabs';
-import { FootballScreen } from '../../../screens/FootballScreen';
+import { AdvancedFootballScreen } from '../../../screens/AdvancedFootballScreen';
 import { CricketScreen } from '../../../screens/CricketScreen';
 import { TennisScreen } from '../../../screens/TennisScreen';
 import BasketballScreen from '../../../screens/BasketballScreen';
@@ -14,7 +14,7 @@ export default function HomeScreen() {
     const renderSportContent = () => {
         switch (selectedSport) {
             case 'football':
-                return <FootballScreen />;
+                return <AdvancedFootballScreen />;
 
             case 'cricket':
                 return <CricketScreen />;

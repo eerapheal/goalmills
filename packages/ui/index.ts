@@ -32,6 +32,7 @@ export const FONT_SIZES = {
 };
 
 export const BORDER_RADIUS = {
+  xs: 2,
   sm: 4,
   md: 8,
   lg: 12,

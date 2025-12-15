@@ -160,6 +160,727 @@ export interface Lineup {
   };
 }
 
+// Advanced Football API Types (AllSportsAPI)
+
+// Base Types
+export interface FootballCountry {
+  country_key: string;
+  country_name: string;
+  country_iso2: string | null;
+  country_logo: string;
+}
+
+export interface FootballLeague {
+  league_key: string;
+  league_name: string;
+  country_key: string;
+  country_name: string;
+  league_logo: string;
+  country_logo: string;
+}
+
+export interface FootballTeam {
+  team_key: string;
+  team_name: string;
+  team_logo: string;
+  players?: FootballPlayer[];
+}
+
+export interface FootballPlayer {
+  player_key: number;
+  player_name: string;
+  player_number: string;
+  player_country: string | null;
+  player_type: string;
+  player_age: string;
+  player_match_played: string;
+  player_goals: string;
+  player_yellow_cards: string;
+  player_red_cards: string;
+  player_image: string;
+  player_minutes?: string;
+  player_injured?: string;
+  player_substitute_out?: string;
+  player_substitutes_on_bench?: string;
+  player_assists?: string;
+  player_is_captain?: string;
+  player_shots_total?: string;
+  player_goals_conceded?: string;
+  player_fouls_commited?: string;
+  player_tackles?: string;
+  player_blocks?: string;
+  player_crosses_total?: string;
+  player_interceptions?: string;
+  player_clearances?: string;
+  player_dispossesed?: string;
+  player_saves?: string;
+  player_inside_box_saves?: string;
+  player_duels_total?: string;
+  player_duels_won?: string;
+  player_dribble_attempts?: string;
+  player_dribble_succ?: string;
+  player_pen_comm?: string;
+  player_pen_won?: string;
+  player_pen_scored?: string;
+  player_pen_missed?: string;
+  player_passes?: string;
+  player_passes_accuracy?: string;
+  player_key_passes?: string;
+  player_woordworks?: string;
+  player_rating?: string;
+  team_name?: string;
+  team_key?: string;
+  player_position?: string;
+}
+
+export interface FootballGoalScorer {
+  time: string;
+  home_scorer: string;
+  score: string;
+  away_scorer: string;
+}
+
+export interface FootballSubstitute {
+  time: string;
+  home_scorer: {
+    in: string;
+    out: string;
+  } | [];
+  score: string;
+  away_scorer: {
+    in: string;
+    out: string;
+  } | [];
+}
+
+export interface FootballCard {
+  time: string;
+  home_fault: string;
+  card: string;
+  away_fault: string;
+}
+
+export interface FootballLineupPlayer {
+  player: string;
+  player_number: string;
+  player_position: string;
+  player_country: string | null;
+  player_key?: string;
+  player_image?: string;
+}
+
+export interface FootballCoach {
+  coache: string;
+  coache_country: string | null;
+  coache_age?: string;
+  coache_image?: string;
+  team_name?: string;
+  trophies?: number;
+}
+
+export interface FootballOfficial {
+  name: string;
+  country: string;
+  matches: number;
+  yellowCards?: number;
+  redCards?: number;
+  image?: string;
+}
+
+export interface FootballTeamLineup {
+  starting_lineups: FootballLineupPlayer[];
+  substitutes: FootballLineupPlayer[];
+  coaches: FootballCoach[];
+  missing_players: any[];
+}
+
+export interface FootballLineups {
+  home_team: FootballTeamLineup;
+  away_team: FootballTeamLineup;
+}
+
+export interface FootballStatistic {
+  type: string;
+  home: string;
+  away: string;
+}
+
+export interface FootballEvent {
+  event_key: string;
+  event_date: string;
+  event_time: string;
+  event_home_team: string;
+  home_team_key: string;
+  event_away_team: string;
+  away_team_key: string;
+  event_halftime_result: string;
+  event_final_result: string;
+  event_ft_result: string;
+  event_penalty_result: string;
+  event_status: string;
+  country_name: string;
+  league_name: string;
+  league_key: string;
+  league_round: string;
+  league_season: string;
+  event_live: string;
+  event_stadium?: string;
+  event_referee?: string;
+  home_team_logo?: string;
+  away_team_logo?: string;
+  event_country_key?: string;
+  league_logo?: string;
+  country_logo?: string;
+  event_home_formation?: string;
+  event_away_formation?: string;
+  fk_stage_key?: string;
+  stage_name?: string;
+  league_group?: string;
+  goalscorers?: FootballGoalScorer[];
+  substitutes?: FootballSubstitute[];
+  cards?: FootballCard[];
+  lineups?: FootballLineups;
+  statistics?: FootballStatistic[];
+}
+
+export interface FootballStanding {
+  standing_place: string;
+  standing_place_type: string | null;
+  standing_team: string;
+  standing_P: string;
+  standing_W: string;
+  standing_D: string;
+  standing_L: string;
+  standing_F: string;
+  standing_A: string;
+  standing_GD: string;
+  standing_PTS: string;
+  team_key: string;
+  league_key: string;
+  league_season: string;
+  league_round: string;
+  standing_updated?: string;
+  fk_stage_key?: string;
+  stage_name?: string;
+}
+
+export interface FootballTopscorer {
+  player_place: string;
+  player_name: string;
+  player_key: number;
+  team_name: string;
+  team_key: string;
+  goals: string;
+  assists: string | null;
+  penalty_goals: string;
+}
+
+export interface FootballVideo {
+  event_key: string;
+  video_title_full: string;
+  video_title: string;
+  video_url: string;
+}
+
+export interface FootballOdds {
+  match_id: string;
+  odd_bookmakers: string;
+  odd_1: string | null;
+  odd_x: string | null;
+  odd_2: string | null;
+  odd_1x: string | null;
+  odd_12: string | null;
+  odd_x2: string | null;
+  'ah-4.5_1': string | null;
+  'ah-4.5_2': string | null;
+  'ah-4_1': string | null;
+  'ah-4_2': string | null;
+  'ah-3.5_1': string | null;
+  'ah-3.5_2': string | null;
+  'ah-3_1': string | null;
+  'ah-3_2': string | null;
+  'ah-2.5_1': string | null;
+  'ah-2.5_2': string | null;
+  'ah-2_1': string | null;
+  'ah-2_2': string | null;
+  'ah-1.5_1': string | null;
+  'ah-1.5_2': string | null;
+  'ah-1_1': string | null;
+  'ah-1_2': string | null;
+  'ah0_1': string | null;
+  'ah0_2': string | null;
+  'ah+0.5_1': string | null;
+  'ah+1_1': string | null;
+  'ah+1_2': string | null;
+  'ah+1.5_1': string | null;
+  'ah+1.5_2': string | null;
+  'ah+2_1': string | null;
+  'ah+2_2': string | null;
+  'ah+2.5_1': string | null;
+  'ah+2.5_2': string | null;
+  'ah+3_1': string | null;
+  'ah+3_2': string | null;
+  'ah+3.5_1': string | null;
+  'ah+3.5_2': string | null;
+  'ah+4_1': string | null;
+  'ah+4_2': string | null;
+  'ah+4.5_1': string | null;
+  'ah+4.5_2': string | null;
+  'o+0.5': string | null;
+  'u+0.5': string | null;
+  'o+1': string | null;
+  'u+1': string | null;
+  'o+1.5': string | null;
+  'u+1.5': string | null;
+  'o+2': string | null;
+  'u+2': string | null;
+  'o+2.5': string | null;
+  'u+2.5': string | null;
+  'o+3': string | null;
+  'u+3': string | null;
+  'o+3.5': string | null;
+  'u+3.5': string | null;
+  'o+4': string | null;
+  'u+4': string | null;
+  'o+4.5': string | null;
+  'u+4.5': string | null;
+  'o+5': string | null;
+  'u+5': string | null;
+  'o+5.5': string | null;
+  'u+5.5': string | null;
+  bts_yes: string | null;
+  bts_no: string | null;
+}
+
+export interface FootballProbability {
+  event_key: string;
+  country_key: string;
+  country_name: string;
+  league_key: string;
+  league_name: string;
+  event_date: string;
+  event_time: string;
+  event_status: string;
+  home_team_key: string;
+  event_home_team: string;
+  event_away_team: string;
+  away_team_key: string;
+  event_halftime_result: string;
+  event_final_result: string;
+  event_ft_result: string;
+  event_penalty_result: string;
+  event_home_formation: string;
+  event_away_formation: string;
+  event_live: string;
+  event_HW: string;
+  event_D: string;
+  event_AW: string;
+  event_HW_D: string;
+  event_AW_D: string;
+  event_HW_AW: string;
+  event_O: string;
+  event_U: string;
+  event_O_1: string;
+  event_U_1: string;
+  event_O_3: string;
+  event_U_3: string;
+  event_bts: string;
+  event_ots: string;
+  event_ah_h_45: string;
+  event_ah_a_45: string;
+  event_ah_h_35: string;
+  event_ah_a_35: string;
+  event_ah_h_25: string;
+  event_ah_a_25: string;
+  event_ah_h_15: string;
+  event_ah_a_15: string;
+  event_ah_h_05: string;
+  event_ah_a_05: string;
+  'event_ah_h_-05': string;
+  'event_ah_a_-05': string;
+  'event_ah_h_-15': string;
+  'event_ah_a_-15': string;
+  'event_ah_h_-25': string;
+  'event_ah_a_-25': string;
+  'event_ah_h_-35': string;
+  'event_ah_a_-35': string;
+  'event_ah_h_-45': string;
+  'event_ah_a_-45': string;
+}
+
+export interface FootballLiveOdd {
+  odd_name: string;
+  is_odd_suspended: 'Yes' | 'No';
+  odd_type: string;
+  odd_value: string;
+  odd_participant_handicap: string | null;
+  odd_last_updated: string;
+  match_id: string;
+}
+
+export interface FootballComment {
+  comments_time: string;
+  comments_text: string;
+  comments_state_info: string | null;
+  match_id: string;
+}
+
+export interface FootballBookmaker {
+  [bookmakerName: string]: string;
+}
+
+export interface FootballFullOddsMarket {
+  [outcome: string]: FootballBookmaker;
+}
+
+export interface FootballFullMatchOdds {
+  [marketName: string]: FootballFullOddsMarket;
+}
+
+// API Response Types
+export interface FootballApiResponse<T> {
+  success: 0 | 1;
+  result: T;
+}
+
+export interface FootballCountriesResponse {
+  success: 1;
+  result: FootballCountry[];
+}
+
+export interface FootballLeaguesResponse {
+  success: 1;
+  result: FootballLeague[];
+}
+
+export interface FootballFixturesResponse {
+  success: 1;
+  result: FootballEvent[];
+}
+
+export interface FootballH2HResponse {
+  success: 1;
+  result: {
+    H2H: FootballEvent[];
+    firstTeamResults: FootballEvent[];
+    secondTeamResults: FootballEvent[];
+  };
+}
+
+export interface FootballLivescoreResponse {
+  success: 1;
+  result: FootballEvent[];
+}
+
+export interface FootballStandingsResponse {
+  success: 1;
+  result: {
+    total: FootballStanding[];
+    home: FootballStanding[];
+    away: FootballStanding[];
+  };
+}
+
+export interface FootballTopscorersResponse {
+  success: 1;
+  result: FootballTopscorer[];
+}
+
+export interface FootballTeamsResponse {
+  success: 1;
+  result: FootballTeam[];
+}
+
+export interface FootballPlayersResponse {
+  success: 1;
+  result: FootballPlayer[];
+}
+
+export interface FootballVideosResponse {
+  success: 1;
+  result: FootballVideo[];
+}
+
+export interface FootballOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: FootballOdds[];
+  };
+}
+
+export interface FootballProbabilitiesResponse {
+  success: 1;
+  result: FootballProbability[];
+}
+
+export interface FootballLiveOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: FootballLiveOdd[];
+  };
+}
+
+export interface FootballCommentsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: FootballComment[];
+  };
+}
+
+export interface FootballFullOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: FootballFullMatchOdds;
+  };
+}
+
+// API Request Parameter Types
+export interface FootballBaseParams {
+  met: string;
+  APIkey: string;
+}
+
+export interface FootballCountriesParams extends FootballBaseParams {
+  met: 'Countries';
+}
+
+export interface FootballLeaguesParams extends FootballBaseParams {
+  met: 'Leagues';
+  countryId?: number;
+}
+
+export interface FootballFixturesParams extends FootballBaseParams {
+  met: 'Fixtures';
+  from: string; // yyyy-mm-dd
+  to: string; // yyyy-mm-dd
+  timezone?: string;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+  teamId?: number;
+  leagueGroup?: string;
+  withPlayerStats?: string | number;
+}
+
+export interface FootballH2HParams extends FootballBaseParams {
+  met: 'H2H';
+  firstTeamId: number;
+  secondTeamId: number;
+  timezone?: string;
+}
+
+export interface FootballLivescoreParams extends FootballBaseParams {
+  met: 'Livescore';
+  timezone?: string;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+  withPlayerStats?: string | number;
+}
+
+export interface FootballStandingsParams extends FootballBaseParams {
+  met: 'Standings';
+  leagueId: number;
+}
+
+export interface FootballTopscorersParams extends FootballBaseParams {
+  met: 'Topscorers';
+  leagueId: number;
+}
+
+export interface FootballTeamsParams extends FootballBaseParams {
+  met: 'Teams';
+  leagueId?: number;
+  teamId?: number;
+  teamName?: string;
+}
+
+export interface FootballPlayersParams extends FootballBaseParams {
+  met: 'Players';
+  playerId?: number;
+  playerName?: string;
+  leagueId?: number;
+  teamId?: number;
+}
+
+export interface FootballVideosParams extends FootballBaseParams {
+  met: 'Videos';
+  eventId: number;
+}
+
+export interface FootballOddsParams extends FootballBaseParams {
+  met: 'Odds';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+export interface FootballProbabilitiesParams extends FootballBaseParams {
+  met: 'Probabilities';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+export interface FootballLiveOddsParams extends FootballBaseParams {
+  met: 'OddsLive';
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+  timezone?: string;
+}
+
+export interface FootballCommentsParams extends FootballBaseParams {
+  met: 'Comments';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  live?: string | number;
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+  timezone?: string;
+}
+
+export interface FootballFullOddsParams extends FootballBaseParams {
+  met: 'FullOdds';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
+}
+
+// API Client Interface
+export interface FootballAPIClient {
+  /**
+   * Get list of supported countries
+   */
+  getCountries(params: Omit<FootballCountriesParams, 'met'>): Promise<FootballCountriesResponse>;
+
+  /**
+   * Get list of supported leagues/competitions
+   */
+  getLeagues(params: Omit<FootballLeaguesParams, 'met'>): Promise<FootballLeaguesResponse>;
+
+  /**
+   * Get football fixtures/events
+   */
+  getFixtures(params: Omit<FootballFixturesParams, 'met'>): Promise<FootballFixturesResponse>;
+
+  /**
+   * Get head to head results between two teams
+   */
+  getH2H(params: Omit<FootballH2HParams, 'met'>): Promise<FootballH2HResponse>;
+
+  /**
+   * Get live football matches
+   */
+  getLivescore(params: Omit<FootballLivescoreParams, 'met'>): Promise<FootballLivescoreResponse>;
+
+  /**
+   * Get league standings (total, home, away)
+   */
+  getStandings(params: Omit<FootballStandingsParams, 'met'>): Promise<FootballStandingsResponse>;
+
+  /**
+   * Get top scorers for a league
+   */
+  getTopscorers(params: Omit<FootballTopscorersParams, 'met'>): Promise<FootballTopscorersResponse>;
+
+  /**
+   * Get teams information with players
+   */
+  getTeams(params: Omit<FootballTeamsParams, 'met'>): Promise<FootballTeamsResponse>;
+
+  /**
+   * Get player information and statistics
+   */
+  getPlayers(params: Omit<FootballPlayersParams, 'met'>): Promise<FootballPlayersResponse>;
+
+  /**
+   * Get video highlights for events
+   */
+  getVideos(params: Omit<FootballVideosParams, 'met'>): Promise<FootballVideosResponse>;
+
+  /**
+   * Get pre-match odds for events
+   */
+  getOdds(params: Omit<FootballOddsParams, 'met'>): Promise<FootballOddsResponse>;
+
+  /**
+   * Get match probabilities
+   */
+  getProbabilities(params: Omit<FootballProbabilitiesParams, 'met'>): Promise<FootballProbabilitiesResponse>;
+
+  /**
+   * Get live odds for ongoing events
+   */
+  getLiveOdds(params: Omit<FootballLiveOddsParams, 'met'>): Promise<FootballLiveOddsResponse>;
+
+  /**
+   * Get live match comments/commentary
+   */
+  getComments(params: Omit<FootballCommentsParams, 'met'>): Promise<FootballCommentsResponse>;
+
+  /**
+   * Get full odds list with all bookmakers and markets
+   */
+  getFullOdds(params: Omit<FootballFullOddsParams, 'met'>): Promise<FootballFullOddsResponse>;
+}
+
+// Utility Types
+export type FootballEventStatus = 
+  | 'Finished' 
+  | 'Live'
+  | 'Not Started'
+  | 'Postponed'
+  | 'Cancelled'
+  | 'Abandoned'
+  | string; // Can be minute number like "45", "73"
+
+export type FootballCardType = 
+  | 'yellow card'
+  | 'red card'
+  | 'yellow red card';
+
+export type FootballPlayerType = 
+  | 'Goalkeepers'
+  | 'Defenders'
+  | 'Midfielders'
+  | 'Forwards';
+
+export type FootballStatisticType =
+  | 'Shots Total'
+  | 'Shots On Goal'
+  | 'Shots Off Goal'
+  | 'Shots Blocked'
+  | 'Shots Inside Box'
+  | 'Shots Outside Box'
+  | 'Fouls'
+  | 'Corners'
+  | 'Offsides'
+  | 'Ball Possession'
+  | 'Yellow Cards'
+  | 'Red Cards'
+  | 'Saves'
+  | 'Passes Total'
+  | 'Passes Accurate'
+  | string;
+
+// Extended Types for Detailed Match Data
+export interface FootballDetailedEvent extends FootballEvent {
+  goalscorers: FootballGoalScorer[];
+  substitutes: FootballSubstitute[];
+  cards: FootballCard[];
+  lineups: FootballLineups;
+  statistics: FootballStatistic[];
+  lineups?: FootballLineups;
+}
+
 // Cricket Types
 
 export interface CricketTeam {
