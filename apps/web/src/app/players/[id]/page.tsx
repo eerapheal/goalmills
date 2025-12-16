@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
 import { FootballPlayer } from '@goalmills/types';
+import { BackButton } from '../../../components/BackButton';
 
 export default function PlayerDetailsPage() {
     const params = useParams();
@@ -44,7 +46,7 @@ export default function PlayerDetailsPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
                 <h1 className="text-2xl font-bold text-white mb-4">Player Not Found</h1>
-                <button onClick={() => router.back()} className="text-secondary hover:underline">Go Back</button>
+                <BackButton className="mt-4" />
             </div>
         );
     }
@@ -52,11 +54,14 @@ export default function PlayerDetailsPage() {
     return (
         <div className="min-h-screen bg-background pt-[90px] pb-20 p-4">
             <div className="max-w-4xl mx-auto glass-card rounded-2xl overflow-hidden animate-fade-in relative">
+                {/* Back Button */}
+                <BackButton className="absolute top-4 left-4 z-20" />
+
                 {/* Background Gradient */}
                 <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-br from-secondary/20 to-primary/20" />
 
                 <div className="relative pt-12 px-8 flex flex-col md:flex-row items-center md:items-end gap-8 pb-8 border-b border-white/5">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface shadow-xl bg-white/10">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface shadow-xl bg-white/10 shrink-0">
                         <img src={player.player_image} alt={player.player_name} className="w-full h-full object-cover" />
                     </div>
                     <div className="text-center md:text-left mb-2 flex-1">

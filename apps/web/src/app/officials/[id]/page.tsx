@@ -2,23 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-
-type Official = {
-    name: string;
-    country: string;
-    matches: number;
-    yellowCards: number;
-    redCards: number;
-    image: string;
-};
-
-const mockOfficials: Official[] = [
-    { name: 'Michael Oliver', country: 'England', matches: 245, image: 'https://ui-avatars.com/api/?name=Michael+Oliver&background=random&size=200', yellowCards: 1234, redCards: 89 },
-    { name: 'Anthony Taylor', country: 'England', matches: 198, image: 'https://ui-avatars.com/api/?name=Anthony+Taylor&background=random&size=200', yellowCards: 987, redCards: 67 },
-    { name: 'Björn Kuipers', country: 'Netherlands', matches: 312, image: 'https://ui-avatars.com/api/?name=Bjorn+Kuipers&background=random&size=200', yellowCards: 1567, redCards: 102 },
-    { name: 'Daniele Orsato', country: 'Italy', matches: 267, image: 'https://ui-avatars.com/api/?name=Daniele+Orsato&background=random&size=200', yellowCards: 1345, redCards: 95 },
-    { name: 'Clément Turpin', country: 'France', matches: 189, image: 'https://ui-avatars.com/api/?name=Clement+Turpin&background=random&size=200', yellowCards: 876, redCards: 54 },
-];
+import { advancedFootballApi } from '../../../services/advancedFootballApi';
+import { FootballOfficial } from '@goalmills/types';
+import { BackButton } from '../../../components/BackButton';
 
 export default function OfficialDetailsPage() {
     const params = useParams();
@@ -26,15 +12,24 @@ export default function OfficialDetailsPage() {
     const officialId = params.id;
 
     const [loading, setLoading] = useState(true);
-    const [official, setOfficial] = useState<Official | null>(null);
+    const [official, setOfficial] = useState<FootballOfficial | null>(null);
 
     useEffect(() => {
-        setTimeout(() => {
-            const index = Number(officialId) % mockOfficials.length;
-            const found = isNaN(index) ? mockOfficials[0] : mockOfficials[index];
-            setOfficial(found);
-            setLoading(false);
-        }, 500);
+        const loadOfficial = async () => {
+            try {
+                const res = await advancedFootballApi.getOfficials();
+                const officials = res.result;
+                const index = Number(officialId) % officials.length;
+                const found = isNaN(index) ? officials[0] : officials[index];
+                setOfficial(found);
+            } catch (error) {
+                console.error('Error loading official:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadOfficial();
     }, [officialId]);
 
     if (loading) {
@@ -49,7 +44,8 @@ export default function OfficialDetailsPage() {
 
     return (
         <div className="min-h-screen bg-background pt-[90px] pb-20 p-4">
-            <div className="max-w-3xl mx-auto glass-card rounded-2xl overflow-hidden animate-fade-in">
+            <div className="max-w-3xl mx-auto glass-card rounded-2xl overflow-hidden animate-fade-in relative">
+                <BackButton className="absolute top-4 left-4 z-20" />
                 <div className="p-8 border-b border-white/5 flex flex-col md:flex-row items-center gap-8">
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 shadow-xl">
                         <img src={official.image} alt={official.name} className="w-full h-full object-cover" />

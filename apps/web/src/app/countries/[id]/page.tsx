@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
 import { FootballLeague, FootballCountry } from '@goalmills/types';
+import { BackButton } from '../../../components/BackButton';
 
 export default function CountryPage() {
     const params = useParams();
@@ -47,7 +48,7 @@ export default function CountryPage() {
             <div className="min-h-screen bg-background pt-[90px] p-4 flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-2xl text-white font-bold mb-2">Country Not Found</h1>
-                    <Link href="/" className="text-secondary hover:underline">Go Back Home</Link>
+                    <BackButton className="mt-4" />
                 </div>
             </div>
         )
@@ -56,6 +57,9 @@ export default function CountryPage() {
     return (
         <div className="min-h-screen bg-background pt-[90px] pb-20 p-4">
             <div className="max-w-7xl mx-auto">
+                <div className="mb-6">
+                    <BackButton />
+                </div>
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-20 h-20 bg-surface rounded-full p-4 flex items-center justify-center shadow-lg">
                         <img

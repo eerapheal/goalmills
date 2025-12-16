@@ -424,39 +424,184 @@ const mockStandings: FootballStanding[] = [
   },
 ];
 
-// Mock Data - Top Scorers
-const mockTopscorers: FootballTopscorer[] = [
-  {
-    player_place: '1',
-    player_name: 'Erling Haaland',
-    player_key: 1100,
-    team_name: 'Manchester City',
-    team_key: '50',
-    goals: '18',
-    assists: '5',
-    penalty_goals: '3',
-  },
-  {
-    player_place: '2',
-    player_name: 'Mohamed Salah',
-    player_key: 306,
-    team_name: 'Liverpool',
-    team_key: '40',
-    goals: '15',
-    assists: '8',
-    penalty_goals: '2',
-  },
-  {
-    player_place: '3',
-    player_name: 'Harry Kane',
-    player_key: 276,
-    team_name: 'Bayern Munich',
-    team_key: '157',
-    goals: '14',
-    assists: '4',
-    penalty_goals: '4',
-  },
-];
+// Mock Data - Top Scorers By League
+const mockTopscorersByLeague: { [key: string]: FootballTopscorer[] } = {
+  // Premier League (152)
+  '152': [
+    {
+      player_place: '1',
+      player_name: 'Erling Haaland',
+      player_key: 1100,
+      team_name: 'Manchester City',
+      team_key: '50',
+      goals: '18',
+      assists: '5',
+      penalty_goals: '3',
+    },
+    {
+      player_place: '2',
+      player_name: 'Mohamed Salah',
+      player_key: 306,
+      team_name: 'Liverpool',
+      team_key: '40',
+      goals: '15',
+      assists: '8',
+      penalty_goals: '2',
+    },
+    {
+      player_place: '3',
+      player_name: 'Ollie Watkins',
+      player_key: 1101, // Mock key
+      team_name: 'Aston Villa',
+      team_key: '66', // Mock key
+      goals: '11',
+      assists: '10',
+      penalty_goals: '0',
+    },
+    {
+      player_place: '4',
+      player_name: 'Son Heung-min',
+      player_key: 1102,
+      team_name: 'Tottenham',
+      team_key: '47',
+      goals: '11',
+      assists: '5',
+      penalty_goals: '1',
+    },
+  ],
+  // La Liga (302)
+  '302': [
+    {
+      player_place: '1',
+      player_name: 'Jude Bellingham',
+      player_key: 1200,
+      team_name: 'Real Madrid',
+      team_key: '541',
+      goals: '16',
+      assists: '4',
+      penalty_goals: '1',
+    },
+    {
+      player_place: '2',
+      player_name: 'Artem Dovbyk',
+      player_key: 1201,
+      team_name: 'Girona',
+      team_key: '100', // Mock
+      goals: '14',
+      assists: '5',
+      penalty_goals: '2',
+    },
+    {
+      player_place: '3',
+      player_name: 'Robert Lewandowski',
+      player_key: 1202,
+      team_name: 'Barcelona',
+      team_key: '529',
+      goals: '13',
+      assists: '4',
+      penalty_goals: '2',
+    },
+  ],
+  // Bundesliga (175)
+  '175': [
+    {
+      player_place: '1',
+      player_name: 'Harry Kane',
+      player_key: 276,
+      team_name: 'Bayern Munich',
+      team_key: '157',
+      goals: '24',
+      assists: '5',
+      penalty_goals: '3',
+    },
+    {
+      player_place: '2',
+      player_name: 'Serhou Guirassy',
+      player_key: 1301,
+      team_name: 'Stuttgart',
+      team_key: '101',
+      goals: '17',
+      assists: '1',
+      penalty_goals: '2',
+    },
+    {
+      player_place: '3',
+      player_name: 'Leroy Sané',
+      player_key: 1302,
+      team_name: 'Bayern Munich',
+      team_key: '157',
+      goals: '8',
+      assists: '10',
+      penalty_goals: '0',
+    },
+  ],
+  // Serie A (207)
+  '207': [
+    {
+      player_place: '1',
+      player_name: 'Lautaro Martínez',
+      player_key: 1400,
+      team_name: 'Inter Milan',
+      team_key: '102',
+      goals: '19',
+      assists: '2',
+      penalty_goals: '2',
+    },
+    {
+      player_place: '2',
+      player_name: 'Dusan Vlahovic',
+      player_key: 1401,
+      team_name: 'Juventus',
+      team_key: '496',
+      goals: '12',
+      assists: '2',
+      penalty_goals: '1',
+    },
+    {
+      player_place: '3',
+      player_name: 'Olivier Giroud',
+      player_key: 1402,
+      team_name: 'AC Milan',
+      team_key: '489',
+      goals: '11',
+      assists: '8',
+      penalty_goals: '3',
+    },
+  ],
+  // Champions League (3) - Example of generic player having different goals here
+  '3': [
+    {
+      player_place: '1',
+      player_name: 'Erling Haaland',
+      player_key: 1100,
+      team_name: 'Manchester City',
+      team_key: '50',
+      goals: '6',
+      assists: '1',
+      penalty_goals: '1',
+    },
+    {
+      player_place: '2',
+      player_name: 'Harry Kane',
+      player_key: 276,
+      team_name: 'Bayern Munich',
+      team_key: '157',
+      goals: '5',
+      assists: '2',
+      penalty_goals: '1',
+    },
+    {
+      player_place: '3',
+      player_name: 'Antoine Griezmann',
+      player_key: 1500,
+      team_name: 'Atletico Madrid',
+      team_key: '103',
+      goals: '5',
+      assists: '0',
+      penalty_goals: '0',
+    },
+  ],
+};
 
 // Mock Data - Players
 const mockPlayers: FootballPlayer[] = [
@@ -732,9 +877,10 @@ export const advancedFootballApi = {
    */
   getTopscorers: async (leagueId: number): Promise<FootballTopscorersResponse> => {
     await delay(500);
+    const topscorers = mockTopscorersByLeague[String(leagueId)] || [];
     return {
       success: 1,
-      result: mockTopscorers,
+      result: topscorers,
     };
   },
 

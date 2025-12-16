@@ -3,39 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
-// We need to define or import types, but advancedFootballApi is already typed.
-// We can use the return type or check the mock data structure.
-// Based on advancedFootballApi.ts, coaches are returned as part of something or not explicitly?
-// Wait, advancedFootballApi doesn't have getCoachById. It has mockCoaches but maybe no endpoint exposed?
-// Let's check advancedFootballApi.ts content again.
-// It has getTeams, getPlayers. But wait, I need to check if it has getCoaches.
-// If not, I should probably add it or simulate it.
-// Checking previous view of api file (Step 24). It has mockCoaches but I only saw getCountries, getLeagues, getFixtures, getH2H, getLivescore, getStandings, getTopscorers, getTeams, getPlayers, getVideos.
-// So no getCoaches. I will assume I need to fetch it or finding it from somewhere.
-// BUT, the user asked to "make page for... choche... using advancedFootballApi".
-// I will create a simple mock fetching in this file for now if API doesn't support it directly, OR I can assume it should be added to api.
-// However, I can't easily edit the big API file without multi-step.
-// Use 'any' for now or infer if possible, but better to mock locally or assume it works.
-// Actually, I can check if I can just use a placeholder or if I should implement a simple hook.
-// I'll simulate fetching for now.
-
-type Coach = {
-    coache: string;
-    coache_country: string;
-    team_name: string;
-    trophies?: number;
-    coache_image: string;
-};
-
-// Mock data (since API might miss it dedicated endpoint, or I missed it)
-const mockCoaches: Coach[] = [
-    { coache: 'Pep Guardiola', coache_country: 'Spain', team_name: 'Manchester City', trophies: 38, coache_image: 'https://ui-avatars.com/api/?name=Pep+Guardiola&background=random&size=200' },
-    { coache: 'Jürgen Klopp', coache_country: 'Germany', team_name: 'Liverpool', trophies: 12, coache_image: 'https://ui-avatars.com/api/?name=Jurgen+Klopp&background=random&size=200' },
-    { coache: 'Carlo Ancelotti', coache_country: 'Italy', team_name: 'Real Madrid', trophies: 28, coache_image: 'https://ui-avatars.com/api/?name=Carlo+Ancelotti&background=random&size=200' },
-    { coache: 'Mikel Arteta', coache_country: 'Spain', team_name: 'Arsenal', trophies: 2, coache_image: 'https://ui-avatars.com/api/?name=Mikel+Arteta&background=random&size=200' },
-    { coache: 'Erik ten Hag', coache_country: 'Netherlands', team_name: 'Manchester United', trophies: 6, coache_image: 'https://ui-avatars.com/api/?name=Erik+ten+Hag&background=random&size=200' },
-    { coache: 'Thomas Tuchel', coache_country: 'Germany', team_name: 'Bayern Munich', trophies: 11, coache_image: 'https://ui-avatars.com/api/?name=Thomas+Tuchel&background=random&size=200' },
-];
+import { FootballCoach } from '@goalmills/types';
+import { BackButton } from '../../../components/BackButton';
 
 export default function CoachDetailsPage() {
     const params = useParams();
@@ -45,17 +14,25 @@ export default function CoachDetailsPage() {
     const coachId = params.id;
 
     const [loading, setLoading] = useState(true);
-    const [coach, setCoach] = useState<Coach | null>(null);
+    const [coach, setCoach] = useState<FootballCoach | null>(null);
 
     useEffect(() => {
-        // Simulate API call
-        setTimeout(() => {
-            // Just pick a random one or based on ID hash for consistency if real ID not available
-            const index = Number(coachId) % mockCoaches.length;
-            const found = isNaN(index) ? mockCoaches[0] : mockCoaches[index];
-            setCoach(found);
-            setLoading(false);
-        }, 500);
+        const loadCoach = async () => {
+            try {
+                const res = await advancedFootballApi.getCoaches();
+                const coaches = res.result;
+                // Just pick a random one or based on ID hash for consistency if real ID not available
+                const index = Number(coachId) % coaches.length;
+                const found = isNaN(index) ? coaches[0] : coaches[index];
+                setCoach(found);
+            } catch (error) {
+                console.error('Error loading coach:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadCoach();
     }, [coachId]);
 
     if (loading) {
@@ -70,7 +47,8 @@ export default function CoachDetailsPage() {
 
     return (
         <div className="min-h-screen bg-background pt-[90px] pb-20 p-4">
-            <div className="max-w-2xl mx-auto glass-card rounded-2xl overflow-hidden animate-fade-in">
+            <div className="max-w-2xl mx-auto glass-card rounded-2xl overflow-hidden animate-fade-in relative">
+                <BackButton className="absolute top-4 left-4 z-20" />
                 <div className="bg-gradient-to-r from-secondary/20 to-primary/20 p-8 text-center border-b border-white/5">
                     <div className="w-40 h-40 mx-auto rounded-full p-2 bg-surfaceHighlight/50 mb-6">
                         <img src={coach.coache_image} alt={coach.coache} className="w-full h-full rounded-full object-cover shadow-2xl" />

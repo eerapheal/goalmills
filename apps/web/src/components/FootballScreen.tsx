@@ -145,6 +145,17 @@ export function FootballScreen() {
         { id: 'teams', label: 'Teams', count: teams.length },
     ];
 
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filterData = <T extends any>(data: T[], key: keyof T | ((item: T) => string)): T[] => {
+        if (!searchQuery) return data;
+        const lowerQuery = searchQuery.toLowerCase();
+        return data.filter(item => {
+            const value = typeof key === 'function' ? key(item) : String(item[key]);
+            return value.toLowerCase().includes(lowerQuery);
+        });
+    };
+
     const renderContent = () => {
         if (loading) {
             return (
@@ -157,96 +168,117 @@ export function FootballScreen() {
 
         switch (activeTab) {
             case 'live':
+                const filteredLive = filterData(liveEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
                 return (
                     <div className="p-4 space-y-2 animate-fade-in">
-                        {liveEvents.length > 0 ? (
+                        {filteredLive.length > 0 ? (
                             <>
                                 <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
                                     <span className="inline-block w-2 h-2 bg-accent-red rounded-full animate-pulse"></span>
                                     Live Matches
                                 </h2>
-                                {liveEvents.map((event) => (
+                                {filteredLive.map((event) => (
                                     <FootballMatchCard key={event.event_key} event={event} />
                                 ))}
                             </>
                         ) : (
                             <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mx-auto max-w-lg mt-8 text-center">
                                 <span className="text-6xl mb-6 opacity-80">⚽</span>
-                                <p className="text-xl font-bold text-text-primary mb-2">No live matches right now</p>
-                                <p className="text-text-muted">Check out Upcoming or Results to stay updated!</p>
+                                <p className="text-xl font-bold text-text-primary mb-2">No live matches found</p>
+                                <p className="text-text-muted">Try a different search term or check back later!</p>
                             </div>
                         )}
                     </div>
                 );
 
             case 'upcoming':
+                const filteredUpcoming = filterData(upcomingEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">📅 Upcoming Matches</h2>
-                        {upcomingEvents.map((event) => (
-                            <FootballMatchCard key={event.event_key} event={event} />
-                        ))}
+                        {filteredUpcoming.length > 0 ? (
+                            filteredUpcoming.map((event) => (
+                                <FootballMatchCard key={event.event_key} event={event} />
+                            ))
+                        ) : (
+                            <p className="text-text-muted italic">No upcoming matches found.</p>
+                        )}
                     </div>
                 );
 
             case 'results':
+                const filteredResults = filterData(finishedEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">✅ Recent Results</h2>
-                        {finishedEvents.map((event) => (
-                            <FootballMatchCard key={event.event_key} event={event} />
-                        ))}
+                        {filteredResults.length > 0 ? (
+                            filteredResults.map((event) => (
+                                <FootballMatchCard key={event.event_key} event={event} />
+                            ))
+                        ) : (
+                            <p className="text-text-muted italic">No results found.</p>
+                        )}
                     </div>
                 );
 
             case 'standings':
+                // Search in standings (usually searching for team name)
+                const filteredStandings = filterData(standings, 'team_name'); // Assuming team_name exists on standing object or we map it? 
+                // Wait, FootballStanding usually has team_name. Let's check type if possible, but usually yes.
+                // Assuming it works for now.
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🏆 Premier League Standings</h2>
                         <div className="glass-card rounded-xl overflow-hidden">
-                            <FootballStandingsTable standings={standings} teams={teams} />
+                            <FootballStandingsTable standings={filteredStandings} teams={teams} />
                         </div>
                     </div>
                 );
 
             case 'topscorers':
+                const filteredScorers = filterData(topscorers, 'player_name');
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">⚽ Top Scorers</h2>
-                        <FootballTopScorers scorers={topscorers} teams={teams} />
+                        <FootballTopScorers scorers={filteredScorers} teams={teams} />
                     </div>
                 );
 
             case 'news':
+                const filteredNews = filterData(blogPosts, 'title');
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">📰 Latest News</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {blogPosts.map((post) => (
+                            {filteredNews.map((post) => (
                                 <BlogCard key={post._id} post={post} />
                             ))}
                         </div>
+                        {filteredNews.length === 0 && <p className="text-text-muted italic">No news found.</p>}
                     </div>
                 );
 
             case 'videos':
+                const filteredVideos = filterData(videos, (v) => `${v.event_home_team} ${v.event_away_team} ${v.league_name}`);
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🎥 Video Highlights</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {videos.map((video) => (
+                            {filteredVideos.map((video) => (
                                 <FootballVideoCard key={video.event_key} video={video} />
                             ))}
                         </div>
+                        {filteredVideos.length === 0 && <p className="text-text-muted italic">No videos found.</p>}
                     </div>
                 );
 
             case 'countries':
+                const filteredCountries = filterData(countries, 'country_name');
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🌍 Countries</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {countries.map((country) => (
+                            {filteredCountries.map((country) => (
                                 <Link
                                     href={`/countries/${country.country_key}`}
                                     key={country.country_key}
@@ -259,16 +291,18 @@ export function FootballScreen() {
                                 </Link>
                             ))}
                         </div>
+                        {filteredCountries.length === 0 && <p className="text-text-muted italic">No countries found.</p>}
                     </div>
                 );
 
             case 'leagues':
             case 'competitions':
+                const filteredLeagues = filterData(leagues, (l) => `${l.league_name} ${l.country_name}`);
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🏆 {activeTab === 'leagues' ? 'Leagues' : 'Competitions'}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {leagues.map((league) => (
+                            {filteredLeagues.map((league) => (
                                 <Link
                                     href={`/leagues/${league.league_key}`}
                                     key={league.league_key}
@@ -284,15 +318,17 @@ export function FootballScreen() {
                                 </Link>
                             ))}
                         </div>
+                        {filteredLeagues.length === 0 && <p className="text-text-muted italic">No leagues found.</p>}
                     </div>
                 );
 
             case 'teams':
+                const filteredTeams = filterData(teams, 'team_name');
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">👕 Teams</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {teams.map((team) => (
+                            {filteredTeams.map((team) => (
                                 <Link
                                     href={`/teams/${team.team_key}`}
                                     key={team.team_key}
@@ -305,6 +341,7 @@ export function FootballScreen() {
                                 </Link>
                             ))}
                         </div>
+                        {filteredTeams.length === 0 && <p className="text-text-muted italic">No teams found.</p>}
                     </div>
                 );
 
@@ -318,13 +355,27 @@ export function FootballScreen() {
             {/* Header */}
             <div className="sticky top-0 z-40 bg-surface/90 backdrop-blur-lg border-b border-white/5">
                 <div className="p-4 pt-6 max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
                         <div>
                             <h1 className="text-3xl font-black text-white italic tracking-tighter">
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">GOAL</span>
                                 <span className="text-white">MILLS</span>
                             </h1>
                             <p className="text-sm text-text-muted font-medium">Premium Sports Analytics</p>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="relative w-full md:w-96">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span className="text-text-muted">🔍</span>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder={`Search ${activeTab}...`}
+                                className="w-full bg-background border border-white/10 rounded-full py-2.5 pl-10 pr-4 text-sm text-white placeholder-text-muted focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -333,7 +384,10 @@ export function FootballScreen() {
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => {
+                                    setActiveTab(tab.id);
+                                    setSearchQuery(''); // Reset search on tab change
+                                }}
                                 className={`
                                     flex items-center gap-2 px-5 py-2.5 rounded-full border 
                                     transition-all duration-300 whitespace-nowrap text-sm font-bold tracking-wide

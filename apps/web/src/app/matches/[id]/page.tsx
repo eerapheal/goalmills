@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FootballEvent, FootballLineups, FootballStatistic } from '@goalmills/types';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
+import { BackButton } from '../../../components/BackButton';
 
 type MatchTab = 'summary' | 'lineups' | 'stats' | 'info';
 
@@ -63,12 +64,7 @@ export default function MatchDetailsPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
                 <h1 className="text-2xl font-bold text-white mb-4">Match Not Found</h1>
-                <button
-                    onClick={() => router.back()}
-                    className="px-6 py-2 bg-primary rounded-lg text-white font-bold hover:bg-primary-dark transition-colors"
-                >
-                    Go Back
-                </button>
+                <BackButton className="mt-4" />
             </div>
         );
     }
@@ -84,7 +80,8 @@ export default function MatchDetailsPage() {
     return (
         <div className="min-h-screen bg-background pb-20">
             {/* Header / Scoreboard */}
-            <div className="bg-gradient-to-b from-surface to-background border-b border-white/5 pt-8 pb-4 px-4">
+            <div className="bg-gradient-to-b from-surface to-background border-b border-white/5 pt-8 pb-4 px-4 relative">
+                <BackButton className="absolute top-4 left-4 z-20" />
                 <div className="max-w-4xl mx-auto">
                     {/* League Info */}
                     <Link href={`/leagues/${fixture.league_key}`} className="flex items-center justify-center gap-2 mb-6 text-text-muted text-sm font-bold uppercase tracking-wider hover:text-white transition-colors">
@@ -105,13 +102,13 @@ export default function MatchDetailsPage() {
 
                         {/* Score */}
                         <div className="flex flex-col items-center px-4 sm:px-12">
-                            <div className="flex items-center gap-4 text-4xl sm:text-6xl font-black text-white mb-2 tracking-tighter">
+                            <div className="flex items-center gap-4 text-4xl sm:text-6xl font-black text-white mb-2 tracking-tighter drop-shadow-lg">
                                 <span>{fixture.event_final_result ? fixture.event_final_result.split(' - ')[0] : '-'}</span>
                                 <span className="opacity-50 text-3xl sm:text-4xl">:</span>
                                 <span>{fixture.event_final_result ? fixture.event_final_result.split(' - ')[1] : '-'}</span>
                             </div>
-                            <div className={`px-3 py-1 rounded text-sm font-bold tracking-wider uppercase
-                                ${isLive ? 'bg-accent-red text-white animate-pulse' : 'bg-white/10 text-text-muted'}
+                            <div className={`px-4 py-1.5 rounded-full text-sm font-bold tracking-wider uppercase shadow-lg
+                                ${isLive ? 'bg-accent-red text-white animate-pulse' : 'bg-surfaceHighlight text-text-muted border border-white/5'}
                             `}>
                                 {fixture.event_status}
                             </div>
@@ -252,10 +249,42 @@ export default function MatchDetailsPage() {
                 )}
 
                 {activeTab === 'stats' && (
-                    <div className="animate-fade-in flex flex-col items-center justify-center py-12 text-center">
-                        <span className="text-4xl mb-4">📊</span>
-                        <h3 className="text-xl font-bold text-white mb-2">Detailed Statistics</h3>
-                        <p className="text-text-muted max-w-sm">Detailed match statistics like possession, shots, and passes are coming soon.</p>
+                    <div className="animate-fade-in space-y-4">
+                        {fixture.statistics && fixture.statistics.length > 0 ? (
+                            fixture.statistics.map((stat, index) => {
+                                // Parse values to numbers for progress bars (removing %, etc)
+                                const homeVal = parseInt(stat.home) || 0;
+                                const awayVal = parseInt(stat.away) || 0;
+                                const total = homeVal + awayVal;
+                                const homePercent = total > 0 ? (homeVal / total) * 100 : 50;
+
+                                return (
+                                    <div key={index} className="bg-surface/30 p-4 rounded-xl border border-white/5">
+                                        <div className="flex justify-between mb-2 text-sm font-bold">
+                                            <span className="text-white">{stat.home}</span>
+                                            <span className="text-text-muted uppercase text-xs tracking-wider">{stat.type}</span>
+                                            <span className="text-white">{stat.away}</span>
+                                        </div>
+                                        <div className="flex w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                            <div
+                                                className="bg-secondary h-full"
+                                                style={{ width: `${homePercent}%` }}
+                                            />
+                                            <div
+                                                className="bg-accent-red h-full"
+                                                style={{ width: `${100 - homePercent}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-center">
+                                <span className="text-4xl mb-4">📊</span>
+                                <h3 className="text-xl font-bold text-white mb-2">No Statistics Available</h3>
+                                <p className="text-text-muted">Detailed statistics are not available for this match yet.</p>
+                            </div>
+                        )}
                     </div>
                 )}
 

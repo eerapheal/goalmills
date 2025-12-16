@@ -59,7 +59,7 @@ export default function HomePage() {
             <SportTabs selectedSport={selectedSport} onSelectSport={setSelectedSport} />
 
             {/* Sport Content */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto scrollbar-hide">
                 {renderSportContent()}
             </div>
         </div>

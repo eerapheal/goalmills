@@ -7,6 +7,7 @@ import { FootballLeague, FootballEvent, FootballStanding, FootballTopscorer } fr
 import { FootballMatchCard } from '../../../components/FootballMatchCard';
 import { FootballStandingsTable } from '../../../components/FootballStandingsTable';
 import { FootballTopScorers } from '../../../components/FootballTopScorers';
+import { BackButton } from '../../../components/BackButton';
 
 type Tab = 'fixtures' | 'results' | 'standings' | 'topscorers';
 
@@ -74,7 +75,7 @@ export default function LeagueDetailsPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
                 <h1 className="text-2xl font-bold text-white mb-4">League Not Found</h1>
-                <button onClick={() => router.back()} className="text-secondary hover:underline">Go Back</button>
+                <BackButton className="mt-4" />
             </div>
         );
     }
@@ -85,7 +86,8 @@ export default function LeagueDetailsPage() {
     return (
         <div className="min-h-screen bg-background pt-[90px] pb-20">
             {/* Header */}
-            <div className="bg-surface border-b border-white/5 pt-8 pb-6 px-4">
+            <div className="bg-surface border-b border-white/5 pt-8 pb-6 px-4 relative">
+                <BackButton className="absolute top-4 left-4 z-20" />
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
                     <div className="relative w-24 h-24 p-4 bg-white/5 rounded-2xl border border-white/10">
                         <img src={league.league_logo} alt={league.league_name} className="w-full h-full object-contain p-2" />
