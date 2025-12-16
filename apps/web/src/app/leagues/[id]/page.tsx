@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { League, Fixture, Standing } from '@goalmills/types';
-import { footballApi } from '../../../services/footballApi';
-import { FixtureCard } from '../../../components/FixtureCard';
-import { StandingsTable } from '../../../components/StandingsTable';
+import { advancedFootballApi } from '../../../services/advancedFootballApi';
+import { FootballLeague, FootballEvent, FootballStanding, FootballTopscorer } from '@goalmills/types';
+import { FootballMatchCard } from '../../../components/FootballMatchCard';
+import { FootballStandingsTable } from '../../../components/FootballStandingsTable';
+import { FootballTopScorers } from '../../../components/FootballTopScorers';
 
-type Tab = 'fixtures' | 'results' | 'standings';
+type Tab = 'fixtures' | 'results' | 'standings' | 'topscorers';
 
 export default function LeagueDetailsPage() {
     const params = useParams();
@@ -17,24 +17,41 @@ export default function LeagueDetailsPage() {
 
     const [activeTab, setActiveTab] = useState<Tab>('fixtures');
     const [loading, setLoading] = useState(true);
-    const [league, setLeague] = useState<League | null>(null);
-    const [fixtures, setFixtures] = useState<Fixture[]>([]);
-    const [standings, setStandings] = useState<Standing[]>([]);
+    const [league, setLeague] = useState<FootballLeague | null>(null);
+    const [events, setEvents] = useState<FootballEvent[]>([]);
+    const [standings, setStandings] = useState<FootballStanding[]>([]);
+    const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
 
     useEffect(() => {
-        const loadLeagueData = async () => {
+        const loadData = async () => {
             if (!leagueId) return;
 
             try {
-                const [leagueData, fixturesData, standingsData] = await Promise.all([
-                    footballApi.getLeagueById(leagueId),
-                    footballApi.getFixturesByLeague(leagueId),
-                    footballApi.getStandingsByLeague(leagueId),
+                const today = new Date();
+                const past = new Date(today);
+                past.setDate(past.getDate() - 30);
+                const future = new Date(today);
+                future.setDate(future.getDate() + 30);
+
+                const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
+                const [leaguesRes, fixturesRes, standingsRes, topscorersRes] = await Promise.all([
+                    advancedFootballApi.getLeagues(), // Ideally get by ID
+                    advancedFootballApi.getFixtures({
+                        from: formatDate(past),
+                        to: formatDate(future),
+                        leagueId: leagueId
+                    }),
+                    advancedFootballApi.getStandings(leagueId),
+                    advancedFootballApi.getTopscorers(leagueId)
                 ]);
 
-                setLeague(leagueData);
-                setFixtures(fixturesData); // This contains all fixtures (past, future)
-                setStandings(standingsData);
+                const foundLeague = leaguesRes.result.find(l => l.league_key === String(leagueId));
+                setLeague(foundLeague || null);
+                setEvents(fixturesRes.result);
+                setStandings(standingsRes.result.total);
+                setTopscorers(topscorersRes.result);
+
             } catch (error) {
                 console.error('Error loading league data:', error);
             } finally {
@@ -42,12 +59,8 @@ export default function LeagueDetailsPage() {
             }
         };
 
-        loadLeagueData();
+        loadData();
     }, [leagueId]);
-
-    const upcomingFixtures = fixtures.filter(f => f.fixture.status.short === 'NS' || f.fixture.status.short === 'TBD');
-    const pastFixtures = fixtures.filter(f => ['FT', 'AET', 'PEN'].includes(f.fixture.status.short)).reverse();
-    const liveFixtures = fixtures.filter(f => ['1H', '2H', 'HT', 'ET', 'P'].includes(f.fixture.status.short));
 
     if (loading) {
         return (
@@ -61,42 +74,39 @@ export default function LeagueDetailsPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
                 <h1 className="text-2xl font-bold text-white mb-4">League Not Found</h1>
-                <button
-                    onClick={() => router.back()}
-                    className="px-6 py-2 bg-primary rounded-lg text-white font-bold hover:bg-primary-dark transition-colors"
-                >
-                    Go Back
-                </button>
+                <button onClick={() => router.back()} className="text-secondary hover:underline">Go Back</button>
             </div>
         );
     }
 
+    const upcomingEvents = events.filter(e => e.event_status === 'Not Started').sort((a, b) => new Date(`${a.event_date} ${a.event_time}`).getTime() - new Date(`${b.event_date} ${b.event_time}`).getTime());
+    const finishedEvents = events.filter(e => e.event_status === 'Finished').sort((a, b) => new Date(`${b.event_date} ${b.event_time}`).getTime() - new Date(`${a.event_date} ${a.event_time}`).getTime());
+
     return (
-        <div className="min-h-screen bg-background pb-20">
+        <div className="min-h-screen bg-background pt-[90px] pb-20">
             {/* Header */}
             <div className="bg-surface border-b border-white/5 pt-8 pb-6 px-4">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
                     <div className="relative w-24 h-24 p-4 bg-white/5 rounded-2xl border border-white/10">
-                        <Image src={league.logo} alt={league.name} fill className="object-contain p-2" />
+                        <img src={league.league_logo} alt={league.league_name} className="w-full h-full object-contain p-2" />
                     </div>
                     <div className="text-center md:text-left">
-                        <h1 className="text-3xl font-black text-white mb-2">{league.name}</h1>
+                        <h1 className="text-3xl font-black text-white mb-2">{league.league_name}</h1>
                         <div className="flex items-center justify-center md:justify-start gap-3 text-text-muted font-medium">
                             <span className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full text-sm">
-                                <Image src={league.flag} alt={league.country} width={16} height={12} className="object-cover rounded-sm" />
-                                {league.country}
+                                <img src={league.country_logo} alt={league.country_name} className="w-4 h-3 object-cover rounded-sm" />
+                                {league.country_name}
                             </span>
-                            <span className="bg-white/5 px-3 py-1 rounded-full text-sm">{league.season} Season</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-white/5">
+            <div className="sticky top-[90px] z-30 bg-background/80 backdrop-blur-md border-b border-white/5">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex gap-8 overflow-x-auto">
-                        {(['fixtures', 'results', 'standings'] as const).map((tab) => (
+                    <div className="flex gap-8 overflow-x-auto scrollbar-hide">
+                        {(['fixtures', 'results', 'standings', 'topscorers'] as const).map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -114,55 +124,40 @@ export default function LeagueDetailsPage() {
                 </div>
             </div>
 
-            {/* Content */}
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {activeTab === 'fixtures' && (
-                    <div className="animate-fade-in space-y-4">
-                        {liveFixtures.length > 0 && (
-                            <div className="mb-8">
-                                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-accent-red rounded-full animate-pulse" />
-                                    Live Matches
-                                </h3>
-                                {liveFixtures.map(fixture => (
-                                    <FixtureCard key={fixture.fixture.id} fixture={fixture} />
-                                ))}
-                            </div>
-                        )}
-
+                    <div className="space-y-4 animate-fade-in">
                         <h3 className="text-xl font-bold text-white mb-4">Upcoming Matches</h3>
-                        {upcomingFixtures.length > 0 ? (
-                            upcomingFixtures.map(fixture => (
-                                <FixtureCard key={fixture.fixture.id} fixture={fixture} />
-                            ))
-                        ) : (
-                            <p className="text-text-muted text-center py-8">No upcoming matches scheduled.</p>
-                        )}
+                        {upcomingEvents.map(event => (
+                            <FootballMatchCard key={event.event_key} event={event} />
+                        ))}
+                        {upcomingEvents.length === 0 && <p className="text-text-muted text-center py-8">No upcoming matches.</p>}
                     </div>
                 )}
-
                 {activeTab === 'results' && (
-                    <div className="animate-fade-in space-y-4">
+                    <div className="space-y-4 animate-fade-in">
                         <h3 className="text-xl font-bold text-white mb-4">Recent Results</h3>
-                        {pastFixtures.length > 0 ? (
-                            pastFixtures.map(fixture => (
-                                <FixtureCard key={fixture.fixture.id} fixture={fixture} />
-                            ))
-                        ) : (
-                            <p className="text-text-muted text-center py-8">No results found.</p>
-                        )}
+                        {finishedEvents.map(event => (
+                            <FootballMatchCard key={event.event_key} event={event} />
+                        ))}
+                        {finishedEvents.length === 0 && <p className="text-text-muted text-center py-8">No recent results.</p>}
                     </div>
                 )}
-
                 {activeTab === 'standings' && (
                     <div className="animate-fade-in">
-                        <h3 className="text-xl font-bold text-white mb-4">League Table</h3>
                         <div className="glass-card rounded-xl overflow-hidden">
-                            <StandingsTable standings={standings} />
+                            <FootballStandingsTable standings={standings} teams={[]} />
                         </div>
                     </div>
                 )}
+
+                {activeTab === 'topscorers' && (
+                    <div className="animate-fade-in">
+                        <FootballTopScorers scorers={topscorers} teams={[]} />
+                    </div>
+                )}
             </div>
+
         </div>
     );
 }

@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     liveContainer: {
-        borderColor: COLORS.danger,
+        borderColor: COLORS.warning,
         borderWidth: 1.5,
         backgroundColor: 'rgba(220, 38, 38, 0.08)',
     },
@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
     leagueInfo: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between', 
         marginBottom: SPACING.xs,
         paddingBottom: SPACING.xs,
         borderBottomWidth: 1,
