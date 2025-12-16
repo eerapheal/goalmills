@@ -293,7 +293,7 @@ const generateMockEvents = (): FootballEvent[] => {
       date.setDate(date.getDate() + match.dateOffset);
       
       events.push({
-          event_key: `upcoming-${index}`,
+          event_key: `${2000 + index}`,
           event_date: date.toISOString().split('T')[0],
           event_time: match.time,
           event_home_team: match.home.team_name,

@@ -78,7 +78,7 @@ export default function MatchDetailsPage() {
     ].sort((a, b) => parseInt(a.time) - parseInt(b.time));
 
     return (
-        <div className="min-h-screen bg-background pb-20">
+        <div className="min-h-screen bg-background pb-20 pt-20">
             {/* Header / Scoreboard */}
             <div className="bg-gradient-to-b from-surface to-background border-b border-white/5 pt-8 pb-4 px-4 relative">
                 <BackButton className="absolute top-4 left-4 z-20" />
