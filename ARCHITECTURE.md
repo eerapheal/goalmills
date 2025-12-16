@@ -2,6 +2,8 @@
 
 ## 🏗️ Architecture Overview
 
+The GoalMills architecture is designed for code sharing and feature parity between Web (Next.js) and Mobile (React Native/Expo).
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     GOALMILLS MONOREPO                      │
@@ -12,18 +14,21 @@
                 │                           │
          ┌──────▼──────┐            ┌──────▼──────┐
          │    APPS     │            │  PACKAGES   │
+         │ (Consumers) │            │ (Providers) │
          └─────────────┘            └─────────────┘
                 │                           │
         ┌───────┴────────┐         ┌────────┼────────┐
         │                │         │        │        │
    ┌────▼────┐     ┌────▼────┐   │        │        │
    │   WEB   │     │ MOBILE  │   │        │        │
-   │Next.js  │     │  Expo   │   │        │        │
+   │ Next.js │     │  Expo   │   │        │        │
+   │(Services)     │(Services)   │        │        │
    └────┬────┘     └────┬────┘   │        │        │
         │               │         │        │        │
         │               │    ┌────▼───┐ ┌─▼──┐ ┌───▼────┐
         │               │    │   UI   │ │TYPES│ │ CONFIG │
-        │               │    │Tokens  │ │ TS  │ │  Base  │
+        │               │    │Premium │ │ TS  │ │  Base  │
+        │               │    │ Design │ │Defs │ │ Setup  │
         └───────┬───────┘    └────────┘ └─────┘ └────────┘
                 │
                 │  Shared Dependencies
@@ -34,299 +39,124 @@
         └───────────────┘
 ```
 
-## 📦 Package Dependencies
+## 🔄 Data Flow & API Strategy
+
+Both applications utilize an "Advanced Service" pattern. While the services reside within each application to allow for platform-specific optimizations (e.g., caching, fetch implementations), they share 100% of the domain types and mock data structures.
 
 ```
-apps/web
-├── @goalmills/ui ──────┐
-├── @goalmills/types ───┤
-├── @goalmills/config ──┤
-├── next               │
-├── react              │
-└── react-dom          │
-                       │
-apps/mobile            │
-├── @goalmills/ui ─────┤
-├── @goalmills/types ──┤
-├── @goalmills/config ─┤
-├── expo               │
-├── expo-router        │
-├── react              │
-└── react-native       │
-                       │
-packages/ui ◄──────────┤
-├── @goalmills/types ──┤
-└── react              │
-                       │
-packages/types ◄───────┤
-└── typescript         │
-                       │
-packages/config ◄──────┘
-└── typescript
+┌───────────────────────────────────────────────────────────────────┐
+│                          SHARED TYPES                             │
+│                      (@goalmills/types)                           │
+│  Definitions for: Leagues, Teams, Players, Matches, Events...     │
+└────────────────────────────────┬──────────────────────────────────┘
+                                 │
+                 ┌───────────────┴───────────────┐
+                 │                               │
+       ┌─────────▼─────────┐           ┌─────────▼─────────┐
+       │     WEB APP       │           │    MOBILE APP     │
+       │                   │           │                   │
+       │  ┌─────────────┐  │           │  ┌─────────────┐  │
+       │  │ Service API │  │           │  │ Service API │  │
+       │  └──────┬──────┘  │           │  └──────┬──────┘  │
+       │         │         │           │         │         │
+       │  ┌──────▼──────┐  │           │  ┌──────▼──────┐  │
+       │  │  Components │  │           │  │   Screens   │  │
+       │  └─────────────┘  │           │  └─────────────┘  │
+       └───────────────────┘           └───────────────────┘
 ```
 
-## 🔄 Data Flow
+### ⚽ Football Domain
+- **AdvancedFootballApi**: Handles complex data relationships.
+  - **Fixtures**: Live, Upcoming, Finished flows with minute-by-minute updates.
+  - **Entities**: Detailed parsing for Teams, Players, Officials, and Coaches.
+  - **Analysis**: Odds movements, Win Probabilities, and rich Head-to-Head calculations.
+  - **Multimedia**: Integration of video highlights and news feeds.
+
+### 🏏 Cricket Domain
+- **AdvancedCricketApi**: Specialized for cricket scoring nuances.
+  - **Scoring**: In-depth inning processing, ball-by-ball commentary, and fall of wickets.
+  - **Rankings**: ICC compliant ranking tables for Teams and Players (Test, ODI, T20).
+  - **Series**: Tournament aggregation, points tables, and Net Run Rate (NRR) calculators.
+
+### 🏀 Basketball Domain
+- **BasketballApi**: Optimized for high-frequency scoring updates.
+  - **Game State**: Quarter-by-quarter tracking and live clock management.
+  - **Statistics**: Granular player efficiency metrics (FG%, +/-) and team comparisons.
+  - **Markets**: Betting odds integration for Spreads and Totals.
+
+### 🎾 Tennis Domain
+- **TennisApi**: Focused on set and game-level granularity.
+  - **Match Flow**: Point-by-point tracking (15-30, Deuce, Ad) and tie-break logic.
+  - **Tournaments**: Hierarchy support for Grand Slams, ATP/WTA tours, and surface types.
+  - **Performance**: Player surface stats (Grass vs Clay) and H2H history.
+
+## 🎨 Design System (Premium UI)
+
+The design system (`packages/ui`) is built for a "Premium Sport" aesthetic.
+
+- **Theme**: Dark Mode First (Deep Navys, Sleek Blacks).
+- **Typography**: Modern Sans-Serif (Inter/Roboto variants).
+- **Components**:
+  - `GlassCard`: Glassmorphism effects for premium feel.
+  - `hero-gradient`: Vibrant gradients for impact.
+  - `MatchCard`: Unified card design for fixtures.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    API LAYER (Future)                   │
-│  @goalmills/api - Shared API calls for both platforms  │
-└────────────────────┬────────────────────────────────────┘
-                     │
-         ┌───────────┴───────────┐
-         │                       │
-    ┌────▼────┐            ┌────▼────┐
-    │   WEB   │            │ MOBILE  │
-    │  Pages  │            │ Screens │
-    └────┬────┘            └────┬────┘
-         │                      │
-         │  ┌──────────────────┐│
-         │  │  Shared Types    ││
-         └─►│  @goalmills/types││◄┘
-            │  - Team          │
-            │  - League        │
-            │  - Fixture       │
-            │  - Player        │
-            └──────────────────┘
+packages/ui/
+├── src/
+│   ├── colors.ts       # HSL Tailored Palettes
+│   ├── spacing.ts      # 4px Grid System
+│   └── components/     # Platform Agnostic Components
 ```
 
-## 🎨 Design System Flow
+## 📱 Platform Specifics
 
-```
-packages/ui/index.ts
-├── COLORS
-│   ├── primary: #001f3f (Navy Blue)
-│   ├── secondary: #0074D9
-│   ├── success: #2ECC40
-│   └── ...
-│
-├── SPACING
-│   ├── xs: 4px
-│   ├── sm: 8px
-│   ├── md: 16px
-│   └── ...
-│
-├── FONT_SIZES
-│   ├── xs: 12px
-│   ├── sm: 14px
-│   ├── md: 16px
-│   └── ...
-│
-└── UTILITIES
-    ├── formatDate()
-    ├── formatTime()
-    └── formatDateTime()
+### Web (apps/web)
+- **Framework**: Next.js 14 App Router.
+- **Styling**: TailwindCSS with Custom Config.
+- **Key Routes**:
+  - `/football/*`: Deep nesting for specialized football pages.
+  - `/cricket/*`: Dedicated cricket hub.
 
-         │
-         ├──► apps/web/src/app/**/*.tsx
-         │    (Next.js components use design tokens)
-         │
-         └──► apps/mobile/app/**/*.tsx
-              (React Native components use design tokens)
-```
-
-## 🚀 Build Pipeline (Turborepo)
-
-```
-pnpm dev
-    │
-    ├─► turbo run dev
-    │       │
-    │       ├─► packages/types (no build needed)
-    │       ├─► packages/ui (no build needed)
-    │       ├─► packages/config (no build needed)
-    │       │
-    │       ├─► apps/web
-    │       │   └─► next dev (http://localhost:3000)
-    │       │
-    │       └─► apps/mobile
-    │           └─► expo start (QR code + dev server)
-    │
-    └─► Cached results for faster rebuilds
-```
-
-## 📱 Platform-Specific Implementations
-
-### Web (Next.js)
-```
-apps/web/src/app/
-├── layout.tsx          # Root layout with metadata
-├── page.tsx            # Home page
-├── globals.css         # Global styles
-└── [feature]/
-    ├── page.tsx        # Feature page
-    └── layout.tsx      # Feature layout
-```
-
-### Mobile (Expo Router)
-```
-apps/mobile/app/
-├── _layout.tsx         # Root navigation
-├── index.tsx           # Home screen
-└── [feature].tsx       # Feature screen
-    or
-└── [feature]/
-    ├── _layout.tsx     # Nested navigation
-    └── index.tsx       # Feature home
-```
+### Mobile (apps/mobile)
+- **Framework**: React Native with Expo Router.
+- **Styling**: Native StyleSheet + Token Abstractions.
+- **Navigation**: Tab-based root with Stack navigators for deep features.
 
 ## 🔧 Technology Stack
 
-### Frontend Frameworks
-- **Web**: Next.js 14 (App Router)
-- **Mobile**: React Native 0.73 + Expo 50
+### Core
+- **Monorepo Manager**: Turborepo
+- **Package Manager**: PNPM
+- **Language**: TypeScript 5.x
 
-### Build Tools
-- **Monorepo**: Turborepo 1.11
-- **Package Manager**: PNPM 8
-- **Bundler (Web)**: Next.js built-in (Webpack/Turbopack)
-- **Bundler (Mobile)**: Metro (Expo)
-
-### Language
-- **TypeScript** 5.3 across all packages
-
-### Styling
-- **Web**: CSS Modules + Global CSS
-- **Mobile**: React Native StyleSheet
-- **Shared**: Design tokens from @goalmills/ui
-
-## 🌐 Cross-Platform Strategy
-
-### Shared Code (70%)
-```typescript
-// packages/types - 100% shared
-export interface Team { ... }
-export interface League { ... }
-
-// packages/ui - 100% shared
-export const COLORS = { ... }
-export const formatDate = () => { ... }
-
-// Future: packages/api - 100% shared
-export const fetchTeams = async () => { ... }
-```
-
-### Platform-Specific (30%)
-```typescript
-// Web: CSS Modules
-import styles from './page.module.css'
-
-// Mobile: StyleSheet
-import { StyleSheet } from 'react-native'
-const styles = StyleSheet.create({ ... })
-```
+### State Management
+- **Pattern**: Service-based fetching with clean separation of concerns.
+- **Data**: Comprehensive Mock Data generation for reliable dev/demo environments.
 
 ## 📊 File Organization
 
 ```
 goalmills/
-├── apps/                    # Applications
-│   ├── web/                # Next.js app
+├── apps/
+│   ├── web/
 │   │   ├── src/
-│   │   │   └── app/       # App Router pages
-│   │   ├── public/        # Static assets
-│   │   └── package.json
+│   │   │   ├── services/    # AdvancedFootballApi, AdvancedCricketApi
+│   │   │   ├── components/  # Web-only components
+│   │   │   └── app/         # Next.js Pages
 │   │
-│   └── mobile/            # Expo app
-│       ├── app/           # Expo Router screens
-│       ├── assets/        # Images, fonts
-│       └── package.json
+│   └── mobile/
+│       ├── services/        # Service-mirror of web (Platform adapted)
+│       └── app/             # Expo Screens
 │
-├── packages/              # Shared packages
-│   ├── ui/               # Design system
-│   ├── types/            # TypeScript types
-│   └── config/           # Shared configs
-│
-└── [config files]        # Root configuration
-    ├── package.json      # Root scripts
-    ├── turbo.json       # Turborepo config
-    └── pnpm-workspace.yaml
-```
-
-## 🔐 Environment Variables
-
-### Web (.env.local)
-```bash
-NEXT_PUBLIC_API_URL=https://api.goalmills.com
-NEXT_PUBLIC_API_KEY=your_api_key
-```
-
-### Mobile (.env)
-```bash
-EXPO_PUBLIC_API_URL=https://api.goalmills.com
-EXPO_PUBLIC_API_KEY=your_api_key
-```
-
-## 🧪 Testing Strategy (Future)
-
-```
-packages/ui/
-├── __tests__/
-│   ├── utils.test.ts
-│   └── components.test.tsx
-
-apps/web/
-├── __tests__/
-│   └── pages/
-│       └── index.test.tsx
-
-apps/mobile/
-├── __tests__/
-│   └── screens/
-│       └── index.test.tsx
-```
-
-## 📈 Scalability
-
-### Adding New Packages
-```bash
-mkdir packages/api
-cd packages/api
-pnpm init
-# Add to pnpm-workspace.yaml automatically
-```
-
-### Adding New Apps
-```bash
-mkdir apps/admin
-cd apps/admin
-pnpm init
-# Add to pnpm-workspace.yaml automatically
+└── packages/
+    ├── types/               # The contract that binds apps together
+    └── ui/                  # The look and feel
 ```
 
 ## 🎯 Development Workflow
 
-```
-1. Feature Request
-   │
-   ├─► Create shared types in packages/types
-   │
-   ├─► Create shared API in packages/api (future)
-   │
-   ├─► Implement Web UI in apps/web
-   │
-   ├─► Implement Mobile UI in apps/mobile
-   │
-   └─► Test on both platforms
-```
-
-## 🚢 Deployment Strategy
-
-### Web (Vercel/Netlify)
-```bash
-cd apps/web
-pnpm build
-# Deploy .next/ directory
-```
-
-### Mobile (EAS Build)
-```bash
-cd apps/mobile
-eas build --platform ios
-eas build --platform android
-eas submit
-```
-
----
-
-**Built with ❤️ using modern web technologies**
+1.  **Type Definition**: Update `@goalmills/types` with new entity properties.
+2.  **Service Implementation**: specific logic in `apps/*/services/`.
+3.  **UI Component**: Build in `packages/ui` if shared, or app-specific folder.
+4.  **Integration**: Wire up the service data to the UI.

@@ -6,8 +6,47 @@ import { Header } from '../components/Header';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'GoalMills - Multi-Sport Platform',
-    description: 'Your ultimate destination for live scores, fixtures, and sports news',
+    title: "GoalMills | Live Scores, Sports Stats & Betting Insights",
+    description:
+        "Get real-time live scores, match stats, standings, and betting insights for Football, Cricket, NBA & Tennis. Fast, accurate sports data on web & mobile.",
+    keywords: [
+        "live scores",
+        "football live scores",
+        "cricket live score",
+        "NBA live scores",
+        "tennis live scores",
+        "sports analytics",
+        "sports betting odds",
+        "match statistics",
+        "sports predictions",
+        "Next.js sports app",
+    ],
+    alternates: {
+        canonical: "https://goalmills.com",
+    },
+    openGraph: {
+        title: "GoalMills | Live Sports Scores & Analytics Platform",
+        description:
+            "Real-time scores, detailed match stats, standings, and betting insights for Football, Cricket, NBA & Tennis.",
+        url: "https://goalmills.com",
+        siteName: "GoalMills",
+        images: [
+            {
+                url: "/og-image.png",
+                width: 1200,
+                height: 630,
+                alt: "GoalMills Live Sports Platform",
+            },
+        ],
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "GoalMills | Live Scores & Sports Analytics",
+        description:
+            "Live football, cricket, NBA & tennis scores with deep stats and betting insights.",
+        images: ["/og-image.png"],
+    },
 };
 
 export default function RootLayout({
