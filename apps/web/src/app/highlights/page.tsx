@@ -9,7 +9,7 @@ const MOCK_HIGHLIGHTS = Array.from({ length: 8 }).map((_, i) => ({
 
 export default function HighlightsPage() {
     return (
-        <div className="min-h-screen bg-slate-950 p-6 md:p-12 pt-24">
+        <div className="min-h-screen bg-slate-950 p-6 md:p-12 mt-[90px]">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight">
                     Match <span className="text-blue-500">Highlights</span>
