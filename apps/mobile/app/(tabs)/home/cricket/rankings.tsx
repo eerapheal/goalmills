@@ -1,39 +1,47 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
-
-// Mock Rankings Data
-const rankingsData = {
-    test: [
-        { rank: 1, team: 'Australia', points: 124, rating: 124, logo: 'https://flagcdn.com/w320/au.png' },
-        { rank: 2, team: 'India', points: 120, rating: 120, logo: 'https://flagcdn.com/w320/in.png' },
-        { rank: 3, team: 'England', points: 105, rating: 105, logo: 'https://flagcdn.com/w320/gb-eng.png' },
-        { rank: 4, team: 'South Africa', points: 103, rating: 103, logo: 'https://flagcdn.com/w320/za.png' },
-        { rank: 5, team: 'New Zealand', points: 96, rating: 96, logo: 'https://flagcdn.com/w320/nz.png' },
-    ],
-    odi: [
-        { rank: 1, team: 'India', points: 118, rating: 118, logo: 'https://flagcdn.com/w320/in.png' },
-        { rank: 2, team: 'Australia', points: 113, rating: 113, logo: 'https://flagcdn.com/w320/au.png' },
-        { rank: 3, team: 'Pakistan', points: 109, rating: 109, logo: 'https://flagcdn.com/w320/pk.png' },
-        { rank: 4, team: 'South Africa', points: 106, rating: 106, logo: 'https://flagcdn.com/w320/za.png' },
-        { rank: 5, team: 'New Zealand', points: 101, rating: 102, logo: 'https://flagcdn.com/w320/nz.png' },
-    ],
-    t20: [
-        { rank: 1, team: 'India', points: 264, rating: 264, logo: 'https://flagcdn.com/w320/in.png' },
-        { rank: 2, team: 'Australia', points: 257, rating: 257, logo: 'https://flagcdn.com/w320/au.png' },
-        { rank: 3, team: 'England', points: 252, rating: 252, logo: 'https://flagcdn.com/w320/gb-eng.png' },
-        { rank: 4, team: 'West Indies', points: 252, rating: 252, logo: 'https://flagcdn.com/w320/bb.png' },
-        { rank: 5, team: 'New Zealand', points: 250, rating: 250, logo: 'https://flagcdn.com/w320/nz.png' },
-    ],
-};
+import { CricketStanding } from '@goalmills/types';
+import { advancedCricketApi } from '../../../../services/advancedCricketApi';
 
 type Format = 'test' | 'odi' | 't20';
+
+const LEAGUE_IDS: Record<Format, number> = {
+    test: 101,
+    odi: 102,
+    t20: 103,
+};
 
 export default function CricketRankingsScreen() {
     const router = useRouter();
     const [activeFormat, setActiveFormat] = useState<Format>('test');
+    const [loading, setLoading] = useState(false);
+    const [standings, setStandings] = useState<CricketStanding[]>([]);
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const response = await advancedCricketApi.getStandings({
+                    leagueId: LEAGUE_IDS[activeFormat],
+                    APIkey: 'mock'
+                });
+                if (response.result && response.result.total) {
+                    setStandings(response.result.total);
+                } else {
+                    setStandings([]);
+                }
+            } catch (error) {
+                console.error('Error loading rankings:', error);
+                setStandings([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, [activeFormat]);
 
     const renderTable = () => (
         <View style={styles.table}>
@@ -43,17 +51,27 @@ export default function CricketRankingsScreen() {
                 <Text style={[styles.headText, { flex: 2, textAlign: 'right' }]}>Rating</Text>
                 <Text style={[styles.headText, { flex: 2, textAlign: 'right' }]}>Points</Text>
             </View>
-            {rankingsData[activeFormat].map((item) => (
-                <View key={item.team} style={styles.row}>
-                    <Text style={[styles.cellText, { flex: 1, fontWeight: '700' }]}>{item.rank}</Text>
-                    <View style={{ flex: 4, flexDirection: 'row', alignItems: 'center' }}>
-                        <Image source={{ uri: item.logo }} style={styles.teamLogo} />
-                        <Text style={styles.cellText}>{item.team}</Text>
+            {loading ? (
+                <ActivityIndicator size="small" color={COLORS.secondary} style={{ padding: 20 }} />
+            ) : standings.length > 0 ? (
+                standings.map((item) => (
+                    <View key={item.team_key} style={styles.row}>
+                        <Text style={[styles.cellText, { flex: 1, fontWeight: '700' }]}>{item.standing_place}</Text>
+                        <View style={{ flex: 4, flexDirection: 'row', alignItems: 'center' }}>
+                            {/* Logo not available in CricketStanding, using placeholder or rely on name */}
+                            <View style={styles.teamLogoPlaceholder}>
+                                <Text style={styles.teamLogoText}>{item.standing_team.charAt(0)}</Text>
+                            </View>
+                            <Text style={styles.cellText}>{item.standing_team}</Text>
+                        </View>
+                        <Text style={[styles.cellText, { flex: 2, textAlign: 'right' }]}>{item.standing_NRR || '-'}</Text>
+                        {/* Note: NRR used as placeholder for Rating if not available, or Pts */}
+                        <Text style={[styles.cellText, { flex: 2, textAlign: 'right' }]}>{item.standing_Pts}</Text>
                     </View>
-                    <Text style={[styles.cellText, { flex: 2, textAlign: 'right' }]}>{item.rating}</Text>
-                    <Text style={[styles.cellText, { flex: 2, textAlign: 'right' }]}>{item.points}</Text>
-                </View>
-            ))}
+                ))
+            ) : (
+                <Text style={styles.emptyText}>No rankings available for this format.</Text>
+            )}
         </View>
     );
 
@@ -161,10 +179,24 @@ const styles = StyleSheet.create({
         color: COLORS.background,
         fontSize: FONT_SIZES.sm,
     },
-    teamLogo: {
+    teamLogoPlaceholder: {
         width: 24,
-        height: 16,
+        height: 24,
         marginRight: SPACING.sm,
-        borderRadius: 2,
+        borderRadius: 12,
+        backgroundColor: COLORS.secondary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    teamLogoText: {
+        color: COLORS.backgroundDark,
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    emptyText: {
+        color: COLORS.textLight,
+        textAlign: 'center',
+        padding: SPACING.md,
+        fontStyle: 'italic',
     },
 });

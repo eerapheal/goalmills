@@ -209,6 +209,11 @@ export default function MatchDetailsScreen() {
                 title: 'Match Details',
                 headerStyle: { backgroundColor: '#001f3f' },
                 headerTintColor: '#fff',
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
+                        <Text style={{ color: '#fff', fontSize: 16 }}>← Back</Text>
+                    </TouchableOpacity>
+                ),
             }} />
 
             <ScrollView contentContainerStyle={styles.scrollContent}>

@@ -11,13 +11,11 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { CricketMatchInfo, CricketSeries, BlogPost, VideoHighlight } from '@goalmills/types';
-import { cricketApi } from '../services/cricketApi';
+import { CricketEvent, CricketLeague } from '@goalmills/types';
+import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
-import { NewsCard } from '../components/NewsCard';
-import { VideoCard } from '../components/VideoCard';
 
-type CricketTab = 'live' | 'upcoming' | 'results' | 'series' | 'news' | 'videos';
+type CricketTab = 'live' | 'upcoming' | 'results' | 'series';
 
 export function CricketScreen() {
     const router = useRouter();
@@ -26,30 +24,36 @@ export function CricketScreen() {
     const [refreshing, setRefreshing] = useState(false);
 
     // Data states
-    const [liveMatches, setLiveMatches] = useState<CricketMatchInfo[]>([]);
-    const [upcomingMatches, setUpcomingMatches] = useState<CricketMatchInfo[]>([]);
-    const [recentMatches, setRecentMatches] = useState<CricketMatchInfo[]>([]);
-    const [seriesList, setSeriesList] = useState<CricketSeries[]>([]);
-    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-    const [videos, setVideos] = useState<VideoHighlight[]>([]);
+    const [liveMatches, setLiveMatches] = useState<CricketEvent[]>([]);
+    const [upcomingMatches, setUpcomingMatches] = useState<CricketEvent[]>([]);
+    const [recentMatches, setRecentMatches] = useState<CricketEvent[]>([]);
+    const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
+
+    const getDateString = (daysOffset: number = 0) => {
+        const date = new Date();
+        date.setDate(date.getDate() + daysOffset);
+        return date.toISOString().split('T')[0];
+    };
 
     const loadData = async () => {
         try {
-            const [live, upcoming, recent, seriesData, posts, videoData] = await Promise.all([
-                cricketApi.getLiveMatches(),
-                cricketApi.getUpcomingMatches(),
-                cricketApi.getRecentMatches(),
-                cricketApi.getSeries(),
-                cricketApi.getBlogPosts(),
-                cricketApi.getVideoHighlights(),
+            // Basic date ranges
+            const today = getDateString();
+            const futureDate = getDateString(7);
+            const pastDate = getDateString(-7);
+
+            const [live, upcoming, recent, seriesData] = await Promise.all([
+                advancedCricketApi.getLivescore({ APIkey: 'mock' }),
+                advancedCricketApi.getFixtures({ from: today, to: futureDate, APIkey: 'mock' }),
+                advancedCricketApi.getFixtures({ from: pastDate, to: today, APIkey: 'mock' }),
+                advancedCricketApi.getLeagues({ APIkey: 'mock' }),
             ]);
 
-            setLiveMatches(live.matches);
-            setUpcomingMatches(upcoming.matches);
-            setRecentMatches(recent.matches);
-            setSeriesList(seriesData.series);
-            setBlogPosts(posts);
-            setVideos(videoData);
+            setLiveMatches(live.result || []);
+            setUpcomingMatches(upcoming.result || []);
+            setRecentMatches(recent.result || []);
+            setSeriesList(seriesData.result || []);
+
         } catch (error) {
             console.error('Error loading cricket data:', error);
         } finally {
@@ -72,8 +76,6 @@ export function CricketScreen() {
         { id: 'upcoming', label: 'Upcoming', count: upcomingMatches.length },
         { id: 'results', label: 'Results', count: recentMatches.length },
         { id: 'series', label: 'Series' },
-        { id: 'news', label: 'News', count: blogPosts.length },
-        { id: 'videos', label: 'Videos', count: videos.length },
     ];
 
     const renderContent = () => {
@@ -94,7 +96,7 @@ export function CricketScreen() {
                             <>
                                 <Text style={styles.sectionTitle}>🔴 Live Matches</Text>
                                 {liveMatches.map((match) => (
-                                    <CricketMatchCard key={match.id} match={match} />
+                                    <CricketMatchCard key={match.event_key} match={match} />
                                 ))}
                             </>
                         ) : (
@@ -112,7 +114,7 @@ export function CricketScreen() {
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
                         {upcomingMatches.map((match) => (
-                            <CricketMatchCard key={match.id} match={match} />
+                            <CricketMatchCard key={match.event_key} match={match} />
                         ))}
                     </View>
                 );
@@ -122,7 +124,7 @@ export function CricketScreen() {
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>✅ Recent Results</Text>
                         {recentMatches.map((match) => (
-                            <CricketMatchCard key={match.id} match={match} />
+                            <CricketMatchCard key={match.event_key} match={match} />
                         ))}
                     </View>
                 );
@@ -133,39 +135,24 @@ export function CricketScreen() {
                         <Text style={styles.sectionTitle}>🏆 Cricket Series</Text>
                         {seriesList.map((series) => (
                             <Pressable
-                                key={series.id}
+                                key={series.league_key}
                                 style={({ pressed }) => [styles.seriesCard, pressed && styles.pressedTab]}
-                                onPress={() => router.push(`/home/cricket/series/${series.id}`)}
+                                onPress={() => router.push(`/home/cricket/series/${series.league_key}`)}
                             >
-                                {series.image && <Image source={{ uri: series.image }} style={styles.seriesImage} />}
-                                <View style={styles.seriesInfo}>
-                                    <Text style={styles.seriesName}>{series.name}</Text>
-                                    <Text style={styles.seriesDetails}>
-                                        {new Date(series.startDate).toLocaleDateString()} - {new Date(series.endDate).toLocaleDateString()}
+                                {/* CricketLeague doesn't have image, utilize placeholder or remove */}
+                                <View style={[styles.seriesImage, { backgroundColor: COLORS.secondary }]}>
+                                    <Text style={{ color: COLORS.background, fontSize: 32, fontWeight: 'bold', alignSelf: 'center', marginTop: 40 }}>
+                                        {series.league_name.charAt(0)}
                                     </Text>
-                                    <Text style={styles.seriesType}>{series.seriesType} • {series.country || series.tournament}</Text>
+                                </View>
+                                <View style={styles.seriesInfo}>
+                                    <Text style={styles.seriesName}>{series.league_name}</Text>
+                                    <Text style={styles.seriesDetails}>
+                                        {series.league_year}
+                                    </Text>
+                                    <Text style={styles.seriesType}>Season: {series.league_season}</Text>
                                 </View>
                             </Pressable>
-                        ))}
-                    </View>
-                );
-
-            case 'news':
-                return (
-                    <View style={styles.content}>
-                        <Text style={styles.sectionTitle}>📰 Latest News</Text>
-                        {blogPosts.map((post) => (
-                            <NewsCard key={post._id} item={post} onPress={() => router.push(`/news/${post._id}`)} />
-                        ))}
-                    </View>
-                );
-
-            case 'videos':
-                return (
-                    <View style={styles.content}>
-                        <Text style={styles.sectionTitle}>🎥 Video Highlights</Text>
-                        {videos.map((video) => (
-                            <VideoCard key={video.id} item={video} onPress={() => router.push(`/highlight/${video.id}`)} />
                         ))}
                     </View>
                 );

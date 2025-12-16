@@ -1,49 +1,10 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { CricketPlayer } from '@goalmills/types';
-import { cricketApi } from '../../../../../services/cricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CricketPlayersListScreen() {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [players, setPlayers] = useState<CricketPlayer[]>([]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                // Fetch teams first to get IDs, then fetch players for first few teams
-                const teamsRes = await cricketApi.getTeams();
-                const teamIds = teamsRes.teams.map(t => t.id).slice(0, 3); // Update: just grab a few
-
-                const playersArrays = await Promise.all(
-                    teamIds.map(id => cricketApi.getPlayersByTeamId({ teamId: id }))
-                );
-
-                // Flatten results
-                const allPlayers = playersArrays.flatMap(p => p.players);
-                setPlayers(allPlayers);
-            } catch (error) {
-                console.error('Error loading players:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadData();
-    }, []);
-
-    const renderItem = ({ item }: { item: CricketPlayer }) => (
-        <TouchableOpacity style={styles.card} onPress={() => router.push(`/home/cricket/players/${item.id}`)}>
-            <Image source={{ uri: item.image }} style={styles.avatar} />
-            <View style={styles.info}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.role}>{item.role}</Text>
-                <Text style={styles.style}>{item.battingStyle}</Text>
-            </View>
-        </TouchableOpacity>
-    );
 
     return (
         <View style={styles.container}>
@@ -59,20 +20,9 @@ export default function CricketPlayersListScreen() {
                     ),
                 }}
             />
-            {loading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.secondary} />
-                </View>
-            ) : (
-                <FlatList
-                    data={players}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={styles.listContent}
-                    numColumns={2}
-                    columnWrapperStyle={styles.row}
-                />
-            )}
+            <View style={styles.loadingContainer}>
+                <Text style={styles.emptyText}>Player information is currently not available via the API.</Text>
+            </View>
         </View>
     );
 }

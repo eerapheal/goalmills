@@ -71,6 +71,9 @@ export default function TennisLeagueDetailsScreen() {
                 headerTitle: league.league_name,
                 headerStyle: { backgroundColor: COLORS.backgroundDark },
                 headerTintColor: '#fff',
+                headerLeft: () => (
+                    <Text onPress={() => router.back()} style={{ color: '#fff', fontSize: 16, marginLeft: 10 }}>← Back</Text>
+                ),
             }} />
             <ScrollView contentContainerStyle={styles.content}>
                 <View style={styles.header}>

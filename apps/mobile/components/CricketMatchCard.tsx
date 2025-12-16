@@ -1,28 +1,23 @@
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { CricketMatchInfo } from '@goalmills/types';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, formatDate, formatTime } from '@goalmills/ui';
+import { CricketEvent } from '@goalmills/types';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 
 interface CricketMatchCardProps {
-    match: CricketMatchInfo;
+    match: CricketEvent;
     onPress?: () => void;
 }
 
 export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
     const router = useRouter();
-    const { status, teamInfo, score, date, matchType } = match;
-    const isLive = status === 'Live';
-    const isUpcoming = status === 'Upcoming';
-
-    // Get scores for home and away teams
-    const homeScore = score?.find(s => s.teamId === teamInfo[0].id);
-    const awayScore = score?.find(s => s.teamId === teamInfo[1].id);
+    const isLive = match.event_status === 'Live';
+    const isUpcoming = match.event_status === 'Upcoming' || !match.event_status; // or check date
 
     const handleMatchPress = () => {
         if (onPress) {
             onPress();
         } else {
-            router.push(`/home/cricket/matches/${match.id}`);
+            router.push(`/home/cricket/matches/${match.event_key}`);
         }
     };
 
@@ -39,7 +34,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
             <View style={styles.header}>
                 <View style={styles.leagueInfo}>
                     <Text style={styles.leagueName} numberOfLines={1}>
-                        {match.series} • {matchType}
+                        {match.league_name} • {match.league_season}
                     </Text>
                 </View>
                 {isLive && (
@@ -57,17 +52,24 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                     style={[styles.teamContainer, styles.teamHome]}
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/home/cricket/teams/${teamInfo[0].id}`);
+                        // Navigate to team? API has home_team_key
+                        if (match.home_team_key) router.push(`/home/cricket/teams/${match.home_team_key}`);
                     }}
                 >
-                    <Image source={{ uri: teamInfo[0].logo }} style={styles.teamLogo} />
+                    {match.event_home_team_logo ? (
+                        <Image source={{ uri: match.event_home_team_logo }} style={styles.teamLogo} />
+                    ) : (
+                        <View style={[styles.teamLogo, styles.teamLogoPlaceholder]}>
+                            <Text style={styles.teamLogoText}>{match.event_home_team.charAt(0)}</Text>
+                        </View>
+                    )}
                     <View style={styles.teamInfo}>
                         <Text style={styles.teamName} numberOfLines={1}>
-                            {teamInfo[0].shortName || teamInfo[0].name}
+                            {match.event_home_team}
                         </Text>
-                        {!isUpcoming && homeScore && (
+                        {!isUpcoming && match.event_home_final_result && (
                             <Text style={styles.scoreText}>
-                                {homeScore.runs}/{homeScore.wickets} <Text style={styles.overs}>({homeScore.overs})</Text>
+                                {match.event_home_final_result}
                             </Text>
                         )}
                     </View>
@@ -77,11 +79,11 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                 <View style={styles.statusContainer}>
                     {isUpcoming ? (
                         <View style={styles.timeContainer}>
-                            <Text style={styles.time}>{formatTime(date)}</Text>
-                            <Text style={styles.date}>{formatDate(date)}</Text>
+                            <Text style={styles.time}>{match.event_time}</Text>
+                            <Text style={styles.date}>{match.event_date_start}</Text>
                         </View>
                     ) : (
-                        <Text style={styles.statusText}>{status}</Text>
+                        <Text style={styles.statusText}>{match.event_status}</Text>
                     )}
                 </View>
 
@@ -90,24 +92,30 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                     style={[styles.teamContainer, styles.teamAway]}
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/home/cricket/teams/${teamInfo[1].id}`);
+                        if (match.away_team_key) router.push(`/home/cricket/teams/${match.away_team_key}`);
                     }}
                 >
                     <View style={[styles.teamInfo, { alignItems: 'flex-end' }]}>
                         <Text style={[styles.teamName, { textAlign: 'right' }]} numberOfLines={1}>
-                            {teamInfo[1].shortName || teamInfo[1].name}
+                            {match.event_away_team}
                         </Text>
-                        {!isUpcoming && awayScore && (
+                        {!isUpcoming && match.event_away_final_result && (
                             <Text style={styles.scoreText}>
-                                {awayScore.runs}/{awayScore.wickets} <Text style={styles.overs}>({awayScore.overs})</Text>
+                                {match.event_away_final_result}
                             </Text>
                         )}
                     </View>
-                    <Image source={{ uri: teamInfo[1].logo }} style={styles.teamLogo} />
+                    {match.event_away_team_logo ? (
+                        <Image source={{ uri: match.event_away_team_logo }} style={styles.teamLogo} />
+                    ) : (
+                        <View style={[styles.teamLogo, styles.teamLogoPlaceholder]}>
+                            <Text style={styles.teamLogoText}>{match.event_away_team.charAt(0)}</Text>
+                        </View>
+                    )}
                 </Pressable>
             </View>
 
-            <Text style={styles.venueText} numberOfLines={1}>{match.venue.name}, {match.venue.city}</Text>
+            <Text style={styles.venueText} numberOfLines={1}>{match.event_stadium}</Text>
         </Pressable>
     );
 }
@@ -115,9 +123,9 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: BORDER_RADIUS.lg,
-        padding: SPACING.md,
-        marginBottom: SPACING.sm,
+        borderRadius: BORDER_RADIUS.md,
+        padding: SPACING.sm,
+        marginBottom: SPACING.xs,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
@@ -127,23 +135,23 @@ const styles = StyleSheet.create({
     },
     liveContainer: {
         borderColor: COLORS.yellow,
-        borderWidth: 2,
-        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+        borderWidth: 1.5,
+        backgroundColor: 'rgba(255, 215, 0, 0.08)',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: SPACING.sm,
-        paddingBottom: SPACING.xs,
+        marginBottom: SPACING.xs,
+        paddingBottom: 4,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+        borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     },
     leagueInfo: {
         flex: 1,
     },
     leagueName: {
-        fontSize: FONT_SIZES.xs,
+        fontSize: 10,
         fontWeight: '600',
         color: COLORS.textLight,
         textTransform: 'uppercase',
@@ -152,7 +160,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: COLORS.yellow,
-        paddingHorizontal: SPACING.xs,
+        paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: BORDER_RADIUS.sm,
     },
@@ -161,10 +169,10 @@ const styles = StyleSheet.create({
         height: 4,
         borderRadius: 2,
         backgroundColor: COLORS.text,
-        marginRight: 4,
+        marginRight: 3,
     },
     liveText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '700',
         color: COLORS.text,
     },
@@ -172,13 +180,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: SPACING.xs,
+        marginBottom: 4,
     },
     teamContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
     },
     teamHome: {
         justifyContent: 'flex-start',
@@ -190,54 +198,64 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     teamLogo: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
     },
+    teamLogoPlaceholder: {
+        backgroundColor: COLORS.secondary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    teamLogoText: {
+        color: COLORS.backgroundDark,
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
     teamName: {
-        fontSize: FONT_SIZES.sm,
+        fontSize: 12,
         fontWeight: '700',
         color: COLORS.background,
     },
     scoreText: {
-        fontSize: FONT_SIZES.md,
+        fontSize: 13,
         fontWeight: '800',
         color: COLORS.background,
-        marginTop: 2,
+        marginTop: 1,
     },
     overs: {
-        fontSize: FONT_SIZES.xs,
+        fontSize: 10,
         fontWeight: '400',
         color: COLORS.textLight,
     },
     statusContainer: {
         alignItems: 'center',
-        width: 80,
+        width: 70,
     },
     timeContainer: {
         alignItems: 'center',
     },
     time: {
-        fontSize: FONT_SIZES.md,
+        fontSize: 12,
         fontWeight: '700',
         color: COLORS.background,
     },
     date: {
-        fontSize: 10,
+        fontSize: 9,
         color: COLORS.textLight,
     },
     statusText: {
-        fontSize: FONT_SIZES.xs,
+        fontSize: 10,
         fontWeight: '600',
         color: COLORS.secondary,
         textTransform: 'uppercase',
         textAlign: 'center',
     },
     venueText: {
-        fontSize: 10,
+        fontSize: 9,
         color: COLORS.textLight,
-        marginTop: SPACING.xs,
+        marginTop: 4,
         textAlign: 'center',
     },
 });

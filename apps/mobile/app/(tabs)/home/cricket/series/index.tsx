@@ -2,20 +2,20 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { CricketSeries } from '@goalmills/types';
-import { cricketApi } from '../../../../../services/cricketApi';
+import { CricketLeague } from '@goalmills/types';
+import { advancedCricketApi } from '../../../../../services/advancedCricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CricketSeriesListScreen() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [seriesList, setSeriesList] = useState<CricketSeries[]>([]);
+    const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                const response = await cricketApi.getSeries();
-                setSeriesList(response.series);
+                const response = await advancedCricketApi.getLeagues({ APIkey: 'mock' });
+                setSeriesList(response.result || []);
             } catch (error) {
                 console.error('Error loading series:', error);
             } finally {
@@ -25,27 +25,34 @@ export default function CricketSeriesListScreen() {
         loadData();
     }, []);
 
-    const renderItem = ({ item }: { item: CricketSeries }) => (
-        <TouchableOpacity style={styles.card} onPress={() => router.push(`/cricket/series/${item.id}`)}>
-            {item.image && <Image source={{ uri: item.image }} style={styles.cardImage} />}
+    const renderItem = ({ item }: { item: CricketLeague }) => (
+        <TouchableOpacity style={styles.card} onPress={() => router.push(`/home/cricket/series/${item.league_key}`)}>
+            {/* Start using league_logo if available, else placeholder */}
+            <View style={[styles.cardImage, { justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.secondary }]}>
+                {item.league_logo ? (
+                    <Image source={{ uri: item.league_logo }} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                    <Text style={{ fontSize: 32, fontWeight: 'bold', color: COLORS.background }}>{item.league_name.charAt(0)}</Text>
+                )}
+            </View>
             <View style={styles.cardContent}>
                 <View style={styles.header}>
-                    <Text style={styles.seriesName}>{item.name}</Text>
+                    <Text style={styles.seriesName}>{item.league_name}</Text>
                     <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{item.seriesType}</Text>
+                        <Text style={styles.badgeText}>{item.league_season}</Text>
                     </View>
                 </View>
                 <View style={styles.details}>
                     <View style={styles.row}>
                         <Ionicons name="calendar-outline" size={16} color={COLORS.textLight} />
                         <Text style={styles.detailText}>
-                            {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
+                            {item.league_year}
                         </Text>
                     </View>
-                    {item.country && (
+                    {item.country_name && (
                         <View style={styles.row}>
                             <Ionicons name="location-outline" size={16} color={COLORS.textLight} />
-                            <Text style={styles.detailText}>{item.country}</Text>
+                            <Text style={styles.detailText}>{item.country_name}</Text>
                         </View>
                     )}
                 </View>
@@ -75,7 +82,7 @@ export default function CricketSeriesListScreen() {
                 <FlatList
                     data={seriesList}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.league_key.toString()}
                     contentContainerStyle={styles.listContent}
                 />
             )}

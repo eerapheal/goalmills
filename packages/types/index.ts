@@ -880,265 +880,339 @@ export interface FootballDetailedEvent extends FootballEvent {
   statistics: FootballStatistic[];
 }
 
-// Cricket Types
+// Cricket Types (Refactored)
+
+export interface CricketLeague {
+  league_key: string;
+  league_name: string;
+  league_year: string;
+  league_season?: string;
+  league_logo?: string;
+  country_name?: string;
+  country_key?: string;
+}
 
 export interface CricketTeam {
-  id: number;
-  name: string;
-  shortName?: string;
-  logo?: string;
-  country?: string;
-}
+  team_key: string;
+  team_name: string;
+  team_logo: string | null;
+} 
 
-export interface CricketPlayer {
-  id: number;
-  name: string;
-  fullName?: string;
-  nickName?: string;
-  role?: string;
-  battingStyle?: string;
-  bowlingStyle?: string;
-  country?: string;
-  image?: string;
-  teamId?: number;
-}
-
-export interface CricketSeries {
-  id: number;
-  name: string;
-  startDate: string;
-  endDate: string;
-  seriesType?: string;
-  tournament?: string;
-  country?: string;
-  image?: string;
-}
-
-export interface CricketVenue {
-  id: number;
-  name: string;
-  city?: string;
-  country?: string;
-}
-
-export interface CricketMatchInfo {
-  id: number;
-  name: string;
-  matchType: string;
-  status: string;
-  venue: CricketVenue;
-  date: string;
-  dateTimeGMT: string;
-  teams: [string, string];
-  teamInfo: CricketTeam[];
-  score?: CricketMatchScore[];
-  series: string;
-  seriesId: number;
-  matchStarted: boolean;
-  matchEnded: boolean;
-  isFeatured?: boolean;
-  importance?: number;
-}
-
-export interface CricketMatchScore {
-  team: string;
-  teamId: number;
+export interface CricketScorecardPlayer {
   innings: string;
-  runs: number;
-  wickets: number;
-  overs: number;
+  player: string;
+  type: 'Batsman' | 'Bowler';
+  status: string;
+  R: string; // Runs
+  B: string; // Balls
+  Min: string; // Minutes
+  '4s': string; // Fours
+  '6s': string; // Sixes
+  O: string | null; // Overs (for bowlers)
+  M: string | null; // Maidens (for bowlers)
+  W: string | null; // Wickets (for bowlers)
+  SR: string; // Strike Rate
+  ER: string | null; // Economy Rate (for bowlers)
 }
 
-export interface CricketBatsmanScore {
-  playerId: number;
-  name: string;
-  runs: number;
-  balls: number;
-  fours: number;
-  sixes: number;
-  strikeRate: number;
-  isOut: boolean;
-  dismissal?: string;
+export interface CricketComment {
+  innings: string;
+  balls: string;
+  overs: string;
+  ended: 'Yes' | 'No';
+  runs: string;
+  post: string;
 }
 
-export interface CricketBowlerStats {
-  playerId: number;
-  name: string;
-  overs: number;
-  maidens: number;
-  runs: number;
-  wickets: number;
-  economy: number;
-  wides?: number;
-  noBalls?: number;
+export interface CricketLineupPlayer {
+  player: string;
+  player_country: string;
 }
 
-export interface CricketScoreboard {
-  matchId: number;
-  currentInnings: number;
-  battingTeam: CricketTeam;
-  bowlingTeam: CricketTeam;
-  batsmen: CricketBatsmanScore[];
-  bowlers: CricketBowlerStats[];
-  totalRuns: number;
-  totalWickets: number;
-  totalOvers: number;
-  runRate: number;
-  requiredRunRate?: number;
-  target?: number;
-  result?: string;
+export interface CricketTeamLineup {
+  starting_lineups: CricketLineupPlayer[];
+}
+
+export interface CricketLineups {
+  home_team: CricketTeamLineup;
+  away_team: CricketTeamLineup;
+}
+
+export interface CricketWicket {
+  innings: string;
+  fall: string; // e.g., "87.2 ov"
+  balwer: string; // Note: Appears to be typo in API (should be "bowler")
+  batsman: string;
+  score: string; // e.g., "211/3"
+}
+
+export interface CricketExtra {
+  innings: string;
+  nr: string;
+  text: string;
+  total_overs: string | null;
+  total: string;
+  percent_over: string | null;
+}
+
+export interface CricketEvent {
+  event_key: string;
+  event_date_start: string | null;
+  event_date_stop: string | null;
+  event_time: string | null;
+  event_home_team: string;
+  home_team_key: string;
+  event_away_team: string;
+  away_team_key: string;
+  event_service_home: string;
+  event_service_away: string;
+  event_home_final_result: string;
+  event_away_final_result: string;
+  event_home_rr: string | null;
+  event_away_rr: string | null;
+  event_status: string;
+  event_status_info: string;
+  country_name?: string;
+  league_name: string;
+  league_key: string;
+  league_round: string;
+  league_season: string;
+  event_live: string;
+  event_type?: string;
+  event_toss?: string;
+  event_man_of_match?: string;
+  event_stadium?: string;
+  event_home_team_logo?: string;
+  event_away_team_logo?: string;
+  scorecard?: {
+    [innings: string]: CricketScorecardPlayer[];
+  };
+  comments?: {
+    [innings: string]: CricketComment[];
+  };
+  lineups?: CricketLineups;
+  wickets?: {
+    [innings: string]: CricketWicket[];
+  };
+  extra?: {
+    [innings: string]: CricketExtra;
+  };
+}
+
+export interface CricketStanding {
+  standing_place: string;
+  standing_place_type: string;
+  standing_team: string;
+  standing_MP: string; // Matches Played
+  standing_W: string; // Wins
+  standing_L: string; // Losses
+  standing_NR: string; // No Result
+  standing_R: string; // Runs
+  standing_NRR: string; // Net Run Rate
+  standing_Pts: string; // Points
+  team_key: string;
+  league_key: string;
+  league_round: string;
+  standing_updated: string;
+}
+
+export interface CricketBookmaker {
+  [bookmakerName: string]: string;
+}
+
+export interface CricketOddsMarket {
+  [outcome: string]: CricketBookmaker;
+}
+
+export interface CricketMatchOdds {
+  [marketName: string]: CricketOddsMarket;
 }
 
 // Cricket API Response Types
+export interface CricketApiResponse<T> {
+  success: 0 | 1;
+  result: T;
+}
+
+export interface CricketLeaguesResponse {
+  success: 1;
+  result: CricketLeague[];
+}
+
 export interface CricketFixturesResponse {
-  fixtures: CricketMatchInfo[];
-  totalMatches: number;
+  success: 1;
+  result: CricketEvent[];
 }
 
-export interface CricketLiveMatchResponse {
-  matches: CricketMatchInfo[];
-  totalMatches: number;
+export interface CricketLivescoreResponse {
+  success: 1;
+  result: CricketEvent[];
 }
 
-export interface CricketSeriesResponse {
-  series: CricketSeries[];
-  totalSeries: number;
+export interface CricketH2HResponse {
+  success: 1;
+  result: {
+    H2H: CricketEvent[];
+    firstTeamResults: CricketEvent[];
+    secondTeamResults: CricketEvent[];
+  };
+}
+
+export interface CricketStandingsResponse {
+  success: 1;
+  result: {
+    total: CricketStanding[];
+  };
 }
 
 export interface CricketTeamsResponse {
-  teams: CricketTeam[];
-  totalTeams: number;
+  success: 1;
+  result: CricketTeam[];
 }
 
-export interface CricketPlayersResponse {
-  players: CricketPlayer[];
-  totalPlayers: number;
-}
-
-export interface CricketMatchDetailResponse {
-  matchInfo: CricketMatchInfo;
-  venueInfo?: CricketVenue;
-  tossResults?: {
-    winner: string;
-    decision: string;
+export interface CricketOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: CricketMatchOdds;
   };
-  matchFormat?: string;
-  umpires?: string[];
-  referee?: string;
 }
 
-export interface CricketScoreboardResponse {
-  scoreboard: CricketScoreboard;
-  matchInfo: CricketMatchInfo;
+// Cricket API Request Parameter Types
+export interface CricketBaseParams {
+  met: string;
+  APIkey: string;
 }
 
-// Endpoint Specific Types
-export interface GetCricketFixturesParams {
-  type?: 'all' | 'international' | 'domestic' | 'league' | 'women';
-  page?: number;
-  limit?: number;
+export interface CricketLeaguesParams extends CricketBaseParams {
+  met: 'Leagues';
 }
 
-export interface GetCricketSeriesParams {
-  type?: 'all' | 'international' | 'domestic' | 'league' | 'women';
-  page?: number;
-  limit?: number;
+export interface CricketFixturesParams extends CricketBaseParams {
+  met: 'Fixtures';
+  timezone?: string;
+  from: string; // yyyy-mm-dd
+  to: string; // yyyy-mm-dd
+  leagueId?: number;
+  matchId?: number;
 }
 
-export interface GetCricketMatchesParams {
-  type?: 'live' | 'recent' | 'upcoming';
-  page?: number;
-  limit?: number;
+export interface CricketLivescoreParams extends CricketBaseParams {
+  met: 'Livescore';
+  timezone?: string;
+  leagueId?: number;
+  matchId?: number;
 }
 
-export interface GetCricketSchedulesParams {
-  type?: 'all' | 'international' | 'domestic' | 'league' | 'women';
-  page?: number;
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
+export interface CricketH2HParams extends CricketBaseParams {
+  met: 'H2H';
+  firstTeamId: number;
+  secondTeamId: number;
+  timezone?: string;
 }
 
-export interface GetCricketTeamsParams {
-  type?: 'international' | 'domestic' | 'league' | 'women';
-  page?: number;
-  limit?: number;
+export interface CricketStandingsParams extends CricketBaseParams {
+  met: 'Standings';
+  leagueId: number;
 }
 
-export interface GetCricketPlayersParams {
-  teamId: number;
-  page?: number;
-  limit?: number;
+export interface CricketTeamsParams extends CricketBaseParams {
+  met: 'Teams';
+  teamId?: number;
+  leagueId?: number;
 }
 
-export interface GetCricketMatchInfoParams {
-  matchId: number;
-}
-
-export interface GetCricketScoreboardParams {
-  matchId: number;
-}
-
-// Schedule Type
-export interface CricketSchedule {
-  date: string;
-  matches: CricketMatchInfo[];
-}
-
-export interface CricketSchedulesResponse {
-  schedules: CricketSchedule[];
-  totalDays: number;
-}
-
-export interface GetCricketSeriesMatchesParams {
-  seriesId: number;
-  type?: 'all' | 'live' | 'recent' | 'upcoming';
-  page?: number;
-  limit?: number;
+export interface CricketOddsParams extends CricketBaseParams {
+  met: 'Odds';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
+  countryId?: number;
+  leagueId?: number;
+  matchId?: number;
 }
 
 // API Client Interface
-export interface CricbuzzAPIClient {
-  // Fixtures
-  getFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
-  getInternationalFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
-  getDomesticFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
-  getLeagueFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
-  getWomenFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
-  
-  // Series
-  getSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
-  getInternationalSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
-  getDomesticSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
-  getLeagueSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
-  getWomenSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
-  getSeriesMatches(params: GetCricketSeriesMatchesParams): Promise<CricketLiveMatchResponse>;
-  
-  // Matches
-  getLiveMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
-  getRecentMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
-  getUpcomingMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
-  getFeaturedMatches(limit?: number): Promise<CricketLiveMatchResponse>;
-  getImportantMatches(limit?: number): Promise<CricketLiveMatchResponse>;
-  getMatchInfo(params: GetCricketMatchInfoParams): Promise<CricketMatchDetailResponse>;
-  getMatchScoreboard(params: GetCricketScoreboardParams): Promise<CricketScoreboardResponse>;
-  
-  // Schedules
-  getSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
-  getInternationalSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
-  getDomesticSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
-  getLeagueSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
-  getWomenSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
-  
-  // Teams
-  getTeams(): Promise<CricketTeamsResponse>;
-  getInternationalTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
-  getDomesticTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
-  getLeagueTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
-  getWomenTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
-  
-  // Players
-  getPlayersByTeamId(params: GetCricketPlayersParams): Promise<CricketPlayersResponse>;
+export interface CricketAPIClient {
+  /**
+   * Get list of supported cricket leagues/competitions
+   */
+  getLeagues(params?: Omit<CricketLeaguesParams, 'met'>): Promise<CricketLeaguesResponse>;
+
+  /**
+   * Get cricket fixtures/matches
+   */
+  getFixtures(params?: Omit<CricketFixturesParams, 'met'>): Promise<CricketFixturesResponse>;
+
+  /**
+   * Get live cricket matches
+   */
+  getLivescore(params?: Omit<CricketLivescoreParams, 'met'>): Promise<CricketLivescoreResponse>;
+
+  /**
+   * Get head to head results between two teams
+   */
+  getH2H(params: Omit<CricketH2HParams, 'met'>): Promise<CricketH2HResponse>;
+
+  /**
+   * Get league standings
+   */
+  getStandings(params: Omit<CricketStandingsParams, 'met'>): Promise<CricketStandingsResponse>;
+
+  /**
+   * Get teams information
+   */
+  getTeams(params?: Omit<CricketTeamsParams, 'met'>): Promise<CricketTeamsResponse>;
+
+  /**
+   * Get pre-match odds for cricket events
+   */
+  getOdds(params?: Omit<CricketOddsParams, 'met'>): Promise<CricketOddsResponse>;
+}
+
+// Utility Types
+export type CricketEventStatus = 
+  | 'Finished'
+  | 'In Progress'
+  | 'Stumps'
+  | 'Not Started'
+  | 'Postponed'
+  | 'Cancelled'
+  | 'Abandoned'
+  | string;
+
+export type CricketEventType = 
+  | 'TEST'
+  | 'ODI'
+  | 'T20'
+  | 'T20I'
+  | 'First-class'
+  | 'List A'
+  | string;
+
+export type CricketPlayerType = 
+  | 'Batsman'
+  | 'Bowler';
+
+export type CricketInningsName = 
+  | 'Live'
+  | `${string} 1 INN`
+  | `${string} 2 INN`
+  | string;
+
+// Extended Types for Detailed Match Data
+export interface CricketDetailedEvent extends CricketEvent {
+  scorecard: {
+    [innings: string]: CricketScorecardPlayer[];
+  };
+  comments: {
+    [innings: string]: CricketComment[];
+  };
+  lineups: CricketLineups;
+  wickets: {
+    [innings: string]: CricketWicket[];
+  };
+  extra: {
+    [innings: string]: CricketExtra;
+  };
 }
 
 // API Response Types

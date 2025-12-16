@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOp
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketTeam } from '@goalmills/types';
-import { cricketApi } from '../../../../../services/cricketApi';
+import { advancedCricketApi } from '../../../../../services/advancedCricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CricketTeamsListScreen() {
@@ -14,8 +14,8 @@ export default function CricketTeamsListScreen() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const response = await cricketApi.getTeams();
-                setTeams(response.teams);
+                const response = await advancedCricketApi.getTeams();
+                setTeams(response.result); // Changed from response.teams
             } catch (error) {
                 console.error('Error loading teams:', error);
             } finally {
@@ -26,11 +26,11 @@ export default function CricketTeamsListScreen() {
     }, []);
 
     const renderItem = ({ item }: { item: CricketTeam }) => (
-        <TouchableOpacity style={styles.card} onPress={() => router.push(`/home/cricket/teams/${item.id}`)}>
-            <Image source={{ uri: item.logo }} style={styles.logo} />
+        <TouchableOpacity style={styles.card} onPress={() => router.push(`/home/cricket/teams/${item.team_key}`)}>
+            <Image source={{ uri: item.team_logo || 'https://example.com/placeholder.png' }} style={styles.logo} />
             <View style={styles.info}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.country}>{item.country || 'International'}</Text>
+                <Text style={styles.name}>{item.team_name}</Text>
+                {/* <Text style={styles.country}>{item.country || 'International'}</Text> - Country not available */}
             </View>
             <Ionicons name="chevron-forward" size={20} color={COLORS.textLight} />
         </TouchableOpacity>
@@ -58,7 +58,7 @@ export default function CricketTeamsListScreen() {
                 <FlatList
                     data={teams}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.team_key.toString()}
                     contentContainerStyle={styles.listContent}
                 />
             )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { TennisEvent, TennisPlayer } from '@goalmills/types';
 import { tennisApi } from '../../../../../services/tennisApi';
@@ -8,6 +8,7 @@ import { TennisMatchCard } from '../../../../../components/TennisMatchCard';
 
 export default function TennisPlayerDetailsScreen() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [player, setPlayer] = useState<TennisPlayer | null>(null);
     const [matches, setMatches] = useState<TennisEvent[]>([]);
@@ -64,6 +65,9 @@ export default function TennisPlayerDetailsScreen() {
                 headerTitle: player.player_name,
                 headerStyle: { backgroundColor: COLORS.backgroundDark },
                 headerTintColor: '#fff',
+                headerLeft: () => (
+                    <Text onPress={() => router.back()} style={{ color: '#fff', fontSize: 16, marginLeft: 10 }}>← Back</Text>
+                ),
             }} />
 
             <ScrollView contentContainerStyle={styles.content}>

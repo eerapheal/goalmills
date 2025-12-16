@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { CricketSeries, CricketMatchInfo } from '@goalmills/types';
-import { cricketApi } from '../../../../../services/cricketApi';
+import { CricketLeague, CricketEvent } from '@goalmills/types';
+import { advancedCricketApi } from '../../../../../services/advancedCricketApi';
 import { CricketMatchCard } from '../../../../../components/CricketMatchCard';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -11,30 +11,37 @@ export default function CricketSeriesDetailsScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [series, setSeries] = useState<CricketSeries | null>(null);
-    const [fixtures, setFixtures] = useState<CricketMatchInfo[]>([]);
+    const [series, setSeries] = useState<CricketLeague | null>(null);
+    const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
     const [activeTab, setActiveTab] = useState<'fixtures' | 'rankings'>('fixtures');
 
     useEffect(() => {
         const loadData = async () => {
             if (!id) return;
             try {
-                const seriesId = parseInt(id);
-                // Fetch series info
-                const seriesRes = await cricketApi.getSeries();
-                const foundSeries = seriesRes.series.find(s => s.id === seriesId);
+                // Fetch series info from leagues list
+                const leaguesRes = await advancedCricketApi.getLeagues({ APIkey: 'mock' });
+                // Note: getLeagues generally returns all supported leagues. Filter by ID.
+                const foundSeries = leaguesRes.result?.find(l => l.league_key === id);
                 setSeries(foundSeries || null);
 
-                // Fetch fixtures and filter by seriesId
-                if (foundSeries) {
-                    const fixturesRes = await cricketApi.getFixtures();
-                    // Mock data usually returns limited set, so we might not find many matches for specific mock series if IDs don't align perfectly in mock generator.
-                    // But we'll try filtration.
-                    const seriesFixtures = fixturesRes.fixtures.filter(f => f.seriesId === seriesId);
+                // Fetch fixtures for this league
+                // We'll fetch upcoming matches for this league.
+                // Or maybe fetch past and upcoming? 'from' and 'to' date required by API?
+                // Fixture endpoint usually requires date range.
+                // Let's set a wide range for demo or just next 30 days.
+                const today = new Date().toISOString().split('T')[0];
+                const nextMonth = new Date();
+                nextMonth.setDate(nextMonth.getDate() + 30);
+                const fixturesRes = await advancedCricketApi.getFixtures({
+                    leagueId: Number(id),
+                    from: today,
+                    to: nextMonth.toISOString().split('T')[0],
+                    APIkey: 'mock'
+                });
 
-                    // Fallback to all fixtures if none match (for demo purposes if mock data IDs mismatch)
-                    setFixtures(seriesFixtures.length > 0 ? seriesFixtures : fixturesRes.fixtures);
-                }
+                setFixtures(fixturesRes.result || []);
+
             } catch (error) {
                 console.error('Error loading series details:', error);
             } finally {
@@ -51,7 +58,7 @@ export default function CricketSeriesDetailsScreen() {
         <View style={styles.container}>
             <Stack.Screen
                 options={{
-                    title: series.name,
+                    title: series.league_name,
                     headerStyle: { backgroundColor: COLORS.backgroundDark },
                     headerTintColor: COLORS.text,
                     headerLeft: () => (
@@ -62,14 +69,22 @@ export default function CricketSeriesDetailsScreen() {
                 }}
             />
             <View style={styles.header}>
-                {series.image && <Image source={{ uri: series.image }} style={styles.headerImage} />}
+                <View style={styles.headerImage}>
+                    {series.league_logo ? (
+                        <Image source={{ uri: series.league_logo }} style={{ width: '100%', height: '100%' }} />
+                    ) : (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.secondary }}>
+                            <Text style={{ fontSize: 48, fontWeight: 'bold' }}>{series.league_name.charAt(0)}</Text>
+                        </View>
+                    )}
+                </View>
                 <View style={styles.headerContent}>
-                    <Text style={styles.title}>{series.name}</Text>
+                    <Text style={styles.title}>{series.league_name}</Text>
                     <Text style={styles.subtitle}>
-                        {new Date(series.startDate).toLocaleDateString()} - {new Date(series.endDate).toLocaleDateString()}
+                        {series.league_year}
                     </Text>
                     <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{series.seriesType}</Text>
+                        <Text style={styles.badgeText}>{series.league_season}</Text>
                     </View>
                 </View>
 
@@ -92,9 +107,9 @@ export default function CricketSeriesDetailsScreen() {
                 <FlatList
                     data={fixtures}
                     renderItem={({ item }) => <CricketMatchCard match={item} />}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.event_key.toString()}
                     contentContainerStyle={styles.content}
-                    ListEmptyComponent={<Text style={styles.emptyText}>No matches found for this series.</Text>}
+                    ListEmptyComponent={<Text style={styles.emptyText}>No upcoming matches found for this series.</Text>}
                 />
             ) : (
                 <View style={styles.content}>

@@ -121,6 +121,11 @@ export default function TennisMatchDetailsScreen() {
                 headerTitle: 'Match Details',
                 headerStyle: { backgroundColor: COLORS.backgroundDark },
                 headerTintColor: '#fff',
+                headerLeft: () => (
+                    <Pressable onPress={() => router.back()} style={{ marginLeft: 0 }}>
+                        <Text style={{ color: '#fff', fontSize: 16 }}>← Back</Text>
+                    </Pressable>
+                ),
             }} />
             <ScrollView contentContainerStyle={styles.content}>
                 {/* Header Scoreboard */}
