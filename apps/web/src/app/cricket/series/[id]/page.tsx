@@ -2,26 +2,42 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { cricketApi } from '../../../../services/cricketApi';
-import { CricketSeries } from '@goalmills/types';
+import { advancedCricketApi } from '../../../../services/advancedCricketApi';
+import { CricketLeague, CricketEvent } from '@goalmills/types';
+import { CricketMatchCard } from '../../../../components/CricketMatchCard';
 import Image from 'next/image';
 
 export default function CricketSeriesDetailsPage() {
     const params = useParams();
     const router = useRouter();
-    const [series, setSeries] = useState<CricketSeries | null>(null);
+    const [series, setSeries] = useState<CricketLeague | null>(null);
+    const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadData = async () => {
             if (!params.id) return;
-            const seriesId = Number(params.id);
+            const seriesId = String(params.id);
             try {
-                const response = await cricketApi.getSeries();
-                const found = response.series.find(s => s.id === seriesId);
-                setSeries(found || null);
+                // Get series details
+                const seriesRes = await advancedCricketApi.getLeagues({ APIkey: 'mock' });
+                const foundSeries = seriesRes.result.find(s => s.league_key === seriesId);
+                setSeries(foundSeries || null);
+
+                if (foundSeries) {
+                    // Get fixtures for this series
+                    const today = new Date().toISOString().split('T')[0];
+                    const futureDate = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+                    const fixturesRes = await advancedCricketApi.getFixtures({
+                        leagueId: Number(seriesId),
+                        from: today,
+                        to: futureDate,
+                        APIkey: 'mock'
+                    });
+                    setFixtures(fixturesRes.result || []);
+                }
             } catch (error) {
-                console.error('Error loading series:', error);
+                console.error('Error loading series details:', error);
             } finally {
                 setLoading(false);
             }
@@ -48,7 +64,7 @@ export default function CricketSeriesDetailsPage() {
 
     return (
         <div className="min-h-screen bg-[#0a0e27] pt-[90px] pb-10">
-            <div className="max-w-5xl mx-auto px-4">
+            <div className="max-w-4xl mx-auto px-4">
                 {/* Header with Back Button */}
                 <div className="flex items-center gap-4 mb-6">
                     <button
@@ -60,34 +76,39 @@ export default function CricketSeriesDetailsPage() {
                     <span className="text-sm font-bold text-text-muted uppercase tracking-wider">Series Details</span>
                 </div>
 
-                {/* Hero Banner */}
-                <div className="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden mb-8 shadow-2xl">
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e27] to-transparent z-10" />
-                    {series.image && <Image src={series.image} alt={series.name} fill className="object-cover" />}
-
-                    <div className="absolute bottom-0 left-0 w-full p-8 z-20">
-                        <div className="inline-block bg-secondary px-3 py-1 rounded text-xs font-bold text-white uppercase tracking-wider mb-3">
-                            {series.seriesType}
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2">{series.name}</h1>
-                        <div className="flex items-center gap-4 text-gray-300 font-medium">
-                            <span className="flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                {new Date(series.startDate).toLocaleDateString()} - {new Date(series.endDate).toLocaleDateString()}
-                            </span>
-                            <span className="flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                {series.country || series.tournament}
-                            </span>
+                {/* Series Header Card */}
+                <div className="glass-card rounded-2xl p-8 mb-8 border border-white/5">
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                        {series.league_logo ? (
+                            <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-xl flex-shrink-0">
+                                <Image src={series.league_logo} alt={series.league_name} fill className="object-cover" />
+                            </div>
+                        ) : (
+                            <div className="w-32 h-32 bg-blue-500/20 rounded-xl flex items-center justify-center shadow-xl flex-shrink-0">
+                                <span className="text-5xl font-bold text-blue-400">{series.league_name.charAt(0)}</span>
+                            </div>
+                        )}
+                        <div className="text-center md:text-left flex-1">
+                            <h1 className="text-4xl font-extrabold text-white mb-2">{series.league_name}</h1>
+                            <p className="text-xl text-text-secondary mb-2">{series.league_season} • {series.country_name}</p>
+                            <p className="text-lg text-text-muted">{series.league_year}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Content Tabs (Simplified) */}
-                <div className="glass-card rounded-xl p-6 border border-white/5">
-                    <h2 className="text-xl font-bold text-white mb-4">Matches</h2>
-                    <p className="text-text-muted text-center py-8">Match schedule for this series will appear here.</p>
-                </div>
+                {/* Fixtures Section */}
+                <h2 className="text-2xl font-bold text-white mb-6 pl-2 border-l-4 border-secondary">Fixtures</h2>
+                {fixtures.length > 0 ? (
+                    <div className="space-y-2">
+                        {fixtures.map(match => (
+                            <CricketMatchCard key={match.event_key} match={match} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="glass-card rounded-xl p-8 text-center">
+                        <p className="text-text-secondary">No fixtures available for this series.</p>
+                    </div>
+                )}
             </div>
         </div>
     );

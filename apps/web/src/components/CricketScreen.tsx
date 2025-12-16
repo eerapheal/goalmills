@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CricketMatchInfo, CricketSeries, CricketTeam } from '@goalmills/types';
-import { cricketApi } from '../services/cricketApi';
+import { CricketEvent, CricketLeague, CricketTeam } from '@goalmills/types';
+import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from './CricketMatchCard';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,27 +15,37 @@ export function CricketScreen() {
     const [refreshing, setRefreshing] = useState(false);
 
     // Data states
-    const [liveMatches, setLiveMatches] = useState<CricketMatchInfo[]>([]);
-    const [upcomingMatches, setUpcomingMatches] = useState<CricketMatchInfo[]>([]);
-    const [recentMatches, setRecentMatches] = useState<CricketMatchInfo[]>([]);
-    const [seriesList, setSeriesList] = useState<CricketSeries[]>([]);
+    const [liveMatches, setLiveMatches] = useState<CricketEvent[]>([]);
+    const [upcomingMatches, setUpcomingMatches] = useState<CricketEvent[]>([]);
+    const [recentMatches, setRecentMatches] = useState<CricketEvent[]>([]);
+    const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
     const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
+
+    const getDateString = (daysOffset: number = 0) => {
+        const date = new Date();
+        date.setDate(date.getDate() + daysOffset);
+        return date.toISOString().split('T')[0];
+    };
 
     const loadData = async () => {
         try {
+            const today = getDateString();
+            const futureDate = getDateString(7);
+            const pastDate = getDateString(-7);
+
             const [live, upcoming, recent, series, teams] = await Promise.all([
-                cricketApi.getLiveMatches(),
-                cricketApi.getUpcomingMatches(),
-                cricketApi.getRecentMatches(),
-                cricketApi.getSeries(),
-                cricketApi.getTeams(),
+                advancedCricketApi.getLivescore({ APIkey: 'mock' }),
+                advancedCricketApi.getFixtures({ from: today, to: futureDate, APIkey: 'mock' }),
+                advancedCricketApi.getFixtures({ from: pastDate, to: today, APIkey: 'mock' }),
+                advancedCricketApi.getLeagues({ APIkey: 'mock' }),
+                advancedCricketApi.getTeams({ APIkey: 'mock' }),
             ]);
 
-            setLiveMatches(live.matches);
-            setUpcomingMatches(upcoming.matches);
-            setRecentMatches(recent.matches);
-            setSeriesList(series.series);
-            setTeamsList(teams.teams);
+            setLiveMatches(live.result || []);
+            setUpcomingMatches(upcoming.result || []);
+            setRecentMatches(recent.result || []);
+            setSeriesList(series.result || []);
+            setTeamsList(teams.result || []);
         } catch (error) {
             console.error('Error loading cricket data:', error);
         } finally {
@@ -83,7 +93,7 @@ export function CricketScreen() {
                                     Live Matches
                                 </h2>
                                 {liveMatches.map((match) => (
-                                    <CricketMatchCard key={match.id} match={match} />
+                                    <CricketMatchCard key={match.event_key} match={match} />
                                 ))}
                             </>
                         ) : (
@@ -101,7 +111,7 @@ export function CricketScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">📅 Upcoming Matches</h2>
                         {upcomingMatches.map((match) => (
-                            <CricketMatchCard key={match.id} match={match} />
+                            <CricketMatchCard key={match.event_key} match={match} />
                         ))}
                     </div>
                 );
@@ -111,7 +121,7 @@ export function CricketScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">✅ Recent Results</h2>
                         {recentMatches.map((match) => (
-                            <CricketMatchCard key={match.id} match={match} />
+                            <CricketMatchCard key={match.event_key} match={match} />
                         ))}
                     </div>
                 );
@@ -123,19 +133,23 @@ export function CricketScreen() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {seriesList.map((series) => (
                                 <Link
-                                    href={`/cricket/series/${series.id}`}
-                                    key={series.id}
+                                    href={`/cricket/series/${series.league_key}`}
+                                    key={series.league_key}
                                     className="glass-card rounded-xl p-4 hover:border-white/20 transition-all flex items-center gap-4 cursor-pointer"
                                 >
-                                    {series.image && (
+                                    {series.league_logo ? (
                                         <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                            <Image src={series.image} alt={series.name} fill className="object-cover" />
+                                            <Image src={series.league_logo} alt={series.league_name} fill className="object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-16 h-16 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-2xl font-bold text-blue-400">{series.league_name.charAt(0)}</span>
                                         </div>
                                     )}
                                     <div className="flex-1">
-                                        <h3 className="font-bold text-white mb-1 leading-tight">{series.name}</h3>
-                                        <p className="text-xs text-text-secondary">{series.seriesType} • {series.country || series.tournament}</p>
-                                        <p className="text-xs text-text-muted mt-1">{new Date(series.startDate).toLocaleDateString()} - {new Date(series.endDate).toLocaleDateString()}</p>
+                                        <h3 className="font-bold text-white mb-1 leading-tight">{series.league_name}</h3>
+                                        <p className="text-xs text-text-secondary">{series.league_season} • {series.country_name}</p>
+                                        <p className="text-xs text-text-muted mt-1">{series.league_year}</p>
                                     </div>
                                 </Link>
                             ))}
@@ -150,15 +164,20 @@ export function CricketScreen() {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {teamsList.map((team) => (
                                 <Link
-                                    href={`/cricket/teams/${team.id}`}
-                                    key={team.id}
+                                    href={`/cricket/teams/${team.team_key}`}
+                                    key={team.team_key}
                                     className="glass-card rounded-xl p-4 flex flex-col items-center text-center hover:bg-white/5 transition-all"
                                 >
-                                    <div className="relative w-16 h-16 mb-3 bg-white/5 rounded-full p-2">
-                                        <Image src={team.logo} alt={team.name} width={64} height={64} className="object-contain w-full h-full" />
-                                    </div>
-                                    <h3 className="font-bold text-white text-sm">{team.name}</h3>
-                                    <p className="text-xs text-text-secondary mt-1">{team.country || 'International'}</p>
+                                    {team.team_logo ? (
+                                        <div className="relative w-16 h-16 mb-3 bg-white/5 rounded-full p-2">
+                                            <Image src={team.team_logo} alt={team.team_name} width={64} height={64} className="object-contain w-full h-full" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-16 h-16 mb-3 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                            <span className="text-2xl font-bold text-blue-400">{team.team_name.charAt(0)}</span>
+                                        </div>
+                                    )}
+                                    <h3 className="font-bold text-white text-sm">{team.team_name}</h3>
                                 </Link>
                             ))}
                         </div>
@@ -216,8 +235,8 @@ export function CricketScreen() {
                                     text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center
                                     ${activeTab === tab.id
                                         ? 'bg-white/20 text-white'
-                                        : 'bg-black/20 text-text-secondary'}
-                                `}>
+                                        : 'bg-black/20 text-text-secondary'}`}
+                                >
                                     {tab.count}
                                 </span>
                             )}

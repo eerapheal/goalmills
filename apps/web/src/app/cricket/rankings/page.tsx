@@ -1,39 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-
-// Mock Rankings Data (Copied from mobile implementation)
-const rankingsData = {
-    test: [
-        { rank: 1, team: 'Australia', points: 124, rating: 124, logo: 'https://flagcdn.com/w320/au.png' },
-        { rank: 2, team: 'India', points: 120, rating: 120, logo: 'https://flagcdn.com/w320/in.png' },
-        { rank: 3, team: 'England', points: 105, rating: 105, logo: 'https://flagcdn.com/w320/gb-eng.png' },
-        { rank: 4, team: 'South Africa', points: 103, rating: 103, logo: 'https://flagcdn.com/w320/za.png' },
-        { rank: 5, team: 'New Zealand', points: 96, rating: 96, logo: 'https://flagcdn.com/w320/nz.png' },
-    ],
-    odi: [
-        { rank: 1, team: 'India', points: 118, rating: 118, logo: 'https://flagcdn.com/w320/in.png' },
-        { rank: 2, team: 'Australia', points: 113, rating: 113, logo: 'https://flagcdn.com/w320/au.png' },
-        { rank: 3, team: 'Pakistan', points: 109, rating: 109, logo: 'https://flagcdn.com/w320/pk.png' },
-        { rank: 4, team: 'South Africa', points: 106, rating: 106, logo: 'https://flagcdn.com/w320/za.png' },
-        { rank: 5, team: 'New Zealand', points: 101, rating: 102, logo: 'https://flagcdn.com/w320/nz.png' },
-    ],
-    t20: [
-        { rank: 1, team: 'India', points: 264, rating: 264, logo: 'https://flagcdn.com/w320/in.png' },
-        { rank: 2, team: 'Australia', points: 257, rating: 257, logo: 'https://flagcdn.com/w320/au.png' },
-        { rank: 3, team: 'England', points: 252, rating: 252, logo: 'https://flagcdn.com/w320/gb-eng.png' },
-        { rank: 4, team: 'West Indies', points: 252, rating: 252, logo: 'https://flagcdn.com/w320/bb.png' },
-        { rank: 5, team: 'New Zealand', points: 250, rating: 250, logo: 'https://flagcdn.com/w320/nz.png' },
-    ],
-};
+import { advancedCricketApi } from '../../../services/advancedCricketApi';
+import { CricketStanding } from '@goalmills/types';
 
 type Format = 'test' | 'odi' | 't20';
+
+const LEAGUE_IDS = {
+    test: '101',
+    odi: '102',
+    t20: '103',
+};
 
 export default function CricketRankingsPage() {
     const router = useRouter();
     const [activeFormat, setActiveFormat] = useState<Format>('test');
+    const [rankings, setRankings] = useState<CricketStanding[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const response = await advancedCricketApi.getStandings({
+                    leagueId: LEAGUE_IDS[activeFormat],
+                    APIkey: 'mock'
+                });
+                setRankings(response.result.total || []);
+            } catch (error) {
+                console.error('Error loading rankings:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, [activeFormat]);
 
     return (
         <div className="min-h-screen bg-[#0a0e27] pt-[90px] pb-10">
@@ -59,8 +62,7 @@ export default function CricketRankingsPage() {
                                 px-6 py-2 rounded-lg font-bold text-sm uppercase transition-all
                                 ${activeFormat === format
                                     ? 'bg-secondary text-white shadow-lg'
-                                    : 'text-text-secondary hover:text-white hover:bg-white/5'}
-                            `}
+                                    : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
                         >
                             {format}
                         </button>
@@ -72,31 +74,40 @@ export default function CricketRankingsPage() {
                     <div className="p-6 border-b border-white/5">
                         <h2 className="text-xl font-bold text-white">Men's Team Rankings - {activeFormat.toUpperCase()}</h2>
                     </div>
-                    <div className="w-full">
-                        <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-white/5 text-xs font-bold text-text-secondary uppercase tracking-wider">
-                            <div className="col-span-1">Rank</div>
-                            <div className="col-span-7">Team</div>
-                            <div className="col-span-2 text-right">Rating</div>
-                            <div className="col-span-2 text-right">Points</div>
-                        </div>
 
-                        {rankingsData[activeFormat].map((item) => (
-                            <div
-                                key={item.team}
-                                className="grid grid-cols-12 gap-4 px-6 py-4 border-t border-white/5 items-center hover:bg-white/5 transition-colors"
-                            >
-                                <div className="col-span-1 font-bold text-white">{item.rank}</div>
-                                <div className="col-span-7 flex items-center gap-3">
-                                    <div className="w-8 h-6 relative shadow-sm">
-                                        <Image src={item.logo} alt={item.team} width={32} height={24} className="object-cover rounded-sm w-full h-full" />
-                                    </div>
-                                    <span className="font-bold text-white text-base">{item.team}</span>
-                                </div>
-                                <div className="col-span-2 text-right text-white font-medium">{item.rating}</div>
-                                <div className="col-span-2 text-right text-white font-medium">{item.points}</div>
+                    {loading ? (
+                        <div className="flex justify-center items-center p-12">
+                            <div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : (
+                        <div className="w-full">
+                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-white/5 text-xs font-bold text-text-secondary uppercase tracking-wider">
+                                <div className="col-span-1">Rank</div>
+                                <div className="col-span-5">Team</div>
+                                <div className="col-span-2 text-right">Matches</div>
+                                <div className="col-span-2 text-right">Points</div>
+                                <div className="col-span-2 text-right">Rating</div>
                             </div>
-                        ))}
-                    </div>
+
+                            {rankings.map((item) => (
+                                <div
+                                    key={item.team_key}
+                                    className="grid grid-cols-12 gap-4 px-6 py-4 border-t border-white/5 items-center hover:bg-white/5 transition-colors"
+                                >
+                                    <div className="col-span-1 font-bold text-white">{item.standing_place}</div>
+                                    <div className="col-span-5 flex items-center gap-3">
+                                        <div className="w-8 h-6 bg-white/5 rounded-sm flex items-center justify-center">
+                                            <span className="text-xs font-bold text-blue-400">{item.standing_team.charAt(0)}</span>
+                                        </div>
+                                        <span className="font-bold text-white text-base">{item.standing_team}</span>
+                                    </div>
+                                    <div className="col-span-2 text-right text-white font-medium">{item.standing_MP}</div>
+                                    <div className="col-span-2 text-right text-white font-medium">{item.standing_Pts}</div>
+                                    <div className="col-span-2 text-right text-secondary font-bold">{item.standing_Pts}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

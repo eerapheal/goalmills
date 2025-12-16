@@ -1,40 +1,25 @@
 'use client';
 
-import { CricketMatchInfo } from '@goalmills/types';
+import { CricketEvent } from '@goalmills/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 interface CricketMatchCardProps {
-    match: CricketMatchInfo;
+    match: CricketEvent;
     onPress?: () => void;
 }
 
 export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
     const router = useRouter();
-    const { status, teamInfo, score, date, matchType, series } = match;
-    const isLive = status === 'Live';
-    const isUpcoming = status === 'Upcoming';
-
-    // Get scores for home and away teams
-    const homeScore = score?.find(s => s.teamId === teamInfo[0].id);
-    const awayScore = score?.find(s => s.teamId === teamInfo[1].id);
-
-    const formatTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    };
+    const isLive = match.event_live === '1';
+    const isUpcoming = match.event_status === 'Not Started';
 
     const handleCardClick = () => {
         if (onPress) {
             onPress();
         } else {
-            router.push(`/cricket/matches/${match.id}`);
+            router.push(`/cricket/matches/${match.event_key}`);
         }
     };
 
@@ -59,7 +44,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                     className="flex items-center gap-2"
                 >
                     <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                        {series} • {matchType}
+                        {match.league_name} • {match.event_type}
                     </span>
                 </div>
                 {isLive && (
@@ -77,20 +62,34 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
             <div className="flex items-center justify-between relative z-10 gap-4">
                 {/* Home Team */}
                 <Link
-                    href={`/cricket/teams/${teamInfo[0].id}`}
+                    href={`/cricket/teams/${match.home_team_key}`}
                     onClick={(e) => e.stopPropagation()}
                     className="flex-1 flex flex-row items-center justify-start gap-3 group-hover:opacity-80 transition-opacity"
                 >
-                    <div className="relative w-8 h-8 rounded-full bg-white/5 p-1">
-                        <Image src={teamInfo[0].logo} alt={teamInfo[0].name} width={32} height={32} className="object-contain w-full h-full" />
-                    </div>
+                    {match.event_home_team_logo ? (
+                        <div className="relative w-8 h-8 rounded-full bg-white/5 p-1">
+                            <Image
+                                src={match.event_home_team_logo}
+                                alt={match.event_home_team}
+                                width={32}
+                                height={32}
+                                className="object-contain w-full h-full"
+                            />
+                        </div>
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <span className="text-xs font-bold text-blue-400">
+                                {match.event_home_team.charAt(0)}
+                            </span>
+                        </div>
+                    )}
                     <div className="flex flex-col">
                         <p className="text-sm font-bold text-text-primary leading-tight">
-                            {teamInfo[0].shortName || teamInfo[0].name}
+                            {match.event_home_team}
                         </p>
-                        {!isUpcoming && homeScore && (
+                        {!isUpcoming && match.event_home_final_result && (
                             <p className="text-xs font-bold text-text-primary mt-0.5 whitespace-nowrap">
-                                {homeScore.runs}/{homeScore.wickets} <span className="text-text-muted font-normal">({homeScore.overs})</span>
+                                {match.event_home_final_result}
                             </p>
                         )}
                     </div>
@@ -98,22 +97,22 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
 
                 {/* Status/Time Center */}
                 <Link
-                    href={`/cricket/matches/${match.id}`}
+                    href={`/cricket/matches/${match.event_key}`}
                     onClick={(e) => e.stopPropagation()}
                     className="flex flex-col items-center justify-center min-w-[80px]"
                 >
                     {isUpcoming ? (
                         <div className="flex flex-col items-center">
-                            <span className="text-base font-bold text-text-primary tracking-tight">{formatTime(date)}</span>
-                            <span className="text-[10px] font-medium text-text-muted">{formatDate(date)}</span>
+                            <span className="text-base font-bold text-text-primary tracking-tight">{match.event_time}</span>
+                            <span className="text-[10px] font-medium text-text-muted">{match.event_date_start}</span>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center">
                             <span className={`text-[10px] font-bold tracking-wider uppercase ${isLive ? 'text-yellow-500' : 'text-blue-400'}`}>
-                                {status}
+                                {match.event_status}
                             </span>
                             <p className="text-[10px] text-text-muted mt-1 truncate max-w-[100px] text-center">
-                                {match.venue.city}
+                                {match.event_stadium}
                             </p>
                         </div>
                     )}
@@ -121,20 +120,34 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
 
                 {/* Away Team */}
                 <Link
-                    href={`/cricket/teams/${teamInfo[1].id}`}
+                    href={`/cricket/teams/${match.away_team_key}`}
                     onClick={(e) => e.stopPropagation()}
                     className="flex-1 flex flex-row-reverse items-center justify-start gap-3 group-hover:opacity-80 transition-opacity text-right"
                 >
-                    <div className="relative w-8 h-8 rounded-full bg-white/5 p-1">
-                        <Image src={teamInfo[1].logo} alt={teamInfo[1].name} width={32} height={32} className="object-contain w-full h-full" />
-                    </div>
+                    {match.event_away_team_logo ? (
+                        <div className="relative w-8 h-8 rounded-full bg-white/5 p-1">
+                            <Image
+                                src={match.event_away_team_logo}
+                                alt={match.event_away_team}
+                                width={32}
+                                height={32}
+                                className="object-contain w-full h-full"
+                            />
+                        </div>
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <span className="text-xs font-bold text-blue-400">
+                                {match.event_away_team.charAt(0)}
+                            </span>
+                        </div>
+                    )}
                     <div className="flex flex-col items-end">
                         <p className="text-sm font-bold text-text-primary leading-tight">
-                            {teamInfo[1].shortName || teamInfo[1].name}
+                            {match.event_away_team}
                         </p>
-                        {!isUpcoming && awayScore && (
+                        {!isUpcoming && match.event_away_final_result && (
                             <p className="text-xs font-bold text-text-primary mt-0.5 whitespace-nowrap">
-                                {awayScore.runs}/{awayScore.wickets} <span className="text-text-muted font-normal">({awayScore.overs})</span>
+                                {match.event_away_final_result}
                             </p>
                         )}
                     </div>
