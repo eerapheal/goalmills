@@ -223,7 +223,7 @@ export function FootballScreen() {
 
             case 'standings':
                 // Search in standings (usually searching for team name)
-                const filteredStandings = filterData(standings, 'team_name'); // Assuming team_name exists on standing object or we map it? 
+                const filteredStandings = filterData(standings, 'standing_team');
                 // Wait, FootballStanding usually has team_name. Let's check type if possible, but usually yes.
                 // Assuming it works for now.
                 return (
@@ -259,7 +259,7 @@ export function FootballScreen() {
                 );
 
             case 'videos':
-                const filteredVideos = filterData(videos, (v) => `${v.event_home_team} ${v.event_away_team} ${v.league_name}`);
+                const filteredVideos = filterData(videos, (v) => `${v.video_title} ${v.video_title_full}`);
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🎥 Video Highlights</h2>
