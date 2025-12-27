@@ -1080,7 +1080,7 @@ export interface CricketOddsResponse {
 // Cricket API Request Parameter Types
 export interface CricketBaseParams {
   met: string;
-  APIkey: string;
+  APIkey?: string;
 }
 
 export interface CricketLeaguesParams extends CricketBaseParams {
@@ -2016,4 +2016,113 @@ export type BasketballOddsOutcome =
   | string;
 
 export type SportType = 'football' | 'cricket' | 'tennis' | 'basketball' | 'baseball' | 'hockey';
+
+// Additional Cricket Types and Client Interface
+
+export interface CricketSeries {
+  series_key: string;
+  series_name: string;
+  series_date_start: string;
+  series_date_end: string;
+  series_type: string;
+}
+
+export interface CricketSeriesResponse {
+  success: number;
+  result: CricketSeries[];
+}
+
+export interface CricketLiveMatchResponse {
+  success: number;
+  result: CricketEvent[];
+}
+
+export interface CricketMatchDetailResponse {
+  success: number;
+  result: CricketEvent;
+}
+
+export interface CricketScoreboardResponse {
+  success: number;
+  result: any; // Todo: define scoreboard
+}
+
+export interface CricketScoreboard {
+  [key: string]: any;
+}
+
+export interface CricketSchedulesResponse {
+  success: number;
+  result: any[]; // Todo: define schedule
+}
+
+export interface CricketPlayer {
+  player_key: string;
+  player_name: string;
+  team_key: string;
+  player_type: string;
+  player_image: string;
+}
+
+export interface CricketPlayersResponse {
+  success: number;
+  result: CricketPlayer[];
+}
+
+// Params Aliases/Definitions for those missing
+export type GetCricketFixturesParams = CricketFixturesParams;
+export type GetCricketSeriesParams = CricketBaseParams;
+export type GetCricketMatchesParams = CricketBaseParams;
+export interface GetCricketMatchInfoParams extends CricketBaseParams {
+  matchId: string | number;
+}
+export interface GetCricketScoreboardParams extends CricketBaseParams {
+  matchId: string | number;
+}
+export type GetCricketSchedulesParams = CricketBaseParams;
+export type GetCricketTeamsParams = CricketTeamsParams;
+export interface GetCricketPlayersParams extends CricketBaseParams {
+    teamId: string | number;
+}
+
+export interface CricbuzzAPIClient {
+  getFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
+  getInternationalFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
+  getDomesticFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
+  getLeagueFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
+  getWomenFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
+
+  getSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
+  getInternationalSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
+  getDomesticSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
+  getLeagueSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
+  getWomenSeries(params?: GetCricketSeriesParams): Promise<CricketSeriesResponse>;
+  getSeriesMatches(params: { seriesId: number }): Promise<CricketLiveMatchResponse>;
+
+  getLiveMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
+  getRecentMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
+  getUpcomingMatches(params?: GetCricketMatchesParams): Promise<CricketLiveMatchResponse>;
+  getFeaturedMatches(limit?: number): Promise<CricketLiveMatchResponse>;
+  getImportantMatches(limit?: number): Promise<CricketLiveMatchResponse>;
+
+  getMatchInfo(params: GetCricketMatchInfoParams): Promise<CricketMatchDetailResponse>;
+  getMatchScoreboard(params: GetCricketScoreboardParams): Promise<CricketScoreboardResponse>;
+
+  getSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
+  getInternationalSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
+  getDomesticSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
+  getLeagueSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
+  getWomenSchedules(params?: GetCricketSchedulesParams): Promise<CricketSchedulesResponse>;
+
+  getTeams(): Promise<CricketTeamsResponse>;
+  getInternationalTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
+  getDomesticTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
+  getLeagueTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
+  getWomenTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
+
+  getPlayersByTeamId(params: GetCricketPlayersParams): Promise<CricketPlayersResponse>;
+
+  getBlogPosts(): Promise<any[]>;
+  getVideoHighlights(): Promise<any[]>;
+}
 

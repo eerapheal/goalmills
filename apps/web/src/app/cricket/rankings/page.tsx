@@ -9,9 +9,9 @@ import { CricketStanding } from '@goalmills/types';
 type Format = 'test' | 'odi' | 't20';
 
 const LEAGUE_IDS = {
-    test: '101',
-    odi: '102',
-    t20: '103',
+    test: 101,
+    odi: 102,
+    t20: 103,
 };
 
 export default function CricketRankingsPage() {
@@ -25,8 +25,7 @@ export default function CricketRankingsPage() {
             setLoading(true);
             try {
                 const response = await advancedCricketApi.getStandings({
-                    leagueId: LEAGUE_IDS[activeFormat],
-                    APIkey: 'mock'
+                    leagueId: LEAGUE_IDS[activeFormat]
                 });
                 setRankings(response.result.total || []);
             } catch (error) {
