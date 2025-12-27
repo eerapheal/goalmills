@@ -19,7 +19,7 @@ export default function CricketTeamDetailsPage() {
             if (!params.id) return;
             const teamId = String(params.id);
             try {
-                const teamsRes = await advancedCricketApi.getTeams({ teamId, APIkey: 'mock' });
+                const teamsRes = await advancedCricketApi.getTeams({ teamId: parseInt(teamId), APIkey: 'mock' });
                 const foundTeam = teamsRes.result[0];
                 setTeam(foundTeam || null);
 

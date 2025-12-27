@@ -1313,6 +1313,7 @@ export interface TennisEvent {
   league_key: number | string;
   league_round: string;
   league_season: string;
+  league_surface?: string;
   event_live: string;
   event_first_player_logo: string | null;
   event_second_player_logo: string | null;

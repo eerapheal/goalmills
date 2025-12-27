@@ -28,7 +28,16 @@ export default function MatchDetailsScreen() {
         try {
             const fixtureId = Number(id);
             // In advanced api, getting specific match by ID is done via getFixtures({ matchId })
-            const response = await advancedFootballApi.getFixtures({ matchId: fixtureId }); // matchId=fixtureId
+            // We need to provide date range even when filtering by matchId
+            const today = new Date();
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+            const response = await advancedFootballApi.getFixtures({
+                from: oneYearAgo.toISOString().split('T')[0],
+                to: today.toISOString().split('T')[0],
+                matchId: fixtureId
+            });
 
             if (response.success && response.result.length > 0) {
                 const event = response.result[0];

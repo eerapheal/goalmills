@@ -82,4 +82,9 @@ const styles = StyleSheet.create({
         fontSize: 10,
         textAlign: 'center',
     },
+    emptyText: {
+        color: COLORS.textLight,
+        fontSize: FONT_SIZES.md,
+        textAlign: 'center',
+    },
 });

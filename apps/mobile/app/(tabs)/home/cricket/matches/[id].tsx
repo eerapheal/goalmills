@@ -19,7 +19,22 @@ export default function CricketMatchDetailsScreen() {
         const loadData = async () => {
             if (!id) return;
             try {
-                const response = await advancedCricketApi.getFixtures({ matchId: Number(id), APIkey: 'mock' });
+                // Create date range for the API call (required parameters)
+                const today = new Date();
+                const fromDate = new Date(today);
+                fromDate.setDate(today.getDate() - 30); // 30 days ago
+                const toDate = new Date(today);
+                toDate.setDate(today.getDate() + 30); // 30 days from now
+
+                const from = fromDate.toISOString().split('T')[0]; // yyyy-mm-dd
+                const to = toDate.toISOString().split('T')[0]; // yyyy-mm-dd
+
+                const response = await advancedCricketApi.getFixtures({
+                    matchId: Number(id),
+                    APIkey: 'mock',
+                    from,
+                    to
+                });
                 if (response.result && response.result.length > 0) {
                     setMatch(response.result[0]);
                 }
