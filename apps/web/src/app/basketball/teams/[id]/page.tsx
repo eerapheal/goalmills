@@ -21,9 +21,17 @@ export default function BasketballTeamPage() {
         const loadTeamData = async () => {
             try {
                 const teamId = parseInt(params.id as string);
+                const today = new Date();
+                const fromDate = new Date(today);
+                fromDate.setDate(today.getDate() - 30);
+                const toDate = new Date(today);
+                toDate.setDate(today.getDate() + 30);
+                const from = fromDate.toISOString().split('T')[0];
+                const to = toDate.toISOString().split('T')[0];
+
                 const [teamsData, matchesData, playersData] = await Promise.all([
                     basketballApi.getTeams({ teamId }),
-                    basketballApi.getFixtures({ teamId }),
+                    basketballApi.getFixtures({ teamId, from, to }),
                     basketballApi.getPlayers({ teamId })
                 ]);
 

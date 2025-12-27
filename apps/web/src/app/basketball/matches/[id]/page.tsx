@@ -21,8 +21,16 @@ export default function BasketballMatchPage() {
         const loadMatchData = async () => {
             try {
                 const matchId = parseInt(params.id as string);
+                const today = new Date();
+                const fromDate = new Date(today);
+                fromDate.setDate(today.getDate() - 30);
+                const toDate = new Date(today);
+                toDate.setDate(today.getDate() + 30);
+                const from = fromDate.toISOString().split('T')[0];
+                const to = toDate.toISOString().split('T')[0];
+
                 const [matchData, oddsData, statsData, lineupsData] = await Promise.all([
-                    basketballApi.getFixtures({ matchId }),
+                    basketballApi.getFixtures({ matchId, from, to }),
                     basketballApi.getOdds({ matchId }),
                     basketballApi.getStatistics({ matchId }),
                     basketballApi.getLineups({ matchId })
