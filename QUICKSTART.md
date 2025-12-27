@@ -316,3 +316,67 @@ pnpm dev
 ```
 
 Happy coding! 🚀
+
+
+
+📌 1. PROPRIETARY SOFTWARE LICENSE AGREEMENT
+
+GoalMills Software License – Version 1.0 (2025)
+
+Copyright © 2025 GoalMills / Ekpenisi Erue Raphael
+All rights reserved.
+
+This License Agreement (“Agreement”) governs the use of the GoalMills software, including its source code, binaries, APIs, UI components, assets, documentation, designs, databases, and related materials (“Software”).
+
+By installing, accessing, or using the Software, you agree to be bound by this Agreement.
+
+1. GRANT OF LICENSE
+
+GoalMills grants you a limited, non-transferable, revocable license to use the Software solely for personal or internal business usage according to this Agreement.
+
+2. RESTRICTIONS
+
+You may NOT:
+
+copy or reproduce the Software in whole or part
+
+modify, translate, adapt, or create derivative works
+
+distribute, sublicense, lease, resell, or share the Software
+
+reverse engineer, disassemble, or extract source code
+
+remove copyright notices or security/technical restrictions
+
+use any code, assets, or components in other software
+
+Any unauthorized use terminates this license immediately.
+
+3. OWNERSHIP
+
+The Software remains the exclusive property of GoalMills / Ekpenisi Erue Raphael.
+No rights or ownership are transferred through this Agreement.
+
+4. INTELLECTUAL PROPERTY RIGHTS
+
+All copyrights, trademarks, trade secrets, patents, and proprietary elements are legally protected under US and international law.
+
+5. DISCLAIMER
+
+The Software is provided “AS IS,” without warranty of any kind including merchantability, fitness for purpose, or non-infringement.
+
+6. LIMITATION OF LIABILITY
+
+GoalMills will not be liable for:
+
+loss of data
+
+business interruption
+
+lost profits
+
+indirect, incidental, or consequential damages
+
+7. GOVERNING LAW
+
+This Agreement is governed by the laws of the Nigeria Federal Republic and the State of Delta.
