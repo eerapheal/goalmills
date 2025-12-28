@@ -37,6 +37,8 @@ export function FootballScreen() {
     const [countries, setCountries] = useState<FootballCountry[]>([]);
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [videos, setVideos] = useState<FootballVideo[]>([]);
+    const [currentLeagueId, setCurrentLeagueId] = useState<number>(152);
+    const [isLeagueDataLoading, setIsLeagueDataLoading] = useState(false);
 
     const loadData = async () => {
         try {
@@ -44,7 +46,7 @@ export function FootballScreen() {
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
             const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 7);
+            tomorrow.setDate(tomorrow.getDate() + 14);
 
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
@@ -110,7 +112,7 @@ export function FootballScreen() {
             const allFixtures = fixturesRes?.result || [];
             const upcoming = allFixtures.filter((e) => {
                 const eventDate = new Date(`${e.event_date} ${e.event_time}`);
-                return eventDate > now && e.event_status === 'Not Started';
+                return eventDate > now && (e.event_status === 'Not Started' || e.event_status === '');
             });
             const finished = allFixtures.filter((e) => e.event_status === 'Finished');
 
@@ -144,29 +146,76 @@ export function FootballScreen() {
                 '31': 25,   // MLS
             };
 
-            const sortByRank = (a: FootballEvent, b: FootballEvent) => {
+            const sortByRankAndDate = (a: FootballEvent, b: FootballEvent, ascending: boolean = true) => {
                 const rankA = leagueRankings[a.league_key] || 0;
                 const rankB = leagueRankings[b.league_key] || 0;
-                // If same league rank, sort by time
-                if (rankB === rankA) {
-                    return a.event_time.localeCompare(b.event_time);
+
+                if (rankB !== rankA) {
+                    return rankB - rankA;
                 }
-                return rankB - rankA;
+
+                // If same rank, sort by date and time
+                const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
+                const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
+                return ascending ? dateA - dateB : dateB - dateA;
             };
 
-            const live = (livescoreRes?.result || []).sort(sortByRank);
-            upcoming.sort(sortByRank);
-            finished.sort(sortByRank);
+            const live = (livescoreRes?.result || []).sort((a, b) => sortByRankAndDate(a, b, true));
+            upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
+            finished.sort((a, b) => sortByRankAndDate(a, b, false));
 
             setLiveEvents(live);
-            setUpcomingEvents(upcoming.slice(0, 15));
-            setFinishedEvents(finished.slice(0, 15));
-            setStandings(standingsRes?.result?.total || []);
+            setUpcomingEvents(upcoming.slice(0, 50));
+            setFinishedEvents(finished.slice(0, 50));
             setTopscorers(topscorersRes?.result || []);
             setLeagues(leaguesRes?.result || []);
             setCountries(countriesRes?.result || []);
             setBlogPosts(posts || []);
             setVideos(videosRes?.result || []);
+
+            // Initial standings load (Premier League)
+            const rawStandings = standingsRes?.result?.total || [];
+
+            // Intelligent Stage Filter to remove female teams (WSL etc) from male leagues
+            const leagueSpecificStandings = rawStandings.filter(s => String(s.league_key) === '152');
+
+            const stageGroups: { [key: string]: FootballStanding[] } = {};
+            leagueSpecificStandings.forEach(s => {
+                const stageId = s.fk_stage_key || 'default';
+                if (!stageGroups[stageId]) stageGroups[stageId] = [];
+                stageGroups[stageId].push(s);
+            });
+
+            // Find the correct stage (usually the one with ~20 teams and no "W" in team names)
+            let bestStage: FootballStanding[] = [];
+            Object.values(stageGroups).forEach(stageTeams => {
+                const femaleTeamCount = stageTeams.filter(t =>
+                    t.standing_team.endsWith(' W') ||
+                    t.standing_team.includes(' Women') ||
+                    t.standing_team.includes(' Ladies') ||
+                    (t.standing_place_type && t.standing_place_type.toLowerCase().includes('wsl'))
+                ).length;
+
+                // Pick the stage with the most teams that doesn't look like a female league
+                if (femaleTeamCount === 0 || stageTeams.length > bestStage.length) {
+                    if (femaleTeamCount === 0 || (bestStage.length > 0 && femaleTeamCount < bestStage.length)) {
+                        bestStage = stageTeams;
+                    }
+                }
+
+                // Fallback: if we haven't picked anything, pick the one with 0 female teams if possible
+                if (bestStage.length === 0 && femaleTeamCount === 0) {
+                    bestStage = stageTeams;
+                }
+            });
+
+            // Final fallback: just take the one with the most teams but filter out individual "W" teams
+            if (bestStage.length === 0 && Object.keys(stageGroups).length > 0) {
+                const biggestStage = Object.values(stageGroups).sort((a, b) => b.length - a.length)[0];
+                bestStage = biggestStage.filter(t => !t.standing_team.endsWith(' W'));
+            }
+
+            setStandings(bestStage);
 
             // Fetch teams for top leagues
             console.log('🔄 Loading teams from top leagues...');
@@ -197,9 +246,79 @@ export function FootballScreen() {
         }
     };
 
+    const loadLeagueSpecificData = async (leagueId: number) => {
+        setIsLeagueDataLoading(true);
+        setCurrentLeagueId(leagueId);
+        try {
+            const [standingsRes, topscorersRes] = await Promise.all([
+                advancedFootballApi.getStandings(leagueId),
+                advancedFootballApi.getTopscorers(leagueId)
+            ]);
+
+            // Intelligent Stage Filter
+            const rawStandings = standingsRes.result?.total || [];
+            const leagueSpecificStandings = rawStandings.filter(s => String(s.league_key) === String(leagueId));
+
+            const stageGroups: { [key: string]: FootballStanding[] } = {};
+            leagueSpecificStandings.forEach(s => {
+                const stageId = s.fk_stage_key || 'default';
+                if (!stageGroups[stageId]) stageGroups[stageId] = [];
+                stageGroups[stageId].push(s);
+            });
+
+            let bestStage: FootballStanding[] = [];
+            Object.values(stageGroups).forEach(stageTeams => {
+                const femaleTeamCount = stageTeams.filter(t =>
+                    t.standing_team.endsWith(' W') ||
+                    t.standing_team.includes(' Women') ||
+                    t.standing_team.includes(' Ladies') ||
+                    (t.standing_place_type && t.standing_place_type.toLowerCase().includes('wsl'))
+                ).length;
+
+                if (femaleTeamCount === 0) {
+                    if (stageTeams.length > bestStage.length) {
+                        bestStage = stageTeams;
+                    }
+                }
+            });
+
+            // Fallback for leagues that might only have one stage which the API mixed up
+            if (bestStage.length === 0) {
+                const biggestStage = Object.values(stageGroups).sort((a, b) => b.length - a.length)[0] || [];
+                bestStage = biggestStage.filter(t => !t.standing_team.endsWith(' W') && !t.standing_team.includes(' Women'));
+            }
+
+            setStandings(bestStage);
+            setTopscorers(topscorersRes?.result || []);
+
+            console.log(`✅ Loaded league-specific data for ${leagueId}: ${filteredStandings.length} standings, ${topscorersRes?.result?.length || 0} scorers`);
+        } catch (error) {
+            console.error('❌ Error loading league specific data:', error);
+        } finally {
+            setIsLeagueDataLoading(false);
+        }
+    };
+
     useEffect(() => {
         loadData();
     }, []);
+
+    // Polling for live matches
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (activeTab === 'live' && !loading) {
+            console.log('⏱️ Starting live score polling (30s)...');
+            interval = setInterval(() => {
+                onRefresh();
+            }, 30000);
+        }
+        return () => {
+            if (interval) {
+                console.log('⏱️ Stopping live score polling.');
+                clearInterval(interval);
+            }
+        };
+    }, [activeTab, loading]);
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -232,6 +351,75 @@ export function FootballScreen() {
         });
     };
 
+    const groupMatchesByLeague = (events: FootballEvent[]) => {
+        const groups: { [key: string]: { name: string; logo: string; key: string, matches: FootballEvent[] } } = {};
+
+        events.forEach(event => {
+            const leagueId = event.league_key;
+            if (!groups[leagueId]) {
+                groups[leagueId] = {
+                    name: event.league_name,
+                    logo: event.league_logo,
+                    key: event.league_key,
+                    matches: []
+                };
+            }
+            groups[leagueId].matches.push(event);
+        });
+
+        return Object.values(groups);
+    };
+
+    const renderMatchGroups = (events: FootballEvent[], type: 'live' | 'upcoming' | 'finished') => {
+        const leagueGroups = groupMatchesByLeague(events);
+
+        if (leagueGroups.length === 0) {
+            return (
+                <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mx-auto max-w-lg mt-8 text-center animate-fade-in">
+                    <span className="text-6xl mb-6 opacity-80">
+                        {type === 'live' ? '⚽' : type === 'upcoming' ? '📅' : '🏁'}
+                    </span>
+                    <p className="text-xl font-bold text-text-primary mb-2">
+                        {type === 'live' ? 'No live matches' : type === 'upcoming' ? 'No upcoming matches' : 'No results found'}
+                    </p>
+                    <p className="text-text-muted">Try a different search term or check back later!</p>
+                </div>
+            );
+        }
+
+        return (
+            <div className="space-y-8 pb-10">
+                {leagueGroups.map((group) => (
+                    <div key={group.key} className="animate-fade-in">
+                        {/* Group Header */}
+                        <div className="flex items-center justify-between mb-3 px-2">
+                            <Link
+                                href={`/leagues/${group.key}`}
+                                className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+                            >
+                                <div className="w-8 h-8 p-1 bg-white/5 rounded-lg border border-white/10 group-hover:border-white/20 transition-colors">
+                                    <img src={group.logo} alt={group.name} className="w-full h-full object-contain" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-black text-white uppercase tracking-wider">{group.name}</h3>
+                                    <p className="text-[10px] text-text-muted font-bold tracking-widest uppercase">League Competition</p>
+                                </div>
+                            </Link>
+                            <div className="h-px flex-1 mx-4 bg-gradient-to-r from-white/10 to-transparent" />
+                        </div>
+
+                        {/* Matches */}
+                        <div className="space-y-2">
+                            {group.matches.map((event, idx) => (
+                                <FootballMatchCard key={event.event_key || `${group.key}-${idx}`} event={event} hideLeague={true} />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     const renderSkeleton = () => (
         <div className="p-4 space-y-4 animate-pulse">
             <div className="h-8 w-48 bg-surfaceHighlight/50 rounded-lg mb-6" />
@@ -250,24 +438,22 @@ export function FootballScreen() {
             case 'live':
                 const filteredLive = filterData(liveEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
                 return (
-                    <div className="p-4 space-y-2 animate-fade-in">
-                        {filteredLive.length > 0 ? (
-                            <>
-                                <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
-                                    <span className="inline-block w-2 h-2 bg-accent-red rounded-full animate-pulse"></span>
-                                    Live Matches
-                                </h2>
-                                {filteredLive.map((event, index) => (
-                                    <FootballMatchCard key={event.event_key || `live-${index}`} event={event} />
-                                ))}
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mx-auto max-w-lg mt-8 text-center">
-                                <span className="text-6xl mb-6 opacity-80">⚽</span>
-                                <p className="text-xl font-bold text-text-primary mb-2">No live matches found</p>
-                                <p className="text-text-muted">Try a different search term or check back later!</p>
-                            </div>
-                        )}
+                    <div className="p-4 animate-fade-in">
+                        <div className="flex items-center justify-between mb-8 px-2">
+                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                <span className="inline-block w-3 h-3 bg-accent-red rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
+                                Live Score
+                            </h2>
+                            <button
+                                onClick={onRefresh}
+                                disabled={refreshing}
+                                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-sm font-bold text-text-primary"
+                            >
+                                <span className={refreshing ? 'animate-spin' : ''}>🔄</span>
+                                {refreshing ? 'Refreshing...' : 'Refresh'}
+                            </button>
+                        </div>
+                        {renderMatchGroups(filteredLive, 'live')}
                     </div>
                 );
 
@@ -275,14 +461,13 @@ export function FootballScreen() {
                 const filteredUpcoming = filterData(upcomingEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
                 return (
                     <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">📅 Upcoming Matches</h2>
-                        {filteredUpcoming.length > 0 ? (
-                            filteredUpcoming.map((event, index) => (
-                                <FootballMatchCard key={event.event_key || `upcoming-${index}`} event={event} />
-                            ))
-                        ) : (
-                            <p className="text-text-muted italic">No upcoming matches found.</p>
-                        )}
+                        <div className="flex items-center justify-between mb-8 px-2">
+                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">📅</span>
+                                Upcoming Fixtures
+                            </h2>
+                        </div>
+                        {renderMatchGroups(filteredUpcoming, 'upcoming')}
                     </div>
                 );
 
@@ -290,37 +475,100 @@ export function FootballScreen() {
                 const filteredResults = filterData(finishedEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
                 return (
                     <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">✅ Recent Results</h2>
-                        {filteredResults.length > 0 ? (
-                            filteredResults.map((event, index) => (
-                                <FootballMatchCard key={event.event_key || `result-${index}`} event={event} />
-                            ))
-                        ) : (
-                            <p className="text-text-muted italic">No results found.</p>
-                        )}
+                        <div className="flex items-center justify-between mb-8 px-2">
+                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                <span className="p-2 bg-accent-green/20 rounded-lg text-accent-green">✅</span>
+                                Match Results
+                            </h2>
+                        </div>
+                        {renderMatchGroups(filteredResults, 'finished')}
                     </div>
                 );
 
             case 'standings':
-                // Search in standings (usually searching for team name)
-                const filteredStandings = filterData(standings, 'standing_team');
-                // Wait, FootballStanding usually has team_name. Let's check type if possible, but usually yes.
-                // Assuming it works for now.
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">🏆 Premier League Standings</h2>
-                        <div className="glass-card rounded-xl overflow-hidden">
-                            <FootballStandingsTable standings={filteredStandings} teams={teams} />
-                        </div>
-                    </div>
-                );
-
             case 'topscorers':
-                const filteredScorers = filterData(topscorers, 'player_name');
+                const isStandings = activeTab === 'standings';
+                const filteredData = isStandings
+                    ? filterData(standings, 'standing_team')
+                    : filterData(topscorers, 'player_name');
+
+                const topLeagues = [
+                    { id: 152, name: 'EPL', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'from-purple-600' },
+                    { id: 302, name: 'La Liga', icon: '🇪🇸', color: 'from-orange-500' },
+                    { id: 175, name: 'Bundesliga', icon: '🇩🇪', color: 'from-red-600' },
+                    { id: 207, name: 'Serie A', icon: '🇮🇹', color: 'from-blue-600' },
+                    { id: 168, name: 'Ligue 1', icon: '🇫🇷', color: 'from-yellow-500' },
+                    { id: 3, name: 'UCL', icon: '⭐️', color: 'from-blue-900' }
+                ];
+
+                const currentLeague = topLeagues.find(l => l.id === currentLeagueId);
+
                 return (
                     <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">⚽ Top Scorers</h2>
-                        <FootballTopScorers scorers={filteredScorers} teams={teams} />
+                        <div className="flex flex-col gap-6 mb-8">
+                            <div className="flex items-center justify-between flex-wrap gap-4">
+                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                    <span className={`p-2 bg-gradient-to-br ${currentLeague?.color} to-surface rounded-lg text-white shadow-lg`}>
+                                        {isStandings ? '🏆' : '⚽'}
+                                    </span>
+                                    {currentLeague?.name} {isStandings ? 'Standings' : 'Top Scorers'}
+                                </h2>
+
+                                <div className="flex gap-2 p-1 bg-white/5 rounded-full border border-white/5">
+                                    <button
+                                        onClick={() => setActiveTab('standings')}
+                                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${isStandings ? 'bg-white text-black' : 'text-text-muted hover:text-white'}`}
+                                    >
+                                        Table
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab('topscorers')}
+                                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${!isStandings ? 'bg-white text-black' : 'text-text-muted hover:text-white'}`}
+                                    >
+                                        Scorers
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* League Selector */}
+                            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-1">
+                                {topLeagues.map((league) => (
+                                    <button
+                                        key={league.id}
+                                        onClick={() => loadLeagueSpecificData(league.id)}
+                                        className={`
+                                            px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-3 shrink-0 border
+                                            ${currentLeagueId === league.id
+                                                ? 'bg-white text-black border-white shadow-xl shadow-white/10 scale-105'
+                                                : 'glass-card text-text-muted border-white/5 hover:border-white/20 hover:text-white'}
+                                        `}
+                                    >
+                                        <span className="text-lg">{league.icon}</span>
+                                        {league.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {isLeagueDataLoading ? (
+                            <div className="grid grid-cols-1 gap-4 animate-pulse">
+                                {[...Array(8)].map((_, i) => (
+                                    <div key={i} className="h-16 bg-surfaceHighlight/20 rounded-2xl" />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="animate-fade-in-up">
+                                {isStandings ? (
+                                    <div className="glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/5">
+                                        <FootballStandingsTable standings={filteredData as any} teams={teams} />
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <FootballTopScorers scorers={filteredData as any} teams={teams} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 );
 

@@ -173,12 +173,12 @@ export const advancedFootballApi = {
    * Get list of supported leagues/competitions
    * Endpoint: ?met=Leagues&countryId={id}
    */
-  getLeagues: async (countryId?: number): Promise<FootballLeaguesResponse> => {
+  getLeagues: async (countryId?: number, leagueId?: number): Promise<FootballLeaguesResponse> => {
     try {
       const params: Record<string, any> = {};
-      if (countryId) {
-        params.countryId = countryId;
-      }
+      if (countryId) params.countryId = countryId;
+      if (leagueId) params.leagueId = leagueId;
+
       const response = await fetchFromAPI<FootballLeaguesResponse>('Leagues', params);
       return response;
     } catch (error) {

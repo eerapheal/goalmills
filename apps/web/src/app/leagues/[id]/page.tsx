@@ -39,7 +39,7 @@ export default function LeagueDetailsPage() {
                 const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
                 const [leaguesRes, fixturesRes, standingsRes, topscorersRes] = await Promise.all([
-                    advancedFootballApi.getLeagues().catch(err => {
+                    advancedFootballApi.getLeagues(undefined, leagueId).catch(err => {
                         console.error('❌ Leagues API error:', err);
                         return { success: 1, result: [] };
                     }),
@@ -61,10 +61,12 @@ export default function LeagueDetailsPage() {
                     })
                 ]);
 
-                const foundLeague = leaguesRes.result.find(l => l.league_key === String(leagueId));
+                const leagues = leaguesRes?.result || [];
+                const foundLeague = leagues.find(l => l.league_key === String(leagueId));
 
                 // If league not found in leagues list, try to get it from fixtures
-                if (!foundLeague && fixturesRes.result.length > 0) {
+                const fixtures = fixturesRes?.result || [];
+                if (!foundLeague && fixtures.length > 0) {
                     const firstFixture = fixturesRes.result[0];
                     setLeague({
                         league_key: String(leagueId),
@@ -84,9 +86,43 @@ export default function LeagueDetailsPage() {
                     }
                 }
 
-                setEvents(fixturesRes.result || []);
-                setStandings(standingsRes.result?.total || []);
-                setTopscorers(topscorersRes.result || []);
+                setEvents(fixtures);
+
+                // Intelligent Stage Filter to remove female teams (WSL etc) from male leagues
+                const rawStandings = standingsRes.result?.total || [];
+                const stageGroups: { [key: string]: FootballStanding[] } = {};
+                rawStandings.forEach(s => {
+                    const stageId = s.fk_stage_key || 'default';
+                    if (!stageGroups[stageId]) stageGroups[stageId] = [];
+                    stageGroups[stageId].push(s);
+                });
+
+                let bestStage: FootballStanding[] = [];
+                Object.values(stageGroups).forEach(stageTeams => {
+                    const femaleTeamCount = stageTeams.filter(t =>
+                        t.standing_team.endsWith(' W') ||
+                        t.standing_team.includes(' Women') ||
+                        t.standing_team.includes(' Ladies') ||
+                        (t.standing_place_type && t.standing_place_type.toLowerCase().includes('wsl'))
+                    ).length;
+
+                    if (femaleTeamCount === 0 || stageTeams.length > bestStage.length) {
+                        if (femaleTeamCount === 0 || (bestStage.length > 0 && femaleTeamCount < bestStage.length)) {
+                            bestStage = stageTeams;
+                        }
+                    }
+                    if (bestStage.length === 0 && femaleTeamCount === 0) {
+                        bestStage = stageTeams;
+                    }
+                });
+
+                if (bestStage.length === 0 && Object.keys(stageGroups).length > 0) {
+                    const biggestStage = Object.values(stageGroups).sort((a, b) => b.length - a.length)[0];
+                    bestStage = biggestStage.filter(t => !t.standing_team.endsWith(' W'));
+                }
+
+                setStandings(bestStage);
+                setTopscorers(topscorersRes?.result || []);
 
                 console.log('✅ League data loaded:', {
                     fixtures: fixturesRes.result?.length || 0,

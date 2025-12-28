@@ -8,9 +8,10 @@ import { useRouter } from 'next/navigation';
 interface FootballMatchCardProps {
     event: FootballEvent;
     onPress?: () => void;
+    hideLeague?: boolean;
 }
 
-export function FootballMatchCard({ event, onPress }: FootballMatchCardProps) {
+export function FootballMatchCard({ event, onPress, hideLeague = false }: FootballMatchCardProps) {
     const router = useRouter();
 
     // Parse status and time
@@ -52,31 +53,33 @@ export function FootballMatchCard({ event, onPress }: FootballMatchCardProps) {
             )}
 
             {/* League Header */}
-            <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5 relative z-10">
-                <div
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-2"
-                >
-                    <Link href={`/leagues/${event.league_key}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        {event.league_logo && (
-                            <Image src={event.league_logo} alt={event.league_name} width={16} height={16} className="w-4 h-4 object-contain" />
-                        )}
-                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{event.league_name} - {event.league_round}</span>
-                    </Link>
-                </div>
-                {isLive && (
-                    <div className="flex items-center gap-1.5 bg-yellow-500/20 px-2 py-0.5 rounded-full border border-yellow-500/20">
-                        <span className="relative flex h-1.5 w-1.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-yellow-500"></span>
-                        </span>
-                        <span className="text-[9px] font-bold text-yellow-500 tracking-widest">LIVE</span>
+            {!hideLeague && (
+                <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5 relative z-10">
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-2"
+                    >
+                        <Link href={`/leagues/${event.league_key}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                            {event.league_logo && (
+                                <Image src={event.league_logo} alt={event.league_name} width={16} height={16} className="w-4 h-4 object-contain" />
+                            )}
+                            <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{event.league_name} - {event.league_round}</span>
+                        </Link>
                     </div>
-                )}
-            </div>
+                    {isLive && (
+                        <div className="flex items-center gap-1.5 bg-yellow-500/20 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-yellow-500"></span>
+                            </span>
+                            <span className="text-[9px] font-bold text-yellow-500 tracking-widest">LIVE</span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Match Info */}
-            <div className="flex items-center justify-between relative z-10">
+            <div className={`flex items-center justify-between relative z-10 ${hideLeague ? 'pt-1' : ''}`}>
                 {/* Home Team */}
                 <Link
                     href={`/teams/${event.home_team_key}`}

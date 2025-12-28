@@ -35,7 +35,7 @@ export default function TeamDetailsPage() {
                 if (teamsRes.result && teamsRes.result.length > 0) {
                     setTeam(teamsRes.result[0]);
                 }
-                setPlayers(playersRes.result);
+                setPlayers(playersRes.result || []);
 
                 // Process fixtures
                 if (fixturesRes.result) {
