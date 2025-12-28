@@ -48,74 +48,149 @@ export function FootballScreen() {
 
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
+            console.log('🔄 Loading football data...');
+
             const [
                 livescoreRes,
                 fixturesRes,
                 standingsRes,
                 topscorersRes,
                 leaguesRes,
-                teamsRes,
                 countriesRes,
                 posts,
                 videosRes,
             ] = await Promise.all([
-                advancedFootballApi.getLivescore(),
+                advancedFootballApi.getLivescore().catch(err => {
+                    console.error('❌ Livescore API error:', err);
+                    return { success: 1, result: [] };
+                }),
                 advancedFootballApi.getFixtures({
                     from: formatDate(yesterday),
                     to: formatDate(tomorrow),
+                }).catch(err => {
+                    console.error('❌ Fixtures API error:', err);
+                    return { success: 1, result: [] };
                 }),
-                advancedFootballApi.getStandings(152), // Premier League
-                advancedFootballApi.getTopscorers(152),
-                advancedFootballApi.getLeagues(),
-
-                advancedFootballApi.getTeams(),
-                advancedFootballApi.getCountries(),
+                advancedFootballApi.getStandings(152).catch(err => {
+                    console.error('❌ Standings API error:', err);
+                    return { success: 1, result: { total: [], home: [], away: [] } };
+                }),
+                advancedFootballApi.getTopscorers(152).catch(err => {
+                    console.error('❌ Topscorers API error:', err);
+                    return { success: 1, result: [] };
+                }),
+                advancedFootballApi.getLeagues().catch(err => {
+                    console.error('❌ Leagues API error:', err);
+                    return { success: 1, result: [] };
+                }),
+                advancedFootballApi.getCountries().catch(err => {
+                    console.error('❌ Countries API error:', err);
+                    return { success: 1, result: [] };
+                }),
                 advancedFootballApi.getBlogPosts(),
-                advancedFootballApi.getVideos(),
+                advancedFootballApi.getVideos().catch(err => {
+                    console.error('❌ Videos API error:', err);
+                    return { success: 1, result: [] };
+                }),
             ]);
 
-            setLiveEvents(livescoreRes.result);
+            console.log('✅ API Responses:', {
+                livescore: livescoreRes?.result?.length || 0,
+                fixtures: fixturesRes?.result?.length || 0,
+                standings: standingsRes?.result?.total?.length || 0,
+                topscorers: topscorersRes?.result?.length || 0,
+                leagues: leaguesRes?.result?.length || 0,
+                countries: countriesRes?.result?.length || 0,
+                videos: videosRes?.result?.length || 0,
+            });
+
 
             // Filter upcoming and finished from fixtures
             const now = new Date();
-            const upcoming = fixturesRes.result.filter((e) => {
+            const allFixtures = fixturesRes?.result || [];
+            const upcoming = allFixtures.filter((e) => {
                 const eventDate = new Date(`${e.event_date} ${e.event_time}`);
                 return eventDate > now && e.event_status === 'Not Started';
             });
-            const finished = fixturesRes.result.filter((e) => e.event_status === 'Finished');
+            const finished = allFixtures.filter((e) => e.event_status === 'Finished');
 
-            // League rankings for sorting
+            console.log('📊 Filtered events:', {
+                live: livescoreRes?.result?.length || 0,
+                upcoming: upcoming.length,
+                finished: finished.length
+            });
+
+            // League rankings for sorting (Advanced)
             const leagueRankings: { [key: string]: number } = {
+                // Top Tier
                 '152': 100, // Premier League
                 '302': 95,  // La Liga
                 '175': 90,  // Bundesliga
                 '207': 85,  // Serie A
-                '3': 80,    // UEFA Champions League
-                '168': 75,  // Ligue 1
+                '168': 80,  // Ligue 1
+                '3': 110,   // UEFA Champions League
+                '4': 75,    // UEFA Europa League
+                '683': 70,  // UEFA Conference League
+                '28': 65,   // World Cup
+                '6': 60,    // Euro Championship
+
+                // Second Tier / Popular
+                '262': 55,  // Eredivisie (Netherlands)
+                '322': 50,  // Liga Portugal
+                '12': 45,   // FA Cup
+                '141': 40,  // Championship (England)
+                '10': 35,   // Copa America
+                '343': 30,  // Brazilian Serie A
+                '31': 25,   // MLS
             };
 
-            // Sort logic
             const sortByRank = (a: FootballEvent, b: FootballEvent) => {
                 const rankA = leagueRankings[a.league_key] || 0;
                 const rankB = leagueRankings[b.league_key] || 0;
+                // If same league rank, sort by time
+                if (rankB === rankA) {
+                    return a.event_time.localeCompare(b.event_time);
+                }
                 return rankB - rankA;
             };
 
+            const live = (livescoreRes?.result || []).sort(sortByRank);
             upcoming.sort(sortByRank);
             finished.sort(sortByRank);
 
+            setLiveEvents(live);
             setUpcomingEvents(upcoming.slice(0, 15));
             setFinishedEvents(finished.slice(0, 15));
-            setStandings(standingsRes.result.total);
-            setTopscorers(topscorersRes.result);
-            setLeagues(leaguesRes.result);
-            setTeams(teamsRes.result);
-            setCountries(countriesRes.result);
-            setBlogPosts(posts);
-            setVideos(videosRes.result);
+            setStandings(standingsRes?.result?.total || []);
+            setTopscorers(topscorersRes?.result || []);
+            setLeagues(leaguesRes?.result || []);
+            setCountries(countriesRes?.result || []);
+            setBlogPosts(posts || []);
+            setVideos(videosRes?.result || []);
+
+            // Fetch teams for top leagues
+            console.log('🔄 Loading teams from top leagues...');
+            const topLeagueIds = [152, 302, 175, 207, 168]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
+            const teamsPromises = topLeagueIds.map(leagueId =>
+                advancedFootballApi.getTeams({ leagueId }).catch(err => {
+                    console.error(`❌ Teams API error for league ${leagueId}:`, err);
+                    return { success: 1, result: [] };
+                })
+            );
+
+            const teamsResponses = await Promise.all(teamsPromises);
+            const allTeams = teamsResponses.flatMap(res => res?.result || []);
+
+            // Remove duplicates based on team_key
+            const uniqueTeams = Array.from(
+                new Map(allTeams.map(team => [team.team_key, team])).values()
+            );
+
+            console.log(`✅ Loaded ${uniqueTeams.length} unique teams from ${topLeagueIds.length} leagues`);
+            setTeams(uniqueTeams);
 
         } catch (error) {
-            console.error('Error loading football data:', error);
+            console.error('❌ Critical error loading football data:', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -132,22 +207,23 @@ export function FootballScreen() {
     };
 
     const tabs: { id: FootballTab; label: string; count?: number }[] = [
-        { id: 'live', label: 'Live', count: liveEvents.length },
-        { id: 'upcoming', label: 'Upcoming', count: upcomingEvents.length },
-        { id: 'results', label: 'Results', count: finishedEvents.length },
+        { id: 'live', label: 'Live', count: liveEvents?.length ?? 0 },
+        { id: 'upcoming', label: 'Upcoming', count: upcomingEvents?.length ?? 0 },
+        { id: 'results', label: 'Results', count: finishedEvents?.length ?? 0 },
         { id: 'standings', label: 'Standings' },
         { id: 'topscorers', label: 'Top Scorers' },
-        { id: 'news', label: 'News', count: blogPosts.length },
-        { id: 'videos', label: 'Videos', count: videos.length },
-        { id: 'countries', label: 'Countries', count: countries.length },
-        { id: 'leagues', label: 'Leagues', count: leagues.length },
-        { id: 'competitions', label: 'Competitions', count: leagues.length },
-        { id: 'teams', label: 'Teams', count: teams.length },
+        { id: 'news', label: 'News', count: blogPosts?.length ?? 0 },
+        { id: 'videos', label: 'Videos', count: videos?.length ?? 0 },
+        { id: 'countries', label: 'Countries', count: countries?.length ?? 0 },
+        { id: 'leagues', label: 'Leagues', count: leagues?.length ?? 0 },
+        { id: 'competitions', label: 'Competitions', count: leagues?.length ?? 0 },
+        { id: 'teams', label: 'Teams', count: teams?.length ?? 0 },
     ];
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filterData = <T extends any>(data: T[], key: keyof T | ((item: T) => string)): T[] => {
+    const filterData = <T extends any>(data: T[] | undefined, key: keyof T | ((item: T) => string)): T[] => {
+        if (!data) return [];
         if (!searchQuery) return data;
         const lowerQuery = searchQuery.toLowerCase();
         return data.filter(item => {
@@ -156,14 +232,18 @@ export function FootballScreen() {
         });
     };
 
+    const renderSkeleton = () => (
+        <div className="p-4 space-y-4 animate-pulse">
+            <div className="h-8 w-48 bg-surfaceHighlight/50 rounded-lg mb-6" />
+            {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-32 bg-surfaceHighlight/30 rounded-xl border border-white/5" />
+            ))}
+        </div>
+    );
+
     const renderContent = () => {
         if (loading) {
-            return (
-                <div className="flex flex-col items-center justify-center p-12 animate-pulse">
-                    <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin mb-4" />
-                    <p className="text-text-secondary font-medium tracking-wide">Loading football data...</p>
-                </div>
-            );
+            return renderSkeleton();
         }
 
         switch (activeTab) {
@@ -177,8 +257,8 @@ export function FootballScreen() {
                                     <span className="inline-block w-2 h-2 bg-accent-red rounded-full animate-pulse"></span>
                                     Live Matches
                                 </h2>
-                                {filteredLive.map((event) => (
-                                    <FootballMatchCard key={event.event_key} event={event} />
+                                {filteredLive.map((event, index) => (
+                                    <FootballMatchCard key={event.event_key || `live-${index}`} event={event} />
                                 ))}
                             </>
                         ) : (
@@ -197,8 +277,8 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">📅 Upcoming Matches</h2>
                         {filteredUpcoming.length > 0 ? (
-                            filteredUpcoming.map((event) => (
-                                <FootballMatchCard key={event.event_key} event={event} />
+                            filteredUpcoming.map((event, index) => (
+                                <FootballMatchCard key={event.event_key || `upcoming-${index}`} event={event} />
                             ))
                         ) : (
                             <p className="text-text-muted italic">No upcoming matches found.</p>
@@ -212,8 +292,8 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">✅ Recent Results</h2>
                         {filteredResults.length > 0 ? (
-                            filteredResults.map((event) => (
-                                <FootballMatchCard key={event.event_key} event={event} />
+                            filteredResults.map((event, index) => (
+                                <FootballMatchCard key={event.event_key || `result-${index}`} event={event} />
                             ))
                         ) : (
                             <p className="text-text-muted italic">No results found.</p>
@@ -250,8 +330,8 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">📰 Latest News</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredNews.map((post) => (
-                                <BlogCard key={post._id} post={post} />
+                            {filteredNews.map((post, index) => (
+                                <BlogCard key={post._id || `news-${index}`} post={post} />
                             ))}
                         </div>
                         {filteredNews.length === 0 && <p className="text-text-muted italic">No news found.</p>}
@@ -264,8 +344,8 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🎥 Video Highlights</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {filteredVideos.map((video) => (
-                                <FootballVideoCard key={video.event_key} video={video} />
+                            {filteredVideos.map((video, index) => (
+                                <FootballVideoCard key={video.event_key || `video-${index}`} video={video} />
                             ))}
                         </div>
                         {filteredVideos.length === 0 && <p className="text-text-muted italic">No videos found.</p>}
@@ -278,10 +358,10 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🌍 Countries</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {filteredCountries.map((country) => (
+                            {filteredCountries.map((country, index) => (
                                 <Link
                                     href={`/countries/${country.country_key}`}
-                                    key={country.country_key}
+                                    key={country.country_key || `country-${index}`}
                                     className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
                                 >
                                     <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
@@ -302,10 +382,10 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🏆 {activeTab === 'leagues' ? 'Leagues' : 'Competitions'}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {filteredLeagues.map((league) => (
+                            {filteredLeagues.map((league, index) => (
                                 <Link
                                     href={`/leagues/${league.league_key}`}
-                                    key={league.league_key}
+                                    key={league.league_key || `league-${index}`}
                                     className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
                                 >
                                     <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
@@ -328,10 +408,10 @@ export function FootballScreen() {
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">👕 Teams</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {filteredTeams.map((team) => (
+                            {filteredTeams.map((team, index) => (
                                 <Link
                                     href={`/teams/${team.team_key}`}
-                                    key={team.team_key}
+                                    key={team.team_key || `team-${index}`}
                                     className="glass-card p-6 rounded-xl flex flex-col items-center gap-4 text-center hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
                                 >
                                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center p-4 group-hover:scale-110 transition-transform shadow-lg shadow-black/20">

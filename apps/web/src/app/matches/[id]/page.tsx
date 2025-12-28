@@ -54,8 +54,16 @@ export default function MatchDetailsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-background pt-[90px] p-4">
+                <div className="max-w-4xl mx-auto space-y-8 animate-pulse">
+                    <div className="h-64 bg-surfaceHighlight/30 rounded-2xl" />
+                    <div className="h-12 w-full bg-surfaceHighlight/20 rounded-lg" />
+                    <div className="space-y-4">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="h-16 bg-surfaceHighlight/30 rounded-xl" />
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }

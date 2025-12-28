@@ -18,16 +18,41 @@ export default function CountryPage() {
         const loadData = async () => {
             if (!id) return;
             try {
-                const [leaguesRes, countriesRes] = await Promise.all([
-                    advancedFootballApi.getLeagues(Number(id)),
-                    advancedFootballApi.getCountries()
+                console.log('🔄 Loading country data for ID:', id);
+
+                // Fetch both countries and leagues in parallel
+                const [countriesRes, leaguesRes] = await Promise.all([
+                    advancedFootballApi.getCountries().catch(() => ({ result: [] })),
+                    advancedFootballApi.getLeagues(Number(id)).catch(() => ({ result: [] }))
                 ]);
 
-                setLeagues(leaguesRes.result);
-                const foundCountry = countriesRes.result.find(c => c.country_key === id);
-                setCountry(foundCountry || null);
+                const foundLeagues = leaguesRes.result || [];
+                setLeagues(foundLeagues);
+
+                const foundCountry = countriesRes.result?.find(c => String(c.country_key) === String(id));
+
+                if (foundCountry) {
+                    setCountry(foundCountry);
+                    console.log('✅ Found country in global list:', foundCountry.country_name);
+                } else if (foundLeagues.length > 0) {
+                    // Fallback: extract country info from the first league
+                    const firstLeague = foundLeagues[0];
+                    setCountry({
+                        country_key: String(id),
+                        country_name: firstLeague.country_name,
+                        country_logo: firstLeague.country_logo,
+                        country_iso2: null
+                    } as FootballCountry);
+                    console.log('⚠️ Country info extracted from league data:', firstLeague.country_name);
+                } else {
+                    console.error('❌ Country not found with ID:', id);
+                    setCountry(null);
+                }
+
+                console.log(`📊 Loaded ${foundLeagues.length} leagues for country ID ${id}`);
+
             } catch (error) {
-                console.error('Error loading country data:', error);
+                console.error('❌ Error loading country data:', error);
             } finally {
                 setLoading(false);
             }
@@ -37,8 +62,21 @@ export default function CountryPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-background pt-[90px] p-4">
+                <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 bg-surfaceHighlight/50 rounded-full" />
+                        <div className="space-y-4">
+                            <div className="h-6 w-48 bg-surfaceHighlight/50 rounded-lg" />
+                            <div className="h-4 w-24 bg-surfaceHighlight/30 rounded-lg" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="h-20 bg-surfaceHighlight/30 rounded-xl" />
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }

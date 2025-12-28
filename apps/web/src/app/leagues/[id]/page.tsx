@@ -28,6 +28,8 @@ export default function LeagueDetailsPage() {
             if (!leagueId) return;
 
             try {
+                console.log('🔄 Loading league data for ID:', leagueId);
+
                 const today = new Date();
                 const past = new Date(today);
                 past.setDate(past.getDate() - 30);
@@ -37,24 +39,63 @@ export default function LeagueDetailsPage() {
                 const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
                 const [leaguesRes, fixturesRes, standingsRes, topscorersRes] = await Promise.all([
-                    advancedFootballApi.getLeagues(), // Ideally get by ID
+                    advancedFootballApi.getLeagues().catch(err => {
+                        console.error('❌ Leagues API error:', err);
+                        return { success: 1, result: [] };
+                    }),
                     advancedFootballApi.getFixtures({
                         from: formatDate(past),
                         to: formatDate(future),
                         leagueId: leagueId
+                    }).catch(err => {
+                        console.error('❌ Fixtures API error:', err);
+                        return { success: 1, result: [] };
                     }),
-                    advancedFootballApi.getStandings(leagueId),
-                    advancedFootballApi.getTopscorers(leagueId)
+                    advancedFootballApi.getStandings(leagueId).catch(err => {
+                        console.error('❌ Standings API error:', err);
+                        return { success: 1, result: { total: [], home: [], away: [] } };
+                    }),
+                    advancedFootballApi.getTopscorers(leagueId).catch(err => {
+                        console.error('❌ Topscorers API error:', err);
+                        return { success: 1, result: [] };
+                    })
                 ]);
 
                 const foundLeague = leaguesRes.result.find(l => l.league_key === String(leagueId));
-                setLeague(foundLeague || null);
-                setEvents(fixturesRes.result);
-                setStandings(standingsRes.result.total);
-                setTopscorers(topscorersRes.result);
+
+                // If league not found in leagues list, try to get it from fixtures
+                if (!foundLeague && fixturesRes.result.length > 0) {
+                    const firstFixture = fixturesRes.result[0];
+                    setLeague({
+                        league_key: String(leagueId),
+                        league_name: firstFixture.league_name,
+                        league_logo: firstFixture.league_logo || '',
+                        country_key: firstFixture.event_country_key || '',
+                        country_name: firstFixture.country_name,
+                        country_logo: firstFixture.country_logo || '',
+                    } as FootballLeague);
+                    console.log('✅ League info extracted from fixtures:', firstFixture.league_name);
+                } else {
+                    setLeague(foundLeague || null);
+                    if (foundLeague) {
+                        console.log('✅ Found league:', foundLeague.league_name);
+                    } else {
+                        console.error('❌ League not found with ID:', leagueId);
+                    }
+                }
+
+                setEvents(fixturesRes.result || []);
+                setStandings(standingsRes.result?.total || []);
+                setTopscorers(topscorersRes.result || []);
+
+                console.log('✅ League data loaded:', {
+                    fixtures: fixturesRes.result?.length || 0,
+                    standings: standingsRes.result?.total?.length || 0,
+                    topscorers: topscorersRes.result?.length || 0
+                });
 
             } catch (error) {
-                console.error('Error loading league data:', error);
+                console.error('❌ Error loading league data:', error);
             } finally {
                 setLoading(false);
             }
@@ -65,8 +106,26 @@ export default function LeagueDetailsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-background pt-[90px] p-4">
+                <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+                    <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 bg-surfaceHighlight/50 rounded-full" />
+                        <div className="space-y-4">
+                            <div className="h-8 w-64 bg-surfaceHighlight/50 rounded-lg" />
+                            <div className="h-4 w-32 bg-surfaceHighlight/30 rounded-lg" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="md:col-span-2 space-y-4">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="h-24 bg-surfaceHighlight/30 rounded-xl" />
+                            ))}
+                        </div>
+                        <div className="space-y-4">
+                            <div className="h-96 bg-surfaceHighlight/30 rounded-xl" />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -130,8 +189,8 @@ export default function LeagueDetailsPage() {
                 {activeTab === 'fixtures' && (
                     <div className="space-y-4 animate-fade-in">
                         <h3 className="text-xl font-bold text-white mb-4">Upcoming Matches</h3>
-                        {upcomingEvents.map(event => (
-                            <FootballMatchCard key={event.event_key} event={event} />
+                        {upcomingEvents.map((event, index) => (
+                            <FootballMatchCard key={`fixture-${event.event_key}-${index}`} event={event} />
                         ))}
                         {upcomingEvents.length === 0 && <p className="text-text-muted text-center py-8">No upcoming matches.</p>}
                     </div>
@@ -139,8 +198,8 @@ export default function LeagueDetailsPage() {
                 {activeTab === 'results' && (
                     <div className="space-y-4 animate-fade-in">
                         <h3 className="text-xl font-bold text-white mb-4">Recent Results</h3>
-                        {finishedEvents.map(event => (
-                            <FootballMatchCard key={event.event_key} event={event} />
+                        {finishedEvents.map((event, index) => (
+                            <FootballMatchCard key={`result-${event.event_key}-${index}`} event={event} />
                         ))}
                         {finishedEvents.length === 0 && <p className="text-text-muted text-center py-8">No recent results.</p>}
                     </div>

@@ -113,8 +113,19 @@ export default function TeamDetailsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-background pt-[90px] p-4">
+                <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+                    <div className="h-48 bg-surfaceHighlight/30 rounded-2xl" />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2 space-y-8">
+                            <div className="h-64 bg-surfaceHighlight/30 rounded-xl" />
+                            <div className="h-96 bg-surfaceHighlight/30 rounded-xl" />
+                        </div>
+                        <div className="space-y-4">
+                            <div className="h-96 bg-surfaceHighlight/30 rounded-xl" />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -195,8 +206,8 @@ export default function TeamDetailsPage() {
                     <div className="lg:col-span-2 space-y-4">
                         <h2 className="text-xl font-bold text-white">Recent Results</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {recentMatches.map(match => (
-                                <Link href={`/matches/${match.event_key}`} key={match.event_key} className="bg-surface p-4 rounded-xl border border-white/5 hover:border-white/20 transition-colors flex items-center justify-between group">
+                            {recentMatches.map((match, index) => (
+                                <Link href={`/matches/${match.event_key}`} key={`recent-${match.event_key}-${index}`} className="bg-surface p-4 rounded-xl border border-white/5 hover:border-white/20 transition-colors flex items-center justify-between group">
                                     <div className="flex flex-col items-center w-12 text-xs text-text-muted">
                                         <span className="font-bold">{new Date(match.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                                         <span>{match.league_round.replace('Round ', 'R')}</span>
@@ -225,8 +236,8 @@ export default function TeamDetailsPage() {
                     <h2 className="text-xl font-bold text-white mb-4">Upcoming Fixtures</h2>
                     {upcomingMatches.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {upcomingMatches.map(match => (
-                                <Link href={`/matches/${match.event_key}`} key={match.event_key} className="bg-surface p-5 rounded-xl border border-white/5 hover:border-secondary/50 transition-all group relative overflow-hidden">
+                            {upcomingMatches.map((match, index) => (
+                                <Link href={`/matches/${match.event_key}`} key={`upcoming-${match.event_key}-${index}`} className="bg-surface p-5 rounded-xl border border-white/5 hover:border-secondary/50 transition-all group relative overflow-hidden">
                                     <div className="absolute top-0 right-0 p-2 opacity-50">
                                         <img src={match.league_logo} className="w-8 h-8 opacity-20 grayscale" />
                                     </div>
