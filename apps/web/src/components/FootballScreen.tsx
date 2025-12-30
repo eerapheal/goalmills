@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
     FootballEvent,
@@ -38,19 +38,123 @@ export function FootballScreen() {
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [videos, setVideos] = useState<FootballVideo[]>([]);
     const [currentLeagueId, setCurrentLeagueId] = useState<number>(152);
+    const [matchFilterLeagueId, setMatchFilterLeagueId] = useState<number | null>(null);
     const [isLeagueDataLoading, setIsLeagueDataLoading] = useState(false);
+
+
+    // League rankings for sorting (Advanced)
+    const leagueRankings: { [key: string]: number } = {
+        // Top Tier
+        '152': 100, // Premier League
+        '302': 95,  // La Liga
+        '175': 90,  // Bundesliga
+        '207': 85,  // Serie A
+        '168': 80,  // Ligue 1
+        '3': 110,   // UEFA Champions League
+        '4': 75,    // UEFA Europa League
+        '683': 70,  // UEFA Conference League
+        '28': 65,   // World Cup
+        '6': 60,    // Euro Championship
+
+        // Second Tier / Popular
+        '262': 55,  // Eredivisie (Netherlands)
+        '322': 50,  // Liga Portugal
+        '12': 45,   // FA Cup
+        '141': 40,  // Championship (England)
+        '10': 35,   // Copa America
+        '343': 30,  // Brazilian Serie A
+        '31': 25,   // MLS
+    };
+
+    const sortByRankAndDate = (a: FootballEvent, b: FootballEvent, ascending: boolean = true) => {
+        const rankA = leagueRankings[a.league_key] || 0;
+        const rankB = leagueRankings[b.league_key] || 0;
+
+        if (rankB !== rankA) {
+            return rankB - rankA;
+        }
+
+        // If same rank, sort by date and time
+        const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
+        const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
+        return ascending ? dateA - dateB : dateB - dateA;
+    };
+
+    const fetchMatches = async (leagueId: number | null) => {
+        setLoading(true);
+        try {
+            let fromDate: string;
+            let toDate: string;
+            const today = new Date();
+
+            if (leagueId) {
+                // Season Range
+                const currentYear = today.getFullYear();
+                const currentMonth = today.getMonth(); // 0-11
+                if (currentMonth >= 6) { // Jul - Dec
+                    fromDate = `${currentYear}-07-01`;
+                    toDate = `${currentYear + 1}-06-30`;
+                } else { // Jan - Jun
+                    fromDate = `${currentYear - 1}-07-01`;
+                    toDate = `${currentYear}-06-30`;
+                }
+            } else {
+                // Default Range (Yesterday to +14 days)
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 14);
+                fromDate = yesterday.toISOString().split('T')[0];
+                toDate = tomorrow.toISOString().split('T')[0];
+            }
+
+            console.log(`🔄 Loading fixtures for ${leagueId ? `League ${leagueId}` : 'All Leagues'} (${fromDate} to ${toDate})...`);
+
+            const fixturesRes = await advancedFootballApi.getFixtures({
+                from: fromDate,
+                to: toDate,
+                leagueId: leagueId || undefined
+            });
+
+            // Filter upcoming and finished from fixtures
+            const now = new Date();
+            const allFixtures = fixturesRes?.result || [];
+            const upcoming = allFixtures.filter((e) => {
+                const eventDate = new Date(`${e.event_date} ${e.event_time}`);
+                return eventDate > now && (e.event_status === 'Not Started' || e.event_status === '');
+            });
+            const finished = allFixtures.filter((e) => e.event_status === 'Finished');
+
+            upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
+            finished.sort((a, b) => sortByRankAndDate(a, b, false));
+
+            setUpcomingEvents(upcoming);
+            setFinishedEvents(finished);
+
+            console.log(`✅ Loaded ${upcoming.length} upcoming and ${finished.length} finished matches`);
+
+        } catch (error) {
+            console.error('❌ Error loading fixtures:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const loadData = async () => {
         try {
+            // Initial load: uses default range logic implicit in fetchMatches(null) 
+            // BUT loadData is doing Promise.all for everything.
+            // We can let loadData handle the restricted initial load as before, or refactor.
+            // To keep it simple and safe, I will keep loadData mostly as is but use the helper functions.
+
             const today = new Date();
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 14);
-
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
-            console.log('🔄 Loading football data...');
+            console.log('🔄 Loading initial football data...');
 
             const [
                 livescoreRes,
@@ -96,17 +200,6 @@ export function FootballScreen() {
                 }),
             ]);
 
-            console.log('✅ API Responses:', {
-                livescore: livescoreRes?.result?.length || 0,
-                fixtures: fixturesRes?.result?.length || 0,
-                standings: standingsRes?.result?.total?.length || 0,
-                topscorers: topscorersRes?.result?.length || 0,
-                leagues: leaguesRes?.result?.length || 0,
-                countries: countriesRes?.result?.length || 0,
-                videos: videosRes?.result?.length || 0,
-            });
-
-
             // Filter upcoming and finished from fixtures
             const now = new Date();
             const allFixtures = fixturesRes?.result || [];
@@ -116,57 +209,13 @@ export function FootballScreen() {
             });
             const finished = allFixtures.filter((e) => e.event_status === 'Finished');
 
-            console.log('📊 Filtered events:', {
-                live: livescoreRes?.result?.length || 0,
-                upcoming: upcoming.length,
-                finished: finished.length
-            });
-
-            // League rankings for sorting (Advanced)
-            const leagueRankings: { [key: string]: number } = {
-                // Top Tier
-                '152': 100, // Premier League
-                '302': 95,  // La Liga
-                '175': 90,  // Bundesliga
-                '207': 85,  // Serie A
-                '168': 80,  // Ligue 1
-                '3': 110,   // UEFA Champions League
-                '4': 75,    // UEFA Europa League
-                '683': 70,  // UEFA Conference League
-                '28': 65,   // World Cup
-                '6': 60,    // Euro Championship
-
-                // Second Tier / Popular
-                '262': 55,  // Eredivisie (Netherlands)
-                '322': 50,  // Liga Portugal
-                '12': 45,   // FA Cup
-                '141': 40,  // Championship (England)
-                '10': 35,   // Copa America
-                '343': 30,  // Brazilian Serie A
-                '31': 25,   // MLS
-            };
-
-            const sortByRankAndDate = (a: FootballEvent, b: FootballEvent, ascending: boolean = true) => {
-                const rankA = leagueRankings[a.league_key] || 0;
-                const rankB = leagueRankings[b.league_key] || 0;
-
-                if (rankB !== rankA) {
-                    return rankB - rankA;
-                }
-
-                // If same rank, sort by date and time
-                const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
-                const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
-                return ascending ? dateA - dateB : dateB - dateA;
-            };
-
             const live = (livescoreRes?.result || []).sort((a, b) => sortByRankAndDate(a, b, true));
             upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
             finished.sort((a, b) => sortByRankAndDate(a, b, false));
 
             setLiveEvents(live);
-            setUpcomingEvents(upcoming.slice(0, 50));
-            setFinishedEvents(finished.slice(0, 50));
+            setUpcomingEvents(upcoming);
+            setFinishedEvents(finished);
             setTopscorers(topscorersRes?.result || []);
             setLeagues(leaguesRes?.result || []);
             setCountries(countriesRes?.result || []);
@@ -291,7 +340,7 @@ export function FootballScreen() {
             setStandings(bestStage);
             setTopscorers(topscorersRes?.result || []);
 
-            console.log(`✅ Loaded league-specific data for ${leagueId}: ${filteredStandings.length} standings, ${topscorersRes?.result?.length || 0} scorers`);
+            console.log(`✅ Loaded league-specific data for ${leagueId}: ${bestStage.length} standings, ${topscorersRes?.result?.length || 0} scorers`);
         } catch (error) {
             console.error('❌ Error loading league specific data:', error);
         } finally {
@@ -299,9 +348,20 @@ export function FootballScreen() {
         }
     };
 
+    const isMounted = useState(false); // actually useRef is better but let's use proper hook
+    const hasMounted = useRef(false);
+
     useEffect(() => {
         loadData();
     }, []);
+
+    useEffect(() => {
+        if (!hasMounted.current) {
+            hasMounted.current = true;
+            return;
+        }
+        fetchMatches(matchFilterLeagueId);
+    }, [matchFilterLeagueId]);
 
     // Polling for live matches
     useEffect(() => {
@@ -334,8 +394,8 @@ export function FootballScreen() {
         { id: 'news', label: 'News', count: blogPosts?.length ?? 0 },
         { id: 'videos', label: 'Videos', count: videos?.length ?? 0 },
         { id: 'countries', label: 'Countries', count: countries?.length ?? 0 },
-        { id: 'leagues', label: 'Leagues', count: leagues?.length ?? 0 },
-        { id: 'competitions', label: 'Competitions', count: leagues?.length ?? 0 },
+        { id: 'leagues', label: 'Leagues', count: Math.min(leagues?.length ?? 0, 70) },
+        { id: 'competitions', label: 'Competitions', count: Math.min(leagues?.length ?? 0, 70) },
         { id: 'teams', label: 'Teams', count: teams?.length ?? 0 },
     ];
 
@@ -359,7 +419,7 @@ export function FootballScreen() {
             if (!groups[leagueId]) {
                 groups[leagueId] = {
                     name: event.league_name,
-                    logo: event.league_logo,
+                    logo: event.league_logo || '',
                     key: event.league_key,
                     matches: []
                 };
@@ -368,6 +428,88 @@ export function FootballScreen() {
         });
 
         return Object.values(groups);
+    };
+
+    const topLeagueConfigs = [
+        { id: 152, name: 'EPL', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'from-purple-600' },
+        { id: 302, name: 'La Liga', icon: '🇪🇸', color: 'from-orange-500' },
+        { id: 175, name: 'Bundesliga', icon: '🇩🇪', color: 'from-red-600' },
+        { id: 207, name: 'Serie A', icon: '🇮🇹', color: 'from-blue-600' },
+        { id: 168, name: 'Ligue 1', icon: '🇫🇷', color: 'from-yellow-500' },
+        { id: 3, name: 'UCL', icon: '⭐️', color: 'from-blue-900' },
+        { id: 4, name: 'UEL', icon: '🇪🇺', color: 'from-orange-600' },
+        { id: 683, name: 'UECL', icon: '🇪🇺', color: 'from-green-600' },
+        { id: 141, name: 'Championship', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'from-blue-700' },
+        { id: 262, name: 'Eredivisie', icon: '🇳🇱', color: 'from-red-500' },
+        { id: 322, name: 'Primeira Liga', icon: '🇵🇹', color: 'from-green-700' },
+        { id: 343, name: 'Serie A', icon: '🇧🇷', color: 'from-green-500' },
+        { id: 31, name: 'MLS', icon: '🇺🇸', color: 'from-blue-500' },
+    ];
+
+    const getTopLeagues = () => {
+        const leagueRankingsForSelector: { [key: string]: number } = {
+            '152': 100, '302': 95, '175': 90, '207': 85, '168': 80, '3': 110, '4': 75, '683': 70,
+            '28': 65, '6': 60, '262': 55, '322': 50, '12': 45, '141': 40, '10': 35, '343': 30, '31': 25
+        };
+
+        const otherLeagues = leagues
+            .filter(l => !topLeagueConfigs.some(hl => String(hl.id) === String(l.league_key)))
+            .sort((a, b) => {
+                const rankA = leagueRankingsForSelector[a.league_key] || 0;
+                const rankB = leagueRankingsForSelector[b.league_key] || 0;
+                if (rankA !== rankB) return rankB - rankA;
+                return a.league_name.localeCompare(b.league_name);
+            })
+            .slice(0, 50 - topLeagueConfigs.length)
+            .map(l => ({
+                id: Number(l.league_key),
+                name: l.league_name.split(' - ')[0].split(' (')[0],
+                icon: '🌍',
+                color: 'from-gray-600'
+            }));
+
+        return [...topLeagueConfigs, ...otherLeagues].sort((a, b) => {
+            const rankA = leagueRankingsForSelector[String(a.id)] || 0;
+            const rankB = leagueRankingsForSelector[String(b.id)] || 0;
+            return rankB - rankA;
+        });
+    };
+
+    const renderLeagueSelector = (selectedId: number | null, onSelect: (id: number | null) => void, showAll = true) => {
+        const topLeagues = getTopLeagues();
+        return (
+            <div className="flex gap-3 overflow-x-auto pb-6 mt-2 scrollbar-hide px-1">
+                {showAll && (
+                    <button
+                        onClick={() => onSelect(null)}
+                        className={`
+                            px-6 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 shrink-0 border uppercase tracking-wider
+                            ${selectedId === null
+                                ? 'bg-secondary text-surface border-secondary shadow-lg shadow-secondary/20 scale-105'
+                                : 'glass-card text-text-muted border-white/5 hover:border-white/20 hover:text-white'}
+                        `}
+                    >
+                        <span>🏟️</span>
+                        All Matches
+                    </button>
+                )}
+                {topLeagues.map((league) => (
+                    <button
+                        key={league.id}
+                        onClick={() => onSelect(league.id)}
+                        className={`
+                            px-6 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 shrink-0 border uppercase tracking-wider
+                            ${selectedId === league.id
+                                ? 'bg-white text-black border-white shadow-xl shadow-white/10 scale-105'
+                                : 'glass-card text-text-muted border-white/5 hover:border-white/20 hover:text-white'}
+                        `}
+                    >
+                        <span className="text-base">{league.icon}</span>
+                        {league.name}
+                    </button>
+                ))}
+            </div>
+        );
     };
 
     const renderMatchGroups = (events: FootballEvent[], type: 'live' | 'upcoming' | 'finished') => {
@@ -436,72 +578,81 @@ export function FootballScreen() {
 
         switch (activeTab) {
             case 'live':
-                const filteredLive = filterData(liveEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
+                let filteredLive = filterData(liveEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
+                if (matchFilterLeagueId) {
+                    filteredLive = filteredLive.filter(e => String(e.league_key) === String(matchFilterLeagueId));
+                }
                 return (
                     <div className="p-4 animate-fade-in">
-                        <div className="flex items-center justify-between mb-8 px-2">
-                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                <span className="inline-block w-3 h-3 bg-accent-red rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
-                                Live Score
-                            </h2>
-                            <button
-                                onClick={onRefresh}
-                                disabled={refreshing}
-                                className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-sm font-bold text-text-primary"
-                            >
-                                <span className={refreshing ? 'animate-spin' : ''}>🔄</span>
-                                {refreshing ? 'Refreshing...' : 'Refresh'}
-                            </button>
+                        <div className="flex flex-col gap-2 mb-6">
+                            <div className="flex items-center justify-between px-2">
+                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                    <span className="inline-block w-3 h-3 bg-accent-red rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
+                                    Live Score
+                                </h2>
+                                <button
+                                    onClick={onRefresh}
+                                    disabled={refreshing}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-sm font-bold text-text-primary"
+                                >
+                                    <span className={refreshing ? 'animate-spin' : ''}>🔄</span>
+                                    {refreshing ? 'Refreshing...' : 'Refresh'}
+                                </button>
+                            </div>
+                            {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
                         </div>
                         {renderMatchGroups(filteredLive, 'live')}
                     </div>
                 );
 
             case 'upcoming':
-                const filteredUpcoming = filterData(upcomingEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
+                let filteredUpcoming = filterData(upcomingEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
+                if (matchFilterLeagueId) {
+                    filteredUpcoming = filteredUpcoming.filter(e => String(e.league_key) === String(matchFilterLeagueId));
+                }
                 return (
                     <div className="p-4 animate-fade-in">
-                        <div className="flex items-center justify-between mb-8 px-2">
-                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">📅</span>
-                                Upcoming Fixtures
-                            </h2>
+                        <div className="flex flex-col gap-2 mb-6">
+                            <div className="flex items-center justify-between px-2">
+                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                    <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">📅</span>
+                                    Upcoming Fixtures
+                                </h2>
+                            </div>
+                            {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
                         </div>
                         {renderMatchGroups(filteredUpcoming, 'upcoming')}
                     </div>
                 );
 
             case 'results':
-                const filteredResults = filterData(finishedEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
+                let filteredResults = filterData(finishedEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
+                if (matchFilterLeagueId) {
+                    filteredResults = filteredResults.filter(e => String(e.league_key) === String(matchFilterLeagueId));
+                }
                 return (
                     <div className="p-4 animate-fade-in">
-                        <div className="flex items-center justify-between mb-8 px-2">
-                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                <span className="p-2 bg-accent-green/20 rounded-lg text-accent-green">✅</span>
-                                Match Results
-                            </h2>
+                        <div className="flex flex-col gap-2 mb-6">
+                            <div className="flex items-center justify-between px-2">
+                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                    <span className="p-2 bg-accent-green/20 rounded-lg text-accent-green">✅</span>
+                                    Match Results
+                                </h2>
+                            </div>
+                            {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
                         </div>
                         {renderMatchGroups(filteredResults, 'finished')}
                     </div>
                 );
 
             case 'standings':
-            case 'topscorers':
+            case 'topscorers': {
+                const topLeagues = getTopLeagues();
+                const currentLeague = topLeagues.find(l => l.id === currentLeagueId);
                 const isStandings = activeTab === 'standings';
                 const filteredData = isStandings
-                    ? filterData(standings, 'standing_team')
-                    : filterData(topscorers, 'player_name');
-
-                const topLeagues = [
-                    { id: 152, name: 'EPL', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'from-purple-600' },
-                    { id: 302, name: 'La Liga', icon: '🇪🇸', color: 'from-orange-500' },
-                    { id: 175, name: 'Bundesliga', icon: '🇩🇪', color: 'from-red-600' },
-                    { id: 207, name: 'Serie A', icon: '🇮🇹', color: 'from-blue-600' },
-                    { id: 168, name: 'Ligue 1', icon: '🇫🇷', color: 'from-yellow-500' },
-                    { id: 3, name: 'UCL', icon: '⭐️', color: 'from-blue-900' }
-                ];
-
-                const currentLeague = topLeagues.find(l => l.id === currentLeagueId);
+                    ? filterData(standings, (s) => s.standing_team)
+                    : filterData(topscorers, (s) => s.player_name);
 
                 return (
                     <div className="p-4 animate-fade-in">
@@ -531,23 +682,7 @@ export function FootballScreen() {
                             </div>
 
                             {/* League Selector */}
-                            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-1">
-                                {topLeagues.map((league) => (
-                                    <button
-                                        key={league.id}
-                                        onClick={() => loadLeagueSpecificData(league.id)}
-                                        className={`
-                                            px-6 py-3 rounded-2xl text-sm font-bold transition-all flex items-center gap-3 shrink-0 border
-                                            ${currentLeagueId === league.id
-                                                ? 'bg-white text-black border-white shadow-xl shadow-white/10 scale-105'
-                                                : 'glass-card text-text-muted border-white/5 hover:border-white/20 hover:text-white'}
-                                        `}
-                                    >
-                                        <span className="text-lg">{league.icon}</span>
-                                        {league.name}
-                                    </button>
-                                ))}
-                            </div>
+                            {renderLeagueSelector(currentLeagueId, (id) => id && loadLeagueSpecificData(id), false)}
                         </div>
 
                         {isLeagueDataLoading ? (
@@ -571,6 +706,7 @@ export function FootballScreen() {
                         )}
                     </div>
                 );
+            }
 
             case 'news':
                 const filteredNews = filterData(blogPosts, 'title');
@@ -625,28 +761,62 @@ export function FootballScreen() {
 
             case 'leagues':
             case 'competitions':
-                const filteredLeagues = filterData(leagues, (l) => `${l.league_name} ${l.country_name}`);
+                const leagueRankingsForList: { [key: string]: number } = {
+                    '152': 100, '302': 95, '175': 90, '207': 85, '168': 80, '3': 110, '4': 75, '683': 70,
+                    '28': 65, '6': 60, '262': 55, '322': 50, '12': 45, '141': 40, '10': 35, '343': 30, '31': 25
+                };
+
+                const sortedLeagues = [...leagues].sort((a, b) => {
+                    const rankA = leagueRankingsForList[a.league_key] || 0;
+                    const rankB = leagueRankingsForList[b.league_key] || 0;
+                    if (rankA !== rankB) return rankB - rankA;
+                    return a.league_name.localeCompare(b.league_name);
+                }).slice(0, 70);
+
+                const filteredLeagues = filterData(sortedLeagues, (l) => `${l.league_name} ${l.country_name}`);
+
                 return (
                     <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">🏆 {activeTab === 'leagues' ? 'Leagues' : 'Competitions'}</h2>
+                        <div className="flex items-center justify-between mb-8 px-2">
+                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                                <span className="p-2 bg-gradient-to-br from-secondary to-accent-yellow rounded-lg text-white shadow-lg">🏆</span>
+                                {activeTab === 'leagues' ? 'Top Leagues' : 'Top Competitions'}
+                            </h2>
+                            <div className="text-sm font-bold text-text-muted">Showing 70 Leagues</div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredLeagues.map((league, index) => (
                                 <Link
                                     href={`/leagues/${league.league_key}`}
                                     key={league.league_key || `league-${index}`}
-                                    className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
+                                    className="glass-card p-4 rounded-2xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group border border-white/5 hover:border-white/20 shadow-xl hover:shadow-2xl"
                                 >
-                                    <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+                                    <div className="relative w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
                                         <img src={league.league_logo} alt={league.league_name} className="w-full h-full object-contain" />
+                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-secondary text-surface text-[10px] font-black rounded-full flex items-center justify-center border-2 border-surface">
+                                            {index + 1}
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-text-primary text-lg group-hover:text-white transition-colors">{league.league_name}</h3>
-                                        <p className="text-sm text-text-muted">{league.country_name}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-bold text-text-primary text-lg group-hover:text-white transition-colors truncate">{league.league_name}</h3>
+                                        <p className="text-sm text-text-muted flex items-center gap-2">
+                                            <span>{league.country_name}</span>
+                                        </p>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-secondary group-hover:text-surface transition-all">
+                                        <span className="text-xl">›</span>
                                     </div>
                                 </Link>
                             ))}
                         </div>
-                        {filteredLeagues.length === 0 && <p className="text-text-muted italic">No leagues found.</p>}
+                        {filteredLeagues.length === 0 && (
+                            <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mt-8 text-center">
+                                <span className="text-6xl mb-6 opacity-80">🧪</span>
+                                <p className="text-xl font-bold text-text-primary mb-2">No leagues found</p>
+                                <p className="text-text-muted">Try a different search term.</p>
+                            </div>
+                        )}
                     </div>
                 );
 
