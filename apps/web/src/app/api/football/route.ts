@@ -29,20 +29,45 @@ export async function GET(request: NextRequest) {
 
     console.log('Proxying request to:', apiUrl.toString());
 
-    // Make the request to the external API
-    const response = await fetch(apiUrl.toString(), {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      cache: 'no-store',
-    });
+    // Make the request to the external API with retries
+    let response;
+    let attempts = 0;
+    const maxAttempts = 3;
 
-    if (!response.ok) {
-      console.error('API Error:', response.status, response.statusText);
+    while (attempts < maxAttempts) {
+      try {
+        attempts++;
+        response = await fetch(apiUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          cache: 'no-store',
+        });
+
+        if (response.ok) break;
+        
+        // If 500, wait and retry
+        if (response.status >= 500 && attempts < maxAttempts) {
+          console.warn(`API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempts)); // Exponential backoff-ish
+          continue;
+        }
+        
+        break; // Don't retry 4xx errors
+      } catch (err) {
+        if (attempts >= maxAttempts) throw err;
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+      }
+    }
+
+    if (!response || !response.ok) {
+      const status = response ? response.status : 500;
+      const statusText = response ? response.statusText : 'Fetch failed';
+      console.error('API Error:', status, statusText);
       return NextResponse.json(
-        { error: `API request failed: ${response.status} ${response.statusText}` },
-        { status: response.status }
+        { error: `API request failed: ${status} ${statusText}` },
+        { status: status }
       );
     }
 

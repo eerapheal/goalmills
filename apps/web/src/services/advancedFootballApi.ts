@@ -344,22 +344,7 @@ export const advancedFootballApi = {
     }
   },
 
-  /**
-   * Get video highlights for events
-   * Endpoint: ?met=Videos&eventId={id}
-   */
-  getVideos: async (eventId?: number): Promise<FootballVideosResponse> => {
-    try {
-      const params: Record<string, any> = {};
-      if (eventId) params.eventId = eventId;
 
-      const response = await fetchFromAPI<FootballVideosResponse>('Videos', params);
-      return response;
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-      return { success: 1, result: [] };
-    }
-  },
 
   /**
    * Get pre-match odds for events
@@ -493,16 +478,66 @@ export const advancedFootballApi = {
   },
 
   /**
-   * Get all blog posts (using mock data as not available in API)
+   * Get all blog posts from MongoDB
    */
   getBlogPosts: async (): Promise<BlogPost[]> => {
-    return mockBlogPosts;
+    try {
+      const res = await fetch('/api/news', { cache: 'no-store' }); // Internal API
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data;
+    } catch (error) {
+       console.error('Error fetching blog posts:', error);
+       return [];
+    }
   },
 
   /**
-   * Get a blog post by ID (using mock data as not available in API)
+   * Get a blog post by ID from MongoDB
    */
   getBlogPostById: async (id: string): Promise<BlogPost | null> => {
-    return mockBlogPosts.find((p) => p._id === id) || null;
+    try {
+        const res = await fetch(`/api/news/${id}`, { cache: 'no-store' });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        return null;
+    }
+  },
+
+  /**
+   * Get video highlights (Merged API + MongoDB)
+   * Endpoint: ?met=Videos&eventId={id}
+   */
+  getVideos: async (eventId?: number): Promise<FootballVideosResponse> => {
+    try {
+      // 1. Fetch from External API first (if needed, or just use ours?)
+      // The user wants admin uploads. Let's prioritize our DB videos or merge them.
+      // For simplicity/requirement match, let's fetch from our DB.
+      // But typically we might want both. Let's merge.
+      
+      const externalPromise = fetchFromAPI<FootballVideosResponse>('Videos', eventId ? { eventId } : {})
+        .catch(() => ({ success: 1, result: [] }));
+      
+      const internalPromise = fetch('/api/videos', { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : [])
+        .catch(() => []);
+
+      const [externalRes, internalRes] = await Promise.all([externalPromise, internalPromise]);
+
+      // Map internal videos to match FootballVideo structure if needed
+      // Our Mongo model has video_title, video_url, etc which matches.
+      
+      const combined = [...(internalRes || []), ...(externalRes?.result || [])];
+      
+      return {
+          success: 1,
+          result: combined
+      };
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+      return { success: 1, result: [] };
+    }
   },
 };
