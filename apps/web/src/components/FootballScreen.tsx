@@ -99,13 +99,13 @@ export function FootballScreen() {
                     toDate = `${currentYear}-06-30`;
                 }
             } else {
-                // Default Range (Yesterday to +14 days)
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 14);
-                fromDate = yesterday.toISOString().split('T')[0];
-                toDate = tomorrow.toISOString().split('T')[0];
+                // Default Range (-60 days to +30 days)
+                const past = new Date(today);
+                past.setDate(past.getDate() - 60);
+                const future = new Date(today);
+                future.setDate(future.getDate() + 30);
+                fromDate = past.toISOString().split('T')[0];
+                toDate = future.toISOString().split('T')[0];
             }
 
             console.log(`🔄 Loading fixtures for ${leagueId ? `League ${leagueId}` : 'All Leagues'} (${fromDate} to ${toDate})...`);
@@ -148,10 +148,10 @@ export function FootballScreen() {
             // To keep it simple and safe, I will keep loadData mostly as is but use the helper functions.
 
             const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 14);
+            const past = new Date(today);
+            past.setDate(past.getDate() - 60); // 60 days of results
+            const future = new Date(today);
+            future.setDate(future.getDate() + 30); // 30 days of upcoming
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
             console.log('🔄 Loading initial football data...');
@@ -171,8 +171,8 @@ export function FootballScreen() {
                     return { success: 1, result: [] };
                 }),
                 advancedFootballApi.getFixtures({
-                    from: formatDate(yesterday),
-                    to: formatDate(tomorrow),
+                    from: formatDate(past),
+                    to: formatDate(future),
                 }).catch(err => {
                     console.error('❌ Fixtures API error:', err);
                     return { success: 1, result: [] };
@@ -377,10 +377,10 @@ export function FootballScreen() {
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (activeTab === 'live' && !loading) {
-            console.log('⏱️ Starting live score polling (30s)...');
+            console.log('⏱️ Starting live score polling (45s)...');
             interval = setInterval(() => {
                 onRefresh();
-            }, 30000);
+            }, 45000);
         }
         return () => {
             if (interval) {

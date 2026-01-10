@@ -27,7 +27,7 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
             const team = teams.find(t => String(t.team_key) === String(scorer.team_key));
             if (team?.players) {
                 let player = team.players.find(p => String(p.player_key) === String(scorer.player_key));
-                
+
                 // Fallback to name search if ID match fails
                 if (!player) {
                     player = team.players.find(p => p.player_name.toLowerCase() === scorer.player_name.toLowerCase());
@@ -41,7 +41,7 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
                 for (const t of teams) {
                     if (t.players) {
                         let player = t.players.find(p => String(p.player_key) === String(scorer.player_key));
-                        
+
                         if (!player) {
                             player = t.players.find(p => p.player_name.toLowerCase() === scorer.player_name.toLowerCase());
                         }
@@ -57,9 +57,21 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.player_name)}&background=random&color=fff`;
     };
 
+    const sortedScorers = [...scorers].sort((a, b) => {
+        const goalsA = parseInt(a.goals) || 0;
+        const goalsB = parseInt(b.goals) || 0;
+        if (goalsB !== goalsA) return goalsB - goalsA;
+
+        const assistsA = parseInt(a.assists || '0') || 0;
+        const assistsB = parseInt(b.assists || '0') || 0;
+        if (assistsB !== assistsA) return assistsB - assistsA;
+
+        return parseInt(a.player_place) - parseInt(b.player_place);
+    });
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {scorers.map((scorer, index) => {
+            {sortedScorers.map((scorer, index) => {
                 const teamLogo = getTeamLogo(scorer);
                 const playerAvatar = getPlayerAvatar(scorer);
 

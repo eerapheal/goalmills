@@ -136,6 +136,11 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
                             `}>
                                 {isLive ? `${event.event_status}'` : event.event_status}
                             </div>
+                            {!isLive && event.event_date && (
+                                <div className="text-[8px] font-medium text-text-muted mt-0.5 whitespace-nowrap">
+                                    {event.event_date}
+                                </div>
+                            )}
                         </div>
                     )}
                 </Link>
