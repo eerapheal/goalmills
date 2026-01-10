@@ -20,7 +20,7 @@ export default function LeagueDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [league, setLeague] = useState<FootballLeague | null>(null);
   const [events, setEvents] = useState<FootballEvent[]>([]);
-  const [standings, setStandings] = useState<FootballStanding[]>([]);
+  const [standings, setStandings] = useState<{ name: string; teams: FootballStanding[] }[]>([]);
   const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
   const [teams, setTeams] = useState<FootballTeam[]>([]);
 
@@ -100,40 +100,67 @@ export default function LeagueDetailsPage() {
 
         setEvents(fixtures);
 
-        // Intelligent Stage Filter to remove female teams (WSL etc) from male leagues
-        const rawStandings = standingsRes.result?.total || [];
-        const stageGroups: { [key: string]: FootballStanding[] } = {};
+        // Process Standings with Mobile App Grouping Logic
+        let rawStandings: FootballStanding[] = [];
+        const result = standingsRes.result;
+
+        if (result) {
+          if (Array.isArray(result)) {
+            rawStandings = result;
+          } else if (result.total && Array.isArray(result.total)) {
+            rawStandings = result.total;
+          }
+        }
+        const groupedStandings: { [key: string]: FootballStanding[] } = {};
+
         rawStandings.forEach(s => {
-          const stageId = s.fk_stage_key || 'default';
-          if (!stageGroups[stageId]) stageGroups[stageId] = [];
-          stageGroups[stageId].push(s);
-        });
+          let groupName = s.stage_name || 'League Table';
 
-        let bestStage: FootballStanding[] = [];
-        Object.values(stageGroups).forEach(stageTeams => {
-          const femaleTeamCount = stageTeams.filter(t =>
-            t.standing_team.endsWith(' W') ||
-            t.standing_team.includes(' Women') ||
-            t.standing_team.includes(' Ladies') ||
-            (t.standing_place_type && t.standing_place_type.toLowerCase().includes('wsl'))
-          ).length;
+          // Normalize variations
+          if (groupName === 'League Stage' || groupName === 'League Phase') {
+            groupName = 'League Table';
+          }
 
-          if (femaleTeamCount === 0 || stageTeams.length > bestStage.length) {
-            if (femaleTeamCount === 0 || (bestStage.length > 0 && femaleTeamCount < bestStage.length)) {
-              bestStage = stageTeams;
+          const specificGroup = (s as any).group || (s as any).league_group;
+          const round = s.league_round;
+
+          // Priority 1: Specific Group found in hidden fields
+          if (specificGroup) {
+            groupName = specificGroup;
+          }
+          // Priority 2: Use Round Logic
+          else if (round && round.length < 25) {
+            if (groupName === 'Group Stage' || groupName === 'League Table') {
+              groupName = round;
+            } else if (round !== groupName && !groupName.includes(round)) {
+              // Concatenate for cases like "League A" + "Group 1"
+              groupName = `${groupName} - ${round}`;
             }
           }
-          if (bestStage.length === 0 && femaleTeamCount === 0) {
-            bestStage = stageTeams;
+
+          groupName = groupName.trim();
+
+          if (!groupedStandings[groupName]) {
+            groupedStandings[groupName] = [];
           }
+          groupedStandings[groupName].push(s);
         });
 
-        if (bestStage.length === 0 && Object.keys(stageGroups).length > 0) {
-          const biggestStage = Object.values(stageGroups).sort((a, b) => b.length - a.length)[0];
-          bestStage = biggestStage.filter(t => !t.standing_team.endsWith(' W'));
+        // Remove generic "Group Stage" if specific groups exist
+        if (Object.keys(groupedStandings).length > 1 && groupedStandings['Group Stage']) {
+          delete groupedStandings['Group Stage'];
         }
 
-        setStandings(bestStage);
+        // Convert to array and sort groups
+        const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
+          name,
+          teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
+        }));
+
+        // Sort groups alphabetically (e.g. Group A, Group B, ...)
+        standingsData.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+        setStandings(standingsData);
         setTopscorers(topscorersRes?.result || []);
 
         // Enhance teams with data from fixtures to ensure we have logos for everyone
@@ -292,10 +319,19 @@ export default function LeagueDetailsPage() {
           </div>
         )}
         {activeTab === 'standings' && (
-          <div className="animate-fade-in">
-            <div className="glass-card rounded-xl overflow-hidden">
-              <FootballStandingsTable standings={standings} teams={teams} />
-            </div>
+          <div className="space-y-8 animate-fade-in">
+            {standings.length > 0 ? (
+              standings.map((group, index) => (
+                <div key={`group-${index}`} className="space-y-4">
+                  {(standings.length > 1 || group.name !== 'League Table') && (
+                    <h3 className="text-xl font-bold text-white pl-2">{group.name}</h3>
+                  )}
+                  <FootballStandingsTable standings={group.teams} teams={teams} />
+                </div>
+              ))
+            ) : (
+              <p className="text-text-muted text-center py-8">No standings available.</p>
+            )}
           </div>
         )}
 

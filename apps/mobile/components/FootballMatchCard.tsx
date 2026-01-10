@@ -25,6 +25,20 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
         away: (1.8 + Math.random() * 2.5).toFixed(2),
     }), [event.event_key]);
 
+    // Helper to get local time from UTC
+    const getLocalTime = (date: string, time: string) => {
+        if (!date || !time) return time;
+        try {
+            // Assume API returns UTC
+            const utcDate = new Date(`${date}T${time}Z`);
+            if (isNaN(utcDate.getTime())) return time;
+            // Format for mobile: HH:mm
+            return utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        } catch (e) {
+            return time;
+        }
+    };
+
     const getStatusDisplay = () => {
         if (isLive) {
             if (!isNaN(Number(event.event_status))) {
@@ -35,7 +49,7 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
         if (isFinished) {
             return event.event_status === 'Finished' ? 'FT' : event.event_status;
         }
-        return event.event_time || event.event_status;
+        return getLocalTime(event.event_date, event.event_time) || event.event_status;
     };
 
     const getScoreDisplay = () => {

@@ -47,7 +47,7 @@ export function FootballStandingsTable({ standings, teams = [] }: FootballStandi
 
                     return (
                         <div
-                            key={standing.team_key}
+                            key={`${standing.team_key}-${index}`}
                             className={`
                                 grid grid-cols-12 items-center py-4 px-6 transition-all duration-300 hover:bg-white/[0.04] group
                                 ${rank <= 4 ? 'bg-blue-500/[0.02]' : ''}

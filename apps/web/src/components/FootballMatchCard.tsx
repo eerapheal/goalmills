@@ -38,6 +38,20 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
 
     const scores = getScore();
 
+    const getLocalTime = (date: string, time: string) => {
+        if (!date || !time) return time;
+        try {
+            // Assume API returns UTC
+            const utcDate = new Date(`${date}T${time}Z`);
+            if (isNaN(utcDate.getTime())) return time;
+            return utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            return time;
+        }
+    };
+
+    const matchTime = getLocalTime(event.event_date, event.event_time);
+
     return (
         <div
             onClick={handleCardClick}
@@ -116,7 +130,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
                 >
                     {isScheduled ? (
                         <div className="flex flex-col items-center">
-                            <span className="text-base font-bold text-text-primary tracking-tight">{event.event_time}</span>
+                            <span className="text-base font-bold text-text-primary tracking-tight">{matchTime}</span>
                             <span className="text-[9px] font-medium text-text-muted">{event.event_date}</span>
                         </div>
                     ) : (
