@@ -163,15 +163,15 @@ export default function TeamDetailPage() {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <View style={styles.headerTop}>
+                <View style={styles.headerContent}>
                     <Pressable onPress={() => router.back()} style={styles.backButton}>
                         <Ionicons name="arrow-back" size={24} color={COLORS.background} />
                     </Pressable>
+                    {team.team_logo && (
+                        <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />
+                    )}
+                    <Text style={styles.teamName}>{team.team_name}</Text>
                 </View>
-                {team.team_logo && (
-                    <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />
-                )}
-                <Text style={styles.teamName}>{team.team_name}</Text>
             </View>
 
             {/* Tabs */}
@@ -344,30 +344,27 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: 'rgba(0, 31, 63, 0.9)',
-        padding: SPACING.xl,
-        alignItems: 'center',
+        padding: SPACING.md,
         borderBottomWidth: 3,
         borderBottomColor: COLORS.secondary,
-        paddingTop: 50,
     },
-    headerTop: {
-        width: '100%',
-        alignItems: 'flex-start',
-        marginBottom: SPACING.md,
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     backButton: {
-        padding: SPACING.xs,
+        marginRight: SPACING.md,
     },
     teamLogo: {
-        width: 100,
-        height: 100,
-        marginBottom: SPACING.md,
+        width: 40,
+        height: 40,
+        marginRight: SPACING.md,
     },
     teamName: {
-        fontSize: FONT_SIZES.xxl + 4,
+        fontSize: FONT_SIZES.lg,
         fontWeight: '900',
         color: COLORS.background,
-        textAlign: 'center',
+        flex: 1,
     },
     tabsContainer: {
         backgroundColor: 'rgba(0, 0, 0, 0.3)',

@@ -19,6 +19,8 @@ import {
     FootballLineups,
     FootballOdds,
     FootballComment,
+    FootballH2HResponse,
+    FootballProbability,
 } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 
@@ -56,10 +58,10 @@ export default function FootballMatchDetailsPage() {
                     from: formatDate(past),
                     to: formatDate(future),
                     matchId: Number(id),
-                }).catch(() => ({ result: [] })),
-                advancedFootballApi.getOdds({ matchId: Number(id) }).catch(() => ({ result: {} })),
-                advancedFootballApi.getComments({ matchId: Number(id) }).catch(() => ({ result: {} })),
-                advancedFootballApi.getProbabilities({ matchId: Number(id) }).catch(() => ({ result: [] })),
+                }),
+                advancedFootballApi.getOdds({ matchId: Number(id) }),
+                advancedFootballApi.getComments({ matchId: Number(id) }),
+                advancedFootballApi.getProbabilities({ matchId: Number(id) }),
             ]);
 
             if (fixturesRes.result && fixturesRes.result.length > 0) {
@@ -197,30 +199,49 @@ export default function FootballMatchDetailsPage() {
         </View>
     );
 
-    const renderStats = () => (
-        <View style={styles.section}>
-            {event.statistics && event.statistics.length > 0 ? (
-                <>
-                    <Text style={styles.sectionTitle}>📊 Match Statistics</Text>
-                    {event.statistics.map((stat, index) => (
-                        <View key={index} style={styles.statRow}>
-                            <Text style={styles.statValue}>{stat.home}</Text>
-                            <Text style={styles.statType}>{stat.type}</Text>
-                            <Text style={styles.statValue}>{stat.away}</Text>
-                        </View>
-                    ))}
-                </>
-            ) : (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyText}>No statistics available</Text>
+    const renderStats = () => {
+        if (!event.statistics || event.statistics.length === 0) {
+            return (
+                <View style={styles.section}>
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyText}>No statistics available</Text>
+                    </View>
                 </View>
-            )}
-        </View>
-    );
+            );
+        }
+
+        const priorityOrder = ['Shots On Target', 'Shots Off Target', 'Shots Total'];
+        const excludedTypes = ['Shot On Goal', 'Shot Off Goal'];
+
+        const filteredAndSortedStats = [...event.statistics]
+            .filter(stat => !excludedTypes.includes(stat.type))
+            .sort((a, b) => {
+                const indexA = priorityOrder.indexOf(a.type);
+                const indexB = priorityOrder.indexOf(b.type);
+
+                if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                if (indexA !== -1) return -1;
+                if (indexB !== -1) return 1;
+                return 0;
+            });
+
+        return (
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>📊 Match Statistics</Text>
+                {filteredAndSortedStats.map((stat, index) => (
+                    <View key={index} style={styles.statRow}>
+                        <Text style={styles.statValue}>{stat.home}</Text>
+                        <Text style={styles.statType}>{stat.type}</Text>
+                        <Text style={styles.statValue}>{stat.away}</Text>
+                    </View>
+                ))}
+            </View>
+        );
+    };
 
     const renderLineups = () => (
         <View style={styles.section}>
-            {event.event_home_formation && event.event_away_formation ? (
+            {event.lineups ? (
                 <>
                     <Text style={styles.sectionTitle}>👥 Formations</Text>
                     <View style={styles.formationsRow}>
@@ -233,6 +254,48 @@ export default function FootballMatchDetailsPage() {
                             <Text style={styles.formationValue}>{event.event_away_formation}</Text>
                         </View>
                     </View>
+
+                    {[
+                        { team: event.lineups.home_team, name: event.event_home_team, formation: event.event_home_formation },
+                        { team: event.lineups.away_team, name: event.event_away_team, formation: event.event_away_formation }
+                    ].map((teamData, teamIdx) => (
+                        <View key={`team-lineup-${teamIdx}`} style={styles.teamLineupSection}>
+                            <View style={styles.teamLineupHeader}>
+                                <Text style={styles.teamLineupName}>{teamData.name}</Text>
+                                <Text style={styles.teamLineupFormationBadge}>{teamData.formation}</Text>
+                            </View>
+
+                            <View style={styles.lineupSubsection}>
+                                <Text style={styles.lineupSubsectionTitle}>Starting XI</Text>
+                                {teamData.team.starting_lineups.map((player) => (
+                                    <View key={player.player_key || player.player} style={styles.playerRow}>
+                                        <Text style={styles.playerNumber}>{player.player_number}</Text>
+                                        <Text style={styles.playerName}>{player.player}</Text>
+                                        <Text style={styles.playerPositionIcon}>{player.player_position}</Text>
+                                    </View>
+                                ))}
+                            </View>
+
+                            {teamData.team.substitutes.length > 0 && (
+                                <View style={styles.lineupSubsection}>
+                                    <Text style={styles.lineupSubsectionTitle}>Substitutes</Text>
+                                    {teamData.team.substitutes.map((player) => (
+                                        <View key={player.player_key || player.player} style={[styles.playerRow, styles.substituteRow]}>
+                                            <Text style={styles.playerNumber}>{player.player_number}</Text>
+                                            <Text style={styles.playerName}>{player.player}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+
+                            {teamData.team.coaches && teamData.team.coaches.length > 0 && (
+                                <View style={styles.coachSection}>
+                                    <Text style={styles.coachLabel}>Coach:</Text>
+                                    <Text style={styles.coachName}>{teamData.team.coaches[0].coache}</Text>
+                                </View>
+                            )}
+                        </View>
+                    ))}
                 </>
             ) : (
                 <View style={styles.emptyState}>
@@ -355,23 +418,23 @@ export default function FootballMatchDetailsPage() {
                         <View style={styles.probRow}>
                             <Text style={styles.probLabel}>Home Win</Text>
                             <View style={styles.probBarContainer}>
-                                <View style={[styles.probBar, { width: `${probabilities.event_probability_home}%`, backgroundColor: COLORS.primary }]} />
+                                <View style={[styles.probBar, { width: `${probabilities.event_HW}%` as any, backgroundColor: COLORS.primary }]} />
                             </View>
-                            <Text style={styles.probValue}>{probabilities.event_probability_home}%</Text>
+                            <Text style={styles.probValue}>{probabilities.event_HW}%</Text>
                         </View>
                         <View style={styles.probRow}>
                             <Text style={styles.probLabel}>Draw</Text>
                             <View style={styles.probBarContainer}>
-                                <View style={[styles.probBar, { width: `${probabilities.event_probability_draw}%`, backgroundColor: COLORS.secondary }]} />
+                                <View style={[styles.probBar, { width: `${probabilities.event_D}%` as any, backgroundColor: COLORS.secondary }]} />
                             </View>
-                            <Text style={styles.probValue}>{probabilities.event_probability_draw}%</Text>
+                            <Text style={styles.probValue}>{probabilities.event_D}%</Text>
                         </View>
                         <View style={styles.probRow}>
                             <Text style={styles.probLabel}>Away Win</Text>
                             <View style={styles.probBarContainer}>
-                                <View style={[styles.probBar, { width: `${probabilities.event_probability_away}%`, backgroundColor: COLORS.danger }]} />
+                                <View style={[styles.probBar, { width: `${probabilities.event_AW}%` as any, backgroundColor: COLORS.danger }]} />
                             </View>
-                            <Text style={styles.probValue}>{probabilities.event_probability_away}%</Text>
+                            <Text style={styles.probValue}>{probabilities.event_AW}%</Text>
                         </View>
                     </View>
                 </>
@@ -397,14 +460,17 @@ export default function FootballMatchDetailsPage() {
         <View style={styles.container}>
             {/* Match Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={COLORS.background} />
-                </Pressable>
-                <View style={styles.leagueHeader}>
-                    {event.league_logo && (
-                        <Image source={{ uri: event.league_logo }} style={styles.leagueLogo} />
-                    )}
-                    <Text style={styles.leagueName}>{event.league_name}</Text>
+                {/* Navigation Row with League Info */}
+                <View style={styles.headerNavRow}>
+                    <Pressable onPress={() => router.back()} style={styles.backButton}>
+                        <Ionicons name="arrow-back" size={24} color={COLORS.background} />
+                    </Pressable>
+                    <View style={styles.leagueInfo}>
+                        {event.league_logo && (
+                            <Image source={{ uri: event.league_logo }} style={styles.leagueLogo} />
+                        )}
+                        <Text style={styles.leagueName}>{event.league_name}</Text>
+                    </View>
                 </View>
 
                 <View style={styles.matchHeader}>
@@ -515,18 +581,22 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: 'rgba(0, 31, 63, 0.9)',
-        padding: SPACING.lg,
+        padding: SPACING.md,
         borderBottomWidth: 3,
         borderBottomColor: COLORS.secondary,
-        paddingTop: 50,
     },
-    backButton: {
-        marginBottom: SPACING.md,
-    },
-    leagueHeader: {
+    headerNavRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginBottom: SPACING.lg,
+    },
+    backButton: {
+        marginRight: SPACING.md,
+    },
+    leagueInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
     },
     leagueLogo: {
         width: 24,
@@ -549,8 +619,8 @@ const styles = StyleSheet.create({
         gap: SPACING.sm,
     },
     teamLogo: {
-        width: 60,
-        height: 60,
+        width: 40,
+        height: 40,
     },
     teamName: {
         fontSize: FONT_SIZES.sm,
@@ -725,6 +795,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
     },
+
     formationsRow: {
         flexDirection: 'row',
         gap: SPACING.md,
@@ -732,20 +803,21 @@ const styles = StyleSheet.create({
     formationBox: {
         flex: 1,
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        padding: SPACING.lg,
+        padding: SPACING.md,
         borderRadius: BORDER_RADIUS.lg,
         alignItems: 'center',
     },
     formationLabel: {
-        fontSize: FONT_SIZES.sm,
+        fontSize: FONT_SIZES.xs,
         color: COLORS.textLight,
         marginBottom: SPACING.xs,
     },
     formationValue: {
-        fontSize: FONT_SIZES.xxl,
+        fontSize: FONT_SIZES.lg,
         fontWeight: '800',
         color: COLORS.secondary,
     },
+
     oddsGrid: {
         flexDirection: 'row',
         gap: SPACING.md,
@@ -870,5 +942,99 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: COLORS.secondary,
         textAlign: 'right',
+    },
+    teamLineupSection: {
+        marginTop: SPACING.lg,
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: BORDER_RADIUS.lg,
+        padding: SPACING.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    teamLineupHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
+        paddingBottom: SPACING.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    },
+    teamLineupName: {
+        fontSize: FONT_SIZES.md,
+        fontWeight: '800',
+        color: COLORS.background,
+    },
+
+    teamLineupFormationBadge: {
+        fontSize: FONT_SIZES.xs,
+        fontWeight: 'bold',
+        color: COLORS.secondary,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: BORDER_RADIUS.sm,
+    },
+
+    lineupSubsection: {
+        marginBottom: SPACING.md,
+    },
+    lineupSubsectionTitle: {
+        fontSize: FONT_SIZES.xs,
+        fontWeight: '800',
+        color: COLORS.textLight,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: SPACING.sm,
+    },
+    playerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 6,
+        gap: SPACING.sm,
+    },
+    substituteRow: {
+        opacity: 0.7,
+    },
+    playerNumber: {
+        width: 24,
+        fontSize: FONT_SIZES.xs,
+        fontWeight: '700',
+        color: COLORS.secondary,
+        textAlign: 'center',
+        fontFamily: 'monospace',
+    },
+    playerName: {
+        flex: 1,
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.background,
+        fontWeight: '600',
+    },
+    playerPositionIcon: {
+        fontSize: 10,
+        color: COLORS.textLight,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        paddingHorizontal: 4,
+        paddingVertical: 2,
+        borderRadius: BORDER_RADIUS.xs,
+        overflow: 'hidden',
+    },
+    coachSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: SPACING.sm,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.05)',
+        marginTop: SPACING.xs,
+    },
+    coachLabel: {
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.textLight,
+        marginRight: 6,
+    },
+    coachName: {
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.background,
+        fontWeight: '700',
     },
 });

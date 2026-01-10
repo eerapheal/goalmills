@@ -71,14 +71,33 @@ export function AdvancedFootballScreen() {
     };
 
     const sortByRankAndDate = (a: FootballEvent, b: FootballEvent, ascending: boolean = true) => {
+        const dateA = new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime();
+        const dateB = new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime();
+
+        // For RESULTS (ascending = false): Purely date based (Newest first)
+        if (!ascending) {
+            return dateB - dateA;
+        }
+
+        // For UPCOMING (ascending = true):
+        // 1. Prioritize Today and Tomorrow matches (within 30 hours)
+        const now = new Date().getTime();
+        const diffA = dateA - now;
+        const diffB = dateB - now;
+        const isNearA = diffA > -7200000 && diffA < 108000000; // -2h to +30h
+        const isNearB = diffB > -7200000 && diffB < 108000000;
+
+        if (isNearA && !isNearB) return -1;
+        if (!isNearA && isNearB) return 1;
+
+        // 2. If both are near or both are far, use Rank logic
         const rankA = leagueRankings[a.league_key] || 0;
         const rankB = leagueRankings[b.league_key] || 0;
 
         if (rankB !== rankA) return rankB - rankA;
 
-        const dateA = new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime();
-        const dateB = new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime();
-        return ascending ? dateA - dateB : dateB - dateA;
+        // 3. Fallback to date
+        return dateA - dateB;
     };
 
     const [matchFilterLeagueId, setMatchFilterLeagueId] = useState<number | null>(null);
@@ -88,15 +107,15 @@ export function AdvancedFootballScreen() {
         try {
             if (!refreshing && !isRefreshingMatches) setLoading(true);
             const today = new Date();
-            const past = new Date(today);
-            past.setDate(past.getDate() - 7); // Default to 7 days for global
             const future = new Date(today);
-            future.setDate(future.getDate() + 7); // Default to 7 days for global
+            future.setDate(future.getDate() + 14); // Extended to 14 days for more upcoming matches
+            const past = new Date(today);
+            past.setDate(past.getDate() - 14); // Extended to 14 days for more results
 
-            // If league filtered, use wider range
+            // If league filtered, use much wider range to ensure we get data
             if (filterLeagueId) {
-                past.setDate(past.getDate() - 30);
-                future.setDate(future.getDate() + 30);
+                past.setDate(past.getDate() - 60);
+                future.setDate(future.getDate() + 60);
             }
 
             const formatDate = (date: Date) => date.toISOString().split('T')[0];

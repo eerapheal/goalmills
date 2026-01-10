@@ -39,14 +39,9 @@ export default function LeagueDetailPage() {
             const currentYear = today.getFullYear();
             const currentMonth = today.getMonth(); // 0-11
 
-            // Determine season start year (July to June)
-            let seasonStartYear = currentYear;
-            if (currentMonth < 6) { // Jan - Jun
-                seasonStartYear = currentYear - 1;
-            }
-
-            const fromDate = `${seasonStartYear}-07-01`;
-            const toDate = `${seasonStartYear + 1}-06-30`;
+            // Fetch a wider range to ensure we capture the full current/upcoming season regardless of league schedule type
+            const fromDate = `${currentYear - 1}-01-01`;
+            const toDate = `${currentYear + 2}-01-01`;
 
             const [leaguesRes, fixturesRes, standingsRes, topscorersRes, teamsRes] = await Promise.all([
                 advancedFootballApi.getLeagues(undefined, leagueId).catch(() => ({ result: [] })),
@@ -63,7 +58,25 @@ export default function LeagueDetailPage() {
             const leagues = leaguesRes.result || [];
             let foundLeague = leagues.find((l) => String(l.league_key) === String(id));
 
-            const rawFixtures = fixturesRes.result || [];
+            let rawFixtures = fixturesRes.result || [];
+
+            // FILTER FOR LATEST SEASON
+            // This ensures we don't show mixed seasons or old data.
+            // We find the "latest" season present in the data and filter by it.
+            if (rawFixtures.length > 0) {
+                // Collect all unique seasons
+                const seasons = Array.from(new Set(rawFixtures.map(f => f.league_season).filter(s => s)));
+                if (seasons.length > 0) {
+                    // Sort seasons descending (e.g. "2025/2026" > "2024/2025", "2026" > "2025")
+                    seasons.sort((a, b) => {
+                        // Handle potential simple year vs range strings
+                        return b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' });
+                    });
+                    const latestSeason = seasons[0];
+                    console.log(`Mobile: Filtering league ${id} for latest season: ${latestSeason}`);
+                    rawFixtures = rawFixtures.filter(f => f.league_season === latestSeason);
+                }
+            }
 
             // If league not found in leagues list, try to get it from fixtures
             if (!foundLeague && rawFixtures.length > 0) {
@@ -287,10 +300,10 @@ export default function LeagueDetailPage() {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={COLORS.background} />
-                </Pressable>
                 <View style={styles.headerContent}>
+                    <Pressable onPress={() => router.back()} style={styles.backButton}>
+                        <Ionicons name="arrow-back" size={24} color={COLORS.background} />
+                    </Pressable>
                     {league.league_logo && (
                         <Image source={{ uri: league.league_logo }} style={styles.leagueLogo} />
                     )}
@@ -443,21 +456,20 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: 'rgba(0, 31, 63, 0.9)',
-        padding: SPACING.lg,
+        padding: SPACING.md,
         borderBottomWidth: 3,
         borderBottomColor: COLORS.secondary,
-        paddingTop: 50, // Added padding for status bar
     },
     backButton: {
-        marginBottom: SPACING.md,
+        marginRight: SPACING.md,
     },
     headerContent: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     leagueLogo: {
-        width: 80,
-        height: 80,
+        width: 40,
+        height: 40,
         marginRight: SPACING.md,
         borderRadius: BORDER_RADIUS.md,
     },
@@ -465,7 +477,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     leagueName: {
-        fontSize: FONT_SIZES.xxl,
+        fontSize: FONT_SIZES.lg,
         fontWeight: '900',
         color: COLORS.background,
         marginBottom: SPACING.xs,
