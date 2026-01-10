@@ -332,16 +332,29 @@ export function AdvancedFootballScreen() {
         const groupedStandings: { [key: string]: FootballStanding[] } = {};
         standings.forEach(s => {
             let groupName = s.stage_name || 'League Table';
+
+            // Normalize variations
+            if (groupName === 'League Stage' || groupName === 'League Phase') {
+                groupName = 'League Table';
+            }
+
             const specificGroup = (s as any).group || (s as any).league_group;
             const round = s.league_round;
 
-            if (groupName === 'Group Stage' || groupName === 'League Table') {
-                if (specificGroup) {
-                    groupName = specificGroup;
-                } else if (round && round.length < 20) {
+            // Priority 1: Specific Group found in hidden fields
+            if (specificGroup) {
+                groupName = specificGroup;
+            }
+            // Priority 2: Use Round Logic
+            else if (round && round.length < 25) {
+                if (groupName === 'Group Stage' || groupName === 'League Table') {
                     groupName = round;
+                } else if (round !== groupName && !groupName.includes(round)) {
+                    // Concatenate for cases like "League A" + "Group 1"
+                    groupName = `${groupName} - ${round}`;
                 }
             }
+
             groupName = groupName.trim();
 
             if (!groupedStandings[groupName]) {
@@ -349,6 +362,11 @@ export function AdvancedFootballScreen() {
             }
             groupedStandings[groupName].push(s);
         });
+
+        // Remove generic "Group Stage" if specific groups exist
+        if (Object.keys(groupedStandings).length > 1 && groupedStandings['Group Stage']) {
+            delete groupedStandings['Group Stage'];
+        }
 
         const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
             name,

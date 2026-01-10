@@ -110,37 +110,46 @@ export default function LeagueDetailPage() {
             }
 
             const groupedStandings: { [key: string]: FootballStanding[] } = {};
+            const processedGroups = new Set<string>();
 
             rawStandings.forEach(s => {
                 // Try to find the most specific group name
-                // "stage_name" is often "Group A", "Group B" etc.
-                // But sometimes it's just "Group Stage", so we check hidden fields "group" or "league_group"
-                // Determine the most specific group name possible
                 let groupName = s.stage_name || 'League Table';
+
+                // Normalize variations
+                if (groupName === 'League Stage' || groupName === 'League Phase') {
+                    groupName = 'League Table';
+                }
+
                 const specificGroup = (s as any).group || (s as any).league_group;
                 const round = s.league_round;
 
-                // If the stage name is generic, try to find a more specific one
-                if (groupName === 'Group Stage' || groupName === 'League Table') {
-                    if (specificGroup) {
-                        groupName = specificGroup;
-                    } else if (round && round.length < 20) {
-                        // Use round if it looks like a group name (e.g. "Group A" vs "Regular Season - Week 1")
-                        groupName = round;
+                // Priority 1: Specific Group found in hidden fields
+                if (specificGroup) {
+                    groupName = specificGroup;
+                }
+                // Priority 2: Use Round Logic
+                else if (round && round.length < 25) {
+                    if (groupName === 'Group Stage' || groupName === 'League Table') {
+                         groupName = round;
+                    } else if (round !== groupName && !groupName.includes(round)) {
+                         // Concatenate for cases like "League A" + "Group 1"
+                         groupName = `${groupName} - ${round}`;
                     }
                 }
 
-                // Capitalize first letter if needed or clean up
                 groupName = groupName.trim();
-
-                // If specific group exists and is not already part of the name, append it for clarity?
-                // Actually, usually specificGroup IS the name we want (e.g. "Group A")
 
                 if (!groupedStandings[groupName]) {
                     groupedStandings[groupName] = [];
                 }
                 groupedStandings[groupName].push(s);
             });
+
+            // Remove generic "Group Stage" if specific groups exist
+            if (Object.keys(groupedStandings).length > 1 && groupedStandings['Group Stage']) {
+                delete groupedStandings['Group Stage'];
+            }
 
             // Convert to array and sort groups
             const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
@@ -346,12 +355,19 @@ export default function LeagueDetailPage() {
                     )}
                     <View style={styles.headerText}>
                         <Text style={styles.leagueName}>{league.league_name}</Text>
-                        <View style={styles.countryInfo}>
+                        <Pressable
+                            style={styles.countryInfo}
+                            onPress={() => {
+                                if (league.country_key) {
+                                    router.push(`/home/football/countries/${league.country_key}` as any);
+                                }
+                            }}
+                        >
                             {league.country_logo && (
                                 <Image source={{ uri: league.country_logo }} style={styles.countryFlag} />
                             )}
                             <Text style={styles.countryName}>{league.country_name}</Text>
-                        </View>
+                        </Pressable>
                     </View>
                 </View>
             </View>
