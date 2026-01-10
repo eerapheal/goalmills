@@ -22,25 +22,32 @@ export default function FootballTeamsPage() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        loadTeams();
-    }, []);
-
-    useEffect(() => {
-        if (searchQuery.trim() === '') {
-            setFilteredTeams(teams);
-        } else {
-            const filtered = teams.filter((team) =>
-                team.team_name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredTeams(filtered);
-        }
-    }, [searchQuery, teams]);
+        const timer = setTimeout(() => {
+            loadTeams();
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     const loadTeams = async () => {
         try {
-            const response = await advancedFootballApi.getTeams();
-            setTeams(response.result);
-            setFilteredTeams(response.result);
+            setLoading(true);
+            console.log('🔄 Mobile: Searching teams for', searchQuery);
+
+            let response;
+            if (searchQuery.trim() === '') {
+                // Fetch teams from major leagues as default
+                response = await advancedFootballApi.getTeams({ leagueId: 152 }); // Premier League
+            } else {
+                response = await advancedFootballApi.getTeams({ teamName: searchQuery });
+            }
+
+            if (response.result) {
+                setTeams(response.result);
+                setFilteredTeams(response.result);
+            } else {
+                setTeams([]);
+                setFilteredTeams([]);
+            }
         } catch (error) {
             console.error('Error loading teams:', error);
         } finally {

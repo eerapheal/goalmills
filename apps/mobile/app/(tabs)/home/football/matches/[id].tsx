@@ -29,7 +29,10 @@ export default function FootballMatchDetailsPage() {
     const [event, setEvent] = useState<FootballEvent | null>(null);
     const [odds, setOdds] = useState<FootballOdds | null>(null);
     const [comments, setComments] = useState<FootballComment[]>([]);
-    const [activeTab, setActiveTab] = useState<'overview' | 'stats' | 'lineups' | 'odds' | 'commentary'>('overview');
+    const [h2h, setH2h] = useState<FootballH2HResponse['result'] | null>(null);
+    const [probabilities, setProbabilities] = useState<FootballProbability | null>(null);
+    const [activeTab, setActiveTab] = useState<'overview' | 'stats' | 'lineups' | 'odds' | 'commentary' | 'h2h' | 'probabilities'>('overview');
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         loadMatchData();
@@ -37,39 +40,58 @@ export default function FootballMatchDetailsPage() {
 
     const loadMatchData = async () => {
         try {
+            if (!refreshing) setLoading(true);
             const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 7);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 7);
+            const past = new Date(today);
+            past.setDate(past.getDate() - 30);
+            const future = new Date(today);
+            future.setDate(future.getDate() + 30);
 
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
-            const [fixturesRes, oddsRes, commentsRes] = await Promise.all([
+            console.log('🔄 Mobile: Loading match details for', id);
+
+            const [fixturesRes, oddsRes, commentsRes, probabilitiesRes] = await Promise.all([
                 advancedFootballApi.getFixtures({
-                    from: formatDate(yesterday),
-                    to: formatDate(tomorrow),
+                    from: formatDate(past),
+                    to: formatDate(future),
                     matchId: Number(id),
-                }),
-                advancedFootballApi.getOdds({ matchId: Number(id) }),
-                advancedFootballApi.getComments({ matchId: Number(id) }),
+                }).catch(() => ({ result: [] })),
+                advancedFootballApi.getOdds({ matchId: Number(id) }).catch(() => ({ result: {} })),
+                advancedFootballApi.getComments({ matchId: Number(id) }).catch(() => ({ result: {} })),
+                advancedFootballApi.getProbabilities({ matchId: Number(id) }).catch(() => ({ result: [] })),
             ]);
 
-            if (fixturesRes.result.length > 0) {
-                setEvent(fixturesRes.result[0]);
+            if (fixturesRes.result && fixturesRes.result.length > 0) {
+                const foundEvent = fixturesRes.result[0];
+                setEvent(foundEvent);
+
+                // Fetch H2H using team IDs from found event
+                if (foundEvent.home_team_key && foundEvent.away_team_key) {
+                    const h2hRes = await advancedFootballApi.getH2H(
+                        Number(foundEvent.home_team_key),
+                        Number(foundEvent.away_team_key)
+                    ).catch(() => null);
+                    if (h2hRes) setH2h(h2hRes.result);
+                }
             }
 
-            if (oddsRes.result[id]) {
+            if (oddsRes.result && oddsRes.result[id]) {
                 setOdds(oddsRes.result[id][0]);
             }
 
-            if (commentsRes.result[id]) {
+            if (commentsRes.result && commentsRes.result[id]) {
                 setComments(commentsRes.result[id]);
+            }
+
+            if (probabilitiesRes.result && probabilitiesRes.result.length > 0) {
+                setProbabilities(probabilitiesRes.result[0]);
             }
         } catch (error) {
             console.error('Error loading match data:', error);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -300,12 +322,75 @@ export default function FootballMatchDetailsPage() {
         </View>
     );
 
+    const renderH2H = () => (
+        <View style={styles.section}>
+            {h2h ? (
+                <>
+                    <Text style={styles.sectionTitle}>🤝 Head to Head</Text>
+                    {h2h.H2H.map((match: FootballEvent, index: number) => (
+                        <View key={index} style={styles.h2hRow}>
+                            <Text style={styles.h2hDate}>{match.event_date}</Text>
+                            <View style={styles.h2hTeams}>
+                                <Text style={styles.h2hTeamName}>{match.event_home_team}</Text>
+                                <Text style={styles.h2hScore}>{match.event_final_result}</Text>
+                                <Text style={styles.h2hTeamName}>{match.event_away_team}</Text>
+                            </View>
+                        </View>
+                    ))}
+                </>
+            ) : (
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyText}>No H2H data available</Text>
+                </View>
+            )}
+        </View>
+    );
+
+    const renderProbabilities = () => (
+        <View style={styles.section}>
+            {probabilities ? (
+                <>
+                    <Text style={styles.sectionTitle}>🎯 Match Probabilities</Text>
+                    <View style={styles.probContainer}>
+                        <View style={styles.probRow}>
+                            <Text style={styles.probLabel}>Home Win</Text>
+                            <View style={styles.probBarContainer}>
+                                <View style={[styles.probBar, { width: `${probabilities.event_probability_home}%`, backgroundColor: COLORS.primary }]} />
+                            </View>
+                            <Text style={styles.probValue}>{probabilities.event_probability_home}%</Text>
+                        </View>
+                        <View style={styles.probRow}>
+                            <Text style={styles.probLabel}>Draw</Text>
+                            <View style={styles.probBarContainer}>
+                                <View style={[styles.probBar, { width: `${probabilities.event_probability_draw}%`, backgroundColor: COLORS.secondary }]} />
+                            </View>
+                            <Text style={styles.probValue}>{probabilities.event_probability_draw}%</Text>
+                        </View>
+                        <View style={styles.probRow}>
+                            <Text style={styles.probLabel}>Away Win</Text>
+                            <View style={styles.probBarContainer}>
+                                <View style={[styles.probBar, { width: `${probabilities.event_probability_away}%`, backgroundColor: COLORS.danger }]} />
+                            </View>
+                            <Text style={styles.probValue}>{probabilities.event_probability_away}%</Text>
+                        </View>
+                    </View>
+                </>
+            ) : (
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyText}>No probabilities available</Text>
+                </View>
+            )}
+        </View>
+    );
+
     const tabs = [
         { id: 'overview' as const, label: 'Overview' },
         { id: 'stats' as const, label: 'Stats' },
         { id: 'lineups' as const, label: 'Lineups' },
-        { id: 'odds' as const, label: 'Odds' },
         { id: 'commentary' as const, label: 'Commentary' },
+        { id: 'h2h' as const, label: 'H2H' },
+        { id: 'probabilities' as const, label: 'Predictions' },
+        { id: 'odds' as const, label: 'Odds' },
     ];
 
     return (
@@ -395,6 +480,8 @@ export default function FootballMatchDetailsPage() {
                 {activeTab === 'lineups' && renderLineups()}
                 {activeTab === 'odds' && renderOdds()}
                 {activeTab === 'commentary' && renderCommentary()}
+                {activeTab === 'h2h' && renderH2H()}
+                {activeTab === 'probabilities' && renderProbabilities()}
             </ScrollView>
         </View>
     );
@@ -720,5 +807,68 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: FONT_SIZES.md,
         color: COLORS.textLight,
+    },
+    h2hRow: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        padding: SPACING.md,
+        borderRadius: BORDER_RADIUS.md,
+        marginBottom: SPACING.sm,
+    },
+    h2hDate: {
+        fontSize: FONT_SIZES.xs,
+        color: COLORS.textLight,
+        marginBottom: SPACING.xs,
+    },
+    h2hTeams: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    h2hTeamName: {
+        flex: 1,
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.background,
+        fontWeight: '600',
+    },
+    h2hScore: {
+        fontSize: FONT_SIZES.md,
+        fontWeight: '800',
+        color: COLORS.secondary,
+        paddingHorizontal: SPACING.md,
+    },
+    probContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        padding: SPACING.lg,
+        borderRadius: BORDER_RADIUS.lg,
+    },
+    probRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
+    },
+    probLabel: {
+        width: 80,
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.background,
+        fontWeight: '600',
+    },
+    probBarContainer: {
+        flex: 1,
+        height: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: 4,
+        marginHorizontal: SPACING.md,
+        overflow: 'hidden',
+    },
+    probBar: {
+        height: '100%',
+        borderRadius: 4,
+    },
+    probValue: {
+        width: 40,
+        fontSize: FONT_SIZES.sm,
+        fontWeight: '700',
+        color: COLORS.secondary,
+        textAlign: 'right',
     },
 });

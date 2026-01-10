@@ -182,7 +182,7 @@ export interface FootballLeague {
 export interface FootballTeam {
   team_key: string;
   team_name: string;
-  team_logo: string;
+  team_logo?: string;
   players?: FootballPlayer[];
 }
 

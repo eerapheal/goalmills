@@ -49,15 +49,59 @@ export function AdvancedFootballScreen() {
     const [videos, setVideos] = useState<FootballVideo[]>([]);
     const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
-    const loadData = async () => {
+    // League rankings for sorting (Advanced) - Synced with Web App
+    const leagueRankings: { [key: string]: number } = {
+        '152': 100, // Premier League
+        '302': 95,  // La Liga
+        '175': 90,  // Bundesliga
+        '207': 85,  // Serie A
+        '168': 80,  // Ligue 1
+        '3': 110,   // UEFA Champions League
+        '4': 75,    // UEFA Europa League
+        '683': 70,  // UEFA Conference League
+        '28': 65,   // World Cup
+        '6': 60,    // Euro Championship
+        '262': 55,  // Eredivisie (Netherlands)
+        '322': 50,  // Liga Portugal
+        '12': 45,   // FA Cup
+        '141': 40,  // Championship (England)
+        '10': 35,   // Copa America
+        '343': 30,  // Brazilian Serie A
+        '31': 25,   // MLS
+    };
+
+    const sortByRankAndDate = (a: FootballEvent, b: FootballEvent, ascending: boolean = true) => {
+        const rankA = leagueRankings[a.league_key] || 0;
+        const rankB = leagueRankings[b.league_key] || 0;
+
+        if (rankB !== rankA) return rankB - rankA;
+
+        const dateA = new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime();
+        const dateB = new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime();
+        return ascending ? dateA - dateB : dateB - dateA;
+    };
+
+    const [matchFilterLeagueId, setMatchFilterLeagueId] = useState<number | null>(null);
+    const [isRefreshingMatches, setIsRefreshingMatches] = useState(false);
+
+    const loadData = async (filterLeagueId: number | null = null) => {
         try {
+            if (!refreshing && !isRefreshingMatches) setLoading(true);
             const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 7);
+            const past = new Date(today);
+            past.setDate(past.getDate() - 7); // Default to 7 days for global
+            const future = new Date(today);
+            future.setDate(future.getDate() + 7); // Default to 7 days for global
+
+            // If league filtered, use wider range
+            if (filterLeagueId) {
+                past.setDate(past.getDate() - 30);
+                future.setDate(future.getDate() + 30);
+            }
 
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
+            console.log(`🔄 Mobile: Loading football data${filterLeagueId ? ` for League ${filterLeagueId}` : ''}...`);
 
             const [
                 livescoreRes,
@@ -69,76 +113,185 @@ export function AdvancedFootballScreen() {
                 posts,
                 videosRes,
             ] = await Promise.all([
-                advancedFootballApi.getLivescore(),
+                advancedFootballApi.getLivescore({
+                    leagueId: filterLeagueId || undefined
+                }).catch(() => ({ result: [] })),
                 advancedFootballApi.getFixtures({
-                    from: formatDate(yesterday),
-                    to: formatDate(tomorrow),
-                }),
-                advancedFootballApi.getStandings(152), // Premier League
-                advancedFootballApi.getTopscorers(152),
-                advancedFootballApi.getLeagues(),
-                advancedFootballApi.getTeams(),
-                advancedFootballApi.getBlogPosts(),
-                advancedFootballApi.getVideos(),
+                    from: formatDate(past),
+                    to: formatDate(future),
+                    leagueId: filterLeagueId || undefined
+                }).catch(() => ({ result: [] })),
+                advancedFootballApi.getStandings(filterLeagueId || 152).catch(() => ({ result: { total: [] } })),
+                advancedFootballApi.getTopscorers(filterLeagueId || 152).catch(() => ({ result: [] })),
+                advancedFootballApi.getLeagues().catch(() => ({ result: [] })),
+                advancedFootballApi.getTeams({ leagueId: filterLeagueId || 152 }).catch(() => ({ result: [] })),
+                advancedFootballApi.getBlogPosts().catch(() => []),
+                advancedFootballApi.getVideos().catch(() => ({ result: [] })),
             ]);
 
-            setLiveEvents(livescoreRes.result);
+            setLiveEvents(livescoreRes.result || []);
 
-            // Filter upcoming and finished from fixtures
+            // Process Fixtures
+            let fixtures = fixturesRes.result || [];
+
+            // If not filtering by league, and global fixtures are few, fetch top leagues
+            if (!filterLeagueId && fixtures.length < 20) {
+                const topLeagues = [152, 302, 175, 207, 168, 3]; // EPL, La Liga, Bunesliga, Serie A, Ligue 1, UCL
+                const topFixturesPromises = topLeagues.map(id =>
+                    advancedFootballApi.getFixtures({
+                        from: formatDate(past),
+                        to: formatDate(future),
+                        leagueId: id
+                    }).catch(() => ({ result: [] }))
+                );
+                const responses = await Promise.all(topFixturesPromises);
+                responses.forEach(res => {
+                    if (res.result) fixtures = [...fixtures, ...res.result];
+                });
+
+                // Remove duplicates
+                const matchMap = new Map();
+                fixtures.forEach(f => matchMap.set(f.event_key, f));
+                fixtures = Array.from(matchMap.values());
+            }
+
             const now = new Date();
-            const upcoming = fixturesRes.result.filter((e) => {
-                const eventDate = new Date(`${e.event_date} ${e.event_time}`);
-                return eventDate > now && e.event_status === 'Not Started';
+            const upcoming = fixtures.filter((e: FootballEvent) => {
+                const status = e.event_status?.toLowerCase();
+                const isFinished = status === 'finished' || e.event_status === 'FT' || e.event_status === 'AET' || e.event_status === 'AP';
+                return !isFinished;
             });
-            const finished = fixturesRes.result.filter((e) => e.event_status === 'Finished');
-
-            // League rankings for sorting
-            const leagueRankings: { [key: string]: number } = {
-                '152': 100, // Premier League
-                '302': 95,  // La Liga
-                '175': 90,  // Bundesliga
-                '207': 85,  // Serie A
-                '3': 80,    // UEFA Champions League
-                '168': 75,  // Ligue 1
-            };
-
-            // Sort upcoming by league ranking
-            upcoming.sort((a, b) => {
-                const rankA = leagueRankings[a.league_key] || 0;
-                const rankB = leagueRankings[b.league_key] || 0;
-                return rankB - rankA;
+            const finished = fixtures.filter((e: FootballEvent) => {
+                const status = e.event_status?.toLowerCase();
+                return status === 'finished' || e.event_status === 'FT' || e.event_status === 'AET' || e.event_status === 'AP';
             });
 
-            // Sort finished matches by league ranking
-            finished.sort((a, b) => {
-                const rankA = leagueRankings[a.league_key] || 0;
-                const rankB = leagueRankings[b.league_key] || 0;
-                return rankB - rankA;
+            upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
+            finished.sort((a, b) => sortByRankAndDate(a, b, false));
+
+            setUpcomingEvents(upcoming);
+            setFinishedEvents(finished);
+
+            // Intelligent Team & Logo Merging
+            const teamMap = new Map<string, FootballTeam>();
+            if (teamsRes?.result) {
+                teamsRes.result.forEach((t: FootballTeam) => teamMap.set(String(t.team_key), t));
+            }
+
+            // Extract logos from fixtures for missing teams
+            fixtures.forEach((f: FootballEvent) => {
+                const homeKey = String(f.home_team_key);
+                const awayKey = String(f.away_team_key);
+
+                if (!teamMap.has(homeKey)) {
+                    teamMap.set(homeKey, { team_key: homeKey, team_name: f.event_home_team, team_logo: f.home_team_logo || undefined } as FootballTeam);
+                } else if (!teamMap.get(homeKey)?.team_logo) {
+                    const existing = teamMap.get(homeKey)!;
+                    existing.team_logo = f.home_team_logo || undefined;
+                }
+
+                if (!teamMap.has(awayKey)) {
+                    teamMap.set(awayKey, { team_key: awayKey, team_name: f.event_away_team, team_logo: f.away_team_logo || undefined } as FootballTeam);
+                } else if (!teamMap.get(awayKey)?.team_logo) {
+                    const existing = teamMap.get(awayKey)!;
+                    existing.team_logo = f.away_team_logo || undefined;
+                }
             });
 
-            setUpcomingEvents(upcoming.slice(0, 15));
-            setFinishedEvents(finished.slice(0, 15));
-            setStandings(standingsRes.result.total);
-            setTopscorers(topscorersRes.result);
-            setLeagues(leaguesRes.result);
-            setTeams(teamsRes.result);
-            setBlogPosts(posts);
-            setVideos(videosRes.result);
+            const finalTeams = Array.from(teamMap.values());
+            setTeams(finalTeams);
+
+            // Process Standings (Filtering for main stage)
+            const rawStandings = standingsRes.result?.total || [];
+            setStandings(rawStandings.slice(0, 20));
+
+            // Process Top Scorers
+            setTopscorers(topscorersRes.result || []);
+
+            setLeagues(leaguesRes.result || []);
+            setBlogPosts(posts || []);
+            setVideos(videosRes.result || []);
+
+            console.log('✅ Mobile football data loaded');
         } catch (error) {
-            console.error('Error loading football data:', error);
+            console.error('❌ Mobile Error loading football data:', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
+            setIsRefreshingMatches(false);
         }
+    };
+
+    const handleLeagueFilter = async (leagueId: number | null) => {
+        setMatchFilterLeagueId(leagueId);
+        setIsRefreshingMatches(true);
+        await loadData(leagueId);
+    };
+
+    const renderLeagueSelector = () => {
+        const topLeagues = [
+            { id: null, name: 'All', icon: '🏟️' },
+            { id: 152, name: 'EPL', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+            { id: 302, name: 'La Liga', icon: '🇪🇸' },
+            { id: 175, name: 'Bundesliga', icon: '🇩🇪' },
+            { id: 207, name: 'Serie A', icon: '🇮🇹' },
+            { id: 168, name: 'Ligue 1', icon: '🇫🇷' },
+            { id: 3, name: 'UCL', icon: '⭐️' },
+        ];
+
+        return (
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.leagueSelector}
+                contentContainerStyle={styles.leagueSelectorContent}
+            >
+                {topLeagues.map((league) => (
+                    <Pressable
+                        key={String(league.id)}
+                        onPress={() => handleLeagueFilter(league.id)}
+                        style={[
+                            styles.leagueBtn,
+                            matchFilterLeagueId === league.id && styles.activeLeagueBtn
+                        ]}
+                    >
+                        <Text style={styles.leagueIcon}>{league.icon}</Text>
+                        <Text style={[
+                            styles.leagueBtnText,
+                            matchFilterLeagueId === league.id && styles.activeLeagueBtnText
+                        ]}>
+                            {league.name}
+                        </Text>
+                    </Pressable>
+                ))}
+            </ScrollView>
+        );
     };
 
     useEffect(() => {
         loadData();
     }, []);
 
+    // 45s Auto-Refresh for Live Matches
+    useEffect(() => {
+        let interval: any;
+        if (activeTab === 'live' && !loading) {
+            console.log('⏱️ Mobile: Starting live score polling (45s)...');
+            interval = setInterval(() => {
+                loadData();
+            }, 45000);
+        }
+        return () => {
+            if (interval) {
+                console.log('⏱️ Mobile: Stopping live score polling.');
+                clearInterval(interval);
+            }
+        };
+    }, [activeTab, loading]);
+
     const onRefresh = () => {
         setRefreshing(true);
-        loadData();
+        loadData(matchFilterLeagueId);
     };
 
     const tabs: { id: FootballTab; label: string; count?: number }[] = [
@@ -177,7 +330,7 @@ export function AdvancedFootballScreen() {
                     const teamLogo = getTeamLogo(standing.team_key);
                     return (
                         <Pressable
-                            key={standing.team_key}
+                            key={`standing-${standing.team_key}-${index}`}
                             style={[
                                 styles.standingsRow,
                                 index < 4 && styles.championsLeagueRow,
@@ -222,7 +375,7 @@ export function AdvancedFootballScreen() {
                     const teamLogo = getTeamLogo(scorer.team_key);
                     return (
                         <Pressable
-                            key={scorer.player_key}
+                            key={`scorer-${scorer.player_key}-${index}`}
                             style={styles.topscorerCard}
                             onPress={() => router.push(`/home/football/players/${scorer.player_key}` as any)}
                         >
@@ -272,11 +425,14 @@ export function AdvancedFootballScreen() {
             case 'live':
                 return (
                     <View style={styles.content}>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.sectionTitle}>🔴 Live Matches</Text>
+                            {renderLeagueSelector()}
+                        </View>
                         {liveEvents.length > 0 ? (
                             <>
-                                <Text style={styles.sectionTitle}>🔴 Live Matches</Text>
-                                {liveEvents.map((event) => (
-                                    <FootballMatchCard key={event.event_key} event={event} />
+                                {liveEvents.map((event, index) => (
+                                    <FootballMatchCard key={`live-${event.event_key || index}`} event={event} />
                                 ))}
                             </>
                         ) : (
@@ -292,20 +448,46 @@ export function AdvancedFootballScreen() {
             case 'upcoming':
                 return (
                     <View style={styles.content}>
-                        <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
-                        {upcomingEvents.map((event) => (
-                            <FootballMatchCard key={event.event_key} event={event} />
-                        ))}
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
+                            {renderLeagueSelector()}
+                        </View>
+                        {isRefreshingMatches ? (
+                            <ActivityIndicator color={COLORS.secondary} style={{ marginTop: 20 }} />
+                        ) : (
+                            upcomingEvents.map((event, index) => (
+                                <FootballMatchCard key={`upcoming-${event.event_key || index}`} event={event} />
+                            ))
+                        )}
+                        {upcomingEvents.length === 0 && !isRefreshingMatches && (
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyEmoji}>📅</Text>
+                                <Text style={styles.emptyText}>No upcoming matches</Text>
+                            </View>
+                        )}
                     </View>
                 );
 
             case 'results':
                 return (
                     <View style={styles.content}>
-                        <Text style={styles.sectionTitle}>✅ Recent Results</Text>
-                        {finishedEvents.map((event) => (
-                            <FootballMatchCard key={event.event_key} event={event} />
-                        ))}
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.sectionTitle}>✅ Recent Results</Text>
+                            {renderLeagueSelector()}
+                        </View>
+                        {isRefreshingMatches ? (
+                            <ActivityIndicator color={COLORS.secondary} style={{ marginTop: 20 }} />
+                        ) : (
+                            finishedEvents.map((event, index) => (
+                                <FootballMatchCard key={`finished-${event.event_key || index}`} event={event} />
+                            ))
+                        )}
+                        {finishedEvents.length === 0 && !isRefreshingMatches && (
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyEmoji}>🏁</Text>
+                                <Text style={styles.emptyText}>No recent results</Text>
+                            </View>
+                        )}
                     </View>
                 );
 
@@ -329,8 +511,8 @@ export function AdvancedFootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>📰 Latest News</Text>
-                        {blogPosts.map((post) => (
-                            <NewsCard key={post._id} item={post} onPress={() => router.push(`/news/${post._id}`)} />
+                        {blogPosts.map((post, index) => (
+                            <NewsCard key={`news-${post._id || index}`} item={post} onPress={() => router.push(`/news/${post._id}`)} />
                         ))}
                     </View>
                 );
@@ -339,9 +521,9 @@ export function AdvancedFootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>🎥 Video Highlights</Text>
-                        {videos.filter((v) => v).map((video) => (
+                        {videos.filter((v) => v).map((video, index) => (
                             <FootballVideoCard
-                                key={video.event_key}
+                                key={`video-${video.event_key || index}`}
                                 video={video}
                                 onPress={() => video.video_url && setSelectedVideo(video.video_url)}
                             />
@@ -500,6 +682,43 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingBottom: SPACING.xl,
+    },
+    contentHeader: {
+        marginBottom: SPACING.md,
+    },
+    leagueSelector: {
+        marginTop: SPACING.sm,
+        flexGrow: 0,
+    },
+    leagueSelectorContent: {
+        paddingRight: SPACING.lg,
+        gap: SPACING.sm,
+    },
+    leagueBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: SPACING.md,
+        paddingVertical: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: BORDER_RADIUS.full,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    activeLeagueBtn: {
+        backgroundColor: COLORS.secondary,
+        borderColor: COLORS.primary,
+    },
+    leagueIcon: {
+        fontSize: 16,
+        marginRight: 6,
+    },
+    leagueBtnText: {
+        color: COLORS.textLight,
+        fontSize: FONT_SIZES.xs,
+        fontWeight: 'bold',
+    },
+    activeLeagueBtnText: {
+        color: COLORS.background,
     },
     content: {
         padding: SPACING.md,

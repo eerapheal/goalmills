@@ -11,11 +11,11 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { FootballTeam, FootballPlayer, FootballEvent } from '@goalmills/types';
+import { FootballTeam, FootballPlayer, FootballEvent, FootballStanding } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 
-type TeamTab = 'squad' | 'fixtures';
+type TeamTab = 'squad' | 'fixtures' | 'results' | 'table';
 
 export default function TeamDetailPage() {
     const router = useRouter();
@@ -25,6 +25,7 @@ export default function TeamDetailPage() {
     const [team, setTeam] = useState<FootballTeam | null>(null);
     const [players, setPlayers] = useState<FootballPlayer[]>([]);
     const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
+    const [standings, setStandings] = useState<FootballStanding[]>([]);
 
     useEffect(() => {
         loadTeamData();
@@ -32,27 +33,70 @@ export default function TeamDetailPage() {
 
     const loadTeamData = async () => {
         try {
+            setLoading(true);
+            const teamId = Number(id);
             const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 7);
-            const nextWeek = new Date(today);
-            nextWeek.setDate(nextWeek.getDate() + 14);
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth(); // 0-11
 
-            const formatDate = (date: Date) => date.toISOString().split('T')[0];
+            // Determine season start year (July to June)
+            let seasonStartYear = currentYear;
+            if (currentMonth < 6) { // Jan - Jun
+                seasonStartYear = currentYear - 1;
+            }
+
+            const fromDate = `${seasonStartYear}-07-01`;
+            const toDate = `${seasonStartYear + 1}-06-30`;
+
+            console.log(`🔄 Mobile: Loading team details for ${teamId} (Season: ${seasonStartYear}/${seasonStartYear + 1})...`);
 
             const [teamsRes, playersRes, fixturesRes] = await Promise.all([
-                advancedFootballApi.getTeams({ teamId: Number(id) }),
-                advancedFootballApi.getPlayers({ teamId: Number(id) }),
+                advancedFootballApi.getTeams({ teamId }).catch(() => ({ result: [] })),
+                advancedFootballApi.getPlayers({ teamId }).catch(() => ({ result: [] })),
                 advancedFootballApi.getFixtures({
-                    from: formatDate(yesterday),
-                    to: formatDate(nextWeek),
-                    teamId: Number(id),
-                }),
+                    from: fromDate,
+                    to: toDate,
+                    teamId: teamId,
+                }).catch(() => ({ result: [] })),
             ]);
 
-            setTeam(teamsRes.result[0] || null);
-            setPlayers(playersRes.result);
-            setFixtures(fixturesRes.result);
+            const teamData = teamsRes.result[0];
+            setTeam(teamData || null);
+            setPlayers(playersRes.result || []);
+            setFixtures(fixturesRes.result || []);
+
+            // Process Standings with Intelligent Stage Handling
+            if (fixturesRes.result?.[0]?.league_key) {
+                const leagueId = Number(fixturesRes.result[0].league_key);
+                const standingsRes = await advancedFootballApi.getStandings(leagueId).catch(() => null);
+
+                if (standingsRes?.result?.total) {
+                    const rawStandings = standingsRes.result.total;
+                    const stageGroups: { [key: string]: FootballStanding[] } = {};
+
+                    if (Array.isArray(rawStandings)) {
+                        rawStandings.forEach(s => {
+                            const stageId = s.fk_stage_key || 'default';
+                            if (!stageGroups[stageId]) stageGroups[stageId] = [];
+                            stageGroups[stageId].push(s);
+                        });
+                    } else if (typeof rawStandings === 'object') {
+                        // Handle object format if returned
+                        Object.keys(rawStandings).forEach(stageName => {
+                            stageGroups[stageName] = (rawStandings as any)[stageName];
+                        });
+                    }
+
+                    let bestStage: FootballStanding[] = [];
+                    Object.values(stageGroups).forEach(stageTeams => {
+                        if (stageTeams.length > bestStage.length) {
+                            bestStage = stageTeams;
+                        }
+                    });
+
+                    setStandings(bestStage);
+                }
+            }
         } catch (error) {
             console.error('Error loading team data:', error);
         } finally {
@@ -86,6 +130,35 @@ export default function TeamDetailPage() {
         return acc;
     }, {} as { [key: string]: FootballPlayer[] });
 
+    const renderStandingsTable = () => (
+        <View style={styles.standingsTable}>
+            <View style={styles.standingsHeader}>
+                <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
+                <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
+                <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
+                <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
+            </View>
+            {standings.map((standing, index) => (
+                <View
+                    key={standing.team_key}
+                    style={[
+                        styles.standingsRow,
+                        String(standing.team_key) === String(id) && styles.highlightedRow,
+                    ]}
+                >
+                    <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
+                    <Text style={[styles.standingsText, styles.teamCol]} numberOfLines={1}>
+                        {standing.standing_team}
+                    </Text>
+                    <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
+                    <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
+                        {standing.standing_PTS}
+                    </Text>
+                </View>
+            ))}
+        </View>
+    );
+
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -103,27 +176,45 @@ export default function TeamDetailPage() {
 
             {/* Tabs */}
             <View style={styles.tabsContainer}>
-                <Pressable
-                    style={[styles.tab, activeTab === 'squad' && styles.activeTab]}
-                    onPress={() => setActiveTab('squad')}
-                >
-                    <Text style={[styles.tabText, activeTab === 'squad' && styles.activeTabText]}>
-                        Squad ({players.length})
-                    </Text>
-                </Pressable>
-                <Pressable
-                    style={[styles.tab, activeTab === 'fixtures' && styles.activeTab]}
-                    onPress={() => setActiveTab('fixtures')}
-                >
-                    <Text style={[styles.tabText, activeTab === 'fixtures' && styles.activeTabText]}>
-                        Fixtures ({fixtures.length})
-                    </Text>
-                </Pressable>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <Pressable
+                        style={[styles.tab, activeTab === 'squad' && styles.activeTab]}
+                        onPress={() => setActiveTab('squad')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'squad' && styles.activeTabText]}>
+                            Squad
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.tab, activeTab === 'fixtures' && styles.activeTab]}
+                        onPress={() => setActiveTab('fixtures')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'fixtures' && styles.activeTabText]}>
+                            Fixtures
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.tab, activeTab === 'results' && styles.activeTab]}
+                        onPress={() => setActiveTab('results')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'results' && styles.activeTabText]}>
+                            Results
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.tab, activeTab === 'table' && styles.activeTab]}
+                        onPress={() => setActiveTab('table')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'table' && styles.activeTabText]}>
+                            Table
+                        </Text>
+                    </Pressable>
+                </ScrollView>
             </View>
 
             {/* Content */}
             <ScrollView style={styles.content}>
-                {activeTab === 'squad' ? (
+                {activeTab === 'squad' && (
                     <View style={styles.section}>
                         {Object.entries(groupedPlayers).map(([position, positionPlayers]) => (
                             <View key={position} style={styles.positionGroup}>
@@ -166,14 +257,56 @@ export default function TeamDetailPage() {
                             </View>
                         )}
                     </View>
-                ) : (
+                )}
+                {activeTab === 'fixtures' && (
                     <View style={styles.section}>
-                        {fixtures.map((event) => (
-                            <FootballMatchCard key={event.event_key} event={event} />
-                        ))}
-                        {fixtures.length === 0 && (
+                        {fixtures
+                            .filter(f => {
+                                const status = f.event_status?.toLowerCase();
+                                return status !== 'finished' && f.event_status !== 'FT' && f.event_status !== 'AET' && f.event_status !== 'AP';
+                            })
+                            .sort((a, b) => new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime() - new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime())
+                            .map((event, index) => (
+                                <FootballMatchCard key={`fixture-${event.event_key || index}`} event={event} />
+                            ))}
+                        {fixtures.filter(f => {
+                            const status = f.event_status?.toLowerCase();
+                            return status !== 'finished' && f.event_status !== 'FT' && f.event_status !== 'AET' && f.event_status !== 'AP';
+                        }).length === 0 && (
+                                <View style={styles.emptyState}>
+                                    <Text style={styles.emptyText}>No upcoming matches available</Text>
+                                </View>
+                            )}
+                    </View>
+                )}
+                {activeTab === 'results' && (
+                    <View style={styles.section}>
+                        {fixtures
+                            .filter(f => {
+                                const status = f.event_status?.toLowerCase();
+                                return status === 'finished' || f.event_status === 'FT' || f.event_status === 'AET' || f.event_status === 'AP';
+                            })
+                            .sort((a, b) => new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime() - new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime())
+                            .map((event, index) => (
+                                <FootballMatchCard key={`result-${event.event_key || index}`} event={event} />
+                            ))}
+                        {fixtures.filter(f => {
+                            const status = f.event_status?.toLowerCase();
+                            return status === 'finished' || f.event_status === 'FT' || f.event_status === 'AET' || f.event_status === 'AP';
+                        }).length === 0 && (
+                                <View style={styles.emptyState}>
+                                    <Text style={styles.emptyText}>No past results available</Text>
+                                </View>
+                            )}
+                    </View>
+                )}
+                {activeTab === 'table' && (
+                    <View style={styles.section}>
+                        {standings.length > 0 ? (
+                            renderStandingsTable()
+                        ) : (
                             <View style={styles.emptyState}>
-                                <Text style={styles.emptyText}>No fixtures available</Text>
+                                <Text style={styles.emptyText}>No table data available</Text>
                             </View>
                         )}
                     </View>
@@ -237,17 +370,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     tabsContainer: {
-        flexDirection: 'row',
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255, 255, 255, 0.1)',
     },
     tab: {
-        flex: 1,
+        paddingHorizontal: SPACING.lg,
         paddingVertical: SPACING.md,
         alignItems: 'center',
         borderBottomWidth: 3,
         borderBottomColor: 'transparent',
+        minWidth: 100,
     },
     activeTab: {
         borderBottomColor: COLORS.secondary,
@@ -343,4 +476,42 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.md,
         color: COLORS.textLight,
     },
+    standingsTable: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: BORDER_RADIUS.lg,
+        overflow: 'hidden',
+    },
+    standingsHeader: {
+        flexDirection: 'row',
+        padding: SPACING.md,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    standingsHeaderText: {
+        fontSize: FONT_SIZES.xs,
+        fontWeight: '800',
+        color: COLORS.secondary,
+        textTransform: 'uppercase',
+    },
+    standingsRow: {
+        flexDirection: 'row',
+        padding: SPACING.md,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        alignItems: 'center',
+    },
+    highlightedRow: {
+        backgroundColor: 'rgba(184, 158, 24, 0.15)',
+    },
+    standingsText: {
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.background,
+        fontWeight: '600',
+    },
+    posCol: { width: 30 },
+    teamCol: { flex: 1 },
+    statCol: { width: 40, textAlign: 'center' },
+    ptsCol: { width: 50, textAlign: 'right' },
+    ptsValue: { color: COLORS.secondary, fontWeight: '800' },
 });

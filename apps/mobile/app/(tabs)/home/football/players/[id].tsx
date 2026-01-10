@@ -86,10 +86,13 @@ export default function PlayerDetailPage() {
                 <Text style={styles.sectionTitle}>ℹ️ Player Information</Text>
                 <View style={styles.infoGrid}>
                     {player.team_name && (
-                        <View style={styles.infoItem}>
+                        <Pressable
+                            style={styles.infoItem}
+                            onPress={() => router.push(`/home/football/teams/${player.team_key}` as any)}
+                        >
                             <Text style={styles.infoLabel}>Team</Text>
-                            <Text style={styles.infoValue}>{player.team_name}</Text>
-                        </View>
+                            <Text style={[styles.infoValue, { color: COLORS.secondary }]}>{player.team_name}</Text>
+                        </Pressable>
                     )}
                     {player.player_type && (
                         <View style={styles.infoItem}>

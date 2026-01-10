@@ -75,7 +75,7 @@ export function FootballScreen() {
             // Process Finished (Filter FT)
             if (finishedRes.success) {
                 const finished = finishedRes.result
-                    .filter(e => e.event_status === 'Finished' || e.event_status === 'FT')
+                    .filter(e => e.event_status === 'Finished' || e.event_status === 'FT' || e.event_status === 'AET' || e.event_status === 'AP')
                     .slice(0, 15)
                     .map(mapEventToFixture);
                 setFinishedFixtures(finished);

@@ -12,8 +12,11 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
     const router = useRouter();
 
     const isLive = event.event_live === '1';
-    const isFinished = event.event_status === 'Finished';
-    const isUpcoming = event.event_status === 'Not Started';
+    const isFinished = event.event_status?.toLowerCase() === 'finished' ||
+        event.event_status === 'FT' ||
+        event.event_status === 'AET' ||
+        event.event_status === 'AP';
+    const isUpcoming = !isLive && !isFinished;
 
     // Mock odds for live and upcoming matches - use useMemo to prevent regeneration
     const mockOdds = useMemo(() => ({
@@ -29,9 +32,10 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
             }
             return 'LIVE';
         }
-        if (isFinished) return 'FT';
-        if (isUpcoming) return event.event_time;
-        return event.event_status;
+        if (isFinished) {
+            return event.event_status === 'Finished' ? 'FT' : event.event_status;
+        }
+        return event.event_time || event.event_status;
     };
 
     const getScoreDisplay = () => {
@@ -104,8 +108,11 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
                         <Text style={styles.statusText}>{getStatusDisplay()}</Text>
                     </View>
                     <Text style={[styles.score, isLive && styles.liveScore]}>
-                        {getScoreDisplay()}
+                        {isLive ? (event.event_final_result || getScoreDisplay()) : getScoreDisplay()}
                     </Text>
+                    {!isLive && event.event_date && (
+                        <Text style={styles.matchDateText}>{event.event_date}</Text>
+                    )}
                 </View>
 
                 {/* Away Team */}
@@ -167,7 +174,7 @@ const styles = StyleSheet.create({
     leagueInfo: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between', 
+        justifyContent: 'space-between',
         marginBottom: SPACING.xs,
         paddingBottom: SPACING.xs,
         borderBottomWidth: 1,
@@ -253,6 +260,11 @@ const styles = StyleSheet.create({
     },
     liveScore: {
         color: COLORS.danger,
+    },
+    matchDateText: {
+        fontSize: 8,
+        color: COLORS.textLight,
+        fontWeight: '500',
     },
     oddsContainer: {
         flexDirection: 'row',

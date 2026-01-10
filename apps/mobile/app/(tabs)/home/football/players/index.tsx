@@ -23,27 +23,32 @@ export default function FootballPlayersPage() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        loadPlayers();
-    }, []);
-
-    useEffect(() => {
-        if (searchQuery.trim() === '') {
-            setFilteredPlayers(players);
-        } else {
-            const filtered = players.filter(
-                (player) =>
-                    player.player_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    player.team_name?.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredPlayers(filtered);
-        }
-    }, [searchQuery, players]);
+        const timer = setTimeout(() => {
+            loadPlayers();
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     const loadPlayers = async () => {
         try {
-            const response = await advancedFootballApi.getPlayers();
-            setPlayers(response.result);
-            setFilteredPlayers(response.result);
+            setLoading(true);
+            console.log('🔄 Mobile: Searching players for', searchQuery);
+
+            let response;
+            if (searchQuery.trim() === '') {
+                // Default to some major players/teams if empty
+                response = await advancedFootballApi.getPlayers({ teamId: 102 }); // Real Madrid
+            } else {
+                response = await advancedFootballApi.getPlayers({ playerName: searchQuery });
+            }
+
+            if (response.result) {
+                setPlayers(response.result);
+                setFilteredPlayers(response.result);
+            } else {
+                setPlayers([]);
+                setFilteredPlayers([]);
+            }
         } catch (error) {
             console.error('Error loading players:', error);
         } finally {
