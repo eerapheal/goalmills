@@ -263,7 +263,16 @@ export default function TeamDetailPage() {
                         {fixtures
                             .filter(f => {
                                 const status = f.event_status?.toLowerCase();
-                                return status !== 'finished' && f.event_status !== 'FT' && f.event_status !== 'AET' && f.event_status !== 'AP';
+                                const isFinished = status === 'finished' || f.event_status === 'FT' || f.event_status === 'AET' || f.event_status === 'AP';
+                                if (isFinished) return false;
+
+                                // Filter for next 90 days
+                                const eventDate = new Date(`${f.event_date} ${f.event_time || '00:00'}`);
+                                const now = new Date();
+                                now.setHours(0, 0, 0, 0); // Start of today
+                                const dayDiff = (eventDate.getTime() - now.getTime()) / (1000 * 3600 * 24);
+
+                                return dayDiff >= 0 && dayDiff <= 90;
                             })
                             .sort((a, b) => new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime() - new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime())
                             .map((event, index) => (

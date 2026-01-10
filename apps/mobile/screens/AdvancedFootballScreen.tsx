@@ -7,7 +7,6 @@ import {
     Pressable,
     ActivityIndicator,
     RefreshControl,
-
     Image,
     Linking,
 } from 'react-native';
@@ -222,7 +221,7 @@ export function AdvancedFootballScreen() {
 
             // Process Standings (Filtering for main stage)
             const rawStandings = standingsRes.result?.total || [];
-            setStandings(rawStandings.slice(0, 20));
+            setStandings(rawStandings);
 
             // Process Top Scorers
             setTopscorers(topscorersRes.result || []);
@@ -324,59 +323,103 @@ export function AdvancedFootballScreen() {
     ];
 
     const renderStandingsTable = () => {
-        // ... existing implementation ...
         const getTeamLogo = (teamKey: string) => {
-            const team = teams.find(t => t.team_key === teamKey);
+            const team = teams.find(t => String(t.team_key) === String(teamKey));
             return team?.team_logo;
         };
 
-        return (
-            <View style={styles.standingsTable}>
-                {/* Header */}
-                <View style={styles.standingsHeader}>
-                    <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
-                    <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
-                    <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
-                </View>
+        // Group Standings Logic
+        const groupedStandings: { [key: string]: FootballStanding[] } = {};
+        standings.forEach(s => {
+            let groupName = s.stage_name || 'League Table';
+            const specificGroup = (s as any).group || (s as any).league_group;
+            const round = s.league_round;
 
-                {/* Rows */}
-                {standings.map((standing, index) => {
-                    const teamLogo = getTeamLogo(standing.team_key);
-                    return (
-                        <Pressable
-                            key={`standing-${standing.team_key}-${index}`}
-                            style={[
-                                styles.standingsRow,
-                                index < 4 && styles.championsLeagueRow,
-                                index === 4 && styles.europaLeagueRow,
-                            ]}
-                            onPress={() => router.push(`/home/football/teams/${standing.team_key}` as any)}
-                        >
-                            <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
-                            <View style={styles.teamColContainer}>
-                                {teamLogo && (
-                                    <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
-                                )}
-                                <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
-                                    {standing.standing_team}
+            if (groupName === 'Group Stage' || groupName === 'League Table') {
+                if (specificGroup) {
+                    groupName = specificGroup;
+                } else if (round && round.length < 20) {
+                    groupName = round;
+                }
+            }
+            groupName = groupName.trim();
+
+            if (!groupedStandings[groupName]) {
+                groupedStandings[groupName] = [];
+            }
+            groupedStandings[groupName].push(s);
+        });
+
+        const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
+            name,
+            teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
+        }));
+        standingsData.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+        return (
+            <View>
+                {standingsData.length === 0 ? (
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyText}>No standings available</Text>
+                    </View>
+                ) : (
+                    standingsData.map((group, groupIndex) => (
+                        <View key={`group-${groupIndex}`} style={styles.standingsTable}>
+                            {standingsData.length > 1 && (
+                                <Text style={[styles.sectionTitle, { fontSize: FONT_SIZES.md, marginBottom: SPACING.sm, marginTop: SPACING.md }]}>
+                                    {group.name}
                                 </Text>
+                            )}
+                            {/* Header */}
+                            <View style={styles.standingsHeader}>
+                                <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
+                                <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
+                                <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
                             </View>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
-                            <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
-                                {standing.standing_PTS}
-                            </Text>
-                        </Pressable>
-                    );
-                })}
+                            {/* Rows */}
+                            {group.teams.map((standing, index) => {
+                                const teamLogo = getTeamLogo(standing.team_key);
+                                return (
+                                    <Pressable
+                                        key={`${group.name}-${standing.team_key}-${index}`} // Safe Key
+                                        style={[
+                                            styles.standingsRow,
+                                            index < 4 && styles.championsLeagueRow,
+                                        ]}
+                                        onPress={() => {
+                                            if (standing.team_key) {
+                                                router.push(`/home/football/teams/${standing.team_key}` as any);
+                                            }
+                                        }}
+                                    >
+                                        <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
+                                        <View style={styles.teamColContainer}>
+                                            {teamLogo && (
+                                                <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
+                                            )}
+                                            <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
+                                                {standing.standing_team}
+                                            </Text>
+                                        </View>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
+                                        <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
+                                            {standing.standing_PTS}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
+                    ))
+                )}
             </View>
         );
     };
@@ -511,9 +554,46 @@ export function AdvancedFootballScreen() {
                 );
 
             case 'standings':
+                // Filter and sort leagues by rank (Top 70)
+                const standingsLeagues = [...leagues]
+                    .sort((a, b) => {
+                        const rankA = leagueRankings[a.league_key] || 0;
+                        const rankB = leagueRankings[b.league_key] || 0;
+                        if (rankB !== rankA) return rankB - rankA;
+                        return a.league_name.localeCompare(b.league_name);
+                    });
+
+                const top70Leagues = standingsLeagues.slice(0, 70);
+
                 return (
                     <View style={styles.content}>
-                        <Text style={styles.sectionTitle}>🏆 Premier League Standings</Text>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.sectionTitle}>🏆 Standings</Text>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                style={styles.leagueSelector}
+                                contentContainerStyle={styles.leagueSelectorContent}
+                            >
+                                {top70Leagues.map((league) => (
+                                    <Pressable
+                                        key={String(league.league_key)}
+                                        onPress={() => handleLeagueFilter(Number(league.league_key))}
+                                        style={[
+                                            styles.leagueBtn,
+                                            matchFilterLeagueId === Number(league.league_key) && styles.activeLeagueBtn
+                                        ]}
+                                    >
+                                        <Text style={[
+                                            styles.leagueBtnText,
+                                            matchFilterLeagueId === Number(league.league_key) && styles.activeLeagueBtnText
+                                        ]}>
+                                            {league.league_name}
+                                        </Text>
+                                    </Pressable>
+                                ))}
+                            </ScrollView>
+                        </View>
                         {renderStandingsTable()}
                     </View>
                 );

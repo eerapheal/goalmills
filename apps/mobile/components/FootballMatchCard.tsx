@@ -59,7 +59,11 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
                 pressed && styles.pressed,
                 isLive && styles.liveContainer,
             ]}
-            onPress={() => router.push(`/home/football/matches/${event.event_key}` as any)}
+            onPress={() => {
+                if (event.event_key) {
+                    router.push(`/home/football/matches/${String(event.event_key)}` as any);
+                }
+            }}
         >
             {/* League Info - Compact */}
             <View style={styles.leagueInfo}>
@@ -69,7 +73,9 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
                 <Pressable
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/home/football/leagues/${event.league_key}` as any);
+                        if (event.league_key) {
+                            router.push(`/home/football/leagues/${String(event.league_key)}` as any);
+                        }
                     }}
                 >
                     <Text style={styles.leagueName} numberOfLines={1}>
@@ -91,7 +97,9 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
                     style={styles.team}
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/home/football/teams/${event.home_team_key}` as any);
+                        if (event.home_team_key) {
+                            router.push(`/home/football/teams/${String(event.home_team_key)}` as any);
+                        }
                     }}
                 >
                     {event.home_team_logo && (
@@ -120,7 +128,9 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
                     style={styles.team}
                     onPress={(e) => {
                         e.stopPropagation();
-                        router.push(`/home/football/teams/${event.away_team_key}` as any);
+                        if (event.away_team_key) {
+                            router.push(`/home/football/teams/${String(event.away_team_key)}` as any);
+                        }
                     }}
                 >
                     {event.away_team_logo && (

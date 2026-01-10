@@ -24,7 +24,7 @@ export default function LeagueDetailPage() {
     const [activeTab, setActiveTab] = useState<LeagueTab>('fixtures');
     const [league, setLeague] = useState<FootballLeague | null>(null);
     const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
-    const [standings, setStandings] = useState<FootballStanding[]>([]);
+    const [standings, setStandings] = useState<{ name: string; teams: FootballStanding[] }[]>([]);
     const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
     const [teams, setTeams] = useState<FootballTeam[]>([]);
 
@@ -60,19 +60,16 @@ export default function LeagueDetailPage() {
 
             let rawFixtures = fixturesRes.result || [];
 
-            // FILTER FOR LATEST SEASON
-            // This ensures we don't show mixed seasons or old data.
-            // We find the "latest" season present in the data and filter by it.
+            let latestSeason: string | null = null;
             if (rawFixtures.length > 0) {
                 // Collect all unique seasons
                 const seasons = Array.from(new Set(rawFixtures.map(f => f.league_season).filter(s => s)));
                 if (seasons.length > 0) {
-                    // Sort seasons descending (e.g. "2025/2026" > "2024/2025", "2026" > "2025")
+                    // Sort seasons descending
                     seasons.sort((a, b) => {
-                        // Handle potential simple year vs range strings
                         return b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' });
                     });
-                    const latestSeason = seasons[0];
+                    latestSeason = seasons[0];
                     console.log(`Mobile: Filtering league ${id} for latest season: ${latestSeason}`);
                     rawFixtures = rawFixtures.filter(f => f.league_season === latestSeason);
                 }
@@ -92,41 +89,69 @@ export default function LeagueDetailPage() {
             }
             setLeague(foundLeague || null);
 
-            // Sort individual tab data precisely like web app
+            // Sort individual tab data
             setFixtures(rawFixtures);
 
-            // Process Standings with Intelligent Stage Handling (Web App Logic)
-            const rawStandings = standingsRes.result?.total || [];
-            const stageGroups: { [key: string]: FootballStanding[] } = {};
+            // Process Standings: Group by stage_name to support multi-group competitions (e.g. World Cup, UCL)
+            let rawStandings: FootballStanding[] = [];
+            const result = standingsRes.result;
+
+            if (result) {
+                if (Array.isArray(result)) {
+                    rawStandings = result;
+                } else if (result.total && Array.isArray(result.total)) {
+                    rawStandings = result.total;
+                }
+            }
+
+            // FILTER STANDINGS BY LATEST SEASON (Synced with Fixtures)
+            if (latestSeason) {
+                rawStandings = rawStandings.filter(s => s.league_season === latestSeason);
+            }
+
+            const groupedStandings: { [key: string]: FootballStanding[] } = {};
+
             rawStandings.forEach(s => {
-                const stageId = s.fk_stage_key || 'default';
-                if (!stageGroups[stageId]) stageGroups[stageId] = [];
-                stageGroups[stageId].push(s);
-            });
+                // Try to find the most specific group name
+                // "stage_name" is often "Group A", "Group B" etc.
+                // But sometimes it's just "Group Stage", so we check hidden fields "group" or "league_group"
+                // Determine the most specific group name possible
+                let groupName = s.stage_name || 'League Table';
+                const specificGroup = (s as any).group || (s as any).league_group;
+                const round = s.league_round;
 
-            let bestStage: FootballStanding[] = [];
-            Object.values(stageGroups).forEach(stageTeams => {
-                const femaleTeamCount = stageTeams.filter(t =>
-                    t.standing_team.endsWith(' W') ||
-                    t.standing_team.includes(' Women') ||
-                    t.standing_team.includes(' Ladies')
-                ).length;
-
-                if (femaleTeamCount === 0 || stageTeams.length > bestStage.length) {
-                    if (femaleTeamCount === 0 || (bestStage.length > 0 && femaleTeamCount < bestStage.length)) {
-                        bestStage = stageTeams;
+                // If the stage name is generic, try to find a more specific one
+                if (groupName === 'Group Stage' || groupName === 'League Table') {
+                    if (specificGroup) {
+                        groupName = specificGroup;
+                    } else if (round && round.length < 20) {
+                        // Use round if it looks like a group name (e.g. "Group A" vs "Regular Season - Week 1")
+                        groupName = round;
                     }
                 }
-                if (bestStage.length === 0 && femaleTeamCount === 0) {
-                    bestStage = stageTeams;
+
+                // Capitalize first letter if needed or clean up
+                groupName = groupName.trim();
+
+                // If specific group exists and is not already part of the name, append it for clarity?
+                // Actually, usually specificGroup IS the name we want (e.g. "Group A")
+
+                if (!groupedStandings[groupName]) {
+                    groupedStandings[groupName] = [];
                 }
+                groupedStandings[groupName].push(s);
             });
 
-            if (bestStage.length === 0 && Object.keys(stageGroups).length > 0) {
-                const biggestStage = Object.values(stageGroups).sort((a, b) => b.length - a.length)[0];
-                bestStage = biggestStage.filter(t => !t.standing_team.endsWith(' W'));
-            }
-            setStandings(bestStage);
+            // Convert to array and sort groups
+            const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
+                name,
+                teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
+            }));
+
+            // Sort groups alphabetically (e.g. Group A, Group B, ...)
+            standingsData.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+            setStandings(standingsData);
 
             setTopscorers(topscorersRes.result || []);
 
@@ -190,52 +215,64 @@ export default function LeagueDetailPage() {
         };
 
         return (
-            <View style={styles.standingsTable}>
-                {/* Header */}
-                <View style={styles.standingsHeader}>
-                    <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
-                    <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
-                    <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
-                    <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
-                </View>
-
-                {/* Rows */}
-                {standings.map((standing, index) => {
-                    const teamLogo = getTeamLogo(standing.team_key);
-                    return (
-                        <Pressable
-                            key={standing.team_key}
-                            style={[
-                                styles.standingsRow,
-                                index < 4 && styles.championsLeagueRow,
-                                index === 4 && styles.europaLeagueRow,
-                            ]}
-                            onPress={() => router.push(`/home/football/teams/${standing.team_key}` as any)}
-                        >
-                            <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
-                            <View style={styles.teamColContainer}>
-                                {teamLogo && (
-                                    <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
-                                )}
-                                <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
-                                    {standing.standing_team}
-                                </Text>
+            <View>
+                {standings.map((group, groupIndex) => (
+                    <View key={`group-${groupIndex}`} style={styles.standingsGroup}>
+                        {standings.length > 1 && (
+                            <Text style={styles.groupTitle}>{group.name}</Text>
+                        )}
+                        <View style={styles.standingsTable}>
+                            {/* Header */}
+                            <View style={styles.standingsHeader}>
+                                <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
+                                <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
+                                <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
+                                <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
                             </View>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
-                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
-                            <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
-                                {standing.standing_PTS}
-                            </Text>
-                        </Pressable>
-                    );
-                })}
+
+                            {/* Rows */}
+                            {group.teams.map((standing, index) => {
+                                const teamLogo = getTeamLogo(standing.team_key);
+                                return (
+                                    <Pressable
+                                        key={`${group.name || 'group'}-${standing.team_key || 'unknown'}-${index}`}
+                                        style={[
+                                            styles.standingsRow,
+                                            index < 4 && styles.championsLeagueRow,
+                                        ]}
+                                        onPress={() => {
+                                            if (standing.team_key) {
+                                                router.push(`/home/football/teams/${standing.team_key}` as any);
+                                            }
+                                        }}
+                                    >
+                                        <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
+                                        <View style={styles.teamColContainer}>
+                                            {teamLogo && (
+                                                <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
+                                            )}
+                                            <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
+                                                {standing.standing_team}
+                                            </Text>
+                                        </View>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
+                                        <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
+                                        <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
+                                            {standing.standing_PTS}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
+                    </View>
+                ))}
             </View>
         );
     };
@@ -364,7 +401,16 @@ export default function LeagueDetailPage() {
                         {fixtures
                             .filter(f => {
                                 const status = f.event_status?.toLowerCase();
-                                return status !== 'finished' && f.event_status !== 'FT' && f.event_status !== 'AET' && f.event_status !== 'AP';
+                                const isFinished = status === 'finished' || f.event_status === 'FT' || f.event_status === 'AET' || f.event_status === 'AP';
+                                if (isFinished) return false;
+
+                                // Filter for next 90 days
+                                const eventDate = new Date(`${f.event_date} ${f.event_time || '00:00'}`);
+                                const now = new Date();
+                                now.setHours(0, 0, 0, 0); // Start of today
+                                const dayDiff = (eventDate.getTime() - now.getTime()) / (1000 * 3600 * 24);
+
+                                return dayDiff >= 0 && dayDiff <= 90;
                             })
                             .sort((a, b) => new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime() - new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime())
                             .map((event, index) => (
@@ -672,5 +718,15 @@ const styles = StyleSheet.create({
     topscorerStatLabel: {
         fontSize: FONT_SIZES.xs,
         color: COLORS.textLight,
+    },
+    standingsGroup: {
+        marginBottom: SPACING.lg,
+    },
+    groupTitle: {
+        fontSize: FONT_SIZES.lg,
+        fontWeight: 'bold',
+        color: COLORS.secondary,
+        marginBottom: SPACING.sm,
+        paddingLeft: SPACING.xs,
     },
 });
