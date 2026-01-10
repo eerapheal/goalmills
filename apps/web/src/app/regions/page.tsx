@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { footballApi } from '../../services/footballApi';
-import { League } from '@goalmills/types';
+import { advancedFootballApi } from '../../services/advancedFootballApi';
+import { League, FootballLeague } from '@goalmills/types';
 import { getLeagueRank } from '../../lib/utils';
 
 export default function RegionsPage() {
@@ -13,9 +13,21 @@ export default function RegionsPage() {
 
     useEffect(() => {
         const loadLeagues = async () => {
-            const data = await footballApi.getLeagues();
+            const res = await advancedFootballApi.getLeagues();
+            const data = res.result || [];
+
+            // Map FootballLeague to the simplified League interface used in this component
+            const mappedLeagues: League[] = data.map((l: FootballLeague) => ({
+                id: Number(l.league_key),
+                name: l.league_name,
+                country: l.country_name,
+                logo: l.league_logo,
+                flag: l.country_logo,
+                season: 0 // Placeholder
+            }));
+
             // Sort by ranking
-            const sorted = data.sort((a, b) => getLeagueRank(a.id) - getLeagueRank(b.id));
+            const sorted = mappedLeagues.sort((a, b) => getLeagueRank(a.id) - getLeagueRank(b.id));
             setLeagues(sorted);
             setLoading(false);
         };

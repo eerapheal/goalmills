@@ -452,6 +452,13 @@ export function FootballScreen() {
             '28': 65, '6': 60, '262': 55, '322': 50, '12': 45, '141': 40, '10': 35, '343': 30, '31': 25
         };
 
+        const leagueLogoMap = new Map(leagues.map(l => [String(l.league_key), l.league_logo]));
+
+        const enhancedTopConfigs = topLeagueConfigs.map(config => ({
+            ...config,
+            logo: leagueLogoMap.get(String(config.id)) || ''
+        }));
+
         const otherLeagues = leagues
             .filter(l => !topLeagueConfigs.some(hl => String(hl.id) === String(l.league_key)))
             .sort((a, b) => {
@@ -465,10 +472,11 @@ export function FootballScreen() {
                 id: Number(l.league_key),
                 name: l.league_name.split(' - ')[0].split(' (')[0],
                 icon: '🌍',
-                color: 'from-gray-600'
+                color: 'from-gray-600',
+                logo: l.league_logo
             }));
 
-        return [...topLeagueConfigs, ...otherLeagues].sort((a, b) => {
+        return [...enhancedTopConfigs, ...otherLeagues].sort((a, b) => {
             const rankA = leagueRankingsForSelector[String(a.id)] || 0;
             const rankB = leagueRankingsForSelector[String(b.id)] || 0;
             return rankB - rankA;
@@ -540,7 +548,11 @@ export function FootballScreen() {
                                 className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
                             >
                                 <div className="w-8 h-8 p-1 bg-white/5 rounded-lg border border-white/10 group-hover:border-white/20 transition-colors">
-                                    <img src={group.logo} alt={group.name} className="w-full h-full object-contain" />
+                                    {group.logo ? (
+                                        <img src={group.logo} alt={group.name} className="w-full h-full object-contain" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-xs">⚽</div>
+                                    )}
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-black text-white uppercase tracking-wider">{group.name}</h3>
@@ -610,13 +622,22 @@ export function FootballScreen() {
                 if (matchFilterLeagueId) {
                     filteredUpcoming = filteredUpcoming.filter(e => String(e.league_key) === String(matchFilterLeagueId));
                 }
+                const upcomingTopLeagues = getTopLeagues();
+                const currentUpcomingLeague = matchFilterLeagueId ? upcomingTopLeagues.find(l => l.id === matchFilterLeagueId) : null;
+
                 return (
                     <div className="p-4 animate-fade-in">
                         <div className="flex flex-col gap-2 mb-6">
                             <div className="flex items-center justify-between px-2">
                                 <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">📅</span>
-                                    Upcoming Fixtures
+                                    {currentUpcomingLeague?.logo ? (
+                                        <div className="w-10 h-10 p-1.5 bg-white/10 rounded-lg flex items-center justify-center">
+                                            <img src={currentUpcomingLeague.logo} alt={currentUpcomingLeague.name} className="w-full h-full object-contain" />
+                                        </div>
+                                    ) : (
+                                        <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">📅</span>
+                                    )}
+                                    {currentUpcomingLeague ? `${currentUpcomingLeague.name} Fixtures` : 'Upcoming Fixtures'}
                                 </h2>
                             </div>
                             {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
@@ -630,13 +651,22 @@ export function FootballScreen() {
                 if (matchFilterLeagueId) {
                     filteredResults = filteredResults.filter(e => String(e.league_key) === String(matchFilterLeagueId));
                 }
+                const resultsTopLeagues = getTopLeagues();
+                const currentResultsLeague = matchFilterLeagueId ? resultsTopLeagues.find(l => l.id === matchFilterLeagueId) : null;
+
                 return (
                     <div className="p-4 animate-fade-in">
                         <div className="flex flex-col gap-2 mb-6">
                             <div className="flex items-center justify-between px-2">
                                 <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    <span className="p-2 bg-accent-green/20 rounded-lg text-accent-green">✅</span>
-                                    Match Results
+                                    {currentResultsLeague?.logo ? (
+                                        <div className="w-10 h-10 p-1.5 bg-white/10 rounded-lg flex items-center justify-center">
+                                            <img src={currentResultsLeague.logo} alt={currentResultsLeague.name} className="w-full h-full object-contain" />
+                                        </div>
+                                    ) : (
+                                        <span className="p-2 bg-accent-green/20 rounded-lg text-accent-green">✅</span>
+                                    )}
+                                    {currentResultsLeague ? `${currentResultsLeague.name} Results` : 'Match Results'}
                                 </h2>
                             </div>
                             {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
@@ -659,8 +689,12 @@ export function FootballScreen() {
                         <div className="flex flex-col gap-6 mb-8">
                             <div className="flex items-center justify-between flex-wrap gap-4">
                                 <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    <span className={`p-2 bg-gradient-to-br ${currentLeague?.color} to-surface rounded-lg text-white shadow-lg`}>
-                                        {isStandings ? '🏆' : '⚽'}
+                                    <span className={`p-2 bg-gradient-to-br ${currentLeague?.color || 'from-gray-600'} to-surface rounded-lg text-white shadow-lg`}>
+                                        {currentLeague?.logo ? (
+                                            <img src={currentLeague.logo} alt={currentLeague.name} className="w-8 h-8 object-contain" />
+                                        ) : (
+                                            isStandings ? '🏆' : '⚽'
+                                        )}
                                     </span>
                                     {currentLeague?.name} {isStandings ? 'Standings' : 'Top Scorers'}
                                 </h2>
@@ -698,9 +732,7 @@ export function FootballScreen() {
                                         <FootballStandingsTable standings={filteredData as any} teams={teams} />
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <FootballTopScorers scorers={filteredData as any} teams={teams} />
-                                    </div>
+                                    <FootballTopScorers scorers={filteredData as any} teams={teams} />
                                 )}
                             </div>
                         )}

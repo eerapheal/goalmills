@@ -1,7 +1,6 @@
 'use client';
 
 import { FootballTopscorer, FootballTeam } from '@goalmills/types';
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface FootballTopScorersProps {
@@ -37,13 +36,18 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
                                 </h3>
                             </Link>
                             <div className="flex items-center gap-2 mt-1">
-                                <Image src={logo} alt={scorer.team_name} width={16} height={16} className="w-4 h-4 object-contain" />
+                                <img
+                                    src={logo}
+                                    alt={scorer.team_name}
+                                    className="w-4 h-4 object-contain"
+                                    onError={(e) => e.currentTarget.style.display = 'none'}
+                                />
                                 <span className="text-xs text-text-secondary truncate">{scorer.team_name}</span>
                             </div>
                         </div>
 
                         {/* Stats */}
-                        <div className="text-right">
+                        <div className="text-right shrink-0">
                             <div className="flex items-center justify-end gap-1.5 mb-1">
                                 <span className="text-lg">⚽</span>
                                 <span className="text-xl font-bold text-secondary">{scorer.goals}</span>
