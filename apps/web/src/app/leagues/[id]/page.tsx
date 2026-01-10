@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
-import { FootballLeague, FootballEvent, FootballStanding, FootballTopscorer } from '@goalmills/types';
+import { FootballLeague, FootballEvent, FootballStanding, FootballTopscorer, FootballTeam } from '@goalmills/types';
 import { FootballMatchCard } from '../../../components/FootballMatchCard';
 import { FootballStandingsTable } from '../../../components/FootballStandingsTable';
 import { FootballTopScorers } from '../../../components/FootballTopScorers';
@@ -22,6 +22,7 @@ export default function LeagueDetailsPage() {
     const [events, setEvents] = useState<FootballEvent[]>([]);
     const [standings, setStandings] = useState<FootballStanding[]>([]);
     const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
+    const [teams, setTeams] = useState<FootballTeam[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -38,7 +39,7 @@ export default function LeagueDetailsPage() {
 
                 const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
-                const [leaguesRes, fixturesRes, standingsRes, topscorersRes] = await Promise.all([
+                const [leaguesRes, fixturesRes, standingsRes, topscorersRes, teamsRes] = await Promise.all([
                     advancedFootballApi.getLeagues(undefined, leagueId).catch(err => {
                         console.error('❌ Leagues API error:', err);
                         return { success: 1, result: [] };
@@ -57,6 +58,10 @@ export default function LeagueDetailsPage() {
                     }),
                     advancedFootballApi.getTopscorers(leagueId).catch(err => {
                         console.error('❌ Topscorers API error:', err);
+                        return { success: 1, result: [] };
+                    }),
+                    advancedFootballApi.getTeams({ leagueId: leagueId }).catch(err => {
+                        console.error('❌ Teams API error:', err);
                         return { success: 1, result: [] };
                     })
                 ]);
@@ -124,10 +129,49 @@ export default function LeagueDetailsPage() {
                 setStandings(bestStage);
                 setTopscorers(topscorersRes?.result || []);
 
+                // Enhance teams with data from fixtures to ensure we have logos for everyone
+                const teamMap = new Map<string, FootballTeam>();
+                if (teamsRes?.result) {
+                    teamsRes.result.forEach((t: FootballTeam) => teamMap.set(String(t.team_key), t));
+                }
+
+                fixtures.forEach((f: FootballEvent) => {
+                    if (f.home_team_key && f.home_team_logo) {
+                        const key = String(f.home_team_key);
+                        const existing = teamMap.get(key);
+                        if (!existing) {
+                            teamMap.set(key, {
+                                team_key: key,
+                                team_name: f.event_home_team,
+                                team_logo: f.home_team_logo
+                            } as FootballTeam);
+                        } else if (!existing.team_logo || existing.team_logo === "") {
+                            existing.team_logo = f.home_team_logo;
+                        }
+                    }
+                    if (f.away_team_key && f.away_team_logo) {
+                        const key = String(f.away_team_key);
+                        const existing = teamMap.get(key);
+                        if (!existing) {
+                            teamMap.set(key, {
+                                team_key: key,
+                                team_name: f.event_away_team,
+                                team_logo: f.away_team_logo
+                            } as FootballTeam);
+                        } else if (!existing.team_logo || existing.team_logo === "") {
+                            existing.team_logo = f.away_team_logo;
+                        }
+                    }
+                });
+
+                const finalTeams = Array.from(teamMap.values());
+                setTeams(finalTeams);
+
                 console.log('✅ League data loaded:', {
                     fixtures: fixturesRes.result?.length || 0,
                     standings: standingsRes.result?.total?.length || 0,
-                    topscorers: topscorersRes.result?.length || 0
+                    topscorers: topscorersRes.result?.length || 0,
+                    teams: finalTeams.length
                 });
 
             } catch (error) {
@@ -185,13 +229,13 @@ export default function LeagueDetailsPage() {
                 <BackButton className="absolute top-4 left-4 z-20" />
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
                     <div className="relative w-24 h-24 p-4 bg-white/5 rounded-2xl border border-white/10">
-                        <img src={league.league_logo} alt={league.league_name} className="w-full h-full object-contain p-2" />
+                        <img src={league.league_logo || undefined} alt={league.league_name} className="w-full h-full object-contain p-2" />
                     </div>
                     <div className="text-center md:text-left">
                         <h1 className="text-3xl font-black text-white mb-2">{league.league_name}</h1>
                         <div className="flex items-center justify-center md:justify-start gap-3 text-text-muted font-medium">
                             <span className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full text-sm">
-                                <img src={league.country_logo} alt={league.country_name} className="w-4 h-3 object-cover rounded-sm" />
+                                <img src={league.country_logo || undefined} alt={league.country_name} className="w-4 h-3 object-cover rounded-sm" />
                                 {league.country_name}
                             </span>
                         </div>
@@ -243,14 +287,14 @@ export default function LeagueDetailsPage() {
                 {activeTab === 'standings' && (
                     <div className="animate-fade-in">
                         <div className="glass-card rounded-xl overflow-hidden">
-                            <FootballStandingsTable standings={standings} teams={[]} />
+                            <FootballStandingsTable standings={standings} teams={teams} />
                         </div>
                     </div>
                 )}
 
                 {activeTab === 'topscorers' && (
                     <div className="animate-fade-in">
-                        <FootballTopScorers scorers={topscorers} teams={[]} />
+                        <FootballTopScorers scorers={topscorers} teams={teams} />
                     </div>
                 )}
             </div>

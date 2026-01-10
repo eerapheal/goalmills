@@ -15,9 +15,11 @@ export function FootballStandingsTable({ standings, teams = [] }: FootballStandi
     // Actually mockStandings doesn't have logo URL directly, it has team_key. Mobile app uses `getTeamLogo` helper.
     // We should pass teams or a logo lookup.
 
-    const getTeamLogo = (teamKey: string) => {
-        const team = teams.find(t => t.team_key === teamKey);
-        return team?.team_logo || `https://ui-avatars.com/api/?name=Team+${teamKey}&background=random`;
+    const getTeamLogo = (teamKey: string | number) => {
+        if (!teamKey) return `https://ui-avatars.com/api/?name=Team&background=random`;
+        const team = teams.find(t => String(t.team_key) === String(teamKey));
+        const logo = team?.team_logo;
+        return (logo && logo !== "") ? logo : `https://ui-avatars.com/api/?name=Team+${teamKey}&background=random`;
     };
 
     return (
@@ -71,7 +73,7 @@ export function FootballStandingsTable({ standings, teams = [] }: FootballStandi
                                 <div className="col-span-4 pl-4 flex items-center min-w-0">
                                     <Link href={`/teams/${standing.team_key}`} className="flex items-center min-w-0 hover:scale-[1.02] transition-transform origin-left">
                                         <div className="relative w-8 h-8 mr-2 shrink-0 p-1 bg-white/5 rounded-lg border border-white/10 group-hover:border-white/20 transition-colors sm:mr-4">
-                                            <Image src={logo} alt={standing.standing_team} width={32} height={32} className="object-contain w-full h-full" />
+                                            <Image src={logo || `https://ui-avatars.com/api/?name=T&background=random`} alt={standing.standing_team} width={32} height={32} className="object-contain w-full h-full" />
                                         </div>
                                         <span className={`text-xs sm:text-sm font-bold truncate ${rank <= 4 ? 'text-white' : 'text-text-primary group-hover:text-white'}`}>
                                             {standing.standing_team}

@@ -299,9 +299,10 @@ export function FootballScreen() {
         setIsLeagueDataLoading(true);
         setCurrentLeagueId(leagueId);
         try {
-            const [standingsRes, topscorersRes] = await Promise.all([
+            const [standingsRes, topscorersRes, teamsRes] = await Promise.all([
                 advancedFootballApi.getStandings(leagueId),
-                advancedFootballApi.getTopscorers(leagueId)
+                advancedFootballApi.getTopscorers(leagueId),
+                advancedFootballApi.getTeams({ leagueId: leagueId })
             ]);
 
             // Intelligent Stage Filter
@@ -340,7 +341,16 @@ export function FootballScreen() {
             setStandings(bestStage);
             setTopscorers(topscorersRes?.result || []);
 
-            console.log(`✅ Loaded league-specific data for ${leagueId}: ${bestStage.length} standings, ${topscorersRes?.result?.length || 0} scorers`);
+            // Merge new teams into existing teams list to avoid duplicates
+            if (teamsRes?.result) {
+                setTeams(prevTeams => {
+                    const teamMap = new Map(prevTeams.map(t => [t.team_key, t]));
+                    teamsRes.result.forEach(t => teamMap.set(t.team_key, t));
+                    return Array.from(teamMap.values());
+                });
+            }
+
+            console.log(`✅ Loaded league-specific data for ${leagueId}: ${bestStage.length} standings, ${topscorersRes?.result?.length || 0} scorers, ${teamsRes?.result?.length || 0} teams`);
         } catch (error) {
             console.error('❌ Error loading league specific data:', error);
         } finally {

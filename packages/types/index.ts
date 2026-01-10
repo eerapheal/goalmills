@@ -373,6 +373,8 @@ export interface FootballTopscorer {
   goals: string;
   assists: string | null;
   penalty_goals: string;
+  player_image?: string;
+  team_logo?: string;
 }
 
 export interface FootballVideo {
