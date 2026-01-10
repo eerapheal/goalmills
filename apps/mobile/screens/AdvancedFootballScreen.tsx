@@ -52,12 +52,13 @@ export function AdvancedFootballScreen() {
     const loadData = async () => {
         try {
             const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 7);
-
+            const past = new Date(today);
+            past.setDate(past.getDate() - 60); // 60 days of results
+            const future = new Date(today);
+            future.setDate(future.getDate() + 30); // 30 days of upcoming
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
+            console.log('🔄 Mobile: Loading live football data...');
 
             const [
                 livescoreRes,
@@ -69,28 +70,54 @@ export function AdvancedFootballScreen() {
                 posts,
                 videosRes,
             ] = await Promise.all([
-                advancedFootballApi.getLivescore(),
+                advancedFootballApi.getLivescore().catch(() => ({ result: [] })),
                 advancedFootballApi.getFixtures({
-                    from: formatDate(yesterday),
-                    to: formatDate(tomorrow),
-                }),
-                advancedFootballApi.getStandings(152), // Premier League
-                advancedFootballApi.getTopscorers(152),
-                advancedFootballApi.getLeagues(),
-                advancedFootballApi.getTeams(),
-                advancedFootballApi.getBlogPosts(),
-                advancedFootballApi.getVideos(),
+                    from: formatDate(past),
+                    to: formatDate(future),
+                }).catch(() => ({ result: [] })),
+                advancedFootballApi.getStandings(152).catch(() => ({ result: { total: [] } })), // Premier League
+                advancedFootballApi.getTopscorers(152).catch(() => ({ result: [] })),
+                advancedFootballApi.getLeagues().catch(() => ({ result: [] })),
+                advancedFootballApi.getTeams({ leagueId: 152 }).catch(() => ({ result: [] })),
+                advancedFootballApi.getBlogPosts().catch(() => []),
+                advancedFootballApi.getVideos().catch(() => ({ result: [] })),
             ]);
 
-            setLiveEvents(livescoreRes.result);
+            setLiveEvents(livescoreRes.result || []);
 
-            // Filter upcoming and finished from fixtures
-            const now = new Date();
-            const upcoming = fixturesRes.result.filter((e) => {
-                const eventDate = new Date(`${e.event_date} ${e.event_time}`);
-                return eventDate > now && e.event_status === 'Not Started';
+            // Process Fixtures
+            const fixtures = fixturesRes.result || [];
+            const upcoming = fixtures.filter((e: FootballEvent) => e.event_status === 'Not Started');
+            const finished = fixtures.filter((e: FootballEvent) => e.event_status === 'Finished');
+
+            // Intelligent Team & Logo Merging
+            const teamMap = new Map<string, FootballTeam>();
+            if (teamsRes?.result) {
+                teamsRes.result.forEach((t: FootballTeam) => teamMap.set(String(t.team_key), t));
+            }
+
+            // Extract logos from fixtures for missing teams
+            fixtures.forEach((f: FootballEvent) => {
+                const homeKey = String(f.home_team_key);
+                const awayKey = String(f.away_team_key);
+
+                if (!teamMap.has(homeKey)) {
+                    teamMap.set(homeKey, { team_key: homeKey, team_name: f.event_home_team, team_logo: f.home_team_logo || undefined } as FootballTeam);
+                } else if (!teamMap.get(homeKey)?.team_logo) {
+                    const existing = teamMap.get(homeKey)!;
+                    existing.team_logo = f.home_team_logo || undefined;
+                }
+
+                if (!teamMap.has(awayKey)) {
+                    teamMap.set(awayKey, { team_key: awayKey, team_name: f.event_away_team, team_logo: f.away_team_logo || undefined } as FootballTeam);
+                } else if (!teamMap.get(awayKey)?.team_logo) {
+                    const existing = teamMap.get(awayKey)!;
+                    existing.team_logo = f.away_team_logo || undefined;
+                }
             });
-            const finished = fixturesRes.result.filter((e) => e.event_status === 'Finished');
+
+            const finalTeams = Array.from(teamMap.values());
+            setTeams(finalTeams);
 
             // League rankings for sorting
             const leagueRankings: { [key: string]: number } = {
@@ -102,30 +129,38 @@ export function AdvancedFootballScreen() {
                 '168': 75,  // Ligue 1
             };
 
-            // Sort upcoming by league ranking
-            upcoming.sort((a, b) => {
+            const sortByLeague = (a: FootballEvent, b: FootballEvent) => {
                 const rankA = leagueRankings[a.league_key] || 0;
                 const rankB = leagueRankings[b.league_key] || 0;
-                return rankB - rankA;
-            });
+                if (rankB !== rankA) return rankB - rankA;
+                return new Date(`${a.event_date} ${a.event_time}`).getTime() - new Date(`${b.event_date} ${b.event_time}`).getTime();
+            };
 
-            // Sort finished matches by league ranking
+            upcoming.sort(sortByLeague);
             finished.sort((a, b) => {
                 const rankA = leagueRankings[a.league_key] || 0;
                 const rankB = leagueRankings[b.league_key] || 0;
-                return rankB - rankA;
+                if (rankB !== rankA) return rankB - rankA;
+                return new Date(`${b.event_date} ${b.event_time}`).getTime() - new Date(`${a.event_date} ${a.event_time}`).getTime();
             });
 
-            setUpcomingEvents(upcoming.slice(0, 15));
-            setFinishedEvents(finished.slice(0, 15));
-            setStandings(standingsRes.result.total);
-            setTopscorers(topscorersRes.result);
-            setLeagues(leaguesRes.result);
-            setTeams(teamsRes.result);
-            setBlogPosts(posts);
-            setVideos(videosRes.result);
+            setUpcomingEvents(upcoming);
+            setFinishedEvents(finished);
+
+            // Process Standings (Filtering for main stage)
+            const rawStandings = standingsRes.result?.total || [];
+            setStandings(rawStandings.slice(0, 20));
+
+            // Process Top Scorers
+            setTopscorers(topscorersRes.result || []);
+
+            setLeagues(leaguesRes.result || []);
+            setBlogPosts(posts || []);
+            setVideos(videosRes.result || []);
+
+            console.log('✅ Mobile football data loaded');
         } catch (error) {
-            console.error('Error loading football data:', error);
+            console.error('❌ Mobile Error loading football data:', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -135,6 +170,23 @@ export function AdvancedFootballScreen() {
     useEffect(() => {
         loadData();
     }, []);
+
+    // 45s Auto-Refresh for Live Matches
+    useEffect(() => {
+        let interval: any;
+        if (activeTab === 'live' && !loading) {
+            console.log('⏱️ Mobile: Starting live score polling (45s)...');
+            interval = setInterval(() => {
+                loadData();
+            }, 45000);
+        }
+        return () => {
+            if (interval) {
+                console.log('⏱️ Mobile: Stopping live score polling.');
+                clearInterval(interval);
+            }
+        };
+    }, [activeTab, loading]);
 
     const onRefresh = () => {
         setRefreshing(true);

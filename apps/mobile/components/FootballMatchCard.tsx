@@ -104,8 +104,11 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
                         <Text style={styles.statusText}>{getStatusDisplay()}</Text>
                     </View>
                     <Text style={[styles.score, isLive && styles.liveScore]}>
-                        {getScoreDisplay()}
+                        {isLive ? (event.event_final_result || getScoreDisplay()) : getScoreDisplay()}
                     </Text>
+                    {!isLive && event.event_date && (
+                        <Text style={styles.matchDateText}>{event.event_date}</Text>
+                    )}
                 </View>
 
                 {/* Away Team */}
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
     leagueInfo: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between', 
+        justifyContent: 'space-between',
         marginBottom: SPACING.xs,
         paddingBottom: SPACING.xs,
         borderBottomWidth: 1,
@@ -253,6 +256,11 @@ const styles = StyleSheet.create({
     },
     liveScore: {
         color: COLORS.danger,
+    },
+    matchDateText: {
+        fontSize: 8,
+        color: COLORS.textLight,
+        fontWeight: '500',
     },
     oddsContainer: {
         flexDirection: 'row',

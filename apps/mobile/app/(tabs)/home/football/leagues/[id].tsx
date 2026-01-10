@@ -11,11 +11,11 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { FootballLeague, FootballEvent, FootballStanding } from '@goalmills/types';
+import { FootballLeague, FootballEvent, FootballStanding, FootballTopscorer, FootballTeam } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 
-type LeagueTab = 'fixtures' | 'standings';
+type LeagueTab = 'fixtures' | 'standings' | 'topscorers';
 
 export default function LeagueDetailPage() {
     const router = useRouter();
@@ -25,6 +25,8 @@ export default function LeagueDetailPage() {
     const [league, setLeague] = useState<FootballLeague | null>(null);
     const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
     const [standings, setStandings] = useState<FootballStanding[]>([]);
+    const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
+    const [teams, setTeams] = useState<FootballTeam[]>([]);
 
     useEffect(() => {
         loadLeagueData();
@@ -32,28 +34,69 @@ export default function LeagueDetailPage() {
 
     const loadLeagueData = async () => {
         try {
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 7);
-            const nextWeek = new Date(today);
-            nextWeek.setDate(nextWeek.getDate() + 14);
+            const leagueId = Number(id);
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            const seasonStartYear = currentMonth < 6 ? currentYear - 1 : currentYear;
 
-            const formatDate = (date: Date) => date.toISOString().split('T')[0];
+            const fromDate = `${seasonStartYear}-07-01`;
+            const toDate = `${seasonStartYear + 1}-06-30`;
 
-            const [leaguesRes, fixturesRes, standingsRes] = await Promise.all([
-                advancedFootballApi.getLeagues(),
+            const [leaguesRes, fixturesRes, standingsRes, topscorersRes, teamsRes] = await Promise.all([
+                advancedFootballApi.getLeagues().catch(() => ({ result: [] })),
                 advancedFootballApi.getFixtures({
-                    from: formatDate(yesterday),
-                    to: formatDate(nextWeek),
-                    leagueId: Number(id),
-                }),
-                advancedFootballApi.getStandings(Number(id)),
+                    from: fromDate,
+                    to: toDate,
+                    leagueId: leagueId,
+                }).catch(() => ({ result: [] })),
+                advancedFootballApi.getStandings(leagueId).catch(() => ({ result: { total: [] } })),
+                advancedFootballApi.getTopscorers(leagueId).catch(() => ({ result: [] })),
+                advancedFootballApi.getTeams({ leagueId: leagueId }).catch(() => ({ result: [] })),
             ]);
 
-            const foundLeague = leaguesRes.result.find((l) => l.league_key === id);
+            const foundLeague = leaguesRes.result?.find((l) => String(l.league_key) === String(id));
             setLeague(foundLeague || null);
-            setFixtures(fixturesRes.result);
-            setStandings(standingsRes.result.total);
+
+            const rawFixtures = fixturesRes.result || [];
+            // Sort fixtures by date
+            rawFixtures.sort((a: FootballEvent, b: FootballEvent) =>
+                new Date(`${a.event_date} ${a.event_time}`).getTime() - new Date(`${b.event_date} ${b.event_time}`).getTime()
+            );
+            setFixtures(rawFixtures);
+
+            // Process Standings with Stage Handling
+            let finalStandings: FootballStanding[] = [];
+            if (standingsRes.result) {
+                if (Array.isArray(standingsRes.result.total)) {
+                    finalStandings = standingsRes.result.total;
+                } else if (typeof standingsRes.result.total === 'object') {
+                    const stages = Object.keys(standingsRes.result.total);
+                    const bestStage = stages.includes('Regular Season') ? 'Regular Season' : stages[0];
+                    finalStandings = (standingsRes.result.total as any)[bestStage] || [];
+                }
+            }
+            setStandings(finalStandings);
+
+            setTopscorers(topscorersRes.result || []);
+
+            // Merge team data
+            const teamMap = new Map<string, FootballTeam>();
+            if (teamsRes.result) {
+                teamsRes.result.forEach((t: FootballTeam) => teamMap.set(String(t.team_key), t));
+            }
+
+            // Supplement logos from fixtures
+            rawFixtures.forEach((f: FootballEvent) => {
+                if (!teamMap.has(String(f.home_team_key))) {
+                    teamMap.set(String(f.home_team_key), { team_key: f.home_team_key, team_name: f.event_home_team, team_logo: f.home_team_logo } as FootballTeam);
+                }
+                if (!teamMap.has(String(f.away_team_key))) {
+                    teamMap.set(String(f.away_team_key), { team_key: f.away_team_key, team_name: f.event_away_team, team_logo: f.away_team_logo } as FootballTeam);
+                }
+            });
+            setTeams(Array.from(teamMap.values()));
+
         } catch (error) {
             console.error('Error loading league data:', error);
         } finally {
@@ -78,47 +121,118 @@ export default function LeagueDetailPage() {
         );
     }
 
-    const renderStandingsTable = () => (
-        <View style={styles.standingsTable}>
-            {/* Header */}
-            <View style={styles.standingsHeader}>
-                <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
-                <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
-                <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
-            </View>
+    const renderStandingsTable = () => {
+        const getTeamLogo = (teamKey: string) => {
+            const team = teams.find(t => String(t.team_key) === String(teamKey));
+            return team?.team_logo;
+        };
 
-            {/* Rows */}
-            {standings.map((standing, index) => (
-                <Pressable
-                    key={standing.team_key}
-                    style={[
-                        styles.standingsRow,
-                        index < 4 && styles.championsLeagueRow,
-                        index === 4 && styles.europaLeagueRow,
-                    ]}
-                    onPress={() => router.push(`/home/football/teams/${standing.team_key}` as any)}
-                >
-                    <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
-                    <Text style={[styles.standingsText, styles.teamCol]} numberOfLines={1}>
-                        {standing.standing_team}
-                    </Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
-                    <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
-                        {standing.standing_PTS}
-                    </Text>
-                </Pressable>
-            ))}
-        </View>
-    );
+        return (
+            <View style={styles.standingsTable}>
+                {/* Header */}
+                <View style={styles.standingsHeader}>
+                    <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
+                    <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
+                    <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
+                    <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
+                    <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
+                    <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
+                    <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
+                    <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
+                </View>
+
+                {/* Rows */}
+                {standings.map((standing, index) => {
+                    const teamLogo = getTeamLogo(standing.team_key);
+                    return (
+                        <Pressable
+                            key={standing.team_key}
+                            style={[
+                                styles.standingsRow,
+                                index < 4 && styles.championsLeagueRow,
+                                index === 4 && styles.europaLeagueRow,
+                            ]}
+                            onPress={() => router.push(`/home/football/teams/${standing.team_key}` as any)}
+                        >
+                            <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
+                            <View style={styles.teamColContainer}>
+                                {teamLogo && (
+                                    <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
+                                )}
+                                <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
+                                    {standing.standing_team}
+                                </Text>
+                            </View>
+                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
+                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
+                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
+                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
+                            <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
+                            <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
+                                {standing.standing_PTS}
+                            </Text>
+                        </Pressable>
+                    );
+                })}
+            </View>
+        );
+    };
+
+    const renderTopscorers = () => {
+        const getTeamLogo = (teamKey: string) => {
+            const team = teams.find(t => String(t.team_key) === String(teamKey));
+            return team?.team_logo;
+        };
+
+        const sortedScorers = [...topscorers].sort((a, b) => {
+            const goalsA = parseInt(a.goals) || 0;
+            const goalsB = parseInt(b.goals) || 0;
+            if (goalsB !== goalsA) return goalsB - goalsA;
+            const assistsA = parseInt(a.assists || '0') || 0;
+            const assistsB = parseInt(b.assists || '0') || 0;
+            return assistsB - assistsA;
+        });
+
+        return (
+            <View style={styles.topscorersContainer}>
+                {sortedScorers.map((scorer) => {
+                    const teamLogo = getTeamLogo(scorer.team_key);
+                    return (
+                        <Pressable
+                            key={scorer.player_key}
+                            style={styles.topscorerCard}
+                            onPress={() => router.push(`/home/football/players/${scorer.player_key}` as any)}
+                        >
+                            <View style={styles.topscorerRank}>
+                                <Text style={styles.topscorerRankText}>{scorer.player_place}</Text>
+                            </View>
+                            <View style={styles.topscorerInfo}>
+                                <Text style={styles.topscorerName}>{scorer.player_name}</Text>
+                                <View style={styles.topscorerTeamContainer}>
+                                    {teamLogo && (
+                                        <Image source={{ uri: teamLogo }} style={styles.topscorerTeamLogo} />
+                                    )}
+                                    <Text style={styles.topscorerTeam}>{scorer.team_name}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.topscorerStats}>
+                                <View style={styles.topscorerStat}>
+                                    <Text style={styles.topscorerStatValue}>⚽ {scorer.goals}</Text>
+                                    <Text style={styles.topscorerStatLabel}>Goals</Text>
+                                </View>
+                                {scorer.assists && (
+                                    <View style={styles.topscorerStat}>
+                                        <Text style={styles.topscorerStatValue}>🎯 {scorer.assists}</Text>
+                                        <Text style={styles.topscorerStatLabel}>Assists</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </Pressable>
+                    );
+                })}
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -150,7 +264,7 @@ export default function LeagueDetailPage() {
                     onPress={() => setActiveTab('fixtures')}
                 >
                     <Text style={[styles.tabText, activeTab === 'fixtures' && styles.activeTabText]}>
-                        Fixtures ({fixtures.length})
+                        Fixtures
                     </Text>
                 </Pressable>
                 <Pressable
@@ -158,7 +272,15 @@ export default function LeagueDetailPage() {
                     onPress={() => setActiveTab('standings')}
                 >
                     <Text style={[styles.tabText, activeTab === 'standings' && styles.activeTabText]}>
-                        Standings ({standings.length})
+                        Standings
+                    </Text>
+                </Pressable>
+                <Pressable
+                    style={[styles.tab, activeTab === 'topscorers' && styles.activeTab]}
+                    onPress={() => setActiveTab('topscorers')}
+                >
+                    <Text style={[styles.tabText, activeTab === 'topscorers' && styles.activeTabText]}>
+                        Top Scorers
                     </Text>
                 </Pressable>
             </View>
@@ -176,13 +298,23 @@ export default function LeagueDetailPage() {
                             </View>
                         )}
                     </View>
-                ) : (
+                ) : activeTab === 'standings' ? (
                     <View style={styles.section}>
                         {standings.length > 0 ? (
                             renderStandingsTable()
                         ) : (
                             <View style={styles.emptyState}>
                                 <Text style={styles.emptyText}>No standings available</Text>
+                            </View>
+                        )}
+                    </View>
+                ) : (
+                    <View style={styles.section}>
+                        {topscorers.length > 0 ? (
+                            renderTopscorers()
+                        ) : (
+                            <View style={styles.emptyState}>
+                                <Text style={styles.emptyText}>No top scorers available</Text>
                             </View>
                         )}
                     </View>
@@ -357,5 +489,85 @@ const styles = StyleSheet.create({
     ptsValue: {
         fontWeight: '700',
         color: COLORS.secondary,
+    },
+    teamColContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: SPACING.sm,
+    },
+    teamColText: {
+        flex: 1,
+        textAlign: 'left',
+    },
+    standingsTeamLogo: {
+        width: 18,
+        height: 18,
+        marginRight: SPACING.xs,
+    },
+    topscorersContainer: {
+        gap: SPACING.md,
+    },
+    topscorerCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: BORDER_RADIUS.lg,
+        padding: SPACING.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        marginBottom: SPACING.sm,
+    },
+    topscorerRank: {
+        width: 36,
+        height: 36,
+        borderRadius: BORDER_RADIUS.full,
+        backgroundColor: COLORS.secondary,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: SPACING.md,
+    },
+    topscorerRankText: {
+        fontSize: FONT_SIZES.md,
+        fontWeight: '800',
+        color: COLORS.background,
+    },
+    topscorerInfo: {
+        flex: 1,
+    },
+    topscorerName: {
+        fontSize: FONT_SIZES.md,
+        fontWeight: '700',
+        color: COLORS.background,
+        marginBottom: 2,
+    },
+    topscorerTeamContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    topscorerTeamLogo: {
+        width: 14,
+        height: 14,
+        marginRight: SPACING.xs,
+    },
+    topscorerTeam: {
+        fontSize: FONT_SIZES.sm,
+        color: COLORS.textLight,
+    },
+    topscorerStats: {
+        flexDirection: 'row',
+        gap: SPACING.md,
+    },
+    topscorerStat: {
+        alignItems: 'center',
+    },
+    topscorerStatValue: {
+        fontSize: FONT_SIZES.md,
+        fontWeight: '700',
+        color: COLORS.secondary,
+    },
+    topscorerStatLabel: {
+        fontSize: FONT_SIZES.xs,
+        color: COLORS.textLight,
     },
 });
