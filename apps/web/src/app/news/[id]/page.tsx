@@ -137,9 +137,9 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
                 <div className="absolute inset-0 bg-slate-950/20" />
 
-                <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-10 pb-12 md:pt-48 md:pb-32">
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-5 pt-30 md:pb-12">
                     <Link href="/news" className="text-blue-400 hover:text-blue-300 mb-8 inline-flex items-center gap-2 font-black uppercase tracking-widest text-xs transition-all hover:-translate-x-1">
-                        <span className="text-lg">←</span> Back to News
+                        <span className="text-lg">←</span>to News
                     </Link>
 
                     <div className="max-w-5xl">
@@ -148,10 +148,10 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                                 {article.category as string}
                             </span>
                         )}
-                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-8 leading-tight tracking-tighter uppercase italic break-words">
+                        <h1 className="text-2xl md:text-3xl lg:text-6xl font-black text-white mb-8 leading-tight tracking-tighter uppercase italic break-words">
                             {article.title as string}
                         </h1>
-                        <p className="text-slate-300 text-xl md:text-3xl font-medium max-w-4xl leading-relaxed mb-10 opacity-90 border-l-4 border-blue-500 pl-6 italic break-words">
+                        <p className="text-slate-300 text-lg md:text-2xl font-medium max-w-4xl leading-relaxed mb-10 opacity-90 border-l-4 border-blue-500 pl-6 italic break-words">
                             {article.excerpt as string}
                         </p>
 
@@ -187,7 +187,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
             </div>
 
             {/* Content Section */}
-            <div className="max-w-4xl mx-auto px-6 py-20">
+            <div className="max-w-4xl mx-auto px-6">
                 <div
                     className="prose prose-invert prose-blue prose-xl max-w-none text-slate-300 
                     prose-headings:text-white prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter 

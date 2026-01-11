@@ -10,7 +10,7 @@ export default async function NewsPage() {
     const news = await News.find({}).sort({ createdAt: -1 });
 
     return (
-        <div className="min-h-screen bg-slate-950 px-6 py-12 md:px-12 pt-[90px]">
+        <div className="min-h-screen bg-slate-950 px-6 py-12 md:px-12 pt-[115px]">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight">
                     Latest <span className="text-blue-500">News</span>
