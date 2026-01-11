@@ -85,7 +85,8 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
     } else {
         console.warn(`Error fetching ${method}:`, error);
     }
-    throw error;
+    // Return undefined instead of throwing to avoid loud console Errors
+    return undefined as any;
   }
 }
 
