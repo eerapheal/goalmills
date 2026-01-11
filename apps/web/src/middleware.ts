@@ -13,9 +13,9 @@ export default withAuth(
       }
     }
 
-    // Protection for Admin/Staful routes
+    // Protection for Admin/staff routes
     if (path.startsWith("/admin")) {
-      if (token?.role !== "staful" && token?.role !== "super-admin") {
+      if (token?.role !== "staff" && token?.role !== "super-admin") {
         return NextResponse.redirect(new URL("/", req.url));
       }
     }

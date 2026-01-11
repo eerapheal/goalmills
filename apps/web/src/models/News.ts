@@ -21,6 +21,11 @@ const NewsSchema = new mongoose.Schema({
     type: String,
     default: 'GoalMills Admin',
   },
+  authorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  },
   readTime: {
     type: Number,
     default: 3,

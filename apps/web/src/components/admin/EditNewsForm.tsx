@@ -1,17 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import 'react-quill-new/dist/quill.snow.css';
 
-export default function UploadVideoForm() {
+// Dynamic import for ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+
+interface EditNewsFormProps {
+    id: string;
+}
+
+export default function EditNewsForm({ id }: EditNewsFormProps) {
+    const router = useRouter();
     const [title, setTitle] = useState('');
-    const [videoUrl, setVideoUrl] = useState('');
-    const [thumbnail, setThumbnail] = useState('');
-    const [eventKey, setEventKey] = useState('');
+    const [excerpt, setExcerpt] = useState('');
+    const [content, setContent] = useState('');
+    const [image, setImage] = useState('');
     const [source, setSource] = useState('');
     const [category, setCategory] = useState('');
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+        const fetchArticle = async () => {
+            try {
+                const res = await fetch(`/api/news/${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setTitle(data.title);
+                    setExcerpt(data.excerpt);
+                    setContent(data.content);
+                    setImage(data.image || '');
+                    setSource(data.source || '');
+                    setCategory(data.category || '');
+                } else {
+                    setMessage({ type: 'error', text: 'Failed to fetch article details.' });
+                }
+            } catch (err) {
+                setMessage({ type: 'error', text: 'An error occurred fetching the article.' });
+            } finally {
+                setFetching(false);
+            }
+        };
+        fetchArticle();
+    }, [id]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -28,7 +64,7 @@ export default function UploadVideoForm() {
             });
             const data = await res.json();
             if (res.ok) {
-                setThumbnail(data.url);
+                setImage(data.url);
             } else {
                 alert(data.message || 'Upload failed');
             }
@@ -45,31 +81,27 @@ export default function UploadVideoForm() {
         setMessage(null);
 
         try {
-            const res = await fetch('/api/videos', {
-                method: 'POST',
+            const res = await fetch(`/api/news/${id}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    video_title: title,
-                    video_url: videoUrl,
-                    video_thumbnail: thumbnail,
-                    event_key: eventKey,
+                    title,
+                    excerpt,
+                    content,
+                    image,
                     source,
                     category,
                 }),
             });
 
             if (res.ok) {
-                setMessage({ type: 'success', text: 'Video uploaded successfully!' });
-                setTitle('');
-                setVideoUrl('');
-                setThumbnail('');
-                setEventKey('');
-                setSource('');
-                setCategory('');
+                setMessage({ type: 'success', text: 'News article updated successfully!' });
+                setTimeout(() => router.push('/admin/dashboard'), 1500);
             } else {
-                setMessage({ type: 'error', text: 'Failed to upload video.' });
+                const data = await res.json();
+                setMessage({ type: 'error', text: data.message || 'Failed to update news article.' });
             }
         } catch (error) {
             setMessage({ type: 'error', text: 'An error occurred.' });
@@ -78,10 +110,12 @@ export default function UploadVideoForm() {
         }
     };
 
+    if (fetching) return <div className="p-8 text-white animate-pulse">Loading article data...</div>;
+
     return (
         <div className="glass-card p-6 rounded-2xl h-fit">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span>🎥</span> Upload Highlight Video
+                <span>📝</span> Edit News Article
             </h2>
 
             {message && (
@@ -93,14 +127,14 @@ export default function UploadVideoForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Video Title</label>
+                        <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Title</label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
-                            placeholder="e.g. Man City vs Arsenal"
+                            placeholder="Article Title"
                         />
                     </div>
                     <div>
@@ -110,7 +144,7 @@ export default function UploadVideoForm() {
                             value={source}
                             onChange={(e) => setSource(e.target.value)}
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
-                            placeholder="e.g. YouTube, SuperSport"
+                            placeholder="e.g. ESPN, BBC"
                         />
                     </div>
                 </div>
@@ -122,35 +156,35 @@ export default function UploadVideoForm() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
-                        placeholder="e.g. Highlights, Interviews, Match Analysis"
+                        placeholder="e.g. Premier League, Transfer News"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Video URL (MP4/Youtube)</label>
-                    <input
-                        type="url"
-                        value={videoUrl}
-                        onChange={(e) => setVideoUrl(e.target.value)}
+                    <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Excerpt</label>
+                    <textarea
+                        value={excerpt}
+                        onChange={(e) => setExcerpt(e.target.value)}
                         required
+                        rows={2}
                         className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
-                        placeholder="https://..."
+                        placeholder="Brief summary..."
                     />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                     <div>
-                        <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Thumbnail URL</label>
+                        <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Image URL</label>
                         <input
                             type="url"
-                            value={thumbnail}
-                            onChange={(e) => setThumbnail(e.target.value)}
+                            value={image}
+                            onChange={(e) => setImage(e.target.value)}
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
                             placeholder="https://..."
                         />
                     </div>
                     <div>
-                        <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Or Upload Thumbnail</label>
+                        <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Or Upload Image</label>
                         <input
                             type="file"
                             accept="image/*"
@@ -159,26 +193,34 @@ export default function UploadVideoForm() {
                         />
                     </div>
                 </div>
-                {uploading && <div className="text-xs text-blue-400 animate-pulse">Uploading thumbnail...</div>}
+                {uploading && <div className="text-xs text-blue-400 animate-pulse">Uploading image...</div>}
 
                 <div>
-                    <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Match Event Key (Optional)</label>
-                    <input
-                        type="text"
-                        value={eventKey}
-                        onChange={(e) => setEventKey(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
-                        placeholder="e.g. 12345"
-                    />
+                    <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Content</label>
+                    <div className="bg-white/90 rounded-lg text-black overflow-hidden min-h-[300px]">
+                        <ReactQuill
+                            theme="snow"
+                            value={content}
+                            onChange={setContent}
+                            style={{ height: '250px', marginBottom: '40px' }}
+                        />
+                    </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-4 flex gap-4">
+                    <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold uppercase tracking-wider py-3 rounded-lg transition-all"
+                    >
+                        Cancel
+                    </button>
                     <button
                         type="submit"
                         disabled={loading || uploading}
-                        className="w-full bg-secondary hover:bg-secondary/90 text-white font-black uppercase tracking-wider py-3 rounded-lg transition-all hover:scale-[1.02] shadow-lg shadow-secondary/20 disabled:opacity-50"
+                        className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-wider py-3 rounded-lg transition-all hover:scale-[1.02] shadow-lg shadow-blue-600/20 disabled:opacity-50"
                     >
-                        {loading ? 'Uploading...' : 'Save Video'}
+                        {loading ? 'Updating...' : 'Update Article'}
                     </button>
                 </div>
             </form>

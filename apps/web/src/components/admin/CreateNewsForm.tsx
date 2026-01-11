@@ -13,6 +13,7 @@ export default function CreateNewsForm() {
     const [content, setContent] = useState('');
     const [image, setImage] = useState('');
     const [source, setSource] = useState('');
+    const [category, setCategory] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -60,6 +61,7 @@ export default function CreateNewsForm() {
                     content,
                     image,
                     source,
+                    category,
                 }),
             });
 
@@ -70,6 +72,7 @@ export default function CreateNewsForm() {
                 setContent('');
                 setImage('');
                 setSource('');
+                setCategory('');
             } else {
                 setMessage({ type: 'error', text: 'Failed to create news article.' });
             }
@@ -115,6 +118,17 @@ export default function CreateNewsForm() {
                             placeholder="e.g. ESPN, BBC"
                         />
                     </div>
+                </div>
+
+                <div>
+                    <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Category</label>
+                    <input
+                        type="text"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
+                        placeholder="e.g. Premier League, Transfer News"
+                    />
                 </div>
 
                 <div>

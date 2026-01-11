@@ -21,6 +21,10 @@ const VideoSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  category: {
+    type: String,
+    default: 'General',
+  },
 }, { timestamps: true });
 
 export default mongoose.models.Video || mongoose.model('Video', VideoSchema);

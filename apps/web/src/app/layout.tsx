@@ -6,6 +6,7 @@ import { Header } from '../components/Header';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://goalmills.com'),
     title: "GoalMills | Live Scores, Sports Stats & Betting Insights",
     description:
         "Get real-time live scores, match stats, standings, and betting insights for Football, Cricket, NBA & Tennis. Fast, accurate sports data on web & mobile.",

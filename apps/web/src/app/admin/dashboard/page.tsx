@@ -3,6 +3,7 @@
 import { useSession, signOut } from 'next-auth/react';
 import CreateNewsForm from '@/components/admin/CreateNewsForm';
 import UploadVideoForm from '@/components/admin/UploadVideoForm';
+import NewsList from '@/components/admin/NewsList';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -39,6 +40,11 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <CreateNewsForm />
                     <UploadVideoForm />
+                </div>
+
+                {/* Management Section */}
+                <div className="grid grid-cols-1 gap-8">
+                    <NewsList />
                 </div>
             </div>
         </div>
