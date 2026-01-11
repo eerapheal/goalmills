@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   --color-background: #020617;
@@ -56,6 +57,15 @@ body {
   font-family: var(--font-sans);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   @apply antialiased;
+}
+
+@layer base {
+  .prose img {
+    @apply max-w-full h-auto rounded-2xl mx-auto shadow-2xl;
+  }
+  .prose iframe {
+    @apply max-w-full rounded-2xl mx-auto shadow-2xl;
+  }
 }
 
 @layer utilities {

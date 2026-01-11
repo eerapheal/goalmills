@@ -20,11 +20,13 @@ interface ReactPlayerProps {
     [key: string]: any;
 }
 
-// Dynamic import of ReactPlayer to avoid SSR issues (hydration mismatch)
-const ReactPlayer = dynamic(() => import('react-player').then(mod => mod.default || (mod as any).default || mod), {
+// Dynamic import of ReactPlayer to avoid SSR issues
+const ReactPlayerImport = dynamic(() => import('react-player'), {
     ssr: false,
     loading: () => <div className="aspect-video w-full bg-slate-900 rounded-3xl animate-pulse flex items-center justify-center text-slate-500 font-bold uppercase tracking-widest text-xs">Loading Player...</div>
 });
+
+const ReactPlayer = ReactPlayerImport as any;
 
 interface VideoPlayerProps {
     url: string;
