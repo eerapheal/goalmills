@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import dbConnect from '@/lib/db';
 import News from '@/models/News';
+import { ShareButtons } from '@/components/ShareButtons';
 
 // Function to generate metadata
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -207,16 +208,10 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                         Back to all news
                     </Link>
 
-                    <div className="flex items-center gap-4">
-                        <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Share this article</span>
-                        <div className="flex gap-2">
-                            {[1, 2, 3].map((i) => (
-                                <button key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors text-white">
-                                    {i === 1 ? 'X' : i === 2 ? 'f' : 'in'}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+                    <ShareButtons
+                        url={`https://goalmills-web.vercel.app/news/${id}`}
+                        title={article.title as string}
+                    />
                 </div>
             </div>
         </div>
