@@ -28,9 +28,15 @@ export interface VideoHighlight {
   thumbnail: string;
   views: number;
   duration: string;
+  date?: string;
   createdAt: string;
   teams: string[];
   description?: string;
+  league?: {
+    name: string;
+    logo: string;
+  };
+  videoUrl?: string;
 }
 
 // Football Types
@@ -39,16 +45,18 @@ export interface Team {
   name: string;
   logo: string;
   winner?: boolean | null;
+  colors?: any;
 }
 
 export interface League {
   id: number;
   name: string;
-  country: string;
+  country?: string;
   logo: string;
-  flag: string;
-  season: number;
+  flag?: string;
+  season?: number;
   round?: string;
+  type?: string;
 }
 
 export interface Score {
@@ -65,6 +73,7 @@ export interface Fixture {
     timezone: string;
     date: string;
     timestamp: number;
+    periods: { first: number | null; second: number | null } | null;
     venue: {
       id: number | null;
       name: string | null;
@@ -247,8 +256,10 @@ export interface FootballPlayer {
 export interface FootballGoalScorer {
   time: string;
   home_scorer: string;
+  home_assist?: string;
   score: string;
   away_scorer: string;
+  away_assist?: string;
 }
 
 export interface FootballSubstitute {

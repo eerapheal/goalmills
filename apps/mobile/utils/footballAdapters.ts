@@ -40,14 +40,14 @@ export const mapEventToFixture = (event: FootballEvent): Fixture => {
     return {
         fixture: {
             id: parseInt(event.event_key),
-            referee: event.event_referee,
+            referee: event.event_referee || null,
             timezone: 'UTC',
             date: `${event.event_date}T${event.event_time}:00`,
             timestamp: new Date(`${event.event_date}T${event.event_time}:00`).getTime() / 1000,
             periods: { first: null, second: null },
             venue: {
                 id: null,
-                name: event.event_stadium,
+                name: event.event_stadium || null,
                 city: ''
             },
             status: {
@@ -60,7 +60,7 @@ export const mapEventToFixture = (event: FootballEvent): Fixture => {
             id: parseInt(event.league_key),
             name: event.league_name,
             country: event.country_name,
-            logo: event.league_logo,
+            logo: event.league_logo || '',
             flag: event.country_logo,
             season: parseInt(event.league_season), // extracting year
             round: event.league_round
@@ -69,13 +69,13 @@ export const mapEventToFixture = (event: FootballEvent): Fixture => {
             home: {
                 id: parseInt(event.home_team_key),
                 name: event.event_home_team,
-                logo: event.home_team_logo,
+                logo: event.home_team_logo || '',
                 winner: goals.home !== null && goals.away !== null ? goals.home > goals.away : undefined
             },
             away: {
                 id: parseInt(event.away_team_key),
                 name: event.event_away_team,
-                logo: event.away_team_logo,
+                logo: event.away_team_logo || '',
                 winner: goals.home !== null && goals.away !== null ? goals.away > goals.home : undefined
             }
         },
@@ -129,13 +129,39 @@ export const mapVideoToHighlight = (video: FootballVideo): VideoHighlight => {
     };
 };
 
+export const mapInternalVideoToHighlight = (video: any): VideoHighlight => {
+  let teams: string[] = [];
+  if (video.video_title.includes(' vs ')) {
+      teams = video.video_title.split(' vs ');
+  } else {
+      teams = [video.video_title];
+  }
+
+  return {
+      id: video._id,
+      title: video.video_title,
+      thumbnail: video.video_thumbnail || 'https://via.placeholder.com/640x360',
+      duration: 'Highlights',
+      views: Math.floor(Math.random() * 1000) + 50, // Randomized for UI
+      date: video.createdAt,
+      league: {
+          name: video.category || 'Football',
+          logo: ''
+      },
+      teams: teams,
+      videoUrl: video.video_url,
+      description: video.source || '',
+      createdAt: video.createdAt,
+  };
+};
+
 export const mapStandingToStanding = (standing: FootballStanding): Standing => {
     return {
         rank: parseInt(standing.standing_place),
         team: {
             id: parseInt(standing.team_key),
             name: standing.standing_team,
-            logo: `https://crests.football-data.org/${standing.team_key}.png` // Might not match exactly but using mock logic
+            logo: standing.team_key ? `https://crests.football-data.org/${standing.team_key}.png` : ''
         },
         points: parseInt(standing.standing_PTS),
         goalsDiff: parseInt(standing.standing_GD),
@@ -177,7 +203,7 @@ export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
             if (g.home_scorer) {
                 events.push({
                     time: { elapsed: time, extra: null },
-                    team: { id: homeTeamId, name: event.event_home_team, logo: event.home_team_logo },
+                    team: { id: homeTeamId, name: event.event_home_team, logo: event.home_team_logo || '' },
                     player: { id: 0, name: g.home_scorer },
                     assist: { id: 0, name: g.home_assist || '' },
                     type: 'Goal',
@@ -188,7 +214,7 @@ export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
             if (g.away_scorer) {
                 events.push({
                     time: { elapsed: time, extra: null },
-                    team: { id: awayTeamId, name: event.event_away_team, logo: event.away_team_logo },
+                    team: { id: awayTeamId, name: event.event_away_team, logo: event.away_team_logo || '' },
                     player: { id: 0, name: g.away_scorer },
                     assist: { id: 0, name: g.away_assist || '' },
                     type: 'Goal',
@@ -209,7 +235,7 @@ export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
              if (c.home_fault) {
                  events.push({
                     time: { elapsed: time, extra: null },
-                    team: { id: homeTeamId, name: event.event_home_team, logo: event.home_team_logo },
+                    team: { id: homeTeamId, name: event.event_home_team, logo: event.home_team_logo || '' },
                     player: { id: 0, name: c.home_fault },
                     assist: { id: 0, name: '' },
                     type: cardType,
@@ -220,7 +246,7 @@ export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
              if (c.away_fault) {
                  events.push({
                     time: { elapsed: time, extra: null },
-                    team: { id: awayTeamId, name: event.event_away_team, logo: event.away_team_logo },
+                    team: { id: awayTeamId, name: event.event_away_team, logo: event.away_team_logo || '' },
                     player: { id: 0, name: c.away_fault },
                     assist: { id: 0, name: '' },
                     type: cardType,
@@ -263,13 +289,13 @@ export const mapLineupsToLineups = (event: FootballEvent): Lineup[] => {
             coach: {
                 id: 0,
                 name: teamData.coaches?.[0]?.coache || 'Unknown',
-                photo: null
+                photo: ''
             }
         };
     };
 
-    const homeLineup = mapTeamLineup(event.lineups.home_team, event.event_home_team, parseInt(event.home_team_key), event.home_team_logo, event.event_home_formation);
-    const awayLineup = mapTeamLineup(event.lineups.away_team, event.event_away_team, parseInt(event.away_team_key), event.away_team_logo, event.event_away_formation);
+    const homeLineup = mapTeamLineup(event.lineups.home_team, event.event_home_team, parseInt(event.home_team_key), event.home_team_logo || '', event.event_home_formation || '');
+    const awayLineup = mapTeamLineup(event.lineups.away_team, event.event_away_team, parseInt(event.away_team_key), event.away_team_logo || '', event.event_away_formation || '');
 
     return [homeLineup, awayLineup];
 };
@@ -279,6 +305,8 @@ export const mapLeagueToLeague = (league: FootballLeague): League => {
         id: parseInt(league.league_key),
         name: league.league_name,
         type: 'League',
-        logo: league.league_logo
+        logo: league.league_logo,
+        country: league.country_name,
+        flag: league.country_logo
     };
 };

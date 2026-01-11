@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
-import { advancedFootballApi } from '../../../services/advancedFootballApi';
-import { mapVideoToHighlight } from '../../../utils/footballAdapters';
+import { goalmillsApi } from '../../../services/goalmillsApi';
+import { mapInternalVideoToHighlight } from '../../../utils/footballAdapters';
 import { VideoHighlight } from '@goalmills/types';
 import { VideoCard } from '../../../components/VideoCard';
 
@@ -18,10 +18,8 @@ export default function HighlightScreen() {
 
     const loadHighlights = async () => {
         try {
-            const response = await advancedFootballApi.getVideos();
-            if (response.success) {
-                setHighlights(response.result.map(mapVideoToHighlight));
-            }
+            const data = await goalmillsApi.getVideos();
+            setHighlights(data.map(mapInternalVideoToHighlight));
         } catch (error) {
             console.error('Failed to load highlights:', error);
         } finally {

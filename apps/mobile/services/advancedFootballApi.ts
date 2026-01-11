@@ -37,7 +37,7 @@ import {
 } from '@goalmills/types';
 
 // API Configuration
-const API_BASE_URL = 'https://apiv2.allsportsapi.com/football';
+const API_BASE_URL = 'https://goalmills-web.vercel.app/api/football';
 const API_KEY = 'e51b922070b6a96ce765b6dd06b992a71ab36fd777acd0d744ad281cba968770';
 
 // Helper function to build URL with parameters

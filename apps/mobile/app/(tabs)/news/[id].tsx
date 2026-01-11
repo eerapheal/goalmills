@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
-import { advancedFootballApi as footballApi } from '../../../services/advancedFootballApi';
+import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
+import RenderHTML from 'react-native-render-html';
 
 export default function NewsDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [news, setNews] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const { width } = useWindowDimensions();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function NewsDetail() {
 
   const loadNewsDetail = async () => {
     try {
-      const data = await footballApi.getBlogPostById(id);
+      const data = await goalmillsApi.getNewsById(id);
       setNews(data);
     } catch (error) {
       console.error('Failed to load news detail:', error);
@@ -44,6 +46,24 @@ export default function NewsDetail() {
       </View>
     );
   }
+
+  // Define tags styles for HTML rendering
+  const tagsStyles = {
+    body: {
+      color: 'rgba(255,255,255,0.85)',
+      fontSize: 16,
+      lineHeight: 24,
+    },
+    p: {
+      marginBottom: 16,
+    },
+    h1: { color: '#fff', fontSize: 24, fontWeight: 'bold' as const, marginBottom: 12 },
+    h2: { color: '#fff', fontSize: 20, fontWeight: 'bold' as const, marginBottom: 10 },
+    h3: { color: '#fff', fontSize: 18, fontWeight: 'bold' as const, marginBottom: 8 },
+    strong: { fontWeight: 'bold' as const, color: '#fff' },
+    em: { fontStyle: 'italic' as const },
+    a: { color: COLORS.primary, textDecorationLine: 'underline' as const },
+  };
 
   return (
     <>
@@ -87,17 +107,15 @@ export default function NewsDetail() {
 
           <View style={styles.divider} />
 
-          <Text style={styles.bodyText}>
-            {news.content || 'Full article content would go here. This is a mock implementation so we are just showing the structure. Imagine rich text content here with images strings, quotes, and deeper analysis of the match/topic.'}
-          </Text>
-
-          {/* Mock longer content */}
-          <Text style={styles.bodyText}>
-            To give you an idea of how the layout looks with more text: {"\n\n"}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            {"\n\n"}
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </Text>
+          {news.content ? (
+            <RenderHTML
+              contentWidth={width - SPACING.lg * 2}
+              source={{ html: news.content }}
+              tagsStyles={tagsStyles}
+            />
+          ) : (
+            <Text style={styles.bodyText}>No content available for this article.</Text>
+          )}
         </View>
       </ScrollView>
     </>

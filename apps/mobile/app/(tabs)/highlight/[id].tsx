@@ -2,12 +2,23 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
-import { advancedFootballApi } from '../../../services/advancedFootballApi';
-import { mapVideoToHighlight } from '../../../utils/footballAdapters';
+import { goalmillsApi } from '../../../services/goalmillsApi';
+import { mapInternalVideoToHighlight } from '../../../utils/footballAdapters';
 import { VideoHighlight } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 const { width } = Dimensions.get('window');
+
+const getYoutubeId = (url: string) => {
+    if (!url) return null;
+    if (url.includes('embed/')) {
+        return url.split('embed/')[1].split('?')[0];
+    }
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+};
 
 export default function HighlightDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,13 +35,9 @@ export default function HighlightDetail() {
 
     const loadVideoDetail = async () => {
         try {
-            const response = await advancedFootballApi.getVideos(Number(id));
-            if (response.success && response.result.length > 0) {
-                // The API returns an array, possibly with one item matching the ID or multiple. 
-                // If getVideos(id) filters by event_key correctly, we take the first one.
-                // However, advancedFootballApi mock actually returns a list even with ID if it matches event_key.
-                const videoData = response.result[0];
-                setVideo(mapVideoToHighlight(videoData));
+            const data = await goalmillsApi.getVideoById(id);
+            if (data) {
+                setVideo(mapInternalVideoToHighlight(data));
             } else {
                 setVideo(null);
             }
@@ -62,6 +69,8 @@ export default function HighlightDetail() {
         return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(views);
     };
 
+    const youtubeId = video.videoUrl ? getYoutubeId(video.videoUrl) : null;
+
     return (
         <>
             <Stack.Screen
@@ -75,11 +84,15 @@ export default function HighlightDetail() {
             />
             <View style={styles.container}>
                 <View style={styles.videoPlayerContainer}>
-                    {isPlaying ? (
-                        <View style={styles.fakePlayer}>
-                            <Text style={styles.fakePlayerText}>Video Player Would Load Here</Text>
+                    {isPlaying && youtubeId ? (
+                        <View style={{ width: '100%', height: '100%' }}>
+                            <YoutubePlayer
+                                height={width * (9 / 16)}
+                                play={true}
+                                videoId={youtubeId}
+                            />
                             <TouchableOpacity onPress={() => setIsPlaying(false)} style={styles.stopButton}>
-                                <Ionicons name="close-circle" size={40} color="#fff" />
+                                <Ionicons name="close-circle" size={32} color="rgba(255,255,255,0.7)" />
                             </TouchableOpacity>
                         </View>
                     ) : (

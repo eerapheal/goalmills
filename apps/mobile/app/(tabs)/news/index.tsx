@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
-import { advancedFootballApi } from '../../../services/advancedFootballApi';
+import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost } from '@goalmills/types';
 import { NewsCard } from '../../../components/NewsCard';
 
@@ -17,7 +17,7 @@ export default function NewsScreen() {
 
   const loadNews = async () => {
     try {
-      const data = await advancedFootballApi.getBlogPosts();
+      const data = await goalmillsApi.getNews();
       setNews(data);
     } catch (error) {
       console.error('Failed to load news:', error);
