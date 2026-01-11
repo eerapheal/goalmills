@@ -22,8 +22,16 @@ export async function POST(request: Request) {
 
   await dbConnect();
   try {
-    const body = await request.json();
-    const news = await News.create(body);
+    const { title, excerpt, content, image, source } = await request.json();
+    const news = await News.create({
+      title,
+      excerpt,
+      content,
+      image,
+      source,
+      author: session.user.name || 'Admin',
+      readTime: Math.ceil(content.split(' ').length / 200) || 5, // Estimate read time
+    });
     return NextResponse.json(news, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: "Error creating news" }, { status: 400 });

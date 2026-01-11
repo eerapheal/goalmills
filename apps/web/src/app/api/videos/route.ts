@@ -22,8 +22,14 @@ export async function POST(request: Request) {
 
   await dbConnect();
   try {
-    const body = await request.json();
-    const video = await Video.create(body);
+    const { video_title, video_url, video_thumbnail, event_key, source } = await request.json();
+    const video = await Video.create({
+      video_title,
+      video_url,
+      video_thumbnail,
+      event_key,
+      source
+    });
     return NextResponse.json(video, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: "Error creating video" }, { status: 400 });

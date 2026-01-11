@@ -62,7 +62,7 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
                             {videoData.video_title}
                         </h1>
                         <p className="text-slate-400 text-sm">
-                            Uploaded on {videoData.createdAt}
+                            Uploaded on {videoData.createdAt} {videoData.source && <span className="ml-2">• Source: {videoData.source}</span>}
                         </p>
                     </div>
 

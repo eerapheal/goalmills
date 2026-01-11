@@ -29,6 +29,10 @@ const NewsSchema = new mongoose.Schema({
     type: String,
     default: 'General',
   },
+  source: {
+    type: String,
+    required: false,
+  },
 }, { timestamps: true });
 
 export default mongoose.models.News || mongoose.model('News', NewsSchema);
