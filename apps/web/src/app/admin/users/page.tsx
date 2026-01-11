@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { FiArrowLeft, FiLogOut } from 'react-icons/fi';
 import { User, UserRole } from '@goalmills/types';
