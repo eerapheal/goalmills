@@ -4,12 +4,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   useEffect(() => {
     setMounted(true);
@@ -81,6 +83,33 @@ export function Header() {
               </Link>
             );
           })}
+
+          {session?.user ? (
+            <Link href="/profile" className="flex items-center gap-3 pl-4 border-l border-white/10 group">
+              <div className="text-right hidden lg:block">
+                <p className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">{session.user.name}</p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-wider">{session.user.role || 'User'}</p>
+              </div>
+              <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-slate-700 group-hover:border-blue-500 transition-colors">
+                {session.user.image ? (
+                  <Image
+                    src={session.user.image}
+                    alt={session.user.name || 'Profile'}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold">
+                    {session.user.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+            </Link>
+          ) : (
+            <Link href="/signin" className="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all text-sm font-bold ml-4">
+              Sign In
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -114,6 +143,24 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+
+            {session?.user ? (
+              <Link
+                href="/profile"
+                className={`text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-300 to-slate-500 hover:from-blue-400 hover:to-cyan-400 transition-all duration-300 transform ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                style={{ transitionDelay: `${navItems.length * 100}ms` }}
+              >
+                My Profile
+              </Link>
+            ) : (
+              <Link
+                href="/signin"
+                className={`text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-300 to-slate-500 hover:from-blue-400 hover:to-cyan-400 transition-all duration-300 transform ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                style={{ transitionDelay: `${navItems.length * 100}ms` }}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           <div className="absolute bottom-12 text-slate-500 text-sm">

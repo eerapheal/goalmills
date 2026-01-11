@@ -25,5 +25,6 @@ declare module "next-auth/jwt" {
     /** OpenID ID Token */
     id?: string;
     role?: string;
+    picture?: string;
   }
 }

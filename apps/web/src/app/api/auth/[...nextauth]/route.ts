@@ -41,6 +41,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.username,
           role: user.role,
+          image: user.image,
         };
       },
     }),
@@ -49,17 +50,26 @@ export const authOptions: NextAuthOptions = {
     signIn: "/signin",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.picture = user.image;
       }
+      
+      // Allow updating the token when session is updated
+      if (trigger === "update" && session) {
+        if (session.user.image) token.picture = session.user.image;
+        if (session.user.name) token.name = session.user.name;
+      }
+      
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.image = token.picture;
       }
       return session;
     },
