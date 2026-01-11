@@ -21,7 +21,7 @@ export default function NewsList() {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const res = await fetch('/api/news');
+                const res = await fetch('/api/news?admin=true');
                 if (res.ok) {
                     const data = await res.json();
                     setNews(data);
@@ -74,8 +74,8 @@ export default function NewsList() {
                                 <Link
                                     href={canEdit ? `/admin/news/${item._id}/edit` : `#`}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${canEdit
-                                            ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
-                                            : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
+                                        ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
+                                        : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
                                         }`}
                                 >
                                     Edit
@@ -84,8 +84,8 @@ export default function NewsList() {
                                     onClick={() => handleDelete(item._id)}
                                     disabled={!canEdit}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${canEdit
-                                            ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20'
-                                            : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
+                                        ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20'
+                                        : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
                                         }`}
                                 >
                                     Delete

@@ -4,10 +4,29 @@ import News from "@/models/News";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const isAdminRequest = searchParams.get('admin') === 'true';
+  const session = await getServerSession(authOptions) as any;
+
   await dbConnect();
   try {
-    const news = await News.find({}).sort({ createdAt: -1 });
+    let filter = {};
+
+    // If it's an admin request, enforce role-based filtering
+    if (isAdminRequest) {
+      if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      }
+
+      // If staff, only show their own posts
+      if (session.user.role === 'staff') {
+        filter = { authorId: session.user.id };
+      }
+      // If super-admin, filter remains {} (all posts)
+    }
+
+    const news = await News.find(filter).sort({ createdAt: -1 });
     return NextResponse.json(news);
   } catch (error) {
     return NextResponse.json({ message: "Error fetching news" }, { status: 500 });
