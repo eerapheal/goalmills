@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
         padding: SPACING.md,
     },
     title: {
-        color: COLORS.background,
+        color: '#fff',
         fontSize: FONT_SIZES.md,
         fontWeight: 'bold',
         marginBottom: 4,

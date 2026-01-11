@@ -35,6 +35,7 @@ import {
   FootballOfficial,
   BlogPost,
 } from '@goalmills/types';
+import { goalmillsApi } from './goalmillsApi';
 
 // API Configuration
 const API_BASE_URL = 'https://goalmills-web.vercel.app/api/football';
@@ -59,7 +60,8 @@ const buildUrl = (method: string, params: Record<string, any> = {}): string => {
 async function fetchFromAPI<T>(method: string, params: Record<string, any> = {}): Promise<T> {
   try {
     const url = buildUrl(method, params);
-    console.log(`Fetching from API: ${method}`, params);
+    // Be less noisy with dev logs
+    // console.log(`Fetching from API: ${method}`, params);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -69,13 +71,20 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      if (response.status >= 500) {
+        console.warn(`Upstream API ${method} failed with ${response.status}. This is likely a temporary issue with the provider.`);
+      }
+      throw new Error(`API request failed: ${response.status}`);
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(`Error fetching ${method}:`, error);
+    if ((error as any).message?.includes('500')) {
+        // Already warned above
+    } else {
+        console.warn(`Error fetching ${method}:`, error);
+    }
     throw error;
   }
 }
@@ -152,6 +161,43 @@ const mockOfficials: FootballOfficial[] = [
   { name: 'Clément Turpin', country: 'France', matches: 189, image: 'https://ui-avatars.com/api/?name=Clement+Turpin&background=random&size=200', yellowCards: 876, redCards: 54 },
 ];
 
+// Mock Data for Fixtures (for fallback when API is down)
+const mockFixtures: FootballEvent[] = [
+  {
+    event_key: 123456,
+    event_date: new Date().toISOString().split('T')[0],
+    event_time: '20:00',
+    event_home_team: 'Manchester City',
+    home_team_key: 1,
+    event_away_team: 'Liverpool',
+    away_team_key: 2,
+    event_halftime_result: '1 - 0',
+    event_final_result: '2 - 1',
+    event_ft_result: '2 - 1',
+    event_status: 'Finished',
+    league_name: 'Premier League',
+    league_key: 152,
+    home_team_logo: 'https://apiv2.allsportsapi.com/logo/teams/1_manchester-city.png',
+    away_team_logo: 'https://apiv2.allsportsapi.com/logo/teams/2_liverpool.png',
+    event_live: '0',
+  },
+  {
+    event_key: 123457,
+    event_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    event_time: '19:45',
+    event_home_team: 'Real Madrid',
+    home_team_key: 3,
+    event_away_team: 'Barcelona',
+    away_team_key: 4,
+    event_status: '',
+    league_name: 'La Liga',
+    league_key: 302,
+    home_team_logo: 'https://apiv2.allsportsapi.com/logo/teams/3_real-madrid.png',
+    away_team_logo: 'https://apiv2.allsportsapi.com/logo/teams/4_barcelona.png',
+    event_live: '0',
+  }
+] as any[];
+
 // API Implementation
 export const advancedFootballApi = {
   /**
@@ -163,7 +209,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballCountriesResponse>('Countries');
       return response;
     } catch (error) {
-      console.error('Error fetching countries:', error);
       return { success: 1, result: [] };
     }
   },
@@ -181,7 +226,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballLeaguesResponse>('Leagues', params);
       return response;
     } catch (error) {
-      console.error('Error fetching leagues:', error);
       return { success: 1, result: [] };
     }
   },
@@ -213,8 +257,8 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballFixturesResponse>('Fixtures', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching fixtures:', error);
-      return { success: 1, result: [] };
+      // Return mock fixtures as fallback so app isn't empty on API failure
+      return { success: 1, result: mockFixtures };
     }
   },
 
@@ -233,7 +277,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballH2HResponse>('H2H', params);
       return response;
     } catch (error) {
-      console.error('Error fetching H2H:', error);
       return {
         success: 1,
         result: {
@@ -262,7 +305,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballLivescoreResponse>('Livescore', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching livescore:', error);
       return { success: 1, result: [] };
     }
   },
@@ -276,7 +318,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballStandingsResponse>('Standings', { leagueId });
       return response;
     } catch (error) {
-      console.error('Error fetching standings:', error);
       return {
         success: 1,
         result: {
@@ -297,7 +338,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballTopscorersResponse>('Topscorers', { leagueId });
       return response;
     } catch (error) {
-      console.error('Error fetching topscorers:', error);
       return { success: 1, result: [] };
     }
   },
@@ -317,7 +357,7 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballTeamsResponse>('Teams', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching teams:', error);
+      // Teams API is notoriously flaky, return empty result silently
       return { success: 1, result: [] };
     }
   },
@@ -338,7 +378,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballPlayersResponse>('Players', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching players:', error);
       return { success: 1, result: [] };
     }
   },
@@ -352,10 +391,35 @@ export const advancedFootballApi = {
       const params: Record<string, any> = {};
       if (eventId) params.eventId = eventId;
 
-      const response = await fetchFromAPI<FootballVideosResponse>('Videos', params);
-      return response;
+      // 1. Fetch from External API
+      const externalPromise = fetchFromAPI<FootballVideosResponse>('Videos', params)
+        .catch((err) => {
+          console.warn('External API video fetch failed (likely 500):', err.message);
+          return { success: 1, result: [] as FootballVideo[] };
+        });
+
+      // 2. Fetch from Internal Database (matching web app behavior)
+      const internalPromise = goalmillsApi.getVideos()
+        .catch((err) => {
+          console.warn('Internal DB video fetch failed:', err.message);
+          return [] as any[];
+        });
+
+      const [externalRes, internalRes] = await Promise.all([externalPromise, internalPromise]);
+
+      // Map internal videos to FootballVideo structure
+      const mappedInternal = internalRes.map(v => ({
+        event_key: v.event_key || v._id,
+        video_title: v.video_title,
+        video_title_full: v.video_title, // Reuse title if full title not available
+        video_url: v.video_url,
+      } as unknown as FootballVideo));
+
+      return {
+        success: 1,
+        result: [...mappedInternal, ...(externalRes.result || [])],
+      };
     } catch (error) {
-      console.error('Error fetching videos:', error);
       return { success: 1, result: [] };
     }
   },
@@ -377,7 +441,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballOddsResponse>('Odds', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching odds:', error);
       return { success: 1, result: {} };
     }
   },
@@ -399,7 +462,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballProbabilitiesResponse>('Probabilities', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching probabilities:', error);
       return { success: 1, result: [] };
     }
   },
@@ -420,7 +482,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballLiveOddsResponse>('OddsLive', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching live odds:', error);
       return { success: 1, result: {} };
     }
   },
@@ -444,7 +505,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballCommentsResponse>('Comments', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching comments:', error);
       return { success: 1, result: {} };
     }
   },
@@ -466,7 +526,6 @@ export const advancedFootballApi = {
       const response = await fetchFromAPI<FootballFullOddsResponse>('FullOdds', apiParams);
       return response;
     } catch (error) {
-      console.error('Error fetching full odds:', error);
       return { success: 1, result: {} };
     }
   },
