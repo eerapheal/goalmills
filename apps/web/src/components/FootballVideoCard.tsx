@@ -1,6 +1,7 @@
 'use client';
 
 import { FootballVideo } from '@goalmills/types';
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface FootballVideoCardProps {
@@ -35,10 +36,12 @@ export function FootballVideoCard({ video }: FootballVideoCardProps) {
                         className="w-full h-full relative cursor-pointer"
                         onClick={() => setIsPlaying(true)}
                     >
-                        <img
+                        <Image
                             src={thumbnailUrl}
                             alt={video.video_title}
-                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="w-12 h-12 rounded-full bg-secondary/90 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-black/50">

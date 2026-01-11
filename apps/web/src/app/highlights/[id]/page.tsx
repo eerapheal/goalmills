@@ -126,7 +126,7 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
                 </Link>
 
                 <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden p-2 md:p-8 shadow-2xl">
-                   
+
 
                     <div className="w-full">
                         <VideoPlayer
@@ -136,7 +136,7 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
                             className="aspect-[4/3] md:aspect-video"
                         />
                     </div>
-                     <div className="mt-6">
+                    <div className="mt-6">
                         <h1 className="text-lg md:text-2xl font-black text-white mb-2 leading-tight">
                             {videoData.video_title}
                         </h1>

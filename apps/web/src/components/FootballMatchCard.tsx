@@ -75,12 +75,15 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
                     >
                         <Link href={`/leagues/${event.league_key}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                             {event.league_logo && (
-                                <img
-                                    src={event.league_logo}
-                                    alt={event.league_name}
-                                    className="w-4 h-4 object-contain"
-                                    onError={(e) => e.currentTarget.style.display = 'none'}
-                                />
+                                <div className="relative w-4 h-4">
+                                    <Image
+                                        src={event.league_logo}
+                                        alt={event.league_name}
+                                        width={16}
+                                        height={16}
+                                        className="object-contain"
+                                    />
+                                </div>
                             )}
                             <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">{event.league_name} - {event.league_round}</span>
                         </Link>
@@ -107,11 +110,12 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
                 >
                     <div className="relative w-7 h-7 flex items-center justify-center bg-gray-700/50 rounded-full overflow-hidden">
                         {event.home_team_logo ? (
-                            <img
+                            <Image
                                 src={event.home_team_logo}
                                 alt={event.event_home_team}
-                                className="object-contain drop-shadow-lg w-full h-full"
-                                onError={(e) => e.currentTarget.style.display = 'none'}
+                                width={28}
+                                height={28}
+                                className="object-contain drop-shadow-lg"
                             />
                         ) : (
                             <div className="w-full h-full bg-gray-700 rounded-full" />
@@ -170,11 +174,12 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
                     </p>
                     <div className="relative w-7 h-7 flex items-center justify-center bg-gray-700/50 rounded-full overflow-hidden">
                         {event.away_team_logo ? (
-                            <img
+                            <Image
                                 src={event.away_team_logo}
                                 alt={event.event_away_team}
-                                className="object-contain drop-shadow-lg w-full h-full"
-                                onError={(e) => e.currentTarget.style.display = 'none'}
+                                width={28}
+                                height={28}
+                                className="object-contain drop-shadow-lg"
                             />
                         ) : (
                             <div className="w-full h-full bg-gray-700 rounded-full" />

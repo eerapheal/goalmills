@@ -1,6 +1,7 @@
 'use client';
 
 import { FootballTopscorer, FootballTeam } from '@goalmills/types';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface FootballTopScorersProps {
@@ -83,16 +84,12 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
                         {/* Rank & Player Image */}
                         <div className="relative shrink-0">
                             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-secondary/30 group-hover:border-secondary transition-colors bg-white/5">
-                                <img
+                                <Image
                                     src={playerAvatar}
                                     alt={scorer.player_name}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        // If the player_image fails, fallback to ui-avatars
-                                        if (e.currentTarget.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.player_name)}&background=random&color=fff`) {
-                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.player_name)}&background=random&color=fff`;
-                                        }
-                                    }}
+                                    width={56}
+                                    height={56}
+                                    className="object-cover"
                                 />
                             </div>
                             <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-secondary flex items-center justify-center border-2 border-[#0a0a0a] shadow-lg">
@@ -107,15 +104,12 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
                                 </h3>
                             </Link>
                             <div className="flex items-center gap-2 mt-1">
-                                <img
+                                <Image
                                     src={teamLogo}
                                     alt={scorer.team_name}
-                                    className="w-4 h-4 object-contain"
-                                    onError={(e) => {
-                                        if (e.currentTarget.src !== `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.team_name)}&background=random`) {
-                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.team_name)}&background=random`;
-                                        }
-                                    }}
+                                    width={16}
+                                    height={16}
+                                    className="object-contain"
                                 />
                                 <span className="text-xs text-text-secondary truncate">{scorer.team_name}</span>
                             </div>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import dbConnect from '@/lib/db';
 import Video from '@/models/Video';
 
@@ -29,7 +30,7 @@ export default async function HighlightsPage() {
                     Match <span className="text-blue-500">Highlights</span>
                 </h1>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {highlights.map((item) => {
                         const thumbnail = getThumbnail(item.video_url, item.video_thumbnail);
                         return (
@@ -38,10 +39,13 @@ export default async function HighlightsPage() {
                                 key={item._id.toString()}
                                 className="group relative block aspect-video rounded-xl overflow-hidden border border-slate-800 hover:border-blue-500 transition-all duration-300 shadow-lg hover:shadow-blue-500/20"
                             >
-                                <img
+                                <Image
                                     src={thumbnail}
                                     alt={item.video_title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    priority={false}
                                 />
                                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                     <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">

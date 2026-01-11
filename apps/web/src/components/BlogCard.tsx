@@ -20,11 +20,12 @@ export function BlogCard({ post, onPress }: BlogCardProps) {
             className="group glass-card rounded-xl overflow-hidden cursor-pointer h-full flex flex-col"
         >
             <div className="relative w-full h-48 overflow-hidden bg-surfaceHighlight">
-                <img
+                <Image
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => e.currentTarget.style.display = 'none'}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-60" />
 
