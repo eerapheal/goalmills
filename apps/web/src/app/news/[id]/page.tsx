@@ -14,12 +14,69 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         return { title: 'News Not Found' };
     }
 
-    const news = await News.findById(id).select('title excerpt').lean();
+    const news = await News.findById(id).select('title excerpt image author createdAt category').lean();
     if (!news) return { title: 'News Not Found' };
 
+    const title = `${news.title} | GoalMills`;
+    const description = news.excerpt || `Read ${news.title} on GoalMills - Your source for sports news and live scores.`;
+    const imageUrl = news.image || `https://picsum.photos/seed/news${id}/1200/630`;
+    const url = `https://goalmills-web.vercel.app/news/${id}`;
+    const publishedTime = news.createdAt ? new Date(news.createdAt as Date | string).toISOString() : new Date().toISOString();
+
     return {
-        title: `${news.title} | GoalMills`,
-        description: news.excerpt,
+        title,
+        description,
+        keywords: `${news.category || 'sports'}, football news, sports updates, live score, highlight video, cricket, tennis, basketball ${news.author}, GoalMills`,
+        authors: [{ name: news.author as string }],
+        creator: news.author as string,
+        publisher: 'GoalMills',
+
+        // Open Graph
+        openGraph: {
+            type: 'article',
+            title,
+            description,
+            url,
+            siteName: 'GoalMills',
+            images: [
+                {
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: news.title as string,
+                },
+            ],
+            locale: 'en_US',
+            publishedTime,
+            authors: [news.author as string],
+            section: news.category as string || 'Sports',
+        },
+
+        // Twitter Card
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [imageUrl],
+            creator: '@goalmills',
+            site: '@goalmills',
+        },
+
+        // Additional metadata
+        alternates: {
+            canonical: url,
+        },
+        robots: {
+            index: true,
+            follow: true,
+            googleBot: {
+                index: true,
+                follow: true,
+                'max-video-preview': -1,
+                'max-image-preview': 'large',
+                'max-snippet': -1,
+            },
+        },
     };
 }
 

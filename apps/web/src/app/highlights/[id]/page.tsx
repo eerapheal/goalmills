@@ -14,12 +14,81 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         return { title: 'Video Not Found' };
     }
 
-    const video = await Video.findById(id).select('video_title').lean();
+    const video = await Video.findById(id).select('video_title video_url video_thumbnail category createdAt source').lean();
     if (!video) return { title: 'Video Not Found' };
 
+    const title = `${video.video_title} | GoalMills Highlights`;
+    const description = `Watch ${video.video_title} highlights on GoalMills. Catch all the action and key moments from this exciting match.`;
+    const thumbnailUrl = video.video_thumbnail || `https://picsum.photos/seed/video${id}/1200/630`;
+    const url = `https://goalmills.com/highlights/${id}`;
+    const publishedTime = video.createdAt ? new Date(video.createdAt as Date | string).toISOString() : new Date().toISOString();
+
     return {
-        title: `${video.video_title} | GoalMills Results`,
-        description: `Watch highlights for ${video.video_title} on GoalMills.`,
+        title,
+        description,
+        keywords: `${video.category || 'football'}, ${video.video_title}, match highlights, sports videos, GoalMills`,
+        publisher: 'GoalMills',
+
+        // Open Graph for Video
+        openGraph: {
+            type: 'video.other',
+            title,
+            description,
+            url,
+            siteName: 'GoalMills',
+            images: [
+                {
+                    url: thumbnailUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: video.video_title as string,
+                },
+            ],
+            videos: [
+                {
+                    url: video.video_url as string,
+                    secureUrl: video.video_url as string,
+                    type: 'video/mp4',
+                    width: 1280,
+                    height: 720,
+                },
+            ],
+            locale: 'en_US',
+            publishedTime,
+        },
+
+        // Twitter Card for Video
+        twitter: {
+            card: 'player',
+            title,
+            description,
+            images: [thumbnailUrl],
+            players: [
+                {
+                    playerUrl: url,
+                    streamUrl: video.video_url as string,
+                    width: 1280,
+                    height: 720,
+                },
+            ],
+            site: '@goalmills',
+        },
+
+        // Additional metadata
+        alternates: {
+            canonical: url,
+        },
+        robots: {
+            index: true,
+            follow: true,
+            googleBot: {
+                index: true,
+                follow: true,
+                'max-video-preview': -1,
+                'max-image-preview': 'large',
+                'max-snippet': -1,
+            },
+        },
     };
 }
 

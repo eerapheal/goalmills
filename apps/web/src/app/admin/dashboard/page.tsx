@@ -5,6 +5,7 @@ import CreateNewsForm from '@/components/admin/CreateNewsForm';
 import UploadVideoForm from '@/components/admin/UploadVideoForm';
 import NewsList from '@/components/admin/NewsList';
 import Link from 'next/link';
+import { FiLogOut } from 'react-icons/fi';
 
 export default function AdminDashboard() {
     const { data: session } = useSession();
@@ -13,7 +14,7 @@ export default function AdminDashboard() {
         <div className="min-h-screen bg-background p-6 pt-[90px]">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 glass-card p-6 rounded-2xl">
+                <div className="flex flex-col md:flex-row justify-between items-center glass-card p-6 rounded-2xl gap-4">
                     <div>
                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Admin Dashboard</h1>
                         <p className="text-text-muted">Welcome back, <span className="text-secondary font-bold">{session?.user?.name}</span> ({session?.user?.role})</p>
@@ -32,8 +33,9 @@ export default function AdminDashboard() {
                         </Link>
                         <button
                             onClick={() => signOut({ callbackUrl: '/signin' })}
-                            className="px-4 md:px-6 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold border border-red-500/20 transition-colors text-sm md:text-base"
+                            className="flex items-center px-4 md:px-6 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold border border-red-500/20 transition-colors text-sm md:text-base"
                         >
+                            <FiLogOut className="mr-2" />
                             Sign Out
                         </button>
                     </div>

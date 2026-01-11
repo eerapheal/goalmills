@@ -54,18 +54,19 @@ export default function NewsList() {
 
     return (
         <div className="glass-card p-6 rounded-2xl h-fit">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span>📰</span> Manage News Articles
+            <h2 className="text-xl font-bold text-white mb-4 flex flex-wrap items-center gap-2">
+                <span>📰</span>
+                <span className="break-words">Manage News Articles</span>
             </h2>
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                 {news.map((item) => {
                     const canEdit = session?.user?.role === 'super-admin' || item.authorId === (session?.user as any)?.id;
                     return (
                         <div key={item._id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-white/10 transition-colors">
-                            <div className="flex-1 min-w-0">
-                                <h3 className="text-white font-bold truncate">{item.title}</h3>
+                            <div className="flex-1 min-w-0 w-full">
+                                <h3 className="text-white font-bold break-words">{item.title}</h3>
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-text-muted uppercase font-black">
-                                    <span>By {item.author}</span>
+                                    <span className="break-all">By {item.author}</span>
                                     {item.category && <span className="text-blue-400">{item.category}</span>}
                                     <span>{new Date(item.createdAt).toLocaleDateString()}</span>
                                 </div>
