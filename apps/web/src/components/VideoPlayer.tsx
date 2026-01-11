@@ -66,7 +66,7 @@ export default function VideoPlayer({ url, thumbnail, autoPlay = false, classNam
 
     if (ytId) {
         return (
-            <div className={`w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group ${className || 'aspect-video'}`}>
+            <div className={`aspect-video w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group ${className || ''}`}>
                 <iframe
                     src={`https://www.youtube.com/embed/${ytId}?autoplay=${autoPlay ? 1 : 0}&modestbranding=1&rel=0`}
                     className="w-full h-full"
@@ -85,7 +85,7 @@ export default function VideoPlayer({ url, thumbnail, autoPlay = false, classNam
 
     // Fallback to ReactPlayer for other types
     return (
-        <div className={`w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group ${className || 'aspect-video'}`}>
+        <div className={`aspect-video w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group ${className || ''}`}>
             <ReactPlayer
                 url={url}
                 width="100%"

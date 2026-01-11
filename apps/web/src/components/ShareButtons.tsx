@@ -47,33 +47,30 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
     };
 
     return (
-        <div className="flex items-center gap-4">
-            <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest hidden md:block">Share this social media</span>
-            <div className="flex gap-2">
-                {shareLinks.map((platform) => (
-                    <button
-                        key={platform.name}
-                        onClick={() => handleShare(platform.url, platform.name)}
-                        className={`w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 text-slate-400 ${platform.color} hover:scale-110 active:scale-95`}
-                        aria-label={`Share on ${platform.name}`}
-                        title={`Share on ${platform.name}`}
-                    >
-                        <platform.icon className="w-4 h-4" />
-                    </button>
-                ))}
-
+        <div className="flex items-center gap-2">
+            {shareLinks.map((platform) => (
                 <button
-                    onClick={handleCopy}
-                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${copied
-                            ? 'bg-green-500/20 border-green-500/50 text-green-500'
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
-                        }`}
-                    aria-label="Copy Link"
-                    title="Copy Link"
+                    key={platform.name}
+                    onClick={() => handleShare(platform.url, platform.name)}
+                    className={`w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 text-slate-400 ${platform.color} hover:scale-110 active:scale-95`}
+                    aria-label={`Share on ${platform.name}`}
+                    title={`Share on ${platform.name}`}
                 >
-                    {copied ? <FaCheck className="w-4 h-4" /> : <FaLink className="w-4 h-4" />}
+                    <platform.icon className="w-4 h-4" />
                 </button>
-            </div>
+            ))}
+
+            <button
+                onClick={handleCopy}
+                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${copied
+                    ? 'bg-green-500/20 border-green-500/50 text-green-500'
+                    : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
+                    }`}
+                aria-label="Copy Link"
+                title="Copy Link"
+            >
+                {copied ? <FaCheck className="w-4 h-4" /> : <FaLink className="w-4 h-4" />}
+            </button>
         </div>
     );
 }
