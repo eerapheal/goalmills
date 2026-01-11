@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import News from "@/models/News";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const isAdminRequest = searchParams.get('admin') === 'true';
   const session = await getServerSession(authOptions) as any;
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions) as any;
   if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
     return NextResponse.json({ message: "Unauthorized: staff or Super Admin role required" }, { status: 401 });

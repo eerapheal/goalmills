@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions) as any;
   
   if (!session || session.user.role !== 'super-admin') {
@@ -12,13 +13,13 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 
   // Prevent self-deletion
-  if (params.id === session.user.id) {
+  if (id === session.user.id) {
     return NextResponse.json({ message: "Forbidden: You cannot delete your own account" }, { status: 403 });
   }
 
   await dbConnect();
   try {
-    const deletedUser = await User.findByIdAndDelete(params.id);
+    const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }

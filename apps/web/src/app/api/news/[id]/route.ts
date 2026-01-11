@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import News from "@/models/News";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   await dbConnect();
   try {
-    const news = await News.findById(params.id);
+    const news = await News.findById(id);
     if (!news) return NextResponse.json({ message: "News not found" }, { status: 404 });
     return NextResponse.json(news);
   } catch (error) {
@@ -15,7 +16,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions) as any;
   if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -23,7 +25,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
   await dbConnect();
   try {
-    const news = await News.findById(params.id);
+    const news = await News.findById(id);
     if (!news) return NextResponse.json({ message: "News not found" }, { status: 404 });
 
     // RBAC: super-admin can edit anything; staff can only edit their own
@@ -32,7 +34,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const body = await request.json();
-    const updatedNews = await News.findByIdAndUpdate(params.id, body, {
+    const updatedNews = await News.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -42,7 +44,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions) as any;
   if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -50,7 +53,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
   await dbConnect();
   try {
-    const news = await News.findById(params.id);
+    const news = await News.findById(id);
     if (!news) return NextResponse.json({ message: "News not found" }, { status: 404 });
 
     // RBAC check
@@ -58,7 +61,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ message: "Forbidden: You can only delete your own posts" }, { status: 403 });
     }
 
-    await News.findByIdAndDelete(params.id);
+    await News.findByIdAndDelete(id);
     return NextResponse.json({ message: "News deleted successfully" });
   } catch (error) {
     return NextResponse.json({ message: "Error deleting news" }, { status: 500 });
