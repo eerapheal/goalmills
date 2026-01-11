@@ -1,37 +1,78 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import dbConnect from '@/lib/db';
+import Video from '@/models/Video';
+import VideoPlayer from '@/components/VideoPlayer';
+
+// Function to generate metadata
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    await dbConnect();
+
+    // Validate ID format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return { title: 'Video Not Found' };
+    }
+
+    const video = await Video.findById(id).select('video_title').lean();
+    if (!video) return { title: 'Video Not Found' };
+
+    return {
+        title: `${video.video_title} | GoalMills Results`,
+        description: `Watch highlights for ${video.video_title} on GoalMills.`,
+    };
+}
 
 export default async function HighlightDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
+    // Validate ID format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        notFound();
+    }
+
+    await dbConnect();
+    const video = await Video.findById(id).lean();
+
+    if (!video) {
+        notFound();
+    }
+
+    // Prepare video object
+    const videoData = {
+        ...video,
+        _id: video._id.toString(),
+        createdAt: video.createdAt ? new Date(video.createdAt as Date | string).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }) : '',
+    };
+
     return (
-        <div className="min-h-screen bg-slate-950 pt-24 p-6 flex flex-col items-center">
-            <div className="w-full max-w-5xl">
-                <Link href="/highlights" className="text-blue-400 hover:text-blue-300 mb-6 inline-block font-medium">
-                    &larr; Back to Highlights
+        <div className="min-h-screen bg-slate-950 pt-24 pb-12 px-4 md:px-8">
+            <div className="max-w-6xl mx-auto">
+                <Link href="/highlights" className="text-blue-400 hover:text-blue-300 mb-6 inline-flex items-center gap-2 font-medium transition-colors">
+                    <span>&larr;</span> Back to Highlights
                 </Link>
 
-                <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 relative group">
-                    {/* Placeholder for Video Player */}
-                    <img
-                        src={`https://picsum.photos/seed/highlight${id}/1280/720`}
-                        alt="Video Placeholder"
-                        className="w-full h-full object-cover opacity-50"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full p-6 transition-transform hover:scale-110">
-                            <svg className="w-12 h-12 fill-current" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                        </button>
+                <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden p-6 md:p-8 shadow-2xl">
+                    <div className="mb-6">
+                        <h1 className="text-3xl md:text-4xl font-black text-white mb-2 leading-tight">
+                            {videoData.video_title}
+                        </h1>
+                        <p className="text-slate-400 text-sm">
+                            Uploaded on {videoData.createdAt}
+                        </p>
                     </div>
-                    <div className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded animate-pulse">
-                        LIVE
-                    </div>
-                </div>
 
-                <div className="mt-8">
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Match Highlights #{id} with Amazing Plays</h1>
-                    <p className="text-slate-400">Published on Dec 12, 2025 • 2.4M Views</p>
+                    <div className="w-full">
+                        <VideoPlayer
+                            url={videoData.video_url}
+                            thumbnail={videoData.video_thumbnail}
+                            autoPlay={true}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

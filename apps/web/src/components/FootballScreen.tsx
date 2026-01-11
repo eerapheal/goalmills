@@ -118,7 +118,7 @@ export function FootballScreen() {
 
             // Filter upcoming and finished from fixtures
             const allFixtures = fixturesRes?.result || [];
-            
+
             // Robust Status Checks
             const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
             const scheduledStatuses = ['Not Started', 'NS', 'Time to be defined', 'TBD', ''];
@@ -126,12 +126,12 @@ export function FootballScreen() {
             const upcoming = allFixtures.filter((e) => {
                 // Check if status indicates upcoming
                 if (scheduledStatuses.includes(e.event_status)) return true;
-                
+
                 // Also check by date for robustness
                 const eventDate = new Date(`${e.event_date} ${e.event_time}`);
                 // If invalid date, assume it's NOT upcoming unless status says so (handled above)
-                if (isNaN(eventDate.getTime())) return false; 
-                
+                if (isNaN(eventDate.getTime())) return false;
+
                 return eventDate > new Date() && !finishedStatuses.includes(e.event_status);
             });
 
@@ -826,7 +826,13 @@ export function FootballScreen() {
                         <h2 className="text-xl font-bold text-text-primary mb-6">📰 Latest News</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {filteredNews.map((post, index) => (
-                                <BlogCard key={post._id || `news-${index}`} post={post} />
+                                <Link
+                                    href={`/news/${post._id}`}
+                                    key={post._id || `news-${index}`}
+                                    className="block h-full hover:no-underline"
+                                >
+                                    <BlogCard post={post} />
+                                </Link>
                             ))}
                         </div>
                         {filteredNews.length === 0 && <p className="text-text-muted italic">No news found.</p>}
@@ -835,13 +841,53 @@ export function FootballScreen() {
 
             case 'videos':
                 const filteredVideos = filterData(videos, (v) => `${v.video_title} ${v.video_title_full}`);
+
+                const getVideoId = (url: string) => {
+                    try {
+                        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                            return url.split('v=')[1]?.split('&')[0] || url.split('/').pop()?.split('?')[0];
+                        }
+                    } catch (e) { return ''; }
+                    return '';
+                };
+
                 return (
                     <div className="p-4 animate-fade-in">
                         <h2 className="text-xl font-bold text-text-primary mb-6">🎥 Video Highlights</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {filteredVideos.map((video, index) => (
-                                <FootballVideoCard key={video.event_key || `video-${index}`} video={video} />
-                            ))}
+                            {filteredVideos.map((video, index) => {
+                                const thumb = video.video_thumbnail || (getVideoId(video.video_url || '') ? `https://img.youtube.com/vi/${getVideoId(video.video_url || '')}/mqdefault.jpg` : '');
+
+                                return (
+                                    <Link
+                                        href={`/highlights/${video._id}`}
+                                        key={video.event_key || `video-${index}`}
+                                        className="block h-full group"
+                                    >
+                                        <div className="glass-card rounded-xl overflow-hidden h-full flex flex-col transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 border border-white/5 hover:border-blue-500/30">
+                                            <div className="relative aspect-video bg-black">
+                                                <img
+                                                    src={thumb || `https://picsum.photos/seed/${index}/600/400`}
+                                                    alt={video.video_title}
+                                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                                                />
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className="w-12 h-12 rounded-full bg-secondary/90 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-black/50">
+                                                        <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M8 5v14l11-7z" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                                            </div>
+                                            <div className="p-4 flex-1">
+                                                <h3 className="text-white font-bold line-clamp-1 mb-1 group-hover:text-blue-400 transition-colors">{video.video_title}</h3>
+                                                <p className="text-text-muted text-xs line-clamp-2">{video.video_title_full || 'Watch the match highlights'}</p>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
                         </div>
                         {filteredVideos.length === 0 && <p className="text-text-muted italic">No videos found.</p>}
                     </div>

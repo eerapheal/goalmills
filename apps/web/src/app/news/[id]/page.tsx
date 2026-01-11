@@ -1,18 +1,62 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import dbConnect from '@/lib/db';
+import News from '@/models/News';
 
-// Since this is a server component in Next.js 15 (if applicable) or 13+, params are async in recent versions but standard props in others.
-// Assuming Next.js 14/15 standard behavior for now.
+// Function to generate metadata
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    await dbConnect();
+
+    // Validate ID format (Mongodb ObjectId is 24 hex chars)
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return { title: 'News Not Found' };
+    }
+
+    const news = await News.findById(id).select('title excerpt').lean();
+    if (!news) return { title: 'News Not Found' };
+
+    return {
+        title: `${news.title} | GoalMills`,
+        description: news.excerpt,
+    };
+}
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
+
+    // Validate ID format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        notFound();
+    }
+
+    await dbConnect();
+    const news = await News.findById(id).lean();
+
+    if (!news) {
+        notFound();
+    }
+
+    // Explicitly cast to any or a defined Interface to avoid "unknown" type errors
+    // Since lean() returns a plain JS object, we can treat it as such or define an interface.
+    // For now, using basic property access.
+    const article = {
+        ...news,
+        _id: news._id.toString(),
+        createdAt: news.createdAt ? new Date(news.createdAt as Date | string).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }) : '',
+    };
 
     return (
         <div className="min-h-screen bg-slate-950 pt-24 pb-12">
             <div className="relative h-[50vh] w-full">
                 <Image
-                    src={`https://picsum.photos/seed/news${id}/1920/1080`}
-                    alt="News Cover"
+                    src={article.image || `https://picsum.photos/seed/news${id}/1920/1080`}
+                    alt={article.title as string}
                     fill
                     className="object-cover"
                     priority
@@ -24,27 +68,31 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                         &larr; Back to News
                     </Link>
                     <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-                        Detailed Report for Story #{id}
+                        {article.title as string}
                     </h1>
+                    {article.category && (
+                        <span className="inline-block px-3 py-1 bg-blue-600/80 text-white text-xs font-bold uppercase tracking-wider rounded-full mb-4">
+                            {article.category as string}
+                        </span>
+                    )}
                     <p className="text-slate-300 text-lg md:text-xl max-w-2xl">
-                        An in-depth look at the events unfolding in the football world. This is a dynamic page for news item {id}.
+                        {article.excerpt as string}
                     </p>
+                    <div className="mt-4 flex items-center gap-4 text-slate-400 text-sm">
+                        <span>By {article.author as string}</span>
+                        <span>•</span>
+                        <span>{article.readTime as number} min read</span>
+                        <span>•</span>
+                        <span>{article.createdAt}</span>
+                    </div>
                 </div>
             </div>
 
             <div className="max-w-4xl mx-auto px-6 py-12">
-                <div className="prose prose-lg prose-invert max-w-none">
-                    <p className="lead text-xl text-slate-300">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <p>
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                    </p>
-                    <h2 className="text-white">Analysis</h2>
-                    <p>
-                        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                </div>
+                <div
+                    className="prose prose-lg prose-invert max-w-none text-slate-300 prose-headings:text-white prose-strong:text-white prose-a:text-blue-400"
+                    dangerouslySetInnerHTML={{ __html: article.content as string }}
+                />
             </div>
         </div>
     );

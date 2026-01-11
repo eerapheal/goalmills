@@ -378,9 +378,11 @@ export interface FootballTopscorer {
 }
 
 export interface FootballVideo {
+  _id?: string;
   event_key: string;
   video_title_full: string;
   video_title: string;
+  video_thumbnail?: string;
   video_url: string;
 }
 
