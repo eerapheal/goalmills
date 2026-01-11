@@ -18,8 +18,20 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     if (!news) return { title: 'News Not Found' };
 
     const title = `${news.title} | GoalMills`;
-    const description = news.excerpt || `Read ${news.title} on GoalMills - Your source for sports news and live scores.`;
-    const imageUrl = news.image || `https://picsum.photos/seed/news${id}/1200/630`;
+    const description = `${news.excerpt}` || `Read ${news.title} on GoalMills - Your source for sports news and live scores.`;
+
+    // Ensure absolute URL for OG image - OG validators require full URLs
+    let imageUrl = `${news.image}` || '';
+
+    // If no image or relative path, use a default OG-compliant image
+    if (!imageUrl || !imageUrl.startsWith('http')) {
+        // Use a reliable Cloudinary demo image as fallback
+        imageUrl = `https://res.cloudinary.com/demo/image/upload/w_1200,h_630,c_fill,g_auto/sample.jpg`;
+    }
+
+    // Log for debugging OG issues (appears in server logs)
+    console.log('[OG Debug] News ID:', id, '| Image URL:', imageUrl);
+
     const url = `https://goalmills-web.vercel.app/news/${id}`;
     const publishedTime = news.createdAt ? new Date(news.createdAt as Date | string).toISOString() : new Date().toISOString();
 
@@ -41,9 +53,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
             images: [
                 {
                     url: imageUrl,
+                    secureUrl: imageUrl, // Explicitly set secure URL for HTTPS
                     width: 1200,
                     height: 630,
                     alt: news.title as string,
+                    type: 'image/jpeg', // Explicitly specify image type for OG validators
                 },
             ],
             locale: 'en_US',
