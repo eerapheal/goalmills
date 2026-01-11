@@ -15,9 +15,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
   },
-  isAdmin: {
-    type: Boolean,
-    default: true, // Assuming all users created this way are admins for now
+  role: {
+    type: String,
+    enum: ['user', 'staful', 'super-admin'],
+    default: 'user',
   },
 }, { timestamps: true });
 

@@ -4,7 +4,9 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 
-const handler = NextAuth({
+import { NextAuthOptions } from "next-auth";
+
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
@@ -38,6 +40,7 @@ const handler = NextAuth({
           id: user._id.toString(),
           email: user.email,
           name: user.username,
+          role: user.role,
         };
       },
     }),
@@ -49,19 +52,21 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id;
-        session.user.name = token.name;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "supersecretkey123", // Ideally in env
-});
+  secret: process.env.NEXTAUTH_SECRET || "supersecretkey123",
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

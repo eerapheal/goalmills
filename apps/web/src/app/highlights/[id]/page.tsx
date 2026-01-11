@@ -50,7 +50,7 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 pt-24 pb-12 px-4 md:px-8">
+        <div className="min-h-screen bg-slate-950 px-4 md:px-8 pt-[80px] md:pt-[90px] pb-12">
             <div className="max-w-6xl mx-auto">
                 <Link href="/highlights" className="text-blue-400 hover:text-blue-300 mb-6 inline-flex items-center gap-2 font-medium transition-colors">
                     <span>&larr;</span> Back to Highlights
@@ -71,6 +71,7 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
                             url={videoData.video_url}
                             thumbnail={videoData.video_thumbnail}
                             autoPlay={true}
+                            className="aspect-[4/3] md:aspect-video"
                         />
                     </div>
                 </div>

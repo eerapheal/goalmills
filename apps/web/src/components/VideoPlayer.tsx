@@ -30,20 +30,21 @@ interface VideoPlayerProps {
     url: string;
     thumbnail?: string;
     autoPlay?: boolean;
+    className?: string;
 }
 
-export default function VideoPlayer({ url, thumbnail, autoPlay = false }: VideoPlayerProps) {
+export default function VideoPlayer({ url, thumbnail, autoPlay = false, className }: VideoPlayerProps) {
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
         setHasMounted(true);
     }, []);
 
-    if (!hasMounted) return <div className="aspect-video w-full bg-slate-900 rounded-3xl animate-pulse" />;
+    if (!hasMounted) return <div className={`aspect-video w-full bg-slate-900 rounded-3xl animate-pulse ${className || ''}`} />;
 
     if (!url) {
         return (
-            <div className="aspect-video w-full bg-slate-900 rounded-3xl flex flex-col items-center justify-center p-6 text-center">
+            <div className={`aspect-video w-full bg-slate-900 rounded-3xl flex flex-col items-center justify-center p-6 text-center ${className || ''}`}>
                 <p className="text-slate-400 text-sm font-bold">Video URL Missing</p>
             </div>
         );
@@ -63,7 +64,7 @@ export default function VideoPlayer({ url, thumbnail, autoPlay = false }: VideoP
 
     if (ytId) {
         return (
-            <div className="aspect-video w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group">
+            <div className={`w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group ${className || 'aspect-video'}`}>
                 <iframe
                     src={`https://www.youtube.com/embed/${ytId}?autoplay=${autoPlay ? 1 : 0}&modestbranding=1&rel=0`}
                     className="w-full h-full"
@@ -82,7 +83,7 @@ export default function VideoPlayer({ url, thumbnail, autoPlay = false }: VideoP
 
     // Fallback to ReactPlayer for other types
     return (
-        <div className="aspect-video w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group">
+        <div className={`w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/5 relative group ${className || 'aspect-video'}`}>
             <ReactPlayer
                 url={url}
                 width="100%"

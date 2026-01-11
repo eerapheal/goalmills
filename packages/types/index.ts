@@ -1,3 +1,14 @@
+export type UserRole = 'user' | 'staful' | 'super-admin';
+
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Blog and Video Types
 export interface BlogPost {
   _id: string;

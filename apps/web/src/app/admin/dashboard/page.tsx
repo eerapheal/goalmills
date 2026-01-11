@@ -9,15 +9,20 @@ export default function AdminDashboard() {
     const { data: session } = useSession();
 
     return (
-        <div className="min-h-screen bg-background p-6">
+        <div className="min-h-screen bg-background p-6 pt-[90px]">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 glass-card p-6 rounded-2xl">
                     <div>
                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Admin Dashboard</h1>
-                        <p className="text-text-muted">Welcome back, <span className="text-secondary font-bold">{session?.user?.name}</span></p>
+                        <p className="text-text-muted">Welcome back, <span className="text-secondary font-bold">{session?.user?.name}</span> ({session?.user?.role})</p>
                     </div>
                     <div className="flex gap-4">
+                        {session?.user?.role === 'super-admin' && (
+                            <Link href="/admin/users" className="px-6 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-colors">
+                                User Management
+                            </Link>
+                        )}
                         <Link href="/" className="px-6 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-colors">
                             View Site
                         </Link>
