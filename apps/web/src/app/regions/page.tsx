@@ -71,7 +71,7 @@ export default function RegionsPage() {
                                 <div className="flex items-center gap-1.5 mt-1">
                                     <div className="relative w-4 h-3 overflow-hidden rounded-[2px] opacity-70">
                                         {league.flag ? (
-                                            <Image src={league.flag} alt={league.country} fill className="object-cover" />
+                                            <Image src={league.flag} alt={league.country || ''} fill className="object-cover" />
                                         ) : null}
                                     </div>
                                     <span className="text-xs text-text-muted">{league.country}</span>

@@ -72,6 +72,7 @@ export default function CricketMatchDetailsScreen() {
                     <View key={innings} style={styles.card}>
                         <Text style={styles.sectionTitle}>{innings}</Text>
 
+                        {/* Batting Section */}
                         <Text style={styles.subSectionTitle}>Batting</Text>
                         <View style={styles.tableHeader}>
                             <Text style={[styles.tableHeadText, { flex: 3 }]}>Batter</Text>
@@ -81,7 +82,7 @@ export default function CricketMatchDetailsScreen() {
                             <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>6s</Text>
                             <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>SR</Text>
                         </View>
-                        {players.filter(p => p.type === 'Batsman').map((batter, idx) => (
+                        {players.filter(p => p.R !== undefined).map((batter, idx) => (
                             <View key={`${batter.player}-${idx}`} style={styles.tableRow}>
                                 <View style={{ flex: 3 }}>
                                     <Text style={styles.playerName}>{batter.player}</Text>
@@ -97,18 +98,28 @@ export default function CricketMatchDetailsScreen() {
 
                         <View style={styles.divider} />
 
+                        {/* Bowling Section */}
                         <Text style={styles.subSectionTitle}>Bowling</Text>
-                        {/* Assuming bowlers might be in the same list or inferred. 
-                            The new type has 'type' field. But typical API separates them or includes bowling stats in same array?
-                            The new type CricketScorecardPlayer has O, M, W, ER which are bowling stats.
-                            Let's filter based on fields or assume separate entry?
-                            Actually the MOCK data in advancedCricketApi creates separate objects for Bowlers?
-                            Wait, the mock data in advancedCricketApi ONLY created 'Batsman' type players?
-                            "type: 'Batsman'".
-                            I should check advancedCricketApi again. 
-                            It only added Batsmen. I should fix that if I want bowlers.
-                            For now, I'll filter by players who have Overs data or handle gracefully.
-                        */}
+                        <View style={styles.tableHeader}>
+                            <Text style={[styles.tableHeadText, { flex: 3 }]}>Bowler</Text>
+                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>O</Text>
+                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>M</Text>
+                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>R</Text>
+                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>W</Text>
+                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>ER</Text>
+                        </View>
+                        {players.filter(p => p.O !== undefined).map((bowler, idx) => (
+                            <View key={`bowler-${bowler.player}-${idx}`} style={styles.tableRow}>
+                                <View style={{ flex: 3 }}>
+                                    <Text style={styles.playerName}>{bowler.player}</Text>
+                                </View>
+                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.O}</Text>
+                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.M}</Text>
+                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.R}</Text>
+                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{bowler.W}</Text>
+                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.ER}</Text>
+                            </View>
+                        ))}
                     </View>
                 ))}
             </View>
@@ -127,7 +138,11 @@ export default function CricketMatchDetailsScreen() {
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Date</Text>
-                <Text style={styles.infoValue}>{match.event_date_start} {match.event_time}</Text>
+                <Text style={styles.infoValue}>{match.event_date_start}</Text>
+            </View>
+            <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Time</Text>
+                <Text style={styles.infoValue}>{match.event_time}</Text>
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Venue</Text>
@@ -143,6 +158,25 @@ export default function CricketMatchDetailsScreen() {
                 <Text style={styles.infoLabel}>Status</Text>
                 <Text style={styles.infoValue}>{match.event_status}</Text>
             </View>
+            {/* Additional Info */}
+            {'event_man_of_match' in match && (match as any).event_man_of_match && (
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Man of Match</Text>
+                    <Text style={styles.infoValue}>{(match as any).event_man_of_match}</Text>
+                </View>
+            )}
+            {'event_referee' in match && (match as any).event_referee && (
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Referee</Text>
+                    <Text style={styles.infoValue}>{(match as any).event_referee}</Text>
+                </View>
+            )}
+            {'event_umpire_1' in match && (match as any).event_umpire_1 && (
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Umpires</Text>
+                    <Text style={styles.infoValue}>{(match as any).event_umpire_1}, {(match as any).event_umpire_2}</Text>
+                </View>
+            )}
         </View>
     );
 
