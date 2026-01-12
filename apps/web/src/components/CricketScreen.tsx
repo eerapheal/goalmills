@@ -88,9 +88,9 @@ export function CricketScreen() {
             setTeamsList(teams.result || []);
 
             setRankings({
-                'IPL': iplRank.result?.total || [],
-                'T20 WC': t20WorldCupRank.result?.total || [],
-                'BBL': bblRank.result?.total || [],
+                'IPL': iplRank.result?.total || iplRank.result || [],
+                'T20 WC': t20WorldCupRank.result?.total || t20WorldCupRank.result || [],
+                'BBL': bblRank.result?.total || bblRank.result || [],
             });
         } catch (error) {
             console.error('Error loading cricket intelligence:', error);
@@ -312,37 +312,52 @@ export function CricketScreen() {
                             <h2 className="text-sm font-black text-white uppercase tracking-widest">Global Standings Matrix</h2>
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {['IPL', 'T20 WC', 'BBL'].map((format) => (
-                                <div key={format} className="glass-card rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group">
-                                    <div className="absolute -right-6 -bottom-6 text-[8rem] opacity-[0.03] group-hover:rotate-12 transition-all font-black pointer-events-none select-none">#{format}</div>
-                                    <h4 className="text-secondary font-black uppercase tracking-[0.3em] text-xs mb-10 border-b border-white/5 pb-4">{format} Leaderboard</h4>
+                            {['IPL', 'T20 WC', 'BBL'].map((format) => {
+                                const list = Array.isArray(rankings[format]) ? rankings[format] : [];
+                                return (
+                                    <div key={format} className="glass-card rounded-[2rem] p-8 border border-white/5 relative overflow-hidden group min-h-[400px]">
+                                        <div className="absolute -right-6 -bottom-6 text-[8rem] opacity-[0.03] group-hover:rotate-12 transition-all font-black pointer-events-none select-none">#{format}</div>
+                                        <h4 className="text-secondary font-black uppercase tracking-[0.3em] text-xs mb-10 border-b border-white/5 pb-4">{format} Leaderboard</h4>
 
-                                    <div className="space-y-4">
-                                        {(rankings[format] || []).slice(0, 10).map((rank, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="flex items-center justify-between group/row hover:translate-x-1 transition-transform cursor-pointer"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <span className="w-6 text-[10px] font-black text-text-muted/50 tabular-nums">{(idx + 1).toString().padStart(2, '0')}</span>
-                                                    <Link
-                                                        href={`/cricket/teams/${rank.team_key}`}
-                                                        className="text-xs font-black text-white uppercase tracking-tight group-hover/row:text-secondary transition-colors"
+                                        {list.length > 0 ? (
+                                            <div className="space-y-4">
+                                                {list.slice(0, 10).map((rank, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="flex items-center justify-between group/row hover:translate-x-1 transition-transform cursor-pointer"
                                                     >
-                                                        {rank.standing_team}
-                                                    </Link>
-                                                </div>
-                                                <div className="flex items-center gap-4">
-                                                    <span className="text-[10px] font-black text-white tabular-nums">{rank.standing_Pts}</span>
-                                                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${parseFloat(rank.standing_NRR) >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
-                                                        {rank.standing_NRR}
-                                                    </span>
-                                                </div>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="w-6 text-[10px] font-black text-text-muted/50 tabular-nums">{(idx + 1).toString().padStart(2, '0')}</span>
+                                                            <Link
+                                                                href={`/cricket/teams/${rank.team_key}`}
+                                                                className="text-xs font-black text-white uppercase tracking-tight group-hover/row:text-secondary transition-colors"
+                                                            >
+                                                                {rank.standing_team}
+                                                            </Link>
+                                                        </div>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-[10px] font-black text-white tabular-nums">{rank.standing_Pts}</span>
+                                                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${parseFloat(rank.standing_NRR) >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                                                {rank.standing_NRR}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-[200px] text-center">
+                                                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                                                    <span className="text-xl">🏆</span>
+                                                </div>
+                                                <p className="text-[10px] font-black text-text-muted uppercase tracking-widest leading-relaxed">
+                                                    Season Initializing<br />
+                                                    <span className="text-secondary/50">Elite Intel Pending</span>
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 );
