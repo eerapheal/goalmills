@@ -12,6 +12,50 @@ export default function UploadVideoForm() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [fetchingDetails, setFetchingDetails] = useState(false);
+
+    const fetchVideoDetails = async (urlToFetch?: string) => {
+        const url = urlToFetch || videoUrl;
+        if (!url || (!url.includes('youtube.com') && !url.includes('youtu.be'))) return;
+
+        setFetchingDetails(true);
+        try {
+            const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+            if (res.ok) {
+                const data = await res.json();
+
+                // Only set if current values are empty to avoid overwriting user input
+                if (!title) setTitle(data.title);
+                if (!source) setSource(data.author_name);
+
+                // YouTube thumbnails from oembed are sometimes low res, try to get hq if possible
+                let thumbUrl = data.thumbnail_url;
+                const videoIdMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?#]+)/);
+                if (videoIdMatch && videoIdMatch[1]) {
+                    thumbUrl = `https://img.youtube.com/vi/${videoIdMatch[1]}/maxresdefault.jpg`;
+                }
+
+                if (!thumbnail) setThumbnail(thumbUrl);
+
+                if (!category) {
+                    const lowerTitle = (data.title || '').toLowerCase();
+                    if (lowerTitle.includes('highlight') || lowerTitle.includes('match') || lowerTitle.includes('vs')) {
+                        setCategory('Highlights');
+                    } else if (lowerTitle.includes('interview') || lowerTitle.includes('talk') || lowerTitle.includes('press')) {
+                        setCategory('Interviews');
+                    } else if (lowerTitle.includes('training') || lowerTitle.includes('behind')) {
+                        setCategory('Behind the Scenes');
+                    } else {
+                        setCategory('Highlights');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching video details:', error);
+        } finally {
+            setFetchingDetails(false);
+        }
+    };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -128,14 +172,34 @@ export default function UploadVideoForm() {
 
                 <div>
                     <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Video URL (MP4/Youtube)</label>
-                    <input
-                        type="url"
-                        value={videoUrl}
-                        onChange={(e) => setVideoUrl(e.target.value)}
-                        required
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
-                        placeholder="https://..."
-                    />
+                    <div className="flex gap-2">
+                        <input
+                            type="url"
+                            value={videoUrl}
+                            onChange={(e) => {
+                                const newUrl = e.target.value;
+                                setVideoUrl(newUrl);
+                                // Auto-fetch if it looks like a full YouTube URL
+                                if ((newUrl.includes('youtube.com/watch?v=') && newUrl.length > 30) ||
+                                    (newUrl.includes('youtu.be/') && newUrl.length > 20)) {
+                                    fetchVideoDetails(newUrl);
+                                }
+                            }}
+                            required
+                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-secondary transition-colors"
+                            placeholder="https://..."
+                        />
+                        <button
+                            type="button"
+                            onClick={() => fetchVideoDetails()}
+                            disabled={fetchingDetails || !videoUrl}
+                            className="px-4 py-2 bg-secondary/20 text-secondary border border-secondary/50 rounded-lg text-sm font-bold hover:bg-secondary/30 transition-all disabled:opacity-50 flex items-center gap-2"
+                        >
+                            {fetchingDetails ? (
+                                <span className="w-4 h-4 border-2 border-secondary border-t-transparent rounded-full animate-spin"></span>
+                            ) : '✨ Auto-fill'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
@@ -160,6 +224,26 @@ export default function UploadVideoForm() {
                     </div>
                 </div>
                 {uploading && <div className="text-xs text-blue-400 animate-pulse">Uploading thumbnail...</div>}
+
+                {thumbnail && (
+                    <div className="mt-2 relative group rounded-lg overflow-hidden border border-white/10 aspect-video w-full max-w-xs">
+                        <img
+                            src={thumbnail}
+                            alt="Thumbnail Preview"
+                            className="w-full h-full object-cover"
+                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                                type="button"
+                                onClick={() => setThumbnail('')}
+                                className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div>
                     <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">Match Event Key (Optional)</label>
