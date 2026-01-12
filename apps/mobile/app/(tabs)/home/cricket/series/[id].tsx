@@ -15,29 +15,27 @@ export default function CricketSeriesDetailsScreen() {
     const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
     const [activeTab, setActiveTab] = useState<'fixtures' | 'rankings'>('fixtures');
 
+
     useEffect(() => {
         const loadData = async () => {
             if (!id) return;
             try {
                 // Fetch series info from leagues list
-                const leaguesRes = await advancedCricketApi.getLeagues({ APIkey: 'mock' });
-                // Note: getLeagues generally returns all supported leagues. Filter by ID.
+                const leaguesRes = await advancedCricketApi.getLeagues();
                 const foundSeries = leaguesRes.result?.find(l => l.league_key === id);
                 setSeries(foundSeries || null);
 
                 // Fetch fixtures for this league
-                // We'll fetch upcoming matches for this league.
-                // Or maybe fetch past and upcoming? 'from' and 'to' date required by API?
-                // Fixture endpoint usually requires date range.
-                // Let's set a wide range for demo or just next 30 days.
-                const today = new Date().toISOString().split('T')[0];
-                const nextMonth = new Date();
-                nextMonth.setDate(nextMonth.getDate() + 30);
+                const today = new Date();
+                const pastDate = new Date(today);
+                pastDate.setDate(today.getDate() - 14);
+                const futureDate = new Date(today);
+                futureDate.setDate(today.getDate() + 30);
+
                 const fixturesRes = await advancedCricketApi.getFixtures({
                     leagueId: Number(id),
-                    from: today,
-                    to: nextMonth.toISOString().split('T')[0],
-                    APIkey: 'mock'
+                    from: pastDate.toISOString().split('T')[0],
+                    to: futureDate.toISOString().split('T')[0],
                 });
 
                 setFixtures(fixturesRes.result || []);
@@ -59,11 +57,11 @@ export default function CricketSeriesDetailsScreen() {
             <Stack.Screen
                 options={{
                     title: series.league_name,
-                    headerStyle: { backgroundColor: COLORS.backgroundDark },
-                    headerTintColor: COLORS.text,
+                    headerStyle: { backgroundColor: '#0a0e27' },
+                    headerTintColor: '#fff',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+                            <Ionicons name="arrow-back" size={24} color="#fff" />
                         </TouchableOpacity>
                     ),
                 }}
@@ -71,20 +69,19 @@ export default function CricketSeriesDetailsScreen() {
             <View style={styles.header}>
                 <View style={styles.headerImage}>
                     {series.league_logo ? (
-                        <Image source={{ uri: series.league_logo }} style={{ width: '100%', height: '100%' }} />
+                        <Image source={{ uri: series.league_logo }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
                     ) : (
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.secondary }}>
-                            <Text style={{ fontSize: 48, fontWeight: 'bold' }}>{series.league_name.charAt(0)}</Text>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                            <Text style={{ fontSize: 48, fontWeight: '900', color: COLORS.secondary }}>{series.league_name.charAt(0)}</Text>
                         </View>
                     )}
-                </View>
-                <View style={styles.headerContent}>
-                    <Text style={styles.title}>{series.league_name}</Text>
-                    <Text style={styles.subtitle}>
-                        {series.league_year}
-                    </Text>
-                    <View style={styles.badge}>
-                        <Text style={styles.badgeText}>{series.league_season}</Text>
+                    <View style={styles.imageOverlay} />
+                    <View style={styles.headerContentOverlay}>
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{series.league_season}</Text>
+                        </View>
+                        <Text style={styles.title}>{series.league_name}</Text>
+                        <Text style={styles.subtitle}>{series.league_year}</Text>
                     </View>
                 </View>
 
@@ -109,11 +106,18 @@ export default function CricketSeriesDetailsScreen() {
                     renderItem={({ item }) => <CricketMatchCard match={item} />}
                     keyExtractor={(item) => item.event_key.toString()}
                     contentContainerStyle={styles.content}
-                    ListEmptyComponent={<Text style={styles.emptyText}>No upcoming matches found for this series.</Text>}
+                    ListEmptyComponent={
+                        <View style={styles.emptyState}>
+                            <Text style={styles.emptyText}>No upcoming matches found.</Text>
+                        </View>
+                    }
                 />
             ) : (
                 <View style={styles.content}>
-                    <Text style={styles.emptyText}>Rankings not available for this series.</Text>
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyTitle}>RANKINGS INITIALIZING</Text>
+                        <Text style={styles.emptyText}>Table data unavailable for this series.</Text>
+                    </View>
                 </View>
             )}
         </View>
@@ -123,73 +127,97 @@ export default function CricketSeriesDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.backgroundDark,
+        backgroundColor: '#0a0e27',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLORS.backgroundDark,
+        backgroundColor: '#0a0e27',
     },
     content: {
-        padding: SPACING.md,
+        padding: 16,
     },
     header: {
-        backgroundColor: COLORS.backgroundDark,
+        backgroundColor: '#0a0e27',
     },
     headerImage: {
         width: '100%',
-        height: 200,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        height: 240,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        position: 'relative',
     },
-    headerContent: {
-        padding: SPACING.lg,
-        alignItems: 'flex-start',
+    imageOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(10, 14, 39, 0.7)',
+    },
+    headerContentOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 24,
     },
     title: {
-        fontSize: FONT_SIZES.xl,
-        fontWeight: '800',
-        color: COLORS.background,
-        marginBottom: SPACING.xs,
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#fff',
+        marginBottom: 4,
+        letterSpacing: -0.5,
     },
     subtitle: {
-        fontSize: FONT_SIZES.sm,
-        color: COLORS.textLight,
-        marginBottom: SPACING.md,
+        fontSize: 12,
+        color: 'rgba(255, 255, 255, 0.6)',
+        fontWeight: '600',
+        textTransform: 'uppercase',
     },
     badge: {
         backgroundColor: COLORS.secondary,
-        paddingHorizontal: SPACING.sm,
+        paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: BORDER_RADIUS.sm,
+        borderRadius: 8,
+        alignSelf: 'flex-start',
+        marginBottom: 12,
     },
     badgeText: {
-        color: COLORS.background,
-        fontSize: FONT_SIZES.xs,
-        fontWeight: '700',
+        color: '#000',
+        fontSize: 10,
+        fontWeight: '900',
         textTransform: 'uppercase',
     },
     errorText: {
-        color: COLORS.danger,
-        fontSize: FONT_SIZES.md,
+        color: '#f43f5e',
+        fontSize: 14,
         textAlign: 'center',
-        marginTop: SPACING.xl,
+        marginTop: 40,
+    },
+    emptyState: {
+        padding: 40,
+        alignItems: 'center',
+    },
+    emptyTitle: {
+        color: 'rgba(255, 255, 255, 0.2)',
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginBottom: 8,
     },
     emptyText: {
-        color: COLORS.textLight,
+        color: 'rgba(255, 255, 255, 0.4)',
         textAlign: 'center',
-        marginTop: SPACING.xl,
         fontStyle: 'italic',
+        fontSize: 12,
     },
     tabs: {
         flexDirection: 'row',
-        paddingHorizontal: SPACING.lg,
+        paddingHorizontal: 16,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: '#0a0e27',
     },
     tab: {
-        paddingVertical: SPACING.md,
-        marginRight: SPACING.lg,
+        paddingVertical: 16,
+        marginRight: 24,
         borderBottomWidth: 2,
         borderBottomColor: 'transparent',
     },
@@ -197,11 +225,13 @@ const styles = StyleSheet.create({
         borderBottomColor: COLORS.secondary,
     },
     tabText: {
-        color: COLORS.textLight,
-        fontSize: FONT_SIZES.sm,
-        fontWeight: '600',
+        color: 'rgba(255, 255, 255, 0.4)',
+        fontSize: 11,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
     },
     activeTabText: {
-        color: COLORS.background,
+        color: '#fff',
     },
 });

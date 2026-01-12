@@ -121,11 +121,12 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
 }
 
 const styles = StyleSheet.create({
+
     container: {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderRadius: BORDER_RADIUS.md,
-        padding: SPACING.sm,
-        marginBottom: SPACING.xs,
+        padding: 8, // Reduced from SPACING.sm (12)
+        marginBottom: 6, // Reduced from SPACING.xs (8)
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.1)',
     },
@@ -134,47 +135,53 @@ const styles = StyleSheet.create({
         transform: [{ scale: 0.98 }],
     },
     liveContainer: {
-        borderColor: COLORS.yellow,
+        borderColor: 'rgba(245, 158, 11, 0.3)', // amber-500/30
         borderWidth: 1.5,
-        backgroundColor: 'rgba(255, 215, 0, 0.08)',
+        backgroundColor: 'rgba(245, 158, 11, 0.05)', // amber-500/5
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: SPACING.xs,
+        marginBottom: 6,
         paddingBottom: 4,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     },
     leagueInfo: {
         flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     leagueName: {
-        fontSize: 10,
-        fontWeight: '600',
+        fontSize: 9, // Reduced from 10
+        fontWeight: '700',
         color: COLORS.textLight,
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     liveBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.yellow,
+        backgroundColor: 'rgba(245, 158, 11, 0.2)', // amber-500/20
         paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: BORDER_RADIUS.sm,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(245, 158, 11, 0.3)',
     },
     liveDot: {
-        width: 4,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: COLORS.text,
-        marginRight: 3,
+        width: 6, // Increased to 6 to match web relative size
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: COLORS.yellow,
+        marginRight: 4,
     },
     liveText: {
-        fontSize: 9,
-        fontWeight: '700',
-        color: COLORS.text,
+        fontSize: 8, // Reduced from 9
+        fontWeight: '900',
+        color: COLORS.yellow,
+        letterSpacing: 1,
     },
     matchContainer: {
         flexDirection: 'row',
@@ -183,7 +190,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     teamContainer: {
-        flex: 1,
+        flex: 1.2, // Increased flex ratio
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
@@ -198,64 +205,79 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     teamLogo: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        width: 20, // Reduced from 24
+        height: 20,
+        borderRadius: 4, // Rounded square
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        resizeMode: 'contain',
     },
     teamLogoPlaceholder: {
-        backgroundColor: COLORS.secondary,
+        backgroundColor: 'transparent',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     teamLogoText: {
-        color: COLORS.backgroundDark,
-        fontSize: 11,
-        fontWeight: 'bold',
+        color: COLORS.secondary,
+        fontSize: 10,
+        fontWeight: '900',
     },
     teamName: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 10, // Reduced
+        fontWeight: '900', // Black
         color: COLORS.background,
+        textTransform: 'uppercase',
     },
     scoreText: {
-        fontSize: 13,
-        fontWeight: '800',
+        fontSize: 14, // Slightly larger for emphasis
+        fontWeight: '900',
         color: COLORS.background,
-        marginTop: 1,
+        marginTop: 0,
+        fontVariant: ['tabular-nums'],
     },
     overs: {
-        fontSize: 10,
-        fontWeight: '400',
+        fontSize: 9,
+        fontWeight: '700',
         color: COLORS.textLight,
     },
     statusContainer: {
         alignItems: 'center',
-        width: 70,
+        width: 70, // Fixed width
+        paddingHorizontal: 4,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+        marginHorizontal: 4,
     },
     timeContainer: {
         alignItems: 'center',
     },
     time: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 11,
+        fontWeight: '900',
         color: COLORS.background,
+        fontVariant: ['tabular-nums'],
     },
     date: {
-        fontSize: 9,
+        fontSize: 8,
+        fontWeight: '700',
         color: COLORS.textLight,
+        textTransform: 'uppercase',
     },
     statusText: {
-        fontSize: 10,
-        fontWeight: '600',
+        fontSize: 9,
+        fontWeight: '800',
         color: COLORS.secondary,
         textTransform: 'uppercase',
         textAlign: 'center',
+        letterSpacing: 0.5,
     },
     venueText: {
         fontSize: 9,
-        color: COLORS.textLight,
-        marginTop: 4,
+        color: 'rgba(255, 255, 255, 0.4)', // Muted 
+        marginTop: 6,
         textAlign: 'center',
+        fontWeight: '500',
     },
 });

@@ -18,6 +18,7 @@ export default function CricketRankingsScreen() {
     const router = useRouter();
     const [activeFormat, setActiveFormat] = useState<Format>('test');
     const [loading, setLoading] = useState(false);
+
     const [standings, setStandings] = useState<CricketStanding[]>([]);
 
     useEffect(() => {
@@ -25,14 +26,12 @@ export default function CricketRankingsScreen() {
             setLoading(true);
             try {
                 const response = await advancedCricketApi.getStandings({
-                    leagueId: LEAGUE_IDS[activeFormat],
-                    APIkey: 'mock'
+                    leagueId: LEAGUE_IDS[activeFormat]
                 });
-                if (response.result && response.result.total) {
-                    setStandings(response.result.total);
-                } else {
-                    setStandings([]);
-                }
+
+                // Safe extraction logic matching web
+                const data = response.result?.total || (Array.isArray(response.result) ? response.result : []);
+                setStandings(data);
             } catch (error) {
                 console.error('Error loading rankings:', error);
                 setStandings([]);
@@ -46,31 +45,34 @@ export default function CricketRankingsScreen() {
     const renderTable = () => (
         <View style={styles.table}>
             <View style={styles.tableHeader}>
-                <Text style={[styles.headText, { flex: 1 }]}>Rank</Text>
+                <Text style={[styles.headText, { flex: 0.8 }]}>Pos</Text>
                 <Text style={[styles.headText, { flex: 4 }]}>Team</Text>
-                <Text style={[styles.headText, { flex: 2, textAlign: 'right' }]}>Rating</Text>
-                <Text style={[styles.headText, { flex: 2, textAlign: 'right' }]}>Points</Text>
+                <Text style={[styles.headText, { flex: 1.5, textAlign: 'right' }]}>Pts</Text>
+                <Text style={[styles.headText, { flex: 1.5, textAlign: 'right' }]}>NRR</Text>
             </View>
             {loading ? (
-                <ActivityIndicator size="small" color={COLORS.secondary} style={{ padding: 20 }} />
+                <ActivityIndicator size="small" color={COLORS.secondary} style={{ padding: 40 }} />
             ) : standings.length > 0 ? (
-                standings.map((item) => (
-                    <View key={item.team_key} style={styles.row}>
-                        <Text style={[styles.cellText, { flex: 1, fontWeight: '700' }]}>{item.standing_place}</Text>
+                standings.map((item, idx) => (
+                    <View key={item.team_key || idx} style={styles.row}>
+                        <Text style={[styles.cellText, styles.rankPos]}>{item.standing_place}</Text>
                         <View style={{ flex: 4, flexDirection: 'row', alignItems: 'center' }}>
-                            {/* Logo not available in CricketStanding, using placeholder or rely on name */}
                             <View style={styles.teamLogoPlaceholder}>
-                                <Text style={styles.teamLogoText}>{item.standing_team.charAt(0)}</Text>
+                                <Text style={styles.teamLogoText}>{(item.standing_team || '?').charAt(0)}</Text>
                             </View>
-                            <Text style={styles.cellText}>{item.standing_team}</Text>
+                            <Text style={[styles.cellText, styles.teamName]} numberOfLines={1}>{item.standing_team}</Text>
                         </View>
-                        <Text style={[styles.cellText, { flex: 2, textAlign: 'right' }]}>{item.standing_NRR || '-'}</Text>
-                        {/* Note: NRR used as placeholder for Rating if not available, or Pts */}
-                        <Text style={[styles.cellText, { flex: 2, textAlign: 'right' }]}>{item.standing_Pts}</Text>
+                        <Text style={[styles.cellText, styles.points]}>{item.standing_Pts}</Text>
+                        <Text style={[styles.cellText, styles.nrr, parseFloat(item.standing_NRR) >= 0 ? styles.positive : styles.negative]}>
+                            {item.standing_NRR || '-'}
+                        </Text>
                     </View>
                 ))
             ) : (
-                <Text style={styles.emptyText}>No rankings available for this format.</Text>
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyTitle}>SEASON INITIALIZING</Text>
+                    <Text style={styles.emptyText}>Elite Intel Pending</Text>
+                </View>
             )}
         </View>
     );
@@ -80,15 +82,20 @@ export default function CricketRankingsScreen() {
             <Stack.Screen
                 options={{
                     title: 'ICC Rankings',
-                    headerStyle: { backgroundColor: COLORS.backgroundDark },
-                    headerTintColor: COLORS.background,
+                    headerStyle: { backgroundColor: '#0a0e27' },
+                    headerTintColor: '#fff',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={24} color={COLORS.background} />
+                            <Ionicons name="arrow-back" size={24} color="#fff" />
                         </TouchableOpacity>
                     ),
                 }}
             />
+
+            <View style={styles.headerSection}>
+                <Text style={styles.bgTitle}>ICC RANKINGS</Text>
+                <Text style={styles.subTitle}>OFFICIAL STANDINGS</Text>
+            </View>
 
             <View style={styles.tabs}>
                 {(['test', 'odi', 't20'] as Format[]).map((format) => (
@@ -105,7 +112,6 @@ export default function CricketRankingsScreen() {
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
-                <Text style={styles.title}>Men's Team Rankings - {activeFormat.toUpperCase()}</Text>
                 {renderTable()}
             </ScrollView>
         </View>
@@ -115,18 +121,39 @@ export default function CricketRankingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.backgroundDark,
+        backgroundColor: '#0a0e27',
+    },
+    headerSection: {
+        padding: 24,
+        paddingBottom: 0,
+    },
+    bgTitle: {
+        color: 'rgba(255, 255, 255, 0.05)',
+        fontSize: 40,
+        fontWeight: '900',
+        position: 'absolute',
+        top: 10,
+        left: 20,
+        fontStyle: 'italic',
+    },
+    subTitle: {
+        color: COLORS.secondary,
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginTop: 40,
+        marginBottom: 20,
     },
     tabs: {
         flexDirection: 'row',
-        paddingHorizontal: SPACING.md,
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        paddingHorizontal: 16,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        marginBottom: 16,
     },
     tab: {
-        paddingVertical: SPACING.md,
-        marginRight: SPACING.lg,
+        paddingVertical: 16,
+        marginRight: 24,
         borderBottomWidth: 2,
         borderBottomColor: 'transparent',
     },
@@ -134,69 +161,103 @@ const styles = StyleSheet.create({
         borderBottomColor: COLORS.secondary,
     },
     tabText: {
-        color: COLORS.textLight,
-        fontSize: FONT_SIZES.sm,
-        fontWeight: '600',
+        color: 'rgba(255, 255, 255, 0.3)',
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 1,
     },
     activeTabText: {
-        color: COLORS.background,
+        color: '#fff',
     },
     content: {
-        padding: SPACING.md,
-    },
-    title: {
-        fontSize: FONT_SIZES.lg,
-        fontWeight: '700',
-        color: COLORS.background,
-        marginBottom: SPACING.md,
+        padding: 16,
+        paddingTop: 0,
     },
     table: {
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: BORDER_RADIUS.md,
-        padding: SPACING.sm,
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
     },
     tableHeader: {
         flexDirection: 'row',
-        paddingVertical: SPACING.sm,
+        paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-        marginBottom: SPACING.xs,
+        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        marginBottom: 8,
     },
     headText: {
-        color: COLORS.textLight,
-        fontSize: FONT_SIZES.xs,
-        fontWeight: '600',
+        color: 'rgba(255, 255, 255, 0.4)',
+        fontSize: 10,
+        fontWeight: '900',
         textTransform: 'uppercase',
     },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: SPACING.sm,
+        paddingVertical: 10,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+        borderBottomColor: 'rgba(255, 255, 255, 0.03)',
     },
     cellText: {
-        color: COLORS.background,
-        fontSize: FONT_SIZES.sm,
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: '600',
     },
+    rankPos: {
+        flex: 0.8,
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontWeight: '900',
+    },
+    teamName: {
+        fontWeight: '700',
+        textTransform: 'uppercase',
+    },
+    points: {
+        flex: 1.5,
+        textAlign: 'right',
+        fontWeight: '900',
+    },
+    nrr: {
+        flex: 1.5,
+        textAlign: 'right',
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    positive: { color: '#10b981' },
+    negative: { color: '#f43f5e' },
     teamLogoPlaceholder: {
         width: 24,
         height: 24,
-        marginRight: SPACING.sm,
-        borderRadius: 12,
-        backgroundColor: COLORS.secondary,
+        marginRight: 10,
+        borderRadius: 6,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     teamLogoText: {
-        color: COLORS.backgroundDark,
+        color: '#fff',
         fontSize: 10,
-        fontWeight: 'bold',
+        fontWeight: '900',
+    },
+    emptyState: {
+        padding: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    emptyTitle: {
+        color: 'rgba(255, 255, 255, 0.2)',
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginBottom: 8,
     },
     emptyText: {
-        color: COLORS.textLight,
-        textAlign: 'center',
-        padding: SPACING.md,
-        fontStyle: 'italic',
+        color: COLORS.secondary,
+        fontSize: 10,
+        fontWeight: '700',
+        textTransform: 'uppercase',
     },
 });
+

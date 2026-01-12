@@ -12,13 +12,13 @@ export default function CricketTeamDetailsScreen() {
     const [loading, setLoading] = useState(true);
     const [team, setTeam] = useState<CricketTeam | null>(null);
 
+
     useEffect(() => {
         const loadData = async () => {
             if (!id) return;
             try {
-                const teamRes = await advancedCricketApi.getTeams({ teamId: Number(id), APIkey: 'mock' });
+                const teamRes = await advancedCricketApi.getTeams({ teamId: Number(id) });
                 if (teamRes.result && teamRes.result.length > 0) {
-                    // API returns array, we filter or take first if filtered by ID
                     setTeam(teamRes.result[0]);
                 }
             } catch (error) {
@@ -38,24 +38,37 @@ export default function CricketTeamDetailsScreen() {
             <Stack.Screen
                 options={{
                     title: team.team_name,
-                    headerStyle: { backgroundColor: COLORS.backgroundDark },
-                    headerTintColor: COLORS.text,
+                    headerStyle: { backgroundColor: '#0a0e27' },
+                    headerTintColor: '#fff',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+                            <Ionicons name="arrow-back" size={24} color="#fff" />
                         </TouchableOpacity>
                     ),
                 }}
             />
             <ScrollView contentContainerStyle={styles.content}>
                 <View style={styles.header}>
-                    <Image source={{ uri: team.team_logo || 'https://example.com/placeholder.png' }} style={styles.logo} />
+                    <View style={styles.logoContainer}>
+                        {team.team_logo ? (
+                            <Image source={{ uri: team.team_logo }} style={styles.logo} />
+                        ) : (
+                            <Text style={styles.logoText}>{team.team_name.charAt(0)}</Text>
+                        )}
+                    </View>
                     <Text style={styles.name}>{team.team_name}</Text>
-                    {/* <Text style={styles.country}>{team.country}</Text> Country not available */}
+                    <View style={styles.badge}>
+                        <Text style={styles.badgeText}>PROFESSIONAL CLUB</Text>
+                    </View>
                 </View>
 
                 <View style={styles.sectionContainer}>
-                    <Text style={styles.emptyText}>Squad information is currently not available via the API.</Text>
+                    <Text style={styles.sectionTitle}>SQUAD MANIFEST</Text>
+                    <View style={styles.emptyState}>
+                        <Ionicons name="shield-outline" size={48} color="rgba(255,255,255,0.1)" />
+                        <Text style={styles.emptyTitle}>SQUAD INTEL RESTRICTED</Text>
+                        <Text style={styles.emptyText}>Roster details are currently classified.</Text>
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -65,81 +78,105 @@ export default function CricketTeamDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.backgroundDark,
+        backgroundColor: '#0a0e27',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLORS.backgroundDark,
+        backgroundColor: '#0a0e27',
     },
     content: {
-        padding: SPACING.md,
+        padding: 16,
     },
     header: {
         alignItems: 'center',
-        marginBottom: SPACING.xl,
-        padding: SPACING.lg,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: BORDER_RADIUS.lg,
+        marginBottom: 24,
+        padding: 32,
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: 24,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
     },
-    logo: {
+    logoContainer: {
         width: 100,
         height: 100,
-        marginBottom: SPACING.md,
+        borderRadius: 50,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    logo: {
+        width: 80,
+        height: 80,
+        resizeMode: 'contain',
+    },
+    logoText: {
+        fontSize: 40,
+        fontWeight: '900',
+        color: COLORS.secondary,
     },
     name: {
-        fontSize: FONT_SIZES.xl,
-        fontWeight: '800',
-        color: COLORS.background,
-        marginBottom: SPACING.xs,
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#fff',
+        marginBottom: 8,
+        textAlign: 'center',
+        textTransform: 'uppercase',
     },
-    country: {
-        fontSize: FONT_SIZES.md,
-        color: COLORS.textLight,
+    badge: {
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(245, 158, 11, 0.2)',
+    },
+    badgeText: {
+        color: COLORS.secondary,
+        fontSize: 10,
+        fontWeight: '900',
+        letterSpacing: 1,
+    },
+    sectionContainer: {
+        marginTop: 16,
     },
     sectionTitle: {
-        fontSize: FONT_SIZES.lg,
-        fontWeight: '700',
+        fontSize: 12,
+        fontWeight: '900',
         color: COLORS.secondary,
-        marginBottom: SPACING.md,
-        marginTop: SPACING.md,
+        marginBottom: 16,
+        letterSpacing: 2,
+        textTransform: 'uppercase',
     },
-    playerRow: {
-        flexDirection: 'row',
+    emptyState: {
+        padding: 40,
         alignItems: 'center',
-        padding: SPACING.md,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: BORDER_RADIUS.md,
-        marginBottom: SPACING.sm,
+        backgroundColor: 'rgba(255,255,255,0.02)',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
     },
-    playerImage: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-    },
-    playerInfo: {
-        marginLeft: SPACING.md,
-    },
-    playerName: {
-        fontSize: FONT_SIZES.md,
-        fontWeight: '700',
-        color: COLORS.background,
-    },
-    playerRole: {
-        fontSize: FONT_SIZES.xs,
-        color: COLORS.textLight,
-        marginTop: 2,
-    },
-    errorText: {
-        color: COLORS.danger,
-        fontSize: FONT_SIZES.md,
-        textAlign: 'center',
-        marginTop: SPACING.xl,
+    emptyTitle: {
+        color: 'rgba(255, 255, 255, 0.3)',
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginTop: 16,
+        marginBottom: 8,
     },
     emptyText: {
-        color: COLORS.textLight,
-        fontStyle: 'italic',
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: 11,
+        textAlign: 'center',
+    },
+    errorText: {
+        color: '#f43f5e',
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 40,
     },
 });
