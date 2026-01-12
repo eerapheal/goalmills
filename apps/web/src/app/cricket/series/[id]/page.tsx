@@ -3,41 +3,52 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { advancedCricketApi } from '../../../../services/advancedCricketApi';
-import { CricketLeague, CricketEvent } from '@goalmills/types';
+import { CricketLeague, CricketEvent, CricketStanding } from '@goalmills/types';
 import { CricketMatchCard } from '../../../../components/CricketMatchCard';
 import Image from 'next/image';
+import Link from 'next/link';
+
+type TabType = 'fixtures' | 'standings';
 
 export default function CricketSeriesDetailsPage() {
     const params = useParams();
     const router = useRouter();
     const [series, setSeries] = useState<CricketLeague | null>(null);
     const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
+    const [standings, setStandings] = useState<CricketStanding[]>([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<TabType>('fixtures');
 
     useEffect(() => {
         const loadData = async () => {
             if (!params.id) return;
             const seriesId = String(params.id);
             try {
-                // Get series details
-                const seriesRes = await advancedCricketApi.getLeagues({ APIkey: 'mock' });
+                // Get all leagues to find this specific one
+                const seriesRes = await advancedCricketApi.getLeagues();
                 const foundSeries = seriesRes.result.find(s => s.league_key === seriesId);
                 setSeries(foundSeries || null);
 
                 if (foundSeries) {
-                    // Get fixtures for this series
-                    const today = new Date().toISOString().split('T')[0];
-                    const futureDate = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
-                    const fixturesRes = await advancedCricketApi.getFixtures({
-                        leagueId: Number(seriesId),
-                        from: today,
-                        to: futureDate,
-                        APIkey: 'mock'
-                    });
+                    // Parallel fetch for fixtures and standings
+                    const [fixturesRes, standingsRes] = await Promise.all([
+                        advancedCricketApi.getFixtures({
+                            leagueId: Number(seriesId),
+                            from: advancedCricketApi.getFormattedDate(-30),
+                            to: advancedCricketApi.getFormattedDate(60),
+                        }),
+                        advancedCricketApi.getStandings({
+                            leagueId: Number(seriesId)
+                        }).catch(() => ({ success: 1, result: { total: [] } }))
+                    ]);
+
                     setFixtures(fixturesRes.result || []);
+                    setStandings(standingsRes.result?.total || []);
+
+                    // If standings exist, maybe default to that? No, fixtures is usually better.
                 }
             } catch (error) {
-                console.error('Error loading series details:', error);
+                console.error('Error loading series intelligence:', error);
             } finally {
                 setLoading(false);
             }
@@ -47,69 +58,160 @@ export default function CricketSeriesDetailsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex justify-center items-center">
-                <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#0a0e27] pt-[120px] flex flex-col justify-center items-center">
+                <div className="relative w-16 h-16 mb-6">
+                    <div className="absolute inset-0 border-4 border-secondary/20 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <p className="text-text-secondary font-black uppercase tracking-widest text-xs">Accessing Series Archive...</p>
             </div>
         );
     }
 
     if (!series) {
         return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex flex-col justify-center items-center text-white">
-                <h2 className="text-2xl font-bold mb-4">Series Not Found</h2>
-                <button onClick={() => router.back()} className="text-secondary hover:underline">Go Back</button>
+            <div className="min-h-screen bg-[#0a0e27] pt-[120px] flex flex-col justify-center items-center text-white px-4 text-center">
+                <div className="text-6xl mb-6">🔍</div>
+                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">Intel Not Found</h2>
+                <p className="text-text-secondary mb-8 max-w-md">The requested series data is currently restricted or deprecated from the live feed.</p>
+                <button
+                    onClick={() => router.push('/cricket')}
+                    className="px-8 py-3 bg-secondary text-white rounded-full font-black uppercase tracking-widest hover:scale-105 transition-transform"
+                >
+                    Back to Cricket Central
+                </button>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0a0e27] pt-[90px] pb-10">
-            <div className="max-w-4xl mx-auto px-4">
-                {/* Header with Back Button */}
-                <div className="flex items-center gap-4 mb-6">
+        <div className="min-h-screen bg-[#0a0e27] pt-[120px] pb-24">
+            <div className="max-w-5xl mx-auto px-4">
+                {/* Header Navigation */}
+                <div className="flex items-center gap-6 mb-12">
                     <button
                         onClick={() => router.back()}
-                        className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors"
+                        className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-secondary hover:border-secondary transition-all hover:scale-110 group shadow-xl"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><path d="M12 19l-7-7 7-7" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6" /></svg>
                     </button>
-                    <span className="text-sm font-bold text-text-muted uppercase tracking-wider">Series Details</span>
+                    <div>
+                        <span className="text-[10px] font-black text-secondary uppercase tracking-[0.3em]">Series Intelligence</span>
+                        <h1 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter leading-none mt-1">Tournament Overview</h1>
+                    </div>
                 </div>
 
-                {/* Series Header Card */}
-                <div className="glass-card rounded-2xl p-8 mb-8 border border-white/5">
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                        {series.league_logo ? (
-                            <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-xl flex-shrink-0">
-                                <Image src={series.league_logo} alt={series.league_name} fill className="object-cover" />
-                            </div>
-                        ) : (
-                            <div className="w-32 h-32 bg-blue-500/20 rounded-xl flex items-center justify-center shadow-xl flex-shrink-0">
-                                <span className="text-5xl font-bold text-blue-400">{series.league_name.charAt(0)}</span>
-                            </div>
-                        )}
+                {/* Unified Series Identity Card */}
+                <div className="glass-card rounded-[2.5rem] p-8 md:p-12 mb-12 border-2 border-white/5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/5 blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none group-hover:bg-secondary/10 transition-colors" />
+
+                    <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
+                        <div className="relative w-48 h-48 rounded-[2rem] overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 shadow-2xl p-6 flex items-center justify-center group-hover:scale-105 transition-transform group-hover:rotate-2">
+                            {series.league_logo ? (
+                                <Image src={series.league_logo} alt={series.league_name} width={192} height={192} className="object-contain w-full h-full" />
+                            ) : (
+                                <span className="text-8xl font-black text-blue-400">{series.league_name.charAt(0)}</span>
+                            )}
+                        </div>
                         <div className="text-center md:text-left flex-1">
-                            <h1 className="text-4xl font-extrabold text-white mb-2">{series.league_name}</h1>
-                            <p className="text-xl text-text-secondary mb-2">{series.league_season} • {series.country_name}</p>
-                            <p className="text-lg text-text-muted">{series.league_year}</p>
+                            <div className="inline-flex px-4 py-1.5 rounded-full bg-secondary/20 text-secondary text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-secondary/20">
+                                {series.country_name || 'International Events'}
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-tighter leading-none">{series.league_name}</h1>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                                <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-6 py-2.5 rounded-xl border border-white/10 shadow-lg">{series.league_season || '2024 Edition'}</span>
+                                <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-6 py-2.5 rounded-xl border border-white/10 shadow-lg">{series.league_year || 'Series Archive'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Fixtures Section */}
-                <h2 className="text-2xl font-bold text-white mb-6 pl-2 border-l-4 border-secondary">Fixtures</h2>
-                {fixtures.length > 0 ? (
-                    <div className="space-y-2">
-                        {fixtures.map(match => (
-                            <CricketMatchCard key={match.event_key} match={match} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="glass-card rounded-xl p-8 text-center">
-                        <p className="text-text-secondary">No fixtures available for this series.</p>
-                    </div>
-                )}
+                {/* Sub-Navigation Tabs */}
+                <div className="flex gap-4 mb-10 bg-white/5 p-2 rounded-2xl border border-white/5">
+                    {[
+                        { id: 'fixtures', label: 'Match Schedule', icon: '📅' },
+                        { id: 'standings', label: 'League Standings', icon: '📈' }
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as TabType)}
+                            className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
+                                ${activeTab === tab.id ? 'bg-secondary text-white shadow-lg' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+                        >
+                            <span className="text-xs">{tab.icon}</span>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Dynamic Tab Content */}
+                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+                    {activeTab === 'fixtures' ? (
+                        <div className="space-y-4">
+                            {fixtures.length > 0 ? (
+                                fixtures.map(match => (
+                                    <CricketMatchCard key={match.event_key} match={match} />
+                                ))
+                            ) : (
+                                <EmptyPlaceholder icon="🏏" title="No Active Fixtures" message="There are currently no scheduled matches or recent results available for this series in the live roster." />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="glass-card rounded-[2.5rem] border border-white/5 overflow-hidden">
+                            {standings.length > 0 ? (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-xs text-left">
+                                        <thead className="text-text-muted uppercase tracking-[0.2em] bg-white/5">
+                                            <tr>
+                                                <th className="py-6 px-8">#</th>
+                                                <th className="py-6 px-4">Squad Name</th>
+                                                <th className="py-6 px-4 text-center">P</th>
+                                                <th className="py-6 px-4 text-center">W</th>
+                                                <th className="py-6 px-4 text-center">L</th>
+                                                <th className="py-6 px-4 text-center">Pts</th>
+                                                <th className="py-6 px-8 text-right">NRR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-white">
+                                            {standings.map((rank, i) => (
+                                                <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors group">
+                                                    <td className="py-5 px-8 font-black text-text-muted/50 tabular-nums">{(i + 1).toString().padStart(2, '0')}</td>
+                                                    <td className="py-5 px-4">
+                                                        <Link href={`/cricket/teams/${rank.team_key}`} className="font-black text-sm uppercase tracking-tight group-hover:text-secondary transition-colors">
+                                                            {rank.standing_team}
+                                                        </Link>
+                                                    </td>
+                                                    <td className="py-5 px-4 text-center font-black tabular-nums">{rank.standing_MP}</td>
+                                                    <td className="py-5 px-4 text-center font-bold text-emerald-500 tabular-nums">{rank.standing_W}</td>
+                                                    <td className="py-5 px-4 text-center font-bold text-rose-500 tabular-nums">{rank.standing_L}</td>
+                                                    <td className="py-5 px-4 text-center font-black text-secondary tabular-nums">{rank.standing_Pts}</td>
+                                                    <td className={`py-5 px-8 text-right font-black tabular-nums ${parseFloat(rank.standing_NRR) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                        {rank.standing_NRR}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <EmptyPlaceholder icon="📈" title="Standings Evaluated" message="League table data is either not applicable for this series format or is currently being calculated." />
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
+        </div>
+    );
+}
+
+function EmptyPlaceholder({ icon, title, message }: { icon: string, title: string, message: string }) {
+    return (
+        <div className="glass-card rounded-[2.5rem] p-20 text-center border-2 border-dashed border-white/5 bg-transparent">
+            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <span className="text-4xl opacity-40 grayscale">{icon}</span>
+            </div>
+            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-4">{title}</h3>
+            <p className="text-text-muted text-sm max-w-sm mx-auto font-medium leading-relaxed">{message}</p>
         </div>
     );
 }

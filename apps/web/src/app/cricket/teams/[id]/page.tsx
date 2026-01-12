@@ -7,39 +7,41 @@ import { CricketTeam, CricketEvent } from '@goalmills/types';
 import { CricketMatchCard } from '../../../../components/CricketMatchCard';
 import Image from 'next/image';
 
+type TabType = 'schedule' | 'results';
+
 export default function CricketTeamDetailsPage() {
     const params = useParams();
     const router = useRouter();
     const [team, setTeam] = useState<CricketTeam | null>(null);
     const [matches, setMatches] = useState<CricketEvent[]>([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<TabType>('schedule');
 
     useEffect(() => {
         const loadData = async () => {
             if (!params.id) return;
             const teamId = String(params.id);
             try {
-                const teamsRes = await advancedCricketApi.getTeams({ teamId: parseInt(teamId), APIkey: 'mock' });
-                const foundTeam = teamsRes.result[0];
-                setTeam(foundTeam || null);
+                // Fetch team metadata
+                const teamsRes = await advancedCricketApi.getTeams({ teamId: parseInt(teamId) });
+                const foundTeam = teamsRes.result && teamsRes.result.length > 0 ? teamsRes.result[0] : null;
+                setTeam(foundTeam);
 
                 if (foundTeam) {
-                    // Get team matches
-                    const today = new Date().toISOString().split('T')[0];
-                    const futureDate = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+                    // Fetch full fixture window for the squad
                     const matchesRes = await advancedCricketApi.getFixtures({
-                        from: today,
-                        to: futureDate,
-                        APIkey: 'mock'
+                        from: advancedCricketApi.getFormattedDate(-60),
+                        to: advancedCricketApi.getFormattedDate(60),
                     });
-                    // Filter matches where this team is playing
-                    const teamMatches = matchesRes.result.filter(
-                        m => m.home_team_key === teamId || m.away_team_key === teamId
+
+                    // Filter for matches involving this squad ID
+                    const teamMatches = (matchesRes.result || []).filter(
+                        m => String(m.home_team_key) === teamId || String(m.away_team_key) === teamId
                     );
                     setMatches(teamMatches);
                 }
             } catch (error) {
-                console.error('Error loading team details:', error);
+                console.error('Error loading squad intelligence:', error);
             } finally {
                 setLoading(false);
             }
@@ -47,67 +49,133 @@ export default function CricketTeamDetailsPage() {
         loadData();
     }, [params.id]);
 
+    const displayMatches = matches.filter(m => {
+        if (activeTab === 'schedule') return m.event_status === 'Not Started';
+        return m.event_status !== 'Not Started';
+    });
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex justify-center items-center">
-                <div className="w-12 h-12 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#0a0e27] pt-[120px] flex flex-col justify-center items-center">
+                <div className="relative w-16 h-16 mb-6">
+                    <div className="absolute inset-0 border-4 border-secondary/20 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <p className="text-text-secondary font-black uppercase tracking-widest text-xs">Deploying Team Profile...</p>
             </div>
         );
     }
 
     if (!team) {
         return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex flex-col justify-center items-center text-white">
-                <h2 className="text-2xl font-bold mb-4">Team Not Found</h2>
-                <button onClick={() => router.back()} className="text-secondary hover:underline">Go Back</button>
+            <div className="min-h-screen bg-[#0a0e27] pt-[120px] flex flex-col justify-center items-center text-white text-center px-4">
+                <div className="text-6xl mb-6">🛡️</div>
+                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">Squad Archive Error</h2>
+                <p className="text-text-secondary mb-8 max-w-md">The requested squad metadata is currently unavailable in the live feed records.</p>
+                <button
+                    onClick={() => router.push('/cricket')}
+                    className="px-8 py-3 bg-secondary text-white rounded-full font-black uppercase tracking-widest hover:scale-105 transition-transform"
+                >
+                    Back to Cricket Central
+                </button>
             </div>
         );
     }
 
+    const tName = team.team_name || (team as any).name || 'International Squad';
+
     return (
-        <div className="min-h-screen bg-[#0a0e27] pt-[90px] pb-10">
-            <div className="max-w-4xl mx-auto px-4">
-                {/* Header with Back Button */}
-                <div className="flex items-center gap-4 mb-6">
+        <div className="min-h-screen bg-[#0a0e27] pt-[120px] pb-24">
+            <div className="max-w-5xl mx-auto px-4">
+                {/* Header Navigation */}
+                <div className="flex items-center gap-6 mb-12">
                     <button
                         onClick={() => router.back()}
-                        className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors"
+                        className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-secondary hover:border-secondary transition-all hover:scale-110 group shadow-xl"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><path d="M12 19l-7-7 7-7" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6" /></svg>
                     </button>
-                    <span className="text-sm font-bold text-text-muted uppercase tracking-wider">Team Details</span>
+                    <div>
+                        <span className="text-[10px] font-black text-secondary uppercase tracking-[0.3em]">Squad Analytics</span>
+                        <h1 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter leading-none mt-1">SQUAD Overview</h1>
+                    </div>
                 </div>
 
-                {/* Team Header Card */}
-                <div className="glass-card rounded-2xl p-8 mb-8 flex flex-col md:flex-row items-center gap-8 border border-white/5">
-                    {team.team_logo ? (
-                        <div className="relative w-32 h-32 bg-white/5 rounded-full p-4 shadow-xl flex items-center justify-center overflow-hidden">
-                            <Image src={team.team_logo} alt={team.team_name} width={128} height={128} className="object-contain w-full h-full" />
+                {/* Team Identity Card */}
+                <div className="glass-card rounded-[2.5rem] p-8 md:p-12 mb-12 border-2 border-white/5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/5 blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none group-hover:bg-secondary/10 transition-colors" />
+
+                    <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
+                        <div className="relative w-48 h-48 bg-white/5 rounded-full p-6 border border-white/10 flex shrink-0 items-center justify-center shadow-2xl group-hover:scale-105 transition-transform overflow-hidden">
+                            {team.team_logo ? (
+                                <Image src={team.team_logo} alt={tName} width={192} height={192} className="object-contain w-full h-full" />
+                            ) : (
+                                <span className="text-8xl font-black text-blue-400">{tName.charAt(0)}</span>
+                            )}
+                        </div>
+                        <div className="text-center md:text-left relative z-10">
+                            <div className="inline-flex px-4 py-1.5 rounded-full bg-secondary/20 text-secondary text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-secondary/20">
+                                Professional Cricket Entry
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-6">
+                                {tName}
+                            </h1>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                                <p className="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-6 py-2.5 rounded-xl border border-white/10 shadow-lg">Network Key: {team.team_key}</p>
+                                <p className="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-6 py-2.5 rounded-xl border border-white/10 shadow-lg">Status: Verified Member</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Performance Tabs */}
+                <div className="flex gap-4 mb-10 bg-white/5 p-2 rounded-2xl border border-white/5">
+                    {[
+                        { id: 'schedule', label: 'Upcoming Schedule', icon: '📅' },
+                        { id: 'results', label: 'Recent Results', icon: '✅' }
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as TabType)}
+                            className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
+                                ${activeTab === tab.id ? 'bg-secondary text-white shadow-lg' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+                        >
+                            <span className="text-xs">{tab.icon}</span>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Categorized Matches */}
+                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
+                    <div className="mb-8 flex items-center justify-between px-2">
+                        <h2 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                            <span className="w-8 h-[2px] bg-secondary rounded-full"></span>
+                            Verified Fixtures Archive
+                        </h2>
+                        <span className="text-[10px] font-bold text-text-muted italic">{displayMatches.length} squad matches tracked</span>
+                    </div>
+
+                    {displayMatches.length > 0 ? (
+                        <div className="space-y-4">
+                            {displayMatches.map(match => (
+                                <CricketMatchCard key={match.event_key} match={match} />
+                            ))}
                         </div>
                     ) : (
-                        <div className="w-32 h-32 bg-blue-500/20 rounded-full flex items-center justify-center shadow-xl">
-                            <span className="text-5xl font-bold text-blue-400">{team.team_name.charAt(0)}</span>
+                        <div className="glass-card rounded-[2.5rem] p-24 text-center border-2 border-dashed border-white/5 bg-transparent">
+                            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                                <span className="text-4xl opacity-40 grayscale">{activeTab === 'schedule' ? '🏟️' : '📋'}</span>
+                            </div>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-4">
+                                {activeTab === 'schedule' ? 'No Upcoming Games' : 'No Recent Data'}
+                            </h3>
+                            <p className="text-text-muted text-sm max-w-sm mx-auto font-medium leading-relaxed">
+                                Our live feed currently has no {activeTab === 'schedule' ? 'scheduled' : 'recorded'} records for this squad within the active coverage window.
+                            </p>
                         </div>
                     )}
-                    <div className="text-center md:text-left">
-                        <h1 className="text-4xl font-extrabold text-white mb-2">{team.team_name}</h1>
-                        <p className="text-xl text-text-secondary">International Cricket Team</p>
-                    </div>
                 </div>
-
-                {/* Matches Section */}
-                <h2 className="text-2xl font-bold text-white mb-6 pl-2 border-l-4 border-secondary">Upcoming Matches</h2>
-                {matches.length > 0 ? (
-                    <div className="space-y-2">
-                        {matches.map(match => (
-                            <CricketMatchCard key={match.event_key} match={match} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="glass-card rounded-xl p-8 text-center">
-                        <p className="text-text-secondary">No upcoming matches scheduled for this team.</p>
-                    </div>
-                )}
             </div>
         </div>
     );

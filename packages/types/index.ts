@@ -1103,6 +1103,42 @@ export interface CricketOddsResponse {
   };
 }
 
+export interface CricketProbabilitiesResponse {
+  success: 1;
+  result: {
+    [matchId: string]: {
+      event_HW: string;
+      event_D: string;
+      event_AW: string;
+    };
+  };
+}
+
+export interface CricketLiveOddsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: {
+      [marketName: string]: CricketOddsMarket;
+    };
+  };
+}
+
+export interface CricketCommentsResponse {
+  success: 1;
+  result: {
+    [matchId: string]: CricketComment[];
+  };
+}
+
+export interface CricketVideosResponse {
+  success: 1;
+  result: {
+    event_key: string;
+    video_title: string;
+    video_url: string;
+  }[];
+}
+
 // Cricket API Request Parameter Types
 export interface CricketBaseParams {
   met: string;
@@ -1156,6 +1192,27 @@ export interface CricketOddsParams extends CricketBaseParams {
   matchId?: number;
 }
 
+export interface CricketProbabilitiesParams extends CricketBaseParams {
+  met: 'Probabilities';
+  matchId: number;
+}
+
+export interface CricketLiveOddsParams extends CricketBaseParams {
+  met: 'LiveOdds';
+  leagueId?: number;
+  matchId?: number;
+}
+
+export interface CricketCommentsParams extends CricketBaseParams {
+  met: 'Comments';
+  matchId: number;
+}
+
+export interface CricketVideosParams extends CricketBaseParams {
+  met: 'Videos';
+  matchId: number;
+}
+
 // API Client Interface
 export interface CricketAPIClient {
   /**
@@ -1192,6 +1249,26 @@ export interface CricketAPIClient {
    * Get pre-match odds for cricket events
    */
   getOdds(params?: Omit<CricketOddsParams, 'met'>): Promise<CricketOddsResponse>;
+
+  /**
+   * Get match outcome probabilities
+   */
+  getProbabilities(params: Omit<CricketProbabilitiesParams, 'met'>): Promise<CricketProbabilitiesResponse>;
+
+  /**
+   * Get live odds for ongoing events
+   */
+  getLiveOdds(params?: Omit<CricketLiveOddsParams, 'met'>): Promise<CricketLiveOddsResponse>;
+
+  /**
+   * Get match comments
+   */
+  getComments(params: Omit<CricketCommentsParams, 'met'>): Promise<CricketCommentsResponse>;
+
+  /**
+   * Get match videos/highlights
+   */
+  getVideos(params: Omit<CricketVideosParams, 'met'>): Promise<CricketVideosResponse>;
 }
 
 // Utility Types
