@@ -534,7 +534,7 @@ export function FootballScreen() {
             .slice(0, 50 - topLeagueConfigs.length)
             .map(l => ({
                 id: Number(l.league_key),
-                name: l.league_name.split(' - ')[0].split(' (')[0],
+                name: l.league_name?.split(' - ')[0]?.split(' (')[0],
                 icon: '🌍',
                 color: 'from-gray-600',
                 logo: l.league_logo

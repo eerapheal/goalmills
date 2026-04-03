@@ -66,12 +66,19 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
     });
 
     if (!response.ok) {
+      if (response.status >= 500) {
+        console.warn(`Upstream API ${method} failed with ${response.status}. This is likely a temporary issue with the provider.`);
+      }
       throw new Error(`API request failed: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.warn(`Error fetching ${method}:`, error);
+    if ((error as any).message?.includes('500')) {
+        // Already warned above
+    } else {
+        console.warn(`Error fetching ${method}:`, error);
+    }
     return { success: 1, result: [] } as unknown as T;
   }
 }

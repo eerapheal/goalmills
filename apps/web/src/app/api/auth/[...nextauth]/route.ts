@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.picture = user.image;
+        token.picture = user.image ?? undefined;
       }
       
       // Allow updating the token when session is updated
