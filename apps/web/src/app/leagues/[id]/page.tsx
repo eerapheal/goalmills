@@ -253,8 +253,65 @@ export default function LeagueDetailsPage() {
     );
   }
 
-  const upcomingEvents = events.filter(e => e.event_status === 'Not Started').sort((a, b) => new Date(`${a.event_date} ${a.event_time}`).getTime() - new Date(`${b.event_date} ${b.event_time}`).getTime());
-  const finishedEvents = events.filter(e => e.event_status === 'Finished').sort((a, b) => new Date(`${b.event_date} ${b.event_time}`).getTime() - new Date(`${a.event_date} ${a.event_time}`).getTime());
+  const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
+  const liveStatuses = ['Live', 'In Play', '1H', '2H', 'HT', 'ET', 'P'];
+
+  const upcomingEvents = events
+    .filter(e => !finishedStatuses.includes(e.event_status))
+    .sort((a, b) => {
+      // Prioritize LIVE
+      const isLiveA = a.event_live === '1' || liveStatuses.includes(a.event_status);
+      const isLiveB = b.event_live === '1' || liveStatuses.includes(b.event_status);
+      if (isLiveA && !isLiveB) return -1;
+      if (!isLiveA && isLiveB) return 1;
+
+      // Then sort by date and time
+      const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
+      const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
+      
+      // If same date/time, keep order
+      if (dateA === dateB) return 0;
+      return dateA - dateB;
+    });
+
+  const finishedEvents = events
+    .filter(e => finishedStatuses.includes(e.event_status))
+    .sort((a, b) => {
+      const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
+      const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
+      return dateB - dateA; // Results sorted descending (newest first)
+    });
+
+  // Helper to format date header
+  const formatDateHeader = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    
+    // Reset hours to compare dates only
+    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    const diffTime = d.getTime() - t.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays === -1) return 'Yesterday';
+
+    return new Date(dateStr).toLocaleDateString('en-GB', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long' 
+    });
+  };
+
+  // Group events by date for upcoming
+  const groupedUpcoming = upcomingEvents.reduce((groups, event) => {
+    const date = event.event_date;
+    if (!groups[date]) groups[date] = [];
+    groups[date].push(event);
+    return groups;
+  }, {} as Record<string, FootballEvent[]>);
 
   return (
     <div className="min-h-screen bg-background pt-[90px] pb-20">
@@ -301,10 +358,20 @@ export default function LeagueDetailsPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {activeTab === 'fixtures' && (
-          <div className="space-y-4 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             <h3 className="text-xl font-bold text-white mb-4">Upcoming Matches</h3>
-            {upcomingEvents.map((event, index) => (
-              <FootballMatchCard key={`fixture-${event.event_key}-${index}`} event={event} />
+            {Object.keys(groupedUpcoming).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(date => (
+              <div key={date} className="space-y-3">
+                <div className="flex items-center gap-4 px-2">
+                  <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
+                    {formatDateHeader(date)}
+                  </span>
+                  <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+                </div>
+                {groupedUpcoming[date].map((event, index) => (
+                  <FootballMatchCard key={`fixture-${event.event_key}-${index}`} event={event} />
+                ))}
+              </div>
             ))}
             {upcomingEvents.length === 0 && <p className="text-text-muted text-center py-8">No upcoming matches.</p>}
           </div>
