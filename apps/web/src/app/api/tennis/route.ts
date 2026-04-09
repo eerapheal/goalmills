@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = 'https://apiv2.allsportsapi.com/football';
+const API_BASE_URL = 'https://apiv2.allsportsapi.com/tennis';
 const API_KEY = process.env.ALLSPORTS_API_KEY;
 
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Build the API URL with all query parameters
     const apiUrl = new URL(API_BASE_URL);
     apiUrl.searchParams.append('met', method);
-    
+
     if (!API_KEY) {
       return NextResponse.json(
         { error: 'API Key is not configured' },
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    console.log('Proxying request to:', apiUrl.toString());
+    console.log('Proxying tennis request to:', apiUrl.toString());
 
     // Make the request to the external API with retries
     let response;
@@ -56,8 +56,8 @@ export async function GET(request: NextRequest) {
         
         // If 500, wait and retry
         if (response.status >= 500 && attempts < maxAttempts) {
-          console.warn(`API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempts)); // Exponential backoff-ish
+          console.warn(`Tennis API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
           continue;
         }
         
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     if (!response || !response.ok) {
       const status = response ? response.status : 500;
       const statusText = response ? response.statusText : 'Fetch failed';
-      console.error('API Error:', status, statusText);
+      console.error('Tennis API Error:', status, statusText);
       return NextResponse.json(
         { error: `API request failed: ${status} ${statusText}` },
         { status: status }
@@ -79,8 +79,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log('API Response received for method:', method);
-
+    
     // Return the data with CORS headers
     return NextResponse.json(data, {
       headers: {
@@ -90,7 +89,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error('Tennis Proxy error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
