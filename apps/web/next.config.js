@@ -3,7 +3,60 @@ const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@goalmills/ui', '@goalmills/types'],
   images: {
-    domains: ['media.api-sports.io', "img.youtube.com", 'res.cloudinary.com', 'africaeyenews.ng', "apiv2.allsportsapi.com", 'i.imgur.com', 'apiv3.apifootball.com', 'ui-avatars.com', 'crests.football-data.org', 'flagcdn.com', 'images.unsplash.com', "randomuser.me", 'picsum.photos'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'media.api-sports.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'africaeyenews.ng',
+      },
+      {
+        protocol: 'https',
+        hostname: 'apiv2.allsportsapi.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'apiv3.apifootball.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'crests.football-data.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'flagcdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'randomuser.me',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+    ],
   },
 
   async headers() {

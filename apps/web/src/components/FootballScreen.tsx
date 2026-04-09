@@ -207,14 +207,24 @@ export function FootballScreen() {
                 }),
             ]);
 
+            // Robust Status Checks
+            const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
+            const scheduledStatuses = ['Not Started', 'NS', 'Time to be defined', 'TBD', ''];
+
             // Filter upcoming and finished from fixtures
             const now = new Date();
             const allFixtures = fixturesRes?.result || [];
             const upcoming = allFixtures.filter((e) => {
+                // Check if status indicates upcoming
+                if (scheduledStatuses.includes(e.event_status)) return true;
+
+                // Also check by date for robustness
                 const eventDate = new Date(`${e.event_date} ${e.event_time}`);
-                return eventDate > now && (e.event_status === 'Not Started' || e.event_status === '');
+                if (isNaN(eventDate.getTime())) return false;
+
+                return eventDate > now && !finishedStatuses.includes(e.event_status);
             });
-            const finished = allFixtures.filter((e) => e.event_status === 'Finished');
+            const finished = allFixtures.filter((e) => finishedStatuses.includes(e.event_status));
 
             const live = (livescoreRes?.result || []).sort((a, b) => sortByRankAndDate(a, b, true));
             upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
@@ -567,7 +577,7 @@ export function FootballScreen() {
                 )}
                 {topLeagues.map((league) => (
                     <button
-                        key={league.id}
+                        key={`league-selector-${league.id}`}
                         onClick={() => onSelect(league.id)}
                         className={`
                             px-6 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 shrink-0 border uppercase tracking-wider
@@ -603,8 +613,8 @@ export function FootballScreen() {
 
         return (
             <div className="space-y-8 pb-10">
-                {leagueGroups.map((group) => (
-                    <div key={group.key} className="animate-fade-in">
+                {leagueGroups.map((group, groupIdx) => (
+                    <div key={`league-group-${group.key || groupIdx}`} className="animate-fade-in">
                         {/* Group Header */}
                         <div className="flex items-center justify-between mb-3 px-2">
                             <Link
@@ -629,7 +639,7 @@ export function FootballScreen() {
                         {/* Matches */}
                         <div className="space-y-2">
                             {group.matches.map((event, idx) => (
-                                <FootballMatchCard key={event.event_key || `${group.key}-${idx}`} event={event} hideLeague={true} />
+                                <FootballMatchCard key={`match-${event.event_key || `${group.key}-${idx}`}`} event={event} hideLeague={true} />
                             ))}
                         </div>
                     </div>
@@ -795,7 +805,7 @@ export function FootballScreen() {
                                     <div className="space-y-8">
                                         {standings.length > 0 ? (
                                             standings.map((group, index) => (
-                                                <div key={`group-${index}`} className="space-y-3">
+                                                <div key={`standings-group-${group.name}-${index}`} className="space-y-3">
                                                     {(standings.length > 1 || group.name !== 'League Table') && (
                                                         <h3 className="text-xl font-bold text-white pl-4 border-l-4 border-secondary/50">{group.name}</h3>
                                                     )}
@@ -828,7 +838,7 @@ export function FootballScreen() {
                             {filteredNews.map((post, index) => (
                                 <Link
                                     href={`/news/${post._id}`}
-                                    key={post._id || `news-${index}`}
+                                    key={`news-post-${post._id || index}`}
                                     className="block h-full hover:no-underline"
                                 >
                                     <BlogCard post={post} />
@@ -861,7 +871,7 @@ export function FootballScreen() {
                                 return (
                                     <Link
                                         href={`/highlights/${video._id}`}
-                                        key={video.event_key || `video-${index}`}
+                                        key={`video-${video._id || video.event_key || index}`}
                                         className="block h-full group"
                                     >
                                         <div className="glass-card rounded-xl overflow-hidden h-full flex flex-col transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 border border-white/5 hover:border-blue-500/30">
@@ -902,7 +912,7 @@ export function FootballScreen() {
                             {filteredCountries.map((country, index) => (
                                 <Link
                                     href={`/countries/${country.country_key}`}
-                                    key={country.country_key || `country-${index}`}
+                                    key={`country-${country.country_key || index}`}
                                     className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
                                 >
                                     <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
@@ -946,7 +956,7 @@ export function FootballScreen() {
                             {filteredLeagues.map((league, index) => (
                                 <Link
                                     href={`/leagues/${league.league_key}`}
-                                    key={league.league_key || `league-${index}`}
+                                    key={`league-item-${league.league_key || index}`}
                                     className="glass-card p-4 rounded-2xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group border border-white/5 hover:border-white/20 shadow-xl hover:shadow-2xl"
                                 >
                                     <div className="relative w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
@@ -986,7 +996,7 @@ export function FootballScreen() {
                             {filteredTeams.map((team, index) => (
                                 <Link
                                     href={`/teams/${team.team_key}`}
-                                    key={team.team_key || `team-${index}`}
+                                    key={`team-item-${team.team_key || index}`}
                                     className="glass-card p-6 rounded-xl flex flex-col items-center gap-4 text-center hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
                                 >
                                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center p-4 group-hover:scale-110 transition-transform shadow-lg shadow-black/20">
@@ -1038,7 +1048,7 @@ export function FootballScreen() {
                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
                         {tabs.map((tab) => (
                             <button
-                                key={tab.id}
+                                key={`nav-tab-${tab.id}`}
                                 onClick={() => {
                                     setActiveTab(tab.id);
                                     setSearchQuery(''); // Reset search on tab change
