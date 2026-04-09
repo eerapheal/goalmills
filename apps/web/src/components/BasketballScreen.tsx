@@ -39,7 +39,14 @@ export function BasketballScreen() {
             setUpcomingMatches(Array.isArray(fixtures.result) ? fixtures.result : []);
             setRecentMatches(Array.isArray(results.result) ? results.result : []);
             setLeagues(Array.isArray(leaguesData.result) ? leaguesData.result : []);
-            setStandings(standingsData.result?.total || []);
+            const rawStandings = standingsData.result?.total || [];
+            const uniqueStandings = rawStandings.reduce((acc: any[], curr: any) => {
+                if (!acc.some(item => item.team_key === curr.team_key)) {
+                    acc.push(curr);
+                }
+                return acc;
+            }, []);
+            setStandings(uniqueStandings);
             setOdds(oddsData.result && typeof oddsData.result === 'object' ? oddsData.result : {});
         } catch (error) {
             console.error('Error loading basketball data:', error);

@@ -123,19 +123,18 @@ export function FootballScreen() {
             const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
             const scheduledStatuses = ['Not Started', 'NS', 'Time to be defined', 'TBD', ''];
 
+            const todayStr = new Date().toISOString().split('T')[0];
             const upcoming = allFixtures.filter((e) => {
-                // Check if status indicates upcoming
-                if (scheduledStatuses.includes(e.event_status)) return true;
-
-                // Also check by date for robustness
-                const eventDate = new Date(`${e.event_date} ${e.event_time}`);
-                // If invalid date, assume it's NOT upcoming unless status says so (handled above)
-                if (isNaN(eventDate.getTime())) return false;
-
-                return eventDate > new Date() && !finishedStatuses.includes(e.event_status);
+                const isFinished = finishedStatuses.includes(e.event_status);
+                // Strictly upcoming: Not finished and (date is today or in the future)
+                return !isFinished && e.event_date >= todayStr;
             });
-
-            const finished = allFixtures.filter((e) => finishedStatuses.includes(e.event_status));
+ 
+            const finished = allFixtures.filter((e) => {
+                const isFinished = finishedStatuses.includes(e.event_status);
+                // Finished or past date without live status
+                return isFinished || (e.event_date < todayStr && !scheduledStatuses.includes(e.event_status));
+            });
 
             upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
             finished.sort((a, b) => sortByRankAndDate(a, b, false));
@@ -156,9 +155,9 @@ export function FootballScreen() {
         try {
             const today = new Date();
             const past = new Date(today);
-            past.setDate(past.getDate() - 3); // 3 days of results
+            past.setDate(past.getDate() - 7); // 7 days of results
             const future = new Date(today);
-            future.setDate(future.getDate() + 3); // 3 days of upcoming
+            future.setDate(future.getDate() + 7); // 7 days of upcoming
             const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
             console.log('🔄 Loading initial football data...');
@@ -370,7 +369,21 @@ export function FootballScreen() {
                 if (!groupedStandings[groupName]) {
                     groupedStandings[groupName] = [];
                 }
-                groupedStandings[groupName].push(s);
+
+                // Deduplicate: Check if team already in this group by ID or Name
+                const teamExists = groupedStandings[groupName].some(existing => 
+                    existing.team_key === s.team_key || 
+                    existing.standing_team.toLowerCase() === s.standing_team.toLowerCase()
+                );
+
+                // Position uniqueness: Check if rank already taken
+                const rankExists = groupedStandings[groupName].some(existing => 
+                    existing.standing_place === s.standing_place
+                );
+
+                if (!teamExists && !rankExists) {
+                    groupedStandings[groupName].push(s);
+                }
             });
 
             // Remove generic "Group Stage" if specific groups exist
@@ -584,10 +597,69 @@ export function FootballScreen() {
         );
     };
 
-    const renderMatchGroups = (events: FootballEvent[], type: 'live' | 'upcoming' | 'finished') => {
-        const leagueGroups = groupMatchesByLeague(events);
+    const formatDateHeader = (dateStr: string) => {
+        if (!dateStr) return 'Unknown Date';
+        try {
+            const date = new Date(dateStr);
+            const today = new Date();
+            
+            // Reset hours to compare dates only
+            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            
+            const diffTime = d.getTime() - t.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (leagueGroups.length === 0) {
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Tomorrow';
+            if (diffDays === -1) return 'Yesterday';
+
+            return date.toLocaleDateString('en-GB', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long' 
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    };
+
+    const renderLeagueGroup = (group: { name: string; logo: string; key: string, matches: FootballEvent[] }, showHeader = true) => (
+        <div key={group.key} className="animate-fade-in group">
+            {/* Group Header */}
+            {showHeader && (
+                <div className="flex items-center justify-between mb-3 px-2">
+                    <Link
+                        href={`/leagues/${group.key}`}
+                        className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+                    >
+                        <div className="w-8 h-8 p-1 bg-white/5 rounded-lg border border-white/10 group-hover:border-white/20 transition-colors">
+                            {group.logo ? (
+                                <img src={group.logo} alt={group.name} className="w-full h-full object-contain" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs">⚽</div>
+                            )}
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-black text-white uppercase tracking-wider">{group.name}</h3>
+                            <p className="text-[10px] text-text-muted font-bold tracking-widest uppercase">League Competition</p>
+                        </div>
+                    </Link>
+                    <div className="h-px flex-1 mx-4 bg-gradient-to-r from-white/10 to-transparent" />
+                </div>
+            )}
+
+            {/* Matches */}
+            <div className="space-y-2">
+                {group.matches.map((event, idx) => (
+                    <FootballMatchCard key={event.event_key || `${group.key}-${idx}`} event={event} hideLeague={showHeader} />
+                ))}
+            </div>
+        </div>
+    );
+
+    const renderMatchGroups = (events: FootballEvent[], type: 'live' | 'upcoming' | 'finished') => {
+        if (events.length === 0) {
             return (
                 <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mx-auto max-w-lg mt-8 text-center animate-fade-in">
                     <span className="text-6xl mb-6 opacity-80">
@@ -601,39 +673,52 @@ export function FootballScreen() {
             );
         }
 
-        return (
-            <div className="space-y-8 pb-10">
-                {leagueGroups.map((group) => (
-                    <div key={group.key} className="animate-fade-in">
-                        {/* Group Header */}
-                        <div className="flex items-center justify-between mb-3 px-2">
-                            <Link
-                                href={`/leagues/${group.key}`}
-                                className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
-                            >
-                                <div className="w-8 h-8 p-1 bg-white/5 rounded-lg border border-white/10 group-hover:border-white/20 transition-colors">
-                                    {group.logo ? (
-                                        <img src={group.logo} alt={group.name} className="w-full h-full object-contain" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-xs">⚽</div>
-                                    )}
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-black text-white uppercase tracking-wider">{group.name}</h3>
-                                    <p className="text-[10px] text-text-muted font-bold tracking-widest uppercase">League Competition</p>
-                                </div>
-                            </Link>
-                            <div className="h-px flex-1 mx-4 bg-gradient-to-r from-white/10 to-transparent" />
-                        </div>
+        if (type === 'live') {
+            const leagueGroups = groupMatchesByLeague(events);
+            return (
+                <div className="space-y-8 pb-10">
+                    {leagueGroups.map(group => renderLeagueGroup(group))}
+                </div>
+            );
+        }
 
-                        {/* Matches */}
-                        <div className="space-y-2">
-                            {group.matches.map((event, idx) => (
-                                <FootballMatchCard key={event.event_key || `${group.key}-${idx}`} event={event} hideLeague={true} />
-                            ))}
+        // Group by Date for Upcoming and Finished
+        const dateGroups: { [key: string]: FootballEvent[] } = {};
+        events.forEach(event => {
+            const date = event.event_date || 'Unknown';
+            if (!dateGroups[date]) dateGroups[date] = [];
+            dateGroups[date].push(event);
+        });
+
+        // Sort dates: ascending for upcoming, descending for finished
+        const sortedDates = Object.keys(dateGroups).sort((a, b) => {
+            const timeA = new Date(a).getTime();
+            const timeB = new Date(b).getTime();
+            return type === 'upcoming' ? timeA - timeB : timeB - timeA;
+        });
+
+        return (
+            <div className="space-y-12 pb-10">
+                {sortedDates.map(date => {
+                    const matchesInDate = dateGroups[date];
+                    const leagueGroups = groupMatchesByLeague(matchesInDate);
+                    
+                    return (
+                        <div key={date} className="space-y-6">
+                            {/* Date Header */}
+                            <div className="flex items-center gap-4 px-2">
+                                <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
+                                    {formatDateHeader(date)}
+                                </span>
+                                <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+                            </div>
+
+                            <div className="space-y-8">
+                                {leagueGroups.map(group => renderLeagueGroup(group))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         );
     };
@@ -800,7 +885,7 @@ export function FootballScreen() {
                                                         <h3 className="text-xl font-bold text-white pl-4 border-l-4 border-secondary/50">{group.name}</h3>
                                                     )}
                                                     <div className="glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/5">
-                                                        <FootballStandingsTable standings={group.teams} teams={teams} />
+                                                        <FootballStandingsTable standings={group.teams} teams={teams} leagueId={currentLeagueId} />
                                                     </div>
                                                 </div>
                                             ))

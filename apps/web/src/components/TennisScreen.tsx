@@ -45,7 +45,14 @@ export function TennisScreen() {
             setUpcomingMatches(Array.isArray(fixtures.result) ? fixtures.result : []);
             setRecentMatches(Array.isArray(results.result) ? results.result : []);
             setLeagues(Array.isArray(leaguesData.result) ? leaguesData.result : []);
-            setStandings(Array.isArray(standingsData.result) ? standingsData.result : []);
+            const rawStandings = Array.isArray(standingsData.result) ? standingsData.result : [];
+            const uniqueStandings = rawStandings.reduce((acc: any[], curr: any) => {
+                if (!acc.some(item => item.player_key === curr.player_key)) {
+                    acc.push(curr);
+                }
+                return acc;
+            }, []);
+            setStandings(uniqueStandings);
             
             // Odds usually returned as a map, but we'll be defensive
             setOdds(oddsData.result && typeof oddsData.result === 'object' ? oddsData.result : {});

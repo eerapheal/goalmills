@@ -143,7 +143,21 @@ export default function LeagueDetailsPage() {
           if (!groupedStandings[groupName]) {
             groupedStandings[groupName] = [];
           }
-          groupedStandings[groupName].push(s);
+          
+          // Deduplicate: Check if team already in this group by ID or Name
+          const teamExists = groupedStandings[groupName].some(existing => 
+            existing.team_key === s.team_key || 
+            existing.standing_team.toLowerCase() === s.standing_team.toLowerCase()
+          );
+
+          // Position uniqueness: Check if rank already taken
+          const rankExists = groupedStandings[groupName].some(existing => 
+            existing.standing_place === s.standing_place
+          );
+
+          if (!teamExists && !rankExists) {
+            groupedStandings[groupName].push(s);
+          }
         });
 
         // Remove generic "Group Stage" if specific groups exist
@@ -253,11 +267,17 @@ export default function LeagueDetailsPage() {
     );
   }
 
+  const todayStr = new Date().toISOString().split('T')[0];
   const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
   const liveStatuses = ['Live', 'In Play', '1H', '2H', 'HT', 'ET', 'P'];
 
   const upcomingEvents = events
-    .filter(e => !finishedStatuses.includes(e.event_status))
+    .filter(e => {
+      const isFinished = finishedStatuses.includes(e.event_status);
+      const isLive = liveStatuses.includes(e.event_status);
+      // Strictly upcoming: Not finished AND (either it's today+ or it's currently live/not started)
+      return !isFinished && e.event_date >= todayStr;
+    })
     .sort((a, b) => {
       // Prioritize LIVE
       const isLiveA = a.event_live === '1' || liveStatuses.includes(a.event_status);
@@ -275,7 +295,10 @@ export default function LeagueDetailsPage() {
     });
 
   const finishedEvents = events
-    .filter(e => finishedStatuses.includes(e.event_status))
+    .filter(e => {
+      const isFinished = finishedStatuses.includes(e.event_status);
+      return isFinished || (e.event_date < todayStr && !liveStatuses.includes(e.event_status));
+    })
     .sort((a, b) => {
       const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
       const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
@@ -307,6 +330,14 @@ export default function LeagueDetailsPage() {
 
   // Group events by date for upcoming
   const groupedUpcoming = upcomingEvents.reduce((groups, event) => {
+    const date = event.event_date;
+    if (!groups[date]) groups[date] = [];
+    groups[date].push(event);
+    return groups;
+  }, {} as Record<string, FootballEvent[]>);
+
+  // Group events by date for results
+  const groupedResults = finishedEvents.reduce((groups, event) => {
     const date = event.event_date;
     if (!groups[date]) groups[date] = [];
     groups[date].push(event);
@@ -377,10 +408,20 @@ export default function LeagueDetailsPage() {
           </div>
         )}
         {activeTab === 'results' && (
-          <div className="space-y-4 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             <h3 className="text-xl font-bold text-white mb-4">Recent Results</h3>
-            {finishedEvents.map((event, index) => (
-              <FootballMatchCard key={`result-${event.event_key}-${index}`} event={event} />
+            {Object.keys(groupedResults).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()).map(date => (
+              <div key={date} className="space-y-3">
+                <div className="flex items-center gap-4 px-2">
+                  <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
+                    {formatDateHeader(date)}
+                  </span>
+                  <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+                </div>
+                {groupedResults[date].map((event, index) => (
+                  <FootballMatchCard key={`result-${event.event_key}-${index}`} event={event} />
+                ))}
+              </div>
             ))}
             {finishedEvents.length === 0 && <p className="text-text-muted text-center py-8">No recent results.</p>}
           </div>
@@ -393,7 +434,7 @@ export default function LeagueDetailsPage() {
                   {(standings.length > 1 || group.name !== 'League Table') && (
                     <h3 className="text-xl font-bold text-white pl-2">{group.name}</h3>
                   )}
-                  <FootballStandingsTable standings={group.teams} teams={teams} />
+                  <FootballStandingsTable standings={group.teams} teams={teams} leagueId={leagueId} />
                 </div>
               ))
             ) : (
