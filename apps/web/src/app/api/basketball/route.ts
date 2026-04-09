@@ -19,6 +19,19 @@ export async function GET(request: NextRequest) {
     const apiUrl = new URL(API_BASE_URL);
     apiUrl.searchParams.append('met', method);
 
+    // Some endpoints in Basketball API require mandatory parameters other than APIkey
+    // Odds usually require matchId, leagueId, or a date range.
+    if (method === 'Odds' && 
+        !searchParams.get('matchId') && 
+        !searchParams.get('leagueId') && 
+        !searchParams.get('from')) {
+      console.warn(`Basketball API: Skipping ${method} due to missing mandatory parameters`);
+      return NextResponse.json(
+        { success: 1, result: {}, message: 'Mandatory parameters missing, skipping external call' },
+        { status: 200 }
+      );
+    }
+
     if (!API_KEY) {
       return NextResponse.json(
         { error: 'API Key is not configured' },
@@ -72,6 +85,15 @@ export async function GET(request: NextRequest) {
       const status = response ? response.status : 500;
       const statusText = response ? response.statusText : 'Fetch failed';
       console.error('Basketball API Error:', status, statusText);
+
+      // Graceful fallback for 500 errors
+      if (status >= 500) {
+        return NextResponse.json(
+          { success: 1, result: [], message: 'External API error (graceful fallback)' },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { error: `API request failed: ${status} ${statusText}` },
         { status: status }

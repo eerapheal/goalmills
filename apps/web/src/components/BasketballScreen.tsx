@@ -35,12 +35,12 @@ export function BasketballScreen() {
                 basketballApi.getOdds({})
             ]);
 
-            setLiveMatches(live.result);
-            setUpcomingMatches(fixtures.result);
-            setRecentMatches(results.result);
-            setLeagues(leaguesData.result);
-            setStandings(standingsData.result.total || []);
-            setOdds(oddsData.result);
+            setLiveMatches(Array.isArray(live.result) ? live.result : []);
+            setUpcomingMatches(Array.isArray(fixtures.result) ? fixtures.result : []);
+            setRecentMatches(Array.isArray(results.result) ? results.result : []);
+            setLeagues(Array.isArray(leaguesData.result) ? leaguesData.result : []);
+            setStandings(standingsData.result?.total || []);
+            setOdds(oddsData.result && typeof oddsData.result === 'object' ? oddsData.result : {});
         } catch (error) {
             console.error('Error loading basketball data:', error);
         } finally {

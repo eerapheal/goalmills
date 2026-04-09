@@ -41,13 +41,28 @@ export function TennisScreen() {
                 tennisApi.getLiveOdds({})
             ]);
 
-            setLiveMatches(live.result);
-            setUpcomingMatches(fixtures.result);
-            setRecentMatches(results.result);
-            setLeagues(leaguesData.result);
-            setStandings(standingsData.result);
-            setOdds(oddsData.result);
-            setLiveOdds(liveOddsData.result);
+            setLiveMatches(Array.isArray(live.result) ? live.result : []);
+            setUpcomingMatches(Array.isArray(fixtures.result) ? fixtures.result : []);
+            setRecentMatches(Array.isArray(results.result) ? results.result : []);
+            setLeagues(Array.isArray(leaguesData.result) ? leaguesData.result : []);
+            setStandings(Array.isArray(standingsData.result) ? standingsData.result : []);
+            
+            // Odds usually returned as a map, but we'll be defensive
+            setOdds(oddsData.result && typeof oddsData.result === 'object' ? oddsData.result : {});
+            
+            // Transform live odds from array to map for easier access
+            const liveOddsMap: any = {};
+            if (Array.isArray(liveOddsData.result)) {
+                liveOddsData.result.forEach((item: any) => {
+                    if (item.event_key) {
+                        liveOddsMap[String(item.event_key)] = item;
+                    }
+                });
+            } else if (liveOddsData.result && typeof liveOddsData.result === 'object') {
+                // In case it's already a map
+                Object.assign(liveOddsMap, liveOddsData.result);
+            }
+            setLiveOdds(liveOddsMap);
         } catch (error) {
             console.error('Error loading tennis data:', error);
         } finally {

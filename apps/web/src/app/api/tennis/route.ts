@@ -19,6 +19,20 @@ export async function GET(request: NextRequest) {
     const apiUrl = new URL(API_BASE_URL);
     apiUrl.searchParams.append('met', method);
 
+    // Some endpoints in Tennis API require mandatory parameters other than APIkey
+    // OddsLive and Odds usually require matchId, leagueId, or a date range.
+    // If called without any of these, they often return 500.
+    if ((method === 'OddsLive' || method === 'Odds') && 
+        !searchParams.get('matchId') && 
+        !searchParams.get('leagueId') && 
+        !searchParams.get('from')) {
+      console.warn(`Tennis API: Skipping ${method} due to missing mandatory parameters (matchId, leagueId, or date range)`);
+      return NextResponse.json(
+        { success: 1, result: method === 'Odds' ? {} : [], message: 'Mandatory parameters missing, skipping external call' },
+        { status: 200 }
+      );
+    }
+
     if (!API_KEY) {
       return NextResponse.json(
         { error: 'API Key is not configured' },
@@ -72,6 +86,16 @@ export async function GET(request: NextRequest) {
       const status = response ? response.status : 500;
       const statusText = response ? response.statusText : 'Fetch failed';
       console.error('Tennis API Error:', status, statusText);
+      
+      // If the external API fails with 500, return a graceful empty response
+      // to avoid crashing the whole frontend screen.
+      if (status >= 500) {
+        return NextResponse.json(
+          { success: 1, result: [], message: 'External API error (graceful fallback)' },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { error: `API request failed: ${status} ${statusText}` },
         { status: status }

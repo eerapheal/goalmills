@@ -72,6 +72,15 @@ export async function GET(request: NextRequest) {
       const status = response ? response.status : 500;
       const statusText = response ? response.statusText : 'Fetch failed';
       console.error('API Error:', status, statusText);
+
+      // Graceful fallback for 500 errors
+      if (status >= 500) {
+        return NextResponse.json(
+          { success: 1, result: [], message: 'External API error (graceful fallback)' },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { error: `API request failed: ${status} ${statusText}` },
         { status: status }
