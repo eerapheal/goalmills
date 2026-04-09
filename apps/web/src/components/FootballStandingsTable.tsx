@@ -3,6 +3,8 @@
 import { FootballStanding, FootballTeam } from '@goalmills/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { advancedFootballApi } from '../services/advancedFootballApi';
+import { useState, useEffect } from 'react';
 
 interface FootballStandingsTableProps {
     standings: FootballStanding[];
@@ -61,6 +63,53 @@ export function FootballStandingsTable({ standings, teams = [], leagueId }: Foot
         return '';
     };
 
+    const [teamForms, setTeamForms] = useState<Record<string, string[]>>({});
+
+    useEffect(() => {
+        const fetchRecentMatches = async () => {
+            if (!leagueId) return;
+            try {
+                // Fetch last 120 days of league fixtures to ensure we get at least 5 matches
+                const past = new Date();
+                past.setDate(past.getDate() - 120);
+                const from = past.toISOString().split('T')[0];
+                const to = new Date().toISOString().split('T')[0];
+                
+                const res = await advancedFootballApi.getFixtures({ leagueId: Number(leagueId), from, to }).catch(() => null);
+                if (res?.result) {
+                    const forms: Record<string, string[]> = {};
+                    
+                    // Filter finished matches and sort descending by date
+                    const finished = res.result
+                        .filter((m: any) => m.event_status === 'Finished' || m.event_status === 'FT')
+                        .sort((a: any, b: any) => new Date(`${b.event_date} ${b.event_time}`).getTime() - new Date(`${a.event_date} ${a.event_time}`).getTime());
+
+                    finished.forEach((match: any) => {
+                        const h = match.home_team_key;
+                        const a = match.away_team_key;
+                        const finalSplit = match.event_final_result?.split(' - ') || [];
+                        const hScore = parseInt(finalSplit[0] || '0');
+                        const aScore = parseInt(finalSplit[1] || '0');
+                        
+                        if (!forms[h]) forms[h] = [];
+                        if (!forms[a]) forms[a] = [];
+                        
+                        if (forms[h].length < 5) forms[h].push(hScore > aScore ? 'W' : hScore < aScore ? 'L' : 'D');
+                        if (forms[a].length < 5) forms[a].push(aScore > hScore ? 'W' : aScore < hScore ? 'L' : 'D');
+                    });
+
+                    // Reverse them so oldest of the 5 is first, newest is last (standard form display)
+                    Object.keys(forms).forEach(k => forms[k].reverse());
+                    setTeamForms(forms);
+                }
+            } catch (err) {
+                console.error("Failed to fetch form data", err);
+            }
+        };
+
+        fetchRecentMatches();
+    }, [leagueId]);
+
     return (
         <div className="w-full bg-surface/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/5">
             {/* Header */}
@@ -74,7 +123,7 @@ export function FootballStandingsTable({ standings, teams = [], leagueId }: Foot
                     <div className="col-span-1 text-center">L</div>
                     <div className="col-span-1 text-center">GD</div>
                     <div className="col-span-1 text-center text-secondary font-black">Pts</div>
-                    <div className="col-span-2 text-center">Recent Form</div>
+                    <div className="hidden lg:block col-span-2 text-center">Recent Form</div>
                 </div>
             </div>
 
@@ -84,11 +133,6 @@ export function FootballStandingsTable({ standings, teams = [], leagueId }: Foot
                     const rank = parseInt(standing.standing_place);
                     const logo = getTeamLogo(standing.team_key);
                     const gd = parseInt(standing.standing_GD);
-                    
-                    // Handle Form: Usually standing_LP or form in API
-                    // If not present, we can show a placeholder or empty
-                    const rawForm = (standing as any).form || (standing as any).standing_LP || "";
-                    const formArray = rawForm.split('').filter((c: string) => ['W', 'D', 'L'].includes(c.toUpperCase())).slice(0, 4);
 
                     return (
                         <div
@@ -138,26 +182,34 @@ export function FootballStandingsTable({ standings, teams = [], leagueId }: Foot
                                     {standing.standing_PTS}
                                 </div>
 
-                                {/* Form */}
-                                <div className="col-span-2 flex items-center justify-center gap-1.5">
-                                    {formArray.length > 0 ? (
-                                        formArray.map((res: string, i: number) => (
-                                            <div
-                                                key={i}
-                                                className={`
-                                                    w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.1)]
-                                                    ${res === 'W' ? 'bg-accent-green' : res === 'D' ? 'bg-secondary' : 'bg-accent-red'}
-                                                `}
-                                                title={res === 'W' ? 'Win' : res === 'D' ? 'Draw' : 'Loss'}
-                                            />
-                                        ))
-                                    ) : (
-                                        <div className="flex gap-1.5 opacity-20">
-                                            {[...Array(4)].map((_, i) => (
-                                                <div key={i} className="w-2 h-2 rounded-full bg-white/20" />
-                                            ))}
-                                        </div>
-                                    )}
+                                {/* Form - Desktop only */}
+                                <div className="hidden lg:flex col-span-2 items-center justify-center gap-1.5">
+                                    {(() => {
+                                        const displayForm = teamForms[standing.team_key];
+
+                                        return displayForm && displayForm.length > 0 ? (
+                                            displayForm.map((res: string, i: number) => (
+                                                <span
+                                                    key={i}
+                                                    className={`
+                                                        w-5 h-5 flex items-center justify-center rounded text-[9px] font-black
+                                                        ${res === 'W' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                                                          : res === 'D' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                                                          : 'bg-red-500/20 text-red-400 border border-red-500/30'}
+                                                    `}
+                                                    title={res === 'W' ? 'Win' : res === 'D' ? 'Draw' : 'Loss'}
+                                                >
+                                                    {res}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <div className="flex gap-1.5 opacity-20">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <div key={i} className="w-5 h-5 rounded border border-white/20 bg-white/5" />
+                                                ))}
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>

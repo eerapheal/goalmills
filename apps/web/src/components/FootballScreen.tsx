@@ -628,7 +628,7 @@ export function FootballScreen() {
         <div key={group.key} className="animate-fade-in group">
             {/* Group Header */}
             {showHeader && (
-                <div className="flex items-center justify-between mb-3 px-2">
+                <div className="flex items-center justify-between mb-3 px-2 lg:max-w-lg lg:mx-auto">
                     <Link
                         href={`/leagues/${group.key}`}
                         className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
@@ -650,7 +650,7 @@ export function FootballScreen() {
             )}
 
             {/* Matches */}
-            <div className="space-y-2">
+            <div className="space-y-2 lg:max-w-lg lg:mx-auto">
                 {group.matches.map((event, idx) => (
                     <FootballMatchCard key={event.event_key || `${group.key}-${idx}`} event={event} hideLeague={showHeader} />
                 ))}
@@ -706,7 +706,7 @@ export function FootballScreen() {
                     return (
                         <div key={date} className="space-y-6">
                             {/* Date Header */}
-                            <div className="flex items-center gap-4 px-2">
+                            <div className="flex items-center gap-4 px-2 lg:max-w-lg lg:mx-auto">
                                 <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
                                     {formatDateHeader(date)}
                                 </span>
