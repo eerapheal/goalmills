@@ -681,309 +681,96 @@ const mockOdds: { [matchId: string]: any } = {
   }
 };
 
-class BasketballApi implements BasketballAPIClient {
-  private async simulateDelay() {
-    return new Promise(resolve => setTimeout(() => resolve(undefined), 800));
-  }
+// API Configuration
+const API_BASE_URL = 'https://apiv2.allsportsapi.com/basketball/';
+const API_KEY = '1637c7ddbd7bed5f5ffb6973d267ab8782d23d56f4fadc9399af4c05839680af';
 
+// Helper function to build URL with parameters
+const buildUrl = (method: string, params: Record<string, any> = {}): string => {
+  const url = new URL(API_BASE_URL);
+  url.searchParams.append('met', method);
+  url.searchParams.append('APIkey', API_KEY);
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      url.searchParams.append(key, String(value));
+    }
+  });
+  
+  return url.toString();
+};
+
+// Helper function to make API requests
+async function fetchFromAPI<T>(method: string, params: Record<string, any> = {}): Promise<T> {
+  try {
+    const url = buildUrl(method, params);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+        // Silently handle 500/504 if possible or return empty
+        if (response.status >= 500) {
+            console.warn(`Upstream API issue: ${response.status}`);
+            return { success: 1, result: [] } as any;
+        }
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching basketball ${method}:`, error);
+    // Return empty success instead of throwing to avoid UI crashes
+    return { success: 1, result: [] } as any;
+  }
+}
+
+class BasketballApi implements BasketballAPIClient {
   async getCountries(params: Omit<BasketballCountriesParams, 'met'>): Promise<BasketballCountriesResponse> {
-    await this.simulateDelay();
-    return { success: 1, result: mockLeagues };
+    return fetchFromAPI<BasketballCountriesResponse>('Countries', params);
   }
 
   async getLeagues(params: Omit<BasketballLeaguesParams, 'met'>): Promise<BasketballLeaguesResponse> {
-    await this.simulateDelay();
-    let result = mockLeagues;
-    if (params.countryId) {
-      result = result.filter(l => Number(l.country_key) === params.countryId);
-    }
-    return { success: 1, result };
+    return fetchFromAPI<BasketballLeaguesResponse>('Leagues', params);
   }
 
   async getFixtures(params: Omit<BasketballFixturesParams, 'met'>): Promise<BasketballFixturesResponse> {
-    await this.simulateDelay();
-    let result = mockEvents;
-
-    if (params.leagueId) {
-      result = result.filter(e => Number(e.league_key) === params.leagueId);
-    }
-    if (params.matchId) {
-      result = result.filter(e => Number(e.event_key) === params.matchId);
-    }
-    if (params.teamId) {
-      result = result.filter(e => Number(e.home_team_key) === params.teamId || Number(e.away_team_key) === params.teamId);
-    }
-
-    if (params.from && params.to) {
-      const fromDate = new Date(params.from);
-      const toDate = new Date(params.to);
-      result = result.filter(e => {
-        const eventDate = new Date(e.event_date);
-        return eventDate >= fromDate && eventDate <= toDate;
-      });
-    }
-
-    return { success: 1, result };
+    return fetchFromAPI<BasketballFixturesResponse>('Fixtures', params);
   }
 
   async getH2H(params: Omit<BasketballH2HParams, 'met'>): Promise<BasketballH2HResponse> {
-    await this.simulateDelay();
-
-    const h2h = mockEvents.filter(e =>
-      (Number(e.home_team_key) === params.firstTeamId && Number(e.away_team_key) === params.secondTeamId) ||
-      (Number(e.home_team_key) === params.secondTeamId && Number(e.away_team_key) === params.firstTeamId)
-    );
-
-    const firstTeamResults = mockEvents.filter(e =>
-      (Number(e.home_team_key) === params.firstTeamId || Number(e.away_team_key) === params.firstTeamId) &&
-      !((Number(e.home_team_key) === params.secondTeamId) || (Number(e.away_team_key) === params.secondTeamId))
-    ).slice(0, 5);
-
-    const secondTeamResults = mockEvents.filter(e =>
-      (Number(e.home_team_key) === params.secondTeamId || Number(e.away_team_key) === params.secondTeamId) &&
-      !((Number(e.home_team_key) === params.firstTeamId) || (Number(e.away_team_key) === params.firstTeamId))
-    ).slice(0, 5);
-
-    return {
-      success: 1,
-      result: {
-        H2H: h2h,
-        firstTeamResults,
-        secondTeamResults
-      }
-    };
+    return fetchFromAPI<BasketballH2HResponse>('H2H', params);
   }
 
   async getLivescore(params: Omit<BasketballLivescoreParams, 'met'>): Promise<BasketballLivescoreResponse> {
-    await this.simulateDelay();
-    let liveEvents = mockEvents.filter(e => e.event_live === '1');
-    if (params.leagueId) {
-      liveEvents = liveEvents.filter(e => Number(e.league_key) === params.leagueId);
-    }
-    if (params.matchId) {
-      liveEvents = liveEvents.filter(e => Number(e.event_key) === params.matchId);
-    }
-    return { success: 1, result: liveEvents };
+    return fetchFromAPI<BasketballLivescoreResponse>('Livescore', params);
   }
 
   async getStandings(params: Omit<BasketballStandingsParams, 'met'>): Promise<BasketballStandingsResponse> {
-    await this.simulateDelay();
-    let result = mockStandings;
-    if (params.leagueId) {
-      result = result.filter(s => Number(s.league_key) === params.leagueId);
-    }
-    return { success: 1, result: { total: result } };
+    return fetchFromAPI<BasketballStandingsResponse>('Standings', params);
   }
 
   async getTeams(params: Omit<BasketballTeamsParams, 'met'>): Promise<BasketballTeamsResponse> {
-    await this.simulateDelay();
-    let result = mockTeams;
-    if (params.teamId) {
-      result = result.filter(t => Number(t.team_key) === params.teamId);
-    }
-    return { success: 1, result };
+    return fetchFromAPI<BasketballTeamsResponse>('Teams', params);
   }
 
   async getOdds(params: Omit<BasketballOddsParams, 'met'>): Promise<BasketballOddsResponse> {
-    await this.simulateDelay();
-    const result: { [key: string]: any } = {};
-
-    if (params.matchId) {
-      if (mockOdds[params.matchId]) {
-        result[params.matchId] = mockOdds[params.matchId];
-      }
-    } else {
-      Object.assign(result, mockOdds);
-    }
-    return { success: 1, result };
+    return fetchFromAPI<BasketballOddsResponse>('Odds', params);
   }
 
   async getPlayers(params: Omit<BasketballPlayersParams, 'met'>): Promise<BasketballPlayersResponse> {
-    await this.simulateDelay();
-    let result = mockPlayers;
-    
-    if (params.playerId) {
-      result = result.filter(p => Number(p.player_key) === params.playerId);
-    }
-    if (params.teamId) {
-      result = result.filter(p => Number(p.team_key) === params.teamId);
-    }
-    
-    return { success: 1, result };
+    return fetchFromAPI<BasketballPlayersResponse>('Players', params);
   }
 
   async getLineups(params: Omit<BasketballLineupsParams, 'met'>): Promise<BasketballLineupsResponse> {
-    await this.simulateDelay();
-    
-    // Find the match to get team keys
-    const match = mockEvents.find(e => Number(e.event_key) === params.matchId);
-    if (!match) {
-      return {
-        success: 1,
-        result: {
-          home_team: { starting_lineups: [], substitutes: [] },
-          away_team: { starting_lineups: [], substitutes: [] }
-        }
-      };
-    }
-
-    // Get players for both teams
-    const homePlayers = mockPlayers.filter(p => Number(p.team_key) === Number(match.home_team_key));
-    const awayPlayers = mockPlayers.filter(p => Number(p.team_key) === Number(match.away_team_key));
-
-    // Create lineups (first 5 as starters, rest as substitutes)
-    const homeStarting = homePlayers.slice(0, 5).map(p => ({
-      player: p.player_name,
-      player_id: p.player_key,
-      player_number: p.player_number,
-      player_position: p.player_type
-    }));
-    const homeSubstitutes = homePlayers.slice(5).map(p => ({
-      player: p.player_name,
-      player_id: p.player_key,
-      player_number: p.player_number,
-      player_position: p.player_type
-    }));
-
-    const awayStarting = awayPlayers.slice(0, 5).map(p => ({
-      player: p.player_name,
-      player_id: p.player_key,
-      player_number: p.player_number,
-      player_position: p.player_type
-    }));
-    const awaySubstitutes = awayPlayers.slice(5).map(p => ({
-      player: p.player_name,
-      player_id: p.player_key,
-      player_number: p.player_number,
-      player_position: p.player_type
-    }));
-
-    return {
-      success: 1,
-      result: {
-        home_team: {
-          starting_lineups: homeStarting,
-          substitutes: homeSubstitutes
-        },
-        away_team: {
-          starting_lineups: awayStarting,
-          substitutes: awaySubstitutes
-        }
-      }
-    };
+    return fetchFromAPI<BasketballLineupsResponse>('Lineups', params);
   }
 
   async getStatistics(params: Omit<BasketballStatisticsParams, 'met'>): Promise<BasketballStatisticsResponse> {
-    await this.simulateDelay();
-    
-    // Find the match
-    const match = mockEvents.find(e => Number(e.event_key) === params.matchId);
-    if (!match || !match.scores) {
-      return {
-        success: 1,
-        result: {
-          statistics: [],
-          player_statistics: {
-            home_team: [],
-            away_team: []
-          }
-        }
-      };
-    }
-
-    // Calculate team statistics from scores
-    const calculateTotal = (scores: any) => {
-      let total = 0;
-      Object.values(scores).forEach((quarter: any) => {
-        if (quarter && quarter[0]) {
-          total += parseInt(quarter[0].score_home || '0');
-        }
-      });
-      return total.toString();
-    };
-
-    const homeTotal = calculateTotal(match.scores);
-    const awayTotal = match.scores ? Object.values(match.scores).reduce((total: number, quarter: any) => {
-      if (quarter && quarter[0]) {
-        return total + parseInt(quarter[0].score_away || '0');
-      }
-      return total;
-    }, 0).toString() : '0';
-
-    // Generate team statistics
-    const statistics = [
-      { type: 'Field Goals Made', home: '42', away: '38' },
-      { type: 'Field Goals Attempted', home: '88', away: '85' },
-      { type: 'Field Goal %', home: '47.7%', away: '44.7%' },
-      { type: 'Three Point Made', home: '12', away: '15' },
-      { type: 'Three Point Attempted', home: '32', away: '38' },
-      { type: 'Three Point %', home: '37.5%', away: '39.5%' },
-      { type: 'Free Throws Made', home: '16', away: '19' },
-      { type: 'Free Throws Attempted', home: '20', away: '24' },
-      { type: 'Free Throw %', home: '80.0%', away: '79.2%' },
-      { type: 'Total Rebounds', home: '45', away: '42' },
-      { type: 'Offensive Rebounds', home: '10', away: '8' },
-      { type: 'Defensive Rebounds', home: '35', away: '34' },
-      { type: 'Total Assists', home: '24', away: '22' },
-      { type: 'Total Steals', home: '8', away: '7' },
-      { type: 'Total Blocks', home: '5', away: '6' },
-      { type: 'Total Turnovers', home: '12', away: '14' },
-      { type: 'Personal Fouls', home: '18', away: '16' },
-    ];
-
-    // Get players for both teams
-    const homePlayers = mockPlayers.filter(p => Number(p.team_key) === Number(match.home_team_key)).slice(0, 8);
-    const awayPlayers = mockPlayers.filter(p => Number(p.team_key) === Number(match.away_team_key)).slice(0, 8);
-
-    // Generate player statistics
-    const generatePlayerStats = (player: any, isHome: boolean) => {
-      const minutes = Math.floor(Math.random() * 20) + 15;
-      const fgm = Math.floor(Math.random() * 10) + 2;
-      const fga = fgm + Math.floor(Math.random() * 8);
-      const tpm = Math.floor(Math.random() * 4);
-      const tpa = tpm + Math.floor(Math.random() * 5);
-      const ftm = Math.floor(Math.random() * 6);
-      const fta = ftm + Math.floor(Math.random() * 3);
-      const points = (fgm * 2) + tpm + ftm;
-      
-      return {
-        player: player.player_name,
-        player_id: player.player_key,
-        player_minutes: minutes.toString(),
-        player_points: points.toString(),
-        player_field_goals_made: fgm.toString(),
-        player_field_goals_attempts: fga.toString(),
-        player_threepoint_goals_made: tpm.toString(),
-        player_threepoint_goals_attempts: tpa.toString(),
-        player_freethrows_goals_made: ftm.toString(),
-        player_freethrows_goals_attempts: fta.toString(),
-        player_total_rebounds: (Math.floor(Math.random() * 8) + 2).toString(),
-        player_offence_rebounds: (Math.floor(Math.random() * 3)).toString(),
-        player_defense_rebounds: (Math.floor(Math.random() * 6) + 2).toString(),
-        player_assists: (Math.floor(Math.random() * 6)).toString(),
-        player_steals: (Math.floor(Math.random() * 3)).toString(),
-        player_blocks: (Math.floor(Math.random() * 2)).toString(),
-        player_turnovers: (Math.floor(Math.random() * 4)).toString(),
-        player_personal_fouls: (Math.floor(Math.random() * 4)).toString(),
-        player_plus_minus: (Math.floor(Math.random() * 20) - 10).toString(),
-        player_oncourt: 'True' as 'True' | 'False',
-        player_position: player.player_type || 'F'
-      };
-    };
-
-    const homePlayerStats = homePlayers.map(p => generatePlayerStats(p, true));
-    const awayPlayerStats = awayPlayers.map(p => generatePlayerStats(p, false));
-
-    return {
-      success: 1,
-      result: {
-        statistics,
-        player_statistics: {
-          home_team: homePlayerStats,
-          away_team: awayPlayerStats
-        }
-      }
-    };
+    return fetchFromAPI<BasketballStatisticsResponse>('Statistics', params);
   }
 }
 

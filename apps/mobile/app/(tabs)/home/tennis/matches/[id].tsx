@@ -21,25 +21,43 @@ export default function TennisMatchDetailsScreen() {
                 const matchId = Number(id);
                 // Fetch match details
                 const fixturesRes = await tennisApi.getFixtures({ matchId });
-                const foundMatch = fixturesRes.result[0];
+                const rawFixtures = fixturesRes?.result || [];
+                const foundMatch = rawFixtures[0];
                 setMatch(foundMatch || null);
 
                 if (foundMatch) {
                     // Fetch Odds
-                    if (foundMatch.event_live === '1') {
-                        const liveOddsRes = await tennisApi.getLiveOdds({ matchId });
-                        setOdds(liveOddsRes.result[matchId]);
-                    } else {
-                        const oddsRes = await tennisApi.getOdds({ matchId });
-                        setOdds(oddsRes.result[matchId]);
+                    try {
+                        if (foundMatch.event_live === '1') {
+                            const liveOddsRes = await tennisApi.getLiveOdds({ matchId });
+                            const res = liveOddsRes?.result || {};
+                            setOdds(res[matchId] || null);
+                        } else {
+                            const oddsRes = await tennisApi.getOdds({ matchId });
+                            const res = oddsRes?.result || {};
+                            setOdds(res[matchId] || null);
+                        }
+                    } catch (e) {
+                        console.warn("Could not load odds", e);
+                        setOdds(null);
                     }
 
                     // Fetch H2H
-                    const h2hRes = await tennisApi.getH2H({
-                        firstPlayerId: Number(foundMatch.first_player_key),
-                        secondPlayerId: Number(foundMatch.second_player_key)
-                    });
-                    setH2HData(h2hRes.result);
+                    try {
+                        const h2hRes = await tennisApi.getH2H({
+                            firstPlayerId: Number(foundMatch.first_player_key),
+                            secondPlayerId: Number(foundMatch.second_player_key)
+                        });
+                        if (h2hRes?.result && !Array.isArray(h2hRes.result)) {
+                            setH2HData(h2hRes.result);
+                        } else {
+                             // Fallback if result is array or missing keys
+                             setH2HData(null);
+                        }
+                    } catch (e) {
+                         console.warn("Could not load H2H", e);
+                         setH2HData(null);
+                    }
                 }
 
             } catch (error) {

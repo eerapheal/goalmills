@@ -20,28 +20,30 @@ export default function TennisLeagueDetailsScreen() {
             try {
                 const leagueId = Number(id);
 
-                // Get League Info (mock: fetch all and find)
+                // Get League Info
                 const leaguesRes = await tennisApi.getLeagues({});
-                const foundLeague = leaguesRes.result.find(l => Number(l.league_key) === leagueId);
+                const rawLeagues = leaguesRes?.result || [];
+                const foundLeague = rawLeagues.find(l => Number(l.league_key) === leagueId);
                 setLeague(foundLeague || null);
 
-                // Get Fixtures
+                // Get Fixtures (Recent and Upcoming)
                 const matchesRes = await tennisApi.getFixtures({
-                    from: new Date().toISOString().split('T')[0],
+                    from: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
                     to: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
                     leagueId
                 });
-                setFixtures(matchesRes.result);
+                setFixtures(matchesRes?.result || []);
 
                 // Get Standings (If ATP/WTA)
-                if (foundLeague && (foundLeague.league_name.includes('ATP') || foundLeague.league_name.includes('WTA'))) {
+                if (foundLeague && foundLeague.league_name && (foundLeague.league_name.includes('ATP') || foundLeague.league_name.includes('WTA'))) {
                     const type = foundLeague.league_name.includes('WTA') ? 'WTA' : 'ATP';
                     const standRes = await tennisApi.getStandings({ league: type });
-                    setStandings(standRes.result);
+                    setStandings(standRes?.result || []);
                 }
 
             } catch (error) {
-                console.error("Error loading league details", error);
+                console.error("❌ Error loading league details:", error);
+                setLeague(null);
             } finally {
                 setLoading(false);
             }
@@ -101,12 +103,23 @@ export default function TennisLeagueDetailsScreen() {
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
-                    {fixtures.length > 0 ? (
-                        fixtures.map(match => (
+                    {fixtures.filter(m => m.event_live === '1' || m.event_status !== 'Finished').length > 0 ? (
+                        fixtures.filter(m => m.event_live === '1' || m.event_status !== 'Finished').map(match => (
                             <TennisMatchCard key={match.event_key} match={match} />
                         ))
                     ) : (
                         <Text style={styles.emptyText}>No upcoming matches available.</Text>
+                    )}
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>✅ Recent Results</Text>
+                    {fixtures.filter(m => m.event_status === 'Finished' && m.event_live !== '1').length > 0 ? (
+                        fixtures.filter(m => m.event_status === 'Finished' && m.event_live !== '1').map(match => (
+                            <TennisMatchCard key={match.event_key} match={match} />
+                        ))
+                    ) : (
+                        <Text style={styles.emptyText}>No recent results available.</Text>
                     )}
                 </View>
             </ScrollView>

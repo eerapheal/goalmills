@@ -137,8 +137,8 @@ export function FootballScreen() {
                         {liveFixtures.length > 0 ? (
                             <>
                                 <Text style={styles.sectionTitle}>🔴 Live Matches</Text>
-                                {liveFixtures.map((fixture) => (
-                                    <FixtureCard key={fixture.fixture.id} fixture={fixture} />
+                                {liveFixtures.map((fixture, index) => (
+                                    <FixtureCard key={`live-${fixture.fixture.id}-${index}`} fixture={fixture} />
                                 ))}
                             </>
                         ) : (
@@ -155,8 +155,8 @@ export function FootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
-                        {upcomingFixtures.map((fixture) => (
-                            <FixtureCard key={fixture.fixture.id} fixture={fixture} />
+                        {upcomingFixtures.map((fixture, index) => (
+                            <FixtureCard key={`upcoming-${fixture.fixture.id}-${index}`} fixture={fixture} />
                         ))}
                     </View>
                 );
@@ -165,8 +165,8 @@ export function FootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>✅ Recent Results</Text>
-                        {finishedFixtures.map((fixture) => (
-                            <FixtureCard key={fixture.fixture.id} fixture={fixture} />
+                        {finishedFixtures.map((fixture, index) => (
+                            <FixtureCard key={`result-${fixture.fixture.id}-${index}`} fixture={fixture} />
                         ))}
                     </View>
                 );
@@ -183,8 +183,8 @@ export function FootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>📰 Latest News</Text>
-                        {blogPosts.map((post) => (
-                            <NewsCard key={post._id} item={post} onPress={() => router.push(`/news/${post._id}`)} />
+                        {blogPosts.map((post, index) => (
+                            <NewsCard key={`post-${post._id}-${index}`} item={post} onPress={() => router.push(`/news/${post._id}`)} />
                         ))}
                     </View>
                 );
@@ -193,8 +193,8 @@ export function FootballScreen() {
                 return (
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>🎥 Video Highlights</Text>
-                        {videos.filter(v => v).map((video) => (
-                            <VideoCard key={video.id} item={video} onPress={() => router.push(`/highlight/${video.id}`)} />
+                        {videos.filter(v => v).map((video, index) => (
+                            <VideoCard key={`vid-${video.id}-${index}`} item={video} onPress={() => router.push(`/highlight/${video.id}`)} />
                         ))}
                     </View>
                 );

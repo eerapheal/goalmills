@@ -108,15 +108,36 @@ export function CricketScreen() {
                 advancedCricketApi.getStandings({ leagueId: 9779 }).catch(e => ({ result: { total: [] } })),
             ]);
 
+            const deduplicateStanding = (list: any[]) => {
+                const unique = new Map();
+                list.forEach(item => {
+                    if (!unique.has(item.standing_team)) {
+                        unique.set(item.standing_team, item);
+                    }
+                });
+                return Array.from(unique.values());
+            };
+
+            const upcomingData = (upcoming.result || []).filter((m: CricketEvent) => {
+                const status = (m.event_status || '').toUpperCase();
+                const isFinished = status === 'FINISHED' || status === 'FT' || status.includes('WON BY');
+                return m.event_live !== '1' && !isFinished;
+            });
+
+            const recentData = (recent.result || []).filter((m: CricketEvent) => {
+                const status = (m.event_status || '').toUpperCase();
+                return status === 'FINISHED' || status === 'FT' || status.includes('WON BY');
+            });
+
             setLiveMatches(sortMatches(live.result || []));
-            setUpcomingMatches(sortMatches(upcoming.result || []));
-            setRecentMatches(sortMatches(recent.result || []).reverse());
+            setUpcomingMatches(sortMatches(upcomingData));
+            setRecentMatches(sortMatches(recentData).reverse());
             setSeriesList(series.result || []);
             setTeamsList(uniqueTeams);
             setRankings({
-                'IPL': iplRank.result?.total || iplRank.result || [],
-                'T20 WC': t20Rank.result?.total || t20Rank.result || [],
-                'BBL': bblRank.result?.total || bblRank.result || [],
+                'IPL': deduplicateStanding(iplRank.result?.total || iplRank.result || []),
+                'T20 WC': deduplicateStanding(t20Rank.result?.total || t20Rank.result || []),
+                'BBL': deduplicateStanding(bblRank.result?.total || bblRank.result || []),
             });
 
         } catch (error) {

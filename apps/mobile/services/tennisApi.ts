@@ -838,149 +838,87 @@ const mockOdds: { [matchId: string]: any } = {
   }
 };
 
-const mockLiveOdds: { [matchId: string]: any } = {
-  '201': {
-    ...mockEvents.find(e => e.event_key === 201),
-    live_odds: [
-      { odd_name: 'Match Winner', suspended: 'No', type: 'Home', value: '1.65', handicap: '' },
-      { odd_name: 'Match Winner', suspended: 'No', type: 'Away', value: '2.20', handicap: '' },
-      { odd_name: 'Set 3 Winner', suspended: 'No', type: 'Home', value: '1.40', handicap: '' },
-      { odd_name: 'Set 3 Winner', suspended: 'No', type: 'Away', value: '2.80', handicap: '' }
-    ]
-  }
+// API Configuration
+const API_BASE_URL = 'https://apiv2.allsportsapi.com/tennis/';
+const API_KEY = '1637c7ddbd7bed5f5ffb6973d267ab8782d23d56f4fadc9399af4c05839680af';
+
+// Helper function to build URL with parameters
+const buildUrl = (method: string, params: Record<string, any> = {}): string => {
+  const url = new URL(API_BASE_URL);
+  url.searchParams.append('met', method);
+  url.searchParams.append('APIkey', API_KEY);
+  
+  const safeParams = params || {};
+  Object.entries(safeParams).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      url.searchParams.append(key, String(value));
+    }
+  });
+  
+  return url.toString();
 };
 
-class TennisApi implements TennisAPIClient {
-  private async simulateDelay() {
-    return new Promise(resolve => setTimeout(() => resolve(undefined), 800));
-  }
+// Helper function to make API requests
+async function fetchFromAPI<T>(method: string, params: Record<string, any> = {}): Promise<T> {
+  try {
+    const url = buildUrl(method, params);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
 
+    if (!response.ok) {
+        if (response.status >= 500) {
+            console.warn(`Upstream API issue: ${response.status}`);
+            return { success: 1, result: [] } as any;
+        }
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching tennis ${method}:`, error);
+    return { success: 1, result: [] } as any;
+  }
+}
+
+class TennisApi implements TennisAPIClient {
   async getCountries(params: Omit<TennisCountriesParams, 'met'>): Promise<TennisCountriesResponse> {
-    await this.simulateDelay();
-    return { success: 1, result: mockLeagues };
+    return fetchFromAPI<TennisCountriesResponse>('Countries', params);
   }
 
   async getLeagues(params: Omit<TennisLeaguesParams, 'met'>): Promise<TennisLeaguesResponse> {
-    await this.simulateDelay();
-    let result = mockLeagues;
-    if (params.countryId) {
-        result = result.filter(l => Number(l.country_key) === params.countryId);
-    }
-    return { success: 1, result };
+    return fetchFromAPI<TennisLeaguesResponse>('Leagues', params);
   }
 
   async getFixtures(params: Omit<TennisFixturesParams, 'met'>): Promise<TennisFixturesResponse> {
-      await this.simulateDelay();
-      let result = mockEvents;
-
-      if (params.leagueId) {
-          result = result.filter(e => Number(e.league_key) === params.leagueId);
-      }
-      if (params.matchId) {
-            result = result.filter(e => Number(e.event_key) === params.matchId);
-      }
-      if (params.playerId) {
-          result = result.filter(e => Number(e.first_player_key) === params.playerId || Number(e.second_player_key) === params.playerId);
-      }
-
-      if (params.from && params.to) {
-          const fromDate = new Date(params.from);
-          const toDate = new Date(params.to);
-          result = result.filter(e => {
-              const eventDate = new Date(e.event_date);
-              return eventDate >= fromDate && eventDate <= toDate;
-          });
-      }
-
-      return { success: 1, result };
+    return fetchFromAPI<TennisFixturesResponse>('Fixtures', params || {});
   }
 
   async getH2H(params: Omit<TennisH2HParams, 'met'>): Promise<TennisH2HResponse> {
-      await this.simulateDelay();
-      
-      const h2h = mockEvents.filter(e => 
-          (Number(e.first_player_key) === params.firstPlayerId && Number(e.second_player_key) === params.secondPlayerId) ||
-          (Number(e.first_player_key) === params.secondPlayerId && Number(e.second_player_key) === params.firstPlayerId)
-      );
-
-      const firstTeamResults = mockEvents.filter(e => 
-          (Number(e.first_player_key) === params.firstPlayerId || Number(e.second_player_key) === params.firstPlayerId) &&
-          // Exclude H2H matches to just show their other recent form
-          !((Number(e.first_player_key) === params.secondPlayerId) || (Number(e.second_player_key) === params.secondPlayerId))
-      ).slice(0, 5);
-
-      const secondTeamResults = mockEvents.filter(e => 
-          (Number(e.first_player_key) === params.secondPlayerId || Number(e.second_player_key) === params.secondPlayerId) &&
-          !((Number(e.first_player_key) === params.firstPlayerId) || (Number(e.second_player_key) === params.firstPlayerId))
-      ).slice(0, 5);
-
-      return { 
-          success: 1, 
-          result: {
-              H2H: h2h,
-              firstTeamResults,
-              secondTeamResults
-          }
-      };
+    return fetchFromAPI<TennisH2HResponse>('H2H', params || {});
   }
 
   async getLivescore(params: Omit<TennisLivescoreParams, 'met'>): Promise<TennisLivescoreResponse> {
-      await this.simulateDelay();
-      let liveEvents = mockEvents.filter(e => e.event_live === '1');
-      if (params.leagueId) {
-          liveEvents = liveEvents.filter(e => Number(e.league_key) === params.leagueId);
-      }
-      if (params.matchId) {
-          liveEvents = liveEvents.filter(e => Number(e.event_key) === params.matchId);
-      }
-      return { success: 1, result: liveEvents };
+    return fetchFromAPI<TennisLivescoreResponse>('Livescore', params || {});
   }
 
   async getStandings(params: Omit<TennisStandingsParams, 'met'>): Promise<TennisStandingsResponse> {
-      await this.simulateDelay();
-      let result = mockStandings;
-      if (params.league) {
-          result = result.filter(s => s.league === params.league);
-      }
-      return { success: 1, result };
+    return fetchFromAPI<TennisStandingsResponse>('Standings', params || {});
   }
 
   async getPlayers(params: Omit<TennisPlayersParams, 'met'>): Promise<TennisPlayersResponse> {
-      await this.simulateDelay();
-      let result = mockPlayers;
-      if (params.playerId) {
-          result = result.filter(p => Number(p.player_key) === params.playerId);
-      }
-      return { success: 1, result };
+    return fetchFromAPI<TennisPlayersResponse>('Players', params || {});
   }
 
   async getOdds(params: Omit<TennisOddsParams, 'met'>): Promise<TennisOddsResponse> {
-      await this.simulateDelay();
-      const result: { [key: string]: any } = {};
-      
-      if (params.matchId) {
-         if (mockOdds[params.matchId]) {
-             result[params.matchId] = mockOdds[params.matchId];
-         }
-      } else {
-          // Return all mock odds
-          Object.assign(result, mockOdds);
-      }
-      return { success: 1, result };
+    return fetchFromAPI<TennisOddsResponse>('Odds', params || {});
   }
 
   async getLiveOdds(params: Omit<TennisLiveOddsParams, 'met'>): Promise<TennisLiveOddsResponse> {
-      await this.simulateDelay();
-      const result: { [key: string]: any } = {};
-
-      if (params.matchId) {
-          if (mockLiveOdds[params.matchId]) {
-              result[params.matchId] = mockLiveOdds[params.matchId];
-          }
-      } else {
-          Object.assign(result, mockLiveOdds);
-      }
-      return { success: 1, result };
+    return fetchFromAPI<TennisLiveOddsResponse>('LiveOdds', params || {});
   }
 }
 

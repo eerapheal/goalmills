@@ -21,7 +21,8 @@ export default function TennisPlayerDetailsScreen() {
 
                 // Get Player Info
                 const playersRes = await tennisApi.getPlayers({ playerId });
-                const foundPlayer = playersRes.result[0]; // Assuming API returns filtered list or finding logical one
+                const rawPlayers = playersRes?.result || [];
+                const foundPlayer = rawPlayers[0];
                 setPlayer(foundPlayer || null);
 
                 // Get Recent Matches
@@ -30,7 +31,7 @@ export default function TennisPlayerDetailsScreen() {
                     to: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
                     playerId
                 });
-                setMatches(matchesRes.result);
+                setMatches(matchesRes?.result || []);
 
             } catch (error) {
                 console.error("Error loading player details", error);
@@ -103,13 +104,24 @@ export default function TennisPlayerDetailsScreen() {
                 )}
 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>🎾 Recent & Upcoming Matches</Text>
-                    {matches.length > 0 ? (
-                        matches.map(match => (
+                    <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
+                    {matches.filter(m => m.event_live === '1' || (m.event_status !== 'Finished' && m.event_status !== 'FT' && m.event_status !== 'RET' && m.event_status !== 'W/O')).length > 0 ? (
+                        matches.filter(m => m.event_live === '1' || (m.event_status !== 'Finished' && m.event_status !== 'FT' && m.event_status !== 'RET' && m.event_status !== 'W/O')).map(match => (
                             <TennisMatchCard key={match.event_key} match={match} />
                         ))
                     ) : (
-                        <Text style={styles.emptyText}>No match history found.</Text>
+                        <Text style={styles.emptyText}>No upcoming matches found.</Text>
+                    )}
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>✅ Recent Results</Text>
+                    {matches.filter(m => (m.event_status === 'Finished' || m.event_status === 'FT' || m.event_status === 'RET' || m.event_status === 'W/O') && m.event_live !== '1').length > 0 ? (
+                        matches.filter(m => (m.event_status === 'Finished' || m.event_status === 'FT' || m.event_status === 'RET' || m.event_status === 'W/O') && m.event_live !== '1').map(match => (
+                            <TennisMatchCard key={match.event_key} match={match} />
+                        ))
+                    ) : (
+                        <Text style={styles.emptyText}>No recent results found.</Text>
                     )}
                 </View>
             </ScrollView>
