@@ -43,9 +43,9 @@ export default function NewsScreen() {
     <View style={styles.container}>
       <FlatList
         data={news}
-        keyExtractor={(item) => item._id || item.id || Math.random().toString()}
+        keyExtractor={(item) => item._id || Math.random().toString()}
         renderItem={({ item }) => (
-          <NewsCard item={item} onPress={() => handlePress(item._id || item.id)} />
+          <NewsCard item={item} onPress={() => handlePress(item._id)} />
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
