@@ -140,7 +140,7 @@ export default function TeamDetailPage() {
             </View>
             {standings.map((standing, index) => (
                 <View
-                    key={standing.team_key}
+                    key={`standing-${standing.team_key}-${index}`}
                     style={[
                         styles.standingsRow,
                         String(standing.team_key) === String(id) && styles.highlightedRow,
@@ -219,9 +219,9 @@ export default function TeamDetailPage() {
                         {Object.entries(groupedPlayers).map(([position, positionPlayers]) => (
                             <View key={position} style={styles.positionGroup}>
                                 <Text style={styles.positionTitle}>{position}</Text>
-                                {positionPlayers.map((player) => (
+                                {positionPlayers.map((player, playerIndex) => (
                                     <Pressable
-                                        key={player.player_key}
+                                        key={`player-${player.player_key}-${playerIndex}`}
                                         style={({ pressed }) => [styles.playerCard, pressed && styles.pressed]}
                                         onPress={() => router.push(`/home/football/players/${player.player_key}` as any)}
                                     >

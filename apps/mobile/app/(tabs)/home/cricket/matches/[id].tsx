@@ -19,24 +19,34 @@ export default function CricketMatchDetailsScreen() {
         const loadData = async () => {
             if (!id) return;
             try {
-                // Create date range for the API call (required parameters)
+                setLoading(true);
+                // Create wide date range for the API call to ensure match is found
                 const today = new Date();
                 const fromDate = new Date(today);
-                fromDate.setDate(today.getDate() - 30); // 30 days ago
+                fromDate.setDate(today.getDate() - 90); // 90 days ago
                 const toDate = new Date(today);
-                toDate.setDate(today.getDate() + 30); // 30 days from now
+                toDate.setDate(today.getDate() + 90); // 90 days from now
 
-                const from = fromDate.toISOString().split('T')[0]; // yyyy-mm-dd
-                const to = toDate.toISOString().split('T')[0]; // yyyy-mm-dd
+                const from = fromDate.toISOString().split('T')[0];
+                const to = toDate.toISOString().split('T')[0];
 
+                // Try Fixtures first
                 const response = await advancedCricketApi.getFixtures({
                     matchId: Number(id),
-                    APIkey: 'mock',
                     from,
                     to
                 });
+
                 if (response.result && response.result.length > 0) {
                     setMatch(response.result[0]);
+                } else {
+                    // Try Livescore as fallback for current matches
+                    const liveResponse = await advancedCricketApi.getLivescore({
+                        matchId: Number(id)
+                    });
+                    if (liveResponse.result && liveResponse.result.length > 0) {
+                        setMatch(liveResponse.result[0]);
+                    }
                 }
             } catch (error) {
                 console.error('Error loading match details:', error);
@@ -51,6 +61,7 @@ export default function CricketMatchDetailsScreen() {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={COLORS.secondary} />
+                <Text style={styles.loadingText}>Syncing Match Intelligence...</Text>
             </View>
         );
     }
@@ -58,70 +69,99 @@ export default function CricketMatchDetailsScreen() {
     if (!match) {
         return (
             <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Match not found</Text>
+                <View style={styles.errorIconContainer}>
+                    <Ionicons name="alert-circle-outline" size={64} color={COLORS.secondary} />
+                </View>
+                <Text style={styles.errorText}>Match Matrix Unavailable</Text>
+                <Text style={styles.errorSubtext}>The match data could not be retrieved from the worldwide feed.</Text>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                    <Text style={styles.backButtonText}>Return to Dashboard</Text>
+                </TouchableOpacity>
             </View>
         );
     }
 
     const renderScorecard = () => {
-        if (!match.scorecard) return <Text style={styles.emptyText}>No scorecard available</Text>;
+        if (!match.scorecard || Object.keys(match.scorecard).length === 0) {
+            return (
+                <View style={styles.emptyState}>
+                    <Ionicons name="stats-chart-outline" size={48} color="rgba(255,255,255,0.1)" />
+                    <Text style={styles.emptyText}>Scorecard is being initialized...</Text>
+                </View>
+            );
+        }
 
         return (
             <View>
-                {Object.entries(match.scorecard).map(([innings, players]) => (
-                    <View key={innings} style={styles.card}>
-                        <Text style={styles.sectionTitle}>{innings}</Text>
+                {Object.entries(match.scorecard).map(([innings, players]) => {
+                    if (!Array.isArray(players)) return null;
+                    
+                    const batters = players.filter(p => p.R !== undefined);
+                    const bowlers = players.filter(p => p.O !== undefined);
 
-                        {/* Batting Section */}
-                        <Text style={styles.subSectionTitle}>Batting</Text>
-                        <View style={styles.tableHeader}>
-                            <Text style={[styles.tableHeadText, { flex: 3 }]}>Batter</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>R</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>B</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>4s</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>6s</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>SR</Text>
+                    return (
+                        <View key={innings} style={styles.card}>
+                            <Text style={styles.sectionTitle}>{innings.replace('_', ' ').toUpperCase()}</Text>
+
+                            {/* Batting Section */}
+                            {batters.length > 0 && (
+                                <>
+                                    <Text style={styles.subSectionTitle}>Batting Matrix</Text>
+                                    <View style={styles.tableHeader}>
+                                        <Text style={[styles.tableHeadText, { flex: 3 }]}>Batter</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>R</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>B</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>4s</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>6s</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>SR</Text>
+                                    </View>
+                                    {batters.map((batter, idx) => (
+                                        <View key={`${batter.player}-${idx}`} style={styles.tableRow}>
+                                            <View style={{ flex: 3 }}>
+                                                <Text style={styles.playerName}>{batter.player}</Text>
+                                                <Text style={styles.dismissal}>{batter.status}</Text>
+                                            </View>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{batter.R}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.B}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['4s']}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['6s']}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.SR}</Text>
+                                        </View>
+                                    ))}
+                                </>
+                            )}
+
+                            {batters.length > 0 && bowlers.length > 0 && <View style={styles.divider} />}
+
+                            {/* Bowling Section */}
+                            {bowlers.length > 0 && (
+                                <>
+                                    <Text style={styles.subSectionTitle}>Bowling Matrix</Text>
+                                    <View style={styles.tableHeader}>
+                                        <Text style={[styles.tableHeadText, { flex: 3 }]}>Bowler</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>O</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>M</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>R</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>W</Text>
+                                        <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>ER</Text>
+                                    </View>
+                                    {bowlers.map((bowler, idx) => (
+                                        <View key={`bowler-${bowler.player}-${idx}`} style={styles.tableRow}>
+                                            <View style={{ flex: 3 }}>
+                                                <Text style={styles.playerName}>{bowler.player}</Text>
+                                            </View>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.O}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.M}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.R}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold', color: COLORS.secondary }]}>{bowler.W}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.ER}</Text>
+                                        </View>
+                                    ))}
+                                </>
+                            )}
                         </View>
-                        {players.filter(p => p.R !== undefined).map((batter, idx) => (
-                            <View key={`${batter.player}-${idx}`} style={styles.tableRow}>
-                                <View style={{ flex: 3 }}>
-                                    <Text style={styles.playerName}>{batter.player}</Text>
-                                    <Text style={styles.dismissal}>{batter.status}</Text>
-                                </View>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{batter.R}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.B}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['4s']}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['6s']}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.SR}</Text>
-                            </View>
-                        ))}
-
-                        <View style={styles.divider} />
-
-                        {/* Bowling Section */}
-                        <Text style={styles.subSectionTitle}>Bowling</Text>
-                        <View style={styles.tableHeader}>
-                            <Text style={[styles.tableHeadText, { flex: 3 }]}>Bowler</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>O</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>M</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>R</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>W</Text>
-                            <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>ER</Text>
-                        </View>
-                        {players.filter(p => p.O !== undefined).map((bowler, idx) => (
-                            <View key={`bowler-${bowler.player}-${idx}`} style={styles.tableRow}>
-                                <View style={{ flex: 3 }}>
-                                    <Text style={styles.playerName}>{bowler.player}</Text>
-                                </View>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.O}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.M}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.R}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{bowler.W}</Text>
-                                <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.ER}</Text>
-                            </View>
-                        ))}
-                    </View>
-                ))}
+                    );
+                })}
             </View>
         );
     };
@@ -531,7 +571,50 @@ const styles = StyleSheet.create({
         fontSize: 9,
         fontWeight: '700',
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
         marginTop: 2,
+    },
+    loadingText: {
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: 10,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: 2,
+        marginTop: 16,
+    },
+    errorIconContainer: {
+        marginBottom: 20,
+        opacity: 0.8,
+    },
+    errorSubtext: {
+        color: 'rgba(255, 255, 255, 0.4)',
+        fontSize: 12,
+        textAlign: 'center',
+        paddingHorizontal: 40,
+        marginTop: 8,
+        lineHeight: 18,
+    },
+    backButton: {
+        marginTop: 24,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        backgroundColor: COLORS.secondary,
+        borderRadius: 12,
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+    },
+    emptyState: {
+        backgroundColor: 'rgba(255, 255, 255, 0.02)',
+        borderRadius: 24,
+        padding: 40,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+        marginTop: 20,
     },
 });
 

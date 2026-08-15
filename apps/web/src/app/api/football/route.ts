@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = 'https://apiv2.allsportsapi.com/football';
-const API_KEY = 'e51b922070b6a96ce765b6dd06b992a71ab36fd777acd0d744ad281cba968770';
+const API_KEY = process.env.ALLSPORTS_API_KEY;
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,6 +18,13 @@ export async function GET(request: NextRequest) {
     // Build the API URL with all query parameters
     const apiUrl = new URL(API_BASE_URL);
     apiUrl.searchParams.append('met', method);
+    
+    if (!API_KEY) {
+      return NextResponse.json(
+        { error: 'API Key is not configured' },
+        { status: 500 }
+      );
+    }
     apiUrl.searchParams.append('APIkey', API_KEY);
 
     // Copy all other query parameters
@@ -65,6 +72,15 @@ export async function GET(request: NextRequest) {
       const status = response ? response.status : 500;
       const statusText = response ? response.statusText : 'Fetch failed';
       console.error('API Error:', status, statusText);
+
+      // Graceful fallback for 500 errors
+      if (status >= 500) {
+        return NextResponse.json(
+          { success: 1, result: [], message: 'External API error (graceful fallback)' },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { error: `API request failed: ${status} ${statusText}` },
         { status: status }

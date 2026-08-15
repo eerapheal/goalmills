@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
@@ -18,9 +18,10 @@ export default function NewsScreen() {
   const loadNews = async () => {
     try {
       const data = await goalmillsApi.getNews();
-      setNews(data);
+      setNews(data || []);
     } catch (error) {
       console.error('Failed to load news:', error);
+      setNews([]);
     } finally {
       setLoading(false);
     }
@@ -33,7 +34,7 @@ export default function NewsScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.primary || '#000'} />
       </View>
     );
   }
@@ -42,7 +43,7 @@ export default function NewsScreen() {
     <View style={styles.container}>
       <FlatList
         data={news}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item._id || Math.random().toString()}
         renderItem={({ item }) => (
           <NewsCard item={item} onPress={() => handlePress(item._id)} />
         )}
@@ -62,30 +63,27 @@ export default function NewsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundDark,
+    backgroundColor: COLORS.backgroundDark || '#000',
   },
   center: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   listContent: {
-    padding: SPACING.md,
+    padding: SPACING.md || 16,
   },
   header: {
-    marginBottom: SPACING.lg,
-    paddingHorizontal: SPACING.xs,
+    marginBottom: SPACING.lg || 24,
+    paddingHorizontal: SPACING.xs || 4,
   },
   heading: {
-    fontSize: FONT_SIZES.xxl,
+    fontSize: FONT_SIZES.xxl || 32,
     fontWeight: '900',
     color: '#fff',
     marginBottom: 4,
   },
   subheading: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textLight,
+    fontSize: FONT_SIZES.md || 16,
+    color: COLORS.textLight || '#aaa',
   },
-  item: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
-  title: { fontSize: 18, fontWeight: '600', color: '#001f3f' },
-  summary: { fontSize: 14, color: '#555' },
 });

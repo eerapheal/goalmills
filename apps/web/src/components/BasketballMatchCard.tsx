@@ -64,7 +64,7 @@ export function BasketballMatchCard({ match, onPress, odds }: BasketballMatchCar
                     >
                         <div className="relative w-6 h-6 rounded-full bg-white/5 overflow-hidden">
                             <Image
-                                src={match.event_home_team_logo || 'https://via.placeholder.com/40'}
+                                src={match.event_home_team_logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.event_home_team)}&background=random&color=fff`}
                                 alt={match.event_home_team}
                                 width={24}
                                 height={24}
@@ -89,7 +89,7 @@ export function BasketballMatchCard({ match, onPress, odds }: BasketballMatchCar
                     >
                         <div className="relative w-6 h-6 rounded-full bg-white/5 overflow-hidden">
                             <Image
-                                src={match.event_away_team_logo || 'https://via.placeholder.com/40'}
+                                src={match.event_away_team_logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.event_away_team)}&background=random&color=fff`}
                                 alt={match.event_away_team}
                                 width={24}
                                 height={24}

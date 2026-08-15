@@ -95,7 +95,7 @@ export function TennisMatchCard({ match, onPress, odds }: TennisMatchCardProps) 
                     >
                         <div className="relative w-6 h-6 rounded-full bg-white/5 overflow-hidden">
                             <Image
-                                src={match.event_first_player_logo || 'https://via.placeholder.com/40'}
+                                src={match.event_first_player_logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.event_first_player)}&background=random&color=fff`}
                                 alt={match.event_first_player}
                                 width={24}
                                 height={24}
@@ -123,7 +123,7 @@ export function TennisMatchCard({ match, onPress, odds }: TennisMatchCardProps) 
                     >
                         <div className="relative w-6 h-6 rounded-full bg-white/5 overflow-hidden">
                             <Image
-                                src={match.event_second_player_logo || 'https://via.placeholder.com/40'}
+                                src={match.event_second_player_logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.event_second_player)}&background=random&color=fff`}
                                 alt={match.event_second_player}
                                 width={24}
                                 height={24}

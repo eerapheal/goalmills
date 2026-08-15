@@ -36,9 +36,17 @@ export default function BasketballScreen() {
                 to: formatDate(to),
             });
 
-            const live = fixturesRes.result.filter(m => m.event_live === '1');
-            const upcoming = fixturesRes.result.filter(m => m.event_status === 'Not Started');
-            const finished = fixturesRes.result.filter(m => m.event_status === 'Finished');
+            const rawFixtures = fixturesRes?.result || [];
+            const live = rawFixtures.filter(m => m.event_live === '1');
+            const upcoming = rawFixtures.filter(m => {
+                const status = (m.event_status || '').toUpperCase();
+                const isFinished = status === 'FINISHED' || status === 'FT';
+                return m.event_live !== '1' && !isFinished;
+            });
+            const finished = rawFixtures.filter(m => {
+                const status = (m.event_status || '').toUpperCase();
+                return status === 'FINISHED' || status === 'FT';
+            });
 
             setLiveMatches(live);
             setUpcomingMatches(upcoming);

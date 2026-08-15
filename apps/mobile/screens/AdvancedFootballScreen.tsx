@@ -175,13 +175,14 @@ export function AdvancedFootballScreen() {
 
             const now = new Date();
             const upcoming = fixtures.filter((e: FootballEvent) => {
-                const status = e.event_status?.toLowerCase();
-                const isFinished = status === 'finished' || e.event_status === 'FT' || e.event_status === 'AET' || e.event_status === 'AP';
-                return !isFinished;
+                const status = (e.event_status || '').toUpperCase();
+                const isFinished = status === 'FINISHED' || status === 'FT' || status === 'AET' || status === 'AP';
+                const isLive = e.event_live === '1';
+                return !isFinished && !isLive;
             });
             const finished = fixtures.filter((e: FootballEvent) => {
-                const status = e.event_status?.toLowerCase();
-                return status === 'finished' || e.event_status === 'FT' || e.event_status === 'AET' || e.event_status === 'AP';
+                const status = (e.event_status || '').toUpperCase();
+                return status === 'FINISHED' || status === 'FT' || status === 'AET' || status === 'AP';
             });
 
             upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
@@ -219,9 +220,25 @@ export function AdvancedFootballScreen() {
             const finalTeams = Array.from(teamMap.values());
             setTeams(finalTeams);
 
-            // Process Standings (Filtering for main stage)
+            // Process Standings with Strict Deduplication
             const rawStandings = standingsRes.result?.total || [];
-            setStandings(rawStandings);
+            const uniqueStandings: FootballStanding[] = [];
+            const processedTeams = new Set<string>();
+            const processedRanks = new Set<string>();
+
+            rawStandings.forEach((s: FootballStanding) => {
+                const teamId = String(s.team_key);
+                const teamName = s.standing_team.toLowerCase();
+                const rank = s.standing_place;
+
+                if (!processedTeams.has(teamId) && !processedTeams.has(teamName) && !processedRanks.has(rank)) {
+                    uniqueStandings.push(s);
+                    processedTeams.add(teamId);
+                    processedTeams.add(teamName);
+                    processedRanks.add(rank);
+                }
+            });
+            setStandings(uniqueStandings);
 
             // Process Top Scorers
             setTopscorers(topscorersRes.result || []);
@@ -289,6 +306,40 @@ export function AdvancedFootballScreen() {
     useEffect(() => {
         loadData();
     }, []);
+
+    // Helper to group events by date
+    const groupEventsByDate = (events: FootballEvent[]) => {
+        const groups: { [title: string]: FootballEvent[] } = {};
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+        events.forEach(event => {
+            let title = '';
+            if (event.event_date === todayStr) {
+                title = 'Today';
+            } else if (event.event_date === tomorrowStr) {
+                title = 'Tomorrow';
+            } else {
+                // Format: Friday 10 April
+                const date = new Date(event.event_date);
+                title = date.toLocaleDateString('en-GB', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
+            }
+
+            if (!groups[title]) {
+                groups[title] = [];
+            }
+            groups[title].push(event);
+        });
+
+        return Object.entries(groups).map(([title, data]) => ({ title, data }));
+    };
 
     // 45s Auto-Refresh for Live Matches
     useEffect(() => {
@@ -372,7 +423,47 @@ export function AdvancedFootballScreen() {
             name,
             teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
         }));
-        standingsData.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+        // Sort groups (Champions League first, then alphabetical)
+        standingsData.sort((a, b) => {
+            if (a.name.includes('Champions League')) return -1;
+            if (b.name.includes('Champions League')) return 1;
+            return a.name.localeCompare(b.name, undefined, { numeric: true });
+        });
+
+        const isUCL = String(matchFilterLeagueId) === '3';
+        const isUEL = String(matchFilterLeagueId) === '4';
+        const isUECL = String(matchFilterLeagueId) === '683';
+        const isEuropeanTournament = isUCL || isUEL || isUECL;
+
+        const getRowHighlightColor = (rank: number) => {
+            if (isEuropeanTournament) {
+                if (rank <= 8) return isUCL ? 'rgba(59, 130, 246, 0.15)' : isUEL ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)';
+                if (rank <= 24) return 'rgba(255, 255, 255, 0.05)';
+                return 'transparent';
+            }
+            if (rank <= 4) return 'rgba(59, 130, 246, 0.1)';
+            if (rank >= 18) return 'rgba(239, 68, 68, 0.05)';
+            return 'transparent';
+        };
+
+        const getRankBadgeColor = (rank: number) => {
+            if (isEuropeanTournament) {
+                if (rank <= 8) return isUCL ? COLORS.primary : isUEL ? COLORS.warning : COLORS.success;
+                if (rank <= 24) return 'rgba(255, 255, 255, 0.2)';
+                return 'rgba(255, 255, 255, 0.1)';
+            }
+            if (rank <= 4) return COLORS.primary;
+            if (rank >= 18) return COLORS.danger;
+            return 'rgba(255, 255, 255, 0.1)';
+        };
+
+        const getFormColor = (res: string) => {
+            if (res === 'W') return '#22C55E';
+            if (res === 'D') return '#F59E0B';
+            if (res === 'L') return '#EF4444';
+            return 'rgba(255,255,255,0.2)';
+        };
 
         return (
             <View>
@@ -407,7 +498,7 @@ export function AdvancedFootballScreen() {
                                         key={`${group.name}-${standing.team_key}-${index}`} // Safe Key
                                         style={[
                                             styles.standingsRow,
-                                            index < 4 && styles.championsLeagueRow,
+                                            { backgroundColor: getRowHighlightColor(index + 1) }
                                         ]}
                                         onPress={() => {
                                             if (standing.team_key) {
@@ -415,23 +506,43 @@ export function AdvancedFootballScreen() {
                                             }
                                         }}
                                     >
-                                        <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
+                                        <View style={[styles.rankBadge, { backgroundColor: getRankBadgeColor(index + 1) }]}>
+                                            <Text style={styles.rankBadgeText}>{standing.standing_place}</Text>
+                                        </View>
+
                                         <View style={styles.teamColContainer}>
                                             {teamLogo && (
                                                 <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
                                             )}
-                                            <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
+                                            <Text style={styles.standingsText} numberOfLines={1}>
                                                 {standing.standing_team}
                                             </Text>
                                         </View>
+
                                         <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
                                         <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_W}</Text>
                                         <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_D}</Text>
                                         <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_L}</Text>
                                         <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_GD}</Text>
-                                        <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
+                                        <Text style={[styles.standingsText, styles.ptsCol, { color: COLORS.secondary, fontWeight: '900' }]}>
                                             {standing.standing_PTS}
                                         </Text>
+
+                                        {/* Form Indicators (4 dots) */}
+                                        <View style={styles.formDotsContainer}>
+                                            {((standing as any).form || (standing as any).standing_LP || "")
+                                                .split('')
+                                                .filter((c: string) => ['W', 'D', 'L'].includes(c.toUpperCase()))
+                                                .slice(0, 4)
+                                                .map((res: string, i: number) => (
+                                                    <View key={i} style={[styles.formDot, { backgroundColor: getFormColor(res) }]} />
+                                                ))
+                                            }
+                                            {/* Fill remaining with empty dots if less than 4 */}
+                                            {[...Array(Math.max(0, 4 - ((standing as any).form || (standing as any).standing_LP || "").split('').filter((c: string) => ['W', 'D', 'L'].includes(c.toUpperCase())).length))].map((_, i) => (
+                                                <View key={`empty-${i}`} style={[styles.formDot, { backgroundColor: 'rgba(255,255,255,0.05)' }]} />
+                                            ))}
+                                        </View>
                                     </Pressable>
                                 );
                             })}
@@ -512,7 +623,7 @@ export function AdvancedFootballScreen() {
                         {liveEvents.length > 0 ? (
                             <>
                                 {liveEvents.map((event, index) => (
-                                    <FootballMatchCard key={`live-${event.event_key || index}`} event={event} />
+                                    <FootballMatchCard key={`live-${event.event_key}-${index}`} event={event} />
                                 ))}
                             </>
                         ) : (
@@ -535,8 +646,15 @@ export function AdvancedFootballScreen() {
                         {isRefreshingMatches ? (
                             <ActivityIndicator color={COLORS.secondary} style={{ marginTop: 20 }} />
                         ) : (
-                            upcomingEvents.map((event, index) => (
-                                <FootballMatchCard key={`upcoming-${event.event_key || index}`} event={event} />
+                            groupEventsByDate(upcomingEvents).map((group, groupIndex) => (
+                                <View key={`upcoming-group-${groupIndex}`} style={styles.dateGroup}>
+                                    <View style={styles.dateHeader}>
+                                        <Text style={styles.dateHeaderText}>{group.title}</Text>
+                                    </View>
+                                    {group.data.map((event, index) => (
+                                        <FootballMatchCard key={`upcoming-${groupIndex}-${event.event_key}-${index}`} event={event} />
+                                    ))}
+                                </View>
                             ))
                         )}
                         {upcomingEvents.length === 0 && !isRefreshingMatches && (
@@ -558,8 +676,15 @@ export function AdvancedFootballScreen() {
                         {isRefreshingMatches ? (
                             <ActivityIndicator color={COLORS.secondary} style={{ marginTop: 20 }} />
                         ) : (
-                            finishedEvents.map((event, index) => (
-                                <FootballMatchCard key={`finished-${event.event_key || index}`} event={event} />
+                            groupEventsByDate(finishedEvents).map((group, groupIndex) => (
+                                <View key={`results-group-${groupIndex}`} style={styles.dateGroup}>
+                                    <View style={styles.dateHeader}>
+                                        <Text style={styles.dateHeaderText}>{group.title}</Text>
+                                    </View>
+                                    {group.data.map((event, index) => (
+                                        <FootballMatchCard key={`finished-${groupIndex}-${event.event_key}-${index}`} event={event} />
+                                    ))}
+                                </View>
                             ))
                         )}
                         {finishedEvents.length === 0 && !isRefreshingMatches && (
@@ -629,7 +754,7 @@ export function AdvancedFootballScreen() {
                     <View style={styles.content}>
                         <Text style={styles.sectionTitle}>📰 Latest News</Text>
                         {blogPosts.map((post, index) => (
-                            <NewsCard key={`news-${post._id || index}`} item={post} onPress={() => router.push(`/news/${post._id}`)} />
+                            <NewsCard key={`news-${post._id}-${index}`} item={post} onPress={() => router.push(`/news/${post._id}`)} />
                         ))}
                     </View>
                 );
@@ -640,7 +765,7 @@ export function AdvancedFootballScreen() {
                         <Text style={styles.sectionTitle}>🎥 Video Highlights</Text>
                         {videos.filter((v) => v).map((video, index) => (
                             <FootballVideoCard
-                                key={`video-${video.event_key || index}`}
+                                key={`video-${video.event_key}-${index}`}
                                 video={video}
                                 onPress={() => video.video_url && setSelectedVideo(video.video_url)}
                             />
@@ -1034,5 +1159,50 @@ const styles = StyleSheet.create({
     topscorerStatLabel: {
         fontSize: FONT_SIZES.xs,
         color: COLORS.textLight,
+    },
+    rankBadge: {
+        width: 24,
+        height: 24,
+        borderRadius: BORDER_RADIUS.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 4,
+    },
+    rankBadgeText: {
+        fontSize: FONT_SIZES.xs,
+        fontWeight: '900',
+        color: COLORS.background,
+    },
+    formDotsContainer: {
+        width: 45,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: 3,
+        paddingLeft: 4,
+    },
+    formDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+    },
+    dateGroup: {
+        marginBottom: SPACING.lg,
+    },
+    dateHeader: {
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        paddingHorizontal: SPACING.md,
+        paddingVertical: 8,
+        borderRadius: BORDER_RADIUS.md,
+        marginBottom: SPACING.sm,
+        borderLeftWidth: 3,
+        borderLeftColor: COLORS.secondary,
+    },
+    dateHeaderText: {
+        fontSize: FONT_SIZES.sm,
+        fontWeight: '800',
+        color: COLORS.secondary,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
     },
 });

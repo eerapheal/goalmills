@@ -48,13 +48,39 @@ export function TennisScreen() {
         tennisApi.getLiveOdds({})
       ]);
 
-      setLiveMatches(live.result);
-      setUpcomingMatches(fixtures.result);
-      setRecentMatches(results.result);
-      setLeagues(leaguesData.result);
-      setStandings(standingsData.result);
-      setOdds(oddsData.result);
-      setLiveOdds(liveOddsData.result);
+      const allFixtures = fixtures.result || [];
+      const upcoming = allFixtures.filter((m: TennisEvent) => {
+          const status = (m.event_status || '').toUpperCase();
+          const isFinished = status === 'FINISHED' || status === 'FT' || status === 'RET' || status === 'W/O';
+          return m.event_live !== '1' && !isFinished;
+      });
+
+      const allResults = results.result || [];
+      const finished = allResults.filter((m: TennisEvent) => {
+          const status = (m.event_status || '').toUpperCase();
+          return status === 'FINISHED' || status === 'FT' || status === 'RET' || status === 'W/O';
+      });
+
+      setLiveMatches(live.result || []);
+      setUpcomingMatches(upcoming);
+      setRecentMatches(finished);
+      setLeagues(leaguesData.result || []);
+      
+      const rawStandings = standingsData.result || [];
+      const uniqueStandings = rawStandings.reduce((acc: any[], curr: any) => {
+          const isDuplicate = acc.some(item => 
+              item.player_key === curr.player_key || 
+              item.place === curr.place
+          );
+          if (!isDuplicate) {
+              acc.push(curr);
+          }
+          return acc;
+      }, []);
+      setStandings(uniqueStandings);
+      
+      setOdds(oddsData.result || {});
+      setLiveOdds(liveOddsData.result || {});
     } catch (error) {
       console.error('Error loading tennis data:', error);
     } finally {

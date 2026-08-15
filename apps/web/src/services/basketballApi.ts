@@ -331,130 +331,89 @@ const mockLineups: { [matchId: string]: any } = {
   }
 };
 
-class BasketballApi implements BasketballAPIClient {
-  private async simulateDelay() {
-    return new Promise(resolve => setTimeout(() => resolve(undefined), 800));
-  }
+// API Configuration - Using Next.js API route as proxy to avoid CORS issues
+const API_PROXY_URL = '/api/basketball';
 
+// Helper function to build URL with parameters
+const buildUrl = (method: string, params: Record<string, any> = {}): string => {
+  const url = new URL(API_PROXY_URL, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  url.searchParams.append('met', method);
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      url.searchParams.append(key, String(value));
+    }
+  });
+  
+  return url.toString();
+};
+
+// Helper function to make API requests
+async function fetchFromAPI<T>(method: string, params: Record<string, any> = {}): Promise<T> {
+  try {
+    const url = buildUrl(method, params);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching basketball ${method}:`, error);
+    throw error;
+  }
+}
+
+class BasketballApi implements BasketballAPIClient {
   async getCountries(params: Omit<BasketballCountriesParams, 'met'>): Promise<BasketballCountriesResponse> {
-    await this.simulateDelay();
-    return { success: 1, result: mockLeagues };
+    return fetchFromAPI<BasketballCountriesResponse>('Countries', params);
   }
 
   async getLeagues(params: Omit<BasketballLeaguesParams, 'met'>): Promise<BasketballLeaguesResponse> {
-    await this.simulateDelay();
-    return { success: 1, result: mockLeagues };
+    return fetchFromAPI<BasketballLeaguesResponse>('Leagues', params);
   }
 
   async getFixtures(params: Omit<BasketballFixturesParams, 'met'>): Promise<BasketballFixturesResponse> {
-    await this.simulateDelay();
-    let result = mockEvents;
-    
-    if (params.matchId) {
-      result = result.filter(e => Number(e.event_key) === params.matchId);
-    }
-    if (params.leagueId) {
-      result = result.filter(e => Number(e.league_key) === params.leagueId);
-    }
-    if (params.teamId) {
-      result = result.filter(e => Number(e.home_team_key) === params.teamId || Number(e.away_team_key) === params.teamId);
-    }
-    
-    return { success: 1, result };
+    return fetchFromAPI<BasketballFixturesResponse>('Fixtures', params);
   }
 
   async getH2H(params: Omit<BasketballH2HParams, 'met'>): Promise<BasketballH2HResponse> {
-    await this.simulateDelay();
-    return { success: 1, result: { H2H: [], firstTeamResults: [], secondTeamResults: [] } };
+    return fetchFromAPI<BasketballH2HResponse>('H2H', params);
   }
 
   async getLivescore(params: Omit<BasketballLivescoreParams, 'met'>): Promise<BasketballLivescoreResponse> {
-    await this.simulateDelay();
-    const liveEvents = mockEvents.filter(e => e.event_live === '1');
-    return { success: 1, result: liveEvents };
+    return fetchFromAPI<BasketballLivescoreResponse>('Livescore', params);
   }
 
   async getStandings(params: Omit<BasketballStandingsParams, 'met'>): Promise<BasketballStandingsResponse> {
-    await this.simulateDelay();
-    return { success: 1, result: { total: mockStandings } };
+    return fetchFromAPI<BasketballStandingsResponse>('Standings', params);
   }
 
   async getTeams(params: Omit<BasketballTeamsParams, 'met'>): Promise<BasketballTeamsResponse> {
-    await this.simulateDelay();
-    let result = mockTeams;
-    if (params.teamId) {
-      result = result.filter(t => Number(t.team_key) === params.teamId);
-    }
-    return { success: 1, result };
+    return fetchFromAPI<BasketballTeamsResponse>('Teams', params);
   }
 
   async getOdds(params: Omit<BasketballOddsParams, 'met'>): Promise<BasketballOddsResponse> {
-    await this.simulateDelay();
-    const result: { [key: string]: any } = {};
-    
-    if (params.matchId) {
-      if (mockOdds[params.matchId]) {
-        result[params.matchId] = mockOdds[params.matchId];
-      }
-    } else {
-      Object.assign(result, mockOdds);
-    }
-    
-    return { success: 1, result };
+    return fetchFromAPI<BasketballOddsResponse>('Odds', params);
   }
 
   async getPlayers(params: Omit<BasketballPlayersParams, 'met'>): Promise<BasketballPlayersResponse> {
-    await this.simulateDelay();
-    let result = mockPlayers;
-    
-    if (params.playerId) {
-      result = result.filter(p => Number(p.player_key) === params.playerId);
-    }
-    if (params.teamId) {
-      result = result.filter(p => Number(p.team_key) === params.teamId);
-    }
-    
-    return { success: 1, result };
+    return fetchFromAPI<BasketballPlayersResponse>('Players', params);
   }
 
   async getLineups(params: Omit<BasketballLineupsParams, 'met'>): Promise<BasketballLineupsResponse> {
-    await this.simulateDelay();
-    
-    const matchId = String(params.matchId);
-    if (mockLineups[matchId]) {
-      return {
-        success: 1,
-        result: mockLineups[matchId]
-      };
-    }
-    
-    return {
-      success: 1,
-      result: {
-        home_team: { starting_lineups: [], substitutes: [] },
-        away_team: { starting_lineups: [], substitutes: [] }
-      }
-    };
+    return fetchFromAPI<BasketballLineupsResponse>('Lineups', params);
   }
 
   async getStatistics(params: Omit<BasketballStatisticsParams, 'met'>): Promise<BasketballStatisticsResponse> {
-    await this.simulateDelay();
-    
-    const matchId = String(params.matchId);
-    if (mockStatistics[matchId]) {
-      return {
-        success: 1,
-        result: mockStatistics[matchId]
-      };
-    }
-    
-    return {
-      success: 1,
-      result: {
-        statistics: [],
-        player_statistics: { home_team: [], away_team: [] }
-      }
-    };
+    return fetchFromAPI<BasketballStatisticsResponse>('Statistics', params);
   }
 }
 

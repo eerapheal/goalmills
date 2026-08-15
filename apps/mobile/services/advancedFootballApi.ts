@@ -38,8 +38,8 @@ import {
 import { goalmillsApi } from './goalmillsApi';
 
 // API Configuration
-const API_BASE_URL = 'https://goalmills-web.vercel.app/api/football';
-const API_KEY = 'e51b922070b6a96ce765b6dd06b992a71ab36fd777acd0d744ad281cba968770';
+const API_BASE_URL = 'https://apiv2.allsportsapi.com/football/';
+const API_KEY = '1637c7ddbd7bed5f5ffb6973d267ab8782d23d56f4fadc9399af4c05839680af';
 
 // Helper function to build URL with parameters
 const buildUrl = (method: string, params: Record<string, any> = {}): string => {

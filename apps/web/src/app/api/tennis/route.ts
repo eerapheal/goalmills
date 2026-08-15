@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = 'https://apiv2.allsportsapi.com/cricket';
-const API_KEY = '1637c7ddbd7bed5f5ffb6973d267ab8782d23d56f4fadc9399af4c05839680af';
+const API_BASE_URL = 'https://apiv2.allsportsapi.com/tennis';
+const API_KEY = process.env.ALLSPORTS_API_KEY;
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,6 +19,20 @@ export async function GET(request: NextRequest) {
     const apiUrl = new URL(API_BASE_URL);
     apiUrl.searchParams.append('met', method);
 
+    // Some endpoints in Tennis API require mandatory parameters other than APIkey
+    // OddsLive and Odds usually require matchId, leagueId, or a date range.
+    // If called without any of these, they often return 500.
+    if ((method === 'OddsLive' || method === 'Odds') && 
+        !searchParams.get('matchId') && 
+        !searchParams.get('leagueId') && 
+        !searchParams.get('from')) {
+      console.warn(`Tennis API: Skipping ${method} due to missing mandatory parameters (matchId, leagueId, or date range)`);
+      return NextResponse.json(
+        { success: 1, result: method === 'Odds' ? {} : [], message: 'Mandatory parameters missing, skipping external call' },
+        { status: 200 }
+      );
+    }
+
     if (!API_KEY) {
       return NextResponse.json(
         { error: 'API Key is not configured' },
@@ -28,13 +42,13 @@ export async function GET(request: NextRequest) {
     apiUrl.searchParams.append('APIkey', API_KEY);
 
     // Copy all other query parameters
-    searchParams.forEach((value: any, key: any) => {
+    searchParams.forEach((value, key) => {
       if (key !== 'met' && value) {
         apiUrl.searchParams.append(key, value);
       }
     });
 
-    console.log('Proxying cricket request to:', apiUrl.toString());
+    console.log('Proxying tennis request to:', apiUrl.toString());
 
     // Make the request to the external API with retries
     let response;
@@ -56,7 +70,7 @@ export async function GET(request: NextRequest) {
         
         // If 500, wait and retry
         if (response.status >= 500 && attempts < maxAttempts) {
-          console.warn(`Cricket API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
+          console.warn(`Tennis API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
           await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
           continue;
         }
@@ -71,9 +85,10 @@ export async function GET(request: NextRequest) {
     if (!response || !response.ok) {
       const status = response ? response.status : 500;
       const statusText = response ? response.statusText : 'Fetch failed';
-      console.error('Cricket API Error:', status, statusText);
-
-      // Graceful fallback for 500 errors
+      console.error('Tennis API Error:', status, statusText);
+      
+      // If the external API fails with 500, return a graceful empty response
+      // to avoid crashing the whole frontend screen.
       if (status >= 500) {
         return NextResponse.json(
           { success: 1, result: [], message: 'External API error (graceful fallback)' },
@@ -98,7 +113,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Cricket Proxy error:', error);
+    console.error('Tennis Proxy error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
