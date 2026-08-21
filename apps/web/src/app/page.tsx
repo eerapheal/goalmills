@@ -7,6 +7,8 @@ import { FootballScreen } from '../components/FootballScreen';
 import { CricketScreen } from '../components/CricketScreen';
 import { TennisScreen } from '../components/TennisScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
+import { SportsIntelligenceSection } from '../components/SportsIntelligenceSection';
+import { SportsPulseNewsSection } from '../components/SportsPulseNewsSection';
 
 export default function HomePage() {
     const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -62,6 +64,12 @@ export default function HomePage() {
             <div className="flex-1 overflow-y-auto scrollbar-hide">
                 {renderSportContent()}
             </div>
+
+            {/* Section 1: Sports Intelligence & Pro Analytics Suite */}
+            <SportsIntelligenceSection />
+
+            {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
+            <SportsPulseNewsSection />
         </div>
     );
 }
