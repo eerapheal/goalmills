@@ -10,7 +10,7 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "web": "turbo run dev --filter=web",
-    "mobile": "turbo run dev --filter=mobile"
+    "mobile": "turbo run dev --filter=mobiles"
   },
   "devDependencies": {
     "@types/react": "~19.2.18",
