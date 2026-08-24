@@ -1,6 +1,6 @@
 /**
- * API-Football (v3) Enterprise Service Client for Expo Mobile
- * Uses dedicated EXPO_PUBLIC_API_FOOTBALL_KEY_MOBILE environment variable
+ * Complete API-Football (v3.9.3) Enterprise Service Client for Expo Mobile
+ * Implements ALL official endpoints and query parameters strictly according to API-Football documentation.
  */
 
 const API_BASE_URL =
@@ -23,163 +23,254 @@ export interface ApiFootballResponse<T> {
   response: T;
 }
 
-export interface ApiFootballFixtureItem {
-  fixture: {
-    id: number;
-    referee: string | null;
-    timezone: string;
-    date: string;
-    timestamp: number;
-    periods: {
-      first: number | null;
-      second: number | null;
-    };
-    venue: {
-      id: number | null;
-      name: string | null;
-      city: string | null;
-    };
-    status: {
-      long: string;
-      short: string;
-      elapsed: number | null;
-      extra?: number | null;
-    };
-  };
-  league: {
-    id: number;
-    name: string;
-    country: string;
-    logo: string;
-    flag: string | null;
-    season: number;
-    round: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-      winner: boolean | null;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-      winner: boolean | null;
-    };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
-  score: {
-    halftime: { home: number | null; away: number | null };
-    fulltime: { home: number | null; away: number | null };
-    extratime: { home: number | null; away: number | null };
-    penalty: { home: number | null; away: number | null };
-  };
-  events?: ApiFootballEvent[];
-  lineups?: ApiFootballLineup[];
-  statistics?: ApiFootballTeamStats[];
+// -------------------------------------------------------------
+// Type Definitions for Endpoints & Parameter Options
+// -------------------------------------------------------------
+
+export interface TimezoneParams {}
+
+export interface CountriesParams {
+  name?: string;
+  code?: string;
+  search?: string;
 }
 
-export interface ApiFootballEvent {
-  time: {
-    elapsed: number;
-    extra: number | null;
-  };
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  player: {
-    id: number;
-    name: string;
-  };
-  assist: {
-    id: number | null;
-    name: string | null;
-  };
-  type: 'Goal' | 'Card' | 'subst' | 'Var';
-  detail: string;
-  comments: string | null;
+export interface LeaguesParams {
+  id?: number;
+  name?: string;
+  country?: string;
+  code?: string;
+  season?: number;
+  team?: number;
+  type?: 'league' | 'cup';
+  current?: 'true' | 'false';
+  search?: string;
+  last?: number;
 }
 
-export interface ApiFootballLineup {
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-    colors: any;
-  };
-  coach: {
-    id: number;
-    name: string;
-    photo: string;
-  };
-  formation: string;
-  startXI: {
-    player: {
-      id: number;
-      name: string;
-      number: number;
-      pos: string;
-      grid: string | null;
-    };
-  }[];
-  substitutes: {
-    player: {
-      id: number;
-      name: string;
-      number: number;
-      pos: string;
-      grid: string | null;
-    };
-  }[];
+export interface TeamsParams {
+  id?: number;
+  name?: string;
+  league?: number;
+  season?: number;
+  country?: string;
+  code?: string;
+  venue?: number;
+  search?: string;
 }
 
-export interface ApiFootballTeamStats {
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  statistics: {
-    type: string;
-    value: string | number | null;
-  }[];
+export interface TeamStatisticsParams {
+  league: number;
+  season: number;
+  team: number;
+  date?: string; // YYYY-MM-DD
 }
 
-export interface ApiFootballStandingItem {
-  rank: number;
-  team: {
-    id: number;
-    name: string;
-    logo: string;
-  };
-  points: number;
-  goalsDiff: number;
-  group: string;
-  form: string;
-  status: string;
-  description: string | null;
-  all: {
-    played: number;
-    win: number;
-    draw: number;
-    lose: number;
-    goals: {
-      for: number;
-      against: number;
-    };
-  };
+export interface TeamSeasonsParams {
+  team: number;
 }
 
-async function requestApiFootball<T>(endpoint: string, params: Record<string, any> = {}): Promise<T[]> {
-  const url = new URL(`${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`);
-  
+export interface VenuesParams {
+  id?: number;
+  name?: string;
+  city?: string;
+  country?: string;
+  search?: string;
+}
+
+export interface StandingsParams {
+  season: number;
+  league?: number;
+  team?: number;
+}
+
+export interface FixtureRoundsParams {
+  league: number;
+  season: number;
+  current?: boolean;
+  dates?: boolean;
+  timezone?: string;
+}
+
+export interface FixturesParams {
+  id?: number;
+  ids?: string; // "id-id-id" max 20
+  live?: 'all' | string; // "all" or "id-id"
+  date?: string; // YYYY-MM-DD
+  league?: number;
+  season?: number;
+  team?: number;
+  last?: number;
+  next?: number;
+  from?: string; // YYYY-MM-DD
+  to?: string; // YYYY-MM-DD
+  round?: string;
+  status?: string; // e.g. "NS", "NS-PST-FT", "FT"
+  venue?: number;
+  timezone?: string;
+}
+
+export interface HeadToHeadParams {
+  h2h: string; // "team1_id-team2_id"
+  date?: string;
+  league?: number;
+  season?: number;
+  last?: number;
+  next?: number;
+  from?: string;
+  to?: string;
+  status?: string;
+  venue?: number;
+  timezone?: string;
+}
+
+export interface FixtureStatisticsParams {
+  fixture: number;
+  team?: number;
+  type?: string;
+  half?: boolean;
+}
+
+export interface FixtureEventsParams {
+  fixture: number;
+  team?: number;
+  player?: number;
+  type?: 'Goal' | 'Card' | 'subst' | 'Var';
+}
+
+export interface FixtureLineupsParams {
+  fixture: number;
+  team?: number;
+  player?: number;
+  type?: 'startXI' | 'substitutes';
+}
+
+export interface FixturePlayersParams {
+  fixture: number;
+  team?: number;
+}
+
+export interface InjuriesParams {
+  league?: number;
+  season?: number;
+  fixture?: number;
+  team?: number;
+  player?: number;
+  date?: string;
+  ids?: string;
+  timezone?: string;
+}
+
+export interface PredictionsParams {
+  fixture: number;
+}
+
+export interface CoachesParams {
+  id?: number;
+  team?: number;
+  search?: string;
+}
+
+export interface PlayerSeasonsParams {
+  player?: number;
+}
+
+export interface PlayerProfilesParams {
+  player?: number;
+  search?: string;
+  page?: number;
+}
+
+export interface PlayersParams {
+  id?: number;
+  team?: number;
+  league?: number;
+  season?: number;
+  search?: string;
+  page?: number;
+}
+
+export interface PlayerSquadsParams {
+  team?: number;
+  player?: number;
+}
+
+export interface PlayerTeamsParams {
+  player: number;
+}
+
+export interface LeagueSeasonParams {
+  league: number;
+  season: number;
+}
+
+export interface TransfersParams {
+  player?: number;
+  team?: number;
+}
+
+export interface TrophiesParams {
+  player?: number;
+  players?: string; // "id-id" max 20
+  coach?: number;
+  coachs?: string; // "id-id" max 20
+}
+
+export interface SidelinedParams {
+  player?: number;
+  players?: string;
+  coach?: number;
+  coachs?: string;
+}
+
+export interface OddsLiveParams {
+  fixture?: number;
+  league?: number;
+  bet?: number;
+}
+
+export interface OddsLiveBetsParams {
+  id?: string;
+  search?: string;
+}
+
+export interface OddsPreMatchParams {
+  fixture?: number;
+  league?: number;
+  season?: number;
+  date?: string;
+  timezone?: string;
+  page?: number;
+  bookmaker?: number;
+  bet?: number;
+}
+
+export interface OddsMappingParams {
+  page?: number;
+}
+
+export interface OddsBookmakersParams {
+  id?: number;
+  search?: string;
+}
+
+export interface OddsBetsParams {
+  id?: string;
+  search?: string;
+}
+
+// -------------------------------------------------------------
+// Core Request Handler (GET only with x-apisports-key header)
+// -------------------------------------------------------------
+
+async function requestApiFootball<T>(
+  endpoint: string,
+  params: Record<string, any> = {}
+): Promise<T[]> {
+  const cleanBase = API_BASE_URL.replace(/\/$/, '');
+  const cleanEndpoint = endpoint.replace(/^\//, '');
+  const url = new URL(`${cleanBase}/${cleanEndpoint}`);
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       url.searchParams.append(key, String(value));
@@ -188,7 +279,7 @@ async function requestApiFootball<T>(endpoint: string, params: Record<string, an
 
   const headers: Record<string, string> = {
     'x-apisports-key': API_KEY,
-    'Accept': 'application/json',
+    Accept: 'application/json',
   };
 
   try {
@@ -198,94 +289,219 @@ async function requestApiFootball<T>(endpoint: string, params: Record<string, an
     });
 
     if (!response.ok) {
-      throw new Error(`API-Football request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `[API-Football] Request to ${endpoint} failed: ${response.status} ${response.statusText}`
+      );
     }
 
     const data: ApiFootballResponse<T[]> = await response.json();
 
-    if (data.errors && (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)) {
-      console.warn('[API-Football] Error response:', data.errors);
+    if (
+      data.errors &&
+      (Array.isArray(data.errors)
+        ? data.errors.length > 0
+        : Object.keys(data.errors).length > 0)
+    ) {
+      console.warn(`[API-Football] Warnings/Errors on ${endpoint}:`, data.errors);
     }
 
     return data.response || [];
   } catch (error) {
-    console.error(`[API-Football] Failed fetching ${endpoint}:`, error);
+    console.error(`[API-Football] Error on GET ${endpoint}:`, error);
     throw error;
   }
 }
 
+// -------------------------------------------------------------
+// Full Implementation of All API-Football (v3.9.3) Endpoints
+// -------------------------------------------------------------
+
 export const apiFootballService = {
-  /**
-   * Get all live matches in real-time
-   */
-  async getLiveFixtures(): Promise<ApiFootballFixtureItem[]> {
-    return requestApiFootball<ApiFootballFixtureItem>('fixtures', { live: 'all' });
+  // 1. Status & Account Check
+  async getStatus(): Promise<any> {
+    return requestApiFootball<any>('status');
   },
 
-  /**
-   * Get matches by specific date (YYYY-MM-DD)
-   */
-  async getFixturesByDate(date: string, timezone?: string): Promise<ApiFootballFixtureItem[]> {
-    return requestApiFootball<ApiFootballFixtureItem>('fixtures', { date, timezone });
+  // 2. Timezones
+  async getTimezones(): Promise<string[]> {
+    return requestApiFootball<string>('timezone');
   },
 
-  /**
-   * Get detailed match by ID (includes status, venue, score)
-   */
-  async getFixtureById(id: number): Promise<ApiFootballFixtureItem | null> {
-    const fixtures = await requestApiFootball<ApiFootballFixtureItem>('fixtures', { id });
-    return fixtures.length > 0 ? fixtures[0] : null;
+  // 3. Countries
+  async getCountries(params?: CountriesParams): Promise<any[]> {
+    return requestApiFootball<any>('countries', params);
   },
 
-  /**
-   * Get match timeline events (goals, cards, substitutions, VAR)
-   */
-  async getFixtureEvents(fixtureId: number): Promise<ApiFootballEvent[]> {
-    return requestApiFootball<ApiFootballEvent>('fixtures/events', { fixture: fixtureId });
+  // 4. Leagues & Cups
+  async getLeagues(params?: LeaguesParams): Promise<any[]> {
+    return requestApiFootball<any>('leagues', params);
   },
 
-  /**
-   * Get match lineups & formations (4-3-3, starting XI, bench, coach)
-   */
-  async getFixtureLineups(fixtureId: number): Promise<ApiFootballLineup[]> {
-    return requestApiFootball<ApiFootballLineup>('fixtures/lineups', { fixture: fixtureId });
+  // 5. Seasons
+  async getSeasons(): Promise<number[]> {
+    return requestApiFootball<number>('leagues/seasons');
   },
 
-  /**
-   * Get match statistics (shots on target, possession %, passes, corners, xG)
-   */
-  async getFixtureStatistics(fixtureId: number): Promise<ApiFootballTeamStats[]> {
-    return requestApiFootball<ApiFootballTeamStats>('fixtures/statistics', { fixture: fixtureId });
+  // 6. Teams
+  async getTeams(params: TeamsParams): Promise<any[]> {
+    return requestApiFootball<any>('teams', params);
   },
 
-  /**
-   * Get Head-to-Head matches between two teams
-   */
-  async getHeadToHead(team1Id: number, team2Id: number, last: number = 10): Promise<ApiFootballFixtureItem[]> {
-    return requestApiFootball<ApiFootballFixtureItem>('fixtures/headtohead', {
-      h2h: `${team1Id}-${team2Id}`,
-      last,
+  async getTeamStatistics(params: TeamStatisticsParams): Promise<any> {
+    const res = await requestApiFootball<any>('teams/statistics', params);
+    return res.length > 0 ? res[0] : res;
+  },
+
+  async getTeamSeasons(params: TeamSeasonsParams): Promise<number[]> {
+    return requestApiFootball<number>('teams/seasons', params);
+  },
+
+  async getTeamCountries(): Promise<any[]> {
+    return requestApiFootball<any>('teams/countries');
+  },
+
+  // 7. Venues
+  async getVenues(params: VenuesParams): Promise<any[]> {
+    return requestApiFootball<any>('venues', params);
+  },
+
+  // 8. Standings
+  async getStandings(params: StandingsParams): Promise<any[]> {
+    return requestApiFootball<any>('standings', params);
+  },
+
+  // 9. Fixtures
+  async getFixtureRounds(params: FixtureRoundsParams): Promise<string[]> {
+    return requestApiFootball<string>('fixtures/rounds', params);
+  },
+
+  async getFixtures(params: FixturesParams): Promise<any[]> {
+    return requestApiFootball<any>('fixtures', params);
+  },
+
+  async getLiveFixtures(leaguesFilter?: string): Promise<any[]> {
+    return requestApiFootball<any>('fixtures', {
+      live: leaguesFilter || 'all',
     });
   },
 
-  /**
-   * Get league standings table
-   */
-  async getStandings(leagueId: number, season: number): Promise<ApiFootballStandingItem[]> {
-    const res = await requestApiFootball<any>('standings', { league: leagueId, season });
-    if (res.length > 0 && res[0].league && res[0].league.standings) {
-      return res[0].league.standings.flat() as ApiFootballStandingItem[];
-    }
-    return [];
+  async getFixturesByDate(date: string, timezone?: string): Promise<any[]> {
+    return requestApiFootball<any>('fixtures', { date, timezone });
   },
 
-  /**
-   * Get available leagues for a season
-   */
-  async getLeagues(season?: number, current: boolean = true): Promise<any[]> {
-    return requestApiFootball<any>('leagues', {
-      season: season || new Date().getFullYear(),
-      current: current ? 'true' : undefined,
-    });
+  async getFixtureById(id: number): Promise<any | null> {
+    const res = await requestApiFootball<any>('fixtures', { id });
+    return res.length > 0 ? res[0] : null;
+  },
+
+  async getHeadToHead(params: HeadToHeadParams): Promise<any[]> {
+    return requestApiFootball<any>('fixtures/headtohead', params);
+  },
+
+  async getFixtureStatistics(params: FixtureStatisticsParams): Promise<any[]> {
+    return requestApiFootball<any>('fixtures/statistics', params);
+  },
+
+  async getFixtureEvents(params: FixtureEventsParams): Promise<any[]> {
+    return requestApiFootball<any>('fixtures/events', params);
+  },
+
+  async getFixtureLineups(params: FixtureLineupsParams): Promise<any[]> {
+    return requestApiFootball<any>('fixtures/lineups', params);
+  },
+
+  async getFixturePlayerStatistics(params: FixturePlayersParams): Promise<any[]> {
+    return requestApiFootball<any>('fixtures/players', params);
+  },
+
+  // 10. Injuries
+  async getInjuries(params: InjuriesParams): Promise<any[]> {
+    return requestApiFootball<any>('injuries', params);
+  },
+
+  // 11. Predictions
+  async getPredictions(params: PredictionsParams): Promise<any> {
+    const res = await requestApiFootball<any>('predictions', params);
+    return res.length > 0 ? res[0] : null;
+  },
+
+  // 12. Coaches
+  async getCoaches(params: CoachesParams): Promise<any[]> {
+    return requestApiFootball<any>('coachs', params);
+  },
+
+  // 13. Players
+  async getPlayerSeasons(params?: PlayerSeasonsParams): Promise<number[]> {
+    return requestApiFootball<number>('players/seasons', params);
+  },
+
+  async getPlayerProfiles(params: PlayerProfilesParams): Promise<any[]> {
+    return requestApiFootball<any>('players/profiles', params);
+  },
+
+  async getPlayers(params: PlayersParams): Promise<any[]> {
+    return requestApiFootball<any>('players', params);
+  },
+
+  async getPlayerSquads(params: PlayerSquadsParams): Promise<any[]> {
+    return requestApiFootball<any>('players/squads', params);
+  },
+
+  async getPlayerTeams(params: PlayerTeamsParams): Promise<any[]> {
+    return requestApiFootball<any>('players/teams', params);
+  },
+
+  async getTopScorers(params: LeagueSeasonParams): Promise<any[]> {
+    return requestApiFootball<any>('players/topscorers', params);
+  },
+
+  async getTopAssists(params: LeagueSeasonParams): Promise<any[]> {
+    return requestApiFootball<any>('players/topassists', params);
+  },
+
+  async getTopYellowCards(params: LeagueSeasonParams): Promise<any[]> {
+    return requestApiFootball<any>('players/topyellowcards', params);
+  },
+
+  async getTopRedCards(params: LeagueSeasonParams): Promise<any[]> {
+    return requestApiFootball<any>('players/topredcards', params);
+  },
+
+  // 14. Transfers, Trophies, Sidelined
+  async getTransfers(params: TransfersParams): Promise<any[]> {
+    return requestApiFootball<any>('transfers', params);
+  },
+
+  async getTrophies(params: TrophiesParams): Promise<any[]> {
+    return requestApiFootball<any>('trophies', params);
+  },
+
+  async getSidelined(params: SidelinedParams): Promise<any[]> {
+    return requestApiFootball<any>('sidelined', params);
+  },
+
+  // 15. Odds (In-Play & Pre-Match)
+  async getOddsLive(params?: OddsLiveParams): Promise<any[]> {
+    return requestApiFootball<any>('odds/live', params);
+  },
+
+  async getOddsLiveBets(params?: OddsLiveBetsParams): Promise<any[]> {
+    return requestApiFootball<any>('odds/live/bets', params);
+  },
+
+  async getOddsPreMatch(params: OddsPreMatchParams): Promise<any[]> {
+    return requestApiFootball<any>('odds', params);
+  },
+
+  async getOddsMapping(params?: OddsMappingParams): Promise<any[]> {
+    return requestApiFootball<any>('odds/mapping', params);
+  },
+
+  async getOddsBookmakers(params?: OddsBookmakersParams): Promise<any[]> {
+    return requestApiFootball<any>('odds/bookmakers', params);
+  },
+
+  async getOddsBets(params?: OddsBetsParams): Promise<any[]> {
+    return requestApiFootball<any>('odds/bets', params);
   },
 };

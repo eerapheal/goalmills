@@ -1,1140 +1,314 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import {
-    FootballEvent,
-    FootballStanding,
-    FootballTopscorer,
-    FootballTeam,
-    BlogPost,
-    FootballVideo,
-    FootballLeague,
-    FootballCountry
-} from '@goalmills/types';
-import { advancedFootballApi } from '../services/advancedFootballApi';
-import { FootballMatchCard } from '../components/FootballMatchCard';
-import { FootballStandingsTable } from '../components/FootballStandingsTable';
-import { FootballTopScorers } from '../components/FootballTopScorers';
-import { FootballVideoCard } from '../components/FootballVideoCard';
-import { BlogCard } from '../components/BlogCard';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { FootballMatchCard, UnifiedWebMatchEvent } from './FootballMatchCard';
+import { webApiFootballService, ApiFootballFixtureItem, ApiFootballStandingItem } from '../services/apiFootball';
 
-type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'news' | 'videos' | 'countries' | 'leagues' | 'teams' | 'competitions';
+type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export function FootballScreen() {
-    const [activeTab, setActiveTab] = useState<FootballTab>('live');
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<FootballTab>('live');
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split('T')[0]
+  );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [fixtures, setFixtures] = useState<UnifiedWebMatchEvent[]>([]);
+  const [standings, setStandings] = useState<ApiFootballStandingItem[]>([]);
 
-    // Data states
-    const [liveEvents, setLiveEvents] = useState<FootballEvent[]>([]);
-    const [upcomingEvents, setUpcomingEvents] = useState<FootballEvent[]>([]);
-    const [finishedEvents, setFinishedEvents] = useState<FootballEvent[]>([]);
-    const [standings, setStandings] = useState<{ name: string; teams: FootballStanding[] }[]>([]);
-    const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
-    const [leagues, setLeagues] = useState<FootballLeague[]>([]);
-    const [teams, setTeams] = useState<FootballTeam[]>([]);
-    const [countries, setCountries] = useState<FootballCountry[]>([]);
-    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-    const [videos, setVideos] = useState<FootballVideo[]>([]);
-    const [currentLeagueId, setCurrentLeagueId] = useState<number>(152);
-    const [matchFilterLeagueId, setMatchFilterLeagueId] = useState<number | null>(null);
-    const [isLeagueDataLoading, setIsLeagueDataLoading] = useState(false);
+  // 7-day date slider
+  const dateStrip = useMemo(() => {
+    const dates = [];
+    const today = new Date();
+    for (let i = -3; i <= 3; i++) {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      const iso = d.toISOString().split('T')[0];
+      const dayName = i === 0 ? 'Today' : i === -1 ? 'Yesterday' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayNumber = d.getDate();
+      dates.push({ iso, dayName, dayNumber });
+    }
+    return dates;
+  }, []);
 
+  const adaptFixture = (item: ApiFootballFixtureItem): UnifiedWebMatchEvent => {
+    const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(item.fixture.status.short);
+    const scoreStr =
+      item.goals.home !== null && item.goals.away !== null
+        ? `${item.goals.home} - ${item.goals.away}`
+        : undefined;
 
-    // League rankings for sorting (Advanced)
-    const leagueRankings: { [key: string]: number } = {
-        // Top Tier
-        '152': 100, // Premier League
-        '302': 95,  // La Liga
-        '175': 90,  // Bundesliga
-        '207': 85,  // Serie A
-        '168': 80,  // Ligue 1
-        '3': 110,   // UEFA Champions League
-        '4': 75,    // UEFA Europa League
-        '683': 70,  // UEFA Conference League
-        '28': 65,   // World Cup
-        '6': 60,    // Euro Championship
-
-        // Second Tier / Popular
-        '262': 55,  // Eredivisie (Netherlands)
-        '322': 50,  // Liga Portugal
-        '12': 45,   // FA Cup
-        '141': 40,  // Championship (England)
-        '10': 35,   // Copa America
-        '343': 30,  // Brazilian Serie A
-        '31': 25,   // MLS
+    return {
+      event_key: item.fixture.id,
+      event_date: item.fixture.date.split('T')[0],
+      event_time: item.fixture.date.split('T')[1]?.slice(0, 5) || '',
+      event_status: item.fixture.status.short,
+      event_live: isLiveShort ? '1' : '0',
+      event_home_team: item.teams.home.name,
+      home_team_key: item.teams.home.id,
+      home_team_logo: item.teams.home.logo,
+      event_away_team: item.teams.away.name,
+      away_team_key: item.teams.away.id,
+      away_team_logo: item.teams.away.logo,
+      event_final_result: scoreStr,
+      event_ft_result: scoreStr,
+      league_name: item.league.name,
+      league_key: item.league.id,
+      league_logo: item.league.logo,
+      country_name: item.league.country,
     };
+  };
 
-    const sortByRankAndDate = (a: FootballEvent, b: FootballEvent, ascending: boolean = true) => {
-        const rankA = leagueRankings[a.league_key] || 0;
-        const rankB = leagueRankings[b.league_key] || 0;
-
-        if (rankB !== rankA) {
-            return rankB - rankA;
+  // On-demand fetch (NO auto-refresh intervals)
+  const fetchMatches = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'standings') {
+        const res = await webApiFootballService.getStandings({ league: 39, season: new Date().getFullYear() });
+        setStandings(res || []);
+      } else {
+        let raw: ApiFootballFixtureItem[] = [];
+        if (activeTab === 'live') {
+          raw = await webApiFootballService.getLiveFixtures();
+        } else {
+          raw = await webApiFootballService.getFixturesByDate(selectedDate);
         }
-
-        // If same rank, sort by date and time
-        const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
-        const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
-        return ascending ? dateA - dateB : dateB - dateA;
-    };
-
-    const fetchMatches = async (leagueId: number | null) => {
-        setLoading(true);
-        try {
-            let fromDate: string;
-            let toDate: string;
-            const today = new Date();
-
-            if (leagueId) {
-                // Season Range
-                const currentYear = today.getFullYear();
-                const currentMonth = today.getMonth(); // 0-11
-                if (currentMonth >= 6) { // Jul - Dec
-                    fromDate = `${currentYear}-07-01`;
-                    toDate = `${currentYear + 1}-06-30`;
-                } else { // Jan - Jun
-                    fromDate = `${currentYear - 1}-07-01`;
-                    toDate = `${currentYear}-06-30`;
-                }
-            } else {
-                // Default Range (-3 days to +3 days) for All Matches to prevent API overload
-                const past = new Date(today);
-                past.setDate(past.getDate() - 3);
-                const future = new Date(today);
-                future.setDate(future.getDate() + 3);
-                fromDate = past.toISOString().split('T')[0];
-                toDate = future.toISOString().split('T')[0];
-            }
-
-            console.log(`🔄 Loading fixtures for ${leagueId ? `League ${leagueId}` : 'All Leagues'} (${fromDate} to ${toDate})...`);
-
-            const fixturesRes = await advancedFootballApi.getFixtures({
-                from: fromDate,
-                to: toDate,
-                leagueId: leagueId || undefined
-            });
-
-            // Filter upcoming and finished from fixtures
-            const allFixtures = fixturesRes?.result || [];
-
-            // Robust Status Checks
-            const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
-            const scheduledStatuses = ['Not Started', 'NS', 'Time to be defined', 'TBD', ''];
-
-            const todayStr = new Date().toISOString().split('T')[0];
-            const upcoming = allFixtures.filter((e) => {
-                const isFinished = finishedStatuses.includes(e.event_status);
-                // Strictly upcoming: Not finished and (date is today or in the future)
-                return !isFinished && e.event_date >= todayStr;
-            });
- 
-            const finished = allFixtures.filter((e) => {
-                const isFinished = finishedStatuses.includes(e.event_status);
-                // Finished or past date without live status
-                return isFinished || (e.event_date < todayStr && !scheduledStatuses.includes(e.event_status));
-            });
-
-            upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
-            finished.sort((a, b) => sortByRankAndDate(a, b, false));
-
-            setUpcomingEvents(upcoming);
-            setFinishedEvents(finished);
-
-            console.log(`✅ Loaded ${upcoming.length} upcoming and ${finished.length} finished matches`);
-
-        } catch (error) {
-            console.error('❌ Error loading fixtures:', error);
-        } finally {
-            setLoading(false);
+        if (raw && raw.length > 0) {
+          setFixtures(raw.map(adaptFixture));
+        } else {
+          setFixtures([]);
         }
-    };
+      }
+    } catch (err) {
+      console.error('[Web FootballScreen] Error loading matches:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, selectedDate]);
 
-    const loadData = async () => {
-        try {
-            const today = new Date();
-            const past = new Date(today);
-            past.setDate(past.getDate() - 7); // 7 days of results
-            const future = new Date(today);
-            future.setDate(future.getDate() + 7); // 7 days of upcoming
-            const formatDate = (date: Date) => date.toISOString().split('T')[0];
+  useEffect(() => {
+    fetchMatches();
+  }, [fetchMatches]);
 
-            console.log('🔄 Loading initial football data...');
+  const filteredFixtures = useMemo(() => {
+    let list = fixtures;
 
-            const [
-                livescoreRes,
-                fixturesRes,
-                standingsRes,
-                topscorersRes,
-                leaguesRes,
-                countriesRes,
-                posts,
-                videosRes,
-            ] = await Promise.all([
-                advancedFootballApi.getLivescore().catch(err => {
-                    console.error('❌ Livescore API error:', err);
-                    return { success: 1, result: [] };
-                }),
-                advancedFootballApi.getFixtures({
-                    from: formatDate(past),
-                    to: formatDate(future),
-                }).catch(err => {
-                    console.error('❌ Fixtures API error:', err);
-                    return { success: 1, result: [] };
-                }),
-                advancedFootballApi.getStandings(152).catch(err => {
-                    console.error('❌ Standings API error:', err);
-                    return { success: 1, result: { total: [], home: [], away: [] } };
-                }),
-                advancedFootballApi.getTopscorers(152).catch(err => {
-                    console.error('❌ Topscorers API error:', err);
-                    return { success: 1, result: [] };
-                }),
-                advancedFootballApi.getLeagues().catch(err => {
-                    console.error('❌ Leagues API error:', err);
-                    return { success: 1, result: [] };
-                }),
-                advancedFootballApi.getCountries().catch(err => {
-                    console.error('❌ Countries API error:', err);
-                    return { success: 1, result: [] };
-                }),
-                advancedFootballApi.getBlogPosts(),
-                advancedFootballApi.getVideos().catch(err => {
-                    console.error('❌ Videos API error:', err);
-                    return { success: 1, result: [] };
-                }),
-            ]);
+    if (activeTab === 'live') {
+      list = list.filter(f => f.event_live === '1');
+    } else if (activeTab === 'upcoming') {
+      list = list.filter(f => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished');
+    } else if (activeTab === 'results') {
+      list = list.filter(f => f.event_status === 'FT' || f.event_status === 'Finished');
+    }
 
-            // Robust Status Checks
-            const finishedStatuses = ['Finished', 'FT', 'AET', 'AP', 'PEN', 'Match Finished'];
-            const scheduledStatuses = ['Not Started', 'NS', 'Time to be defined', 'TBD', ''];
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        f =>
+          f.event_home_team.toLowerCase().includes(q) ||
+          f.event_away_team.toLowerCase().includes(q) ||
+          (f.league_name && f.league_name.toLowerCase().includes(q))
+      );
+    }
 
-            // Filter upcoming and finished from fixtures
-            const now = new Date();
-            const allFixtures = fixturesRes?.result || [];
-            const upcoming = allFixtures.filter((e) => {
-                // Check if status indicates upcoming
-                if (scheduledStatuses.includes(e.event_status)) return true;
+    return list;
+  }, [fixtures, activeTab, searchQuery]);
 
-                // Also check by date for robustness
-                const eventDate = new Date(`${e.event_date} ${e.event_time}`);
-                if (isNaN(eventDate.getTime())) return false;
+  // Group by league
+  const leagueGroups = useMemo(() => {
+    const groups: { [key: string]: { title: string; logo?: string; matches: UnifiedWebMatchEvent[] } } = {};
 
-                return eventDate > now && !finishedStatuses.includes(e.event_status);
-            });
-            const finished = allFixtures.filter((e) => finishedStatuses.includes(e.event_status));
-
-            const live = (livescoreRes?.result || []).sort((a, b) => sortByRankAndDate(a, b, true));
-            upcoming.sort((a, b) => sortByRankAndDate(a, b, true));
-            finished.sort((a, b) => sortByRankAndDate(a, b, false));
-
-            setLiveEvents(live);
-            setUpcomingEvents(upcoming);
-            setFinishedEvents(finished);
-            setTopscorers(topscorersRes?.result || []);
-            setLeagues(leaguesRes?.result || []);
-            setCountries(countriesRes?.result || []);
-            setBlogPosts(posts || []);
-            setVideos(videosRes?.result || []);
-
-            // Process Initial Standings (Premier League - 152) with Mobile App Logic
-            let rawStandings = standingsRes?.result?.total || [];
-
-            // Intelligent Stage Filter to remove female teams (WSL etc) from male leagues
-            let leagueSpecificStandings = rawStandings.filter(s => String(s.league_key) === '152');
-
-            // If extracting from object/array failed above, ensure we have an array
-            if (!Array.isArray(leagueSpecificStandings)) leagueSpecificStandings = [];
-
-            const groupedStandings: { [key: string]: FootballStanding[] } = {};
-
-            leagueSpecificStandings.forEach(s => {
-                let groupName = s.stage_name || 'League Table';
-
-                // Normalize variations
-                if (groupName === 'League Stage' || groupName === 'League Phase') {
-                    groupName = 'League Table';
-                }
-
-                const specificGroup = (s as any).group || (s as any).league_group;
-                const round = s.league_round;
-
-                // Priority 1: Specific Group found in hidden fields
-                if (specificGroup) {
-                    groupName = specificGroup;
-                }
-                // Priority 2: Use Round Logic
-                else if (round && round.length < 25) {
-                    if (groupName === 'Group Stage' || groupName === 'League Table') {
-                        groupName = round;
-                    } else if (round !== groupName && !groupName.includes(round)) {
-                        // Concatenate for cases like "League A" + "Group 1"
-                        groupName = `${groupName} - ${round}`;
-                    }
-                }
-
-                groupName = groupName.trim();
-
-                if (!groupedStandings[groupName]) {
-                    groupedStandings[groupName] = [];
-                }
-                groupedStandings[groupName].push(s);
-            });
-
-            // Remove generic "Group Stage" if specific groups exist
-            if (Object.keys(groupedStandings).length > 1 && groupedStandings['Group Stage']) {
-                delete groupedStandings['Group Stage'];
-            }
-
-            // Convert and Sort
-            const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
-                name,
-                teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
-            })).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-
-            setStandings(standingsData);
-
-            // Fetch teams for top leagues
-            console.log('🔄 Loading teams from top leagues...');
-            const topLeagueIds = [152, 302, 175, 207, 168]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
-            const teamsPromises = topLeagueIds.map(leagueId =>
-                advancedFootballApi.getTeams({ leagueId }).catch(err => {
-                    console.error(`❌ Teams API error for league ${leagueId}:`, err);
-                    return { success: 1, result: [] };
-                })
-            );
-
-            const teamsResponses = await Promise.all(teamsPromises);
-            const allTeams = teamsResponses.flatMap(res => res?.result || []);
-
-            // Remove duplicates based on team_key
-            const uniqueTeams = Array.from(
-                new Map(allTeams.map(team => [team.team_key, team])).values()
-            );
-
-            console.log(`✅ Loaded ${uniqueTeams.length} unique teams from ${topLeagueIds.length} leagues`);
-            setTeams(uniqueTeams);
-
-        } catch (error) {
-            console.error('❌ Critical error loading football data:', error);
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    };
-
-    const loadLeagueSpecificData = async (leagueId: number) => {
-        setIsLeagueDataLoading(true);
-        setCurrentLeagueId(leagueId);
-        try {
-            const [standingsRes, topscorersRes, teamsRes] = await Promise.all([
-                advancedFootballApi.getStandings(leagueId),
-                advancedFootballApi.getTopscorers(leagueId),
-                advancedFootballApi.getTeams({ leagueId: leagueId })
-            ]);
-
-            // Intelligent Standings Grouping Logic
-            let rawStandings: FootballStanding[] = [];
-            const result = standingsRes.result;
-            if (result) {
-                if (Array.isArray(result)) {
-                    rawStandings = result;
-                } else if (result.total && Array.isArray(result.total)) {
-                    rawStandings = result.total;
-                }
-            }
-
-            const leagueSpecificStandings = rawStandings; // Already fetched for specific league
-
-            const groupedStandings: { [key: string]: FootballStanding[] } = {};
-
-            leagueSpecificStandings.forEach(s => {
-                let groupName = s.stage_name || 'League Table';
-
-                // Normalize variations
-                if (groupName === 'League Stage' || groupName === 'League Phase') {
-                    groupName = 'League Table';
-                }
-
-                const specificGroup = (s as any).group || (s as any).league_group;
-                const round = s.league_round;
-
-                // Priority 1: Specific Group found in hidden fields
-                if (specificGroup) {
-                    groupName = specificGroup;
-                }
-                // Priority 2: Use Round Logic
-                else if (round && round.length < 25) {
-                    if (groupName === 'Group Stage' || groupName === 'League Table') {
-                        groupName = round;
-                    } else if (round !== groupName && !groupName.includes(round)) {
-                        // Concatenate for cases like "League A" + "Group 1"
-                        groupName = `${groupName} - ${round}`;
-                    }
-                }
-
-                groupName = groupName.trim();
-
-                if (!groupedStandings[groupName]) {
-                    groupedStandings[groupName] = [];
-                }
-
-                // Deduplicate: Check if team already in this group by ID or Name
-                const teamExists = groupedStandings[groupName].some(existing => 
-                    existing.team_key === s.team_key || 
-                    existing.standing_team.toLowerCase() === s.standing_team.toLowerCase()
-                );
-
-                // Position uniqueness: Check if rank already taken
-                const rankExists = groupedStandings[groupName].some(existing => 
-                    existing.standing_place === s.standing_place
-                );
-
-                if (!teamExists && !rankExists) {
-                    groupedStandings[groupName].push(s);
-                }
-            });
-
-            // Remove generic "Group Stage" if specific groups exist
-            if (Object.keys(groupedStandings).length > 1 && groupedStandings['Group Stage']) {
-                delete groupedStandings['Group Stage'];
-            }
-
-            // Convert and Sort
-            const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
-                name,
-                teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
-            })).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-
-            setStandings(standingsData);
-            setTopscorers(topscorersRes?.result || []);
-
-            // Merge new teams into existing teams list to avoid duplicates
-            if (teamsRes?.result) {
-                setTeams(prevTeams => {
-                    const teamMap = new Map(prevTeams.map(t => [t.team_key, t]));
-                    teamsRes.result.forEach(t => teamMap.set(t.team_key, t));
-                    return Array.from(teamMap.values());
-                });
-            }
-
-            console.log(`✅ Loaded league-specific data for ${leagueId}: ${standingsData.length} standings, ${topscorersRes?.result?.length || 0} scorers, ${teamsRes?.result?.length || 0} teams`);
-        } catch (error) {
-            console.error('❌ Error loading league specific data:', error);
-        } finally {
-            setIsLeagueDataLoading(false);
-        }
-    };
-
-    const isMounted = useState(false); // actually useRef is better but let's use proper hook
-    const hasMounted = useRef(false);
-
-    useEffect(() => {
-        loadData();
-    }, []);
-
-    useEffect(() => {
-        if (!hasMounted.current) {
-            hasMounted.current = true;
-            return;
-        }
-        fetchMatches(matchFilterLeagueId);
-    }, [matchFilterLeagueId]);
-
-    // Polling for live matches
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (activeTab === 'live' && !loading) {
-            console.log('⏱️ Starting live score polling (45s)...');
-            interval = setInterval(() => {
-                onRefresh();
-            }, 45000);
-        }
-        return () => {
-            if (interval) {
-                console.log('⏱️ Stopping live score polling.');
-                clearInterval(interval);
-            }
+    filteredFixtures.forEach(item => {
+      const leagueTitle = item.league_name || 'Other Matches';
+      if (!groups[leagueTitle]) {
+        groups[leagueTitle] = {
+          title: leagueTitle,
+          logo: item.league_logo,
+          matches: [],
         };
-    }, [activeTab, loading]);
+      }
+      groups[leagueTitle].matches.push(item);
+    });
 
-    const onRefresh = () => {
-        setRefreshing(true);
-        loadData();
-    };
+    return Object.values(groups);
+  }, [filteredFixtures]);
 
-    const tabs: { id: FootballTab; label: string; count?: number }[] = [
-        { id: 'live', label: 'Live', count: liveEvents?.length ?? 0 },
-        { id: 'upcoming', label: 'Upcoming', count: upcomingEvents?.length ?? 0 },
-        { id: 'results', label: 'Results', count: finishedEvents?.length ?? 0 },
-        { id: 'standings', label: 'Standings' },
-        { id: 'topscorers', label: 'Top Scorers' },
-        { id: 'news', label: 'News', count: blogPosts?.length ?? 0 },
-        { id: 'videos', label: 'Videos', count: videos?.length ?? 0 },
-        { id: 'countries', label: 'Countries', count: countries?.length ?? 0 },
-        { id: 'leagues', label: 'Leagues', count: Math.min(leagues?.length ?? 0, 70) },
-        { id: 'competitions', label: 'Competitions', count: Math.min(leagues?.length ?? 0, 70) },
-        { id: 'teams', label: 'Teams', count: teams?.length ?? 0 },
-    ];
+  const tabs: { id: FootballTab; label: string; icon: string }[] = [
+    { id: 'live', label: 'Live Matches', icon: '🔴' },
+    { id: 'upcoming', label: 'Upcoming', icon: '📅' },
+    { id: 'results', label: 'Results', icon: '✅' },
+    { id: 'standings', label: 'Standings', icon: '🏆' },
+  ];
 
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const filterData = <T extends any>(data: T[] | undefined, key: keyof T | ((item: T) => string)): T[] => {
-        if (!data) return [];
-        if (!searchQuery) return data;
-        const lowerQuery = searchQuery.toLowerCase();
-        return data.filter(item => {
-            const value = typeof key === 'function' ? key(item) : String(item[key]);
-            return value.toLowerCase().includes(lowerQuery);
-        });
-    };
-
-    const groupMatchesByLeague = (events: FootballEvent[]) => {
-        const groups: { [key: string]: { name: string; logo: string; key: string, matches: FootballEvent[] } } = {};
-
-        events.forEach(event => {
-            const leagueId = event.league_key;
-            if (!groups[leagueId]) {
-                groups[leagueId] = {
-                    name: event.league_name,
-                    logo: event.league_logo || '',
-                    key: event.league_key,
-                    matches: []
-                };
-            }
-            groups[leagueId].matches.push(event);
-        });
-
-        return Object.values(groups).sort((a, b) => {
-            const rankA = leagueRankings[a.key] || 0;
-            const rankB = leagueRankings[b.key] || 0;
-
-            if (rankB !== rankA) {
-                return rankB - rankA;
-            }
-            return a.name.localeCompare(b.name);
-        });
-    };
-
-    const topLeagueConfigs = [
-        { id: 152, name: 'EPL', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'from-purple-600' },
-        { id: 302, name: 'La Liga', icon: '🇪🇸', color: 'from-orange-500' },
-        { id: 175, name: 'Bundesliga', icon: '🇩🇪', color: 'from-red-600' },
-        { id: 207, name: 'Serie A', icon: '🇮🇹', color: 'from-blue-600' },
-        { id: 168, name: 'Ligue 1', icon: '🇫🇷', color: 'from-yellow-500' },
-        { id: 3, name: 'UCL', icon: '⭐️', color: 'from-blue-900' },
-        { id: 4, name: 'UEL', icon: '🇪🇺', color: 'from-orange-600' },
-        { id: 683, name: 'UECL', icon: '🇪🇺', color: 'from-green-600' },
-        { id: 141, name: 'Championship', icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: 'from-blue-700' },
-        { id: 262, name: 'Eredivisie', icon: '🇳🇱', color: 'from-red-500' },
-        { id: 322, name: 'Primeira Liga', icon: '🇵🇹', color: 'from-green-700' },
-        { id: 343, name: 'Serie A', icon: '🇧🇷', color: 'from-green-500' },
-        { id: 31, name: 'MLS', icon: '🇺🇸', color: 'from-blue-500' },
-    ];
-
-    const getTopLeagues = () => {
-        const leagueRankingsForSelector: { [key: string]: number } = {
-            '152': 100, '302': 95, '175': 90, '207': 85, '168': 80, '3': 110, '4': 75, '683': 70,
-            '28': 65, '6': 60, '262': 55, '322': 50, '12': 45, '141': 40, '10': 35, '343': 30, '31': 25
-        };
-
-        const leagueLogoMap = new Map(leagues.map(l => [String(l.league_key), l.league_logo]));
-
-        const enhancedTopConfigs = topLeagueConfigs.map(config => ({
-            ...config,
-            logo: leagueLogoMap.get(String(config.id)) || ''
-        }));
-
-        const otherLeagues = leagues
-            .filter(l => !topLeagueConfigs.some(hl => String(hl.id) === String(l.league_key)))
-            .sort((a, b) => {
-                const rankA = leagueRankingsForSelector[a.league_key] || 0;
-                const rankB = leagueRankingsForSelector[b.league_key] || 0;
-                if (rankA !== rankB) return rankB - rankA;
-                return a.league_name.localeCompare(b.league_name);
-            })
-            .slice(0, 50 - topLeagueConfigs.length)
-            .map(l => ({
-                id: Number(l.league_key),
-                name: l.league_name?.split(' - ')[0]?.split(' (')[0],
-                icon: '🌍',
-                color: 'from-gray-600',
-                logo: l.league_logo
-            }));
-
-        return [...enhancedTopConfigs, ...otherLeagues].sort((a, b) => {
-            const rankA = leagueRankingsForSelector[String(a.id)] || 0;
-            const rankB = leagueRankingsForSelector[String(b.id)] || 0;
-            return rankB - rankA;
-        });
-    };
-
-    const renderLeagueSelector = (selectedId: number | null, onSelect: (id: number | null) => void, showAll = true) => {
-        const topLeagues = getTopLeagues();
-        return (
-            <div className="flex gap-3 overflow-x-auto pb-6 mt-2 scrollbar-hide px-1">
-                {showAll && (
-                    <button
-                        onClick={() => onSelect(null)}
-                        className={`
-                            px-6 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 shrink-0 border uppercase tracking-wider
-                            ${selectedId === null
-                                ? 'bg-secondary text-surface border-secondary shadow-lg shadow-secondary/20 scale-105'
-                                : 'glass-card text-text-muted border-white/5 hover:border-white/20 hover:text-white'}
-                        `}
-                    >
-                        <span>🏟️</span>
-                        All Matches
-                    </button>
-                )}
-                {topLeagues.map((league) => (
-                    <button
-                        key={`league-selector-${league.id}`}
-                        onClick={() => onSelect(league.id)}
-                        className={`
-                            px-6 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 shrink-0 border uppercase tracking-wider
-                            ${selectedId === league.id
-                                ? 'bg-white text-black border-white shadow-xl shadow-white/10 scale-105'
-                                : 'glass-card text-text-muted border-white/5 hover:border-white/20 hover:text-white'}
-                        `}
-                    >
-                        <span className="text-base">{league.icon}</span>
-                        {league.name}
-                    </button>
-                ))}
-            </div>
-        );
-    };
-
-    const formatDateHeader = (dateStr: string) => {
-        if (!dateStr) return 'Unknown Date';
-        try {
-            const date = new Date(dateStr);
-            const today = new Date();
-            
-            // Reset hours to compare dates only
-            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            
-            const diffTime = d.getTime() - t.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays === 0) return 'Today';
-            if (diffDays === 1) return 'Tomorrow';
-            if (diffDays === -1) return 'Yesterday';
-
-            return date.toLocaleDateString('en-GB', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long' 
-            });
-        } catch (e) {
-            return dateStr;
-        }
-    };
-
-    const renderLeagueGroup = (group: { name: string; logo: string; key: string, matches: FootballEvent[] }, showHeader = true) => (
-        <div key={group.key} className="animate-fade-in group">
-            {/* Group Header */}
-            {showHeader && (
-                <div className="flex items-center justify-between mb-3 px-2 lg:max-w-lg lg:mx-auto">
-                    <Link
-                        href={`/leagues/${group.key}`}
-                        className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
-                    >
-                        <div className="w-8 h-8 p-1 bg-white/5 rounded-lg border border-white/10 group-hover:border-white/20 transition-colors">
-                            {group.logo ? (
-                                <img src={group.logo} alt={group.name} className="w-full h-full object-contain" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-xs">⚽</div>
-                            )}
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-black text-white uppercase tracking-wider">{group.name}</h3>
-                            <p className="text-[10px] text-text-muted font-bold tracking-widest uppercase">League Competition</p>
-                        </div>
-                    </Link>
-                    <div className="h-px flex-1 mx-4 bg-gradient-to-r from-white/10 to-transparent" />
-                </div>
-            )}
-
-            {/* Matches */}
-            <div className="space-y-2 lg:max-w-lg lg:mx-auto">
-                {group.matches.map((event, idx) => (
-                    <FootballMatchCard key={event.event_key || `${group.key}-${idx}`} event={event} hideLeague={showHeader} />
-                ))}
-            </div>
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      {/* Header Bar */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+            Football LiveScore
+          </h1>
+          <p className="text-sm text-slate-400">
+            Real-time fixtures, live match events, lineups, and league tables
+          </p>
         </div>
-    );
 
-    const renderMatchGroups = (events: FootballEvent[], type: 'live' | 'upcoming' | 'finished') => {
-        if (events.length === 0) {
+        {/* Search & Refresh */}
+        <div className="flex items-center space-x-3">
+          <div className="relative flex-1 sm:w-64">
+            <input
+              type="text"
+              placeholder="Search teams or leagues..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#141C2B] px-4 py-2.5 pl-9 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            />
+            <span className="absolute left-3 top-3 text-xs text-slate-400">🔍</span>
+          </div>
+
+          <button
+            onClick={fetchMatches}
+            className="flex items-center space-x-2 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+            title="Refresh on demand"
+          >
+            <span>🔄</span>
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-6 flex space-x-2 overflow-x-auto border-b border-white/10 pb-2">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+                isActive
+                  ? 'border border-emerald-500/50 bg-[#162234] text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Date Strip (for upcoming & results) */}
+      {activeTab !== 'live' && activeTab !== 'standings' && (
+        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
+          {dateStrip.map((item) => {
+            const isSelected = selectedDate === item.iso;
             return (
-                <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mx-auto max-w-lg mt-8 text-center animate-fade-in">
-                    <span className="text-6xl mb-6 opacity-80">
-                        {type === 'live' ? '⚽' : type === 'upcoming' ? '📅' : '🏁'}
-                    </span>
-                    <p className="text-xl font-bold text-text-primary mb-2">
-                        {type === 'live' ? 'No live matches' : type === 'upcoming' ? 'No upcoming matches' : 'No results found'}
-                    </p>
-                    <p className="text-text-muted">Try a different search term or check back later!</p>
-                </div>
+              <button
+                key={item.iso}
+                onClick={() => setSelectedDate(item.iso)}
+                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
+                  isSelected
+                    ? 'border-emerald-500 bg-emerald-500 text-slate-950 font-bold'
+                    : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
+                }`}
+              >
+                <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
+                <span className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}>
+                  {item.dayNumber}
+                </span>
+              </button>
             );
-        }
-
-        const leagueGroups = groupMatchesByLeague(events);
-
-        return (
-            <div className="space-y-8 pb-10">
-                {leagueGroups.map((group) => renderLeagueGroup(group, true))}
-            </div>
-        );
-    };
-
-    const renderSkeleton = () => (
-        <div className="p-4 space-y-4 animate-pulse">
-            <div className="h-8 w-48 bg-surfaceHighlight/50 rounded-lg mb-6" />
-            {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-32 bg-surfaceHighlight/30 rounded-xl border border-white/5" />
-            ))}
+          })}
         </div>
-    );
+      )}
 
-    const renderContent = () => {
-        if (loading) {
-            return renderSkeleton();
-        }
-
-        switch (activeTab) {
-            case 'live':
-                let filteredLive = filterData(liveEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
-                if (matchFilterLeagueId) {
-                    filteredLive = filteredLive.filter(e => String(e.league_key) === String(matchFilterLeagueId));
-                }
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <div className="flex flex-col gap-2 mb-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    <span className="inline-block w-3 h-3 bg-accent-red rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
-                                    Live Score
-                                </h2>
-                                <button
-                                    onClick={onRefresh}
-                                    disabled={refreshing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-sm font-bold text-text-primary"
-                                >
-                                    <span className={refreshing ? 'animate-spin' : ''}>🔄</span>
-                                    {refreshing ? 'Refreshing...' : 'Refresh'}
-                                </button>
-                            </div>
-                            {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
-                        </div>
-                        {renderMatchGroups(filteredLive, 'live')}
-                    </div>
-                );
-
-            case 'upcoming':
-                let filteredUpcoming = filterData(upcomingEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
-                if (matchFilterLeagueId) {
-                    filteredUpcoming = filteredUpcoming.filter(e => String(e.league_key) === String(matchFilterLeagueId));
-                }
-                const upcomingTopLeagues = getTopLeagues();
-                const currentUpcomingLeague = matchFilterLeagueId ? upcomingTopLeagues.find(l => l.id === matchFilterLeagueId) : null;
-
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <div className="flex flex-col gap-2 mb-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    {currentUpcomingLeague?.logo ? (
-                                        <div className="w-10 h-10 p-1.5 bg-white/10 rounded-lg flex items-center justify-center">
-                                            <img src={currentUpcomingLeague.logo} alt={currentUpcomingLeague.name} className="w-full h-full object-contain" />
-                                        </div>
-                                    ) : (
-                                        <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">📅</span>
-                                    )}
-                                    {currentUpcomingLeague ? `${currentUpcomingLeague.name} Fixtures` : 'Upcoming Fixtures'}
-                                </h2>
-                            </div>
-                            {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
-                        </div>
-                        {renderMatchGroups(filteredUpcoming, 'upcoming')}
-                    </div>
-                );
-
-            case 'results':
-                let filteredResults = filterData(finishedEvents, (e) => `${e.event_home_team} ${e.event_away_team} ${e.league_name}`);
-                if (matchFilterLeagueId) {
-                    filteredResults = filteredResults.filter(e => String(e.league_key) === String(matchFilterLeagueId));
-                }
-                const resultsTopLeagues = getTopLeagues();
-                const currentResultsLeague = matchFilterLeagueId ? resultsTopLeagues.find(l => l.id === matchFilterLeagueId) : null;
-
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <div className="flex flex-col gap-2 mb-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    {currentResultsLeague?.logo ? (
-                                        <div className="w-10 h-10 p-1.5 bg-white/10 rounded-lg flex items-center justify-center">
-                                            <img src={currentResultsLeague.logo} alt={currentResultsLeague.name} className="w-full h-full object-contain" />
-                                        </div>
-                                    ) : (
-                                        <span className="p-2 bg-accent-green/20 rounded-lg text-accent-green">✅</span>
-                                    )}
-                                    {currentResultsLeague ? `${currentResultsLeague.name} Results` : 'Match Results'}
-                                </h2>
-                            </div>
-                            {renderLeagueSelector(matchFilterLeagueId, setMatchFilterLeagueId)}
-                        </div>
-                        {renderMatchGroups(filteredResults, 'finished')}
-                    </div>
-                );
-
-            case 'standings':
-            case 'topscorers': {
-                const topLeagues = getTopLeagues();
-                const currentLeague = topLeagues.find(l => l.id === currentLeagueId);
-                const isStandings = activeTab === 'standings';
-                const filteredData = isStandings
-                    ? standings // Already grouped, filtering would need to happen inside groups if we added search
-                    : filterData(topscorers, (s) => s.player_name);
-
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <div className="flex flex-col gap-6 mb-8">
-                            <div className="flex items-center justify-between flex-wrap gap-4">
-                                <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                    <span className={`p-2 bg-gradient-to-br ${currentLeague?.color || 'from-gray-600'} to-surface rounded-lg text-white shadow-lg`}>
-                                        {currentLeague?.logo ? (
-                                            <img src={currentLeague.logo} alt={currentLeague.name} className="w-8 h-8 object-contain" />
-                                        ) : (
-                                            isStandings ? '🏆' : '⚽'
-                                        )}
-                                    </span>
-                                    {currentLeague?.name} {isStandings ? 'Standings' : 'Top Scorers'}
-                                </h2>
-
-                                <div className="flex gap-2 p-1 bg-white/5 rounded-full border border-white/5">
-                                    <button
-                                        onClick={() => setActiveTab('standings')}
-                                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${isStandings ? 'bg-white text-black' : 'text-text-muted hover:text-white'}`}
-                                    >
-                                        Table
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('topscorers')}
-                                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${!isStandings ? 'bg-white text-black' : 'text-text-muted hover:text-white'}`}
-                                    >
-                                        Scorers
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* League Selector */}
-                            {renderLeagueSelector(currentLeagueId, (id) => id && loadLeagueSpecificData(id), false)}
-                        </div>
-
-                        {isLeagueDataLoading ? (
-                            <div className="grid grid-cols-1 gap-4 animate-pulse">
-                                {[...Array(8)].map((_, i) => (
-                                    <div key={i} className="h-16 bg-surfaceHighlight/20 rounded-2xl" />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="animate-fade-in-up">
-                                {isStandings ? (
-                                    <div className="space-y-8">
-                                        {standings.length > 0 ? (
-                                            standings.map((group, index) => (
-                                                <div key={`standings-group-${group.name}-${index}`} className="space-y-3">
-                                                    {(standings.length > 1 || group.name !== 'League Table') && (
-                                                        <h3 className="text-xl font-bold text-white pl-4 border-l-4 border-secondary/50">{group.name}</h3>
-                                                    )}
-                                                    <div className="glass-card rounded-2xl overflow-hidden shadow-2xl border border-white/5">
-                                                        <FootballStandingsTable standings={group.teams} teams={teams} leagueId={currentLeagueId} />
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="glass-card rounded-2xl p-12 text-center text-text-muted">
-                                                No standings available.
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <FootballTopScorers scorers={filteredData as any} teams={teams} />
-                                )}
-                            </div>
-                        )}
-                    </div>
-                );
-            }
-
-            case 'news':
-                const filteredNews = filterData(blogPosts, 'title');
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">📰 Latest News</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredNews.map((post, index) => (
-                                <Link
-                                    href={`/news/${post._id}`}
-                                    key={`news-post-${post._id || index}`}
-                                    className="block h-full hover:no-underline"
-                                >
-                                    <BlogCard post={post} />
-                                </Link>
-                            ))}
-                        </div>
-                        {filteredNews.length === 0 && <p className="text-text-muted italic">No news found.</p>}
-                    </div>
-                );
-
-            case 'videos':
-                const filteredVideos = filterData(videos, (v) => `${v.video_title} ${v.video_title_full}`);
-
-                const getVideoId = (url: string) => {
-                    try {
-                        if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                            return url.split('v=')[1]?.split('&')[0] || url.split('/').pop()?.split('?')[0];
-                        }
-                    } catch (e) { return ''; }
-                    return '';
-                };
-
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">🎥 Video Highlights</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {filteredVideos.map((video, index) => {
-                                const thumb = video.video_thumbnail || (getVideoId(video.video_url || '') ? `https://img.youtube.com/vi/${getVideoId(video.video_url || '')}/mqdefault.jpg` : '');
-
-                                return (
-                                    <Link
-                                        href={`/highlights/${video._id}`}
-                                        key={`video-${video._id || video.event_key || index}`}
-                                        className="block h-full group"
-                                    >
-                                        <div className="glass-card rounded-xl overflow-hidden h-full flex flex-col transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10 border border-white/5 hover:border-blue-500/30">
-                                            <div className="relative aspect-video bg-black">
-                                                <img
-                                                    src={thumb || `https://picsum.photos/seed/${index}/600/400`}
-                                                    alt={video.video_title}
-                                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                                                />
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <div className="w-12 h-12 rounded-full bg-secondary/90 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-black/50">
-                                                        <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                                                            <path d="M8 5v14l11-7z" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                                            </div>
-                                            <div className="p-4 flex-1">
-                                                <h3 className="text-white font-bold line-clamp-1 mb-1 group-hover:text-blue-400 transition-colors">{video.video_title}</h3>
-                                                <p className="text-text-muted text-xs line-clamp-2">{video.video_title_full || 'Watch the match highlights'}</p>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                        {filteredVideos.length === 0 && <p className="text-text-muted italic">No videos found.</p>}
-                    </div>
-                );
-
-            case 'countries':
-                const filteredCountries = filterData(countries, 'country_name');
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">🌍 Countries</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {filteredCountries.map((country, index) => (
-                                <Link
-                                    href={`/countries/${country.country_key}`}
-                                    key={`country-${country.country_key || index}`}
-                                    className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
-                                >
-                                    <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
-                                        <img src={country.country_logo} alt={country.country_name} className="w-full h-full object-contain" />
-                                    </div>
-                                    <span className="font-bold text-text-primary group-hover:text-white transition-colors">{country.country_name}</span>
-                                </Link>
-                            ))}
-                        </div>
-                        {filteredCountries.length === 0 && <p className="text-text-muted italic">No countries found.</p>}
-                    </div>
-                );
-
-            case 'leagues':
-            case 'competitions':
-                const leagueRankingsForList: { [key: string]: number } = {
-                    '152': 100, '302': 95, '175': 90, '207': 85, '168': 80, '3': 110, '4': 75, '683': 70,
-                    '28': 65, '6': 60, '262': 55, '322': 50, '12': 45, '141': 40, '10': 35, '343': 30, '31': 25
-                };
-
-                const sortedLeagues = [...leagues].sort((a, b) => {
-                    const rankA = leagueRankingsForList[a.league_key] || 0;
-                    const rankB = leagueRankingsForList[b.league_key] || 0;
-                    if (rankA !== rankB) return rankB - rankA;
-                    return a.league_name.localeCompare(b.league_name);
-                }).slice(0, 70);
-
-                const filteredLeagues = filterData(sortedLeagues, (l) => `${l.league_name} ${l.country_name}`);
-
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <div className="flex items-center justify-between mb-8 px-2">
-                            <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                                <span className="p-2 bg-gradient-to-br from-secondary to-accent-yellow rounded-lg text-white shadow-lg">🏆</span>
-                                {activeTab === 'leagues' ? 'Top Leagues' : 'Top Competitions'}
-                            </h2>
-                            <div className="text-sm font-bold text-text-muted">Showing 70 Leagues</div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {filteredLeagues.map((league, index) => (
-                                <Link
-                                    href={`/leagues/${league.league_key}`}
-                                    key={`league-item-${league.league_key || index}`}
-                                    className="glass-card p-4 rounded-2xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group border border-white/5 hover:border-white/20 shadow-xl hover:shadow-2xl"
-                                >
-                                    <div className="relative w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
-                                        <img src={league.league_logo} alt={league.league_name} className="w-full h-full object-contain" />
-                                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-secondary text-surface text-[10px] font-black rounded-full flex items-center justify-center border-2 border-surface">
-                                            {index + 1}
-                                        </div>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-text-primary text-lg group-hover:text-white transition-colors truncate">{league.league_name}</h3>
-                                        <p className="text-sm text-text-muted flex items-center gap-2">
-                                            <span>{league.country_name}</span>
-                                        </p>
-                                    </div>
-                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-secondary group-hover:text-surface transition-all">
-                                        <span className="text-xl">›</span>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                        {filteredLeagues.length === 0 && (
-                            <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mt-8 text-center">
-                                <span className="text-6xl mb-6 opacity-80">🧪</span>
-                                <p className="text-xl font-bold text-text-primary mb-2">No leagues found</p>
-                                <p className="text-text-muted">Try a different search term.</p>
-                            </div>
-                        )}
-                    </div>
-                );
-
-            case 'teams':
-                const filteredTeams = filterData(teams, 'team_name');
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">👕 Teams</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {filteredTeams.map((team, index) => (
-                                <Link
-                                    href={`/teams/${team.team_key}`}
-                                    key={`team-item-${team.team_key || index}`}
-                                    className="glass-card p-6 rounded-xl flex flex-col items-center gap-4 text-center hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
-                                >
-                                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center p-4 group-hover:scale-110 transition-transform shadow-lg shadow-black/20">
-                                        <img src={team.team_logo} alt={team.team_name} className="w-full h-full object-contain" />
-                                    </div>
-                                    <span className="font-bold text-text-primary group-hover:text-white transition-colors">{team.team_name}</span>
-                                </Link>
-                            ))}
-                        </div>
-                        {filteredTeams.length === 0 && <p className="text-text-muted italic">No teams found.</p>}
-                    </div>
-                );
-
-            default:
-                return null;
-        }
-    };
-
-    return (
-        <div className="flex-1 bg-background min-h-screen">
-            {/* Header */}
-            <div className="sticky top-0 z-40 bg-surface/90 backdrop-blur-lg border-b border-white/5">
-                <div className="p-4 pt-6 max-w-7xl mx-auto">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-                        <div>
-                            <h1 className="text-3xl font-black text-white italic tracking-tighter">
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">GOAL</span>
-                                <span className="text-white">MILLS</span>
-                            </h1>
-                            <p className="text-sm text-text-muted font-medium">Premium Sports Analytics</p>
-                        </div>
-
-                        {/* Search Bar */}
-                        <div className="relative w-full md:w-96">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span className="text-text-muted">🔍</span>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder={`Search ${activeTab}...`}
-                                className="w-full bg-background border border-white/10 rounded-full py-2.5 pl-10 pr-4 text-sm text-white placeholder-text-muted focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Tabs */}
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-                        {tabs.map((tab) => (
-                            <button
-                                key={`nav-tab-${tab.id}`}
-                                onClick={() => {
-                                    setActiveTab(tab.id);
-                                    setSearchQuery(''); // Reset search on tab change
-                                }}
-                                className={`
-                                    flex items-center gap-2 px-5 py-2.5 rounded-full border 
-                                    transition-all duration-300 whitespace-nowrap text-sm font-bold tracking-wide
-                                    ${activeTab === tab.id
-                                        ? 'bg-secondary text-surface border-secondary shadow-[0_0_15px_rgba(245,158,11,0.3)] scale-105'
-                                        : 'bg-surfaceHighlight/50 border-white/5 text-text-secondary hover:bg-surfaceHighlight hover:text-white'
-                                    }
-                                    active:scale-95
-                                `}
-                            >
-                                <span>{tab.label}</span>
-                                {tab.count !== undefined && tab.count > 0 && (
-                                    <span className={`
-                                        text-[10px] px-1.5 py-0.5 rounded-full min-w-[20px] text-center
-                                        ${activeTab === tab.id
-                                            ? 'bg-surface text-secondary'
-                                            : 'bg-surface text-text-secondary'}
-                                    `}>
-                                        {tab.count}
-                                    </span>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Content */}
-            <div className="max-w-7xl mx-auto pb-20">
-                {refreshing && (
-                    <div className="flex justify-center py-6 animate-fade-in">
-                        <div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin" />
-                    </div>
+      {/* Content Area */}
+      {loading ? (
+        <div className="flex h-64 flex-col items-center justify-center space-y-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <p className="text-sm text-slate-400">Loading football data...</p>
+        </div>
+      ) : activeTab === 'standings' ? (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
+          <h2 className="mb-4 text-lg font-bold text-white">League Table Standings</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-300">
+              <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                <tr>
+                  <th className="py-3 px-2">#</th>
+                  <th className="py-3 px-4">Club</th>
+                  <th className="py-3 px-3 text-center">PL</th>
+                  <th className="py-3 px-3 text-center">W</th>
+                  <th className="py-3 px-3 text-center">D</th>
+                  <th className="py-3 px-3 text-center">L</th>
+                  <th className="py-3 px-3 text-center">GD</th>
+                  <th className="py-3 px-4 text-right">PTS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {standings.map((row) => (
+                  <tr key={row.rank} className="hover:bg-white/5">
+                    <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
+                    <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
+                      <img src={row.team.logo} alt={row.team.name} className="h-5 w-5 object-contain" />
+                      <span>{row.team.name}</span>
+                    </td>
+                    <td className="py-3 px-3 text-center">{row.all.played}</td>
+                    <td className="py-3 px-3 text-center">{row.all.win}</td>
+                    <td className="py-3 px-3 text-center">{row.all.draw}</td>
+                    <td className="py-3 px-3 text-center">{row.all.lose}</td>
+                    <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
+                    <td className="py-3 px-4 text-right font-black text-emerald-400">{row.points}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : leagueGroups.length === 0 ? (
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
+          <span className="text-4xl">⚽</span>
+          <h3 className="mt-3 text-base font-bold text-white">
+            {activeTab === 'live' ? 'No Live Matches Ongoing' : 'No Matches Found'}
+          </h3>
+          <p className="mt-1 text-xs text-slate-400 max-w-sm">
+            {activeTab === 'live'
+              ? 'Check upcoming games or select another date from the calendar.'
+              : 'Try searching for a different team or league.'}
+          </p>
+          <button
+            onClick={fetchMatches}
+            className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-emerald-400 hover:bg-slate-700"
+          >
+            Refresh Feed
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {leagueGroups.map((group) => (
+            <div key={group.title} className="space-y-3">
+              {/* League Header */}
+              <div className="flex items-center space-x-2">
+                {group.logo ? (
+                  <img src={group.logo} alt={group.title} className="h-5 w-5 object-contain" />
+                ) : (
+                  <span className="text-blue-400">🏆</span>
                 )}
-                {renderContent()}
-            </div>
+                <h2 className="text-sm font-bold text-slate-200">{group.title}</h2>
+                <span className="text-xs text-slate-500">({group.matches.length})</span>
+              </div>
 
-            {/* Quick Links / Fab handled elsewhere or can be added here if needed */}
+              {/* Match Cards Grid */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+                {group.matches.map((match) => (
+                  <FootballMatchCard key={match.event_key} event={match} hideLeague />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 }

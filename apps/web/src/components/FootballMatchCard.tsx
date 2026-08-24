@@ -1,214 +1,210 @@
 'use client';
 
-import { FootballEvent } from '@goalmills/types';
-import Image from 'next/image';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+
+export interface UnifiedWebMatchEvent {
+  event_key: string | number;
+  event_date?: string;
+  event_time?: string;
+  event_status?: string;
+  event_live?: string;
+  event_home_team: string;
+  home_team_key?: string | number;
+  home_team_logo?: string;
+  event_away_team: string;
+  away_team_key?: string | number;
+  away_team_logo?: string;
+  event_final_result?: string;
+  event_ft_result?: string;
+  league_name?: string;
+  league_key?: string | number;
+  league_logo?: string;
+  country_name?: string;
+}
 
 interface FootballMatchCardProps {
-    event: FootballEvent;
-    onPress?: () => void;
-    hideLeague?: boolean;
+  event: UnifiedWebMatchEvent;
+  onPress?: () => void;
+  hideLeague?: boolean;
 }
 
 export function FootballMatchCard({ event, onPress, hideLeague = false }: FootballMatchCardProps) {
-    const router = useRouter();
+  const router = useRouter();
 
-    const isLive = event.event_live === '1';
-    const isFinished = event.event_status?.toLowerCase() === 'finished' ||
-        event.event_status === 'FT' ||
-        event.event_status === 'AET' ||
-        event.event_status === 'AP';
-    const isUpcoming = !isLive && !isFinished;
+  const isLive =
+    event.event_live === '1' ||
+    event.event_status === '1H' ||
+    event.event_status === '2H' ||
+    event.event_status === 'HT' ||
+    event.event_status === 'ET' ||
+    event.event_status === 'P' ||
+    event.event_status === 'LIVE';
 
-    // Mock odds for live and upcoming matches
-    const mockOdds = useMemo(() => ({
-        home: (1.5 + Math.random() * 2).toFixed(2),
-        draw: (2.8 + Math.random() * 1.5).toFixed(2),
-        away: (1.8 + Math.random() * 2.5).toFixed(2),
-    }), [event.event_key]);
+  const isFinished =
+    event.event_status?.toLowerCase() === 'finished' ||
+    event.event_status === 'FT' ||
+    event.event_status === 'AET' ||
+    event.event_status === 'AP' ||
+    event.event_status === 'PEN';
 
-    const handleCardClick = () => {
-        if (onPress) {
-            onPress();
-        } else {
-            router.push(`/matches/${event.event_key}`);
-        }
-    };
+  const isUpcoming = !isLive && !isFinished;
 
-    // Helper to get local time from UTC
-    const getLocalTime = (date: string, time: string) => {
-        if (!date || !time) return time;
-        try {
-            const utcDate = new Date(`${date}T${time}Z`);
-            if (isNaN(utcDate.getTime())) return time;
-            return utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-        } catch (e) {
-            return time;
-        }
-    };
+  const formattedKickoff = useMemo(() => {
+    if (!event.event_time && !event.event_date) return 'TBD';
+    if (event.event_time) {
+      return event.event_time.slice(0, 5);
+    }
+    return event.event_date;
+  }, [event.event_time, event.event_date]);
 
-    const getStatusDisplay = () => {
-        if (isLive) {
-            if (!isNaN(Number(event.event_status))) {
-                return `${event.event_status}'`;
-            }
-            return 'LIVE';
-        }
-        if (isFinished) {
-            return event.event_status === 'Finished' ? 'FT' : event.event_status;
-        }
-        return getLocalTime(event.event_date, event.event_time) || event.event_status;
-    };
+  const statusDisplay = useMemo(() => {
+    if (isLive) {
+      if (event.event_status === 'HT') return 'HT';
+      if (!isNaN(Number(event.event_status))) return `${event.event_status}'`;
+      return 'LIVE';
+    }
+    if (isFinished) {
+      return event.event_status === 'Finished' ? 'FT' : event.event_status || 'FT';
+    }
+    return formattedKickoff;
+  }, [isLive, isFinished, event.event_status, formattedKickoff]);
 
-    const getScoreDisplay = () => {
-        if (isFinished) {
-            return event.event_final_result || event.event_ft_result;
-        }
-        if (isLive) {
-            return event.event_final_result || '0 - 0';
-        }
-        return 'vs';
-    };
+  const scoreDisplay = useMemo(() => {
+    if (isFinished || isLive) {
+      if (event.event_final_result && event.event_final_result !== '-') {
+        return event.event_final_result;
+      }
+      if (event.event_ft_result && event.event_ft_result !== '-') {
+        return event.event_ft_result;
+      }
+      return '0 - 0';
+    }
+    return 'vs';
+  }, [isFinished, isLive, event.event_final_result, event.event_ft_result]);
 
-    const statusBgColor = isLive
-        ? 'bg-red-500'
-        : isFinished
-            ? 'bg-slate-500'
-            : 'bg-blue-500';
+  const handleClick = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/matches/${event.event_key}`);
+    }
+  };
 
-    return (
-        <div
-            onClick={handleCardClick}
-            className={`
-                group relative overflow-hidden rounded-lg p-3 mb-2 cursor-pointer
-                transition-all duration-200 w-full lg:max-w-lg lg:mx-auto
-                ${isLive
-                    ? 'bg-red-500/[0.08] border border-amber-500/60 hover:bg-red-500/[0.12]'
-                    : 'bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]'
-                }
-            `}
-            style={{ backdropFilter: 'blur(4px)' }}
-        >
-            {/* League Info Header */}
-            {!hideLeague && (
-                <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-white/[0.05]">
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1.5 flex-1 min-w-0"
-                    >
-                        <Link
-                            href={`/leagues/${event.league_key}`}
-                            className="flex items-center gap-1.5 hover:opacity-80 transition-opacity min-w-0"
-                        >
-                            {event.league_logo && (
-                                <Image
-                                    src={event.league_logo}
-                                    alt={event.league_name || 'League'}
-                                    width={16}
-                                    height={16}
-                                    className="object-contain rounded-sm flex-shrink-0"
-                                />
-                            )}
-                            <span className="text-[11px] font-semibold text-blue-400 truncate">
-                                {event.league_name}
-                            </span>
-                        </Link>
-                    </div>
-                    {isLive && (
-                        <div className="flex items-center gap-1 bg-red-500 px-2 py-0.5 rounded-full flex-shrink-0">
-                            <span className="relative flex h-1 w-1">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-1 w-1 bg-white"></span>
-                            </span>
-                            <span className="text-[9px] font-bold text-white tracking-wider">LIVE</span>
-                        </div>
-                    )}
-                </div>
+  return (
+    <div
+      onClick={handleClick}
+      className={`group relative cursor-pointer rounded-xl border p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+        isLive
+          ? 'border-emerald-500/40 bg-[#162234] shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+          : 'border-white/10 bg-[#141C2B] hover:border-white/20'
+      }`}
+    >
+      {/* League Header */}
+      {!hideLeague && (
+        <div className="mb-3 flex items-center justify-between border-b border-white/5 pb-2 text-xs">
+          <div className="flex items-center space-x-2 truncate">
+            {event.league_logo ? (
+              <img
+                src={event.league_logo}
+                alt={event.league_name || 'League'}
+                className="h-4 w-4 object-contain"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              <span className="text-blue-400">🏆</span>
             )}
+            <span className="font-semibold text-slate-400 truncate">
+              {event.league_name || 'Football'}
+            </span>
+          </div>
 
-            {/* Match Info Row */}
-            <div className="flex items-center justify-between mb-1.5">
-                {/* Home Team */}
-                <Link
-                    href={`/teams/${event.home_team_key}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-1 flex items-center gap-2 min-w-0 hover:opacity-80 transition-opacity"
-                >
-                    {event.home_team_logo && (
-                        <div className="w-7 h-7 flex-shrink-0">
-                            <Image
-                                src={event.home_team_logo}
-                                alt={event.event_home_team || 'Home'}
-                                width={28}
-                                height={28}
-                                className="object-contain"
-                            />
-                        </div>
-                    )}
-                    <span className="text-sm font-semibold text-white truncate">
-                        {event.event_home_team}
-                    </span>
-                </Link>
-
-                {/* Score / Status Center */}
-                <div className="flex flex-col items-center justify-center px-2 min-w-[60px]">
-                    <div className={`${statusBgColor} px-2 py-0.5 rounded-full min-w-[40px] text-center`}>
-                        <span className="text-[9px] font-bold text-white tracking-wide">
-                            {getStatusDisplay()}
-                        </span>
-                    </div>
-                    <span className={`text-lg font-extrabold mt-0.5 ${isLive ? 'text-red-400' : 'text-white'}`}>
-                        {isLive ? (event.event_final_result || getScoreDisplay()) : getScoreDisplay()}
-                    </span>
-                    {!isLive && event.event_date && (
-                        <span className="text-[8px] text-slate-400 font-medium">
-                            {event.event_date}
-                        </span>
-                    )}
-                </div>
-
-                {/* Away Team */}
-                <Link
-                    href={`/teams/${event.away_team_key}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-1 flex items-center gap-2 justify-end min-w-0 hover:opacity-80 transition-opacity"
-                >
-                    <span className="text-sm font-semibold text-white truncate text-right">
-                        {event.event_away_team}
-                    </span>
-                    {event.away_team_logo && (
-                        <div className="w-7 h-7 flex-shrink-0">
-                            <Image
-                                src={event.away_team_logo}
-                                alt={event.event_away_team || 'Away'}
-                                width={28}
-                                height={28}
-                                className="object-contain"
-                            />
-                        </div>
-                    )}
-                </Link>
-            </div>
-
-            {/* Odds Row - Only for Live and Upcoming */}
-            {(isLive || isUpcoming) && (
-                <div className="flex gap-1.5 pt-1.5 border-t border-white/[0.05]">
-                    <div className="flex-1 flex flex-col items-center bg-white/[0.05] border border-white/[0.1] rounded py-1">
-                        <span className="text-[10px] font-semibold text-slate-400 mb-0.5">1</span>
-                        <span className="text-xs font-bold text-blue-400">{mockOdds.home}</span>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center bg-white/[0.05] border border-white/[0.1] rounded py-1">
-                        <span className="text-[10px] font-semibold text-slate-400 mb-0.5">X</span>
-                        <span className="text-xs font-bold text-blue-400">{mockOdds.draw}</span>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center bg-white/[0.05] border border-white/[0.1] rounded py-1">
-                        <span className="text-[10px] font-semibold text-slate-400 mb-0.5">2</span>
-                        <span className="text-xs font-bold text-blue-400">{mockOdds.away}</span>
-                    </div>
-                </div>
-            )}
+          {/* Status Badge */}
+          {isLive ? (
+            <span className="flex items-center space-x-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              <span>{statusDisplay}</span>
+            </span>
+          ) : (
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                isFinished
+                  ? 'bg-slate-700/50 text-slate-400'
+                  : 'bg-white/5 text-slate-300'
+              }`}
+            >
+              {statusDisplay}
+            </span>
+          )}
         </div>
-    );
+      )}
+
+      {/* Match Body */}
+      <div className="flex items-center justify-between">
+        {/* Home Team */}
+        <div className="flex flex-1 items-center space-x-3">
+          {event.home_team_logo ? (
+            <img
+              src={event.home_team_logo}
+              alt={event.event_home_team}
+              className="h-9 w-9 object-contain"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-xs text-slate-400">
+              🛡️
+            </div>
+          )}
+          <span className="text-sm font-bold text-slate-100 line-clamp-1">
+            {event.event_home_team}
+          </span>
+        </div>
+
+        {/* Center Score */}
+        <div className="mx-4 flex flex-col items-center justify-center min-w-[70px]">
+          {isUpcoming ? (
+            <span className="rounded border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-300">
+              {formattedKickoff}
+            </span>
+          ) : (
+            <div className="rounded bg-black/30 px-3 py-1 text-center">
+              <span
+                className={`text-lg font-black tracking-wider ${
+                  isLive ? 'text-emerald-400' : 'text-slate-100'
+                }`}
+              >
+                {scoreDisplay}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Away Team */}
+        <div className="flex flex-1 items-center justify-end space-x-3 text-right">
+          <span className="text-sm font-bold text-slate-100 line-clamp-1">
+            {event.event_away_team}
+          </span>
+          {event.away_team_logo ? (
+            <img
+              src={event.away_team_logo}
+              alt={event.event_away_team}
+              className="h-9 w-9 object-contain"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-xs text-slate-400">
+              🛡️
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
