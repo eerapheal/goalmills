@@ -20,6 +20,7 @@ android/
 ios/
 
 # Misc
+apps/apps/
 .DS_Store
 *.pem
 .env*.local
