@@ -1,285 +1,319 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { BasketballEvent } from '@goalmills/types';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { router } from 'expo-router';
+import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
+import { Ionicons } from '@expo/vector-icons';
+import { ApiBasketballGameItem } from '../services/basketballApi';
 
 interface BasketballMatchCardProps {
-    match: BasketballEvent;
+  match: ApiBasketballGameItem;
+  onPress?: () => void;
+  hideLeague?: boolean;
 }
 
-export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({ match }) => {
-    const isLive = match.event_live === '1';
-    const isFinished = match.event_status === 'Finished';
-    const isUpcoming = !isLive && !isFinished;
+export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
+  match,
+  onPress,
+  hideLeague = false,
+}) => {
+  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(
+    match.status.short
+  );
+  const isFinished = ['FT', 'AOT'].includes(match.status.short);
+  const isUpcoming = !isLive && !isFinished;
 
-    const handlePress = () => {
-        router.push(`/home/basketball/matches/${match.event_key}`);
-    };
+  const handleCardPress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/home/basketball/matches/${match.id}`);
+    }
+  };
 
-    const handleTeamPress = (teamKey: string, e: any) => {
-        e.stopPropagation();
-        router.push(`/home/basketball/teams/${teamKey}`);
-    };
+  const getStatusText = () => {
+    if (isLive) {
+      if (match.status.timer) return `${match.status.short} ${match.status.timer}`;
+      return match.status.short || 'LIVE';
+    }
+    if (isFinished) {
+      return match.status.short === 'AOT' ? 'FT (OT)' : 'FT';
+    }
+    return match.time || 'TBD';
+  };
 
-    return (
-        <TouchableOpacity style={styles.card} onPress={handlePress}>
-            {/* League Info */}
-            <View style={styles.header}>
-                <Text style={styles.leagueName}>{match.league_name}</Text>
-                {isLive && (
-                    <View style={styles.liveBadge}>
-                        <View style={styles.liveDot} />
-                        <Text style={styles.liveText}>LIVE</Text>
-                    </View>
-                )}
-                {isFinished && (
-                    <Text style={styles.finishedText}>FT</Text>
-                )}
-            </View>
-
-            {/* Match Info */}
-            <View style={styles.matchContainer}>
-                {/* Home Team */}
-                <TouchableOpacity
-                    style={styles.teamContainer}
-                    onPress={(e) => handleTeamPress(match.home_team_key, e)}
-                >
-                    <View style={styles.teamRow}>
-                        {match.event_home_team_logo ? (
-                            <Image source={{ uri: match.event_home_team_logo }} style={styles.teamLogo} />
-                        ) : (
-                            <View style={styles.teamLogoPlaceholder} />
-                        )}
-                        <Text style={styles.teamName} numberOfLines={1}>{match.event_home_team}</Text>
-                    </View>
-                </TouchableOpacity>
-
-                {/* Score or Time */}
-                <View style={styles.scoreContainer}>
-                    {isUpcoming ? (
-                        <Text style={styles.timeText}>{match.event_time}</Text>
-                    ) : (
-                        <View style={styles.scoreBox}>
-                            <Text style={styles.scoreText}>{match.event_final_result}</Text>
-                            {isLive && match.event_quarter && (
-                                <Text style={styles.quarterText}>{match.event_quarter}</Text>
-                            )}
-                        </View>
-                    )}
-                </View>
-
-                {/* Away Team */}
-                <TouchableOpacity
-                    style={styles.teamContainer}
-                    onPress={(e) => handleTeamPress(match.away_team_key, e)}
-                >
-                    <View style={styles.teamRow}>
-                        {match.event_away_team_logo ? (
-                            <Image source={{ uri: match.event_away_team_logo }} style={styles.teamLogo} />
-                        ) : (
-                            <View style={styles.teamLogoPlaceholder} />
-                        )}
-                        <Text style={styles.teamName} numberOfLines={1}>{match.event_away_team}</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-
-            {/* Quarter Scores for Finished/Live matches */}
-            {(isLive || isFinished) && match.scores && (
-                <View style={styles.quartersContainer}>
-                    <View style={styles.quarterRow}>
-                        <Text style={styles.quarterLabel}>Q1</Text>
-                        <Text style={styles.quarterLabel}>Q2</Text>
-                        <Text style={styles.quarterLabel}>Q3</Text>
-                        <Text style={styles.quarterLabel}>Q4</Text>
-                        {match.scores.Overtime && <Text style={styles.quarterLabel}>OT</Text>}
-                    </View>
-                    <View style={styles.quarterRow}>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['1stQuarter']?.[0]?.score_home || '-'}
-                        </Text>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['2ndQuarter']?.[0]?.score_home || '-'}
-                        </Text>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['3rdQuarter']?.[0]?.score_home || '-'}
-                        </Text>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['4thQuarter']?.[0]?.score_home || '-'}
-                        </Text>
-                        {match.scores.Overtime && (
-                            <Text style={styles.quarterScore}>
-                                {match.scores.Overtime[0]?.score_home || '-'}
-                            </Text>
-                        )}
-                    </View>
-                    <View style={styles.quarterRow}>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['1stQuarter']?.[0]?.score_away || '-'}
-                        </Text>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['2ndQuarter']?.[0]?.score_away || '-'}
-                        </Text>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['3rdQuarter']?.[0]?.score_away || '-'}
-                        </Text>
-                        <Text style={styles.quarterScore}>
-                            {match.scores['4thQuarter']?.[0]?.score_away || '-'}
-                        </Text>
-                        {match.scores.Overtime && (
-                            <Text style={styles.quarterScore}>
-                                {match.scores.Overtime[0]?.score_away || '-'}
-                            </Text>
-                        )}
-                    </View>
-                </View>
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.card,
+        isLive && styles.liveCard,
+        pressed && styles.cardPressed,
+      ]}
+      onPress={handleCardPress}
+    >
+      {/* League Header */}
+      {!hideLeague && (
+        <View style={styles.header}>
+          <View style={styles.leagueInfo}>
+            {match.league.logo ? (
+              <Image
+                source={{ uri: match.league.logo }}
+                style={styles.leagueLogo}
+                resizeMode="contain"
+              />
+            ) : (
+              <Ionicons name="basketball-outline" size={14} color="#F97316" />
             )}
+            <Text style={styles.leagueName} numberOfLines={1}>
+              {match.league.name}
+            </Text>
+          </View>
 
-            {/* Date for upcoming matches */}
-            {isUpcoming && (
-                <View style={styles.footer}>
-                    <Text style={styles.dateText}>{new Date(match.event_date).toLocaleDateString()}</Text>
-                </View>
-            )}
-        </TouchableOpacity>
-    );
+          {/* Status Badge */}
+          <View style={[styles.statusBadge, isLive && styles.liveStatusBadge]}>
+            {isLive && <View style={styles.livePulse} />}
+            <Text style={[styles.statusText, isLive && styles.liveStatusText]}>
+              {getStatusText()}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {/* Main Teams Row */}
+      <View style={styles.matchContent}>
+        {/* Home Team */}
+        <View style={styles.teamRow}>
+          {match.teams.home.logo ? (
+            <Image
+              source={{ uri: match.teams.home.logo }}
+              style={styles.teamLogo}
+              resizeMode="contain"
+            />
+          ) : (
+            <View style={styles.fallbackLogo}>
+              <Ionicons name="shield-outline" size={14} color="#94A3B8" />
+            </View>
+          )}
+          <Text style={styles.teamName} numberOfLines={1}>
+            {match.teams.home.name}
+          </Text>
+          <Text
+            style={[
+              styles.teamScore,
+              isLive && styles.liveScoreText,
+              isFinished &&
+                (match.scores.home.total || 0) > (match.scores.away.total || 0) &&
+                styles.winningScore,
+            ]}
+          >
+            {isUpcoming ? '-' : match.scores.home.total ?? 0}
+          </Text>
+        </View>
+
+        {/* Away Team */}
+        <View style={[styles.teamRow, { marginTop: 6 }]}>
+          {match.teams.away.logo ? (
+            <Image
+              source={{ uri: match.teams.away.logo }}
+              style={styles.teamLogo}
+              resizeMode="contain"
+            />
+          ) : (
+            <View style={styles.fallbackLogo}>
+              <Ionicons name="shield-outline" size={14} color="#94A3B8" />
+            </View>
+          )}
+          <Text style={styles.teamName} numberOfLines={1}>
+            {match.teams.away.name}
+          </Text>
+          <Text
+            style={[
+              styles.teamScore,
+              isLive && styles.liveScoreText,
+              isFinished &&
+                (match.scores.away.total || 0) > (match.scores.home.total || 0) &&
+                styles.winningScore,
+            ]}
+          >
+            {isUpcoming ? '-' : match.scores.away.total ?? 0}
+          </Text>
+        </View>
+      </View>
+
+      {/* Quarters breakdown (if live or finished) */}
+      {!isUpcoming && (
+        <View style={styles.quartersFooter}>
+          <View style={styles.quarterColumn}>
+            <Text style={styles.quarterLabel}>Q1</Text>
+            <Text style={styles.quarterScore}>
+              {match.scores.home.quarter_1 ?? '-'}:{match.scores.away.quarter_1 ?? '-'}
+            </Text>
+          </View>
+          <View style={styles.quarterColumn}>
+            <Text style={styles.quarterLabel}>Q2</Text>
+            <Text style={styles.quarterScore}>
+              {match.scores.home.quarter_2 ?? '-'}:{match.scores.away.quarter_2 ?? '-'}
+            </Text>
+          </View>
+          <View style={styles.quarterColumn}>
+            <Text style={styles.quarterLabel}>Q3</Text>
+            <Text style={styles.quarterScore}>
+              {match.scores.home.quarter_3 ?? '-'}:{match.scores.away.quarter_3 ?? '-'}
+            </Text>
+          </View>
+          <View style={styles.quarterColumn}>
+            <Text style={styles.quarterLabel}>Q4</Text>
+            <Text style={styles.quarterScore}>
+              {match.scores.home.quarter_4 ?? '-'}:{match.scores.away.quarter_4 ?? '-'}
+            </Text>
+          </View>
+          {match.scores.home.over_time !== null && (
+            <View style={styles.quarterColumn}>
+              <Text style={styles.quarterLabel}>OT</Text>
+              <Text style={styles.quarterScore}>
+                {match.scores.home.over_time}:{match.scores.away.over_time}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+    </Pressable>
+  );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        backgroundColor: '#1a1f3a',
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    leagueName: {
-        color: '#8b92b0',
-        fontSize: 12,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-    },
-    liveBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#dc2626',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
-    },
-    liveDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#fff',
-        marginRight: 4,
-    },
-    liveText: {
-        color: '#fff',
-        fontSize: 10,
-        fontWeight: '700',
-    },
-    finishedText: {
-        color: '#8b92b0',
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    matchContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    teamContainer: {
-        flex: 1,
-    },
-    teamRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    teamLogo: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        marginRight: 8,
-    },
-    teamLogoPlaceholder: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: '#2a3150',
-        marginRight: 8,
-    },
-    teamName: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
-        flex: 1,
-    },
-    scoreContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-    },
-    scoreBox: {
-        alignItems: 'center',
-    },
-    scoreText: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: '700',
-    },
-    quarterText: {
-        color: '#f59e0b',
-        fontSize: 10,
-        fontWeight: '600',
-        marginTop: 2,
-    },
-    timeText: {
-        color: '#8b92b0',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    quartersContainer: {
-        marginTop: 12,
-        paddingTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#2a3150',
-    },
-    quarterRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 4,
-    },
-    quarterLabel: {
-        color: '#8b92b0',
-        fontSize: 11,
-        fontWeight: '600',
-        width: 40,
-        textAlign: 'center',
-    },
-    quarterScore: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: '600',
-        width: 40,
-        textAlign: 'center',
-    },
-    footer: {
-        marginTop: 8,
-        paddingTop: 8,
-        borderTopWidth: 1,
-        borderTopColor: '#2a3150',
-    },
-    dateText: {
-        color: '#8b92b0',
-        fontSize: 12,
-        textAlign: 'center',
-    },
+  card: {
+    backgroundColor: '#141C2B',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: SPACING.sm,
+  },
+  liveCard: {
+    borderColor: 'rgba(249, 115, 22, 0.4)',
+    backgroundColor: '#1A2333',
+  },
+  cardPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.99 }],
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    paddingBottom: 8,
+    marginBottom: 10,
+  },
+  leagueInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
+  leagueLogo: {
+    width: 16,
+    height: 16,
+    marginRight: 6,
+  },
+  leagueName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94A3B8',
+    flex: 1,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: BORDER_RADIUS.full,
+    gap: 4,
+  },
+  liveStatusBadge: {
+    backgroundColor: 'rgba(249, 115, 22, 0.2)',
+    borderColor: '#F97316',
+    borderWidth: 1,
+  },
+  livePulse: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#F97316',
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
+  liveStatusText: {
+    color: '#F97316',
+  },
+  matchContent: {
+    paddingVertical: 2,
+  },
+  teamRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  teamLogo: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  fallbackLogo: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  teamName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#F8FAFC',
+  },
+  teamScore: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#94A3B8',
+    minWidth: 32,
+    textAlign: 'right',
+  },
+  winningScore: {
+    color: '#F8FAFC',
+    fontWeight: '900',
+  },
+  liveScoreText: {
+    color: '#F97316',
+    fontWeight: '900',
+  },
+  quartersFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  quarterColumn: {
+    alignItems: 'center',
+  },
+  quarterLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
+  quarterScore: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#94A3B8',
+    marginTop: 1,
+  },
 });

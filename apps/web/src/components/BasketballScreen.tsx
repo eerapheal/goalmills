@@ -1,258 +1,302 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { BasketballEvent, BasketballLeague, BasketballStanding } from '@goalmills/types';
-import { basketballApi } from '../services/basketballApi';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { BasketballMatchCard } from './BasketballMatchCard';
-import Link from 'next/link';
+import {
+  webBasketballApiService,
+  ApiBasketballGameItem,
+} from '../services/basketballApi';
 
-type BasketballTab = 'live' | 'upcoming' | 'results' | 'leagues' | 'standings';
+type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export function BasketballScreen() {
-    const [activeTab, setActiveTab] = useState<BasketballTab>('live');
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<BasketballTab>('live');
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split('T')[0]
+  );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [games, setGames] = useState<ApiBasketballGameItem[]>([]);
+  const [standings, setStandings] = useState<any[]>([]);
 
-    const [liveMatches, setLiveMatches] = useState<BasketballEvent[]>([]);
-    const [upcomingMatches, setUpcomingMatches] = useState<BasketballEvent[]>([]);
-    const [recentMatches, setRecentMatches] = useState<BasketballEvent[]>([]);
-    const [leagues, setLeagues] = useState<BasketballLeague[]>([]);
-    const [standings, setStandings] = useState<BasketballStanding[]>([]);
-    const [odds, setOdds] = useState<any>({});
+  // 7-day date slider
+  const dateStrip = useMemo(() => {
+    const dates = [];
+    const today = new Date();
+    for (let i = -3; i <= 3; i++) {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      const iso = d.toISOString().split('T')[0];
+      const dayName =
+        i === 0
+          ? 'Today'
+          : i === -1
+          ? 'Yesterday'
+          : i === 1
+          ? 'Tomorrow'
+          : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayNumber = d.getDate();
+      dates.push({ iso, dayName, dayNumber });
+    }
+    return dates;
+  }, []);
 
-    const loadData = async () => {
-        try {
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-
-            const [live, fixtures, results, leaguesData, standingsData, oddsData] = await Promise.all([
-                basketballApi.getLivescore({}),
-                basketballApi.getFixtures({ from: tomorrow, to: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0] }),
-                basketballApi.getFixtures({ from: yesterday, to: yesterday }),
-                basketballApi.getLeagues({}),
-                basketballApi.getStandings({ leagueId: 1 }),
-                basketballApi.getOdds({})
-            ]);
-
-            setLiveMatches(Array.isArray(live.result) ? live.result : []);
-            setUpcomingMatches(Array.isArray(fixtures.result) ? fixtures.result : []);
-            setRecentMatches(Array.isArray(results.result) ? results.result : []);
-            setLeagues(Array.isArray(leaguesData.result) ? leaguesData.result : []);
-            const rawStandings = standingsData.result?.total || [];
-            const uniqueStandings = rawStandings.reduce((acc: any[], curr: any) => {
-                if (!acc.some(item => item.team_key === curr.team_key)) {
-                    acc.push(curr);
-                }
-                return acc;
-            }, []);
-            setStandings(uniqueStandings);
-            setOdds(oddsData.result && typeof oddsData.result === 'object' ? oddsData.result : {});
-        } catch (error) {
-            console.error('Error loading basketball data:', error);
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
+  const fetchGames = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'standings') {
+        // NBA (League ID: 12) default standings
+        const res = await webBasketballApiService.getStandings({
+          league: 12,
+          season: '2023-2024',
+        });
+        setStandings(res || []);
+      } else {
+        let raw: ApiBasketballGameItem[] = [];
+        if (activeTab === 'live') {
+          raw = await webBasketballApiService.getLiveGames();
+        } else {
+          raw = await webBasketballApiService.getGamesByDate(selectedDate);
         }
-    };
+        setGames(raw || []);
+      }
+    } catch (err) {
+      console.error('[Web BasketballScreen] Error loading games:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, selectedDate]);
 
-    useEffect(() => {
-        loadData();
-    }, []);
+  useEffect(() => {
+    fetchGames();
+  }, [fetchGames]);
 
-    const onRefresh = () => {
-        setRefreshing(true);
-        loadData();
-    };
+  const filteredGames = useMemo(() => {
+    let list = games;
 
-    const tabs: { id: BasketballTab; label: string; count?: number }[] = [
-        { id: 'live', label: 'Live', count: liveMatches.length },
-        { id: 'upcoming', label: 'Upcoming', count: upcomingMatches.length },
-        { id: 'results', label: 'Results', count: recentMatches.length },
-        { id: 'leagues', label: 'Leagues' },
-        { id: 'standings', label: 'Standings' },
-    ];
+    if (activeTab === 'live') {
+      list = list.filter((g) =>
+        ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(g.status.short)
+      );
+    } else if (activeTab === 'upcoming') {
+      list = list.filter(
+        (g) =>
+          !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(
+            g.status.short
+          )
+      );
+    } else if (activeTab === 'results') {
+      list = list.filter((g) => ['FT', 'AOT'].includes(g.status.short));
+    }
 
-    const renderContent = () => {
-        if (loading) {
-            return (
-                <div className="flex flex-col items-center justify-center p-12 animate-pulse">
-                    <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4" />
-                    <p className="text-text-secondary font-medium tracking-wide">Loading basketball data...</p>
-                </div>
-            );
-        }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (g) =>
+          g.teams.home.name.toLowerCase().includes(q) ||
+          g.teams.away.name.toLowerCase().includes(q) ||
+          g.league.name.toLowerCase().includes(q)
+      );
+    }
 
-        switch (activeTab) {
-            case 'live':
-                return (
-                    <div className="p-4 space-y-2 animate-fade-in">
-                        {liveMatches.length > 0 ? (
-                            <>
-                                <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
-                                    <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                                    Live Matches
-                                </h2>
-                                {liveMatches.map((match) => (
-                                    <BasketballMatchCard key={match.event_key} match={match} odds={odds[match.event_key]} />
-                                ))}
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center p-12 glass-card rounded-2xl mx-auto max-w-lg mt-8 text-center">
-                                <span className="text-6xl mb-6 opacity-80">🏀</span>
-                                <p className="text-xl font-bold text-text-primary mb-2">No live matches right now</p>
-                                <p className="text-text-muted">Check out Upcoming or Results to stay updated!</p>
-                            </div>
-                        )}
-                    </div>
-                );
+    return list;
+  }, [games, activeTab, searchQuery]);
 
-            case 'upcoming':
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">📅 Upcoming Matches</h2>
-                        {upcomingMatches.map((match) => (
-                            <BasketballMatchCard key={match.event_key} match={match} odds={odds[match.event_key]} />
-                        ))}
-                        {upcomingMatches.length === 0 && (
-                            <p className="text-text-muted text-center py-8">No upcoming matches found.</p>
-                        )}
-                    </div>
-                );
+  // Group by league
+  const leagueGroups = useMemo(() => {
+    const groups: {
+      [key: string]: { title: string; logo?: string; games: ApiBasketballGameItem[] };
+    } = {};
 
-            case 'results':
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">✅ Recent Results</h2>
-                        {recentMatches.map((match) => (
-                            <BasketballMatchCard key={match.event_key} match={match} />
-                        ))}
-                        {recentMatches.length === 0 && (
-                            <p className="text-text-muted text-center py-8">No recent results found.</p>
-                        )}
-                    </div>
-                );
+    filteredGames.forEach((game) => {
+      const leagueTitle = game.league.name || 'Other Competitions';
+      if (!groups[leagueTitle]) {
+        groups[leagueTitle] = {
+          title: leagueTitle,
+          logo: game.league.logo,
+          games: [],
+        };
+      }
+      groups[leagueTitle].games.push(game);
+    });
 
-            case 'leagues':
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">🏆 Leagues</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {leagues.map((league) => (
-                                <Link
-                                    href={`/basketball/leagues/${league.league_key}`}
-                                    key={league.league_key}
-                                    className="glass-card rounded-xl p-4 hover:border-white/20 transition-all cursor-pointer block group"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="font-bold text-white mb-1 group-hover:text-yellow-500 transition-colors">{league.league_name}</h3>
-                                            <p className="text-xs text-text-secondary">{league.country_name}</p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                );
+    return Object.values(groups);
+  }, [filteredGames]);
 
-            case 'standings':
-                return (
-                    <div className="p-4 animate-fade-in">
-                        <h2 className="text-xl font-bold text-text-primary mb-6">📊 NBA Standings</h2>
-                        <div className="glass-card rounded-xl overflow-hidden">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-white/5 bg-white/5 text-xs text-text-muted uppercase">
-                                        <th className="p-4 w-16">#</th>
-                                        <th className="p-4">Team</th>
-                                        <th className="p-4 text-center">W</th>
-                                        <th className="p-4 text-center">L</th>
-                                        <th className="p-4 text-center">PCT</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {standings.map((team) => (
-                                        <tr key={team.team_key} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                            <td className="p-4 font-bold text-text-primary">{team.standing_place}</td>
-                                            <td className="p-4">
-                                                <Link
-                                                    href={`/basketball/teams/${team.team_key}`}
-                                                    className="font-bold text-white hover:text-yellow-500 transition-colors"
-                                                >
-                                                    {team.standing_team}
-                                                </Link>
-                                            </td>
-                                            <td className="p-4 text-center font-bold text-green-500">{team.standing_W}</td>
-                                            <td className="p-4 text-center font-bold text-red-500">{team.standing_L}</td>
-                                            <td className="p-4 text-center font-bold text-yellow-500">{team.standing_PCT}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                );
+  const tabs: { id: BasketballTab; label: string; icon: string }[] = [
+    { id: 'live', label: 'Live Games', icon: '🔴' },
+    { id: 'upcoming', label: 'Upcoming', icon: '📅' },
+    { id: 'results', label: 'Results', icon: '✅' },
+    { id: 'standings', label: 'Standings', icon: '🏆' },
+  ];
 
-            default:
-                return null;
-        }
-    };
-
-    return (
-        <div className="flex-1">
-            <div className="sticky top-[86px] z-30 bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/5 pb-2 pt-2 px-4 shadow-lg">
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-full border 
-                                transition-all duration-300 whitespace-nowrap text-sm font-bold
-                                ${activeTab === tab.id
-                                    ? 'bg-yellow-500 text-white border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.2)]'
-                                    : 'bg-white/5 border-white/5 text-text-secondary hover:bg-white/10 hover:text-white'
-                                }
-                            `}
-                        >
-                            <span>{tab.label}</span>
-                            {tab.count !== undefined && tab.count > 0 && (
-                                <span className={`
-                                    text-[10px] px-1.5 py-0.5 rounded-full min-w-[18px] text-center
-                                    ${activeTab === tab.id
-                                        ? 'bg-white/20 text-white'
-                                        : 'bg-black/20 text-text-secondary'}
-                                `}>
-                                    {tab.count}
-                                </span>
-                            )}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="max-w-4xl mx-auto pb-20 mt-4">
-                {refreshing && (
-                    <div className="flex justify-center py-6 animate-fade-in">
-                        <div className="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                )}
-                {renderContent()}
-            </div>
-
-            <button
-                onClick={onRefresh}
-                disabled={refreshing}
-                className="fixed bottom-8 right-8 bg-yellow-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(234,179,8,0.4)]
-                         hover:bg-yellow-600 hover:scale-110 active:scale-90 transition-all duration-300 
-                         disabled:opacity-50 disabled:scale-100 z-50 group"
-                aria-label="Refresh Data"
-            >
-                <svg className={`w-6 h-6 group-hover:rotate-180 transition-transform duration-500 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-            </button>
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      {/* Header Bar */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+            Basketball LiveScore
+          </h1>
+          <p className="text-sm text-slate-400">
+            Real-time NBA, EuroLeague, and international basketball fixtures & standings
+          </p>
         </div>
-    );
+
+        {/* Search & Refresh */}
+        <div className="flex items-center space-x-3">
+          <div className="relative flex-1 sm:w-64">
+            <input
+              type="text"
+              placeholder="Search teams or leagues..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#141C2B] px-4 py-2.5 pl-9 text-sm text-white placeholder-slate-500 focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+            <span className="absolute left-3 top-3 text-xs text-slate-400">🔍</span>
+          </div>
+
+          <button
+            onClick={fetchGames}
+            className="flex items-center space-x-2 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+            title="Refresh on demand"
+          >
+            <span>🔄</span>
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-6 flex space-x-2 overflow-x-auto border-b border-white/10 pb-2">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+                isActive
+                  ? 'border border-orange-500/50 bg-[#1A2333] text-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Date Strip */}
+      {activeTab !== 'live' && activeTab !== 'standings' && (
+        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
+          {dateStrip.map((item) => {
+            const isSelected = selectedDate === item.iso;
+            return (
+              <button
+                key={item.iso}
+                onClick={() => setSelectedDate(item.iso)}
+                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
+                  isSelected
+                    ? 'border-orange-500 bg-orange-500 text-slate-950 font-bold'
+                    : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
+                }`}
+              >
+                <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
+                <span className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}>
+                  {item.dayNumber}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Content */}
+      {loading ? (
+        <div className="flex h-64 flex-col items-center justify-center space-y-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+          <p className="text-sm text-slate-400">Loading basketball data...</p>
+        </div>
+      ) : activeTab === 'standings' ? (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
+          <h2 className="mb-4 text-lg font-bold text-white">NBA Standings</h2>
+          {standings.length === 0 ? (
+            <p className="text-sm text-slate-400 py-4 text-center">Standings data currently not available.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-300">
+                <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                  <tr>
+                    <th className="py-3 px-2">#</th>
+                    <th className="py-3 px-4">Team</th>
+                    <th className="py-3 px-3 text-center">W</th>
+                    <th className="py-3 px-3 text-center">L</th>
+                    <th className="py-3 px-3 text-center">PCT</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {standings.map((row, idx) => (
+                    <tr key={idx} className="hover:bg-white/5">
+                      <td className="py-3 px-2 font-bold text-slate-400">{row.position || idx + 1}</td>
+                      <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
+                        {row.team?.logo && (
+                          <img src={row.team.logo} alt={row.team.name} className="h-5 w-5 object-contain" />
+                        )}
+                        <span>{row.team?.name || 'Team'}</span>
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-emerald-400">{row.games?.win?.total ?? 0}</td>
+                      <td className="py-3 px-3 text-center font-bold text-red-400">{row.games?.lose?.total ?? 0}</td>
+                      <td className="py-3 px-3 text-center font-medium">{row.games?.win?.percentage ?? '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : leagueGroups.length === 0 ? (
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
+          <span className="text-4xl">🏀</span>
+          <h3 className="mt-3 text-base font-bold text-white">
+            {activeTab === 'live' ? 'No Live Basketball Games' : 'No Games Found'}
+          </h3>
+          <p className="mt-1 text-xs text-slate-400 max-w-sm">
+            {activeTab === 'live'
+              ? 'Check upcoming games or select another date from the calendar.'
+              : 'Try searching for a different team or league.'}
+          </p>
+          <button
+            onClick={fetchGames}
+            className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-orange-400 hover:bg-slate-700"
+          >
+            Refresh Feed
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {leagueGroups.map((group) => (
+            <div key={group.title} className="space-y-3">
+              <div className="flex items-center space-x-2">
+                {group.logo ? (
+                  <img src={group.logo} alt={group.title} className="h-5 w-5 object-contain" />
+                ) : (
+                  <span className="text-orange-400">🏀</span>
+                )}
+                <h2 className="text-sm font-bold text-slate-200">{group.title}</h2>
+                <span className="text-xs text-slate-500">({group.games.length})</span>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+                {group.games.map((game) => (
+                  <BasketballMatchCard key={game.id} match={game} hideLeague />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

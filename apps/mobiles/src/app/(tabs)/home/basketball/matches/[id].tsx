@@ -1,712 +1,671 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { BasketballEvent } from '@goalmills/types';
-import { basketballApi } from '../../../../../services/basketballApi';
-import { BasketballMatchCard } from '../../../../../components/BasketballMatchCard';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Pressable,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
+import { Ionicons } from '@expo/vector-icons';
+import {
+  basketballApiService,
+  ApiBasketballGameItem,
+} from '../../../../../services/basketballApi';
+
+type BasketballDetailTab = 'overview' | 'quarters' | 'stats' | 'h2h' | 'standings';
 
 export default function BasketballMatchDetailsPage() {
-    const params = useLocalSearchParams();
-    const [match, setMatch] = useState<BasketballEvent | null>(null);
-    const [odds, setOdds] = useState<any>(null);
-    const [h2hData, setH2HData] = useState<{ H2H: BasketballEvent[], firstTeamResults: BasketballEvent[], secondTeamResults: BasketballEvent[] } | null>(null);
-    const [lineups, setLineups] = useState<any>(null);
-    const [statistics, setStatistics] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [selectedTab, setSelectedTab] = useState<'overview' | 'statistics' | 'lineups'>('overview');
+  const { id } = useLocalSearchParams();
+  const router = useRouter();
+  const gameId = Number(id);
 
-    useEffect(() => {
-        loadData();
-    }, [params.id]);
+  const [activeTab, setActiveTab] = useState<BasketballDetailTab>('overview');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-    const loadData = async () => {
-        if (!params.id) return;
-        try {
-            const matchId = Number(params.id);
-            const today = new Date();
-            const from = new Date(today);
-            from.setDate(today.getDate() - 15);
-            const to = new Date(today);
-            to.setDate(today.getDate() + 15);
+  const [game, setGame] = useState<ApiBasketballGameItem | null>(null);
+  const [teamStats, setTeamStats] = useState<any[]>([]);
+  const [h2h, setH2H] = useState<ApiBasketballGameItem[]>([]);
+  const [standings, setStandings] = useState<any[]>([]);
 
-            const formatDate = (date: Date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
+  const loadDetails = useCallback(async () => {
+    if (!gameId) return;
+    setLoading(true);
+    try {
+      const [g, st] = await Promise.allSettled([
+        basketballApiService.getGameById(gameId),
+        basketballApiService.getGameTeamStatistics({ id: gameId }),
+      ]);
 
-            const fixturesRes = await basketballApi.getFixtures({
-                matchId,
-                from: formatDate(from),
-                to: formatDate(to)
-            });
-            const foundMatch = fixturesRes.result[0];
-            setMatch(foundMatch || null);
+      if (g.status === 'fulfilled' && g.value) {
+        setGame(g.value);
 
-            if (foundMatch) {
-                // Fetch Odds
-                const oddsRes = await basketballApi.getOdds({ matchId });
-                setOdds(oddsRes.result[matchId]);
-
-                // Fetch H2H
-                const h2hRes = await basketballApi.getH2H({
-                    firstTeamId: Number(foundMatch.home_team_key),
-                    secondTeamId: Number(foundMatch.away_team_key)
-                });
-                setH2HData(h2hRes.result);
-
-                // Fetch Lineups
-                try {
-                    const lineupsRes = await basketballApi.getLineups({ matchId });
-                    setLineups(lineupsRes.result);
-                } catch (error) {
-                    console.error('Error loading lineups:', error);
-                }
-
-                // Fetch Statistics (only for finished or live matches)
-                if (foundMatch.event_status === 'Finished' || foundMatch.event_live === '1') {
-                    try {
-                        const statsRes = await basketballApi.getStatistics({ matchId });
-                        setStatistics(statsRes.result);
-                    } catch (error) {
-                        console.error('Error loading statistics:', error);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Error loading match details:', error);
-        } finally {
-            setLoading(false);
+        // Fetch H2H and Standings in parallel
+        if (g.value.teams?.home?.id && g.value.teams?.away?.id) {
+          basketballApiService
+            .getHeadToHead({
+              h2h: `${g.value.teams.home.id}-${g.value.teams.away.id}`,
+            })
+            .then(res => setH2H(res || []))
+            .catch(() => {});
         }
-    };
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#f59e0b" />
-            </View>
-        );
+        if (g.value.league?.id && g.value.league?.season) {
+          basketballApiService
+            .getStandings({
+              league: g.value.league.id,
+              season: g.value.league.season,
+            })
+            .then(res => setStandings(res || []))
+            .catch(() => {});
+        }
+      }
+
+      if (st.status === 'fulfilled') {
+        setTeamStats(st.value || []);
+      }
+    } catch (err) {
+      console.error('[Basketball MatchDetails] Error loading details:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
+  }, [gameId]);
 
-    if (!match) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Match Not Found</Text>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
+  useEffect(() => {
+    loadDetails();
+  }, [loadDetails]);
 
-    const renderOdds = () => {
-        if (!odds) return null;
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadDetails();
+  };
 
-        return (
-            <View style={styles.oddsCard}>
-                <Text style={styles.sectionTitle}>🎲 Match Odds</Text>
-                {odds['Home/Away'] && (
-                    <View style={styles.oddsGrid}>
-                        <View style={styles.oddItem}>
-                            <Text style={styles.oddLabel}>{match.event_home_team}</Text>
-                            <Text style={styles.oddValue}>{(odds['Home/Away']['Home'] as any)?.['Bet365'] || '-'}</Text>
-                        </View>
-                        <View style={styles.oddItem}>
-                            <Text style={styles.oddLabel}>{match.event_away_team}</Text>
-                            <Text style={styles.oddValue}>{(odds['Home/Away']['Away'] as any)?.['Bet365'] || '-'}</Text>
-                        </View>
-                    </View>
-                )}
-                {odds['Total'] && (
-                    <View style={styles.oddsGrid}>
-                        <View style={styles.oddItem}>
-                            <Text style={styles.oddLabel}>Over</Text>
-                            <Text style={styles.oddValue}>
-                                {Object.keys(odds['Total'])[0]} @ {(Object.values(odds['Total'])[0] as any)?.['Bet365'] || '-'}
-                            </Text>
-                        </View>
-                        <View style={styles.oddItem}>
-                            <Text style={styles.oddLabel}>Under</Text>
-                            <Text style={styles.oddValue}>
-                                {Object.keys(odds['Total'])[1]} @ {(Object.values(odds['Total'])[1] as any)?.['Bet365'] || '-'}
-                            </Text>
-                        </View>
-                    </View>
-                )}
-            </View>
-        );
-    };
-
-    const renderStatistics = () => {
-        if (!statistics) {
-            return (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>Statistics not available</Text>
-                </View>
-            );
-        }
-
-        return (
-            <ScrollView style={styles.tabContent}>
-                {/* Team Statistics */}
-                <View style={styles.statsCard}>
-                    <Text style={styles.sectionTitle}>Team Statistics</Text>
-                    {statistics.statistics.map((stat: any, index: number) => (
-                        <View key={index} style={styles.statRow}>
-                            <Text style={styles.statHome}>{stat.home}</Text>
-                            <Text style={styles.statType}>{stat.type}</Text>
-                            <Text style={styles.statAway}>{stat.away}</Text>
-                        </View>
-                    ))}
-                </View>
-
-                {/* Player Statistics */}
-                {statistics.player_statistics && (
-                    <>
-                        <View style={styles.statsCard}>
-                            <Text style={styles.sectionTitle}>{match?.event_home_team} Players</Text>
-                            <View style={styles.playerStatsHeader}>
-                                <Text style={[styles.playerStatsHeaderText, { flex: 2 }]}>Player</Text>
-                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>PTS</Text>
-                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>REB</Text>
-                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>AST</Text>
-                            </View>
-                            {statistics.player_statistics.home_team.map((player: any, index: number) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.playerStatsRow}
-                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
-                                >
-                                    <Text style={[styles.playerStatsText, { flex: 2 }]}>{player.player}</Text>
-                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_points}</Text>
-                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_total_rebounds}</Text>
-                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_assists}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-
-                        <View style={styles.statsCard}>
-                            <Text style={styles.sectionTitle}>{match?.event_away_team} Players</Text>
-                            <View style={styles.playerStatsHeader}>
-                                <Text style={[styles.playerStatsHeaderText, { flex: 2 }]}>Player</Text>
-                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>PTS</Text>
-                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>REB</Text>
-                                <Text style={[styles.playerStatsHeaderText, { width: 40 }]}>AST</Text>
-                            </View>
-                            {statistics.player_statistics.away_team.map((player: any, index: number) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.playerStatsRow}
-                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
-                                >
-                                    <Text style={[styles.playerStatsText, { flex: 2 }]}>{player.player}</Text>
-                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_points}</Text>
-                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_total_rebounds}</Text>
-                                    <Text style={[styles.playerStatsText, { width: 40 }]}>{player.player_assists}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    </>
-                )}
-            </ScrollView>
-        );
-    };
-
-    const renderLineups = () => {
-        if (!lineups) {
-            return (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>Lineups not available</Text>
-                </View>
-            );
-        }
-
-        return (
-            <ScrollView style={styles.tabContent}>
-                {/* Home Team Lineup */}
-                <View style={styles.lineupsCard}>
-                    <Text style={styles.sectionTitle}>{match?.event_home_team}</Text>
-                    <Text style={styles.lineupSubtitle}>Starting Five</Text>
-                    {lineups.home_team.starting_lineups.map((player: any, index: number) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.lineupRow}
-                            onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
-                        >
-                            <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
-                            <Text style={styles.lineupName}>{player.player}</Text>
-                            <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
-                        </TouchableOpacity>
-                    ))}
-                    {lineups.home_team.substitutes.length > 0 && (
-                        <>
-                            <Text style={[styles.lineupSubtitle, { marginTop: 16 }]}>Substitutes</Text>
-                            {lineups.home_team.substitutes.map((player: any, index: number) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.lineupRow}
-                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
-                                >
-                                    <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
-                                    <Text style={styles.lineupName}>{player.player}</Text>
-                                    <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </>
-                    )}
-                </View>
-
-                {/* Away Team Lineup */}
-                <View style={styles.lineupsCard}>
-                    <Text style={styles.sectionTitle}>{match?.event_away_team}</Text>
-                    <Text style={styles.lineupSubtitle}>Starting Five</Text>
-                    {lineups.away_team.starting_lineups.map((player: any, index: number) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={styles.lineupRow}
-                            onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
-                        >
-                            <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
-                            <Text style={styles.lineupName}>{player.player}</Text>
-                            <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
-                        </TouchableOpacity>
-                    ))}
-                    {lineups.away_team.substitutes.length > 0 && (
-                        <>
-                            <Text style={[styles.lineupSubtitle, { marginTop: 16 }]}>Substitutes</Text>
-                            {lineups.away_team.substitutes.map((player: any, index: number) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.lineupRow}
-                                    onPress={() => router.push(`/home/basketball/players/${player.player_id}`)}
-                                >
-                                    <Text style={styles.lineupNumber}>{player.player_number || '-'}</Text>
-                                    <Text style={styles.lineupName}>{player.player}</Text>
-                                    <Text style={styles.lineupPosition}>{player.player_position || '-'}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </>
-                    )}
-                </View>
-            </ScrollView>
-        );
-    };
-
+  if (loading && !refreshing) {
     return (
-        <ScrollView style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Text style={styles.backBtnText}>←</Text>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Match Details</Text>
-            </View>
-
-            {/* Match Header Card */}
-            <View style={styles.matchHeader}>
-                <TouchableOpacity onPress={() => router.push(`/home/basketball/leagues/${match.league_key}`)}>
-                    <Text style={styles.leagueName}>{match.league_name} - {match.league_round}</Text>
-                </TouchableOpacity>
-                <Text style={styles.matchStatus}>{match.event_status}</Text>
-
-                <View style={styles.teamsContainer}>
-                    {/* Home Team */}
-                    <View style={styles.teamSection}>
-                        {match.event_home_team_logo ? (
-                            <Image source={{ uri: match.event_home_team_logo }} style={styles.teamLogo} />
-                        ) : (
-                            <View style={styles.teamLogoPlaceholder} />
-                        )}
-                        <Text style={styles.teamName}>{match.event_home_team}</Text>
-                    </View>
-
-                    {/* Score */}
-                    <View style={styles.scoreSection}>
-                        <Text style={styles.scoreText}>{match.event_final_result}</Text>
-                        {match.event_live === '1' && match.event_quarter && (
-                            <Text style={styles.quarterText}>{match.event_quarter}</Text>
-                        )}
-                    </View>
-
-                    {/* Away Team */}
-                    <View style={styles.teamSection}>
-                        {match.event_away_team_logo ? (
-                            <Image source={{ uri: match.event_away_team_logo }} style={styles.teamLogo} />
-                        ) : (
-                            <View style={styles.teamLogoPlaceholder} />
-                        )}
-                        <Text style={styles.teamName}>{match.event_away_team}</Text>
-                    </View>
-                </View>
-            </View>
-
-            {/* Odds */}
-            {/* Tabs */}
-            <View style={styles.tabsContainer}>
-                {['overview', 'statistics', 'lineups'].map((tab) => (
-                    <TouchableOpacity
-                        key={tab}
-                        style={[styles.tabButton, selectedTab === tab && styles.activeTabButton]}
-                        onPress={() => setSelectedTab(tab as any)}
-                    >
-                        <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-
-            {selectedTab === 'overview' && (
-                <>
-                    {/* Odds */}
-                    {renderOdds()}
-
-                    {/* H2H */}
-                    {h2hData && (
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Head to Head</Text>
-                            {h2hData.H2H.length > 0 ? (
-                                h2hData.H2H.map(h => (
-                                    <BasketballMatchCard key={h.event_key} match={h} />
-                                ))
-                            ) : (
-                                <Text style={styles.emptyText}>No previous H2H matches.</Text>
-                            )}
-                        </View>
-                    )}
-
-                    {/* Recent Form */}
-                    {h2hData && (
-                        <>
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>{match.event_home_team} Recent Form</Text>
-                                {h2hData.firstTeamResults.map(h => <BasketballMatchCard key={h.event_key} match={h} />)}
-                            </View>
-
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>{match.event_away_team} Recent Form</Text>
-                                {h2hData.secondTeamResults.map(h => <BasketballMatchCard key={h.event_key} match={h} />)}
-                            </View>
-                        </>
-                    )}
-                </>
-            )}
-
-            {selectedTab === 'statistics' && renderStatistics()}
-
-            {selectedTab === 'lineups' && renderLineups()}
-        </ScrollView>
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#F97316" />
+        <Text style={styles.loadingText}>Loading game center...</Text>
+      </View>
     );
+  }
+
+  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(
+    game?.status.short || ''
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Navigation Bar */}
+      <View style={styles.navBar}>
+        <Pressable style={styles.navBackBtn} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
+        </Pressable>
+        <Text style={styles.navTitle} numberOfLines={1}>
+          {game?.league.name || 'Basketball Game Center'}
+        </Text>
+        <Pressable style={styles.navRefreshBtn} onPress={onRefresh}>
+          <Ionicons name="refresh-outline" size={20} color="#F8FAFC" />
+        </Pressable>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#F97316"
+            colors={['#F97316']}
+          />
+        }
+      >
+        {/* Score Banner */}
+        <View style={styles.scoreBanner}>
+          <View style={styles.leagueBannerInfo}>
+            {game?.league.logo && (
+              <Image source={{ uri: game.league.logo }} style={styles.bannerLeagueLogo} resizeMode="contain" />
+            )}
+            <Text style={styles.bannerLeagueText}>
+              {game?.league.name} • {game?.country.name}
+            </Text>
+          </View>
+
+          <View style={styles.bannerTeamsRow}>
+            {/* Home Team */}
+            <View style={styles.bannerTeam}>
+              {game?.teams.home.logo ? (
+                <Image source={{ uri: game.teams.home.logo }} style={styles.bannerTeamLogo} resizeMode="contain" />
+              ) : (
+                <View style={styles.fallbackLogo}><Ionicons name="basketball-outline" size={28} color="#F97316" /></View>
+              )}
+              <Text style={styles.bannerTeamName} numberOfLines={2}>
+                {game?.teams.home.name || 'Home'}
+              </Text>
+            </View>
+
+            {/* Score & Status */}
+            <View style={styles.bannerScoreBox}>
+              <View style={[styles.statusBadge, isLive && styles.liveStatusBadge]}>
+                {isLive && <View style={styles.livePulse} />}
+                <Text style={[styles.statusBadgeText, isLive && styles.liveStatusBadgeText]}>
+                  {game?.status.short || 'VS'}
+                </Text>
+              </View>
+              <Text style={styles.bannerScoreNumbers}>
+                {game?.scores.home.total ?? '-'}:{game?.scores.away.total ?? '-'}
+              </Text>
+              {game?.time && (
+                <Text style={styles.bannerTimeText}>
+                  {game.date} • {game.time}
+                </Text>
+              )}
+            </View>
+
+            {/* Away Team */}
+            <View style={styles.bannerTeam}>
+              {game?.teams.away.logo ? (
+                <Image source={{ uri: game.teams.away.logo }} style={styles.bannerTeamLogo} resizeMode="contain" />
+              ) : (
+                <View style={styles.fallbackLogo}><Ionicons name="basketball-outline" size={28} color="#F97316" /></View>
+              )}
+              <Text style={styles.bannerTeamName} numberOfLines={2}>
+                {game?.teams.away.name || 'Away'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* 5 Tabs Segment */}
+        <View style={styles.tabSegments}>
+          {(['overview', 'quarters', 'stats', 'h2h', 'standings'] as BasketballDetailTab[]).map(tab => (
+            <Pressable
+              key={tab}
+              style={[styles.segmentBtn, activeTab === tab && styles.activeSegmentBtn]}
+              onPress={() => setActiveTab(tab)}
+            >
+              <Text style={[styles.segmentBtnText, activeTab === tab && styles.activeSegmentBtnText]}>
+                {tab.toUpperCase()}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* Tab 1: Overview */}
+        {activeTab === 'overview' && (
+          <View style={styles.tabSection}>
+            <View style={styles.card}>
+              <Text style={styles.cardHeaderTitle}>Game Information</Text>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>League</Text>
+                <Text style={styles.infoValue}>{game?.league.name}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Season</Text>
+                <Text style={styles.infoValue}>{game?.league.season}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Date & Time</Text>
+                <Text style={styles.infoValue}>{game?.date} {game?.time}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Status</Text>
+                <Text style={styles.infoValue}>{game?.status.long || game?.status.short}</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Tab 2: Quarters Breakdown */}
+        {activeTab === 'quarters' && (
+          <View style={styles.tabSection}>
+            <View style={styles.card}>
+              <Text style={styles.cardHeaderTitle}>Quarter-by-Quarter Scores</Text>
+              <View style={styles.quartersTable}>
+                {/* Header */}
+                <View style={styles.tableHeaderRow}>
+                  <Text style={[styles.tableColHeader, { flex: 1 }]}>Team</Text>
+                  <Text style={styles.tableColStatHeader}>Q1</Text>
+                  <Text style={styles.tableColStatHeader}>Q2</Text>
+                  <Text style={styles.tableColStatHeader}>Q3</Text>
+                  <Text style={styles.tableColStatHeader}>Q4</Text>
+                  {game?.scores.home.over_time !== null && (
+                    <Text style={styles.tableColStatHeader}>OT</Text>
+                  )}
+                  <Text style={[styles.tableColStatHeader, { color: '#F97316', fontWeight: '900' }]}>
+                    TOT
+                  </Text>
+                </View>
+
+                {/* Home Team Row */}
+                <View style={styles.tableScoreRow}>
+                  <Text style={styles.tableRowTeamName} numberOfLines={1}>
+                    {game?.teams.home.name}
+                  </Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.home.quarter_1 ?? '-'}</Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.home.quarter_2 ?? '-'}</Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.home.quarter_3 ?? '-'}</Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.home.quarter_4 ?? '-'}</Text>
+                  {game?.scores.home.over_time !== null && (
+                    <Text style={styles.tableScoreVal}>{game?.scores.home.over_time ?? '-'}</Text>
+                  )}
+                  <Text style={[styles.tableScoreVal, styles.tableScoreTotal]}>
+                    {game?.scores.home.total ?? '-'}
+                  </Text>
+                </View>
+
+                {/* Away Team Row */}
+                <View style={styles.tableScoreRow}>
+                  <Text style={styles.tableRowTeamName} numberOfLines={1}>
+                    {game?.teams.away.name}
+                  </Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.away.quarter_1 ?? '-'}</Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.away.quarter_2 ?? '-'}</Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.away.quarter_3 ?? '-'}</Text>
+                  <Text style={styles.tableScoreVal}>{game?.scores.away.quarter_4 ?? '-'}</Text>
+                  {game?.scores.away.over_time !== null && (
+                    <Text style={styles.tableScoreVal}>{game?.scores.away.over_time ?? '-'}</Text>
+                  )}
+                  <Text style={[styles.tableScoreVal, styles.tableScoreTotal]}>
+                    {game?.scores.away.total ?? '-'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Tab 3: Team Statistics */}
+        {activeTab === 'stats' && (
+          <View style={styles.tabSection}>
+            {teamStats.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>Team statistics available for live and completed games.</Text>
+              </View>
+            ) : (
+              <View style={styles.card}>
+                <Text style={styles.cardHeaderTitle}>Team Statistics</Text>
+                {teamStats.map((st, idx) => (
+                  <View key={idx} style={styles.statComparisonRow}>
+                    <Text style={styles.statTypeName}>{st.type || `Stat #${idx + 1}`}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Tab 4: Head-to-Head */}
+        {activeTab === 'h2h' && (
+          <View style={styles.tabSection}>
+            {h2h.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>No head-to-head match history found.</Text>
+              </View>
+            ) : (
+              <View style={styles.card}>
+                <Text style={styles.cardHeaderTitle}>Past Head-to-Head Clashes</Text>
+                {h2h.slice(0, 5).map(h => (
+                  <View key={h.id} style={styles.h2hRow}>
+                    <Text style={styles.h2hDate}>{h.date}</Text>
+                    <View style={styles.h2hMatch}>
+                      <Text style={styles.h2hTeam} numberOfLines={1}>{h.teams.home.name}</Text>
+                      <Text style={styles.h2hScore}>{h.scores.home.total ?? '-'}:{h.scores.away.total ?? '-'}</Text>
+                      <Text style={styles.h2hTeam} numberOfLines={1}>{h.teams.away.name}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Tab 5: Standings */}
+        {activeTab === 'standings' && (
+          <View style={styles.tabSection}>
+            {standings.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>Standings not available for this league.</Text>
+              </View>
+            ) : (
+              <View style={styles.card}>
+                <Text style={styles.cardHeaderTitle}>{game?.league.name} Standings</Text>
+                {standings.map((stRow, idx) => (
+                  <View key={idx} style={styles.tableRow}>
+                    <Text style={styles.tableRank}>{stRow.position || idx + 1}</Text>
+                    <Text style={styles.tableName} numberOfLines={1}>
+                      {stRow.team?.name || 'Team'}
+                    </Text>
+                    <Text style={styles.tableStat}>{stRow.games?.win?.total ?? 0}W</Text>
+                    <Text style={styles.tableStat}>{stRow.games?.lose?.total ?? 0}L</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-    },
-    loadingContainer: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorContainer: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-    },
-    errorText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 16,
-    },
-    backButton: {
-        backgroundColor: '#f59e0b',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        paddingTop: 48,
-    },
-    backBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#1a1f3a',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-    },
-    backBtnText: {
-        color: '#fff',
-        fontSize: 24,
-    },
-    headerTitle: {
-        color: '#8b92b0',
-        fontSize: 14,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-    },
-    matchHeader: {
-        backgroundColor: '#1a1f3a',
-        borderRadius: 16,
-        padding: 16,
-        marginHorizontal: 16,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    leagueName: {
-        color: '#8b92b0',
-        fontSize: 12,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        textAlign: 'center',
-        marginBottom: 8,
-    },
-    matchStatus: {
-        color: '#f59e0b',
-        fontSize: 12,
-        fontWeight: '600',
-        textAlign: 'center',
-        marginBottom: 16,
-    },
-    teamsContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    teamSection: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    teamLogo: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        marginBottom: 8,
-    },
-    teamLogoPlaceholder: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#2a3150',
-        marginBottom: 8,
-    },
-    teamName: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    scoreSection: {
-        alignItems: 'center',
-        paddingHorizontal: 16,
-    },
-    scoreText: {
-        color: '#fff',
-        fontSize: 32,
-        fontWeight: '700',
-    },
-    quarterText: {
-        color: '#f59e0b',
-        fontSize: 12,
-        fontWeight: '600',
-        marginTop: 4,
-    },
-    oddsCard: {
-        backgroundColor: '#1a1f3a',
-        borderRadius: 16,
-        padding: 16,
-        marginHorizontal: 16,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    sectionTitle: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 12,
-    },
-    oddsGrid: {
-        flexDirection: 'row',
-        gap: 12,
-        marginTop: 8,
-    },
-    oddItem: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-        borderRadius: 8,
-        padding: 12,
-        alignItems: 'center',
-    },
-    oddLabel: {
-        color: '#8b92b0',
-        fontSize: 12,
-        marginBottom: 4,
-    },
-    oddValue: {
-        color: '#f59e0b',
-        fontSize: 18,
-        fontWeight: '700',
-    },
-    section: {
-        padding: 16,
-    },
-    emptyText: {
-        color: '#8b92b0',
-        fontSize: 14,
-        textAlign: 'center',
-        fontStyle: 'italic',
-        padding: 16,
-    },
-    tabsContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        marginBottom: 16,
-        gap: 8,
-    },
-    tabButton: {
-        flex: 1,
-        paddingVertical: 10,
-        backgroundColor: '#1a1f3a',
-        borderRadius: 8,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    activeTabButton: {
-        backgroundColor: '#f59e0b',
-        borderColor: '#f59e0b',
-    },
-    tabText: {
-        color: '#8b92b0',
-        fontWeight: '600',
-        fontSize: 14,
-    },
-    activeTabText: {
-        color: '#fff',
-    },
-    tabContent: {
-        flex: 1,
-    },
-    emptyContainer: {
-        padding: 32,
-        alignItems: 'center',
-    },
-    statsCard: {
-        backgroundColor: '#1a1f3a',
-        borderRadius: 16,
-        padding: 16,
-        marginHorizontal: 16,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    statRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#2a3150',
-    },
-    statHome: {
-        color: '#fff',
-        fontWeight: '700',
-        width: 40,
-        textAlign: 'center',
-    },
-    statType: {
-        color: '#8b92b0',
-        fontSize: 12,
-        flex: 1,
-        textAlign: 'center',
-        textTransform: 'uppercase',
-    },
-    statAway: {
-        color: '#fff',
-        fontWeight: '700',
-        width: 40,
-        textAlign: 'center',
-    },
-    playerStatsHeader: {
-        flexDirection: 'row',
-        paddingBottom: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#2a3150',
-        marginBottom: 8,
-    },
-    playerStatsHeaderText: {
-        color: '#8b92b0',
-        fontSize: 12,
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    playerStatsRow: {
-        flexDirection: 'row',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#2a3150',
-    },
-    playerStatsText: {
-        color: '#fff',
-        fontSize: 13,
-        textAlign: 'center',
-    },
-    lineupsCard: {
-        backgroundColor: '#1a1f3a',
-        marginHorizontal: 16,
-        marginBottom: 16,
-        borderRadius: 16,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    lineupSubtitle: {
-        color: '#f59e0b',
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 12,
-        textTransform: 'uppercase',
-    },
-    lineupRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#2a3150',
-    },
-    lineupNumber: {
-        color: '#f59e0b',
-        fontWeight: '700',
-        width: 30,
-        textAlign: 'center',
-    },
-    lineupName: {
-        color: '#fff',
-        flex: 1,
-        fontSize: 14,
-        marginLeft: 8,
-    },
-    lineupPosition: {
-        color: '#8b92b0',
-        fontSize: 12,
-        width: 30,
-        textAlign: 'center',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#0B0F17',
+  },
+  centerContainer: {
+    flex: 1,
+    backgroundColor: '#0B0F17',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.xl,
+  },
+  loadingText: {
+    marginTop: 12,
+    color: '#94A3B8',
+    fontSize: 14,
+  },
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  navBackBtn: {
+    padding: 6,
+  },
+  navTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#F8FAFC',
+  },
+  navRefreshBtn: {
+    padding: 6,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  scoreBanner: {
+    backgroundColor: '#141C2B',
+    padding: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  leagueBannerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.md,
+  },
+  bannerLeagueLogo: {
+    width: 18,
+    height: 18,
+    marginRight: 6,
+  },
+  bannerLeagueText: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '600',
+  },
+  bannerTeamsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  bannerTeam: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  bannerTeamLogo: {
+    width: 52,
+    height: 52,
+    marginBottom: 8,
+  },
+  fallbackLogo: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  bannerTeamName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    textAlign: 'center',
+  },
+  bannerScoreBox: {
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: BORDER_RADIUS.full,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: 6,
+    gap: 4,
+  },
+  liveStatusBadge: {
+    backgroundColor: 'rgba(249, 115, 22, 0.2)',
+    borderColor: '#F97316',
+    borderWidth: 1,
+  },
+  livePulse: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#F97316',
+  },
+  statusBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
+  liveStatusBadgeText: {
+    color: '#F97316',
+  },
+  bannerScoreNumbers: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#F8FAFC',
+    letterSpacing: 2,
+  },
+  bannerTimeText: {
+    fontSize: 10,
+    color: '#64748B',
+    marginTop: 4,
+  },
+  tabSegments: {
+    flexDirection: 'row',
+    backgroundColor: '#141C2B',
+    margin: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    padding: 3,
+  },
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  activeSegmentBtn: {
+    backgroundColor: '#1E293B',
+  },
+  segmentBtnText: {
+    fontSize: 10,
+    color: '#94A3B8',
+    fontWeight: '700',
+  },
+  activeSegmentBtnText: {
+    color: '#F97316',
+  },
+  tabSection: {
+    paddingHorizontal: SPACING.md,
+  },
+  card: {
+    backgroundColor: '#141C2B',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: SPACING.md,
+  },
+  cardHeaderTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    marginBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    paddingBottom: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  infoValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#F8FAFC',
+  },
+  emptyCard: {
+    backgroundColor: '#141C2B',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.xl,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#64748B',
+    fontSize: 13,
+  },
+  quartersTable: {
+    marginTop: 4,
+  },
+  tableHeaderRow: {
+    flexDirection: 'row',
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  tableColHeader: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  tableColStatHeader: {
+    width: 32,
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    textAlign: 'center',
+  },
+  tableScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  tableRowTeamName: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#F8FAFC',
+  },
+  tableScoreVal: {
+    width: 32,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#94A3B8',
+    textAlign: 'center',
+  },
+  tableScoreTotal: {
+    color: '#F97316',
+    fontWeight: '900',
+  },
+  statComparisonRow: {
+    marginBottom: SPACING.md,
+  },
+  statTypeName: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  h2hRow: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  h2hDate: {
+    fontSize: 10,
+    color: '#64748B',
+    marginBottom: 4,
+  },
+  h2hMatch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  h2hTeam: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#F8FAFC',
+  },
+  h2hScore: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#F97316',
+    paddingHorizontal: 8,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  tableRank: {
+    width: 24,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
+  tableName: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#F8FAFC',
+  },
+  tableStat: {
+    width: 38,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94A3B8',
+    textAlign: 'right',
+  },
 });

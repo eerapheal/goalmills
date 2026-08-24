@@ -1,418 +1,351 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { BasketballEvent } from '@goalmills/types';
-import { basketballApi } from '../../../../services/basketballApi';
-import Image from 'next/image';
-import Link from 'next/link';
+import {
+  webBasketballApiService,
+  ApiBasketballGameItem,
+} from '../../../../services/basketballApi';
+
+type BasketballDetailTab = 'overview' | 'quarters' | 'stats' | 'h2h' | 'standings';
 
 export default function BasketballMatchPage() {
-    const params = useParams();
-    const router = useRouter();
-    const [match, setMatch] = useState<BasketballEvent | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'overview' | 'stats' | 'lineups'>('overview');
-    const [odds, setOdds] = useState<any>(null);
-    const [statistics, setStatistics] = useState<any>(null);
-    const [lineups, setLineups] = useState<any>(null);
+  const params = useParams();
+  const router = useRouter();
+  const gameId = Number(params?.id);
 
-    useEffect(() => {
-        const loadMatchData = async () => {
-            try {
-                const matchId = parseInt(params.id as string);
-                const today = new Date();
-                const fromDate = new Date(today);
-                fromDate.setDate(today.getDate() - 30);
-                const toDate = new Date(today);
-                toDate.setDate(today.getDate() + 30);
-                const from = fromDate.toISOString().split('T')[0];
-                const to = toDate.toISOString().split('T')[0];
+  const [activeTab, setActiveTab] = useState<BasketballDetailTab>('overview');
+  const [loading, setLoading] = useState(true);
 
-                const [matchData, oddsData, statsData, lineupsData] = await Promise.all([
-                    basketballApi.getFixtures({ matchId, from, to }),
-                    basketballApi.getOdds({ matchId }),
-                    basketballApi.getStatistics({ matchId }),
-                    basketballApi.getLineups({ matchId })
-                ]);
+  const [game, setGame] = useState<ApiBasketballGameItem | null>(null);
+  const [teamStats, setTeamStats] = useState<any[]>([]);
+  const [h2h, setH2H] = useState<ApiBasketballGameItem[]>([]);
+  const [standings, setStandings] = useState<any[]>([]);
 
-                if (matchData.result && matchData.result.length > 0) {
-                    setMatch(matchData.result[0]);
-                    setOdds(oddsData.result[matchId]);
-                    setStatistics(statsData.result);
-                    setLineups(lineupsData.result);
-                }
-            } catch (error) {
-                console.error('Error loading match data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const loadData = useCallback(async () => {
+    if (!gameId) return;
+    setLoading(true);
+    try {
+      const [g, st] = await Promise.allSettled([
+        webBasketballApiService.getGameById(gameId),
+        webBasketballApiService.getGameTeamStatistics({ id: gameId }),
+      ]);
 
-        loadMatchData();
-    }, [params.id]);
+      if (g.status === 'fulfilled' && g.value) {
+        setGame(g.value);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-        );
+        if (g.value.teams?.home?.id && g.value.teams?.away?.id) {
+          webBasketballApiService
+            .getHeadToHead({
+              h2h: `${g.value.teams.home.id}-${g.value.teams.away.id}`,
+            })
+            .then((res) => setH2H(res || []))
+            .catch(() => {});
+        }
+
+        if (g.value.league?.id && g.value.league?.season) {
+          webBasketballApiService
+            .getStandings({
+              league: g.value.league.id,
+              season: g.value.league.season,
+            })
+            .then((res) => setStandings(res || []))
+            .catch(() => {});
+        }
+      }
+
+      if (st.status === 'fulfilled') {
+        setTeamStats(st.value || []);
+      }
+    } catch (err) {
+      console.error('[Web Basketball Match] Error loading data:', err);
+    } finally {
+      setLoading(false);
     }
+  }, [gameId]);
 
-    if (!match) {
-        return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex items-center justify-center">
-                <p className="text-white">Match not found</p>
-            </div>
-        );
-    }
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
-    const isLive = match.event_live === '1';
+  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(
+    game?.status.short || ''
+  );
 
+  if (loading) {
     return (
-        <div className="min-h-screen bg-[#0a0e27] pt-[90px]">
-            <div className="max-w-4xl mx-auto p-4">
-                {/* Back Button */}
-                <button
-                    onClick={() => router.back()}
-                    className="mb-4 flex items-center gap-2 text-text-secondary hover:text-white transition-colors"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Back
-                </button>
-
-                {/* Match Header */}
-                <div className="glass-card rounded-2xl p-6 mb-4">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <Link href={`/basketball/leagues/${match.league_key}`} className="text-sm font-bold text-text-secondary hover:text-white transition-colors">
-                                {match.league_name} • {match.league_round}
-                            </Link>
-                            <p className="text-xs text-text-muted mt-1">{match.event_date} • {match.event_time}</p>
-                        </div>
-                        {isLive && (
-                            <div className="flex items-center gap-2 bg-yellow-500/20 px-3 py-1.5 rounded-full border border-yellow-500/20">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                                </span>
-                                <span className="text-sm font-bold text-yellow-500">LIVE</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Teams and Score */}
-                    <div className="space-y-6">
-                        {/* Home Team */}
-                        <div className="flex items-center justify-between">
-                            <Link href={`/basketball/teams/${match.home_team_key}`} className="flex items-center gap-4 group">
-                                <div className="relative w-16 h-16 rounded-full bg-white/5 overflow-hidden">
-                                    <Image
-                                        src={match.event_home_team_logo || 'https://via.placeholder.com/64'}
-                                        alt={match.event_home_team}
-                                        width={64}
-                                        height={64}
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <span className="text-2xl font-bold text-white group-hover:text-yellow-500 transition-colors">
-                                    {match.event_home_team}
-                                </span>
-                            </Link>
-                            <span className="text-4xl font-bold text-white">
-                                {match.event_final_result?.split(' - ')[0] || '-'}
-                            </span>
-                        </div>
-
-                        {/* Away Team */}
-                        <div className="flex items-center justify-between">
-                            <Link href={`/basketball/teams/${match.away_team_key}`} className="flex items-center gap-4 group">
-                                <div className="relative w-16 h-16 rounded-full bg-white/5 overflow-hidden">
-                                    <Image
-                                        src={match.event_away_team_logo || 'https://via.placeholder.com/64'}
-                                        alt={match.event_away_team}
-                                        width={64}
-                                        height={64}
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <span className="text-2xl font-bold text-white group-hover:text-yellow-500 transition-colors">
-                                    {match.event_away_team}
-                                </span>
-                            </Link>
-                            <span className="text-4xl font-bold text-white">
-                                {match.event_final_result?.split(' - ')[1] || '-'}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Quarter Scores */}
-                    {match.scores && (
-                        <div className="mt-6 pt-6 border-t border-white/10">
-                            <div className="grid grid-cols-5 gap-2 text-center">
-                                <div className="text-xs text-text-muted font-bold">Team</div>
-                                {Object.keys(match.scores).map((quarter, i) => (
-                                    <div key={i} className="text-xs text-text-muted font-bold">{quarter.replace('Quarter', 'Q')}</div>
-                                ))}
-
-                                <div className="text-sm font-bold text-white">{match.event_home_team.substring(0, 3).toUpperCase()}</div>
-                                {Object.values(match.scores).map((score: any, i) => (
-                                    <div key={i} className="text-sm font-bold text-white">{score[0]?.score_home || '-'}</div>
-                                ))}
-
-                                <div className="text-sm font-bold text-white">{match.event_away_team.substring(0, 3).toUpperCase()}</div>
-                                {Object.values(match.scores).map((score: any, i) => (
-                                    <div key={i} className="text-sm font-bold text-white">{score[0]?.score_away || '-'}</div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Tabs */}
-                <div className="flex gap-2 mb-4">
-                    {(['overview', 'stats', 'lineups'] as const).map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`
-                                px-4 py-2 rounded-full border transition-all capitalize
-                                ${activeTab === tab
-                                    ? 'bg-yellow-500 text-white border-yellow-500'
-                                    : 'bg-white/5 border-white/5 text-text-secondary hover:bg-white/10'}
-                            `}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Tab Content */}
-                {activeTab === 'overview' && odds && (
-                    <div className="glass-card rounded-2xl p-6">
-                        <h3 className="text-xl font-bold text-white mb-4">Betting Odds</h3>
-                        <div className="space-y-4">
-                            {odds['Home/Away'] && (
-                                <div>
-                                    <p className="text-sm text-text-muted mb-2">Match Winner</p>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-white/5 rounded-lg p-4">
-                                            <p className="text-xs text-text-muted mb-2">Home Win</p>
-                                            <p className="text-2xl font-bold text-yellow-500">{odds['Home/Away']['Home']?.['Bet365'] || '-'}</p>
-                                        </div>
-                                        <div className="bg-white/5 rounded-lg p-4">
-                                            <p className="text-xs text-text-muted mb-2">Away Win</p>
-                                            <p className="text-2xl font-bold text-yellow-500">{odds['Home/Away']['Away']?.['Bet365'] || '-'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            {odds['Total'] && (
-                                <div>
-                                    <p className="text-sm text-text-muted mb-2">Total Points</p>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {Object.entries(odds['Total']).map(([key, value]: [string, any]) => (
-                                            <div key={key} className="bg-white/5 rounded-lg p-4">
-                                                <p className="text-xs text-text-muted mb-2">{key}</p>
-                                                <p className="text-xl font-bold text-yellow-500">{value?.['Bet365'] || '-'}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {odds['Handicap'] && (
-                                <div>
-                                    <p className="text-sm text-text-muted mb-2">Handicap</p>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {Object.entries(odds['Handicap']).map(([key, value]: [string, any]) => (
-                                            <div key={key} className="bg-white/5 rounded-lg p-4">
-                                                <p className="text-xs text-text-muted mb-2">{key}</p>
-                                                <p className="text-xl font-bold text-yellow-500">{value?.['Bet365'] || '-'}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'stats' && statistics && (
-                    <div className="space-y-4">
-                        {/* Team Statistics */}
-                        {statistics.statistics && statistics.statistics.length > 0 && (
-                            <div className="glass-card rounded-2xl p-6">
-                                <h3 className="text-xl font-bold text-white mb-4">Team Statistics</h3>
-                                <div className="space-y-3">
-                                    {statistics.statistics.map((stat: any, index: number) => (
-                                        <div key={index} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                                            <div className="flex-1 text-center">
-                                                <p className="text-lg font-bold text-white">{stat.home}</p>
-                                            </div>
-                                            <div className="flex-1 text-center">
-                                                <p className="text-xs text-text-muted font-bold uppercase">{stat.type}</p>
-                                            </div>
-                                            <div className="flex-1 text-center">
-                                                <p className="text-lg font-bold text-white">{stat.away}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Player Statistics */}
-                        {statistics.player_statistics && (
-                            <div className="space-y-4">
-                                {/* Home Team Players */}
-                                {statistics.player_statistics.home_team && statistics.player_statistics.home_team.length > 0 && (
-                                    <div className="glass-card rounded-2xl p-6">
-                                        <h3 className="text-xl font-bold text-white mb-4">{match?.event_home_team} - Player Stats</h3>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left border-collapse text-sm">
-                                                <thead>
-                                                    <tr className="border-b border-white/5 text-xs text-text-muted uppercase">
-                                                        <th className="p-2">Player</th>
-                                                        <th className="p-2 text-center">MIN</th>
-                                                        <th className="p-2 text-center">PTS</th>
-                                                        <th className="p-2 text-center">REB</th>
-                                                        <th className="p-2 text-center">AST</th>
-                                                        <th className="p-2 text-center">FG</th>
-                                                        <th className="p-2 text-center">3P</th>
-                                                        <th className="p-2 text-center">FT</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {statistics.player_statistics.home_team.map((player: any, index: number) => (
-                                                        <tr key={index} className="border-b border-white/5 hover:bg-white/5">
-                                                            <td className="p-2">
-                                                                <Link href={`/basketball/players/${player.player_id}`} className="font-bold text-white hover:text-yellow-500">
-                                                                    {player.player}
-                                                                </Link>
-                                                            </td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_minutes}</td>
-                                                            <td className="p-2 text-center font-bold text-yellow-500">{player.player_points}</td>
-                                                            <td className="p-2 text-center text-white">{player.player_total_rebounds}</td>
-                                                            <td className="p-2 text-center text-white">{player.player_assists}</td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_field_goals_made}/{player.player_field_goals_attempts}</td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_threepoint_goals_made}/{player.player_threepoint_goals_attempts}</td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_freethrows_goals_made}/{player.player_freethrows_goals_attempts}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Away Team Players */}
-                                {statistics.player_statistics.away_team && statistics.player_statistics.away_team.length > 0 && (
-                                    <div className="glass-card rounded-2xl p-6">
-                                        <h3 className="text-xl font-bold text-white mb-4">{match?.event_away_team} - Player Stats</h3>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left border-collapse text-sm">
-                                                <thead>
-                                                    <tr className="border-b border-white/5 text-xs text-text-muted uppercase">
-                                                        <th className="p-2">Player</th>
-                                                        <th className="p-2 text-center">MIN</th>
-                                                        <th className="p-2 text-center">PTS</th>
-                                                        <th className="p-2 text-center">REB</th>
-                                                        <th className="p-2 text-center">AST</th>
-                                                        <th className="p-2 text-center">FG</th>
-                                                        <th className="p-2 text-center">3P</th>
-                                                        <th className="p-2 text-center">FT</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {statistics.player_statistics.away_team.map((player: any, index: number) => (
-                                                        <tr key={index} className="border-b border-white/5 hover:bg-white/5">
-                                                            <td className="p-2">
-                                                                <Link href={`/basketball/players/${player.player_id}`} className="font-bold text-white hover:text-yellow-500">
-                                                                    {player.player}
-                                                                </Link>
-                                                            </td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_minutes}</td>
-                                                            <td className="p-2 text-center font-bold text-yellow-500">{player.player_points}</td>
-                                                            <td className="p-2 text-center text-white">{player.player_total_rebounds}</td>
-                                                            <td className="p-2 text-center text-white">{player.player_assists}</td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_field_goals_made}/{player.player_field_goals_attempts}</td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_threepoint_goals_made}/{player.player_threepoint_goals_attempts}</td>
-                                                            <td className="p-2 text-center text-text-secondary">{player.player_freethrows_goals_made}/{player.player_freethrows_goals_attempts}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {(!statistics || (!statistics.statistics?.length && !statistics.player_statistics?.home_team?.length)) && (
-                            <div className="glass-card rounded-2xl p-6">
-                                <p className="text-text-muted text-center">Statistics will be available during and after the match.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'lineups' && lineups && (
-                    <div className="space-y-4">
-                        {/* Home Team Lineup */}
-                        {lineups.home_team && lineups.home_team.starting_lineups && lineups.home_team.starting_lineups.length > 0 && (
-                            <div className="glass-card rounded-2xl p-6">
-                                <h3 className="text-xl font-bold text-white mb-4">{match?.event_home_team} - Starting Lineup</h3>
-                                <div className="space-y-3">
-                                    {lineups.home_team.starting_lineups.map((player: any, index: number) => (
-                                        <Link
-                                            key={index}
-                                            href={`/basketball/players/${player.player_id}`}
-                                            className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors group"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-sm font-bold text-text-muted w-8">#{player.player_number}</span>
-                                                <span className="font-bold text-white group-hover:text-yellow-500">{player.player}</span>
-                                            </div>
-                                            <span className="text-sm text-text-secondary">{player.player_position}</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Away Team Lineup */}
-                        {lineups.away_team && lineups.away_team.starting_lineups && lineups.away_team.starting_lineups.length > 0 && (
-                            <div className="glass-card rounded-2xl p-6">
-                                <h3 className="text-xl font-bold text-white mb-4">{match?.event_away_team} - Starting Lineup</h3>
-                                <div className="space-y-3">
-                                    {lineups.away_team.starting_lineups.map((player: any, index: number) => (
-                                        <Link
-                                            key={index}
-                                            href={`/basketball/players/${player.player_id}`}
-                                            className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors group"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-sm font-bold text-text-muted w-8">#{player.player_number}</span>
-                                                <span className="font-bold text-white group-hover:text-yellow-500">{player.player}</span>
-                                            </div>
-                                            <span className="text-sm text-text-secondary">{player.player_position}</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {(!lineups || (!lineups.home_team?.starting_lineups?.length && !lineups.away_team?.starting_lineups?.length)) && (
-                            <div className="glass-card rounded-2xl p-6">
-                                <p className="text-text-muted text-center">Lineups will be available closer to match time.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-        </div>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+        <p className="text-sm text-slate-400">Loading game center...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      {/* Back Link */}
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center space-x-1 text-sm font-semibold text-slate-400 hover:text-white"
+        >
+          <span>← Back</span>
+        </button>
+        <button
+          onClick={loadData}
+          className="flex items-center space-x-1.5 rounded-lg border border-white/10 bg-[#1E293B] px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
+        >
+          <span>🔄 Refresh</span>
+        </button>
+      </div>
+
+      {/* Score Banner */}
+      <div className="mb-6 rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-2xl">
+        <div className="mb-6 flex items-center justify-center space-x-2 text-xs font-semibold text-slate-400">
+          {game?.league.logo && (
+            <img src={game.league.logo} alt={game.league.name} className="h-4 w-4 object-contain" />
+          )}
+          <span>
+            {game?.league.name} • {game?.country.name}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-3 items-center gap-4">
+          {/* Home Team */}
+          <div className="flex flex-col items-center text-center">
+            {game?.teams.home.logo ? (
+              <img
+                src={game.teams.home.logo}
+                alt={game.teams.home.name}
+                className="h-16 w-16 object-contain drop-shadow"
+              />
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">🏀</div>
+            )}
+            <h2 className="mt-2 text-base font-bold text-white">{game?.teams.home.name}</h2>
+          </div>
+
+          {/* Center Score */}
+          <div className="flex flex-col items-center justify-center">
+            <span
+              className={`mb-2 rounded-full px-3 py-0.5 text-xs font-bold ${
+                isLive
+                  ? 'border border-orange-500/50 bg-orange-500/10 text-orange-400'
+                  : 'bg-white/10 text-slate-300'
+              }`}
+            >
+              {game?.status.short || 'VS'}
+            </span>
+            <div className="text-4xl font-black tracking-widest text-white">
+              {game?.scores.home.total ?? '-'}:{game?.scores.away.total ?? '-'}
+            </div>
+            {game?.time && (
+              <span className="mt-2 text-[11px] text-slate-500">
+                {game.date} • {game.time}
+              </span>
+            )}
+          </div>
+
+          {/* Away Team */}
+          <div className="flex flex-col items-center text-center">
+            {game?.teams.away.logo ? (
+              <img
+                src={game.teams.away.logo}
+                alt={game.teams.away.name}
+                className="h-16 w-16 object-contain drop-shadow"
+              />
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">🏀</div>
+            )}
+            <h2 className="mt-2 text-base font-bold text-white">{game?.teams.away.name}</h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-6 flex space-x-2 rounded-xl bg-[#141C2B] p-1 border border-white/5">
+        {(['overview', 'quarters', 'stats', 'h2h', 'standings'] as BasketballDetailTab[]).map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 rounded-lg py-2.5 text-xs font-bold uppercase transition ${
+                isActive
+                  ? 'bg-[#1E293B] text-orange-400 shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab 1: Overview */}
+      {activeTab === 'overview' && (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 space-y-4">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-white/5 pb-2">
+            Game Info
+          </h3>
+          <div className="grid gap-3 text-sm">
+            <div className="flex justify-between border-b border-white/5 py-2">
+              <span className="text-slate-400">Competition</span>
+              <span className="font-semibold text-white">{game?.league.name}</span>
+            </div>
+            <div className="flex justify-between border-b border-white/5 py-2">
+              <span className="text-slate-400">Season</span>
+              <span className="font-semibold text-white">{game?.league.season}</span>
+            </div>
+            <div className="flex justify-between border-b border-white/5 py-2">
+              <span className="text-slate-400">Date & Time</span>
+              <span className="font-semibold text-white">{game?.date} {game?.time}</span>
+            </div>
+            <div className="flex justify-between border-b border-white/5 py-2">
+              <span className="text-slate-400">Status</span>
+              <span className="font-semibold text-white">{game?.status.long || game?.status.short}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 2: Quarters */}
+      {activeTab === 'quarters' && (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
+            Quarter-by-Quarter Breakdown
+          </h3>
+          <table className="w-full text-left text-sm text-slate-300">
+            <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+              <tr>
+                <th className="py-2.5 px-3">Team</th>
+                <th className="py-2.5 px-3 text-center">Q1</th>
+                <th className="py-2.5 px-3 text-center">Q2</th>
+                <th className="py-2.5 px-3 text-center">Q3</th>
+                <th className="py-2.5 px-3 text-center">Q4</th>
+                {game?.scores.home.over_time !== null && (
+                  <th className="py-2.5 px-3 text-center">OT</th>
+                )}
+                <th className="py-2.5 px-3 text-center font-black text-orange-400">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              <tr>
+                <td className="py-3 px-3 font-bold text-white">{game?.teams.home.name}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.home.quarter_1 ?? '-'}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.home.quarter_2 ?? '-'}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.home.quarter_3 ?? '-'}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.home.quarter_4 ?? '-'}</td>
+                {game?.scores.home.over_time !== null && (
+                  <td className="py-3 px-3 text-center">{game?.scores.home.over_time ?? '-'}</td>
+                )}
+                <td className="py-3 px-3 text-center font-black text-orange-400">{game?.scores.home.total ?? '-'}</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-3 font-bold text-white">{game?.teams.away.name}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.away.quarter_1 ?? '-'}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.away.quarter_2 ?? '-'}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.away.quarter_3 ?? '-'}</td>
+                <td className="py-3 px-3 text-center">{game?.scores.away.quarter_4 ?? '-'}</td>
+                {game?.scores.away.over_time !== null && (
+                  <td className="py-3 px-3 text-center">{game?.scores.away.over_time ?? '-'}</td>
+                )}
+                <td className="py-3 px-3 text-center font-black text-orange-400">{game?.scores.away.total ?? '-'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Tab 3: Stats */}
+      {activeTab === 'stats' && (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
+            Team Game Statistics
+          </h3>
+          {teamStats.length === 0 ? (
+            <p className="text-center text-sm text-slate-500 py-8">
+              Team statistics available for live and completed games.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {teamStats.map((st, idx) => (
+                <div key={idx} className="flex justify-between border-b border-white/5 py-2 text-sm">
+                  <span className="text-slate-400">{st.type || `Stat #${idx + 1}`}</span>
+                  <span className="font-bold text-white">{st.value || '-'}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab 4: Head-to-Head */}
+      {activeTab === 'h2h' && (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
+            Past H2H Matches
+          </h3>
+          {h2h.length === 0 ? (
+            <p className="text-center text-sm text-slate-500 py-8">No past match history found.</p>
+          ) : (
+            <div className="space-y-3">
+              {h2h.slice(0, 5).map((h) => (
+                <div key={h.id} className="flex items-center justify-between rounded-lg bg-white/[0.02] p-3 border border-white/5">
+                  <span className="text-xs text-slate-400">{h.date}</span>
+                  <div className="flex items-center space-x-3 text-sm font-bold">
+                    <span className="text-slate-200">{h.teams.home.name}</span>
+                    <span className="text-orange-400">{h.scores.home.total ?? '-'}:{h.scores.away.total ?? '-'}</span>
+                    <span className="text-slate-200">{h.teams.away.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab 5: Standings */}
+      {activeTab === 'standings' && (
+        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
+            {game?.league.name} Standings
+          </h3>
+          {standings.length === 0 ? (
+            <p className="text-center text-sm text-slate-500 py-8">Standings not available for this league.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-slate-300">
+                <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                  <tr>
+                    <th className="py-2.5 px-2">#</th>
+                    <th className="py-2.5 px-4">Team</th>
+                    <th className="py-2.5 px-3 text-center">W</th>
+                    <th className="py-2.5 px-3 text-center">L</th>
+                    <th className="py-2.5 px-3 text-center">PCT</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {standings.map((row, idx) => (
+                    <tr key={idx} className="hover:bg-white/5">
+                      <td className="py-2.5 px-2 font-bold text-slate-400">{row.position || idx + 1}</td>
+                      <td className="flex items-center space-x-2.5 py-2.5 px-4 font-bold text-white">
+                        {row.team?.logo && (
+                          <img src={row.team.logo} alt={row.team.name} className="h-4 w-4 object-contain" />
+                        )}
+                        <span>{row.team?.name || 'Team'}</span>
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-bold text-emerald-400">{row.games?.win?.total ?? 0}</td>
+                      <td className="py-2.5 px-3 text-center font-bold text-red-400">{row.games?.lose?.total ?? 0}</td>
+                      <td className="py-2.5 px-3 text-center font-medium">{row.games?.win?.percentage ?? '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
