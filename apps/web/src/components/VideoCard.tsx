@@ -1,77 +1,77 @@
 'use client';
 
+import React from 'react';
 import { VideoHighlight } from '@goalmills/types';
 import Image from 'next/image';
 
 interface VideoCardProps {
-    video: VideoHighlight;
-    onPress?: () => void;
+  video: VideoHighlight;
+  onPress?: () => void;
 }
 
 export function VideoCard({ video, onPress }: VideoCardProps) {
-    const formatViews = (views: number): string => {
-        if (views >= 1000000) {
-            return `${(views / 1000000).toFixed(1)}M`;
-        }
-        if (views >= 1000) {
-            return `${(views / 1000).toFixed(1)}K`;
-        }
-        return views.toString();
-    };
+  const formatViews = (views: number): string => {
+    if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+    if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
+    return views ? views.toString() : '0';
+  };
 
-    return (
-        <div
-            onClick={onPress}
-            className="group glass-card rounded-xl overflow-hidden mb-4 cursor-pointer relative"
-        >
-            <div className="relative w-full aspect-video">
-                <Image
-                    src={video.thumbnail}
-                    alt={video.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/30 transition-colors">
-                    <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center
-                                  group-hover:scale-110 group-hover:bg-accent-red group-hover:border-accent-red/50 transition-all duration-300 shadow-xl">
-                        <svg className="w-6 h-6 text-white ml-1 fill-current" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                        </svg>
-                    </div>
-                </div>
-                <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">
-                    <span className="text-xs font-bold text-white tracking-wide">{video.duration}</span>
-                </div>
-            </div>
+  const leagueName = video.matchInfo?.league || video.league?.name;
+  const dateStr = video.matchInfo?.date || video.date;
 
-            <div className="p-4">
-                <div className="flex justify-between items-start gap-4 mb-2">
-                    <h3 className="text-base font-bold text-text-primary line-clamp-2 leading-snug group-hover:text-primary-light transition-colors">
-                        {video.title}
-                    </h3>
-                </div>
+  return (
+    <div
+      onClick={onPress}
+      className="group relative cursor-pointer rounded-2xl border border-white/10 bg-[#141C2B] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-xl hover:shadow-blue-500/10"
+    >
+      {/* Thumbnail Container */}
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
+        <img
+          src={video.thumbnail || 'https://picsum.photos/seed/vid/800/450'}
+          alt={video.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
 
-                {video.description && (
-                    <p className="text-sm text-text-muted mb-3 line-clamp-1">{video.description}</p>
-                )}
-
-                <div className="flex justify-between items-center text-xs">
-                    <div className="flex items-center gap-1.5 text-text-secondary">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        <span>{formatViews(video.views)} views</span>
-                    </div>
-
-                    {video.teams.length > 0 && (
-                        <span className="text-secondary font-semibold truncate ml-2 flex-1 text-right max-w-[50%]">
-                            {video.teams.join(' vs ')}
-                        </span>
-                    )}
-                </div>
-            </div>
+        {/* Play Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-blue-600/90 text-white shadow-xl backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-500">
+            <svg className="ml-0.5 h-5 w-5 fill-current" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
         </div>
-    );
+
+        {/* Duration Badge */}
+        {video.duration ? (
+          <div className="absolute bottom-2.5 right-2.5 rounded bg-black/80 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+            {video.duration}
+          </div>
+        ) : null}
+
+        {/* League Badge */}
+        {leagueName ? (
+          <div className="absolute top-2.5 left-2.5 rounded-md border border-white/10 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-400 backdrop-blur-sm">
+            {leagueName}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        <h3 className="line-clamp-2 text-sm font-bold text-white transition-colors group-hover:text-blue-400">
+          {video.title}
+        </h3>
+
+        <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-2.5 text-xs text-slate-400">
+          <div className="flex items-center space-x-1.5">
+            <span>👁️</span>
+            <span>{formatViews(video.views)} views</span>
+          </div>
+          {dateStr ? (
+            <div className="text-[11px] text-slate-500">{dateStr}</div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
 }

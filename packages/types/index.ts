@@ -37,6 +37,18 @@ export interface VideoHighlight {
     logo: string;
   };
   videoUrl?: string;
+  matchInfo?: {
+    league?: string;
+    date?: string;
+    homeTeam?: {
+      name?: string;
+      logo?: string;
+    };
+    awayTeam?: {
+      name?: string;
+      logo?: string;
+    };
+  };
 }
 
 // Football Types
