@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import { useToast } from '../Toast';
 import 'react-quill-new/dist/quill.snow.css';
 
 // Dynamic import for ReactQuill to avoid SSR issues
@@ -13,6 +14,7 @@ interface EditNewsFormProps {
 }
 
 export default function EditNewsForm({ id }: EditNewsFormProps) {
+    const toast = useToast();
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [excerpt, setExcerpt] = useState('');
@@ -65,11 +67,12 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
             const data = await res.json();
             if (res.ok) {
                 setImage(data.url);
+                toast.success('Image uploaded successfully');
             } else {
-                alert(data.message || 'Upload failed');
+                toast.error(data.message || 'Upload failed');
             }
         } catch (error) {
-            alert('An error occurred during upload');
+            toast.error('An error occurred during upload');
         } finally {
             setUploading(false);
         }

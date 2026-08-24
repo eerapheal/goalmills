@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useToast } from '../Toast';
 
 interface NewsArticle {
     _id: string;
@@ -14,6 +15,7 @@ interface NewsArticle {
 }
 
 export default function NewsList() {
+    const toast = useToast();
     const { data: session } = useSession();
     const [news, setNews] = useState<NewsArticle[]>([]);
     const [loading, setLoading] = useState(true);
@@ -41,12 +43,13 @@ export default function NewsList() {
             const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
             if (res.ok) {
                 setNews(news.filter(n => n._id !== id));
+                toast.success('Article deleted successfully');
             } else {
                 const data = await res.json();
-                alert(data.message || 'Error deleting article');
+                toast.error(data.message || 'Error deleting article');
             }
         } catch (err) {
-            alert('An error occurred');
+            toast.error('An error occurred');
         }
     };
 

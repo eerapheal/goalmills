@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '../Toast';
 
 export default function UploadVideoForm() {
+    const toast = useToast();
     const [title, setTitle] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
     const [thumbnail, setThumbnail] = useState('');
@@ -73,11 +75,12 @@ export default function UploadVideoForm() {
             const data = await res.json();
             if (res.ok) {
                 setThumbnail(data.url);
+                toast.success('Thumbnail uploaded successfully');
             } else {
-                alert(data.message || 'Upload failed');
+                toast.error(data.message || 'Upload failed');
             }
         } catch (error) {
-            alert('An error occurred during upload');
+            toast.error('An error occurred during upload');
         } finally {
             setUploading(false);
         }

@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useToast } from '../Toast';
 import 'react-quill-new/dist/quill.snow.css';
 
 // Dynamic import for ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
 export default function CreateNewsForm() {
+    const toast = useToast();
     const [title, setTitle] = useState('');
     const [excerpt, setExcerpt] = useState('');
     const [content, setContent] = useState('');
@@ -34,11 +36,12 @@ export default function CreateNewsForm() {
             const data = await res.json();
             if (res.ok) {
                 setImage(data.url);
+                toast.success('Image uploaded successfully');
             } else {
-                alert(data.message || 'Upload failed');
+                toast.error(data.message || 'Upload failed');
             }
         } catch (error) {
-            alert('An error occurred during upload');
+            toast.error('An error occurred during upload');
         } finally {
             setUploading(false);
         }

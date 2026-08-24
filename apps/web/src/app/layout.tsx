@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '../components/Header';
 import { AuthProvider } from '../components/AuthProvider';
+import { ToastProvider } from '../components/Toast';
+import { Footer } from '../components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -51,8 +53,6 @@ export const metadata: Metadata = {
     },
 };
 
-import { Footer } from '../components/Footer';
-
 export default function RootLayout({
     children,
 }: {
@@ -62,11 +62,13 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <body className={`${inter.className} antialiased bg-slate-950 text-slate-200`} suppressHydrationWarning>
                 <AuthProvider>
-                    <Header />
-                    <main>
-                        {children}
-                    </main>
-                    <Footer />
+                    <ToastProvider>
+                        <Header />
+                        <main>
+                            {children}
+                        </main>
+                        <Footer />
+                    </ToastProvider>
                 </AuthProvider>
             </body>
         </html>

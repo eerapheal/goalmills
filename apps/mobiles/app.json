@@ -21,7 +21,9 @@
       "package": "com.goalmills.app",
       "permissions": [
         "INTERNET",
-        "RECEIVE_BOOT_COMPLETED"
+        "RECEIVE_BOOT_COMPLETED",
+        "POST_NOTIFICATIONS",
+        "VIBRATE"
       ],
       "softwareKeyboardLayoutMode": "pan"
     },
@@ -48,6 +50,13 @@
             "targetSdkVersion": 35,
             "buildToolsVersion": "36.0.0"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#001f3f"
         }
       ],
       "expo-font"

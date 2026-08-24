@@ -23,15 +23,27 @@ const Header = () => {
                 </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.privacyButton}
-                onPress={() => router.push('/privacy')}
-                activeOpacity={0.7}
-                accessibilityLabel="Data Safety and Privacy Policy"
-                accessibilityRole="button"
-            >
-                <Ionicons name="shield-checkmark-outline" size={22} color="#4f9bff" />
-            </TouchableOpacity>
+            <View style={styles.rightActions}>
+                <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => router.push('/notifications')}
+                    activeOpacity={0.7}
+                    accessibilityLabel="Alerts and Notifications"
+                    accessibilityRole="button"
+                >
+                    <Ionicons name="notifications-outline" size={21} color="#4f9bff" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => router.push('/privacy')}
+                    activeOpacity={0.7}
+                    accessibilityLabel="Data Safety and Privacy Policy"
+                    accessibilityRole="button"
+                >
+                    <Ionicons name="shield-checkmark-outline" size={21} color="#4f9bff" />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -76,7 +88,12 @@ const styles = StyleSheet.create({
     titlePlain: {
         color: '#fff',
     },
-    privacyButton: {
+    rightActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    actionButton: {
         width: 38,
         height: 38,
         borderRadius: 19,

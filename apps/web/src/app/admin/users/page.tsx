@@ -5,8 +5,10 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { FiArrowLeft, FiLogOut } from 'react-icons/fi';
 import { User, UserRole } from '@goalmills/types';
+import { useToast } from '../../../components/Toast';
 
 export default function UserManagementPage() {
+    const toast = useToast();
     const { data: session } = useSession();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
@@ -44,11 +46,12 @@ export default function UserManagementPage() {
 
             if (res.ok) {
                 setUsers(users.map(u => u._id === userId ? { ...u, role: newRole as any } : u));
+                toast.success('User role updated successfully');
             } else {
-                alert('Failed to update role');
+                toast.error('Failed to update role');
             }
         } catch (err) {
-            alert('An error occurred');
+            toast.error('An error occurred');
         }
     };
 
@@ -62,12 +65,13 @@ export default function UserManagementPage() {
 
             if (res.ok) {
                 setUsers(users.filter(u => u._id !== userId));
+                toast.success('User deleted successfully');
             } else {
                 const data = await res.json();
-                alert(data.message || 'Failed to delete user');
+                toast.error(data.message || 'Failed to delete user');
             }
         } catch (err) {
-            alert('An error occurred');
+            toast.error('An error occurred');
         }
     };
 
