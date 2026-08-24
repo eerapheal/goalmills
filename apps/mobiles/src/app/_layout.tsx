@@ -15,11 +15,12 @@ export default function RootLayout() {
                     headerTitleStyle: {
                         fontWeight: 'bold',
                     },
-                    // Use custom Header component for all screens
+                    // Use custom Header component for stack screens by default
                     header: () => <Header />,
                 }}
             >
                 <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
+                <Stack.Screen name="privacy" options={{ headerShown: false }} />
             </Stack>
         </>
     );

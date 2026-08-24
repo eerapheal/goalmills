@@ -1,34 +1,59 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 const Header = () => {
+    const router = useRouter();
+
     return (
         <View style={styles.container}>
-            <View style={styles.logoWrapper}>
-                <Image source={require('../assets/icon.png')} style={styles.logo} />
-            </View>
-            <Text style={styles.title}>
-                <Text style={styles.titleGradient}>GOAL</Text>
-                <Text style={styles.titlePlain}>MILLS</Text>
-            </Text>
+            <TouchableOpacity
+                style={styles.brandContainer}
+                onPress={() => router.push('/(tabs)/home')}
+                activeOpacity={0.8}
+                accessibilityLabel="Go to Home"
+            >
+                <View style={styles.logoWrapper}>
+                    <Image source={require('../assets/icon.png')} style={styles.logo} />
+                </View>
+                <Text style={styles.title}>
+                    <Text style={styles.titleGradient}>GOAL</Text>
+                    <Text style={styles.titlePlain}>MILLS</Text>
+                </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.privacyButton}
+                onPress={() => router.push('/privacy')}
+                activeOpacity={0.7}
+                accessibilityLabel="Data Safety and Privacy Policy"
+                accessibilityRole="button"
+            >
+                <Ionicons name="shield-checkmark-outline" size={22} color="#4f9bff" />
+            </TouchableOpacity>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 
-         'row',
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingVertical: 12,
         backgroundColor: '#001f3f', // match stack header background
         borderBottomWidth: 1,
         borderBottomColor: '#54789dff',
     },
+    brandContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     logoWrapper: {
-        width: 40,
-        height: 40,
+        width: 38,
+        height: 38,
         borderRadius: 8,
         overflow: 'hidden',
         backgroundColor: '#fff',
@@ -40,16 +65,26 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     title: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: '900',
         color: '#fff',
+        letterSpacing: 0.5,
     },
     titleGradient: {
-        // React Native doesn't support gradient text out of the box; using color placeholder
         color: '#4f9bff',
     },
     titlePlain: {
         color: '#fff',
+    },
+    privacyButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        backgroundColor: 'rgba(79, 155, 255, 0.12)',
+        borderWidth: 1,
+        borderColor: 'rgba(79, 155, 255, 0.25)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 
