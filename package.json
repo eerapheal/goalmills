@@ -13,6 +13,8 @@
     "mobile": "turbo run dev --filter=mobile"
   },
   "devDependencies": {
+    "@types/react": "~19.2.18",
+    "@types/react-dom": "~19.2.4",
     "prettier": "^3.1.0",
     "turbo": "^1.11.0",
     "typescript": "^5.9.0"

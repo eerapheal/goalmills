@@ -19,7 +19,6 @@
         "backgroundColor": "#001f3f"
       },
       "package": "com.goalmills.app",
-      "versionCode": 1,
       "permissions": [
         "INTERNET",
         "RECEIVE_BOOT_COMPLETED"
@@ -45,13 +44,20 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 34,
-            "targetSdkVersion": 34,
-            "buildToolsVersion": "34.0.0"
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
           }
         }
       ],
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b2f0a4ff-9268-4e71-a1d8-e3476445abaa"
+      }
+    },
+    "owner": "sharpalee"
   }
 }
