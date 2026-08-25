@@ -12,11 +12,28 @@ const CACHE_STORE = new Map<string, CacheEntry>();
 // Throttle tracking for rate-limited upstream responses (429)
 let rateLimitBackoffUntil = 0;
 
+// Rate-limit spacer: ensures minimum 250ms spacing between outbound upstream fetches to prevent 429 burst rejects
+let lastFetchTime = 0;
+const MIN_FETCH_GAP_MS = 250;
+
+async function rateLimitedFetch(url: string, options: RequestInit): Promise<Response> {
+  const now = Date.now();
+  const timeSinceLast = now - lastFetchTime;
+  if (timeSinceLast < MIN_FETCH_GAP_MS) {
+    const delay = MIN_FETCH_GAP_MS - timeSinceLast;
+    lastFetchTime = now + delay;
+    await new Promise(resolve => setTimeout(resolve, delay));
+  } else {
+    lastFetchTime = Date.now();
+  }
+  return fetch(url, options);
+}
+
 function getApiBaseUrl(): string {
   let raw =
     process.env.NEXT_PUBLIC_CRICKET_BASE_URL ||
     process.env.CRICKET_BASE_URL ||
-    'https://apiv2.allsportsapi.com/cricket';
+    'https://cricbuzz-cricket.p.rapidapi.com';
 
   raw = raw.trim();
   if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
@@ -39,16 +56,51 @@ function getTtlForEndpoint(endpoint: string): number {
   if (ep.includes('live') || ep.includes('score')) {
     return 15; // 15 seconds for live matches
   }
-  if (ep.includes('fixture') || ep.includes('match') || ep.includes('schedule')) {
+  if (ep.includes('fixture') || ep.includes('match') || ep.includes('schedule') || ep.includes('upcoming') || ep.includes('recent')) {
     return 60; // 1 minute for fixtures / schedules
   }
-  if (ep.includes('standing') || ep.includes('table') || ep.includes('rank')) {
+  if (ep.includes('standing') || ep.includes('table') || ep.includes('rank') || ep.includes('points-table')) {
     return 300; // 5 minutes for standings & rankings
   }
-  if (ep.includes('team') || ep.includes('league') || ep.includes('player') || ep.includes('news')) {
+  if (ep.includes('team') || ep.includes('league') || ep.includes('series') || ep.includes('player') || ep.includes('news')) {
     return 600; // 10 minutes for relatively static info
   }
-  return 60; // default 60 seconds
+  return 60;
+}
+
+/**
+ * Map legacy or generic endpoint names to Cricbuzz RapidAPI routes
+ */
+function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): string {
+  if (endpoint.includes('/')) {
+    return `/${endpoint.replace(/^\//, '')}`;
+  }
+
+  const ep = endpoint.toLowerCase();
+  if (ep === 'livescore' || ep === 'live') {
+    return '/matches/v1/live';
+  }
+  if (ep === 'fixtures' || ep === 'upcoming') {
+    return '/matches/v1/upcoming';
+  }
+  if (ep === 'recent') {
+    return '/matches/v1/recent';
+  }
+  if (ep === 'leagues' || ep === 'series') {
+    return '/series/v1/international';
+  }
+  if (ep === 'standings' || ep === 'points-table') {
+    const seriesId = searchParams.get('leagueId') || searchParams.get('seriesId');
+    return seriesId ? `/series/v1/${seriesId}/points-table` : '/series/v1/international';
+  }
+  if (ep === 'teams') {
+    return '/teams/v1/international';
+  }
+  if (ep === 'news') {
+    return '/news/v1/index';
+  }
+
+  return `/matches/v1/${ep}`;
 }
 
 export async function GET(request: NextRequest) {
@@ -67,9 +119,10 @@ export async function GET(request: NextRequest) {
     const isRapidApi = baseUrlStr.includes('rapidapi.com');
     const apiUrl = new URL(baseUrlStr);
 
-    // Build headers
+    // Build headers matching RapidAPI specs
     const headers: Record<string, string> = {
-      Accept: 'application/json',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     };
 
     if (isRapidApi) {
@@ -77,25 +130,32 @@ export async function GET(request: NextRequest) {
         headers['x-rapidapi-key'] = API_KEY;
       }
       headers['x-rapidapi-host'] = apiUrl.host;
+      apiUrl.pathname = mapCricbuzzPath(endpointParam, searchParams);
 
-      if (endpointParam.includes('/')) {
-        apiUrl.pathname = `/${endpointParam.replace(/^\//, '')}`;
-      } else {
-        apiUrl.pathname = `/cricket/v1/${endpointParam.toLowerCase()}`;
-      }
+      // Only forward valid search params for RapidAPI (strip incompatible date filters)
+      searchParams.forEach((value: any, key: any) => {
+        if (
+          key !== 'met' &&
+          key !== 'endpoint' &&
+          key !== 'from' &&
+          key !== 'to' &&
+          key !== 'timezone' &&
+          value
+        ) {
+          apiUrl.searchParams.append(key, value);
+        }
+      });
     } else {
       apiUrl.searchParams.append('met', endpointParam);
       if (API_KEY) {
         apiUrl.searchParams.append('APIkey', API_KEY);
       }
+      searchParams.forEach((value: any, key: any) => {
+        if (key !== 'met' && key !== 'endpoint' && value) {
+          apiUrl.searchParams.append(key, value);
+        }
+      });
     }
-
-    // Forward all other search params
-    searchParams.forEach((value: any, key: any) => {
-      if (key !== 'met' && key !== 'endpoint' && value) {
-        apiUrl.searchParams.append(key, value);
-      }
-    });
 
     const cacheKey = apiUrl.toString();
     const ttlSeconds = getTtlForEndpoint(endpointParam);
@@ -115,7 +175,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // If we are within a rate limit backoff period (429), return cached stale data or fallback immediately
+    // If rate-limited backoff is active (429), return stale cached data or graceful fallback
     if (now < rateLimitBackoffUntil) {
       if (cached) {
         return NextResponse.json(cached.data, {
@@ -141,9 +201,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    console.log('Proxying cricket request to:', apiUrl.toString());
+
     let response: Response | null = null;
     try {
-      response = await fetch(apiUrl.toString(), {
+      response = await rateLimitedFetch(apiUrl.toString(), {
         method: 'GET',
         headers,
         next: { revalidate: ttlSeconds },
@@ -154,14 +216,16 @@ export async function GET(request: NextRequest) {
 
     if (!response || !response.ok) {
       const status = response ? response.status : 502;
-      console.warn(`Cricket API status ${status} for ${endpointParam}, returning empty success to trigger client fallbacks.`);
-
-      // If rate limited (429), trigger a 30-second backoff window to stop hammering upstream
-      if (status === 429) {
-        rateLimitBackoffUntil = Date.now() + 30_000;
+      if (status === 404) {
+        console.info(`[Info] No live standings/points-table for series ${searchParams.get('leagueId') || searchParams.get('seriesId') || ''} (bilateral tour/non-league format), using graceful client fallback.`);
+      } else {
+        console.warn(`Cricket API status ${status} for ${endpointParam}, returning empty success to trigger client fallbacks.`);
       }
 
-      // If we have any stale cached data, serve it rather than an empty array
+      if (status === 429) {
+        rateLimitBackoffUntil = Date.now() + 15_000;
+      }
+
       if (cached) {
         return NextResponse.json(cached.data, {
           headers: {
@@ -188,10 +252,12 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    // Standardize result property if API returns list or wrapped object
+    // Standardize Cricbuzz response wrapper
     const standardized = {
       success: 1,
-      result: Array.isArray(data) ? data : (data.result ?? data.typeMatches ?? data.matches ?? data),
+      result: Array.isArray(data)
+        ? data
+        : (data.typeMatches ?? data.matches ?? data.values ?? data.storyList ?? data.pointsTable ?? data.result ?? data),
       ...(!Array.isArray(data) ? data : {}),
     };
 
@@ -213,7 +279,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Cricket Proxy error:', error);
-    // Graceful response so UI never crashes
     return NextResponse.json(
       { success: 1, result: [], message: error instanceof Error ? error.message : 'Fallback' },
       { status: 200 }

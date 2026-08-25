@@ -9,6 +9,23 @@ interface CacheEntry {
 const CACHE_STORE = new Map<string, CacheEntry>();
 let rateLimitBackoffUntil = 0;
 
+// Rate-limit spacer: ensures minimum 250ms spacing between outbound upstream fetches to prevent 429 burst rejects
+let lastFetchTime = 0;
+const MIN_FETCH_GAP_MS = 250;
+
+async function rateLimitedFetch(url: string, options: RequestInit): Promise<Response> {
+  const now = Date.now();
+  const timeSinceLast = now - lastFetchTime;
+  if (timeSinceLast < MIN_FETCH_GAP_MS) {
+    const delay = MIN_FETCH_GAP_MS - timeSinceLast;
+    lastFetchTime = now + delay;
+    await new Promise(resolve => setTimeout(resolve, delay));
+  } else {
+    lastFetchTime = Date.now();
+  }
+  return fetch(url, options);
+}
+
 function getApiBaseUrl(): string {
   let raw =
     process.env.NEXT_PUBLIC_BASKETBALL_BASE_URL ||
@@ -143,7 +160,7 @@ export async function GET(request: NextRequest) {
     while (attempts < maxAttempts) {
       try {
         attempts++;
-        response = await fetch(apiUrl.toString(), {
+        response = await rateLimitedFetch(apiUrl.toString(), {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -175,7 +192,7 @@ export async function GET(request: NextRequest) {
       console.warn(`Basketball API status ${status} for ${method}, returning graceful fallback.`);
 
       if (status === 429) {
-        rateLimitBackoffUntil = Date.now() + 30_000;
+        rateLimitBackoffUntil = Date.now() + 15_000;
       }
 
       // If we have any stale cached data, serve it rather than an empty array
