@@ -515,4 +515,233 @@ export const advancedCricketApi = {
       return { success: 1, result: [] };
     }
   },
+
+  getTrendingPlayers: async (): Promise<CricketPlayer[]> => {
+    try {
+      const res = await fetchFromAPI<any>('players/list-trending');
+      const list = res.player || res.result || res.players || (Array.isArray(res) ? res : []);
+      if (Array.isArray(list) && list.length > 0) {
+        return list.map((p: any) => ({
+          player_key: String(p.id || p.player_key || p.playerId),
+          player_name: p.name || p.player_name || 'Cricket Star',
+          team_name: p.teamName || p.team_name || 'National Team',
+          player_country: p.country || p.player_country || 'International',
+          player_type: p.role || p.player_type || 'Batsman',
+          player_image: p.faceImageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${p.faceImageId}/i.jpg` : p.player_image,
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getTrendingPlayers (mobile):', e);
+    }
+    return CRICKET_PLAYERS_DATABASE.slice(0, 10);
+  },
+
+  getPlayerCareer: async (playerId: string | number): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('players/get-career', { playerId: String(playerId) });
+      if (res && (res.values || res.result)) return res.values || res.result;
+    } catch (e) {
+      console.warn('Error in getPlayerCareer (mobile):', e);
+    }
+    const local = CRICKET_PLAYERS_DATABASE.find(p => p.player_key === String(playerId));
+    return local?.career_stats || null;
+  },
+
+  getPlayerNews: async (playerId: string | number): Promise<CricketNewsItem[]> => {
+    try {
+      const res = await fetchFromAPI<any>('players/get-news', { playerId: String(playerId) });
+      const newsList = res.storyList || res.result || res.news || (Array.isArray(res) ? res : []);
+      if (Array.isArray(newsList) && newsList.length > 0) {
+        return newsList.map((item: any, idx: number) => ({
+          id: String(item.story?.id || item.id || idx),
+          title: item.story?.hline || item.title || 'Player Performance Analysis',
+          summary: item.story?.intro || item.summary || 'Tactical breakdown and tournament form.',
+          image: item.story?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${item.story.imageId}/i.jpg` : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
+          published_at: item.story?.pubTime ? new Date(Number(item.story.pubTime)).toLocaleDateString() : 'Today',
+          author: item.story?.source || 'Cricbuzz Editorial',
+          read_time: '3 min read',
+          category: 'Player Spotlight',
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getPlayerNews (mobile):', e);
+    }
+    return [];
+  },
+
+  getPlayerBowling: async (playerId: string | number): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('players/get-bowling', { playerId: String(playerId) });
+      if (res && (res.values || res.result)) return res.values || res.result;
+    } catch (e) {
+      console.warn('Error in getPlayerBowling (mobile):', e);
+    }
+    const local = CRICKET_PLAYERS_DATABASE.find(p => p.player_key === String(playerId));
+    return local?.career_stats?.test || null;
+  },
+
+  getPlayerBatting: async (playerId: string | number): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('players/get-batting', { playerId: String(playerId) });
+      if (res && (res.values || res.result)) return res.values || res.result;
+    } catch (e) {
+      console.warn('Error in getPlayerBatting (mobile):', e);
+    }
+    const local = CRICKET_PLAYERS_DATABASE.find(p => p.player_key === String(playerId));
+    return local?.career_stats?.test || null;
+  },
+
+  getPlayerInfo: async (playerId: string | number): Promise<CricketPlayer | null> => {
+    return await advancedCricketApi.getPlayerById(playerId);
+  },
+
+  getTeamsList: async (type: 'international' | 'league' | 'women' | 'domestic' = 'international'): Promise<CricketTeam[]> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/list', { type });
+      const rawList = res.list || res.result || res.teams || (Array.isArray(res) ? res : []);
+      if (Array.isArray(rawList) && rawList.length > 0) {
+        return rawList.map((t: any) => ({
+          team_key: String(t.teamId || t.team_key || t.id),
+          team_name: t.teamName || t.team_name || t.name,
+          team_short_name: t.teamSName || t.team_short_name || (t.teamName || '').slice(0, 3).toUpperCase(),
+          team_logo: t.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${t.imageId}/i.jpg` : t.team_logo,
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getTeamsList (mobile):', e);
+    }
+    const all = await advancedCricketApi.getTeams();
+    return all.result || [];
+  },
+
+  getTeamSchedules: async (teamId: string | number): Promise<CricketEvent[]> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/get-schedules', { teamId: String(teamId) });
+      const matches = res.teamMatchesData || res.result || res.matches || (Array.isArray(res) ? res : []);
+      if (Array.isArray(matches) && matches.length > 0) {
+        return matches.map((m: any, i: number) => ({
+          event_key: String(m.matchId || m.event_key || i),
+          event_date_start: m.startDate ? new Date(Number(m.startDate)).toISOString().split('T')[0] : '2026-09-01',
+          event_time: m.time || '14:30',
+          event_home_team: m.team1?.teamName || m.event_home_team || 'Team A',
+          home_team_key: String(m.team1?.teamId || m.home_team_key || teamId),
+          event_away_team: m.team2?.teamName || m.event_away_team || 'Team B',
+          away_team_key: String(m.team2?.teamId || m.away_team_key || '2'),
+          league_name: m.seriesName || m.league_name || 'International Series',
+          league_key: String(m.seriesId || m.league_key || '101'),
+          event_status: m.state || 'Not Started',
+          event_live: '0',
+          event_type: m.matchFormat || 'T20',
+          event_stadium: m.venueInfo?.ground || 'International Cricket Stadium',
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getTeamSchedules (mobile):', e);
+    }
+    const res = await advancedCricketApi.getFixtures({
+      from: advancedCricketApi.getFormattedDate(0),
+      to: advancedCricketApi.getFormattedDate(60),
+    });
+    return (res.result || []).filter(m => m.home_team_key === String(teamId) || m.away_team_key === String(teamId));
+  },
+
+  getTeamResults: async (teamId: string | number): Promise<CricketEvent[]> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/get-results', { teamId: String(teamId) });
+      const matches = res.teamMatchesData || res.result || res.matches || (Array.isArray(res) ? res : []);
+      if (Array.isArray(matches) && matches.length > 0) {
+        return matches.map((m: any, i: number) => ({
+          event_key: String(m.matchId || m.event_key || i),
+          event_date_start: m.startDate ? new Date(Number(m.startDate)).toISOString().split('T')[0] : '2026-08-01',
+          event_time: 'Finished',
+          event_home_team: m.team1?.teamName || m.event_home_team || 'Team A',
+          home_team_key: String(m.team1?.teamId || m.home_team_key || teamId),
+          event_away_team: m.team2?.teamName || m.event_away_team || 'Team B',
+          away_team_key: String(m.team2?.teamId || m.away_team_key || '2'),
+          league_name: m.seriesName || m.league_name || 'International Series',
+          league_key: String(m.seriesId || m.league_key || '101'),
+          event_status: 'Finished',
+          event_live: '0',
+          event_type: m.matchFormat || 'ODI',
+          event_status_info: m.status || 'Match Completed',
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getTeamResults (mobile):', e);
+    }
+    const res = await advancedCricketApi.getFixtures({
+      from: advancedCricketApi.getFormattedDate(-60),
+      to: advancedCricketApi.getFormattedDate(-1),
+    });
+    return (res.result || []).filter(m => m.home_team_key === String(teamId) || m.away_team_key === String(teamId));
+  },
+
+  getTeamNews: async (teamId: string | number): Promise<CricketNewsItem[]> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/get-news', { teamId: String(teamId) });
+      const list = res.storyList || res.result || res.news || (Array.isArray(res) ? res : []);
+      if (Array.isArray(list) && list.length > 0) {
+        return list.map((item: any, i: number) => ({
+          id: String(item.story?.id || item.id || i),
+          title: item.story?.hline || item.title || 'Franchise Squad News',
+          summary: item.story?.intro || item.summary || 'Team tactical updates and player selections.',
+          image: item.story?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${item.story.imageId}/i.jpg` : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
+          published_at: item.story?.pubTime ? new Date(Number(item.story.pubTime)).toLocaleDateString() : 'Today',
+          author: item.story?.source || 'Cricbuzz Bureau',
+          read_time: '3 min read',
+          category: 'Team Intel',
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getTeamNews (mobile):', e);
+    }
+    return [];
+  },
+
+  getTeamPlayers: async (teamId: string | number): Promise<CricketPlayer[]> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/get-players', { teamId: String(teamId) });
+      const rawPlayers = res.player || res.result || res.players || (Array.isArray(res) ? res : []);
+      if (Array.isArray(rawPlayers) && rawPlayers.length > 0) {
+        return rawPlayers.map((p: any) => ({
+          player_key: String(p.id || p.player_key || p.playerId),
+          player_name: p.name || p.player_name || 'Squad Member',
+          team_key: String(teamId),
+          player_type: p.role || p.player_type || 'Player',
+          player_country: p.country || 'International',
+          is_captain: p.isCaptain || false,
+          player_image: p.faceImageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${p.faceImageId}/i.jpg` : p.player_image,
+        }));
+      }
+    } catch (e) {
+      console.warn('Error in getTeamPlayers (mobile):', e);
+    }
+    const playersRes = await advancedCricketApi.getPlayersByTeamId({ teamId });
+    return playersRes.result || [];
+  },
+
+  getTeamStatsFilters: async (teamId: string | number): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/get-stats-filters', { teamId: String(teamId) });
+      return res.types || res.result || ['Most Runs', 'Most Wickets', 'Highest Individual Score', 'Best Bowling Figures'];
+    } catch (e) {
+      return ['Most Runs', 'Most Wickets', 'Highest Individual Score', 'Best Bowling Figures'];
+    }
+  },
+
+  getTeamStats: async (teamId: string | number, params: any = {}): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('teams/get-stats', { teamId: String(teamId), ...params });
+      return res.values || res.result || res;
+    } catch (e) {
+      return {
+        headers: ['Player', 'Matches', 'Innings', 'Runs', 'Avg', 'SR'],
+        values: [
+          ['Lead Batter', '12', '12', '584', '53.09', '142.4'],
+          ['All-Rounder', '12', '10', '320', '40.00', '165.2'],
+        ],
+      };
+    }
+  },
 };
+

@@ -2301,6 +2301,21 @@ export interface GetCricketPlayersParams extends CricketBaseParams {
   search?: string;
 }
 
+export interface CricketVenueInfo {
+  id: string | number;
+  ground: string;
+  city: string;
+  country: string;
+  capacity?: string | number;
+  floodlights?: boolean;
+  known_as?: string;
+  ends?: string;
+  home_to?: string;
+  image?: string;
+  curator?: string;
+  profile?: string;
+}
+
 export interface CricbuzzAPIClient {
   getFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
   getInternationalFixtures(params?: GetCricketFixturesParams): Promise<CricketFixturesResponse>;
@@ -2339,8 +2354,30 @@ export interface CricbuzzAPIClient {
   getPlayersByTeamId(params: GetCricketPlayersParams): Promise<CricketPlayersResponse>;
   getPlayerById(playerId: string | number): Promise<CricketPlayer | null>;
 
+  // Players Endpoints
+  getTrendingPlayers(): Promise<CricketPlayer[]>;
+  getPlayerCareer(playerId: string | number): Promise<any>;
+  getPlayerNews(playerId: string | number): Promise<CricketNewsItem[]>;
+  getPlayerBowling(playerId: string | number): Promise<any>;
+  getPlayerBatting(playerId: string | number): Promise<any>;
+  getPlayerInfo(playerId: string | number): Promise<CricketPlayer | null>;
+
+  // Teams Endpoints
+  getTeamsList(type?: 'international' | 'league' | 'women' | 'domestic'): Promise<CricketTeam[]>;
+  getTeamSchedules(teamId: string | number): Promise<CricketEvent[]>;
+  getTeamResults(teamId: string | number): Promise<CricketEvent[]>;
+  getTeamNews(teamId: string | number): Promise<CricketNewsItem[]>;
+  getTeamPlayers(teamId: string | number): Promise<CricketPlayer[]>;
+  getTeamStatsFilters(teamId: string | number): Promise<any>;
+  getTeamStats(teamId: string | number, params?: any): Promise<any>;
+
+  // Venue Endpoints
+  getVenueInfo(venueId: string | number): Promise<CricketVenueInfo | null>;
+  getVenueMatches(venueId: string | number): Promise<CricketEvent[]>;
+
   getBlogPosts(): Promise<any[]>;
   getVideoHighlights(): Promise<any[]>;
 }
+
 
 

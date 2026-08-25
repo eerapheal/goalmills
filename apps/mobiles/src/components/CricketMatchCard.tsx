@@ -32,11 +32,17 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
         >
             {/* Header */}
             <View style={styles.header}>
-                <View style={styles.leagueInfo}>
+                <Pressable
+                    style={styles.leagueInfo}
+                    onPress={(e) => {
+                        e.stopPropagation();
+                        if (match.league_key) router.push(`/home/cricket/series/${match.league_key}`);
+                    }}
+                >
                     <Text style={styles.leagueName} numberOfLines={1}>
                         {match.league_name} • {match.league_season}
                     </Text>
-                </View>
+                </Pressable>
                 {isLive && (
                     <View style={styles.liveBadge}>
                         <View style={styles.liveDot} />
@@ -44,6 +50,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                     </View>
                 )}
             </View>
+
 
             {/* Match Info */}
             <View style={styles.matchContainer}>

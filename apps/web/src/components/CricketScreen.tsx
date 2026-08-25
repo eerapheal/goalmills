@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { advancedCricketApi } from '../services/advancedCricketApi';
-import { CricketEvent, CricketLeague, CricketTeam, CricketStanding, CricketNewsItem } from '@goalmills/types';
+import { CricketEvent, CricketLeague, CricketTeam, CricketStanding, CricketNewsItem, CricketPlayer } from '@goalmills/types';
 import { CricketMatchCard } from './CricketMatchCard';
 import Image from 'next/image';
 import Link from 'next/link';
 
-type TabType = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'rankings' | 'news';
+type TabType = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'athletes' | 'rankings' | 'news';
 type FormatFilter = 'all' | 'international' | 'franchise' | 'domestic' | 'women';
 
 export function CricketScreen() {
@@ -18,11 +18,13 @@ export function CricketScreen() {
     const [recentMatches, setRecentMatches] = useState<CricketEvent[]>([]);
     const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
     const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
+    const [athletesList, setAthletesList] = useState<CricketPlayer[]>([]);
     const [rankings, setRankings] = useState<Record<string, CricketStanding[]>>({});
     const [newsList, setNewsList] = useState<CricketNewsItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [timezone, setTimezone] = useState('GMT');
+
 
     // Priority ranking for major cricket competitions
     const LEAGUE_PRIORITY: Record<string, number> = {
@@ -70,12 +72,13 @@ export function CricketScreen() {
             const futureDate = advancedCricketApi.getFormattedDate(14);
             const pastDate = advancedCricketApi.getFormattedDate(-14);
 
-            const [live, upcoming, recent, series, teams, iplRank, t20WorldCupRank, bblRank, news] = await Promise.all([
+            const [live, upcoming, recent, series, teams, athletes, iplRank, t20WorldCupRank, bblRank, news] = await Promise.all([
                 advancedCricketApi.getLivescore({ timezone }),
                 advancedCricketApi.getFixtures({ from: today, to: futureDate, timezone }),
                 advancedCricketApi.getFixtures({ from: pastDate, to: today, timezone }),
                 advancedCricketApi.getLeagues(),
                 advancedCricketApi.getTeams(),
+                advancedCricketApi.getTrendingPlayers(),
                 advancedCricketApi.getStandings({ leagueId: 9785 }),
                 advancedCricketApi.getStandings({ leagueId: 9843 }),
                 advancedCricketApi.getStandings({ leagueId: 9779 }),
@@ -87,7 +90,9 @@ export function CricketScreen() {
             setRecentMatches(sortMatches(recent.result || []).reverse());
             setSeriesList(series.result || []);
             setTeamsList(teams.result || []);
+            setAthletesList(athletes || []);
             setNewsList(news || []);
+
 
             setRankings({
                 'IPL': iplRank.result?.total || (Array.isArray(iplRank.result) ? iplRank.result : []),
@@ -321,7 +326,56 @@ export function CricketScreen() {
                     </div>
                 );
 
+            case 'athletes':
+                const filteredAthletes = athletesList.filter(p =>
+                    p.player_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (p.player_country && p.player_country.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                    (p.team_name && p.team_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                    (p.player_type && p.player_type.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+
+                return (
+                    <div className="animate-in fade-in duration-500">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                <span>🏏</span> Global Cricket Icons & Athletes ({filteredAthletes.length})
+                            </h2>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {filteredAthletes.map((player) => (
+                                <Link
+                                    href={`/cricket/players/${player.player_key}`}
+                                    key={player.player_key}
+                                    className="group glass-card rounded-2xl p-4 border border-white/5 hover:border-secondary/40 transition-all hover:scale-[1.02] flex items-center gap-4 bg-white/[0.02]"
+                                >
+                                    <div className="relative w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                        {player.player_image ? (
+                                            <Image src={player.player_image} alt={player.player_name} width={56} height={56} className="object-cover w-full h-full" />
+                                        ) : (
+                                            <span className="text-lg font-bold text-secondary">{player.player_name.charAt(0)}</span>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-bold text-white text-xs uppercase tracking-tight truncate group-hover:text-secondary transition-colors">
+                                            {player.player_name}
+                                        </h3>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                {player.player_country}
+                                            </span>
+                                            <span className="text-[9px] font-medium text-text-muted truncate">
+                                                {player.player_type || 'Athlete'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                );
+
             case 'rankings':
+
                 return (
                     <div className="animate-in fade-in duration-500">
                         <div className="flex items-center justify-between mb-8">
@@ -482,9 +536,11 @@ export function CricketScreen() {
                         { id: 'recent', label: 'Results', icon: '📊' },
                         { id: 'series', label: 'Series', icon: '🏆' },
                         { id: 'teams', label: 'Squads', icon: '🛡️' },
+                        { id: 'athletes', label: 'Athletes', icon: '👤' },
                         { id: 'rankings', label: 'Standings', icon: '📈' },
                         { id: 'news', label: 'News & Pulse', icon: '📰' },
                     ].map((tab) => (
+
                         <button
                             key={tab.id}
                             onClick={() => { setActiveTab(tab.id as TabType); setSearchQuery(''); }}

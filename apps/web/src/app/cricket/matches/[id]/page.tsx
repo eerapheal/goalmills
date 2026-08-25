@@ -126,9 +126,12 @@ export default function CricketMatchDetailsPage() {
                             <span className="px-3 py-1 rounded-full bg-blue-500/10 text-[10px] font-bold text-blue-400 uppercase tracking-wider border border-blue-500/20">
                                 {match.event_type || 'Cricket'} • {match.league_season || '2026'}
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-bold text-text-muted uppercase tracking-wider border border-white/10">
+                            <Link
+                                href={`/cricket/series/${match.league_key}`}
+                                className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-bold text-text-muted hover:text-secondary uppercase tracking-wider border border-white/10 transition-colors"
+                            >
                                 🏆 {match.league_name}
-                            </span>
+                            </Link>
                         </div>
                     </div>
 
@@ -137,17 +140,23 @@ export default function CricketMatchDetailsPage() {
                         {/* Home Team */}
                         <div className="flex flex-col items-center md:items-end text-center md:text-right">
                             <div className="flex items-center gap-4 md:flex-row-reverse">
-                                <div className="relative w-16 h-16 rounded-2xl bg-white/5 p-3 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                <Link
+                                    href={`/cricket/teams/${match.home_team_key}`}
+                                    className="relative w-16 h-16 rounded-2xl bg-white/5 p-3 border border-white/10 flex items-center justify-center flex-shrink-0 hover:border-secondary hover:scale-105 transition-all"
+                                >
                                     {match.event_home_team_logo ? (
                                         <Image src={match.event_home_team_logo} alt={match.event_home_team} width={48} height={48} className="object-contain" />
                                     ) : (
                                         <span className="text-xl font-bold text-blue-400">{match.event_home_team.charAt(0)}</span>
                                     )}
-                                </div>
+                                </Link>
                                 <div>
-                                    <h2 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">
+                                    <Link
+                                        href={`/cricket/teams/${match.home_team_key}`}
+                                        className="text-base md:text-lg font-bold text-white hover:text-secondary uppercase tracking-tight transition-colors block"
+                                    >
                                         {match.event_home_team}
-                                    </h2>
+                                    </Link>
                                     {!isUpcoming && (
                                         <div className="mt-1">
                                             <span className="text-xl md:text-2xl font-black text-amber-400 tabular-nums">
@@ -192,17 +201,23 @@ export default function CricketMatchDetailsPage() {
                         {/* Away Team */}
                         <div className="flex flex-col items-center md:items-start text-center md:text-left">
                             <div className="flex items-center gap-4">
-                                <div className="relative w-16 h-16 rounded-2xl bg-white/5 p-3 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                <Link
+                                    href={`/cricket/teams/${match.away_team_key}`}
+                                    className="relative w-16 h-16 rounded-2xl bg-white/5 p-3 border border-white/10 flex items-center justify-center flex-shrink-0 hover:border-secondary hover:scale-105 transition-all"
+                                >
                                     {match.event_away_team_logo ? (
                                         <Image src={match.event_away_team_logo} alt={match.event_away_team} width={48} height={48} className="object-contain" />
                                     ) : (
                                         <span className="text-xl font-bold text-amber-400">{match.event_away_team.charAt(0)}</span>
                                     )}
-                                </div>
+                                </Link>
                                 <div>
-                                    <h2 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">
+                                    <Link
+                                        href={`/cricket/teams/${match.away_team_key}`}
+                                        className="text-base md:text-lg font-bold text-white hover:text-secondary uppercase tracking-tight transition-colors block"
+                                    >
                                         {match.event_away_team}
-                                    </h2>
+                                    </Link>
                                     {!isUpcoming && (
                                         <div className="mt-1">
                                             <span className="text-xl md:text-2xl font-black text-white tabular-nums">
@@ -299,9 +314,12 @@ export default function CricketMatchDetailsPage() {
                                                             {batsmen.map((player, i) => (
                                                                 <tr key={i} className="hover:bg-white/[0.02] transition-colors">
                                                                     <td className="py-3 px-4">
-                                                                        <span className="font-bold text-xs uppercase text-white block">
+                                                                        <Link
+                                                                            href={`/cricket/players/${(player as any).player_id || (player as any).player_key || encodeURIComponent(player.player)}`}
+                                                                            className="font-bold text-xs uppercase text-white hover:text-secondary transition-colors block"
+                                                                        >
                                                                             {player.player}
-                                                                        </span>
+                                                                        </Link>
                                                                         {player.status && (
                                                                             <span className="text-[10px] text-text-muted italic block">
                                                                                 {player.status}
@@ -347,9 +365,15 @@ export default function CricketMatchDetailsPage() {
                                                         <tbody className="text-white divide-y divide-white/5">
                                                             {bowlers.map((player, i) => (
                                                                 <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                                                                    <td className="py-3 px-4 font-bold text-xs uppercase text-white">
-                                                                        {player.player}
+                                                                    <td className="py-3 px-4">
+                                                                        <Link
+                                                                            href={`/cricket/players/${(player as any).player_id || (player as any).player_key || encodeURIComponent(player.player)}`}
+                                                                            className="font-bold text-xs uppercase text-white hover:text-secondary transition-colors"
+                                                                        >
+                                                                            {player.player}
+                                                                        </Link>
                                                                     </td>
+
                                                                     <td className="py-3 px-3 text-center text-xs text-text-muted tabular-nums">
                                                                         {player.O}
                                                                     </td>
@@ -429,16 +453,23 @@ export default function CricketMatchDetailsPage() {
                                     <div className="glass-card rounded-2xl p-6 border border-white/5">
                                         <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/5">
                                             <div className="h-4 w-1 bg-blue-400 rounded-full"></div>
-                                            <h3 className="text-sm font-bold text-white uppercase tracking-tight">
+                                            <Link
+                                                href={`/cricket/teams/${match.home_team_key}`}
+                                                className="text-sm font-bold text-white hover:text-secondary uppercase tracking-tight transition-colors"
+                                            >
                                                 {match.event_home_team} Playing XI
-                                            </h3>
+                                            </Link>
                                         </div>
                                         <div className="space-y-2">
                                             {match.lineups.home_team.starting_lineups.map((p, i) => (
-                                                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/5 transition-all text-xs">
-                                                    <span className="font-bold text-white uppercase">{p.player}</span>
+                                                <Link
+                                                    key={i}
+                                                    href={`/cricket/players/${(p as any).player_id || (p as any).player_key || encodeURIComponent(p.player)}`}
+                                                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-secondary/30 hover:bg-white/5 transition-all text-xs block"
+                                                >
+                                                    <span className="font-bold text-white hover:text-secondary uppercase transition-colors">{p.player}</span>
                                                     <span className="text-[10px] font-medium text-text-muted">{p.player_country || 'Squad'}</span>
-                                                </div>
+                                                </Link>
                                             ))}
                                         </div>
                                     </div>
@@ -446,16 +477,23 @@ export default function CricketMatchDetailsPage() {
                                     <div className="glass-card rounded-2xl p-6 border border-white/5">
                                         <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/5">
                                             <div className="h-4 w-1 bg-amber-400 rounded-full"></div>
-                                            <h3 className="text-sm font-bold text-white uppercase tracking-tight">
+                                            <Link
+                                                href={`/cricket/teams/${match.away_team_key}`}
+                                                className="text-sm font-bold text-white hover:text-secondary uppercase tracking-tight transition-colors"
+                                            >
                                                 {match.event_away_team} Playing XI
-                                            </h3>
+                                            </Link>
                                         </div>
                                         <div className="space-y-2">
                                             {match.lineups.away_team.starting_lineups.map((p, i) => (
-                                                <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/5 transition-all text-xs">
-                                                    <span className="font-bold text-white uppercase">{p.player}</span>
+                                                <Link
+                                                    key={i}
+                                                    href={`/cricket/players/${(p as any).player_id || (p as any).player_key || encodeURIComponent(p.player)}`}
+                                                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-secondary/30 hover:bg-white/5 transition-all text-xs block"
+                                                >
+                                                    <span className="font-bold text-white hover:text-secondary uppercase transition-colors">{p.player}</span>
                                                     <span className="text-[10px] font-medium text-text-muted">{p.player_country || 'Squad'}</span>
-                                                </div>
+                                                </Link>
                                             ))}
                                         </div>
                                     </div>
@@ -487,10 +525,16 @@ export default function CricketMatchDetailsPage() {
                                                             {i + 1}
                                                         </span>
                                                         <div>
-                                                            <span className="font-bold text-white uppercase block">{wicket.batsman}</span>
+                                                            <Link
+                                                                href={`/cricket/players/${(wicket as any).batsman_id || encodeURIComponent(wicket.batsman)}`}
+                                                                className="font-bold text-white hover:text-secondary uppercase block transition-colors"
+                                                            >
+                                                                {wicket.batsman}
+                                                            </Link>
                                                             <span className="text-[10px] text-text-muted block">Bowled by {wicket.balwer}</span>
                                                         </div>
                                                     </div>
+
                                                     <div className="text-right">
                                                         <span className="font-bold text-amber-400 block tabular-nums">{wicket.score}</span>
                                                         <span className="text-[10px] text-text-muted block">Over {wicket.fall}</span>
@@ -505,6 +549,7 @@ export default function CricketMatchDetailsPage() {
                             )}
                         </div>
                     )}
+
 
                     {activeTab === 'h2h' && (
                         <div className="space-y-6">

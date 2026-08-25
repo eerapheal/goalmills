@@ -122,9 +122,13 @@ export default function CricketMatchDetailsScreen() {
                                         <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>SR</Text>
                                     </View>
                                     {batters.map((batter, idx) => (
-                                        <View key={`${batter.player}-${idx}`} style={styles.tableRow}>
+                                        <TouchableOpacity
+                                            key={`${batter.player}-${idx}`}
+                                            style={styles.tableRow}
+                                            onPress={() => router.push(`/home/cricket/players/${batter.player_id || batter.player_key || encodeURIComponent(batter.player)}`)}
+                                        >
                                             <View style={{ flex: 3 }}>
-                                                <Text style={styles.playerName}>{batter.player}</Text>
+                                                <Text style={[styles.playerName, { color: COLORS.white }]}>{batter.player}</Text>
                                                 <Text style={styles.dismissal}>{batter.status}</Text>
                                             </View>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{batter.R}</Text>
@@ -132,7 +136,7 @@ export default function CricketMatchDetailsScreen() {
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['4s']}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['6s']}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.SR}</Text>
-                                        </View>
+                                        </TouchableOpacity>
                                     ))}
                                 </>
                             )}
@@ -152,16 +156,20 @@ export default function CricketMatchDetailsScreen() {
                                         <Text style={[styles.tableHeadText, { flex: 1, textAlign: 'right' }]}>ER</Text>
                                     </View>
                                     {bowlers.map((bowler, idx) => (
-                                        <View key={`bowler-${bowler.player}-${idx}`} style={styles.tableRow}>
+                                        <TouchableOpacity
+                                            key={`bowler-${bowler.player}-${idx}`}
+                                            style={styles.tableRow}
+                                            onPress={() => router.push(`/home/cricket/players/${bowler.player_id || bowler.player_key || encodeURIComponent(bowler.player)}`)}
+                                        >
                                             <View style={{ flex: 3 }}>
-                                                <Text style={styles.playerName}>{bowler.player}</Text>
+                                                <Text style={[styles.playerName, { color: COLORS.white }]}>{bowler.player}</Text>
                                             </View>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.O}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.M || '0'}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.R}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold', color: COLORS.secondary }]}>{bowler.W}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.ER}</Text>
-                                        </View>
+                                        </TouchableOpacity>
                                     ))}
                                 </>
                             )}
@@ -221,29 +229,42 @@ export default function CricketMatchDetailsScreen() {
         return (
             <View style={{ gap: 12 }}>
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>{match.event_home_team} Playing XI</Text>
+                    <TouchableOpacity onPress={() => match.home_team_key && router.push(`/home/cricket/teams/${match.home_team_key}`)}>
+                        <Text style={[styles.sectionTitle, { color: COLORS.white }]}>{match.event_home_team} Playing XI →</Text>
+                    </TouchableOpacity>
                     {match.lineups.home_team.starting_lineups.map((p, i) => (
-                        <View key={i} style={styles.lineupRow}>
+                        <TouchableOpacity
+                            key={i}
+                            style={styles.lineupRow}
+                            onPress={() => router.push(`/home/cricket/players/${p.player_id || p.player_key || encodeURIComponent(p.player)}`)}
+                        >
                             <Text style={styles.lineupNumber}>{i + 1}</Text>
                             <Text style={styles.lineupName}>{p.player}</Text>
                             <Text style={styles.lineupRole}>{p.player_country || 'Squad'}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
 
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>{match.event_away_team} Playing XI</Text>
+                    <TouchableOpacity onPress={() => match.away_team_key && router.push(`/home/cricket/teams/${match.away_team_key}`)}>
+                        <Text style={[styles.sectionTitle, { color: COLORS.white }]}>{match.event_away_team} Playing XI →</Text>
+                    </TouchableOpacity>
                     {match.lineups.away_team.starting_lineups.map((p, i) => (
-                        <View key={i} style={styles.lineupRow}>
+                        <TouchableOpacity
+                            key={i}
+                            style={styles.lineupRow}
+                            onPress={() => router.push(`/home/cricket/players/${p.player_id || p.player_key || encodeURIComponent(p.player)}`)}
+                        >
                             <Text style={styles.lineupNumber}>{i + 1}</Text>
                             <Text style={styles.lineupName}>{p.player}</Text>
                             <Text style={styles.lineupRole}>{p.player_country || 'Squad'}</Text>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
             </View>
         );
     };
+
 
     const renderH2H = () => {
         if (!h2h || !h2h.H2H || h2h.H2H.length === 0) {

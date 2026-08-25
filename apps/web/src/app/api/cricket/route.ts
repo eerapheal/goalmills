@@ -22,11 +22,11 @@ const API_KEY =
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const method = searchParams.get('met');
+    const endpointParam = searchParams.get('endpoint') || searchParams.get('met');
 
-    if (!method) {
+    if (!endpointParam) {
       return NextResponse.json(
-        { error: 'Method parameter (met) is required' },
+        { error: 'Endpoint or method parameter (endpoint/met) is required' },
         { status: 400 }
       );
     }
@@ -45,9 +45,14 @@ export async function GET(request: NextRequest) {
         headers['x-rapidapi-key'] = API_KEY;
       }
       headers['x-rapidapi-host'] = apiUrl.host;
-      apiUrl.pathname = `${apiUrl.pathname.replace(/\/$/, '')}/cricket/v1/${method.toLowerCase()}`;
+
+      if (endpointParam.includes('/')) {
+        apiUrl.pathname = `/${endpointParam.replace(/^\//, '')}`;
+      } else {
+        apiUrl.pathname = `/cricket/v1/${endpointParam.toLowerCase()}`;
+      }
     } else {
-      apiUrl.searchParams.append('met', method);
+      apiUrl.searchParams.append('met', endpointParam);
       if (API_KEY) {
         apiUrl.searchParams.append('APIkey', API_KEY);
       }
@@ -55,10 +60,11 @@ export async function GET(request: NextRequest) {
 
     // Forward all other search params
     searchParams.forEach((value: any, key: any) => {
-      if (key !== 'met' && value) {
+      if (key !== 'met' && key !== 'endpoint' && value) {
         apiUrl.searchParams.append(key, value);
       }
     });
+
 
     console.log('Proxying cricket request to:', apiUrl.toString());
 
@@ -75,12 +81,13 @@ export async function GET(request: NextRequest) {
 
     if (!response || !response.ok) {
       const status = response ? response.status : 502;
-      console.warn(`Cricket API status ${status} for ${method}, returning empty success to trigger client fallbacks.`);
+      console.warn(`Cricket API status ${status} for ${endpointParam}, returning empty success to trigger client fallbacks.`);
       return NextResponse.json(
         { success: 1, result: [], message: `Live feed fallback (status ${status})` },
         { status: 200 }
       );
     }
+
 
     const data = await response.json();
 
