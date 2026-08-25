@@ -553,38 +553,45 @@ export default function CricketMatchDetailsPage() {
 
                     {activeTab === 'h2h' && (
                         <div className="space-y-6">
-                            {h2h ? (
-                                <div className="glass-card rounded-2xl p-6 border border-white/5">
-                                    <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-4 text-center">
-                                        Head-to-Head Encounters
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {h2h.H2H.slice(0, 6).map((res, i) => (
-                                            <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-xs">
-                                                <div className="flex justify-between items-center mb-2 text-[10px] text-text-muted">
-                                                    <span>{res.league_name}</span>
-                                                    <span className="font-bold text-secondary uppercase">{res.event_status}</span>
+                            {(() => {
+                                const h2hList = Array.isArray(h2h)
+                                    ? h2h
+                                    : Array.isArray(h2h?.H2H)
+                                        ? h2h.H2H
+                                        : [];
+                                return h2hList.length > 0 ? (
+                                    <div className="glass-card rounded-2xl p-6 border border-white/5">
+                                        <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-4 text-center">
+                                            Head-to-Head Encounters
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {h2hList.slice(0, 6).map((res, i) => (
+                                                <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 text-xs">
+                                                    <div className="flex justify-between items-center mb-2 text-[10px] text-text-muted">
+                                                        <span>{res.league_name}</span>
+                                                        <span className="font-bold text-secondary uppercase">{res.event_status}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center py-1">
+                                                        <span className="font-bold text-white uppercase">{res.event_home_team}</span>
+                                                        <span className="font-bold text-amber-400 tabular-nums">{res.event_home_final_result}</span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center py-1">
+                                                        <span className="font-bold text-white uppercase">{res.event_away_team}</span>
+                                                        <span className="font-bold text-amber-400 tabular-nums">{res.event_away_final_result}</span>
+                                                    </div>
+                                                    {res.event_status_info && (
+                                                        <p className="mt-2 pt-2 border-t border-white/5 text-[10px] text-emerald-400">
+                                                            {res.event_status_info}
+                                                        </p>
+                                                    )}
                                                 </div>
-                                                <div className="flex justify-between items-center py-1">
-                                                    <span className="font-bold text-white uppercase">{res.event_home_team}</span>
-                                                    <span className="font-bold text-amber-400 tabular-nums">{res.event_home_final_result}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center py-1">
-                                                    <span className="font-bold text-white uppercase">{res.event_away_team}</span>
-                                                    <span className="font-bold text-amber-400 tabular-nums">{res.event_away_final_result}</span>
-                                                </div>
-                                                {res.event_status_info && (
-                                                    <p className="mt-2 pt-2 border-t border-white/5 text-[10px] text-emerald-400">
-                                                        {res.event_status_info}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <EmptyState message="Historical head-to-head records processing." />
-                            )}
+                                ) : (
+                                    <EmptyState message="Historical head-to-head records processing." />
+                                );
+                            })()}
                         </div>
                     )}
 

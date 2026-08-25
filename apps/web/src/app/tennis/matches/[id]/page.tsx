@@ -200,8 +200,8 @@ export default function TennisMatchDetailsPage() {
                 {h2hData && (
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-white mb-4 pl-2 border-l-4 border-yellow-500">Head to Head</h2>
-                        {h2hData.H2H.length > 0 ? (
-                            h2hData.H2H.map(h => (
+                        {(h2hData.H2H?.length ?? 0) > 0 ? (
+                            h2hData.H2H?.map(h => (
                                 <TennisMatchCard key={h.event_key} match={h} />
                             ))
                         ) : (
@@ -214,10 +214,10 @@ export default function TennisMatchDetailsPage() {
                 {h2hData && (
                     <div>
                         <h2 className="text-2xl font-bold text-white mb-4 pl-2 border-l-4 border-yellow-500">{match.event_first_player} Recent Form</h2>
-                        {h2hData.firstTeamResults.map(h => <TennisMatchCard key={h.event_key} match={h} />)}
+                        {h2hData.firstTeamResults?.map(h => <TennisMatchCard key={h.event_key} match={h} />)}
 
                         <h2 className="text-2xl font-bold text-white mb-4 mt-8 pl-2 border-l-4 border-yellow-500">{match.event_second_player} Recent Form</h2>
-                        {h2hData.secondTeamResults.map(h => <TennisMatchCard key={h.event_key} match={h} />)}
+                        {h2hData.secondTeamResults?.map(h => <TennisMatchCard key={h.event_key} match={h} />)}
                     </div>
                 )}
             </div>
