@@ -65,9 +65,10 @@ export async function requestAndRegisterWebPush(
       if (!pushSub) {
         pushSub = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: vapidKey ? urlBase64ToUint8Array(vapidKey) : undefined,
+          applicationServerKey: vapidKey ? (urlBase64ToUint8Array(vapidKey) as any) : undefined,
         });
       }
+
 
       if (pushSub) {
         token = JSON.stringify(pushSub);

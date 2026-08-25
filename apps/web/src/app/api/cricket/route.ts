@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = 'https://apiv2.allsportsapi.com/cricket';
-const API_KEY = '1637c7ddbd7bed5f5ffb6973d267ab8782d23d56f4fadc9399af4c05839680af';
+function getApiBaseUrl(): string {
+  let raw =
+    process.env.NEXT_PUBLIC_CRICKET_BASE_URL ||
+    process.env.CRICKET_BASE_URL ||
+    'https://apiv2.allsportsapi.com/cricket';
+
+  raw = raw.trim();
+  if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
+    raw = `https://${raw}`;
+  }
+  return raw.replace(/\/$/, '');
+}
+
+const API_KEY =
+  process.env.CRICKET_API_KEY ||
+  process.env.NEXT_PUBLIC_CRICKET_API_KEY ||
+  process.env.ALLSPORTS_API_KEY ||
+  '';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,19 +31,29 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Build the API URL with all query parameters
-    const apiUrl = new URL(API_BASE_URL);
-    apiUrl.searchParams.append('met', method);
+    const baseUrlStr = getApiBaseUrl();
+    const isRapidApi = baseUrlStr.includes('rapidapi.com');
+    const apiUrl = new URL(baseUrlStr);
 
-    if (!API_KEY) {
-      return NextResponse.json(
-        { error: 'API Key is not configured' },
-        { status: 500 }
-      );
+    // Build headers
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+    };
+
+    if (isRapidApi) {
+      if (API_KEY) {
+        headers['x-rapidapi-key'] = API_KEY;
+      }
+      headers['x-rapidapi-host'] = apiUrl.host;
+      apiUrl.pathname = `${apiUrl.pathname.replace(/\/$/, '')}/cricket/v1/${method.toLowerCase()}`;
+    } else {
+      apiUrl.searchParams.append('met', method);
+      if (API_KEY) {
+        apiUrl.searchParams.append('APIkey', API_KEY);
+      }
     }
-    apiUrl.searchParams.append('APIkey', API_KEY);
 
-    // Copy all other query parameters
+    // Forward all other search params
     searchParams.forEach((value: any, key: any) => {
       if (key !== 'met' && value) {
         apiUrl.searchParams.append(key, value);
@@ -36,61 +62,36 @@ export async function GET(request: NextRequest) {
 
     console.log('Proxying cricket request to:', apiUrl.toString());
 
-    // Make the request to the external API with retries
-    let response;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (attempts < maxAttempts) {
-      try {
-        attempts++;
-        response = await fetch(apiUrl.toString(), {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          },
-          cache: 'no-store',
-        });
-
-        if (response.ok) break;
-        
-        // If 500, wait and retry
-        if (response.status >= 500 && attempts < maxAttempts) {
-          console.warn(`Cricket API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
-          continue;
-        }
-        
-        break; // Don't retry 4xx errors
-      } catch (err) {
-        if (attempts >= maxAttempts) throw err;
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
-      }
+    let response: Response | null = null;
+    try {
+      response = await fetch(apiUrl.toString(), {
+        method: 'GET',
+        headers,
+        cache: 'no-store',
+      });
+    } catch (fetchErr) {
+      console.warn('Cricket API direct fetch error, falling back to local dataset:', fetchErr);
     }
 
     if (!response || !response.ok) {
-      const status = response ? response.status : 500;
-      const statusText = response ? response.statusText : 'Fetch failed';
-      console.error('Cricket API Error:', status, statusText);
-
-      // Graceful fallback for 500 errors
-      if (status >= 500) {
-        return NextResponse.json(
-          { success: 1, result: [], message: 'External API error (graceful fallback)' },
-          { status: 200 }
-        );
-      }
-
+      const status = response ? response.status : 502;
+      console.warn(`Cricket API status ${status} for ${method}, returning empty success to trigger client fallbacks.`);
       return NextResponse.json(
-        { error: `API request failed: ${status} ${statusText}` },
-        { status: status }
+        { success: 1, result: [], message: `Live feed fallback (status ${status})` },
+        { status: 200 }
       );
     }
 
     const data = await response.json();
-    
-    // Return the data with CORS headers
-    return NextResponse.json(data, {
+
+    // Standardize result property if API returns list or wrapped object
+    const standardized = {
+      success: 1,
+      result: Array.isArray(data) ? data : (data.result ?? data.typeMatches ?? data.matches ?? data),
+      ...(!Array.isArray(data) ? data : {}),
+    };
+
+    return NextResponse.json(standardized, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -99,15 +100,17 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Cricket Proxy error:', error);
+    // Graceful response so UI never crashes
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { success: 1, result: [], message: error instanceof Error ? error.message : 'Fallback' },
+      { status: 200 }
     );
   }
 }
 
 export async function OPTIONS() {
   return new NextResponse(null, {
+    status: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',

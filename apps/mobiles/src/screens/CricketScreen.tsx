@@ -9,15 +9,16 @@ import {
     RefreshControl,
     Image,
     TextInput,
+    TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { CricketEvent, CricketLeague, CricketTeam, CricketStanding } from '@goalmills/types';
+import { CricketEvent, CricketLeague, CricketTeam, CricketStanding, CricketPlayer } from '@goalmills/types';
 import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
+import { Ionicons } from '@expo/vector-icons';
 
-
-type CricketTab = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'rankings';
+type CricketTab = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'athletes' | 'rankings';
 
 // Global league priority for consistent sorting
 const LEAGUE_PRIORITY: Record<string, number> = {
@@ -66,6 +67,7 @@ export function CricketScreen() {
     const [recentMatches, setRecentMatches] = useState<CricketEvent[]>([]);
     const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
     const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
+    const [playersList, setPlayersList] = useState<CricketPlayer[]>([]);
     const [rankings, setRankings] = useState<Record<string, CricketStanding[]>>({});
 
     const getDateString = (daysOffset: number = 0) => {
@@ -80,68 +82,44 @@ export function CricketScreen() {
             const futureDate = getDateString(14);
             const pastDate = getDateString(-14);
 
-            // Fetch core data first
-            const [live, upcoming, recent, series] = await Promise.all([
-                advancedCricketApi.getLivescore().catch(e => ({ result: [] })),
-                advancedCricketApi.getFixtures({ from: today, to: futureDate }).catch(e => ({ result: [] })),
-                advancedCricketApi.getFixtures({ from: pastDate, to: today }).catch(e => ({ result: [] })),
-                advancedCricketApi.getLeagues().catch(e => ({ result: [] })),
+            const [live, upcoming, recent, series, players] = await Promise.all([
+                advancedCricketApi.getLivescore().catch(() => ({ result: [] })),
+                advancedCricketApi.getFixtures({ from: today, to: futureDate }).catch(() => ({ result: [] })),
+                advancedCricketApi.getFixtures({ from: pastDate, to: today }).catch(() => ({ result: [] })),
+                advancedCricketApi.getLeagues().catch(() => ({ result: [] })),
+                advancedCricketApi.getPlayers().catch(() => ({ result: [] })),
             ]);
 
-            // Fetch Teams for major leagues to ensure we get data
-            // Mobile APIs might struggle with "all teams", so we fetch for specific popular leagues
             const teamProms = [
-                advancedCricketApi.getTeams({ leagueId: 9785 }), // IPL
-                advancedCricketApi.getTeams({ leagueId: 9843 }), // T20 WC
-                advancedCricketApi.getTeams({ leagueId: 9779 }), // BBL
-                advancedCricketApi.getTeams({ leagueId: 9683 }), // PSL
+                advancedCricketApi.getTeams({ leagueId: 9785 }),
+                advancedCricketApi.getTeams({ leagueId: 9843 }),
+                advancedCricketApi.getTeams({ leagueId: 9779 }),
+                advancedCricketApi.getTeams({ leagueId: 9683 }),
             ];
             const teamResults = await Promise.all(teamProms);
             const allTeams = teamResults.flatMap(r => r.result || []);
-            // Deduplicate teams by ID
             const uniqueTeams = Array.from(new Map(allTeams.map(t => [t.team_key, t])).values());
 
-            // Fetch Standings
             const [iplRank, t20Rank, bblRank] = await Promise.all([
-                advancedCricketApi.getStandings({ leagueId: 9785 }).catch(e => ({ result: { total: [] } })),
-                advancedCricketApi.getStandings({ leagueId: 9843 }).catch(e => ({ result: { total: [] } })),
-                advancedCricketApi.getStandings({ leagueId: 9779 }).catch(e => ({ result: { total: [] } })),
+                advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: { total: [] } })),
+                advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: { total: [] } })),
+                advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: { total: [] } })),
             ]);
 
-            const deduplicateStanding = (list: any[]) => {
-                const unique = new Map();
-                list.forEach(item => {
-                    if (!unique.has(item.standing_team)) {
-                        unique.set(item.standing_team, item);
-                    }
-                });
-                return Array.from(unique.values());
-            };
-
-            const upcomingData = (upcoming.result || []).filter((m: CricketEvent) => {
-                const status = (m.event_status || '').toUpperCase();
-                const isFinished = status === 'FINISHED' || status === 'FT' || status.includes('WON BY');
-                return m.event_live !== '1' && !isFinished;
-            });
-
-            const recentData = (recent.result || []).filter((m: CricketEvent) => {
-                const status = (m.event_status || '').toUpperCase();
-                return status === 'FINISHED' || status === 'FT' || status.includes('WON BY');
-            });
-
             setLiveMatches(sortMatches(live.result || []));
-            setUpcomingMatches(sortMatches(upcomingData));
-            setRecentMatches(sortMatches(recentData).reverse());
+            setUpcomingMatches(sortMatches(upcoming.result || []));
+            setRecentMatches(sortMatches(recent.result || []).reverse());
             setSeriesList(series.result || []);
             setTeamsList(uniqueTeams);
-            setRankings({
-                'IPL': deduplicateStanding(iplRank.result?.total || iplRank.result || []),
-                'T20 WC': deduplicateStanding(t20Rank.result?.total || t20Rank.result || []),
-                'BBL': deduplicateStanding(bblRank.result?.total || bblRank.result || []),
-            });
+            setPlayersList(players.result || []);
 
+            setRankings({
+                'IPL': iplRank.result?.total || (Array.isArray(iplRank.result) ? iplRank.result : []),
+                'T20 WC': t20Rank.result?.total || (Array.isArray(t20Rank.result) ? t20Rank.result : []),
+                'BBL': bblRank.result?.total || (Array.isArray(bblRank.result) ? bblRank.result : []),
+            });
         } catch (error) {
-            console.error('Error loading cricket data:', error);
+            console.error('Error loading mobile cricket:', error);
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -163,13 +141,20 @@ export function CricketScreen() {
             .filter(s => {
                 const name = s.league_name?.toLowerCase() || '';
                 const search = searchQuery.toLowerCase();
-                const matchesSearch = name.includes(search) ||
-                    s.country_name?.toLowerCase().includes(search);
-                const years = (s.league_season || name).match(/\d{4}/g) || [];
+                const matchesSearch = name.includes(search) || (s.country_name && s.country_name.toLowerCase().includes(search));
+
+                const seasonStr = s.league_season || name;
+                const years = seasonStr.match(/\d{4}/g) || [];
                 const isModern = years.length === 0 || years.some(y => parseInt(y) >= currentYear - 1);
+
                 return matchesSearch && isModern;
             })
-            .sort((a, b) => getLeagueRank(a.league_name) - getLeagueRank(b.league_name));
+            .sort((a, b) => {
+                const rankA = getLeagueRank(a.league_name);
+                const rankB = getLeagueRank(b.league_name);
+                if (rankA !== rankB) return rankA - rankB;
+                return (a.league_name || '').localeCompare(b.league_name || '');
+            });
     }, [seriesList, searchQuery]);
 
     const filteredTeams = useMemo(() => {
@@ -178,11 +163,19 @@ export function CricketScreen() {
         );
     }, [teamsList, searchQuery]);
 
+    const filteredPlayers = useMemo(() => {
+        return playersList.filter(p =>
+            p.player_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.player_country && p.player_country.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+    }, [playersList, searchQuery]);
+
     const tabs: { id: CricketTab; label: string; icon: string }[] = [
-        { id: 'live', label: 'Live', icon: '⚡' },
+        { id: 'live', label: 'Live Action', icon: '⚡' },
         { id: 'upcoming', label: 'Schedule', icon: '🗓️' },
-        { id: 'recent', label: 'Recent', icon: '📊' },
+        { id: 'recent', label: 'Results', icon: '✅' },
         { id: 'series', label: 'Series', icon: '🏆' },
+        { id: 'athletes', label: 'Athletes', icon: '🏏' },
         { id: 'teams', label: 'Squads', icon: '🛡️' },
         { id: 'rankings', label: 'Standings', icon: '📈' },
     ];
@@ -190,17 +183,20 @@ export function CricketScreen() {
     const renderHeader = () => (
         <View style={styles.headerSection}>
             <View style={styles.heroContent}>
-                <Text style={styles.heroBadge}>Worldwide Coverage</Text>
-                <Text style={styles.heroTitle}>Cricket Intelligence</Text>
-                <Text style={styles.heroSubtitle}>Live scores, series intel, and squad analytics.</Text>
+                <Text style={styles.heroBadge}>CRICKET INTELLIGENCE MATRIX</Text>
+                <Text style={styles.heroTitle}>CRICKET</Text>
+                <Text style={styles.heroSubtitle}>
+                    Real-time match analytics, ball-by-ball scorecards, athlete profiles, and ICC world leaderboards.
+                </Text>
             </View>
 
+            {/* Search Input */}
             <View style={styles.searchContainer}>
-                <Text style={styles.searchIcon}>🔍</Text>
+                <Ionicons name="search" size={16} color="rgba(255,255,255,0.4)" style={{ marginRight: 8 }} />
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="SEARCH CRICKET INTELLIGENCE..."
-                    placeholderTextColor="rgba(255, 255, 255, 0.3)"
+                    placeholder="Search teams, players, tournaments..."
+                    placeholderTextColor="rgba(255, 255, 255, 0.4)"
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                 />
@@ -224,7 +220,7 @@ export function CricketScreen() {
                     <View style={styles.tabContent}>
                         <View style={styles.sectionHeader}>
                             <View style={styles.liveDot} />
-                            <Text style={styles.sectionTitle}>PLAYING NOW</Text>
+                            <Text style={styles.sectionTitle}>PLAYING NOW ({liveMatches.length})</Text>
                         </View>
                         {liveMatches.length > 0 ? (
                             liveMatches.map((match) => (
@@ -243,7 +239,7 @@ export function CricketScreen() {
             case 'upcoming':
                 return (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>🗓️ FUTURE FIXTURES</Text>
+                        <Text style={styles.sectionTitle}>🗓️ FUTURE FIXTURES ({upcomingMatches.length})</Text>
                         {upcomingMatches.map((match) => (
                             <CricketMatchCard key={match.event_key} match={match} />
                         ))}
@@ -253,7 +249,7 @@ export function CricketScreen() {
             case 'recent':
                 return (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>✅ RECENT RESULTS</Text>
+                        <Text style={styles.sectionTitle}>✅ RECENT RESULTS ({recentMatches.length})</Text>
                         {recentMatches.map((match) => (
                             <CricketMatchCard key={match.event_key} match={match} />
                         ))}
@@ -263,56 +259,55 @@ export function CricketScreen() {
             case 'series':
                 return (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>🏆 GLOBAL SERIES</Text>
+                        <Text style={styles.sectionTitle}>🏆 GLOBAL SERIES & CUPS ({filteredSeries.length})</Text>
                         <View style={styles.seriesGrid}>
-                            {filteredSeries.map((series) => {
-                                // Fallback logic for missing logos: check if we have teams for this series
-                                const leagueName = series.league_name || '';
-                                const detectedLogos = teamsList
-                                    .filter(t => {
-                                        const tName = t.team_name || '';
-                                        return tName && leagueName.toLowerCase().includes(tName.toLowerCase());
-                                    })
-                                    .map(t => t.team_logo)
-                                    .filter((l): l is string => !!l);
+                            {filteredSeries.map((series) => (
+                                <Pressable
+                                    key={series.league_key}
+                                    style={styles.seriesItem}
+                                    onPress={() => router.push(`/home/cricket/series/${series.league_key}`)}
+                                >
+                                    <View style={styles.seriesLogoContainer}>
+                                        <Text style={styles.seriesInitial}>{series.league_name.charAt(0)}</Text>
+                                    </View>
+                                    <Text style={styles.seriesTitleText} numberOfLines={1}>{series.league_name}</Text>
+                                    <Text style={styles.seriesSubtitleText}>{series.league_season || '2026'}</Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    </View>
+                );
 
-                                return (
-                                    <Pressable
-                                        key={series.league_key}
-                                        style={styles.seriesItem}
-                                        onPress={() => router.push(`/home/cricket/series/${series.league_key}`)}
-                                    >
-                                        <View style={styles.seriesLogoContainer}>
-                                            {series.league_logo ? (
-                                                <Image source={{ uri: series.league_logo }} style={styles.seriesLogo} />
-                                            ) : detectedLogos.length > 0 ? (
-                                                <View style={{ flexDirection: 'row', marginLeft: 10 }}>
-                                                    {detectedLogos.slice(0, 2).map((logo, idx) => (
-                                                        <Image
-                                                            key={idx}
-                                                            source={{ uri: logo }}
-                                                            style={[
-                                                                styles.seriesLogo,
-                                                                {
-                                                                    marginLeft: -10,
-                                                                    borderRadius: 16,
-                                                                    borderWidth: 1,
-                                                                    borderColor: '#0a0e27',
-                                                                    backgroundColor: 'rgba(255,255,255,0.1)'
-                                                                }
-                                                            ]}
-                                                        />
-                                                    ))}
-                                                </View>
-                                            ) : (
-                                                <Text style={styles.seriesInitial}>{series.league_name.charAt(0)}</Text>
-                                            )}
-                                        </View>
-                                        <Text style={styles.seriesTitleText} numberOfLines={1}>{series.league_name}</Text>
-                                        <Text style={styles.seriesSubtitleText}>{series.league_season}</Text>
-                                    </Pressable>
-                                );
-                            })}
+            case 'athletes':
+                return (
+                    <View style={styles.tabContent}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                            <Text style={styles.sectionTitle}>🏏 STAR ATHLETES ({filteredPlayers.length})</Text>
+                            <TouchableOpacity onPress={() => router.push('/home/cricket/players')}>
+                                <Text style={{ color: COLORS.secondary, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>All Athletes →</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.playersList}>
+                            {filteredPlayers.map((player) => (
+                                <TouchableOpacity
+                                    key={player.player_key}
+                                    style={styles.playerCard}
+                                    onPress={() => router.push(`/home/cricket/players/${player.player_key}`)}
+                                >
+                                    <View style={styles.playerAvatar}>
+                                        {player.player_image ? (
+                                            <Image source={{ uri: player.player_image }} style={{ width: '100%', height: '100%' }} />
+                                        ) : (
+                                            <Text style={styles.playerAvatarText}>{player.player_name.charAt(0)}</Text>
+                                        )}
+                                    </View>
+                                    <View style={{ flex: 1, marginLeft: 12 }}>
+                                        <Text style={styles.playerName}>{player.player_name}</Text>
+                                        <Text style={styles.playerRole}>{player.player_type || player.player_role || 'Athlete'} • {player.player_country}</Text>
+                                    </View>
+                                    <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.4)" />
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </View>
                 );
@@ -320,7 +315,7 @@ export function CricketScreen() {
             case 'teams':
                 return (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>🛡️ SQUAD MATRIX</Text>
+                        <Text style={styles.sectionTitle}>🛡️ SQUAD MATRIX ({filteredTeams.length})</Text>
                         <View style={styles.teamsGrid}>
                             {filteredTeams.map((team) => (
                                 <Pressable
@@ -345,12 +340,17 @@ export function CricketScreen() {
             case 'rankings':
                 return (
                     <View style={styles.tabContent}>
-                        <Text style={styles.sectionTitle}>📈 STANDINGS MATRIX</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                            <Text style={styles.sectionTitle}>📈 STANDINGS & ICC MATRIX</Text>
+                            <TouchableOpacity onPress={() => router.push('/home/cricket/rankings')}>
+                                <Text style={{ color: COLORS.secondary, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>ICC World Rankings →</Text>
+                            </TouchableOpacity>
+                        </View>
                         {['IPL', 'T20 WC', 'BBL'].map((format) => {
                             const list = rankings[format] || [];
                             return (
                                 <View key={format} style={styles.rankingCard}>
-                                    <Text style={styles.rankingTitle}>{format} LEADERBOARD</Text>
+                                    <Text style={styles.rankingTitle}>{format} POINTS TABLE</Text>
                                     {list.length > 0 ? (
                                         <View style={styles.rankingList}>
                                             {list.slice(0, 5).map((rank, idx) => (
@@ -360,7 +360,7 @@ export function CricketScreen() {
                                                         <Text style={styles.rankName}>{rank.standing_team}</Text>
                                                     </View>
                                                     <View style={styles.rankStats}>
-                                                        <Text style={styles.rankPts}>{rank.standing_Pts}</Text>
+                                                        <Text style={styles.rankPts}>{rank.standing_Pts} pts</Text>
                                                         <Text style={[styles.rankNrr, parseFloat(rank.standing_NRR) >= 0 ? styles.positive : styles.negative]}>
                                                             {rank.standing_NRR}
                                                         </Text>
@@ -473,29 +473,23 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
         lineHeight: 20,
-        marginBottom: 24,
+        marginBottom: 20,
     },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        borderRadius: 14,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-    },
-    searchIcon: {
-        fontSize: 14,
-        marginRight: 10,
-        opacity: 0.5,
+        borderColor: 'rgba(255, 255, 255, 0.08)',
     },
     searchInput: {
         flex: 1,
         color: '#fff',
-        fontSize: 10,
-        fontWeight: '900',
-        letterSpacing: 1,
+        fontSize: 12,
+        fontWeight: '700',
     },
     tabsWrapper: {
         backgroundColor: '#0a0e27',
@@ -518,11 +512,6 @@ const styles = StyleSheet.create({
     },
     activeTab: {
         backgroundColor: COLORS.secondary,
-        shadowColor: COLORS.secondary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 5,
     },
     tabIcon: {
         fontSize: 14,
@@ -558,8 +547,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '900',
         textTransform: 'uppercase',
-        letterSpacing: 2,
-        marginBottom: 16,
+        letterSpacing: 1.5,
     },
     loadingContainer: {
         padding: 60,
@@ -602,6 +590,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 12,
+        marginTop: 12,
     },
     seriesItem: {
         width: '48%',
@@ -612,116 +601,155 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255, 255, 255, 0.05)',
     },
     seriesLogoContainer: {
-        width: 48,
-        height: 48,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        width: 44,
+        height: 44,
         borderRadius: 12,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
     },
-    seriesLogo: {
-        width: 32,
-        height: 32,
-        resizeMode: 'contain',
-    },
     seriesInitial: {
         color: COLORS.secondary,
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: '900',
     },
     seriesTitleText: {
         color: '#fff',
-        fontSize: 11,
-        fontWeight: '900',
+        fontSize: 12,
+        fontWeight: '800',
         textTransform: 'uppercase',
     },
     seriesSubtitleText: {
         color: 'rgba(255, 255, 255, 0.4)',
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: '700',
-        marginTop: 2,
+        marginTop: 4,
     },
     teamsGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 12,
+        marginTop: 12,
     },
     teamItem: {
         width: '30%',
         alignItems: 'center',
-        marginBottom: 16,
-    },
-    teamLogoContainer: {
-        width: 60,
-        height: 60,
         backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 8,
+        borderRadius: 16,
+        padding: 12,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.05)',
     },
+    teamLogoContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+        overflow: 'hidden',
+    },
     teamLogo: {
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
         resizeMode: 'contain',
     },
     teamInitial: {
         color: COLORS.secondary,
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: '900',
     },
     teamNameText: {
         color: '#fff',
-        fontSize: 9,
-        fontWeight: '900',
-        textTransform: 'uppercase',
+        fontSize: 10,
+        fontWeight: '800',
         textAlign: 'center',
-        width: '100%',
+        textTransform: 'uppercase',
+    },
+    playersList: {
+        gap: 8,
+        marginTop: 8,
+    },
+    playerCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+        borderRadius: 16,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.06)',
+    },
+    playerAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: COLORS.secondary,
+    },
+    playerAvatarText: {
+        color: COLORS.secondary,
+        fontSize: 18,
+        fontWeight: '900',
+    },
+    playerName: {
+        color: '#fff',
+        fontSize: 13,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+    },
+    playerRole: {
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: 10,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        marginTop: 2,
     },
     rankingCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderRadius: 24,
-        padding: 20,
-        marginBottom: 16,
+        borderRadius: 20,
+        padding: 16,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.05)',
+        marginBottom: 16,
     },
     rankingTitle: {
         color: COLORS.secondary,
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
-        letterSpacing: 2,
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-        paddingBottom: 8,
+        letterSpacing: 1.5,
+        textTransform: 'uppercase',
+        marginBottom: 12,
     },
     rankingList: {
-        gap: 12,
+        gap: 8,
     },
     rankingRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingVertical: 6,
     },
     rankTeam: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        flex: 1,
     },
     rankNumber: {
         color: 'rgba(255, 255, 255, 0.3)',
         fontSize: 10,
         fontWeight: '900',
-        width: 20,
+        width: 24,
     },
     rankName: {
         color: '#fff',
-        fontSize: 11,
-        fontWeight: '900',
+        fontSize: 12,
+        fontWeight: '700',
         textTransform: 'uppercase',
     },
     rankStats: {
@@ -736,8 +764,8 @@ const styles = StyleSheet.create({
     },
     rankNrr: {
         fontSize: 9,
-        fontWeight: '900',
-        paddingHorizontal: 8,
+        fontWeight: '800',
+        paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
     },
@@ -746,18 +774,17 @@ const styles = StyleSheet.create({
         color: '#10b981',
     },
     negative: {
-        backgroundColor: 'rgba(244, 63, 94, 0.1)',
-        color: '#f43f5e',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        color: '#ef4444',
     },
     rankingEmpty: {
-        padding: 20,
+        padding: 24,
         alignItems: 'center',
     },
     rankingEmptyText: {
-        color: 'rgba(255, 255, 255, 0.2)',
-        fontSize: 9,
-        fontWeight: '900',
+        color: 'rgba(255, 255, 255, 0.3)',
+        fontSize: 10,
+        fontWeight: '800',
         letterSpacing: 1,
     },
 });
-

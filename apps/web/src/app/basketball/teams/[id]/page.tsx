@@ -30,16 +30,18 @@ export default function BasketballTeamPage() {
                 const to = toDate.toISOString().split('T')[0];
 
                 const [teamsData, matchesData, playersData] = await Promise.all([
-                    basketballApi.getTeams({ teamId }),
+                    basketballApi.getTeams({ id: teamId } as any),
                     basketballApi.getFixtures({ teamId, from, to }),
-                    basketballApi.getPlayers({ teamId })
+                    basketballApi.getPlayers({ team: teamId } as any)
                 ]);
 
-                if (teamsData.result && teamsData.result.length > 0) {
-                    setTeam(teamsData.result[0]);
+                const teamList = teamsData.result || teamsData || [];
+                if (teamList.length > 0) {
+                    setTeam(teamList[0]);
                 }
-                setMatches(matchesData.result);
-                setPlayers(playersData.result);
+                setMatches(matchesData.result || matchesData || []);
+                setPlayers(playersData.result || playersData || []);
+
             } catch (error) {
                 console.error('Error loading team data:', error);
             } finally {
@@ -129,8 +131,9 @@ export default function BasketballTeamPage() {
                     <div>
                         {matches.length > 0 ? (
                             matches.map((match) => (
-                                <BasketballMatchCard key={match.event_key} match={match} />
+                                <BasketballMatchCard key={match.event_key || (match as any).id} match={match as any} />
                             ))
+
                         ) : (
                             <div className="glass-card rounded-2xl p-8 text-center">
                                 <p className="text-text-muted">No matches found for this team.</p>

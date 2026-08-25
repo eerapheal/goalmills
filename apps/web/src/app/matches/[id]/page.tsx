@@ -281,7 +281,7 @@ export default function MatchDetailsPage() {
                     {lineups[0]?.team.name} ({lineups[0]?.formation})
                   </div>
                   <div className="flex flex-wrap justify-around gap-2">
-                    {lineups[0]?.startXI.map((p, idx) => (
+                    {lineups[0]?.startXI.map((p: any, idx: number) => (
                       <div key={idx} className="flex flex-col items-center">
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow">
                           {p.player.number}
@@ -298,7 +298,7 @@ export default function MatchDetailsPage() {
                 {lineups[1] && (
                   <div>
                     <div className="flex flex-wrap justify-around gap-2 mb-4">
-                      {lineups[1]?.startXI.map((p, idx) => (
+                      {lineups[1]?.startXI.map((p: any, idx: number) => (
                         <div key={idx} className="flex flex-col items-center">
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white shadow">
                             {p.player.number}
@@ -323,7 +323,7 @@ export default function MatchDetailsPage() {
                   <div>
                     <h4 className="mb-2 font-bold text-slate-300">{lineups[0]?.team.name}</h4>
                     <ul className="space-y-1 text-slate-400">
-                      {lineups[0]?.substitutes.map((s, idx) => (
+                      {lineups[0]?.substitutes.map((s: any, idx: number) => (
                         <li key={idx}>
                           {s.player.number}. {s.player.name} ({s.player.pos})
                         </li>
@@ -334,7 +334,7 @@ export default function MatchDetailsPage() {
                     <div>
                       <h4 className="mb-2 font-bold text-slate-300">{lineups[1]?.team.name}</h4>
                       <ul className="space-y-1 text-slate-400">
-                        {lineups[1]?.substitutes.map((s, idx) => (
+                        {lineups[1]?.substitutes.map((s: any, idx: number) => (
                           <li key={idx}>
                             {s.player.number}. {s.player.name} ({s.player.pos})
                           </li>
@@ -360,8 +360,9 @@ export default function MatchDetailsPage() {
               Match statistics available during and after the game.
             </p>
           ) : (
-            stats[0]?.statistics.map((st, idx) => {
-              const awayStat = stats[1]?.statistics.find((s) => s.type === st.type);
+            stats[0]?.statistics.map((st: any, idx: number) => {
+              const awayStat = stats[1]?.statistics.find((s: any) => s.type === st.type);
+
               const homeVal = String(st.value ?? 0).replace('%', '');
               const awayVal = String(awayStat?.value ?? 0).replace('%', '');
               const numHome = Number(homeVal) || 1;

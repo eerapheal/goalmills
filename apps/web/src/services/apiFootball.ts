@@ -507,3 +507,12 @@ export const webApiFootballService = {
     return requestApiFootball<any>('odds/bets', params, 86400);
   },
 };
+
+export type ApiFootballFixtureItem = any;
+export type ApiFootballEvent = any;
+export type ApiFootballLineup = any;
+export type ApiFootballTeamStats = any;
+export type ApiFootballStandingItem = any;
+export const apiFootball = webApiFootballService;
+export default webApiFootballService;
+

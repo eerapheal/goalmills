@@ -16,11 +16,13 @@ export default function BasketballPlayerPage() {
         const loadPlayerData = async () => {
             try {
                 const playerId = parseInt(params.id as string);
-                const playersData = await basketballApi.getPlayers({ playerId });
+                const playersData = await basketballApi.getPlayers({ id: playerId } as any);
 
-                if (playersData.result && playersData.result.length > 0) {
-                    setPlayer(playersData.result[0]);
+                const playerList = playersData.result || playersData || [];
+                if (playerList.length > 0) {
+                    setPlayer(playerList[0]);
                 }
+
             } catch (error) {
                 console.error('Error loading player data:', error);
             } finally {

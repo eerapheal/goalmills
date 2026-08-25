@@ -236,6 +236,13 @@ async function requestWebBasketball<T>(
   }
 }
 
+function wrapResult<T extends any[]>(arr: T): T & { result: any; success: number } {
+  const cloned: any = arr;
+  cloned.result = arr;
+  cloned.success = 1;
+  return cloned;
+}
+
 export const webBasketballApiService = {
   async getStatus(): Promise<any> {
     return requestWebBasketball<any>('status', {}, 0);
@@ -253,12 +260,16 @@ export const webBasketballApiService = {
     return requestWebBasketball<any>('countries', params, 86400);
   },
 
-  async getLeagues(params?: BasketballLeaguesParams): Promise<any[]> {
-    return requestWebBasketball<any>('leagues', params, 3600);
+  async getLeagues(params?: BasketballLeaguesParams | any): Promise<any> {
+    const res = await requestWebBasketball<any>('leagues', params, 3600);
+    return wrapResult(res);
   },
 
-  async getTeams(params?: BasketballTeamsParams): Promise<any[]> {
-    return requestWebBasketball<any>('teams', params, 86400);
+  async getTeams(params?: BasketballTeamsParams | any): Promise<any> {
+    const p: any = { ...params };
+    if (p.teamId) { p.id = p.teamId; delete p.teamId; }
+    const res = await requestWebBasketball<any>('teams', p, 86400);
+    return wrapResult(res);
   },
 
   async getTeamStatistics(params: BasketballTeamStatisticsParams): Promise<any> {
@@ -266,17 +277,37 @@ export const webBasketballApiService = {
     return res.length > 0 ? res[0] : res;
   },
 
-  async getPlayers(params?: BasketballPlayersParams): Promise<any[]> {
-    return requestWebBasketball<any>('players', params, 86400);
+  async getPlayers(params?: BasketballPlayersParams | any): Promise<any> {
+    const p: any = { ...params };
+    if (p.playerId) { p.id = p.playerId; delete p.playerId; }
+    if (p.teamId) { p.team = p.teamId; delete p.teamId; }
+    const res = await requestWebBasketball<any>('players', p, 86400);
+    return wrapResult(res);
   },
 
-  async getStandings(params: BasketballStandingsParams): Promise<any[]> {
-    return requestWebBasketball<any>('standings', params, 300);
+  async getStandings(params: BasketballStandingsParams | any): Promise<any> {
+    const p: any = { ...params };
+    if (p.leagueId) { p.league = p.leagueId; delete p.leagueId; }
+    if (!p.season) p.season = '2023-2024';
+    const res = await requestWebBasketball<any>('standings', p, 300);
+    const wrapped = wrapResult(res);
+    wrapped.result = { total: res };
+    return wrapped;
+  },
+
+  async getFixtures(params?: any): Promise<any> {
+    const p: any = { ...params };
+    if (p.leagueId) { p.league = p.leagueId; delete p.leagueId; }
+    if (p.teamId) { p.team = p.teamId; delete p.teamId; }
+    if (!p.season && (p.league || p.team)) p.season = '2023-2024';
+    const res = await requestWebBasketball<ApiBasketballGameItem>('games', p, 60);
+    return wrapResult(res);
   },
 
   async getGames(params: BasketballGamesParams): Promise<ApiBasketballGameItem[]> {
     return requestWebBasketball<ApiBasketballGameItem>('games', params, 60);
   },
+
 
   async getLiveGames(leaguesFilter?: string): Promise<ApiBasketballGameItem[]> {
     return requestWebBasketball<ApiBasketballGameItem>('games', { live: leaguesFilter || 'all' }, 15);
@@ -315,3 +346,7 @@ export const webBasketballApiService = {
     return requestWebBasketball<any>('odds/bookmakers', params, 86400);
   },
 };
+
+export const basketballApi = webBasketballApiService;
+export default webBasketballApiService;
+

@@ -34,10 +34,11 @@ export default function BasketballLeaguePage() {
                     basketballApi.getStandings({ leagueId })
                 ]);
 
-                const foundLeague = leaguesData.result.find(l => Number(l.league_key) === leagueId);
+                const foundLeague = (leaguesData.result || leaguesData).find((l: any) => Number(l.league_key || l.id) === leagueId);
                 setLeague(foundLeague || null);
-                setMatches(matchesData.result);
-                setStandings(standingsData.result.total || []);
+                setMatches(matchesData.result || matchesData || []);
+                setStandings(standingsData.result?.total || standingsData || []);
+
             } catch (error) {
                 console.error('Error loading league data:', error);
             } finally {
@@ -115,8 +116,9 @@ export default function BasketballLeaguePage() {
                     <div>
                         {matches.length > 0 ? (
                             matches.map((match) => (
-                                <BasketballMatchCard key={match.event_key} match={match} />
+                                <BasketballMatchCard key={match.event_key || (match as any).id} match={match as any} />
                             ))
+
                         ) : (
                             <div className="glass-card rounded-2xl p-8 text-center">
                                 <p className="text-text-muted">No matches found for this league.</p>

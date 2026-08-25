@@ -102,29 +102,30 @@ export default function CricketSeriesDetailsPage() {
                 </div>
 
                 {/* Unified Series Identity Card */}
-                <div className="glass-card rounded-[2.5rem] p-8 md:p-12 mb-12 border-2 border-white/5 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/5 blur-[100px] rounded-full -mr-40 -mt-40 pointer-events-none group-hover:bg-secondary/10 transition-colors" />
+                <div className="glass-card rounded-3xl p-6 md:p-8 mb-8 border border-white/10 relative overflow-hidden group bg-gradient-to-br from-white/[0.07] via-[#0a0e27] to-[#0d143d]">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 blur-[80px] rounded-full pointer-events-none" />
 
-                    <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
-                        <div className="relative w-48 h-48 rounded-[2rem] overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 shadow-2xl p-6 flex items-center justify-center group-hover:scale-105 transition-transform group-hover:rotate-2">
+                    <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
+                        <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 shadow-lg p-4 flex items-center justify-center">
                             {series.league_logo ? (
-                                <Image src={series.league_logo} alt={series.league_name} width={192} height={192} className="object-contain w-full h-full" />
+                                <Image src={series.league_logo} alt={series.league_name} width={112} height={112} className="object-contain w-full h-full" />
                             ) : (
-                                <span className="text-8xl font-black text-blue-400">{series.league_name.charAt(0)}</span>
+                                <span className="text-4xl font-bold text-blue-400">{series.league_name.charAt(0)}</span>
                             )}
                         </div>
                         <div className="text-center md:text-left flex-1">
-                            <div className="inline-flex px-4 py-1.5 rounded-full bg-secondary/20 text-secondary text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-secondary/20">
+                            <div className="inline-flex px-3 py-1 rounded-full bg-secondary/20 text-secondary text-[10px] font-bold uppercase tracking-wider mb-2 border border-secondary/20">
                                 {series.country_name || 'International Events'}
                             </div>
-                            <h1 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-tighter leading-none">{series.league_name}</h1>
-                            <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                                <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-6 py-2.5 rounded-xl border border-white/10 shadow-lg">{series.league_season || '2024 Edition'}</span>
-                                <span className="text-[10px] font-black text-white uppercase tracking-widest bg-white/5 px-6 py-2.5 rounded-xl border border-white/10 shadow-lg">{series.league_year || 'Series Archive'}</span>
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-3 uppercase tracking-tight leading-tight">{series.league_name}</h1>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                                <span className="text-[10px] font-bold text-white uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">{series.league_season || '2026 Edition'}</span>
+                                <span className="text-[10px] font-bold text-white uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">{series.league_year || 'Official Tournament'}</span>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 {/* Sub-Navigation Tabs */}
                 <div className="flex gap-4 mb-10 bg-white/5 p-2 rounded-2xl border border-white/5">

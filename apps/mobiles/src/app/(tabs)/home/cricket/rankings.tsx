@@ -1,81 +1,42 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
-import { CricketStanding } from '@goalmills/types';
+import { CricketIccRankingItem } from '@goalmills/types';
 import { advancedCricketApi } from '../../../../services/advancedCricketApi';
 
 type Format = 'test' | 'odi' | 't20';
-
-const LEAGUE_IDS: Record<Format, number> = {
-    test: 101,
-    odi: 102,
-    t20: 103,
-};
+type Category = 'teams' | 'batting' | 'bowling';
+type Gender = 'men' | 'women';
 
 export default function CricketRankingsScreen() {
     const router = useRouter();
+    const [activeGender, setActiveGender] = useState<Gender>('men');
     const [activeFormat, setActiveFormat] = useState<Format>('test');
+    const [activeCategory, setActiveCategory] = useState<Category>('teams');
     const [loading, setLoading] = useState(false);
-
-    const [standings, setStandings] = useState<CricketStanding[]>([]);
+    const [rankings, setRankings] = useState<CricketIccRankingItem[]>([]);
 
     useEffect(() => {
-        const loadData = async () => {
+        const loadRankings = async () => {
             setLoading(true);
             try {
-                const response = await advancedCricketApi.getStandings({
-                    leagueId: LEAGUE_IDS[activeFormat]
-                });
-
-                // Safe extraction logic matching web
-                const data = response.result?.total || (Array.isArray(response.result) ? response.result : []);
-                setStandings(data);
+                const response = await advancedCricketApi.getRankings(
+                    activeFormat,
+                    activeCategory,
+                    activeGender
+                );
+                setRankings(response.rankings || []);
             } catch (error) {
-                console.error('Error loading rankings:', error);
-                setStandings([]);
+                console.error('Error loading mobile ICC rankings:', error);
+                setRankings([]);
             } finally {
                 setLoading(false);
             }
         };
-        loadData();
-    }, [activeFormat]);
-
-    const renderTable = () => (
-        <View style={styles.table}>
-            <View style={styles.tableHeader}>
-                <Text style={[styles.headText, { flex: 0.8 }]}>Pos</Text>
-                <Text style={[styles.headText, { flex: 4 }]}>Team</Text>
-                <Text style={[styles.headText, { flex: 1.5, textAlign: 'right' }]}>Pts</Text>
-                <Text style={[styles.headText, { flex: 1.5, textAlign: 'right' }]}>NRR</Text>
-            </View>
-            {loading ? (
-                <ActivityIndicator size="small" color={COLORS.secondary} style={{ padding: 40 }} />
-            ) : standings.length > 0 ? (
-                standings.map((item, idx) => (
-                    <View key={item.team_key || idx} style={styles.row}>
-                        <Text style={[styles.cellText, styles.rankPos]}>{item.standing_place}</Text>
-                        <View style={{ flex: 4, flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={styles.teamLogoPlaceholder}>
-                                <Text style={styles.teamLogoText}>{(item.standing_team || '?').charAt(0)}</Text>
-                            </View>
-                            <Text style={[styles.cellText, styles.teamName]} numberOfLines={1}>{item.standing_team}</Text>
-                        </View>
-                        <Text style={[styles.cellText, styles.points]}>{item.standing_Pts}</Text>
-                        <Text style={[styles.cellText, styles.nrr, parseFloat(item.standing_NRR) >= 0 ? styles.positive : styles.negative]}>
-                            {item.standing_NRR || '-'}
-                        </Text>
-                    </View>
-                ))
-            ) : (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyTitle}>SEASON INITIALIZING</Text>
-                    <Text style={styles.emptyText}>Elite Intel Pending</Text>
-                </View>
-            )}
-        </View>
-    );
+        loadRankings();
+    }, [activeFormat, activeCategory, activeGender]);
 
     return (
         <View style={styles.container}>
@@ -92,27 +53,116 @@ export default function CricketRankingsScreen() {
                 }}
             />
 
-            <View style={styles.headerSection}>
-                <Text style={styles.bgTitle}>ICC RANKINGS</Text>
-                <Text style={styles.subTitle}>OFFICIAL STANDINGS</Text>
-            </View>
-
-            <View style={styles.tabs}>
-                {(['test', 'odi', 't20'] as Format[]).map((format) => (
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                {/* Gender Toggle */}
+                <View style={styles.genderToggle}>
                     <TouchableOpacity
-                        key={format}
-                        style={[styles.tab, activeFormat === format && styles.activeTab]}
-                        onPress={() => setActiveFormat(format)}
+                        style={[styles.genderBtn, activeGender === 'men' && styles.genderBtnActive]}
+                        onPress={() => setActiveGender('men')}
                     >
-                        <Text style={[styles.tabText, activeFormat === format && styles.activeTabText]}>
-                            {format.toUpperCase()}
+                        <Text style={[styles.genderText, activeGender === 'men' && styles.genderTextActive]}>
+                            Men&apos;s Cricket
                         </Text>
                     </TouchableOpacity>
-                ))}
-            </View>
+                    <TouchableOpacity
+                        style={[styles.genderBtn, activeGender === 'women' && styles.genderBtnActive]}
+                        onPress={() => setActiveGender('women')}
+                    >
+                        <Text style={[styles.genderText, activeGender === 'women' && styles.genderTextActive]}>
+                            Women&apos;s Cricket
+                        </Text>
+                    </TouchableOpacity>
+                </View>
 
-            <ScrollView contentContainerStyle={styles.content}>
-                {renderTable()}
+                {/* Format Tabs */}
+                <View style={styles.formatTabs}>
+                    {(['test', 'odi', 't20'] as Format[]).map((fmt) => (
+                        <TouchableOpacity
+                            key={fmt}
+                            style={[styles.formatBtn, activeFormat === fmt && styles.formatBtnActive]}
+                            onPress={() => setActiveFormat(fmt)}
+                        >
+                            <Text style={[styles.formatText, activeFormat === fmt && styles.formatTextActive]}>
+                                {fmt === 't20' ? 'T20I' : fmt.toUpperCase()}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+
+                {/* Category Chips */}
+                <View style={styles.categoryRow}>
+                    {[
+                        { id: 'teams', label: 'Teams' },
+                        { id: 'batting', label: 'Batting' },
+                        { id: 'bowling', label: 'Bowling' },
+                    ].map((cat) => (
+                        <TouchableOpacity
+                            key={cat.id}
+                            style={[styles.categoryChip, activeCategory === cat.id && styles.categoryChipActive]}
+                            onPress={() => setActiveCategory(cat.id as Category)}
+                        >
+                            <Text style={[styles.categoryText, activeCategory === cat.id && styles.categoryTextActive]}>
+                                {cat.label}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+
+                {/* Rankings Table */}
+                <View style={styles.tableCard}>
+                    <View style={styles.tableHeader}>
+                        <Text style={[styles.thText, { flex: 1, textAlign: 'center' }]}>#</Text>
+                        <Text style={[styles.thText, { flex: 4 }]}>
+                            {activeCategory === 'teams' ? 'Nation' : 'Player'}
+                        </Text>
+                        <Text style={[styles.thText, { flex: 2, textAlign: 'right' }]}>Rating</Text>
+                        <Text style={[styles.thText, { flex: 1, textAlign: 'center' }]}>Trend</Text>
+                    </View>
+
+                    {loading ? (
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="small" color={COLORS.secondary} />
+                        </View>
+                    ) : rankings.length > 0 ? (
+                        rankings.map((item, idx) => {
+                            const isFirst = item.rank === 1;
+                            return (
+                                <View key={idx} style={styles.tableRow}>
+                                    <View style={[styles.rankBadge, isFirst && styles.rankBadgeFirst]}>
+                                        <Text style={[styles.rankText, isFirst && styles.rankTextFirst]}>
+                                            {item.rank}
+                                        </Text>
+                                    </View>
+
+                                    <View style={{ flex: 4, paddingHorizontal: 6 }}>
+                                        <Text style={styles.itemName} numberOfLines={1}>
+                                            {item.team_name || item.player_name}
+                                        </Text>
+                                        {activeCategory !== 'teams' && (
+                                            <Text style={styles.itemSub}>{item.country}</Text>
+                                        )}
+                                    </View>
+
+                                    <Text style={styles.ratingText}>{item.rating}</Text>
+
+                                    <View style={{ flex: 1, alignItems: 'center' }}>
+                                        {item.trend === 'up' ? (
+                                            <Text style={{ color: '#34d399', fontSize: 12, fontWeight: '900' }}>▲</Text>
+                                        ) : item.trend === 'down' ? (
+                                            <Text style={{ color: '#f43f5e', fontSize: 12, fontWeight: '900' }}>▼</Text>
+                                        ) : (
+                                            <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>—</Text>
+                                        )}
+                                    </View>
+                                </View>
+                            );
+                        })
+                    ) : (
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>No rankings data available.</Text>
+                        </View>
+                    )}
+                </View>
             </ScrollView>
         </View>
     );
@@ -123,141 +173,173 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#0a0e27',
     },
-    headerSection: {
-        padding: 24,
-        paddingBottom: 0,
+    scrollContent: {
+        padding: SPACING.md,
+        paddingBottom: SPACING.xxl,
     },
-    bgTitle: {
-        color: 'rgba(255, 255, 255, 0.05)',
-        fontSize: 40,
-        fontWeight: '900',
-        position: 'absolute',
-        top: 10,
-        left: 20,
-        fontStyle: 'italic',
-    },
-    subTitle: {
-        color: COLORS.secondary,
-        fontSize: 12,
-        fontWeight: '900',
-        letterSpacing: 2,
-        marginTop: 40,
-        marginBottom: 20,
-    },
-    tabs: {
+    genderToggle: {
         flexDirection: 'row',
-        paddingHorizontal: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-        marginBottom: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: BORDER_RADIUS.lg,
+        padding: 4,
+        gap: 4,
+        marginBottom: SPACING.sm,
     },
-    tab: {
-        paddingVertical: 16,
-        marginRight: 24,
-        borderBottomWidth: 2,
-        borderBottomColor: 'transparent',
+    genderBtn: {
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+        borderRadius: BORDER_RADIUS.md,
     },
-    activeTab: {
-        borderBottomColor: COLORS.secondary,
+    genderBtnActive: {
+        backgroundColor: COLORS.secondary,
     },
-    tabText: {
-        color: 'rgba(255, 255, 255, 0.3)',
-        fontSize: 11,
+    genderText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 10,
         fontWeight: '900',
-        letterSpacing: 1,
+        textTransform: 'uppercase',
     },
-    activeTabText: {
+    genderTextActive: {
         color: '#fff',
     },
-    content: {
-        padding: 16,
-        paddingTop: 0,
+    formatTabs: {
+        flexDirection: 'row',
+        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+        borderRadius: BORDER_RADIUS.lg,
+        padding: 4,
+        gap: 4,
+        marginBottom: SPACING.sm,
     },
-    table: {
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderRadius: 16,
-        padding: 16,
+    formatBtn: {
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+        borderRadius: BORDER_RADIUS.md,
+    },
+    formatBtnActive: {
+        backgroundColor: '#2563eb',
+    },
+    formatText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 10,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+    },
+    formatTextActive: {
+        color: '#fff',
+    },
+    categoryRow: {
+        flexDirection: 'row',
+        gap: 6,
+        marginBottom: SPACING.md,
+    },
+    categoryChip: {
+        flex: 1,
+        paddingVertical: 8,
+        borderRadius: BORDER_RADIUS.md,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.05)',
+        borderColor: 'rgba(255,255,255,0.06)',
+    },
+    categoryChipActive: {
+        backgroundColor: COLORS.secondary,
+        borderColor: COLORS.secondary,
+    },
+    categoryText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 10,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+    },
+    categoryTextActive: {
+        color: '#fff',
+    },
+    tableCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+        borderRadius: BORDER_RADIUS.xl,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.06)',
+        overflow: 'hidden',
     },
     tableHeader: {
         flexDirection: 'row',
-        paddingBottom: 12,
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 12,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-        marginBottom: 8,
+        borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+        backgroundColor: 'rgba(255, 255, 255, 0.02)',
     },
-    headText: {
+    thText: {
         color: 'rgba(255, 255, 255, 0.4)',
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '900',
         textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
-    row: {
+    tableRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.03)',
+        borderBottomColor: 'rgba(255, 255, 255, 0.04)',
     },
-    cellText: {
-        color: '#fff',
-        fontSize: 11,
-        fontWeight: '600',
-    },
-    rankPos: {
-        flex: 0.8,
-        color: 'rgba(255, 255, 255, 0.5)',
-        fontWeight: '900',
-    },
-    teamName: {
-        fontWeight: '700',
-        textTransform: 'uppercase',
-    },
-    points: {
-        flex: 1.5,
-        textAlign: 'right',
-        fontWeight: '900',
-    },
-    nrr: {
-        flex: 1.5,
-        textAlign: 'right',
-        fontSize: 10,
-        fontWeight: '700',
-    },
-    positive: { color: '#10b981' },
-    negative: { color: '#f43f5e' },
-    teamLogoPlaceholder: {
+    rankBadge: {
         width: 24,
         height: 24,
-        marginRight: 10,
-        borderRadius: 6,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        justifyContent: 'center',
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.06)',
         alignItems: 'center',
+        justifyContent: 'center',
     },
-    teamLogoText: {
-        color: '#fff',
+    rankBadgeFirst: {
+        backgroundColor: 'rgba(245, 158, 11, 0.25)',
+        borderWidth: 1,
+        borderColor: COLORS.secondary,
+    },
+    rankText: {
+        color: 'rgba(255,255,255,0.7)',
         fontSize: 10,
         fontWeight: '900',
     },
-    emptyState: {
-        padding: 40,
-        alignItems: 'center',
-        justifyContent: 'center',
+    rankTextFirst: {
+        color: '#fbbf24',
     },
-    emptyTitle: {
-        color: 'rgba(255, 255, 255, 0.2)',
+    itemName: {
+        color: '#fff',
         fontSize: 12,
+        fontWeight: '800',
+        textTransform: 'uppercase',
+    },
+    itemSub: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 9,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        marginTop: 1,
+    },
+    ratingText: {
+        flex: 2,
+        color: '#fbbf24',
+        fontSize: 13,
         fontWeight: '900',
-        letterSpacing: 2,
-        marginBottom: 8,
+        textAlign: 'right',
+    },
+    loadingContainer: {
+        padding: SPACING.xl,
+        alignItems: 'center',
+    },
+    emptyContainer: {
+        padding: SPACING.xl,
+        alignItems: 'center',
     },
     emptyText: {
-        color: COLORS.secondary,
-        fontSize: 10,
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 11,
         fontWeight: '700',
         textTransform: 'uppercase',
     },
 });
-

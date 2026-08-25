@@ -1153,9 +1153,11 @@ export interface CricketVideosResponse {
 
 // Cricket API Request Parameter Types
 export interface CricketBaseParams {
-  met: string;
+  met?: string;
   APIkey?: string;
+  [key: string]: any;
 }
+
 
 export interface CricketLeaguesParams extends CricketBaseParams {
   met: 'Leagues';
@@ -2133,14 +2135,15 @@ export type BasketballOddsOutcome =
 
 export type SportType = 'football' | 'cricket' | 'tennis' | 'basketball' | 'baseball' | 'hockey';
 
-// Additional Cricket Types and Client Interface
-
 export interface CricketSeries {
   series_key: string;
   series_name: string;
   series_date_start: string;
   series_date_end: string;
   series_type: string;
+  league_logo?: string;
+  total_matches?: number;
+  status?: string;
 }
 
 export interface CricketSeriesResponse {
@@ -2160,7 +2163,7 @@ export interface CricketMatchDetailResponse {
 
 export interface CricketScoreboardResponse {
   success: number;
-  result: any; // Todo: define scoreboard
+  result: any;
 }
 
 export interface CricketScoreboard {
@@ -2169,15 +2172,75 @@ export interface CricketScoreboard {
 
 export interface CricketSchedulesResponse {
   success: number;
-  result: any[]; // Todo: define schedule
+  result: any[];
+}
+
+export interface CricketPlayerStatsFormat {
+  matches: number;
+  innings: number;
+  runs: number;
+  highestScore: string;
+  average: number | string;
+  strikeRate: number | string;
+  centuries: number;
+  fifties: number;
+  fours: number;
+  sixes: number;
+  notOuts?: number;
+  wickets?: number;
+  balls?: number;
+  overs?: string;
+  maidens?: number;
+  runsConceded?: number;
+  bestBowlingInnings?: string;
+  bestBowlingMatch?: string;
+  economy?: number | string;
+  bowlingAverage?: number | string;
+  bowlingStrikeRate?: number | string;
+  fiveWickets?: number;
+  tenWickets?: number;
+  catches?: number;
+  stumpings?: number;
+}
+
+export interface CricketPlayerRecentMatch {
+  match_id: string;
+  match_name: string;
+  date: string;
+  runs: number | string;
+  balls: number | string;
+  wickets: number | string;
+  overs?: string;
+  opponent: string;
+  result?: string;
 }
 
 export interface CricketPlayer {
   player_key: string;
   player_name: string;
-  team_key: string;
-  player_type: string;
-  player_image: string;
+  team_key?: string;
+  team_name?: string;
+  player_type?: string;
+  player_role?: string;
+  player_image?: string;
+  player_country?: string;
+  player_age?: string | number;
+  player_born?: string;
+  player_birth_date?: string;
+  batting_style?: string;
+  bowling_style?: string;
+  jersey_number?: string | number;
+  is_captain?: boolean;
+  is_wicketkeeper?: boolean;
+  bio?: string;
+  career_stats?: {
+    test?: CricketPlayerStatsFormat;
+    odi?: CricketPlayerStatsFormat;
+    t20i?: CricketPlayerStatsFormat;
+    t20?: CricketPlayerStatsFormat;
+    ipl?: CricketPlayerStatsFormat;
+  };
+  recent_matches?: CricketPlayerRecentMatch[];
 }
 
 export interface CricketPlayersResponse {
@@ -2185,7 +2248,41 @@ export interface CricketPlayersResponse {
   result: CricketPlayer[];
 }
 
-// Params Aliases/Definitions for those missing
+export interface CricketIccRankingItem {
+  rank: number;
+  team_name?: string;
+  team_key?: string;
+  player_name?: string;
+  player_key?: string;
+  country: string;
+  rating: number;
+  points?: number;
+  trend?: 'up' | 'down' | 'same';
+  change?: string;
+}
+
+export interface CricketIccRankingsResponse {
+  format: 'test' | 'odi' | 't20';
+  category: 'teams' | 'batting' | 'bowling' | 'allrounders';
+  gender: 'men' | 'women';
+  rankings: CricketIccRankingItem[];
+}
+
+export interface CricketNewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  content?: string;
+  image: string;
+  author: string;
+  source?: string;
+  published_at: string;
+  read_time: string;
+  category: string;
+  tags?: string[];
+}
+
+// Params Aliases/Definitions
 export type GetCricketFixturesParams = CricketFixturesParams;
 export type GetCricketSeriesParams = CricketBaseParams;
 export type GetCricketMatchesParams = CricketBaseParams;
@@ -2198,7 +2295,10 @@ export interface GetCricketScoreboardParams extends CricketBaseParams {
 export type GetCricketSchedulesParams = CricketBaseParams;
 export type GetCricketTeamsParams = CricketTeamsParams;
 export interface GetCricketPlayersParams extends CricketBaseParams {
-    teamId: string | number;
+  teamId?: string | number;
+  playerId?: string | number;
+  leagueId?: string | number;
+  search?: string;
 }
 
 export interface CricbuzzAPIClient {
@@ -2237,8 +2337,10 @@ export interface CricbuzzAPIClient {
   getWomenTeams(params?: GetCricketTeamsParams): Promise<CricketTeamsResponse>;
 
   getPlayersByTeamId(params: GetCricketPlayersParams): Promise<CricketPlayersResponse>;
+  getPlayerById(playerId: string | number): Promise<CricketPlayer | null>;
 
   getBlogPosts(): Promise<any[]>;
   getVideoHighlights(): Promise<any[]>;
 }
+
 
