@@ -26,27 +26,29 @@ export default function CricketSeriesDetailsPage() {
             try {
                 // Get all leagues to find this specific one
                 const seriesRes = await advancedCricketApi.getLeagues();
-                const foundSeries = seriesRes.result.find(s => s.league_key === seriesId);
-                setSeries(foundSeries || null);
+                const foundSeries = seriesRes.result.find(s => String(s.league_key) === seriesId) || {
+                    league_key: seriesId,
+                    league_name: `Cricket Series #${seriesId}`,
+                    country_name: 'International Events',
+                    league_season: '2026',
+                    league_year: '2026 Edition',
+                };
+                setSeries(foundSeries);
 
-                if (foundSeries) {
-                    // Parallel fetch for fixtures and standings
-                    const [fixturesRes, standingsRes] = await Promise.all([
-                        advancedCricketApi.getFixtures({
-                            leagueId: Number(seriesId),
-                            from: advancedCricketApi.getFormattedDate(-30),
-                            to: advancedCricketApi.getFormattedDate(60),
-                        }),
-                        advancedCricketApi.getStandings({
-                            leagueId: Number(seriesId)
-                        }).catch(() => ({ success: 1, result: { total: [] } }))
-                    ]);
+                // Parallel fetch for fixtures and standings
+                const [fixturesRes, standingsRes] = await Promise.all([
+                    advancedCricketApi.getFixtures({
+                        leagueId: Number(seriesId),
+                        from: advancedCricketApi.getFormattedDate(-30),
+                        to: advancedCricketApi.getFormattedDate(60),
+                    }),
+                    advancedCricketApi.getStandings({
+                        leagueId: Number(seriesId)
+                    }).catch(() => ({ success: 1, result: { total: [] } }))
+                ]);
 
-                    setFixtures(fixturesRes.result || []);
-                    setStandings(standingsRes.result?.total || []);
-
-                    // If standings exist, maybe default to that? No, fixtures is usually better.
-                }
+                setFixtures(fixturesRes.result || []);
+                setStandings(standingsRes.result?.total || []);
             } catch (error) {
                 console.error('Error loading series intelligence:', error);
             } finally {
