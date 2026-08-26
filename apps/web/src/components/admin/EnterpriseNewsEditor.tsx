@@ -26,8 +26,9 @@ import {
   FiShield,
   FiClock,
   FiX,
+  FiExternalLink,
 } from 'react-icons/fi';
-import { FaQuoteLeft, FaStrikethrough } from 'react-icons/fa6';
+import { FaQuoteLeft, FaStrikethrough, FaHighlighter, FaLinkSlash } from 'react-icons/fa6';
 import { useToast } from '../Toast';
 
 interface EnterpriseNewsEditorProps {
@@ -56,6 +57,14 @@ const BADGE_OPTIONS = [
   { label: 'None', color: '' },
 ];
 
+const HIGHLIGHT_COLORS = [
+  { id: 'highlight-gold', label: 'Gold', bg: 'bg-amber-400', class: 'highlight-gold' },
+  { id: 'highlight-blue', label: 'Blue', bg: 'bg-blue-400', class: 'highlight-blue' },
+  { id: 'highlight-green', label: 'Green', bg: 'bg-emerald-400', class: 'highlight-green' },
+  { id: 'highlight-purple', label: 'Purple', bg: 'bg-purple-400', class: 'highlight-purple' },
+  { id: 'highlight-red', label: 'Red', bg: 'bg-red-400', class: 'highlight-red' },
+];
+
 export default function EnterpriseNewsEditor({
   value,
   onChange,
@@ -71,6 +80,7 @@ export default function EnterpriseNewsEditor({
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [isHighlightDropdownOpen, setIsHighlightDropdownOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -78,6 +88,7 @@ export default function EnterpriseNewsEditor({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [linkTargetBlank, setLinkTargetBlank] = useState(true);
+  const [isExistingLink, setIsExistingLink] = useState(false);
 
   // Table state
   const [tableRows, setTableRows] = useState(3);
@@ -159,6 +170,14 @@ export default function EnterpriseNewsEditor({
     const html = editorRef.current.innerHTML;
     onChange(html);
   }, [onChange]);
+
+  // Keyboard shortcut handler (e.g., Ctrl+K for links)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openLinkModal();
+    }
+  };
 
   // ----------------------------------------------------
   // Document Paste Handler (Word / Google Docs Clean-up)
@@ -393,25 +412,105 @@ export default function EnterpriseNewsEditor({
     toast.success('Signed image inserted successfully!');
   };
 
-  // Insert Link
-  const handleInsertLink = () => {
-    if (!linkUrl) {
-      toast.error('Please provide a URL');
+  // ----------------------------------------------------
+  // Text Highlighting Tool (Gold, Blue, Green, Purple, Red)
+  // ----------------------------------------------------
+  const handleApplyHighlight = (colorClass: string) => {
+    saveSelection();
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+      toast.info('Please select some text first to highlight it');
+      setIsHighlightDropdownOpen(false);
       return;
     }
+
+    const selectedText = selection.toString();
+    if (colorClass === 'clear') {
+      // Remove highlight: replace with bare text
+      document.execCommand('insertHTML', false, selectedText);
+      toast.success('Highlight removed');
+    } else {
+      const highlightHtml = `<mark class="article-highlight ${colorClass}">${selectedText}</mark>`;
+      document.execCommand('insertHTML', false, highlightHtml);
+      toast.success('Text highlighted!');
+    }
+
+    handleContentChange();
+    setIsHighlightDropdownOpen(false);
+  };
+
+  // ----------------------------------------------------
+  // Open Link Modal (Captures selected text automatically)
+  // ----------------------------------------------------
+  const openLinkModal = () => {
+    saveSelection();
+    const selection = window.getSelection();
+    let selectedText = '';
+    let existingHref = '';
+
+    if (selection && selection.rangeCount > 0) {
+      selectedText = selection.toString();
+
+      // Check if selection is already inside an anchor
+      let node: Node | null = selection.anchorNode;
+      while (node && node !== editorRef.current) {
+        if (node.nodeName === 'A') {
+          existingHref = (node as HTMLAnchorElement).getAttribute('href') || '';
+          break;
+        }
+        node = node.parentNode;
+      }
+    }
+
+    setLinkText(selectedText);
+    setLinkUrl(existingHref);
+    setIsExistingLink(Boolean(existingHref));
+    setIsLinkModalOpen(true);
+  };
+
+  // Attach / Apply Link to Selected or Highlighted Text
+  const handleInsertLink = () => {
+    if (!linkUrl.trim()) {
+      toast.error('Please provide a URL (e.g. https://...)');
+      return;
+    }
+
+    let formattedUrl = linkUrl.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://') && !formattedUrl.startsWith('/') && !formattedUrl.startsWith('#')) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+
     restoreSelection();
     if (!editorRef.current) return;
     editorRef.current.focus();
 
     const target = linkTargetBlank ? ' target="_blank" rel="noopener noreferrer"' : '';
-    const text = linkText.trim() || linkUrl;
-    const linkHtml = `<a href="${linkUrl}" class="text-blue-400 hover:text-blue-300 underline font-medium"${target}>${text}</a>`;
+    const displayText = linkText.trim() || formattedUrl;
+    const linkHtml = `<a href="${formattedUrl}" class="text-blue-400 hover:text-blue-300 underline font-medium"${target}>${displayText}</a>`;
 
     document.execCommand('insertHTML', false, linkHtml);
     handleContentChange();
     setIsLinkModalOpen(false);
     setLinkUrl('');
     setLinkText('');
+    toast.success('Link attached to text!');
+  };
+
+  // Remove Link from Selected Text
+  const handleRemoveLink = () => {
+    restoreSelection();
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+
+    document.execCommand('unlink', false);
+    handleContentChange();
+    setIsLinkModalOpen(false);
+    setLinkUrl('');
+    setLinkText('');
+    toast.success('Link removed');
   };
 
   // Insert Table
@@ -609,6 +708,53 @@ export default function EnterpriseNewsEditor({
           >
             <FaStrikethrough size={13} />
           </button>
+
+          {/* Text Highlighter Dropdown Tool */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsHighlightDropdownOpen(!isHighlightDropdownOpen)}
+              className="p-2 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 flex items-center gap-1"
+              title="Highlight Selected Text"
+            >
+              <FaHighlighter size={13} />
+            </button>
+
+            {isHighlightDropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 z-30 bg-slate-900 border border-white/15 rounded-xl p-2 shadow-2xl flex items-center gap-1.5 animate-fade-in">
+                {HIGHLIGHT_COLORS.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => handleApplyHighlight(c.class)}
+                    className={`w-6 h-6 rounded-full ${c.bg} hover:scale-125 transition-transform shadow-md`}
+                    title={`${c.label} Highlight`}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={() => handleApplyHighlight('clear')}
+                  className="px-2 py-1 rounded text-[10px] font-bold text-slate-400 hover:text-white hover:bg-white/10"
+                  title="Remove Highlight"
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Link & Attachment Tools */}
+        <div className="flex items-center gap-0.5 pr-1.5 border-r border-white/10 shrink-0">
+          <button
+            type="button"
+            onClick={openLinkModal}
+            className="p-2 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 flex items-center gap-1"
+            title="Attach Link to Selected Text (Ctrl+K)"
+          >
+            <FiLink size={14} />
+            <span className="text-[11px] font-bold hidden sm:inline">Link</span>
+          </button>
         </div>
 
         {/* Alignment */}
@@ -690,19 +836,6 @@ export default function EnterpriseNewsEditor({
             <span>Attach Signed Image</span>
           </button>
 
-          {/* Link Modal */}
-          <button
-            type="button"
-            onClick={() => {
-              saveSelection();
-              setIsLinkModalOpen(true);
-            }}
-            className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5"
-            title="Insert Hyperlink"
-          >
-            <FiLink size={14} />
-          </button>
-
           {/* Table Modal */}
           <button
             type="button"
@@ -748,6 +881,7 @@ export default function EnterpriseNewsEditor({
               contentEditable
               onInput={handleContentChange}
               onPaste={handlePaste}
+              onKeyDown={handleKeyDown}
               onBlur={saveSelection}
               onKeyUp={saveSelection}
               onMouseUp={saveSelection}
@@ -1047,47 +1181,52 @@ export default function EnterpriseNewsEditor({
         </div>
       )}
 
-      {/* ----------------- Link Modal ----------------- */}
+      {/* ----------------- Attach Link to Selected/Highlighted Text Modal ----------------- */}
       {isLinkModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#0D1524] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#0D1524] border border-white/10 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <FiLink className="text-blue-400" /> Insert Hyperlink
+                <FiLink className="text-blue-400" />
+                <span>{isExistingLink ? 'Edit Link' : 'Attach Link to Text'}</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsLinkModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
               >
                 <FiX size={18} />
               </button>
             </div>
-            <div className="space-y-3">
+
+            <div className="space-y-3.5">
               <div>
-                <label className="block text-xs text-slate-300 font-bold uppercase mb-1">
+                <label className="block text-xs text-slate-300 font-bold uppercase tracking-wider mb-1.5">
                   Destination URL *
                 </label>
                 <input
                   type="url"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                  placeholder="https://goalmills.com/matches/... or https://..."
+                  autoFocus
+                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
+
               <div>
-                <label className="block text-xs text-slate-300 font-bold uppercase mb-1">
-                  Link Text (Optional)
+                <label className="block text-xs text-slate-300 font-bold uppercase tracking-wider mb-1.5">
+                  Anchor / Selected Text
                 </label>
                 <input
                   type="text"
                   value={linkText}
                   onChange={(e) => setLinkText(e.target.value)}
-                  placeholder="e.g. Read full match report"
-                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                  placeholder="Highlighted text or custom display text..."
+                  className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
+
               <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer pt-1">
                 <input
                   type="checkbox"
@@ -1095,24 +1234,41 @@ export default function EnterpriseNewsEditor({
                   onChange={(e) => setLinkTargetBlank(e.target.checked)}
                   className="rounded text-blue-600 bg-white/10 border-white/20"
                 />
-                <span>Open link in new tab (rel="noopener noreferrer")</span>
+                <span>Open in new tab (rel="noopener noreferrer")</span>
               </label>
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsLinkModalOpen(false)}
-                className="px-4 py-2 text-xs font-bold text-slate-400"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleInsertLink}
-                className="px-5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold"
-              >
-                Apply Link
-              </button>
+
+            <div className="flex items-center justify-between pt-3 border-t border-white/10">
+              {isExistingLink ? (
+                <button
+                  type="button"
+                  onClick={handleRemoveLink}
+                  className="px-3 py-2 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                >
+                  <FaLinkSlash size={13} />
+                  <span>Remove Link</span>
+                </button>
+              ) : (
+                <div />
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsLinkModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleInsertLink}
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-blue-500/25 transition-all"
+                >
+                  <FiLink size={14} />
+                  <span>{isExistingLink ? 'Update Link' : 'Attach Link'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

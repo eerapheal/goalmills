@@ -171,7 +171,6 @@ body {
 
 /* Enforce crisp bright white text on all pasted document elements in editor */
 .enterprise-editable-body,
-.enterprise-editable-body *,
 .enterprise-editable-body p,
 .enterprise-editable-body span,
 .enterprise-editable-body div,
@@ -179,12 +178,61 @@ body {
 .enterprise-editable-body strong,
 .enterprise-editable-body em,
 .enterprise-editable-body font {
-  color: #f8fafc !important;
-  background-color: transparent !important;
+  color: #f8fafc;
 }
 
-.enterprise-editable-body a {
+.enterprise-editable-body a,
+.prose a {
   color: #60a5fa !important;
+  text-decoration: underline !important;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.enterprise-editable-body a:hover,
+.prose a:hover {
+  color: #93c5fd !important;
+}
+
+/* ------------------------------------------------------------- */
+/* Editorial Text Highlights (Gold, Blue, Green, Purple, Red)    */
+/* ------------------------------------------------------------- */
+mark.article-highlight,
+.article-highlight {
+  padding: 0.125rem 0.375rem !important;
+  border-radius: 0.375rem !important;
+  font-weight: 600 !important;
+  display: inline !important;
+}
+
+.highlight-gold {
+  background-color: rgba(245, 158, 11, 0.25) !important;
+  color: #fef08a !important;
+  border-bottom: 2px solid #f59e0b !important;
+}
+
+.highlight-blue {
+  background-color: rgba(59, 130, 246, 0.25) !important;
+  color: #bfdbfe !important;
+  border-bottom: 2px solid #3b82f6 !important;
+}
+
+.highlight-green {
+  background-color: rgba(16, 185, 129, 0.25) !important;
+  color: #a7f3d0 !important;
+  border-bottom: 2px solid #10b981 !important;
+}
+
+.highlight-purple {
+  background-color: rgba(168, 85, 247, 0.25) !important;
+  color: #e9d5ff !important;
+  border-bottom: 2px solid #a855f7 !important;
+}
+
+.highlight-red {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+  border-bottom: 2px solid #ef4444 !important;
 }
 
 .enterprise-editable-body .signed-image-badge,
