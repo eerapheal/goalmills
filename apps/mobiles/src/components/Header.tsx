@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     brandContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingTop: 12,
     },
     logoWrapper: {
         width: 38,
@@ -92,6 +93,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
+        paddingTop: 12,
     },
     actionButton: {
         width: 38,
