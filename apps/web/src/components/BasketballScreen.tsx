@@ -72,30 +72,32 @@ export function BasketballScreen() {
   }, [fetchGames]);
 
   const filteredGames = useMemo(() => {
-    let list = games;
+    let list = Array.isArray(games) ? games : [];
 
     if (activeTab === 'live') {
-      list = list.filter((g) =>
-        ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(g.status.short)
-      );
+      list = list.filter((g) => {
+        const short = g?.status?.short || '';
+        return ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(short);
+      });
     } else if (activeTab === 'upcoming') {
-      list = list.filter(
-        (g) =>
-          !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(
-            g.status.short
-          )
-      );
+      list = list.filter((g) => {
+        const short = g?.status?.short || '';
+        return !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(short);
+      });
     } else if (activeTab === 'results') {
-      list = list.filter((g) => ['FT', 'AOT'].includes(g.status.short));
+      list = list.filter((g) => {
+        const short = g?.status?.short || '';
+        return ['FT', 'AOT'].includes(short);
+      });
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         (g) =>
-          g.teams.home.name.toLowerCase().includes(q) ||
-          g.teams.away.name.toLowerCase().includes(q) ||
-          g.league.name.toLowerCase().includes(q)
+          (g?.teams?.home?.name || '').toLowerCase().includes(q) ||
+          (g?.teams?.away?.name || '').toLowerCase().includes(q) ||
+          (g?.league?.name || '').toLowerCase().includes(q)
       );
     }
 
@@ -109,11 +111,12 @@ export function BasketballScreen() {
     } = {};
 
     filteredGames.forEach((game) => {
-      const leagueTitle = game.league.name || 'Other Competitions';
+      if (!game) return;
+      const leagueTitle = game?.league?.name || 'Other Competitions';
       if (!groups[leagueTitle]) {
         groups[leagueTitle] = {
           title: leagueTitle,
-          logo: game.league.logo,
+          logo: game?.league?.logo,
           games: [],
         };
       }

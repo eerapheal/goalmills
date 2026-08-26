@@ -91,27 +91,32 @@ export default function BasketballScreen() {
   };
 
   const filteredGames = useMemo(() => {
-    let list = games;
+    let list = Array.isArray(games) ? games : [];
 
     if (activeTab === 'live') {
-      list = list.filter(g =>
-        ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(g.status.short)
-      );
+      list = list.filter(g => {
+        const short = g?.status?.short || '';
+        return ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(short);
+      });
     } else if (activeTab === 'upcoming') {
-      list = list.filter(
-        g => !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(g.status.short)
-      );
+      list = list.filter(g => {
+        const short = g?.status?.short || '';
+        return !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(short);
+      });
     } else if (activeTab === 'results') {
-      list = list.filter(g => ['FT', 'AOT'].includes(g.status.short));
+      list = list.filter(g => {
+        const short = g?.status?.short || '';
+        return ['FT', 'AOT'].includes(short);
+      });
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         g =>
-          g.teams.home.name.toLowerCase().includes(q) ||
-          g.teams.away.name.toLowerCase().includes(q) ||
-          g.league.name.toLowerCase().includes(q)
+          (g?.teams?.home?.name || '').toLowerCase().includes(q) ||
+          (g?.teams?.away?.name || '').toLowerCase().includes(q) ||
+          (g?.league?.name || '').toLowerCase().includes(q)
       );
     }
 
@@ -123,10 +128,11 @@ export default function BasketballScreen() {
     const map = new Map<string, { league: any; data: ApiBasketballGameItem[] }>();
 
     filteredGames.forEach(game => {
-      const key = `${game.league.id}_${game.league.name}`;
+      if (!game) return;
+      const key = `${game?.league?.id || 'other'}_${game?.league?.name || 'Other'}`;
       if (!map.has(key)) {
         map.set(key, {
-          league: game.league,
+          league: game?.league || { name: 'Other Competitions' },
           data: [],
         });
       }
@@ -134,9 +140,9 @@ export default function BasketballScreen() {
     });
 
     return Array.from(map.values()).map(entry => ({
-      title: entry.league.name,
-      logo: entry.league.logo,
-      data: entry.data,
+      title: entry?.league?.name || 'Competition',
+      logo: entry?.league?.logo,
+      data: entry?.data || [],
     }));
   }, [filteredGames]);
 

@@ -17,29 +17,28 @@ export function BasketballMatchCard({
 }: BasketballMatchCardProps) {
   const router = useRouter();
 
-  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(
-    match.status.short
-  );
-  const isFinished = ['FT', 'AOT'].includes(match.status.short);
+  const shortStatus = match?.status?.short || '';
+  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(shortStatus);
+  const isFinished = ['FT', 'AOT'].includes(shortStatus);
   const isUpcoming = !isLive && !isFinished;
 
   const handleClick = () => {
     if (onPress) {
       onPress();
-    } else {
+    } else if (match?.id) {
       router.push(`/basketball/matches/${match.id}`);
     }
   };
 
   const getStatusDisplay = () => {
     if (isLive) {
-      if (match.status.timer) return `${match.status.short} ${match.status.timer}`;
-      return match.status.short || 'LIVE';
+      if (match?.status?.timer) return `${shortStatus} ${match.status.timer}`;
+      return shortStatus || 'LIVE';
     }
     if (isFinished) {
-      return match.status.short === 'AOT' ? 'FT (OT)' : 'FT';
+      return shortStatus === 'AOT' ? 'FT (OT)' : 'FT';
     }
-    return match.time || 'TBD';
+    return match?.time || 'TBD';
   };
 
   return (
@@ -55,10 +54,10 @@ export function BasketballMatchCard({
       {!hideLeague && (
         <div className="mb-3 flex items-center justify-between border-b border-white/5 pb-2 text-xs">
           <div className="flex items-center space-x-2 truncate">
-            {match.league.logo ? (
+            {match?.league?.logo ? (
               <img
                 src={match.league.logo}
-                alt={match.league.name}
+                alt={match?.league?.name || 'League'}
                 className="h-4 w-4 object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
@@ -68,7 +67,7 @@ export function BasketballMatchCard({
               <span className="text-orange-400">🏀</span>
             )}
             <span className="font-semibold text-slate-400 truncate">
-              {match.league.name}
+              {match?.league?.name || 'Competition'}
             </span>
           </div>
 
@@ -97,10 +96,10 @@ export function BasketballMatchCard({
         {/* Home Team */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5 truncate">
-            {match.teams.home.logo ? (
+            {match?.teams?.home?.logo ? (
               <img
                 src={match.teams.home.logo}
-                alt={match.teams.home.name}
+                alt={match?.teams?.home?.name || 'Home'}
                 className="h-6 w-6 object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
@@ -110,7 +109,7 @@ export function BasketballMatchCard({
               <span className="text-sm">🛡️</span>
             )}
             <span className="text-sm font-bold text-slate-100 truncate">
-              {match.teams.home.name}
+              {match?.teams?.home?.name || 'Home Team'}
             </span>
           </div>
           <span
@@ -118,22 +117,22 @@ export function BasketballMatchCard({
               isLive
                 ? 'text-orange-400'
                 : isFinished &&
-                  (match.scores.home.total || 0) > (match.scores.away.total || 0)
+                  (match?.scores?.home?.total || 0) > (match?.scores?.away?.total || 0)
                 ? 'text-white'
                 : 'text-slate-400'
             }`}
           >
-            {isUpcoming ? '-' : match.scores.home.total ?? 0}
+            {isUpcoming ? '-' : match?.scores?.home?.total ?? 0}
           </span>
         </div>
 
         {/* Away Team */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5 truncate">
-            {match.teams.away.logo ? (
+            {match?.teams?.away?.logo ? (
               <img
                 src={match.teams.away.logo}
-                alt={match.teams.away.name}
+                alt={match?.teams?.away?.name || 'Away'}
                 className="h-6 w-6 object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
@@ -143,7 +142,7 @@ export function BasketballMatchCard({
               <span className="text-sm">🛡️</span>
             )}
             <span className="text-sm font-bold text-slate-100 truncate">
-              {match.teams.away.name}
+              {match?.teams?.away?.name || 'Away Team'}
             </span>
           </div>
           <span
@@ -151,39 +150,39 @@ export function BasketballMatchCard({
               isLive
                 ? 'text-orange-400'
                 : isFinished &&
-                  (match.scores.away.total || 0) > (match.scores.home.total || 0)
+                  (match?.scores?.away?.total || 0) > (match?.scores?.home?.total || 0)
                 ? 'text-white'
                 : 'text-slate-400'
             }`}
           >
-            {isUpcoming ? '-' : match.scores.away.total ?? 0}
+            {isUpcoming ? '-' : match?.scores?.away?.total ?? 0}
           </span>
         </div>
       </div>
 
       {/* Quarters breakdown */}
-      {!isUpcoming && (
+      {!isUpcoming && match?.scores && (
         <div className="mt-3 flex items-center justify-around border-t border-white/5 pt-2 text-[10px] text-slate-400">
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q1</span>
-            <span>{match.scores.home.quarter_1 ?? '-'}:{match.scores.away.quarter_1 ?? '-'}</span>
+            <span>{match.scores.home?.quarter_1 ?? '-'}:{match.scores.away?.quarter_1 ?? '-'}</span>
           </div>
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q2</span>
-            <span>{match.scores.home.quarter_2 ?? '-'}:{match.scores.away.quarter_2 ?? '-'}</span>
+            <span>{match.scores.home?.quarter_2 ?? '-'}:{match.scores.away?.quarter_2 ?? '-'}</span>
           </div>
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q3</span>
-            <span>{match.scores.home.quarter_3 ?? '-'}:{match.scores.away.quarter_3 ?? '-'}</span>
+            <span>{match.scores.home?.quarter_3 ?? '-'}:{match.scores.away?.quarter_3 ?? '-'}</span>
           </div>
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q4</span>
-            <span>{match.scores.home.quarter_4 ?? '-'}:{match.scores.away.quarter_4 ?? '-'}</span>
+            <span>{match.scores.home?.quarter_4 ?? '-'}:{match.scores.away?.quarter_4 ?? '-'}</span>
           </div>
-          {match.scores.home.over_time !== null && (
+          {match.scores.home?.over_time !== null && match.scores.home?.over_time !== undefined && (
             <div className="text-center">
               <span className="block text-[9px] uppercase text-slate-500 font-bold">OT</span>
-              <span>{match.scores.home.over_time}:{match.scores.away.over_time}</span>
+              <span>{match.scores.home.over_time}:{match.scores.away?.over_time ?? '-'}</span>
             </div>
           )}
         </div>

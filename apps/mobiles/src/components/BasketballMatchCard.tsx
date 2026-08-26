@@ -16,29 +16,28 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
   onPress,
   hideLeague = false,
 }) => {
-  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(
-    match.status.short
-  );
-  const isFinished = ['FT', 'AOT'].includes(match.status.short);
+  const shortStatus = match?.status?.short || '';
+  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(shortStatus);
+  const isFinished = ['FT', 'AOT'].includes(shortStatus);
   const isUpcoming = !isLive && !isFinished;
 
   const handleCardPress = () => {
     if (onPress) {
       onPress();
-    } else {
+    } else if (match?.id) {
       router.push(`/home/basketball/matches/${match.id}`);
     }
   };
 
   const getStatusText = () => {
     if (isLive) {
-      if (match.status.timer) return `${match.status.short} ${match.status.timer}`;
-      return match.status.short || 'LIVE';
+      if (match?.status?.timer) return `${shortStatus} ${match.status.timer}`;
+      return shortStatus || 'LIVE';
     }
     if (isFinished) {
-      return match.status.short === 'AOT' ? 'FT (OT)' : 'FT';
+      return shortStatus === 'AOT' ? 'FT (OT)' : 'FT';
     }
-    return match.time || 'TBD';
+    return match?.time || 'TBD';
   };
 
   return (
@@ -54,7 +53,7 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
       {!hideLeague && (
         <View style={styles.header}>
           <View style={styles.leagueInfo}>
-            {match.league.logo ? (
+            {match?.league?.logo ? (
               <Image
                 source={{ uri: match.league.logo }}
                 style={styles.leagueLogo}
@@ -64,7 +63,7 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
               <Ionicons name="basketball-outline" size={14} color="#F97316" />
             )}
             <Text style={styles.leagueName} numberOfLines={1}>
-              {match.league.name}
+              {match?.league?.name || 'Competition'}
             </Text>
           </View>
 
@@ -82,7 +81,7 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
       <View style={styles.matchContent}>
         {/* Home Team */}
         <View style={styles.teamRow}>
-          {match.teams.home.logo ? (
+          {match?.teams?.home?.logo ? (
             <Image
               source={{ uri: match.teams.home.logo }}
               style={styles.teamLogo}
@@ -94,24 +93,24 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
             </View>
           )}
           <Text style={styles.teamName} numberOfLines={1}>
-            {match.teams.home.name}
+            {match?.teams?.home?.name || 'Home Team'}
           </Text>
           <Text
             style={[
               styles.teamScore,
               isLive && styles.liveScoreText,
               isFinished &&
-                (match.scores.home.total || 0) > (match.scores.away.total || 0) &&
+                (match?.scores?.home?.total || 0) > (match?.scores?.away?.total || 0) &&
                 styles.winningScore,
             ]}
           >
-            {isUpcoming ? '-' : match.scores.home.total ?? 0}
+            {isUpcoming ? '-' : match?.scores?.home?.total ?? 0}
           </Text>
         </View>
 
         {/* Away Team */}
         <View style={[styles.teamRow, { marginTop: 6 }]}>
-          {match.teams.away.logo ? (
+          {match?.teams?.away?.logo ? (
             <Image
               source={{ uri: match.teams.away.logo }}
               style={styles.teamLogo}
@@ -123,54 +122,54 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
             </View>
           )}
           <Text style={styles.teamName} numberOfLines={1}>
-            {match.teams.away.name}
+            {match?.teams?.away?.name || 'Away Team'}
           </Text>
           <Text
             style={[
               styles.teamScore,
               isLive && styles.liveScoreText,
               isFinished &&
-                (match.scores.away.total || 0) > (match.scores.home.total || 0) &&
+                (match?.scores?.away?.total || 0) > (match?.scores?.home?.total || 0) &&
                 styles.winningScore,
             ]}
           >
-            {isUpcoming ? '-' : match.scores.away.total ?? 0}
+            {isUpcoming ? '-' : match?.scores?.away?.total ?? 0}
           </Text>
         </View>
       </View>
 
       {/* Quarters breakdown (if live or finished) */}
-      {!isUpcoming && (
+      {!isUpcoming && match?.scores && (
         <View style={styles.quartersFooter}>
           <View style={styles.quarterColumn}>
             <Text style={styles.quarterLabel}>Q1</Text>
             <Text style={styles.quarterScore}>
-              {match.scores.home.quarter_1 ?? '-'}:{match.scores.away.quarter_1 ?? '-'}
+              {match.scores.home?.quarter_1 ?? '-'}:{match.scores.away?.quarter_1 ?? '-'}
             </Text>
           </View>
           <View style={styles.quarterColumn}>
             <Text style={styles.quarterLabel}>Q2</Text>
             <Text style={styles.quarterScore}>
-              {match.scores.home.quarter_2 ?? '-'}:{match.scores.away.quarter_2 ?? '-'}
+              {match.scores.home?.quarter_2 ?? '-'}:{match.scores.away?.quarter_2 ?? '-'}
             </Text>
           </View>
           <View style={styles.quarterColumn}>
             <Text style={styles.quarterLabel}>Q3</Text>
             <Text style={styles.quarterScore}>
-              {match.scores.home.quarter_3 ?? '-'}:{match.scores.away.quarter_3 ?? '-'}
+              {match.scores.home?.quarter_3 ?? '-'}:{match.scores.away?.quarter_3 ?? '-'}
             </Text>
           </View>
           <View style={styles.quarterColumn}>
             <Text style={styles.quarterLabel}>Q4</Text>
             <Text style={styles.quarterScore}>
-              {match.scores.home.quarter_4 ?? '-'}:{match.scores.away.quarter_4 ?? '-'}
+              {match.scores.home?.quarter_4 ?? '-'}:{match.scores.away?.quarter_4 ?? '-'}
             </Text>
           </View>
-          {match.scores.home.over_time !== null && (
+          {match.scores.home?.over_time !== null && match.scores.home?.over_time !== undefined && (
             <View style={styles.quarterColumn}>
               <Text style={styles.quarterLabel}>OT</Text>
               <Text style={styles.quarterScore}>
-                {match.scores.home.over_time}:{match.scores.away.over_time}
+                {match.scores.home.over_time}:{match.scores.away?.over_time ?? '-'}
               </Text>
             </View>
           )}

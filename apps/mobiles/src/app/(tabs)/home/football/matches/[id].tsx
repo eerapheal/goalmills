@@ -42,7 +42,10 @@ export default function MatchDetailsScreen() {
   const [standings, setStandings] = useState<ApiFootballStandingItem[]>([]);
 
   const loadMatchDetails = useCallback(async () => {
-    if (!matchId) return;
+    if (!matchId || isNaN(matchId)) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [fix, evs, lns, st] = await Promise.allSettled([
@@ -54,19 +57,22 @@ export default function MatchDetailsScreen() {
 
       if (fix.status === 'fulfilled' && fix.value) {
         setFixture(fix.value);
-        if (fix.value.league && fix.value.league.id) {
+        if (fix.value?.league?.id) {
           apiFootballService
             .getStandings({ league: fix.value.league.id, season: fix.value.league.season })
-            .then(res => setStandings(res))
+            .then(res => setStandings(Array.isArray(res) ? res : []))
             .catch(() => {});
         }
+      } else {
+        setFixture(null);
       }
 
-      if (evs.status === 'fulfilled') setEvents(evs.value || []);
-      if (lns.status === 'fulfilled') setLineups(lns.value || []);
-      if (st.status === 'fulfilled') setStats(st.value || []);
+      if (evs.status === 'fulfilled') setEvents(Array.isArray(evs.value) ? evs.value : []);
+      if (lns.status === 'fulfilled') setLineups(Array.isArray(lns.value) ? lns.value : []);
+      if (st.status === 'fulfilled') setStats(Array.isArray(st.value) ? st.value : []);
     } catch (err) {
-      console.error('[MatchDetails] Error loading details:', err);
+      console.warn('[MatchDetails] Error loading details:', err);
+      setFixture(null);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -91,8 +97,34 @@ export default function MatchDetailsScreen() {
     );
   }
 
+  if (!fixture) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.navBar}>
+          <Pressable style={styles.navBackBtn} onPress={() => router.back()}>
+            <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
+          </Pressable>
+          <Text style={styles.navTitle}>Match Details</Text>
+          <Pressable style={styles.navRefreshBtn} onPress={onRefresh}>
+            <Ionicons name="refresh-outline" size={20} color="#F8FAFC" />
+          </Pressable>
+        </View>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="football-outline" size={48} color="#64748B" />
+          <Text style={styles.emptyTitle}>Match Data Unavailable</Text>
+          <Text style={styles.emptySubtitle}>
+            Unable to load fixture details for #{id || 'unknown'}. Please check your connection or try again.
+          </Text>
+          <Pressable style={styles.retryBtn} onPress={onRefresh}>
+            <Text style={styles.retryBtnText}>Retry</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
   const isLive = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(
-    fixture?.fixture.status.short || ''
+    fixture?.fixture?.status?.short || ''
   );
 
   return (
@@ -103,7 +135,7 @@ export default function MatchDetailsScreen() {
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>
-          {fixture?.league.name || 'Match Center'}
+          {fixture?.league?.name || 'Match Center'}
         </Text>
         <Pressable style={styles.navRefreshBtn} onPress={onRefresh}>
           <Ionicons name="refresh-outline" size={20} color="#F8FAFC" />
@@ -124,24 +156,24 @@ export default function MatchDetailsScreen() {
         {/* Score Banner */}
         <View style={styles.scoreBanner}>
           <View style={styles.leagueBannerInfo}>
-            {fixture?.league.logo && (
+            {fixture?.league?.logo && (
               <Image source={{ uri: fixture.league.logo }} style={styles.bannerLeagueLogo} resizeMode="contain" />
             )}
             <Text style={styles.bannerLeagueText}>
-              {fixture?.league.name} • {fixture?.league.round}
+              {fixture?.league?.name} • {fixture?.league?.round || 'Matchday'}
             </Text>
           </View>
 
           <View style={styles.bannerTeamsRow}>
             {/* Home Team */}
             <View style={styles.bannerTeam}>
-              {fixture?.teams.home.logo ? (
+              {fixture?.teams?.home?.logo ? (
                 <Image source={{ uri: fixture.teams.home.logo }} style={styles.bannerTeamLogo} resizeMode="contain" />
               ) : (
                 <View style={styles.fallbackLogo}><Ionicons name="shield-outline" size={28} color="#94A3B8" /></View>
               )}
               <Text style={styles.bannerTeamName} numberOfLines={2}>
-                {fixture?.teams.home.name || 'Home Team'}
+                {fixture?.teams?.home?.name || 'Home Team'}
               </Text>
             </View>
 
@@ -150,14 +182,14 @@ export default function MatchDetailsScreen() {
               <View style={[styles.statusBadge, isLive && styles.liveStatusBadge]}>
                 {isLive && <View style={styles.livePulse} />}
                 <Text style={[styles.statusBadgeText, isLive && styles.liveStatusBadgeText]}>
-                  {fixture?.fixture.status.short || 'VS'}
+                  {fixture?.fixture?.status?.short || 'VS'}
                 </Text>
               </View>
               <Text style={styles.bannerScoreNumbers}>
-                {fixture?.goals.home !== null && fixture?.goals.home !== undefined ? fixture.goals.home : '-'} :{' '}
-                {fixture?.goals.away !== null && fixture?.goals.away !== undefined ? fixture.goals.away : '-'}
+                {fixture?.goals?.home !== null && fixture?.goals?.home !== undefined ? fixture.goals.home : '-'} :{' '}
+                {fixture?.goals?.away !== null && fixture?.goals?.away !== undefined ? fixture.goals.away : '-'}
               </Text>
-              {fixture?.fixture.venue.name && (
+              {fixture?.fixture?.venue?.name && (
                 <Text style={styles.bannerVenueText} numberOfLines={1}>
                   📍 {fixture.fixture.venue.name}
                 </Text>
@@ -166,13 +198,13 @@ export default function MatchDetailsScreen() {
 
             {/* Away Team */}
             <View style={styles.bannerTeam}>
-              {fixture?.teams.away.logo ? (
+              {fixture?.teams?.away?.logo ? (
                 <Image source={{ uri: fixture.teams.away.logo }} style={styles.bannerTeamLogo} resizeMode="contain" />
               ) : (
                 <View style={styles.fallbackLogo}><Ionicons name="shield-outline" size={28} color="#94A3B8" /></View>
               )}
               <Text style={styles.bannerTeamName} numberOfLines={2}>
-                {fixture?.teams.away.name || 'Away Team'}
+                {fixture?.teams?.away?.name || 'Away Team'}
               </Text>
             </View>
           </View>
@@ -201,23 +233,23 @@ export default function MatchDetailsScreen() {
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Date & Time</Text>
                 <Text style={styles.infoValue}>
-                  {fixture?.fixture.date ? new Date(fixture.fixture.date).toLocaleString() : 'TBD'}
+                  {fixture?.fixture?.date ? new Date(fixture.fixture.date).toLocaleString() : 'TBD'}
                 </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Referee</Text>
-                <Text style={styles.infoValue}>{fixture?.fixture.referee || 'Not Assigned'}</Text>
+                <Text style={styles.infoValue}>{fixture?.fixture?.referee || 'Not Assigned'}</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Stadium</Text>
                 <Text style={styles.infoValue}>
-                  {fixture?.fixture.venue.name} ({fixture?.fixture.venue.city})
+                  {fixture?.fixture?.venue?.name || 'Venue TBD'}{fixture?.fixture?.venue?.city ? ` (${fixture.fixture.venue.city})` : ''}
                 </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Half-Time Result</Text>
                 <Text style={styles.infoValue}>
-                  {fixture?.score.halftime.home ?? '-'} - {fixture?.score.halftime.away ?? '-'}
+                  {fixture?.score?.halftime?.home ?? '-'} - {fixture?.score?.halftime?.away ?? '-'}
                 </Text>
               </View>
             </View>
@@ -235,15 +267,15 @@ export default function MatchDetailsScreen() {
               <View style={styles.card}>
                 <Text style={styles.cardHeaderTitle}>Key Events Timeline</Text>
                 {events.map((ev, idx) => {
-                  const isHome = ev.team.id === fixture?.teams.home.id;
-                  const isGoal = ev.type === 'Goal';
-                  const isCard = ev.type === 'Card';
-                  const isYellow = isCard && ev.detail.includes('Yellow');
+                  const isHome = ev?.team?.id === fixture?.teams?.home?.id;
+                  const isGoal = ev?.type === 'Goal';
+                  const isCard = ev?.type === 'Card';
+                  const isYellow = isCard && String(ev?.detail || '').includes('Yellow');
 
                   return (
                     <View key={idx} style={[styles.timelineRow, isHome ? styles.timelineLeft : styles.timelineRight]}>
                       <View style={styles.eventMinuteBox}>
-                        <Text style={styles.eventMinuteText}>{ev.time.elapsed}'</Text>
+                        <Text style={styles.eventMinuteText}>{ev?.time?.elapsed || 0}'</Text>
                       </View>
                       <View style={styles.eventDetailsBox}>
                         <View style={styles.eventTypeRow}>
@@ -256,13 +288,13 @@ export default function MatchDetailsScreen() {
                               ]}
                             />
                           )}
-                          {ev.type === 'subst' && <Ionicons name="swap-horizontal" size={16} color="#3B82F6" />}
-                          <Text style={styles.eventPlayerName}>{ev.player.name}</Text>
+                          {ev?.type === 'subst' && <Ionicons name="swap-horizontal" size={16} color="#3B82F6" />}
+                          <Text style={styles.eventPlayerName}>{ev?.player?.name || 'Player'}</Text>
                         </View>
-                        {ev.assist.name ? (
+                        {ev?.assist?.name ? (
                           <Text style={styles.eventAssistText}>Assist: {ev.assist.name}</Text>
                         ) : null}
-                        <Text style={styles.eventDetailText}>{ev.detail}</Text>
+                        {ev?.detail ? <Text style={styles.eventDetailText}>{ev.detail}</Text> : null}
                       </View>
                     </View>
                   );
@@ -289,16 +321,16 @@ export default function MatchDetailsScreen() {
                   {/* Home Team Formations */}
                   <View style={styles.pitchTeamHalf}>
                     <Text style={styles.pitchFormationHeader}>
-                      {lineups[0]?.team.name} ({lineups[0]?.formation})
+                      {lineups[0]?.team?.name || 'Home'} ({lineups[0]?.formation || '4-3-3'})
                     </Text>
                     <View style={styles.pitchGrid}>
-                      {lineups[0]?.startXI.slice(0, 11).map((p: any, idx: number) => (
+                      {(lineups[0]?.startXI || []).slice(0, 11).map((p: any, idx: number) => (
                         <View key={idx} style={styles.pitchPlayerNode}>
                           <View style={[styles.pitchJersey, { backgroundColor: '#3B82F6' }]}>
-                            <Text style={styles.pitchJerseyNum}>{p.player.number}</Text>
+                            <Text style={styles.pitchJerseyNum}>{p?.player?.number ?? idx + 1}</Text>
                           </View>
                           <Text style={styles.pitchPlayerName} numberOfLines={1}>
-                            {p.player.name.split(' ').pop()}
+                            {(p?.player?.name || 'Player').split(' ').pop()}
                           </Text>
                         </View>
                       ))}
@@ -309,16 +341,16 @@ export default function MatchDetailsScreen() {
                   {lineups[1] && (
                     <View style={styles.pitchTeamHalf}>
                       <Text style={styles.pitchFormationHeader}>
-                        {lineups[1]?.team.name} ({lineups[1]?.formation})
+                        {lineups[1]?.team?.name || 'Away'} ({lineups[1]?.formation || '4-3-3'})
                       </Text>
                       <View style={styles.pitchGrid}>
-                        {lineups[1]?.startXI.slice(0, 11).map((p: any, idx: number) => (
+                        {(lineups[1]?.startXI || []).slice(0, 11).map((p: any, idx: number) => (
                           <View key={idx} style={styles.pitchPlayerNode}>
                             <View style={[styles.pitchJersey, { backgroundColor: '#EF4444' }]}>
-                              <Text style={styles.pitchJerseyNum}>{p.player.number}</Text>
+                              <Text style={styles.pitchJerseyNum}>{p?.player?.number ?? idx + 1}</Text>
                             </View>
                             <Text style={styles.pitchPlayerName} numberOfLines={1}>
-                              {p.player.name.split(' ').pop()}
+                              {(p?.player?.name || 'Player').split(' ').pop()}
                             </Text>
                           </View>
                         ))}
@@ -332,19 +364,19 @@ export default function MatchDetailsScreen() {
                   <Text style={styles.cardHeaderTitle}>Substitutes</Text>
                   <View style={styles.benchRow}>
                     <View style={{ flex: 1, marginRight: 8 }}>
-                      <Text style={styles.benchTeamHeader}>{lineups[0]?.team.name}</Text>
-                      {lineups[0]?.substitutes.map((s: any, idx: number) => (
+                      <Text style={styles.benchTeamHeader}>{lineups[0]?.team?.name || 'Home'}</Text>
+                      {(lineups[0]?.substitutes || []).map((s: any, idx: number) => (
                         <Text key={idx} style={styles.benchPlayerText}>
-                          {s.player.number}. {s.player.name} ({s.player.pos})
+                          {s?.player?.number ?? '-'}. {s?.player?.name || 'Player'} ({s?.player?.pos || 'SUB'})
                         </Text>
                       ))}
                     </View>
                     {lineups[1] && (
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.benchTeamHeader}>{lineups[1]?.team.name}</Text>
-                        {lineups[1]?.substitutes.map((s: any, idx: number) => (
+                        <Text style={styles.benchTeamHeader}>{lineups[1]?.team?.name || 'Away'}</Text>
+                        {(lineups[1]?.substitutes || []).map((s: any, idx: number) => (
                           <Text key={idx} style={styles.benchPlayerText}>
-                            {s.player.number}. {s.player.name} ({s.player.pos})
+                            {s?.player?.number ?? '-'}. {s?.player?.name || 'Player'} ({s?.player?.pos || 'SUB'})
                           </Text>
                         ))}
                       </View>
@@ -366,9 +398,9 @@ export default function MatchDetailsScreen() {
             ) : (
               <View style={styles.card}>
                 <Text style={styles.cardHeaderTitle}>Team Statistics</Text>
-                {stats[0]?.statistics.map((st: any, idx: number) => {
-                  const awayStat = stats[1]?.statistics.find((s: any) => s.type === st.type);
-                  const homeVal = String(st.value ?? 0).replace('%', '');
+                {(stats[0]?.statistics || []).map((st: any, idx: number) => {
+                  const awayStat = (stats[1]?.statistics || []).find((s: any) => s?.type === st?.type);
+                  const homeVal = String(st?.value ?? 0).replace('%', '');
                   const awayVal = String(awayStat?.value ?? 0).replace('%', '');
                   const numHome = Number(homeVal) || 1;
                   const numAway = Number(awayVal) || 1;
@@ -378,8 +410,8 @@ export default function MatchDetailsScreen() {
                   return (
                     <View key={idx} style={styles.statComparisonRow}>
                       <View style={styles.statLabelsRow}>
-                        <Text style={styles.statValHome}>{st.value ?? '0'}</Text>
-                        <Text style={styles.statTypeName}>{st.type}</Text>
+                        <Text style={styles.statValHome}>{st?.value ?? '0'}</Text>
+                        <Text style={styles.statTypeName}>{st?.type || 'Stat'}</Text>
                         <Text style={styles.statValAway}>{awayStat?.value ?? '0'}</Text>
                       </View>
                       <View style={styles.dualBarContainer}>
@@ -403,7 +435,7 @@ export default function MatchDetailsScreen() {
               </View>
             ) : (
               <View style={styles.card}>
-                <Text style={styles.cardHeaderTitle}>{fixture?.league.name} Standings</Text>
+                <Text style={styles.cardHeaderTitle}>{fixture?.league?.name || 'League'} Standings</Text>
                 <View style={styles.tableHeaderRow}>
                   <Text style={[styles.tableColHeader, { width: 28 }]}>#</Text>
                   <Text style={[styles.tableColHeader, { flex: 1 }]}>Team</Text>
@@ -413,19 +445,23 @@ export default function MatchDetailsScreen() {
                 </View>
                 {standings.map(row => {
                   const isCurrent =
-                    row.team.id === fixture?.teams.home.id ||
-                    row.team.id === fixture?.teams.away.id;
+                    row?.team?.id === fixture?.teams?.home?.id ||
+                    row?.team?.id === fixture?.teams?.away?.id;
                   return (
-                    <View key={row.rank} style={[styles.tableRow, isCurrent && styles.tableRowHighlight]}>
-                      <Text style={[styles.tableRank, isCurrent && styles.textHighlight]}>{row.rank}</Text>
-                      <Image source={{ uri: row.team.logo }} style={styles.tableTeamLogo} resizeMode="contain" />
+                    <View key={row?.rank || Math.random()} style={[styles.tableRow, isCurrent && styles.tableRowHighlight]}>
+                      <Text style={[styles.tableRank, isCurrent && styles.textHighlight]}>{row?.rank ?? '-'}</Text>
+                      {row?.team?.logo ? (
+                        <Image source={{ uri: row.team.logo }} style={styles.tableTeamLogo} resizeMode="contain" />
+                      ) : (
+                        <View style={{ width: 16, height: 16, marginRight: 6 }} />
+                      )}
                       <Text style={[styles.tableTeamName, isCurrent && styles.textHighlight]} numberOfLines={1}>
-                        {row.team.name}
+                        {row?.team?.name || 'Team'}
                       </Text>
-                      <Text style={styles.tableStat}>{row.all.played}</Text>
-                      <Text style={styles.tableStat}>{row.goalsDiff}</Text>
-                      <Text style={[styles.tablePts, isCurrent && styles.textHighlight]}>{row.points}</Text>
-                    </View>
+                      <Text style={styles.tableStat}>{row?.all?.played ?? '-'}</Text>
+                      <Text style={styles.tableStat}>{row?.goalsDiff ?? '-'}</Text>
+                      <Text style={[styles.tablePts, isCurrent && styles.textHighlight]}>{row?.points ?? '-'}</Text>
+                      </View>
                   );
                 })}
               </View>
@@ -876,5 +912,37 @@ const styles = StyleSheet.create({
   },
   textHighlight: {
     color: '#10B981',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.xl,
+    marginTop: 60,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    marginTop: SPACING.md,
+    marginBottom: SPACING.xs,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#94A3B8',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: SPACING.lg,
+  },
+  retryBtn: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.md,
+  },
+  retryBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });
