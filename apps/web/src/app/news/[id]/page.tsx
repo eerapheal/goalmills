@@ -8,10 +8,82 @@ import { ShareButtons } from '@/components/ShareButtons';
 import ArticleTrackerAndActions from '@/components/news/ArticleTrackerAndActions';
 import RecentlyViewedSection from '@/components/news/RecentlyViewedSection';
 import { Metadata } from 'next';
-import { FiClock, FiEye, FiTag, FiArrowLeft, FiShield } from 'react-icons/fi';
+import { FiClock, FiEye, FiTag, FiArrowLeft, FiShield, FiArrowRight } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
 
 export const dynamic = 'force-dynamic';
+
+// Helper to cleanly split rich HTML article content at ~50% word count (before the next paragraph)
+function splitContentAtMidpoint(content: string): { firstHalf: string; secondHalf: string } {
+  if (!content) return { firstHalf: '', secondHalf: '' };
+
+  const getWordCount = (html: string) => {
+    return html
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+  };
+
+  const totalWords = getWordCount(content);
+  // If article is very short (< 40 words), don't split; render in full first
+  if (totalWords < 40) {
+    return { firstHalf: content, secondHalf: '' };
+  }
+
+  const targetWords = totalWords * 0.5;
+
+  // Split on block closings (paragraphs, blockquotes, figures, headings, divs)
+  const blockRegex = /(<\/(?:p|blockquote|figure|h2|h3|h4|div|section)>)/i;
+  const parts = content.split(blockRegex);
+
+  if (parts.length > 2) {
+    let accumulatedWords = 0;
+    let splitIndex = -1;
+
+    for (let i = 0; i < parts.length; i += 2) {
+      const segment = parts[i] + (parts[i + 1] || '');
+      accumulatedWords += getWordCount(segment);
+
+      // Once we pass ~50% words and have remaining content, split before next paragraph
+      if (accumulatedWords >= targetWords && i + 2 < parts.length) {
+        splitIndex = i + 2;
+        break;
+      }
+    }
+
+    if (splitIndex !== -1) {
+      return {
+        firstHalf: parts.slice(0, splitIndex).join(''),
+        secondHalf: parts.slice(splitIndex).join(''),
+      };
+    }
+  }
+
+  // Fallback: split on double newlines if no HTML block tags
+  const newlineParts = content.split(/(\n\s*\n)/);
+  if (newlineParts.length > 2) {
+    let accumulatedWords = 0;
+    let splitIndex = -1;
+    for (let i = 0; i < newlineParts.length; i += 2) {
+      const segment = newlineParts[i] + (newlineParts[i + 1] || '');
+      accumulatedWords += getWordCount(segment);
+      if (accumulatedWords >= targetWords && i + 2 < newlineParts.length) {
+        splitIndex = i + 2;
+        break;
+      }
+    }
+    if (splitIndex !== -1) {
+      return {
+        firstHalf: newlineParts.slice(0, splitIndex).join(''),
+        secondHalf: newlineParts.slice(splitIndex).join(''),
+      };
+    }
+  }
+
+  return { firstHalf: content, secondHalf: '' };
+}
 
 export async function generateMetadata({
   params,
@@ -95,8 +167,8 @@ export default async function NewsDetailPage({
     $or: [{ name: news.category }, { slug: news.categorySlug }],
   }).lean();
 
-  // You May Also Like: fetch related articles from same category or tags
-  const youMayAlsoLike = await News.find({
+  // In-Content "You May Also Like" - 3 filtered related articles based on category, tags, or team
+  let inContentRelated: any[] = await News.find({
     _id: { $ne: id },
     $or: [
       { category: news.category },
@@ -106,14 +178,38 @@ export default async function NewsDetailPage({
     ],
   })
     .sort({ views: -1, createdAt: -1 })
+    .limit(3)
+    .lean();
+
+  // If fewer than 3 match category/tags, backfill with top/trending articles so we always have 3
+  if (inContentRelated.length < 3) {
+    const existingIds = [id, ...inContentRelated.map((n: any) => n._id.toString())];
+    const backfill = await News.find({
+      _id: { $nin: existingIds },
+    })
+      .sort({ isBreaking: -1, views: -1, createdAt: -1 })
+      .limit(3 - inContentRelated.length)
+      .lean();
+    inContentRelated = [...inContentRelated, ...backfill];
+  }
+
+  // Bottom section: additional related or trending stories (excluding current and in-content items)
+  const excludedIds = [id, ...inContentRelated.map((n: any) => n._id.toString())];
+  const moreStories = await News.find({
+    _id: { $nin: excludedIds },
+  })
+    .sort({ views: -1, createdAt: -1 })
     .limit(4)
     .lean();
 
-  // Trending stories
+  // Trending stories for sidebar
   const trendingStories = await News.find({ _id: { $ne: id } })
     .sort({ views: -1, isBreaking: -1, createdAt: -1 })
     .limit(4)
     .lean();
+
+  // Split content at ~50% word count
+  const { firstHalf, secondHalf } = splitContentAtMidpoint(news.content || '');
 
   const formattedDate = news.createdAt
     ? new Date(news.createdAt).toLocaleDateString('en-US', {
@@ -256,9 +352,9 @@ export default async function NewsDetailPage({
               </div>
             </div>
 
-            {/* Featured Cover Image */}
+            {/* Featured Cover Image - Compact height on mobile, full display */}
             {news.image && (
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0E1522] shadow-2xl aspect-[16/9] w-full max-w-full">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0E1522] shadow-2xl aspect-[16/9] sm:aspect-[16/9] md:aspect-[21/9] max-h-[220px] sm:max-h-[460px] w-full max-w-full">
                 <Image
                   src={news.image}
                   alt={news.title}
@@ -281,6 +377,7 @@ export default async function NewsDetailPage({
             {/* Main Article Body - Clean, safe prose with overflow control */}
             {news.content && (
               <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 sm:p-8 space-y-4 max-w-full overflow-hidden">
+                {/* First half of article content (up to ~50% word count) */}
                 <div
                   className="prose prose-invert max-w-full text-slate-100 leading-relaxed text-sm sm:text-base break-words [word-break:break-word]
                     [&_*]:text-slate-100 [&_*]:bg-transparent
@@ -294,8 +391,93 @@ export default async function NewsDetailPage({
                     [&_table]:w-full [&_table]:overflow-x-auto [&_table]:block [&_table]:my-4
                     [&_a]:text-blue-400 [&_a]:underline [&_a]:break-all
                     [&_pre]:overflow-x-auto [&_pre]:p-4 [&_pre]:bg-slate-900 [&_pre]:rounded-xl"
-                  dangerouslySetInnerHTML={{ __html: news.content }}
+                  dangerouslySetInnerHTML={{ __html: firstHalf || news.content }}
                 />
+
+                {/* In-Article "You May Also Like" - 3 Clickable Filtered Cards at ~50% mark */}
+                {inContentRelated.length > 0 && (
+                  <div className="my-5 sm:my-8 rounded-2xl border border-blue-500/20 bg-gradient-to-b from-[#0c162d]/90 via-[#0a1122]/90 to-[#070c18]/95 p-3 sm:p-5 shadow-2xl backdrop-blur-md">
+                    <div className="flex items-center justify-between gap-2 pb-2.5 sm:pb-3.5 mb-3 sm:mb-4 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg sm:rounded-xl bg-blue-600/30 text-blue-400 text-xs sm:text-sm shadow-inner">
+                          ⚡
+                        </span>
+                        <div>
+                          <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-white">
+                            You May Also Like
+                          </h3>
+                          <p className="text-[10px] sm:text-[11px] text-slate-400">
+                            Recommended stories related to this article
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-blue-400 uppercase tracking-widest px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                        Suggested
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+                      {inContentRelated.map((item: any) => (
+                        <Link
+                          key={item._id.toString()}
+                          href={`/news/${item._id}`}
+                          className="group flex flex-row sm:flex-col items-center sm:items-stretch justify-between rounded-xl border border-white/10 bg-slate-900/80 hover:bg-slate-800/90 p-2 sm:p-3 transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 gap-2.5 sm:gap-0"
+                        >
+                          <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2.5 sm:gap-0 flex-1 min-w-0 w-full">
+                            {item.image && (
+                              <div className="relative w-16 h-12 sm:w-full sm:h-auto sm:aspect-video flex-shrink-0 overflow-hidden rounded-lg bg-slate-950 sm:mb-2.5">
+                                <Image
+                                  src={item.image}
+                                  alt={item.title}
+                                  fill
+                                  sizes="(max-width: 640px) 64px, (max-width: 1024px) 33vw, 250px"
+                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 mb-1 sm:mb-1.5">
+                                <span className="text-[9px] sm:text-[10px] font-black uppercase text-blue-400 truncate">
+                                  {item.category || 'News'}
+                                </span>
+                                <span className="text-[9px] sm:text-[10px] text-slate-500">•</span>
+                                <span className="text-[9px] sm:text-[10px] text-slate-400 flex items-center gap-1">
+                                  <FiClock size={9} /> {item.readTime || 3}m
+                                </span>
+                              </div>
+                              <h4 className="text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 group-hover:text-blue-400 transition-colors">
+                                {item.title}
+                              </h4>
+                            </div>
+                          </div>
+                          <div className="hidden sm:flex mt-2.5 pt-2 border-t border-white/5 items-center justify-between text-[11px] font-bold text-blue-400 group-hover:text-blue-300">
+                            <span>Read Story</span>
+                            <FiArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Second half of article content (rest of the text after the recommendations) */}
+                {secondHalf && (
+                  <div
+                    className="prose prose-invert max-w-full text-slate-100 leading-relaxed text-sm sm:text-base break-words [word-break:break-word]
+                      [&_*]:text-slate-100 [&_*]:bg-transparent
+                      [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-slate-100
+                      [&_h2]:text-xl sm:[&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:break-words
+                      [&_h3]:text-lg sm:[&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white [&_h3]:mt-4 [&_h3]:mb-2
+                      [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-200 [&_blockquote]:my-4
+                      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:my-3 [&_ul]:text-slate-100
+                      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_ol]:my-3 [&_ol]:text-slate-100
+                      [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-4
+                      [&_table]:w-full [&_table]:overflow-x-auto [&_table]:block [&_table]:my-4
+                      [&_a]:text-blue-400 [&_a]:underline [&_a]:break-all
+                      [&_pre]:overflow-x-auto [&_pre]:p-4 [&_pre]:bg-slate-900 [&_pre]:rounded-xl"
+                    dangerouslySetInnerHTML={{ __html: secondHalf }}
+                  />
+                )}
               </div>
             )}
 
@@ -326,12 +508,12 @@ export default async function NewsDetailPage({
               </div>
             )}
 
-            {/* You May Also Like / Recommended Section */}
-            {youMayAlsoLike.length > 0 && (
+            {/* Bottom More Stories Section */}
+            {moreStories.length > 0 && (
               <section className="pt-8 border-t border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span>💡</span> You May Also Like
+                    <span>💡</span> More Related Stories
                   </h3>
                   <Link
                     href="/news"
@@ -342,7 +524,7 @@ export default async function NewsDetailPage({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {youMayAlsoLike.map((item: any) => (
+                  {moreStories.map((item: any) => (
                     <Link
                       key={item._id.toString()}
                       href={`/news/${item._id}`}
