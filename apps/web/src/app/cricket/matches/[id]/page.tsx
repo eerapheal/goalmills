@@ -25,35 +25,23 @@ export default function CricketMatchDetailsPage() {
     const [odds, setOdds] = useState<CricketMatchOdds | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<TabType>('scorecard');
+    const [homeImgError, setHomeImgError] = useState(false);
+    const [awayImgError, setAwayImgError] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
             if (!params.id) return;
             const matchId = String(params.id);
             try {
-                // Fetch match details via Fixtures endpoint
-                const todayRes = await advancedCricketApi.getFixtures({
-                    matchId: Number(matchId),
-                    from: advancedCricketApi.getFormattedDate(-30),
-                    to: advancedCricketApi.getFormattedDate(30)
-                });
-
-                let foundMatch = todayRes.result && todayRes.result.length > 0 ? todayRes.result[0] : null;
-
-                if (!foundMatch) {
-                    const liveRes = await advancedCricketApi.getLivescore({ matchId: Number(matchId) });
-                    if (liveRes.result && liveRes.result.length > 0) {
-                        foundMatch = liveRes.result[0];
-                    }
-                }
-
+                setLoading(true);
+                const foundMatch = await advancedCricketApi.getMatchFullDetails(matchId);
                 setMatch(foundMatch);
 
                 if (foundMatch) {
                     const [h2hRes, oddsRes] = await Promise.all([
                         advancedCricketApi.getH2H({
-                            firstTeamId: Number(foundMatch.home_team_key),
-                            secondTeamId: Number(foundMatch.away_team_key)
+                            firstTeamId: Number(foundMatch.home_team_key || 1),
+                            secondTeamId: Number(foundMatch.away_team_key || 2),
                         }).catch(() => null),
                         advancedCricketApi.getOdds({
                             matchId: Number(matchId)
@@ -88,16 +76,20 @@ export default function CricketMatchDetailsPage() {
 
     if (!match) {
         return (
-            <div className="min-h-screen bg-[#0a0e27] pt-[120px] flex flex-col justify-center items-center text-white text-center px-4">
-                <div className="text-4xl mb-4">🏏</div>
-                <h2 className="text-xl font-bold uppercase tracking-tight mb-2">Match Not Located</h2>
-                <p className="text-text-secondary text-xs mb-6 max-w-sm">The requested match data could not be found in the current feed.</p>
-                <button
-                    onClick={() => router.push('/cricket')}
-                    className="px-6 py-2.5 bg-secondary text-white rounded-full font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity"
-                >
-                    Back to Cricket Central
-                </button>
+            <div className="min-h-screen bg-[#0a0e27] pt-[120px] flex flex-col justify-center items-center px-4">
+                <div className="glass-card max-w-md w-full p-8 rounded-3xl text-center border border-white/5">
+                    <div className="w-16 h-16 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mx-auto mb-4 text-2xl">
+                        ⚠️
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-2">Match Not Found</h2>
+                    <p className="text-text-muted text-xs mb-6">The requested fixture could not be located in our real-time database feed.</p>
+                    <button
+                        onClick={() => router.back()}
+                        className="px-6 py-2.5 rounded-xl bg-secondary text-white font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all"
+                    >
+                        Back to Dashboard
+                    </button>
+                </div>
             </div>
         );
     }
@@ -107,49 +99,29 @@ export default function CricketMatchDetailsPage() {
 
     return (
         <div className="min-h-screen bg-[#0a0e27] pt-[100px] pb-20">
-            <div className="max-w-5xl mx-auto px-4">
-                {/* Unified Sleek Match Header */}
-                <div className="glass-card rounded-3xl p-6 md:p-8 mb-6 border border-white/10 bg-gradient-to-br from-white/[0.07] via-[#0a0e27] to-[#0d143d] relative overflow-hidden">
-                    {/* Top Action Row */}
-                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-secondary transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                            </div>
-                            <span className="text-xs font-bold uppercase tracking-wider">Back</span>
-                        </button>
-
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Hero Header Card */}
+                <div className="glass-card rounded-3xl p-6 md:p-8 border border-white/10 relative overflow-hidden mb-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-6 border-b border-white/5">
                         <div className="flex items-center gap-2">
-                            <span className="px-3 py-1 rounded-full bg-blue-500/10 text-[10px] font-bold text-blue-400 uppercase tracking-wider border border-blue-500/20">
-                                {match.event_type || 'Cricket'} • {match.league_season || '2026'}
+                            <span className="px-3 py-1 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary text-xs font-black uppercase tracking-wider">
+                                {match.event_type || 'Match'}
                             </span>
-                            <Link
-                                href={`/cricket/series/${match.league_key}`}
-                                className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-bold text-text-muted hover:text-secondary uppercase tracking-wider border border-white/10 transition-colors"
-                            >
-                                🏆 {match.league_name}
-                            </Link>
+                            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                                {match.league_name} • {match.league_season}
+                            </span>
                         </div>
+                        {match.event_stadium && (
+                            <span className="text-xs font-medium text-text-muted flex items-center gap-1.5">
+                                📍 {match.event_stadium}
+                            </span>
+                        )}
                     </div>
 
-                    {/* Main Scoreboard Area */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 py-2">
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-8 my-4">
                         {/* Home Team */}
                         <div className="flex flex-col items-center md:items-end text-center md:text-right">
-                            <div className="flex items-center gap-4 md:flex-row-reverse">
-                                <Link
-                                    href={`/cricket/teams/${match.home_team_key}`}
-                                    className="relative w-16 h-16 rounded-2xl bg-white/5 p-3 border border-white/10 flex items-center justify-center flex-shrink-0 hover:border-secondary hover:scale-105 transition-all"
-                                >
-                                    {match.event_home_team_logo ? (
-                                        <Image src={match.event_home_team_logo} alt={match.event_home_team} width={48} height={48} className="object-contain" />
-                                    ) : (
-                                        <span className="text-xl font-bold text-blue-400">{match.event_home_team.charAt(0)}</span>
-                                    )}
-                                </Link>
+                            <div className="flex flex-row-reverse md:flex-row items-center gap-4">
                                 <div>
                                     <Link
                                         href={`/cricket/teams/${match.home_team_key}`}
@@ -170,6 +142,21 @@ export default function CricketMatchDetailsPage() {
                                         </div>
                                     )}
                                 </div>
+                                <Link
+                                    href={`/cricket/teams/${match.home_team_key}`}
+                                    className="relative w-16 h-16 rounded-2xl bg-white/5 p-2 border border-white/10 flex items-center justify-center flex-shrink-0 hover:border-secondary hover:scale-105 transition-all overflow-hidden"
+                                >
+                                    {match.event_home_team_logo && !homeImgError ? (
+                                        <img
+                                            src={match.event_home_team_logo}
+                                            alt={match.event_home_team}
+                                            className="w-full h-full object-contain"
+                                            onError={() => setHomeImgError(true)}
+                                        />
+                                    ) : (
+                                        <span className="text-xl font-bold text-blue-400">{match.event_home_team.charAt(0)}</span>
+                                    )}
+                                </Link>
                             </div>
                         </div>
 
@@ -203,10 +190,15 @@ export default function CricketMatchDetailsPage() {
                             <div className="flex items-center gap-4">
                                 <Link
                                     href={`/cricket/teams/${match.away_team_key}`}
-                                    className="relative w-16 h-16 rounded-2xl bg-white/5 p-3 border border-white/10 flex items-center justify-center flex-shrink-0 hover:border-secondary hover:scale-105 transition-all"
+                                    className="relative w-16 h-16 rounded-2xl bg-white/5 p-2 border border-white/10 flex items-center justify-center flex-shrink-0 hover:border-secondary hover:scale-105 transition-all overflow-hidden"
                                 >
-                                    {match.event_away_team_logo ? (
-                                        <Image src={match.event_away_team_logo} alt={match.event_away_team} width={48} height={48} className="object-contain" />
+                                    {match.event_away_team_logo && !awayImgError ? (
+                                        <img
+                                            src={match.event_away_team_logo}
+                                            alt={match.event_away_team}
+                                            className="w-full h-full object-contain"
+                                            onError={() => setAwayImgError(true)}
+                                        />
                                     ) : (
                                         <span className="text-xl font-bold text-amber-400">{match.event_away_team.charAt(0)}</span>
                                     )}
@@ -231,7 +223,7 @@ export default function CricketMatchDetailsPage() {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </div>  
                         </div>
                     </div>
 

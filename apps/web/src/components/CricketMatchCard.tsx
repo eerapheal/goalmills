@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import { CricketEvent } from '@goalmills/types';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -12,6 +12,8 @@ interface CricketMatchCardProps {
 
 export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
     const router = useRouter();
+    const [homeImgError, setHomeImgError] = useState(false);
+    const [awayImgError, setAwayImgError] = useState(false);
     const isLive = match.event_live === '1';
     const isUpcoming = match.event_status === 'Not Started';
 
@@ -22,6 +24,9 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
             router.push(`/cricket/matches/${match.event_key}`);
         }
     };
+
+    const homeName = match.event_home_team || 'TBC';
+    const awayName = match.event_away_team || 'TBC';
 
     return (
         <div
@@ -82,17 +87,15 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
                         <div className="relative w-8 h-8 rounded-md bg-white/5 p-1 border border-white/10 flex shrink-0 items-center justify-center overflow-hidden">
-                            {match.event_home_team_logo ? (
-                                <Image
+                            {match.event_home_team_logo && !homeImgError ? (
+                                <img
                                     src={match.event_home_team_logo}
-                                    alt={match.event_home_team || 'Home'}
-                                    width={22}
-                                    height={22}
-                                    style={{ width: 'auto', height: 'auto' }}
-                                    className="object-contain"
+                                    alt={homeName}
+                                    className="w-full h-full object-contain"
+                                    onError={() => setHomeImgError(true)}
                                 />
                             ) : (
-                                <span className="text-xs font-black text-blue-400">{(match.event_home_team || 'H').charAt(0)}</span>
+                                <span className="text-xs font-black text-blue-400">{homeName.charAt(0)}</span>
                             )}
                         </div>
                         <Link
@@ -100,7 +103,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                             onClick={(e) => e.stopPropagation()}
                             className="text-[11px] font-black text-white leading-tight uppercase tracking-tight hover:text-secondary transition-colors"
                         >
-                            {match.event_home_team || 'TBC'}
+                            {homeName}
                         </Link>
                     </div>
                     {!isUpcoming && match.event_home_final_result && (
@@ -137,17 +140,15 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                 <div className="flex flex-col gap-1.5 items-end text-right">
                     <div className="flex flex-row-reverse items-center gap-2">
                         <div className="relative w-8 h-8 rounded-md bg-white/5 p-1 border border-white/10 flex shrink-0 items-center justify-center overflow-hidden">
-                            {match.event_away_team_logo ? (
-                                <Image
+                            {match.event_away_team_logo && !awayImgError ? (
+                                <img
                                     src={match.event_away_team_logo}
-                                    alt={match.event_away_team || 'Away'}
-                                    width={22}
-                                    height={22}
-                                    style={{ width: 'auto', height: 'auto' }}
-                                    className="object-contain"
+                                    alt={awayName}
+                                    className="w-full h-full object-contain"
+                                    onError={() => setAwayImgError(true)}
                                 />
                             ) : (
-                                <span className="text-xs font-black text-blue-400">{(match.event_away_team || 'A').charAt(0)}</span>
+                                <span className="text-xs font-black text-blue-400">{awayName.charAt(0)}</span>
                             )}
                         </div>
                         <Link
@@ -155,7 +156,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                             onClick={(e) => e.stopPropagation()}
                             className="text-[11px] font-black text-white leading-tight uppercase tracking-tight hover:text-secondary transition-colors"
                         >
-                            {match.event_away_team || 'TBC'}
+                            {awayName}
                         </Link>
                     </div>
                     {!isUpcoming && match.event_away_final_result && (

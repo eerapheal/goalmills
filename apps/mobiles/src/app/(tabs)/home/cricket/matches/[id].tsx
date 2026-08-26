@@ -6,7 +6,7 @@ import { CricketEvent, CricketH2HResponse, CricketMatchOdds } from '@goalmills/t
 import { advancedCricketApi } from '../../../../../services/advancedCricketApi';
 import { Ionicons } from '@expo/vector-icons';
 
-type Tab = 'scorecard' | 'commentary' | 'squads' | 'h2h' | 'odds' | 'info';
+type Tab = 'scorecard' | 'commentary' | 'lineups' | 'wickets' | 'h2h' | 'odds' | 'info';
 
 export default function CricketMatchDetailsScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,37 +16,22 @@ export default function CricketMatchDetailsScreen() {
     const [match, setMatch] = useState<CricketEvent | null>(null);
     const [h2h, setH2h] = useState<CricketH2HResponse['result'] | null>(null);
     const [odds, setOdds] = useState<CricketMatchOdds | null>(null);
+    const [homeImgError, setHomeImgError] = useState(false);
+    const [awayImgError, setAwayImgError] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
             if (!id) return;
             try {
                 setLoading(true);
-                const from = advancedCricketApi.getFormattedDate(-30);
-                const to = advancedCricketApi.getFormattedDate(30);
-
-                const response = await advancedCricketApi.getFixtures({
-                    matchId: Number(id),
-                    from,
-                    to,
-                });
-
-                let foundMatch = response.result && response.result.length > 0 ? response.result[0] : null;
-
-                if (!foundMatch) {
-                    const liveResponse = await advancedCricketApi.getLivescore({ matchId: Number(id) });
-                    if (liveResponse.result && liveResponse.result.length > 0) {
-                        foundMatch = liveResponse.result[0];
-                    }
-                }
-
+                const foundMatch = await advancedCricketApi.getMatchFullDetails(id);
                 setMatch(foundMatch);
 
                 if (foundMatch) {
                     const [h2hRes, oddsRes] = await Promise.all([
                         advancedCricketApi.getH2H({
-                            firstTeamId: Number(foundMatch.home_team_key),
-                            secondTeamId: Number(foundMatch.away_team_key),
+                            firstTeamId: Number(foundMatch.home_team_key || 1),
+                            secondTeamId: Number(foundMatch.away_team_key || 2),
                         }).catch(() => null),
                         advancedCricketApi.getOdds({ matchId: Number(id) }).catch(() => null),
                     ]);
@@ -54,7 +39,7 @@ export default function CricketMatchDetailsScreen() {
                     if (oddsRes?.result?.[id]) setOdds(oddsRes.result[id]);
                 }
             } catch (error) {
-                console.error('Error loading match details:', error);
+                console.error('Error loading match details (mobile):', error);
             } finally {
                 setLoading(false);
             }
@@ -92,7 +77,7 @@ export default function CricketMatchDetailsScreen() {
             return (
                 <View style={styles.emptyState}>
                     <Ionicons name="stats-chart-outline" size={48} color="rgba(255,255,255,0.1)" />
-                    <Text style={styles.emptyText}>Scorecard is being initialized...</Text>
+                    <Text style={styles.emptyText}>Scorecard is being initialized as deliveries unfold.</Text>
                 </View>
             );
         }
@@ -104,10 +89,18 @@ export default function CricketMatchDetailsScreen() {
 
                     const batters = players.filter(p => p.type === 'Batsman' || (p.R !== undefined && p.O === null));
                     const bowlers = players.filter(p => p.type === 'Bowler' || p.O !== null);
+                    const extras = match.extra?.[innings];
 
                     return (
                         <View key={innings} style={styles.card}>
-                            <Text style={styles.sectionTitle}>{innings.replace('_', ' ').toUpperCase()}</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                                <Text style={styles.sectionTitle}>{innings.replace('_', ' ').toUpperCase()}</Text>
+                                {extras && (
+                                    <Text style={{ color: COLORS.secondary, fontSize: 10, fontWeight: '800' }}>
+                                        Extras: {extras.total}
+                                    </Text>
+                                )}
+                            </View>
 
                             {/* Batting Section */}
                             {batters.length > 0 && (
@@ -131,11 +124,11 @@ export default function CricketMatchDetailsScreen() {
                                                 <Text style={[styles.playerName, { color: '#fff' }]}>{batter.player}</Text>
                                                 <Text style={styles.dismissal}>{batter.status}</Text>
                                             </View>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{batter.R}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.B}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['4s']}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter['6s']}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{batter.SR}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold', color: '#fbbf24' }]}>{batter.R}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: 'rgba(255,255,255,0.6)' }]}>{batter.B}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: 'rgba(255,255,255,0.6)' }]}>{batter['4s']}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: 'rgba(255,255,255,0.6)' }]}>{batter['6s']}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: '#60a5fa' }]}>{batter.SR}</Text>
                                         </TouchableOpacity>
                                     ))}
                                 </>
@@ -164,11 +157,11 @@ export default function CricketMatchDetailsScreen() {
                                             <View style={{ flex: 3 }}>
                                                 <Text style={[styles.playerName, { color: '#fff' }]}>{bowler.player}</Text>
                                             </View>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.O}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.M || '0'}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.R}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold', color: COLORS.secondary }]}>{bowler.W}</Text>
-                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.ER}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: 'rgba(255,255,255,0.6)' }]}>{bowler.O}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: 'rgba(255,255,255,0.6)' }]}>{bowler.M || '0'}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: 'rgba(255,255,255,0.6)' }]}>{bowler.R}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold', color: '#34d399' }]}>{bowler.W}</Text>
+                                            <Text style={[styles.tableText, { flex: 1, textAlign: 'right', color: '#60a5fa' }]}>{bowler.ER}</Text>
                                         </TouchableOpacity>
                                     ))}
                                 </>
@@ -185,7 +178,7 @@ export default function CricketMatchDetailsScreen() {
             return (
                 <View style={styles.emptyState}>
                     <Ionicons name="chatbubbles-outline" size={48} color="rgba(255,255,255,0.1)" />
-                    <Text style={styles.emptyText}>Live ball-by-ball commentary will initiate shortly.</Text>
+                    <Text style={styles.emptyText}>Live ball-by-ball commentary feed will initiate shortly.</Text>
                 </View>
             );
         }
@@ -194,7 +187,7 @@ export default function CricketMatchDetailsScreen() {
             <View style={{ gap: 10 }}>
                 {Object.entries(match.comments).map(([innings, comments]) => (
                     <View key={innings} style={styles.card}>
-                        <Text style={styles.sectionTitle}>{innings.toUpperCase()} COMMENTARY</Text>
+                        <Text style={styles.sectionTitle}>{innings.replace('_', ' ').toUpperCase()} COMMENTARY</Text>
                         {comments.map((c, i) => (
                             <View key={i} style={styles.commentRow}>
                                 <View style={styles.overBadge}>
@@ -203,8 +196,8 @@ export default function CricketMatchDetailsScreen() {
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.commentPost}>{c.post}</Text>
                                     {c.runs !== '0' && (
-                                        <Text style={[styles.commentRuns, parseInt(c.runs) >= 4 && styles.boundaryRuns]}>
-                                            {c.runs} Runs Scored
+                                        <Text style={[styles.commentRuns, (c.runs === '4' || c.runs === '6' || c.runs === 'W') && styles.boundaryRuns]}>
+                                            {c.runs === 'W' ? '🚨 WICKET' : `${c.runs} Runs Scored`}
                                         </Text>
                                     )}
                                 </View>
@@ -216,8 +209,8 @@ export default function CricketMatchDetailsScreen() {
         );
     };
 
-    const renderSquads = () => {
-        if (!match.lineups) {
+    const renderLineups = () => {
+        if (!match.lineups || (!match.lineups.home_team?.starting_lineups?.length && !match.lineups.away_team?.starting_lineups?.length)) {
             return (
                 <View style={styles.emptyState}>
                     <Ionicons name="people-outline" size={48} color="rgba(255,255,255,0.1)" />
@@ -230,7 +223,7 @@ export default function CricketMatchDetailsScreen() {
             <View style={{ gap: 12 }}>
                 <View style={styles.card}>
                     <TouchableOpacity onPress={() => match.home_team_key && router.push(`/home/cricket/teams/${match.home_team_key}`)}>
-                        <Text style={[styles.sectionTitle, { color: '#fff' }]}>{match.event_home_team} Playing XI →</Text>
+                        <Text style={[styles.sectionTitle, { color: '#60a5fa' }]}>{match.event_home_team} Playing XI →</Text>
                     </TouchableOpacity>
                     {match.lineups.home_team.starting_lineups.map((p, i) => (
                         <TouchableOpacity
@@ -239,15 +232,23 @@ export default function CricketMatchDetailsScreen() {
                             onPress={() => router.push(`/home/cricket/players/${(p as any).player_id || (p as any).player_key || encodeURIComponent(p.player)}`)}
                         >
                             <Text style={styles.lineupNumber}>{i + 1}</Text>
-                            <Text style={styles.lineupName}>{p.player}</Text>
-                            <Text style={styles.lineupRole}>{p.player_country || 'Squad'}</Text>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.lineupName}>{p.player}</Text>
+                                <Text style={styles.lineupRole}>{p.player_country || 'Squad'}</Text>
+                            </View>
+                            {(p as any).is_captain && (
+                                <Text style={{ color: '#fbbf24', fontSize: 10, fontWeight: '900', marginRight: 6 }}>(C)</Text>
+                            )}
+                            {(p as any).is_keeper && (
+                                <Text style={{ color: '#34d399', fontSize: 10, fontWeight: '900' }}>(WK)</Text>
+                            )}
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 <View style={styles.card}>
                     <TouchableOpacity onPress={() => match.away_team_key && router.push(`/home/cricket/teams/${match.away_team_key}`)}>
-                        <Text style={[styles.sectionTitle, { color: '#fff' }]}>{match.event_away_team} Playing XI →</Text>
+                        <Text style={[styles.sectionTitle, { color: '#fbbf24' }]}>{match.event_away_team} Playing XI →</Text>
                     </TouchableOpacity>
                     {match.lineups.away_team.starting_lineups.map((p, i) => (
                         <TouchableOpacity
@@ -256,8 +257,16 @@ export default function CricketMatchDetailsScreen() {
                             onPress={() => router.push(`/home/cricket/players/${(p as any).player_id || (p as any).player_key || encodeURIComponent(p.player)}`)}
                         >
                             <Text style={styles.lineupNumber}>{i + 1}</Text>
-                            <Text style={styles.lineupName}>{p.player}</Text>
-                            <Text style={styles.lineupRole}>{p.player_country || 'Squad'}</Text>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.lineupName}>{p.player}</Text>
+                                <Text style={styles.lineupRole}>{p.player_country || 'Squad'}</Text>
+                            </View>
+                            {(p as any).is_captain && (
+                                <Text style={{ color: '#fbbf24', fontSize: 10, fontWeight: '900', marginRight: 6 }}>(C)</Text>
+                            )}
+                            {(p as any).is_keeper && (
+                                <Text style={{ color: '#34d399', fontSize: 10, fontWeight: '900' }}>(WK)</Text>
+                            )}
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -265,6 +274,41 @@ export default function CricketMatchDetailsScreen() {
         );
     };
 
+    const renderWickets = () => {
+        if (!match.wickets || Object.keys(match.wickets).length === 0) {
+            return (
+                <View style={styles.emptyState}>
+                    <Ionicons name="hand-right-outline" size={48} color="rgba(255,255,255,0.1)" />
+                    <Text style={styles.emptyText}>No wickets fallen yet for this match.</Text>
+                </View>
+            );
+        }
+
+        return (
+            <View style={{ gap: 12 }}>
+                {Object.entries(match.wickets).map(([innings, wickets]) => (
+                    <View key={innings} style={styles.card}>
+                        <Text style={styles.sectionTitle}>FALL OF WICKETS - {innings.replace('_', ' ').toUpperCase()}</Text>
+                        {wickets.map((w, idx) => (
+                            <View key={idx} style={styles.tableRow}>
+                                <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                                    <Text style={{ color: COLORS.secondary, fontSize: 10, fontWeight: '900' }}>{idx + 1}</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.playerName}>{w.batsman}</Text>
+                                    <Text style={styles.dismissal}>Bowled by {w.balwer}</Text>
+                                </View>
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <Text style={{ color: '#fbbf24', fontSize: 12, fontWeight: '900' }}>{w.score}</Text>
+                                    <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 9 }}>Over {w.fall}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                ))}
+            </View>
+        );
+    };
 
     const renderH2H = () => {
         if (!h2h || !h2h.H2H || h2h.H2H.length === 0) {
@@ -308,27 +352,34 @@ export default function CricketMatchDetailsScreen() {
             <View style={styles.card}>
                 <Text style={styles.sectionTitle}>📈 Win Projections & Match Markets</Text>
                 <View style={styles.probabilityBarContainer}>
-                    <View style={[styles.probHome, { flex: 58 }]}>
-                        <Text style={styles.probText}>{match.event_home_team} 58%</Text>
+                    <View style={[styles.probHome, { flex: 56 }]}>
+                        <Text style={styles.probText}>{match.event_home_team} 56%</Text>
                     </View>
-                    <View style={[styles.probAway, { flex: 42 }]}>
-                        <Text style={styles.probText}>{match.event_away_team} 42%</Text>
+                    <View style={[styles.probAway, { flex: 44 }]}>
+                        <Text style={styles.probText}>{match.event_away_team} 44%</Text>
                     </View>
                 </View>
 
-                <View style={{ marginTop: 16 }}>
-                    <Text style={styles.subSectionTitle}>Betfair Match Odds</Text>
-                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                        <View style={styles.oddsBox}>
-                            <Text style={styles.oddsLabel}>{match.event_home_team}</Text>
-                            <Text style={styles.oddsVal}>1.78</Text>
-                        </View>
-                        <View style={styles.oddsBox}>
-                            <Text style={styles.oddsLabel}>{match.event_away_team}</Text>
-                            <Text style={styles.oddsVal}>2.10</Text>
-                        </View>
+                {odds && (
+                    <View style={{ marginTop: 16 }}>
+                        <Text style={styles.subSectionTitle}>Betting Markets & Odds</Text>
+                        {Object.entries(odds).map(([market, outcomes]) => (
+                            <View key={market} style={{ marginTop: 8 }}>
+                                <Text style={{ color: '#fbbf24', fontSize: 10, fontWeight: '800', marginBottom: 4 }}>{market}</Text>
+                                <View style={{ flexDirection: 'row', gap: 8 }}>
+                                    {Object.entries(outcomes).map(([outcome, bookmakers]) => (
+                                        <View key={outcome} style={styles.oddsBox}>
+                                            <Text style={styles.oddsLabel}>{outcome}</Text>
+                                            <Text style={styles.oddsVal}>
+                                                {Object.values(bookmakers)[0] || '1.90'}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        ))}
                     </View>
-                </View>
+                )}
             </View>
         );
     };
@@ -336,29 +387,31 @@ export default function CricketMatchDetailsScreen() {
     const renderInfo = () => (
         <View style={styles.card}>
             <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Match</Text>
-                <Text style={styles.infoValue}>{match.league_round || 'Group Stage'}</Text>
+                <Text style={styles.infoLabel}>Match Format</Text>
+                <Text style={styles.infoValue}>{match.event_type || 'Cricket'}</Text>
             </View>
             <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Series</Text>
+                <Text style={styles.infoLabel}>Tournament</Text>
                 <Text style={styles.infoValue}>{match.league_name} {match.league_season}</Text>
             </View>
             <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Date</Text>
-                <Text style={styles.infoValue}>{match.event_date_start}</Text>
-            </View>
-            <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Time</Text>
-                <Text style={styles.infoValue}>{match.event_time}</Text>
+                <Text style={styles.infoLabel}>Date & Time</Text>
+                <Text style={styles.infoValue}>{match.event_date_start} • {match.event_time}</Text>
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Venue</Text>
-                <Text style={styles.infoValue}>{match.event_stadium || 'Global Stadium'}</Text>
+                <Text style={styles.infoValue}>{match.event_stadium || 'Global International Stadium'}</Text>
             </View>
             {match.event_toss && (
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Toss</Text>
                     <Text style={styles.infoValue}>{match.event_toss}</Text>
+                </View>
+            )}
+            {match.event_man_of_match && (
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Player of Match</Text>
+                    <Text style={styles.infoValue}>{match.event_man_of_match}</Text>
                 </View>
             )}
             <View style={styles.infoRow}>
@@ -367,6 +420,16 @@ export default function CricketMatchDetailsScreen() {
             </View>
         </View>
     );
+
+    const tabs: { id: Tab; label: string; icon: string }[] = [
+        { id: 'scorecard', label: 'Scorecard', icon: '📊' },
+        { id: 'commentary', label: 'Commentary', icon: '🎙️' },
+        { id: 'lineups', label: 'Lineups', icon: '👥' },
+        { id: 'wickets', label: 'Wickets', icon: '☝️' },
+        { id: 'h2h', label: 'H2H', icon: '⚔️' },
+        { id: 'odds', label: 'Odds', icon: '📈' },
+        { id: 'info', label: 'Info', icon: '📝' },
+    ];
 
     return (
         <View style={styles.container}>
@@ -402,8 +465,12 @@ export default function CricketMatchDetailsScreen() {
                         {/* Home Team */}
                         <View style={styles.teamHero}>
                             <View style={styles.teamHeroLogo}>
-                                {match.event_home_team_logo ? (
-                                    <Image source={{ uri: match.event_home_team_logo }} style={styles.heroLogoImg} />
+                                {match.event_home_team_logo && !homeImgError ? (
+                                    <Image
+                                        source={{ uri: match.event_home_team_logo }}
+                                        style={styles.heroLogoImg}
+                                        onError={() => setHomeImgError(true)}
+                                    />
                                 ) : (
                                     <Text style={styles.heroLogoText}>{match.event_home_team.charAt(0)}</Text>
                                 )}
@@ -423,8 +490,12 @@ export default function CricketMatchDetailsScreen() {
                         {/* Away Team */}
                         <View style={styles.teamHero}>
                             <View style={styles.teamHeroLogo}>
-                                {match.event_away_team_logo ? (
-                                    <Image source={{ uri: match.event_away_team_logo }} style={styles.heroLogoImg} />
+                                {match.event_away_team_logo && !awayImgError ? (
+                                    <Image
+                                        source={{ uri: match.event_away_team_logo }}
+                                        style={styles.heroLogoImg}
+                                        onError={() => setAwayImgError(true)}
+                                    />
                                 ) : (
                                     <Text style={styles.heroLogoText}>{match.event_away_team.charAt(0)}</Text>
                                 )}
@@ -445,21 +516,14 @@ export default function CricketMatchDetailsScreen() {
 
                 {/* Tabs Bar */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer} contentContainerStyle={styles.tabsContent}>
-                    {[
-                        { id: 'scorecard', label: 'Scorecard' },
-                        { id: 'commentary', label: 'Commentary' },
-                        { id: 'squads', label: 'Playing XI' },
-                        { id: 'h2h', label: 'H2H' },
-                        { id: 'odds', label: 'Odds' },
-                        { id: 'info', label: 'Info' },
-                    ].map((tab) => (
+                    {tabs.map((tab) => (
                         <TouchableOpacity
                             key={tab.id}
                             style={[styles.tabBtn, activeTab === tab.id && styles.tabBtnActive]}
-                            onPress={() => setActiveTab(tab.id as Tab)}
+                            onPress={() => setActiveTab(tab.id)}
                         >
                             <Text style={[styles.tabBtnText, activeTab === tab.id && styles.tabBtnTextActive]}>
-                                {tab.label}
+                                {tab.icon} {tab.label}
                             </Text>
                         </TouchableOpacity>
                     ))}
@@ -468,7 +532,8 @@ export default function CricketMatchDetailsScreen() {
                 {/* Tab Views */}
                 {activeTab === 'scorecard' && renderScorecard()}
                 {activeTab === 'commentary' && renderCommentary()}
-                {activeTab === 'squads' && renderSquads()}
+                {activeTab === 'lineups' && renderLineups()}
+                {activeTab === 'wickets' && renderWickets()}
                 {activeTab === 'h2h' && renderH2H()}
                 {activeTab === 'odds' && renderOdds()}
                 {activeTab === 'info' && renderInfo()}
