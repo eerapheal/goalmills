@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { useToast } from '../Toast';
 import { POPULAR_TEAMS } from '@/lib/newsUtils';
-import 'react-quill-new/dist/quill.snow.css';
-
-// Dynamic import for ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import EnterpriseNewsEditor from './EnterpriseNewsEditor';
+import { FiUploadCloud, FiFileText, FiStar, FiZap, FiTag, FiLayers, FiImage } from 'react-icons/fi';
 
 interface CategoryOption {
   _id: string;
@@ -59,9 +56,9 @@ export default function CreateNewsForm() {
         body: formData,
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.url) {
         setImage(data.url);
-        toast.success('Image uploaded successfully');
+        toast.success('Cover image uploaded successfully');
       } else {
         toast.error(data.message || 'Upload failed');
       }
@@ -79,6 +76,12 @@ export default function CreateNewsForm() {
     const finalCategory = category === '__custom__' ? customCategory.trim() : category;
     if (!finalCategory) {
       toast.error('Please select or specify a category');
+      setLoading(false);
+      return;
+    }
+
+    if (!content.trim() || content === '<p><br></p>') {
+      toast.error('Please enter article content');
       setLoading(false);
       return;
     }
@@ -126,57 +129,58 @@ export default function CreateNewsForm() {
   };
 
   return (
-    <div className="glass-card p-6 rounded-2xl h-fit space-y-6">
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+    <div className="glass-card p-4 sm:p-7 rounded-3xl h-fit space-y-6 max-w-full">
+      <div className="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>📰</span> Create News Article
+          <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+            <span>📰</span> Create News Story
           </h2>
-          <p className="text-xs text-text-muted">
-            Publish rich stories with responsive layouts & multi-filter tags
+          <p className="text-xs text-slate-400 mt-0.5">
+            Enterprise news publishing with document copy-paste, signed media & advanced SEO
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Title *
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Title & Source */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiFileText className="text-blue-400" /> Article Title *
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-              placeholder="Article Title"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-base font-semibold focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="e.g. Real Madrid Secure Thrilling Comeback Victory..."
             />
           </div>
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Source
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+              Editorial Source
             </label>
             <input
               type="text"
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-              placeholder="e.g. ESPN, Sky Sports, GoalMills Desk"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="e.g. GoalMills Desk, Reuters, Sky"
             />
           </div>
         </div>
 
-        {/* Dynamic Category Selector */}
+        {/* Dynamic Category Selector & Related Team */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Category *
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiLayers className="text-blue-400" /> Category *
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors cursor-pointer"
+              className="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
             >
               {categories.map((c) => (
                 <option key={c._id} value={c.name}>
@@ -189,7 +193,7 @@ export default function CreateNewsForm() {
 
           {category === '__custom__' ? (
             <div>
-              <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
+              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
                 Custom Category Name *
               </label>
               <input
@@ -197,21 +201,21 @@ export default function CreateNewsForm() {
                 value={customCategory}
                 onChange={(e) => setCustomCategory(e.target.value)}
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
+                className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g. World Cup 2026"
               />
             </div>
           ) : (
             <div>
-              <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-                Related Team (For Favorite Team News)
+              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+                Related Team (For Team Hub Feeds)
               </label>
               <input
                 type="text"
                 list="teams-list"
                 value={relatedTeam}
                 onChange={(e) => setRelatedTeam(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
+                className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g. Arsenal, Real Madrid, Lakers"
               />
               <datalist id="teams-list">
@@ -225,50 +229,50 @@ export default function CreateNewsForm() {
 
         {/* Tags */}
         <div>
-          <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-            Tags (Comma separated keywords)
+          <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+            <FiTag className="text-blue-400" /> Keywords & SEO Tags (Comma separated)
           </label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-            placeholder="e.g. Arsenal, Premier League, Bukayo Saka, Champions League"
+            className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="e.g. Arsenal, Premier League, Bukayo Saka, Champions League, Transfer News"
           />
         </div>
 
         {/* Excerpt */}
         <div>
-          <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-            Excerpt *
+          <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+            Lead Excerpt / Social Summary *
           </label>
           <textarea
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
             required
             rows={2}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-            placeholder="Brief punchy summary of the article..."
+            className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors leading-relaxed"
+            placeholder="Brief punchy summary of the story for SEO meta tags and social embeds..."
           />
         </div>
 
-        {/* Cover Image */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        {/* Cover Hero Image */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end bg-slate-900/40 p-4 rounded-2xl border border-white/5">
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Image URL
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiImage className="text-blue-400" /> Cover Hero Image URL
             </label>
             <input
               type="url"
               value={image}
               onChange={(e) => setImage(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
+              className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="https://images.unsplash.com/..."
             />
           </div>
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Or Upload Image File
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+              Or Upload Cover File
             </label>
             <input
               type="file"
@@ -278,53 +282,59 @@ export default function CreateNewsForm() {
             />
           </div>
         </div>
-        {uploading && <div className="text-xs text-blue-400 animate-pulse">Uploading image...</div>}
+        {uploading && <div className="text-xs text-blue-400 animate-pulse font-bold">Uploading cover image...</div>}
 
         {/* Flags & Toggles */}
-        <div className="flex flex-wrap items-center gap-6 py-2 border-t border-b border-white/5">
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-white">
+        <div className="flex flex-wrap items-center gap-6 py-3 border-t border-b border-white/5">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm font-semibold text-white">
             <input
               type="checkbox"
               checked={isBreaking}
               onChange={(e) => setIsBreaking(e.target.checked)}
               className="w-4 h-4 rounded text-red-600 focus:ring-0 bg-white/10 border-white/20"
             />
-            <span>🔥 Mark as Breaking News</span>
+            <span className="flex items-center gap-1">
+              <FiZap className="text-red-500" /> Mark as Breaking News
+            </span>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-white">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm font-semibold text-white">
             <input
               type="checkbox"
               checked={isFeatured}
               onChange={(e) => setIsFeatured(e.target.checked)}
               className="w-4 h-4 rounded text-amber-500 focus:ring-0 bg-white/10 border-white/20"
             />
-            <span>⭐ Feature on Homepage / Top Picks</span>
+            <span className="flex items-center gap-1">
+              <FiStar className="text-amber-400" /> Feature on Top Picks
+            </span>
           </label>
         </div>
 
-        {/* Rich Text Editor */}
+        {/* Enterprise Rich News Editor */}
         <div>
-          <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-            Article Content (Rich Text)
+          <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+            <span>Article Body (Enterprise Studio) *</span>
+            <span className="text-[11px] text-blue-400 font-normal">
+              Copy-paste formatted docs or click to attach signed media
+            </span>
           </label>
-          <div className="bg-white/95 rounded-xl text-black overflow-hidden min-h-[280px]">
-            <ReactQuill
-              theme="snow"
-              value={content}
-              onChange={setContent}
-              style={{ height: '220px', marginBottom: '40px' }}
-            />
-          </div>
+          <EnterpriseNewsEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Paste your story from Word/Google Docs or start typing here..."
+            minHeight="380px"
+          />
         </div>
 
-        <div className="pt-4">
+        {/* Publish Action Button */}
+        <div className="pt-2">
           <button
             type="submit"
             disabled={loading || uploading}
-            className="w-full bg-secondary hover:bg-secondary/90 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-all hover:scale-[1.01] shadow-lg shadow-secondary/20 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            {loading ? 'Publishing Story...' : 'Publish News Story'}
+            <span>{loading ? 'Publishing Story...' : 'Publish News Story'}</span>
           </button>
         </div>
       </form>

@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../Toast';
 import { POPULAR_TEAMS } from '@/lib/newsUtils';
-import 'react-quill-new/dist/quill.snow.css';
-
-// Dynamic import for ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+import EnterpriseNewsEditor from './EnterpriseNewsEditor';
+import { FiUploadCloud, FiFileText, FiStar, FiZap, FiTag, FiLayers, FiImage } from 'react-icons/fi';
 
 interface EditNewsFormProps {
   id: string;
@@ -87,9 +84,9 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
         body: formData,
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.url) {
         setImage(data.url);
-        toast.success('Image uploaded successfully');
+        toast.success('Cover image uploaded successfully');
       } else {
         toast.error(data.message || 'Upload failed');
       }
@@ -107,6 +104,12 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
     const finalCategory = category === '__custom__' ? customCategory.trim() : category;
     if (!finalCategory) {
       toast.error('Category is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!content.trim() || content === '<p><br></p>') {
+      toast.error('Please enter article content');
       setLoading(false);
       return;
     }
@@ -146,63 +149,67 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
   };
 
   if (fetching) {
-    return <div className="p-8 text-white animate-pulse">Loading article data...</div>;
+    return (
+      <div className="glass-card p-12 text-center text-white rounded-3xl animate-pulse flex flex-col items-center justify-center gap-3">
+        <div className="h-8 w-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+        <span className="text-sm font-bold text-slate-300">Loading article editor studio...</span>
+      </div>
+    );
   }
 
-  const isKnownCategory = categories.some((c) => c.name === category);
-
   return (
-    <div className="glass-card p-6 rounded-2xl h-fit space-y-6">
-      <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <span>📝</span> Edit News Article
-      </h2>
+    <div className="glass-card p-4 sm:p-7 rounded-3xl h-fit space-y-6 max-w-full">
+      <div className="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 gap-3">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+            <span>📝</span> Edit News Story
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Update content, signed media, categories, and SEO keywords
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Title *
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Title & Source */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiFileText className="text-blue-400" /> Article Title *
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-              placeholder="Article Title"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-base font-semibold focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="e.g. Article Title"
             />
           </div>
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Source
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+              Editorial Source
             </label>
             <input
               type="text"
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-              placeholder="e.g. ESPN, BBC"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="e.g. GoalMills Desk, Reuters"
             />
           </div>
         </div>
 
-        {/* Dynamic Category Selector */}
+        {/* Category & Related Team */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Category *
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiLayers className="text-blue-400" /> Category *
             </label>
             <select
-              value={isKnownCategory ? category : '__custom__'}
-              onChange={(e) => {
-                if (e.target.value === '__custom__') {
-                  setCategory('__custom__');
-                  setCustomCategory(category);
-                } else {
-                  setCategory(e.target.value);
-                }
-              }}
-              className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors cursor-pointer"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
             >
               {categories.map((c) => (
                 <option key={c._id} value={c.name}>
@@ -213,37 +220,34 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
             </select>
           </div>
 
-          {category === '__custom__' || !isKnownCategory ? (
+          {category === '__custom__' ? (
             <div>
-              <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
+              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
                 Custom Category Name *
               </label>
               <input
                 type="text"
-                value={customCategory || (!isKnownCategory ? category : '')}
-                onChange={(e) => {
-                  setCustomCategory(e.target.value);
-                  setCategory(e.target.value);
-                }}
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-                placeholder="e.g. World Cup 2026"
+                className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                placeholder="e.g. Champions League"
               />
             </div>
           ) : (
             <div>
-              <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-                Related Team (Favorite Team Filtering)
+              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+                Related Team (For Team Hub Feeds)
               </label>
               <input
                 type="text"
-                list="teams-edit-list"
+                list="teams-list"
                 value={relatedTeam}
                 onChange={(e) => setRelatedTeam(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
+                className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g. Arsenal, Real Madrid, Lakers"
               />
-              <datalist id="teams-edit-list">
+              <datalist id="teams-list">
                 {POPULAR_TEAMS.map((t) => (
                   <option key={t} value={t} />
                 ))}
@@ -254,50 +258,50 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
 
         {/* Tags */}
         <div>
-          <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-            Tags (Comma separated)
+          <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+            <FiTag className="text-blue-400" /> Keywords & SEO Tags (Comma separated)
           </label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-            placeholder="e.g. Arsenal, Premier League, Bukayo Saka"
+            className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="e.g. Arsenal, Bukayo Saka, Champions League"
           />
         </div>
 
         {/* Excerpt */}
         <div>
-          <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-            Excerpt *
+          <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+            Lead Excerpt / Social Summary *
           </label>
           <textarea
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
             required
             rows={2}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-            placeholder="Brief summary..."
+            className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors leading-relaxed"
+            placeholder="Brief summary of the article..."
           />
         </div>
 
-        {/* Cover Image */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        {/* Cover Hero Image */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end bg-slate-900/40 p-4 rounded-2xl border border-white/5">
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Image URL
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FiImage className="text-blue-400" /> Cover Hero Image URL
             </label>
             <input
               type="url"
               value={image}
               onChange={(e) => setImage(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-secondary transition-colors"
-              placeholder="https://..."
+              className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+              placeholder="https://images.unsplash.com/..."
             />
           </div>
           <div>
-            <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-              Or Upload Image
+            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+              Or Upload Cover File
             </label>
             <input
               type="file"
@@ -307,60 +311,66 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
             />
           </div>
         </div>
-        {uploading && <div className="text-xs text-blue-400 animate-pulse">Uploading image...</div>}
+        {uploading && <div className="text-xs text-blue-400 animate-pulse font-bold">Uploading image...</div>}
 
         {/* Flags & Toggles */}
-        <div className="flex flex-wrap items-center gap-6 py-2 border-t border-b border-white/5">
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-white">
+        <div className="flex flex-wrap items-center gap-6 py-3 border-t border-b border-white/5">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm font-semibold text-white">
             <input
               type="checkbox"
               checked={isBreaking}
               onChange={(e) => setIsBreaking(e.target.checked)}
               className="w-4 h-4 rounded text-red-600 focus:ring-0 bg-white/10 border-white/20"
             />
-            <span>🔥 Breaking News</span>
+            <span className="flex items-center gap-1">
+              <FiZap className="text-red-500" /> Mark as Breaking News
+            </span>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-white">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm font-semibold text-white">
             <input
               type="checkbox"
               checked={isFeatured}
               onChange={(e) => setIsFeatured(e.target.checked)}
               className="w-4 h-4 rounded text-amber-500 focus:ring-0 bg-white/10 border-white/20"
             />
-            <span>⭐ Feature on Homepage / Top Picks</span>
+            <span className="flex items-center gap-1">
+              <FiStar className="text-amber-400" /> Feature on Top Picks
+            </span>
           </label>
         </div>
 
-        {/* Content */}
+        {/* Enterprise Rich News Editor */}
         <div>
-          <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
-            Content
+          <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+            <span>Article Body (Enterprise Studio) *</span>
+            <span className="text-[11px] text-blue-400 font-normal">
+              Edit formatted docs or attach signed media
+            </span>
           </label>
-          <div className="bg-white/95 rounded-xl text-black overflow-hidden min-h-[280px]">
-            <ReactQuill
-              theme="snow"
-              value={content}
-              onChange={setContent}
-              style={{ height: '220px', marginBottom: '40px' }}
-            />
-          </div>
+          <EnterpriseNewsEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Edit story content..."
+            minHeight="380px"
+          />
         </div>
 
-        <div className="pt-4 flex gap-4">
+        {/* Actions */}
+        <div className="pt-2 flex flex-col sm:flex-row gap-3">
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all"
+            className="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 font-bold uppercase tracking-wider py-3.5 rounded-2xl transition-all text-center"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading || uploading}
-            className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-all hover:scale-[1.01] shadow-lg shadow-blue-600/20 disabled:opacity-50"
+            className="flex-[2] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-3.5 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? 'Updating Story...' : 'Update News Story'}
+            <span>{loading ? 'Updating Story...' : 'Save & Update News Story'}</span>
           </button>
         </div>
       </form>

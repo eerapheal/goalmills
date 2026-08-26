@@ -125,8 +125,42 @@ export default async function NewsDetailPage({
 
   const accentColor = categoryDoc?.color || '#3B82F6';
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: news.title,
+    description: news.excerpt || news.title,
+    image: [news.image || 'https://res.cloudinary.com/demo/image/upload/sample.jpg'],
+    datePublished: news.createdAt ? new Date(news.createdAt).toISOString() : new Date().toISOString(),
+    dateModified: news.updatedAt ? new Date(news.updatedAt).toISOString() : (news.createdAt ? new Date(news.createdAt).toISOString() : new Date().toISOString()),
+    author: [
+      {
+        '@type': 'Person',
+        name: news.author || 'GoalMills Staff',
+      },
+    ],
+    publisher: {
+      '@type': 'Organization',
+      name: 'GoalMills',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://goalmills-web.vercel.app/logo.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://goalmills-web.vercel.app/news/${id}`,
+    },
+  };
+
   return (
     <main className="min-h-screen bg-[#070B12] text-white selection:bg-blue-500/30 overflow-x-hidden">
+      {/* Schema.org NewsArticle JSON-LD for Google News & Advanced SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Client view tracker & reading progress bar */}
       <ArticleTrackerAndActions
         article={{
@@ -248,13 +282,14 @@ export default async function NewsDetailPage({
             {news.content && (
               <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 sm:p-8 space-y-4 max-w-full overflow-hidden">
                 <div
-                  className="prose prose-invert max-w-full text-slate-300 leading-relaxed text-sm sm:text-base break-words [word-break:break-word]
-                    [&_p]:mb-4 [&_p]:leading-relaxed
+                  className="prose prose-invert max-w-full text-slate-100 leading-relaxed text-sm sm:text-base break-words [word-break:break-word]
+                    [&_*]:text-slate-100 [&_*]:bg-transparent
+                    [&_p]:mb-4 [&_p]:leading-relaxed [&_p]:text-slate-100
                     [&_h2]:text-xl sm:[&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:break-words
                     [&_h3]:text-lg sm:[&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white [&_h3]:mt-4 [&_h3]:mb-2
-                    [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-300 [&_blockquote]:my-4
-                    [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:my-3
-                    [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_ol]:my-3
+                    [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-200 [&_blockquote]:my-4
+                    [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:my-3 [&_ul]:text-slate-100
+                    [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_ol]:my-3 [&_ol]:text-slate-100
                     [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-4
                     [&_table]:w-full [&_table]:overflow-x-auto [&_table]:block [&_table]:my-4
                     [&_a]:text-blue-400 [&_a]:underline [&_a]:break-all

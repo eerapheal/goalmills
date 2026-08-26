@@ -97,3 +97,103 @@ body {
   }
 }
 
+/* ------------------------------------------------------------- */
+/* Enterprise Signed Image Figure & Editorial Styling            */
+/* ------------------------------------------------------------- */
+.signed-image-figure {
+  position: relative;
+  display: block;
+  clear: both;
+}
+
+@media (max-width: 640px) {
+  /* On mobile screens, force floated images to 100% full width */
+  .signed-image-figure[data-align="left"],
+  .signed-image-figure[data-align="right"] {
+    float: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+.signed-image-wrapper {
+  position: relative;
+  border-radius: 1rem 1rem 0 0;
+  overflow: hidden;
+  background-color: #070d18;
+}
+
+.signed-image-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.signed-image-caption {
+  font-family: var(--font-sans);
+}
+
+.article-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.article-table th {
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.article-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.article-blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #cbd5e1;
+  margin: 1.5rem 0;
+}
+
+/* Editable placeholder */
+.enterprise-editable-body:empty:before {
+  content: attr(data-placeholder);
+  color: #475569;
+  pointer-events: none;
+  font-style: italic;
+}
+
+/* Enforce crisp bright white text on all pasted document elements in editor */
+.enterprise-editable-body,
+.enterprise-editable-body *,
+.enterprise-editable-body p,
+.enterprise-editable-body span,
+.enterprise-editable-body div,
+.enterprise-editable-body li,
+.enterprise-editable-body strong,
+.enterprise-editable-body em,
+.enterprise-editable-body font {
+  color: #f8fafc !important;
+  background-color: transparent !important;
+}
+
+.enterprise-editable-body a {
+  color: #60a5fa !important;
+}
+
+.enterprise-editable-body .signed-image-badge,
+.enterprise-editable-body .signed-image-badge * {
+  color: #ffffff !important;
+}
+
+.enterprise-editable-body .caption-sig {
+  color: #60a5fa !important;
+}
+
+
