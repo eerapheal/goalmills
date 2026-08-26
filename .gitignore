@@ -23,8 +23,14 @@ ios/
 apps/apps/
 .DS_Store
 *.pem
-.env*.local
 .turbo
+
+# Environment Variables
+.env
+.env.*
+.env*.local
+!.env.example
+!.env.*.example
 
 # Debug
 npm-debug.log*
