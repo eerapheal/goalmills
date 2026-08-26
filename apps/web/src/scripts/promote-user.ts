@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
+import dns from 'node:dns';
 import dotenv from 'dotenv';
 import path from 'path';
 import User from '../models/User';
+
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch {}
 
 // Load env vars
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });

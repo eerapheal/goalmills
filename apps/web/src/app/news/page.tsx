@@ -6,8 +6,13 @@ import News from '@/models/News';
 export const dynamic = 'force-dynamic';
 
 export default async function NewsPage() {
-    await dbConnect();
-    const news = await News.find({}).sort({ createdAt: -1 });
+    let news: any[] = [];
+    try {
+        await dbConnect();
+        news = await News.find({}).sort({ createdAt: -1 });
+    } catch (err) {
+        console.error('Error fetching news:', err);
+    }
 
     return (
         <div className="min-h-screen bg-slate-950 px-6 py-12 md:px-12 pt-[115px]">

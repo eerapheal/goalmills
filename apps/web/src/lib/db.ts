@@ -1,4 +1,12 @@
 import mongoose from 'mongoose';
+import dns from 'node:dns';
+
+// Fix Node.js DNS SRV resolution querySrv ECONNREFUSED issue on Windows/certain ISPs
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch {
+  // Ignore if setServers is not supported in the current runtime
+}
 
 const MONGODB_URL = process.env.MONGODB_URL;
 
