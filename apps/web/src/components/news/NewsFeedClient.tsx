@@ -19,9 +19,11 @@ import {
   FiEye,
   FiPlus,
   FiCheck,
-  FiStar,
+  FiSliders,
   FiRefreshCw,
+  FiStar,
 } from 'react-icons/fi';
+import { GoalmillsLoader } from '../GoalmillsLoader';
 import { FaFire } from 'react-icons/fa6';
 
 interface NewsFeedClientProps {
@@ -310,9 +312,8 @@ export default function NewsFeedClient({
 
       {/* Loading State */}
       {loading ? (
-        <div className="py-20 text-center text-slate-400 space-y-2">
-          <FiRefreshCw className="animate-spin text-3xl text-blue-500 mx-auto" />
-          <p className="text-sm font-semibold">Fetching latest sports headlines...</p>
+        <div className="py-16">
+          <GoalmillsLoader size="md" label="News Pulse" sublabel="Fetching latest sports stories & transfer news..." />
         </div>
       ) : news.length === 0 ? (
         <div className="rounded-2xl border border-white/10 bg-white/[0.02] py-16 text-center text-slate-400 space-y-3">

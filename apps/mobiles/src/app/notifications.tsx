@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { notificationService } from '../services/notificationService';
 import { useToast } from '../components/Toast';
+import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 interface NotificationItem {
   _id: string;
@@ -176,7 +177,7 @@ export default function NotificationsScreen() {
 
         {/* Notifications List */}
         {loading ? (
-          <ActivityIndicator size="large" color="#4f9bff" style={{ marginTop: 40 }} />
+          <GoalmillsLoader size="md" label="GoalMills Alerts" sublabel="Syncing recent notifications..." style={{ marginTop: 20 }} />
         ) : notifications.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="notifications-off-outline" size={48} color="#64748b" />

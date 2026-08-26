@@ -138,3 +138,15 @@ export const formatTime = (date: string | Date): string => {
 export const formatDateTime = (date: string | Date): string => {
   return `${formatDate(date)} ${formatTime(date)}`;
 };
+
+// GoalMills Unified Brand Loader Configuration
+export const LOADER_THEME = {
+  orbitElectricBlue: '#3B82F6',
+  orbitLiveEmerald: '#10B981',
+  orbitGold: '#F59E0B',
+  coreBackground: '#0E1726',
+  coreText: '#FFFFFF',
+  liveDot: '#10B981',
+  glow: 'rgba(59, 130, 246, 0.35)',
+};
+

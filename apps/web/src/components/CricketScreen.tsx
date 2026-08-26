@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketEvent, CricketLeague, CricketTeam, CricketStanding, CricketNewsItem, CricketPlayer } from '@goalmills/types';
 import { CricketMatchCard } from './CricketMatchCard';
+import { GoalmillsLoader } from './GoalmillsLoader';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -171,12 +172,8 @@ export function CricketScreen() {
     const renderTabContent = () => {
         if (loading) {
             return (
-                <div className="flex flex-col items-center justify-center py-32 space-y-6">
-                    <div className="relative w-16 h-16">
-                        <div className="absolute inset-0 border-4 border-secondary/20 rounded-full"></div>
-                        <div className="absolute inset-0 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] animate-pulse">Syncing Worldwide Cricket Feed...</p>
+                <div className="py-20">
+                    <GoalmillsLoader size="md" label="Cricket Live Arena" sublabel="Syncing worldwide cricket feed & live ball-by-ball..." />
                 </div>
             );
         }

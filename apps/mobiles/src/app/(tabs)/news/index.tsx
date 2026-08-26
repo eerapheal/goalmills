@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost, Category } from '@goalmills/types';
 import { NewsCard } from '../../../components/NewsCard';
+import { GoalmillsLoader } from '../../../components/GoalmillsLoader';
 import {
   MOBILE_FILTER_TABS,
   MOBILE_POPULAR_TEAMS,
@@ -230,8 +231,7 @@ export default function NewsScreen() {
       {/* Articles List */}
       {loading && !refreshing ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text style={styles.loadingText}>Loading sports pulse...</Text>
+          <GoalmillsLoader size="md" label="News Pulse" sublabel="Fetching sports headlines & rumors..." />
         </View>
       ) : (
         <FlatList

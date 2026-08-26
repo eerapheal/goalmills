@@ -18,6 +18,7 @@ import {
   ApiBasketballGameItem,
 } from '../services/basketballApi';
 import { BasketballMatchCard } from '../components/BasketballMatchCard';
+import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -232,8 +233,7 @@ export default function BasketballScreen() {
       {/* Main Content */}
       {loading && !refreshing ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#F97316" />
-          <Text style={styles.loadingText}>Loading basketball data...</Text>
+          <GoalmillsLoader size="md" label="Basketball Live" sublabel="Syncing NBA court action & standings..." />
         </View>
       ) : activeTab === 'standings' ? (
         <ScrollView

@@ -6,6 +6,7 @@ import {
   webBasketballApiService,
   ApiBasketballGameItem,
 } from '../services/basketballApi';
+import { GoalmillsLoader } from './GoalmillsLoader';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -218,10 +219,7 @@ export function BasketballScreen() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex h-64 flex-col items-center justify-center space-y-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
-          <p className="text-sm text-slate-400">Loading basketball data...</p>
-        </div>
+        <GoalmillsLoader size="md" label="Basketball Hub" sublabel="Syncing NBA scores & court action..." />
       ) : activeTab === 'standings' ? (
         <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
           <h2 className="mb-4 text-lg font-bold text-white">NBA Standings</h2>

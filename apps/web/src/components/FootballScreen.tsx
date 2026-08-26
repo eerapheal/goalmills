@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { FootballMatchCard, UnifiedWebMatchEvent } from './FootballMatchCard';
 import { webApiFootballService, ApiFootballFixtureItem, ApiFootballStandingItem } from '../services/apiFootball';
+import { GoalmillsLoader } from './GoalmillsLoader';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -259,10 +260,7 @@ export function FootballScreen() {
 
       {/* Content Area */}
       {loading ? (
-        <div className="flex h-64 flex-col items-center justify-center space-y-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-          <p className="text-sm text-slate-400">Loading football data...</p>
-        </div>
+        <GoalmillsLoader size="md" label="Football Hub" sublabel="Syncing live scores & league standings..." />
       ) : activeTab === 'standings' ? (
         <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
           <h2 className="mb-4 text-lg font-bold text-white">League Table Standings</h2>

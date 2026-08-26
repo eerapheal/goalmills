@@ -14,6 +14,7 @@ import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { TennisEvent, TennisStanding, TennisLeague } from '@goalmills/types';
 import { tennisApi } from '../services/tennisApi';
 import { TennisMatchCard } from '../components/TennisMatchCard';
+import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 type TennisTab = 'live' | 'upcoming' | 'results' | 'leagues' | 'standings';
 
@@ -110,8 +111,7 @@ export function TennisScreen() {
     if (loading) {
       return (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.secondary} />
-          <Text style={styles.loadingText}>Loading tennis data...</Text>
+          <GoalmillsLoader size="md" label="Tennis Live" sublabel="Syncing ATP/WTA live matches & rankings..." />
         </View>
       );
     }

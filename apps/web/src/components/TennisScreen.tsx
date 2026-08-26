@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { TennisEvent, TennisLeague, TennisStanding } from '@goalmills/types';
 import { tennisApi } from '../services/tennisApi';
 import { TennisMatchCard } from './TennisMatchCard';
+import { GoalmillsLoader } from './GoalmillsLoader';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -98,9 +99,8 @@ export function TennisScreen() {
     const renderContent = () => {
         if (loading) {
             return (
-                <div className="flex flex-col items-center justify-center p-12 animate-pulse">
-                    <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4" />
-                    <p className="text-text-secondary font-medium tracking-wide">Loading tennis data...</p>
+                <div className="py-16">
+                    <GoalmillsLoader size="md" label="Tennis Grand Slam & ATP" sublabel="Syncing court live scores & tournament brackets..." />
                 </div>
             );
         }

@@ -17,6 +17,7 @@ import { FixtureCard } from '../components/FixtureCard';
 import { StandingsTable } from '../components/StandingsTable';
 import { NewsCard } from '../components/NewsCard';
 import { VideoCard } from '../components/VideoCard';
+import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
 
@@ -124,8 +125,7 @@ export function FootballScreen() {
         if (loading) {
             return (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.secondary} />
-                    <Text style={styles.loadingText}>Loading football data...</Text>
+                    <GoalmillsLoader size="md" label="Football Live" sublabel="Syncing match fixtures & league tables..." />
                 </View>
             );
         }

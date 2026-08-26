@@ -15,6 +15,7 @@ import { SPACING, BORDER_RADIUS } from '@goalmills/ui';
 import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
+import { GoalmillsLoader } from '../../../components/GoalmillsLoader';
 import RenderHTML from 'react-native-render-html';
 import {
   newsHistoryUtil,
@@ -177,8 +178,7 @@ export default function NewsDetail() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.loadingText}>Loading story...</Text>
+        <GoalmillsLoader size="fullscreen" label="GoalMills News" sublabel="Loading story & exclusive analysis..." />
       </View>
     );
   }

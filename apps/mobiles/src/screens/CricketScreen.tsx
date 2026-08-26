@@ -16,6 +16,7 @@ import { COLORS, BORDER_RADIUS } from '@goalmills/ui';
 import { CricketEvent, CricketLeague, CricketTeam, CricketStanding, CricketPlayer, CricketNewsItem } from '@goalmills/types';
 import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
+import { GoalmillsLoader } from '../components/GoalmillsLoader';
 import { Ionicons } from '@expo/vector-icons';
 
 type CricketTab = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'athletes' | 'rankings' | 'news';
@@ -292,8 +293,7 @@ export function CricketScreen() {
         if (loading) {
             return (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.secondary} />
-                    <Text style={styles.loadingText}>Syncing Global Feed...</Text>
+                    <GoalmillsLoader size="md" label="Cricket Live" sublabel="Syncing international ball-by-ball & scores..." />
                 </View>
             );
         }
