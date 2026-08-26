@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { useToast } from '../Toast';
 
-export default function UploadVideoForm() {
+interface UploadVideoFormProps {
+    onSuccess?: () => void;
+}
+
+export default function UploadVideoForm({ onSuccess }: UploadVideoFormProps = {}) {
     const toast = useToast();
     const [title, setTitle] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
@@ -108,6 +112,7 @@ export default function UploadVideoForm() {
             });
 
             if (res.ok) {
+                toast.success('Video highlight uploaded successfully!');
                 setMessage({ type: 'success', text: 'Video uploaded successfully!' });
                 setTitle('');
                 setVideoUrl('');
@@ -115,6 +120,7 @@ export default function UploadVideoForm() {
                 setEventKey('');
                 setSource('');
                 setCategory('');
+                onSuccess?.();
             } else {
                 setMessage({ type: 'error', text: 'Failed to upload video.' });
             }
