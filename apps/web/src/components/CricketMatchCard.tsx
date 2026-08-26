@@ -88,6 +88,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                                     alt={match.event_home_team || 'Home'}
                                     width={22}
                                     height={22}
+                                    style={{ width: 'auto', height: 'auto' }}
                                     className="object-contain"
                                 />
                             ) : (
@@ -142,6 +143,7 @@ export function CricketMatchCard({ match, onPress }: CricketMatchCardProps) {
                                     alt={match.event_away_team || 'Away'}
                                     width={22}
                                     height={22}
+                                    style={{ width: 'auto', height: 'auto' }}
                                     className="object-contain"
                                 />
                             ) : (

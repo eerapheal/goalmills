@@ -208,11 +208,24 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
+    // Check if data is an upstream API error response
+    const hasUpstreamError =
+      data.error === '1' ||
+      data.error === 1 ||
+      (Array.isArray(data.result) && data.result.some((r: any) => r && (r.cod || (r.msg && !r.event_key))));
+
+    const sanitizedResult = hasUpstreamError
+      ? []
+      : Array.isArray(data)
+      ? data
+      : (data.result ?? data.response ?? data);
+
     // Standardize result property
     const standardized = {
       success: 1,
-      result: Array.isArray(data) ? data : (data.result ?? data),
+      result: Array.isArray(sanitizedResult) ? sanitizedResult : [],
       ...(!Array.isArray(data) ? data : {}),
+      ...(hasUpstreamError ? { message: 'Upstream account notice, using fallback data' } : {}),
     };
 
     // Store in memory cache

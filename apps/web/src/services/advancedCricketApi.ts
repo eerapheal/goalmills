@@ -769,7 +769,7 @@ const CRICKET_NEWS_FEED: CricketNewsItem[] = [
     title: 'T20 Global Revolution: How 200+ Strike Rates Redefined White-Ball Strategy',
     summary: 'An in-depth statistical analysis on how powerplay batting metrics and boundary percentage have shifted the median T20 total past 210 runs.',
     content: 'Top teams across international cricket and franchise leagues now prioritize high-impact boundaries over traditional anchor roles, unlocking historic scoring records in modern cricket history.',
-    image: 'https://images.unsplash.com/photo-1512719994953-eabf508b8da9?q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=800',
     author: 'Harsha Bhogle',
     source: 'Tactical Pulse',
     published_at: '2026-02-25T08:15:00Z',
@@ -1445,32 +1445,12 @@ export const advancedCricketApi = {
   getTeamSchedules: async (teamId: string | number): Promise<CricketEvent[]> => {
     try {
       const res = await fetchFromAPI<any>('teams/get-schedules', { teamId: String(teamId) });
-      const matches = res.teamMatchesData || res.result || res.matches || (Array.isArray(res) ? res : []);
-      if (Array.isArray(matches) && matches.length > 0) {
-        return matches.map((m: any, i: number) => ({
-          event_key: String(m.matchId || m.event_key || i),
-          event_date_start: m.startDate ? new Date(Number(m.startDate)).toISOString().split('T')[0] : '2026-09-01',
-          event_time: m.time || '14:30',
-          event_home_team: m.team1?.teamName || m.event_home_team || 'Team A',
-          home_team_key: String(m.team1?.teamId || m.home_team_key || teamId),
-          event_away_team: m.team2?.teamName || m.event_away_team || 'Team B',
-          away_team_key: String(m.team2?.teamId || m.away_team_key || '2'),
-          league_name: m.seriesName || m.league_name || 'International Series',
-          league_key: String(m.seriesId || m.league_key || '101'),
-          event_status: m.state || 'Not Started',
-          event_live: '0',
-          event_type: m.matchFormat || 'T20',
-          event_stadium: m.venueInfo?.ground || 'International Cricket Stadium',
-        })) as unknown as CricketEvent[];
-      }
+      const matches = res.result || res.teamMatchesData || res.matches || (Array.isArray(res) ? res : []);
+      if (Array.isArray(matches) && matches.length > 0) return matches;
     } catch (e) {
       console.warn('Error in getTeamSchedules:', e);
     }
-    const res = await advancedCricketApi.getFixtures({
-      from: advancedCricketApi.getFormattedDate(0),
-      to: advancedCricketApi.getFormattedDate(60),
-    });
-    return (res.result || []).filter(m => m.home_team_key === String(teamId) || m.away_team_key === String(teamId));
+    return [];
   },
 
   /**
@@ -1479,32 +1459,12 @@ export const advancedCricketApi = {
   getTeamResults: async (teamId: string | number): Promise<CricketEvent[]> => {
     try {
       const res = await fetchFromAPI<any>('teams/get-results', { teamId: String(teamId) });
-      const matches = res.teamMatchesData || res.result || res.matches || (Array.isArray(res) ? res : []);
-      if (Array.isArray(matches) && matches.length > 0) {
-        return matches.map((m: any, i: number) => ({
-          event_key: String(m.matchId || m.event_key || i),
-          event_date_start: m.startDate ? new Date(Number(m.startDate)).toISOString().split('T')[0] : '2026-08-01',
-          event_time: 'Finished',
-          event_home_team: m.team1?.teamName || m.event_home_team || 'Team A',
-          home_team_key: String(m.team1?.teamId || m.home_team_key || teamId),
-          event_away_team: m.team2?.teamName || m.event_away_team || 'Team B',
-          away_team_key: String(m.team2?.teamId || m.away_team_key || '2'),
-          league_name: m.seriesName || m.league_name || 'International Series',
-          league_key: String(m.seriesId || m.league_key || '101'),
-          event_status: 'Finished',
-          event_live: '0',
-          event_type: m.matchFormat || 'ODI',
-          event_status_info: m.status || 'Match Completed',
-        })) as unknown as CricketEvent[];
-      }
+      const matches = res.result || res.teamMatchesData || res.matches || (Array.isArray(res) ? res : []);
+      if (Array.isArray(matches) && matches.length > 0) return matches;
     } catch (e) {
       console.warn('Error in getTeamResults:', e);
     }
-    const res = await advancedCricketApi.getFixtures({
-      from: advancedCricketApi.getFormattedDate(-60),
-      to: advancedCricketApi.getFormattedDate(-1),
-    });
-    return (res.result || []).filter(m => m.home_team_key === String(teamId) || m.away_team_key === String(teamId));
+    return [];
   },
 
   /**
@@ -1538,18 +1498,8 @@ export const advancedCricketApi = {
   getTeamPlayers: async (teamId: string | number): Promise<CricketPlayer[]> => {
     try {
       const res = await fetchFromAPI<any>('teams/get-players', { teamId: String(teamId) });
-      const rawPlayers = res.player || res.result || res.players || (Array.isArray(res) ? res : []);
-      if (Array.isArray(rawPlayers) && rawPlayers.length > 0) {
-        return rawPlayers.map((p: any) => ({
-          player_key: String(p.id || p.player_key || p.playerId),
-          player_name: p.name || p.player_name || 'Squad Member',
-          team_key: String(teamId),
-          player_type: p.role || p.player_type || 'Player',
-          player_country: p.country || 'International',
-          is_captain: p.isCaptain || false,
-          player_image: p.faceImageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${p.faceImageId}/i.jpg` : p.player_image,
-        }));
-      }
+      const rawPlayers = res.result || res.player || res.players || (Array.isArray(res) ? res : []);
+      if (Array.isArray(rawPlayers) && rawPlayers.length > 0) return rawPlayers;
     } catch (e) {
       console.warn('Error in getTeamPlayers:', e);
     }

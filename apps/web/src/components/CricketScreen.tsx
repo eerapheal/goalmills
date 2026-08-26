@@ -450,7 +450,13 @@ export function CricketScreen() {
                             {newsList.map((item) => (
                                 <div key={item.id} className="glass-card rounded-[2rem] overflow-hidden border border-white/5 flex flex-col group hover:border-secondary/40 transition-all">
                                     <div className="relative h-48 w-full overflow-hidden bg-white/5">
-                                        <Image src={item.image} alt={item.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <Image
+                                            src={item.image}
+                                            alt={item.title}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
                                         <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-secondary/80 backdrop-blur-md text-[9px] font-black uppercase tracking-wider text-white">
                                             {item.category}
                                         </div>

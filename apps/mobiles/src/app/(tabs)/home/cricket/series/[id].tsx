@@ -13,8 +13,6 @@ export default function CricketSeriesDetailsScreen() {
     const [loading, setLoading] = useState(true);
     const [series, setSeries] = useState<CricketLeague | null>(null);
     const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
-    const [activeTab, setActiveTab] = useState<'fixtures' | 'rankings'>('fixtures');
-
 
     useEffect(() => {
         const loadData = async () => {
@@ -23,7 +21,13 @@ export default function CricketSeriesDetailsScreen() {
                 // Fetch series info from leagues list
                 const leaguesRes = await advancedCricketApi.getLeagues();
                 const foundSeries = leaguesRes.result?.find(l => l.league_key === id);
-                setSeries(foundSeries || null);
+                setSeries(foundSeries || {
+                    league_key: id,
+                    league_name: `Cricket Series #${id}`,
+                    country_name: 'International',
+                    league_season: '2026',
+                    league_year: '2026',
+                });
 
                 // Fetch fixtures for this league
                 const today = new Date();
@@ -78,48 +82,30 @@ export default function CricketSeriesDetailsScreen() {
                     <View style={styles.imageOverlay} />
                     <View style={styles.headerContentOverlay}>
                         <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{series.league_season}</Text>
+                            <Text style={styles.badgeText}>{series.league_season || '2026'}</Text>
                         </View>
                         <Text style={styles.title}>{series.league_name}</Text>
-                        <Text style={styles.subtitle}>{series.league_year}</Text>
+                        <Text style={styles.subtitle}>{series.country_name || 'Tournament Schedule'}</Text>
                     </View>
-                </View>
-
-                <View style={styles.tabs}>
-                    {(['fixtures', 'rankings'] as const).map((tab) => (
-                        <TouchableOpacity
-                            key={tab}
-                            style={[styles.tab, activeTab === tab && styles.activeTab]}
-                            onPress={() => setActiveTab(tab)}
-                        >
-                            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                                {tab.toUpperCase()}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
                 </View>
             </View>
 
-            {activeTab === 'fixtures' ? (
-                <FlatList
-                    data={fixtures}
-                    renderItem={({ item }) => <CricketMatchCard match={item} />}
-                    keyExtractor={(item) => item.event_key.toString()}
-                    contentContainerStyle={styles.content}
-                    ListEmptyComponent={
-                        <View style={styles.emptyState}>
-                            <Text style={styles.emptyText}>No upcoming matches found.</Text>
-                        </View>
-                    }
-                />
-            ) : (
-                <View style={styles.content}>
-                    <View style={styles.emptyState}>
-                        <Text style={styles.emptyTitle}>RANKINGS INITIALIZING</Text>
-                        <Text style={styles.emptyText}>Table data unavailable for this series.</Text>
+            <FlatList
+                data={fixtures}
+                renderItem={({ item }) => <CricketMatchCard match={item} />}
+                keyExtractor={(item) => item.event_key.toString()}
+                contentContainerStyle={styles.content}
+                ListHeaderComponent={
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>MATCH SCHEDULE & RESULTS ({fixtures.length})</Text>
                     </View>
-                </View>
-            )}
+                }
+                ListEmptyComponent={
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyText}>No scheduled matches found for this tournament.</Text>
+                    </View>
+                }
+            />
         </View>
     );
 }
@@ -143,23 +129,23 @@ const styles = StyleSheet.create({
     },
     headerImage: {
         width: '100%',
-        height: 240,
+        height: 200,
         backgroundColor: 'rgba(255,255,255,0.05)',
         position: 'relative',
     },
     imageOverlay: {
         ...StyleSheet.absoluteFill,
-        backgroundColor: 'rgba(10, 14, 39, 0.7)',
+        backgroundColor: 'rgba(10, 14, 39, 0.75)',
     },
     headerContentOverlay: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 24,
+        padding: 20,
     },
     title: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: '900',
         color: '#fff',
         marginBottom: 4,
@@ -177,7 +163,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: 8,
         alignSelf: 'flex-start',
-        marginBottom: 12,
+        marginBottom: 10,
     },
     badgeText: {
         color: '#000',
@@ -191,47 +177,24 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 40,
     },
+    sectionHeader: {
+        marginBottom: 12,
+    },
+    sectionTitle: {
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+    },
     emptyState: {
         padding: 40,
         alignItems: 'center',
-    },
-    emptyTitle: {
-        color: 'rgba(255, 255, 255, 0.2)',
-        fontSize: 12,
-        fontWeight: '900',
-        letterSpacing: 2,
-        marginBottom: 8,
     },
     emptyText: {
         color: 'rgba(255, 255, 255, 0.4)',
         textAlign: 'center',
         fontStyle: 'italic',
         fontSize: 12,
-    },
-    tabs: {
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-        backgroundColor: '#0a0e27',
-    },
-    tab: {
-        paddingVertical: 16,
-        marginRight: 24,
-        borderBottomWidth: 2,
-        borderBottomColor: 'transparent',
-    },
-    activeTab: {
-        borderBottomColor: COLORS.secondary,
-    },
-    tabText: {
-        color: 'rgba(255, 255, 255, 0.4)',
-        fontSize: 11,
-        fontWeight: '900',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
-    activeTabText: {
-        color: '#fff',
     },
 });

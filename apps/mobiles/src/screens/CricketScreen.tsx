@@ -18,7 +18,7 @@ import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
 import { Ionicons } from '@expo/vector-icons';
 
-type CricketTab = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'athletes' | 'rankings';
+type CricketTab = 'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'athletes';
 
 // Global league priority for consistent sorting
 const LEAGUE_PRIORITY: Record<string, number> = {
@@ -68,7 +68,6 @@ export function CricketScreen() {
     const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
     const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
     const [playersList, setPlayersList] = useState<CricketPlayer[]>([]);
-    const [rankings, setRankings] = useState<Record<string, CricketStanding[]>>({});
 
     const getDateString = (daysOffset: number = 0) => {
         const date = new Date();
@@ -100,24 +99,12 @@ export function CricketScreen() {
             const allTeams = teamResults.flatMap(r => r.result || []);
             const uniqueTeams = Array.from(new Map(allTeams.map(t => [t.team_key, t])).values());
 
-            const [iplRank, t20Rank, bblRank] = await Promise.all([
-                advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: { total: [] } })),
-                advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: { total: [] } })),
-                advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: { total: [] } })),
-            ]);
-
             setLiveMatches(sortMatches(live.result || []));
             setUpcomingMatches(sortMatches(upcoming.result || []));
             setRecentMatches(sortMatches(recent.result || []).reverse());
             setSeriesList(series.result || []);
             setTeamsList(uniqueTeams);
             setPlayersList(players.result || []);
-
-            setRankings({
-                'IPL': iplRank.result?.total || (Array.isArray(iplRank.result) ? iplRank.result : []),
-                'T20 WC': t20Rank.result?.total || (Array.isArray(t20Rank.result) ? t20Rank.result : []),
-                'BBL': bblRank.result?.total || (Array.isArray(bblRank.result) ? bblRank.result : []),
-            });
         } catch (error) {
             console.error('Error loading mobile cricket:', error);
         } finally {
@@ -177,7 +164,6 @@ export function CricketScreen() {
         { id: 'series', label: 'Series', icon: '🏆' },
         { id: 'athletes', label: 'Athletes', icon: '🏏' },
         { id: 'teams', label: 'Squads', icon: '🛡️' },
-        { id: 'rankings', label: 'Standings', icon: '📈' },
     ];
 
     const renderHeader = () => (
@@ -334,48 +320,6 @@ export function CricketScreen() {
                                 </Pressable>
                             ))}
                         </View>
-                    </View>
-                );
-
-            case 'rankings':
-                return (
-                    <View style={styles.tabContent}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                            <Text style={styles.sectionTitle}>📈 STANDINGS & ICC MATRIX</Text>
-                            <TouchableOpacity onPress={() => router.push('/home/cricket/rankings')}>
-                                <Text style={{ color: COLORS.secondary, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>ICC World Rankings →</Text>
-                            </TouchableOpacity>
-                        </View>
-                        {['IPL', 'T20 WC', 'BBL'].map((format) => {
-                            const list = rankings[format] || [];
-                            return (
-                                <View key={format} style={styles.rankingCard}>
-                                    <Text style={styles.rankingTitle}>{format} POINTS TABLE</Text>
-                                    {list.length > 0 ? (
-                                        <View style={styles.rankingList}>
-                                            {list.slice(0, 5).map((rank, idx) => (
-                                                <View key={idx} style={styles.rankingRow}>
-                                                    <View style={styles.rankTeam}>
-                                                        <Text style={styles.rankNumber}>{(idx + 1).toString().padStart(2, '0')}</Text>
-                                                        <Text style={styles.rankName}>{rank.standing_team}</Text>
-                                                    </View>
-                                                    <View style={styles.rankStats}>
-                                                        <Text style={styles.rankPts}>{rank.standing_Pts} pts</Text>
-                                                        <Text style={[styles.rankNrr, parseFloat(rank.standing_NRR) >= 0 ? styles.positive : styles.negative]}>
-                                                            {rank.standing_NRR}
-                                                        </Text>
-                                                    </View>
-                                                </View>
-                                            ))}
-                                        </View>
-                                    ) : (
-                                        <View style={styles.rankingEmpty}>
-                                            <Text style={styles.rankingEmptyText}>SEASON INITIALIZING</Text>
-                                        </View>
-                                    )}
-                                </View>
-                            );
-                        })}
                     </View>
                 );
 

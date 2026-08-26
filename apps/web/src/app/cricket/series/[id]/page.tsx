@@ -3,21 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { advancedCricketApi } from '../../../../services/advancedCricketApi';
-import { CricketLeague, CricketEvent, CricketStanding } from '@goalmills/types';
+import { CricketLeague, CricketEvent } from '@goalmills/types';
 import { CricketMatchCard } from '../../../../components/CricketMatchCard';
 import Image from 'next/image';
-import Link from 'next/link';
-
-type TabType = 'fixtures' | 'standings';
 
 export default function CricketSeriesDetailsPage() {
     const params = useParams();
     const router = useRouter();
     const [series, setSeries] = useState<CricketLeague | null>(null);
     const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
-    const [standings, setStandings] = useState<CricketStanding[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<TabType>('fixtures');
 
     useEffect(() => {
         const loadData = async () => {
@@ -35,20 +30,14 @@ export default function CricketSeriesDetailsPage() {
                 };
                 setSeries(foundSeries);
 
-                // Parallel fetch for fixtures and standings
-                const [fixturesRes, standingsRes] = await Promise.all([
-                    advancedCricketApi.getFixtures({
-                        leagueId: Number(seriesId),
-                        from: advancedCricketApi.getFormattedDate(-30),
-                        to: advancedCricketApi.getFormattedDate(60),
-                    }),
-                    advancedCricketApi.getStandings({
-                        leagueId: Number(seriesId)
-                    }).catch(() => ({ success: 1, result: { total: [] } }))
-                ]);
+                // Fetch fixtures for this series
+                const fixturesRes = await advancedCricketApi.getFixtures({
+                    leagueId: Number(seriesId),
+                    from: advancedCricketApi.getFormattedDate(-30),
+                    to: advancedCricketApi.getFormattedDate(60),
+                });
 
                 setFixtures(fixturesRes.result || []);
-                setStandings(standingsRes.result?.total || []);
             } catch (error) {
                 console.error('Error loading series intelligence:', error);
             } finally {
@@ -128,78 +117,22 @@ export default function CricketSeriesDetailsPage() {
                     </div>
                 </div>
 
-
-                {/* Sub-Navigation Tabs */}
-                <div className="flex gap-4 mb-10 bg-white/5 p-2 rounded-2xl border border-white/5">
-                    {[
-                        { id: 'fixtures', label: 'Match Schedule', icon: '📅' },
-                        { id: 'standings', label: 'League Standings', icon: '📈' }
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as TabType)}
-                            className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
-                                ${activeTab === tab.id ? 'bg-secondary text-white shadow-lg' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
-                        >
-                            <span className="text-xs">{tab.icon}</span>
-                            {tab.label}
-                        </button>
-                    ))}
+                {/* Section Title */}
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+                    <h2 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+                        <span>📅</span> Match Schedule & Results
+                    </h2>
+                    <span className="text-xs text-text-muted font-bold">{fixtures.length} Matches</span>
                 </div>
 
-                {/* Dynamic Tab Content */}
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                    {activeTab === 'fixtures' ? (
-                        <div className="space-y-4">
-                            {fixtures.length > 0 ? (
-                                fixtures.map(match => (
-                                    <CricketMatchCard key={match.event_key} match={match} />
-                                ))
-                            ) : (
-                                <EmptyPlaceholder icon="🏏" title="No Active Fixtures" message="There are currently no scheduled matches or recent results available for this series in the live roster." />
-                            )}
-                        </div>
+                {/* Match Fixtures List */}
+                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 space-y-4">
+                    {fixtures.length > 0 ? (
+                        fixtures.map(match => (
+                            <CricketMatchCard key={match.event_key} match={match} />
+                        ))
                     ) : (
-                        <div className="glass-card rounded-[2.5rem] border border-white/5 overflow-hidden">
-                            {standings.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-xs text-left">
-                                        <thead className="text-text-muted uppercase tracking-[0.2em] bg-white/5">
-                                            <tr>
-                                                <th className="py-6 px-8">#</th>
-                                                <th className="py-6 px-4">Squad Name</th>
-                                                <th className="py-6 px-4 text-center">P</th>
-                                                <th className="py-6 px-4 text-center">W</th>
-                                                <th className="py-6 px-4 text-center">L</th>
-                                                <th className="py-6 px-4 text-center">Pts</th>
-                                                <th className="py-6 px-8 text-right">NRR</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="text-white">
-                                            {standings.map((rank, i) => (
-                                                <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors group">
-                                                    <td className="py-5 px-8 font-black text-text-muted/50 tabular-nums">{(i + 1).toString().padStart(2, '0')}</td>
-                                                    <td className="py-5 px-4">
-                                                        <Link href={`/cricket/teams/${rank.team_key}`} className="font-black text-sm uppercase tracking-tight group-hover:text-secondary transition-colors">
-                                                            {rank.standing_team}
-                                                        </Link>
-                                                    </td>
-                                                    <td className="py-5 px-4 text-center font-black tabular-nums">{rank.standing_MP}</td>
-                                                    <td className="py-5 px-4 text-center font-bold text-emerald-500 tabular-nums">{rank.standing_W}</td>
-                                                    <td className="py-5 px-4 text-center font-bold text-rose-500 tabular-nums">{rank.standing_L}</td>
-                                                    <td className="py-5 px-4 text-center font-black text-secondary tabular-nums">{rank.standing_Pts}</td>
-                                                    <td className={`py-5 px-8 text-right font-black tabular-nums ${parseFloat(rank.standing_NRR) >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                                        {rank.standing_NRR}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
-                                <EmptyPlaceholder icon="📈" title="Standings Evaluated" message="League table data is either not applicable for this series format or is currently being calculated." />
-                            )}
-                        </div>
+                        <EmptyPlaceholder icon="🏏" title="No Active Fixtures" message="There are currently no scheduled matches or recent results available for this series in the live roster." />
                     )}
                 </div>
             </div>

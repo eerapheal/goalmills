@@ -85,7 +85,13 @@ export default function CricketPlayerDetailsPage() {
                         {/* Avatar */}
                         <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-3xl overflow-hidden bg-white/5 border-2 border-white/10 shadow-2xl flex-shrink-0">
                             {player.player_image ? (
-                                <Image src={player.player_image} alt={player.player_name} fill className="object-cover" />
+                                <Image
+                                    src={player.player_image}
+                                    alt={player.player_name}
+                                    fill
+                                    sizes="(max-width: 768px) 144px, 176px"
+                                    className="object-cover"
+                                />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-5xl font-black text-secondary">
                                     {player.player_name.charAt(0)}

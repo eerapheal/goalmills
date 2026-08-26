@@ -50,28 +50,90 @@ const API_KEY =
 function getTtlForEndpoint(endpoint: string): number {
   const ep = endpoint.toLowerCase();
   if (ep.includes('live') || ep.includes('score')) return 15;
-  if (ep.includes('fixture') || ep.includes('match') || ep.includes('schedule') || ep.includes('upcoming') || ep.includes('recent')) return 60;
+  if (ep.includes('fixture') || ep.includes('match') || ep.includes('schedule') || ep.includes('upcoming') || ep.includes('recent') || ep.includes('results')) return 60;
   if (ep.includes('standing') || ep.includes('table') || ep.includes('rank') || ep.includes('points-table')) return 300;
-  if (ep.includes('team') || ep.includes('league') || ep.includes('series') || ep.includes('player') || ep.includes('news')) return 600;
+  if (ep.includes('team') || ep.includes('league') || ep.includes('series') || ep.includes('player') || ep.includes('news') || ep.includes('stats')) return 600;
   return 60;
 }
 
 // ─── Cricbuzz Path Mapping ────────────────────────────────────────────────────
 function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): string {
-  if (endpoint.includes('/')) return `/${endpoint.replace(/^\//, '')}`;
+  const ep = endpoint.toLowerCase().trim();
+  const playerId = searchParams.get('playerId') || searchParams.get('id') || searchParams.get('player_id');
+  const seriesId = searchParams.get('leagueId') || searchParams.get('seriesId') || searchParams.get('id');
+  const teamId = searchParams.get('teamId') || searchParams.get('team_id') || searchParams.get('id');
 
-  const ep = endpoint.toLowerCase();
+  // Direct paths starting with '/'
+  if (endpoint.startsWith('/')) return endpoint;
+
+  // Live / Matches / Fixtures / Recent
   if (ep === 'livescore' || ep === 'live') return '/matches/v1/live';
   if (ep === 'fixtures' || ep === 'upcoming') return '/matches/v1/upcoming';
   if (ep === 'recent') return '/matches/v1/recent';
-  if (ep === 'leagues' || ep === 'series') return '/series/v1/international';
-  if (ep === 'standings' || ep === 'points-table') {
-    const seriesId = searchParams.get('leagueId') || searchParams.get('seriesId');
+
+  // Series / Leagues
+  if (ep === 'leagues' || ep === 'series' || ep === 'series/v1/international') return '/series/v1/international';
+  if (ep === 'standings' || ep === 'points-table' || ep.includes('points-table')) {
     return seriesId ? `/series/v1/${seriesId}/points-table` : '/series/v1/international';
   }
-  if (ep === 'teams') return '/teams/v1/international';
-  if (ep === 'news') return '/news/v1/index';
-  return `/matches/v1/${ep}`;
+
+  // Teams: Specialized sub-routes
+  if (ep === 'teams/get-schedules' || ep === 'teams/schedules' || ep === 'teams/schedule') {
+    return teamId ? `/teams/v1/${teamId}/schedule` : '/matches/v1/upcoming';
+  }
+  if (ep === 'teams/get-results' || ep === 'teams/results') {
+    return teamId ? `/teams/v1/${teamId}/results` : '/matches/v1/recent';
+  }
+  if (ep === 'teams/get-players' || ep === 'teams/players') {
+    return teamId ? `/teams/v1/${teamId}/players` : '/stats/v1/player/trending';
+  }
+  if (ep === 'teams/get-news' || ep === 'teams/news') {
+    return teamId ? `/news/v1/team/${teamId}` : '/news/v1/index';
+  }
+  if (ep === 'teams/get-stats' || ep === 'teams/get-stats-filters' || ep === 'teams/stats') {
+    return teamId ? `/stats/v1/team/${teamId}` : '/teams/v1/international';
+  }
+
+  // Teams: General listing
+  if (ep === 'teams' || ep === 'teams/list' || ep.startsWith('teams/')) {
+    const teamType = searchParams.get('type') || 'international';
+    return `/teams/v1/${teamType}`;
+  }
+
+  // Players
+  if (
+    ep === 'players' ||
+    ep === 'players/list-trending' ||
+    ep === 'players/trending' ||
+    ep === 'stats/v1/player/trending' ||
+    ep.includes('trending')
+  ) {
+    if (playerId) return `/stats/v1/player/${playerId}`;
+    return '/stats/v1/player/trending';
+  }
+
+  if (ep === 'players/get-info' || ep === 'player/info' || ep === 'player') {
+    return playerId ? `/stats/v1/player/${playerId}` : '/stats/v1/player/trending';
+  }
+  if (ep === 'players/get-career' || ep === 'player/career') {
+    return playerId ? `/stats/v1/player/${playerId}/career` : '/stats/v1/player/trending';
+  }
+  if (ep === 'players/get-batting' || ep === 'player/batting') {
+    return playerId ? `/stats/v1/player/${playerId}/batting` : '/stats/v1/player/trending';
+  }
+  if (ep === 'players/get-bowling' || ep === 'player/bowling') {
+    return playerId ? `/stats/v1/player/${playerId}/bowling` : '/stats/v1/player/trending';
+  }
+  if (ep === 'players/get-news' || ep === 'player/news') {
+    return '/news/v1/index';
+  }
+
+  // News
+  if (ep === 'news' || ep === 'news/v1/index' || ep.includes('news')) {
+    return '/news/v1/index';
+  }
+
+  return endpoint.includes('/') ? `/${endpoint.replace(/^\//, '')}` : `/matches/v1/${endpoint}`;
 }
 
 // ─── Cricbuzz → App Format Transformers ───────────────────────────────────────
@@ -80,8 +142,74 @@ const CRICBUZZ_IMG = (id: number | string) =>
   `https://static.cricbuzz.com/a/img/v1/i1/c${id}/i.jpg`;
 
 /**
- * Extract a flat array of CricketEvent objects from the nested Cricbuzz
- * `typeMatches[].seriesMatches[].seriesAdWrapper.matches[]` structure.
+ * Build score strings from innings data
+ */
+function buildScoreStr(teamScore: any): string {
+  if (!teamScore) return '';
+  const parts: string[] = [];
+  for (const key of ['inngs1', 'inngs2', 'inngs3', 'inngs4']) {
+    const inn = teamScore[key];
+    if (!inn) continue;
+    let s = `${inn.runs}`;
+    if (inn.wickets !== undefined && inn.wickets < 10) s += `/${inn.wickets}`;
+    if (inn.overs !== undefined) s += ` (${inn.overs} ov)`;
+    if (inn.isDeclared) s += 'd';
+    parts.push(s);
+  }
+  return parts.join(' & ');
+}
+
+/**
+ * Convert match info & score into a standardized CricketEvent
+ */
+function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): any {
+  if (!info) return null;
+
+  const t1 = info.team1 || {};
+  const t2 = info.team2 || {};
+  const venue = info.venueInfo || {};
+  const startMs = Number(info.startDate || 0);
+  const endMs = Number(info.endDate || 0);
+  const startDate = startMs ? new Date(startMs).toISOString().split('T')[0] : null;
+  const endDate = endMs ? new Date(endMs).toISOString().split('T')[0] : null;
+  const startTime = startMs
+    ? new Date(startMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+    : null;
+
+  const isLive = info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
+
+  return {
+    event_key: String(info.matchId),
+    event_date_start: startDate,
+    event_date_stop: endDate,
+    event_time: startTime,
+    event_home_team: t1.teamName || 'TBA',
+    home_team_key: String(t1.teamId || ''),
+    event_away_team: t2.teamName || 'TBA',
+    away_team_key: String(t2.teamId || ''),
+    event_service_home: '',
+    event_service_away: '',
+    event_home_final_result: buildScoreStr(score?.team1Score),
+    event_away_final_result: buildScoreStr(score?.team2Score),
+    event_home_rr: null,
+    event_away_rr: null,
+    event_status: info.state || info.stateTitle || 'Scheduled',
+    event_status_info: info.status || '',
+    country_name: info.matchFormat || 'International',
+    league_name: info.seriesName || seriesNameFallback || '',
+    league_key: String(info.seriesId || ''),
+    league_round: info.matchDesc || '',
+    league_season: new Date(startMs || Date.now()).getFullYear().toString(),
+    event_live: isLive ? '1' : '0',
+    event_type: info.matchFormat || 'Cricket',
+    event_stadium: venue.ground ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}` : undefined,
+    event_home_team_logo: t1.imageId ? CRICBUZZ_IMG(t1.imageId) : undefined,
+    event_away_team_logo: t2.imageId ? CRICBUZZ_IMG(t2.imageId) : undefined,
+  };
+}
+
+/**
+ * Extract a flat array of CricketEvent objects from Cricbuzz typeMatches structure
  */
 function transformCricbuzzMatches(data: any): any[] {
   const typeMatches = data?.typeMatches;
@@ -89,7 +217,6 @@ function transformCricbuzzMatches(data: any): any[] {
 
   const events: any[] = [];
   for (const tm of typeMatches) {
-    const matchType = tm.matchType || '';
     const seriesMatches = tm.seriesMatches;
     if (!Array.isArray(seriesMatches)) continue;
 
@@ -98,68 +225,8 @@ function transformCricbuzzMatches(data: any): any[] {
       if (!wrapper?.matches) continue;
 
       for (const m of wrapper.matches) {
-        const info = m.matchInfo;
-        const score = m.matchScore;
-        if (!info) continue;
-
-        const t1 = info.team1 || {};
-        const t2 = info.team2 || {};
-        const venue = info.venueInfo || {};
-        const startMs = Number(info.startDate || 0);
-        const endMs = Number(info.endDate || 0);
-        const startDate = startMs ? new Date(startMs).toISOString().split('T')[0] : null;
-        const endDate = endMs ? new Date(endMs).toISOString().split('T')[0] : null;
-        const startTime = startMs
-          ? new Date(startMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
-          : null;
-
-        // Build score strings from innings data
-        const buildScoreStr = (teamScore: any): string => {
-          if (!teamScore) return '';
-          const parts: string[] = [];
-          for (const key of ['inngs1', 'inngs2', 'inngs3', 'inngs4']) {
-            const inn = teamScore[key];
-            if (!inn) continue;
-            let s = `${inn.runs}`;
-            if (inn.wickets !== undefined && inn.wickets < 10) s += `/${inn.wickets}`;
-            if (inn.overs !== undefined) s += ` (${inn.overs} ov)`;
-            if (inn.isDeclared) s += 'd';
-            parts.push(s);
-          }
-          return parts.join(' & ');
-        };
-
-        const isLive = info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
-        const isComplete = info.state === 'Complete' || (info.stateTitle || '').includes('Won');
-
-        events.push({
-          event_key: String(info.matchId),
-          event_date_start: startDate,
-          event_date_stop: endDate,
-          event_time: startTime,
-          event_home_team: t1.teamName || 'TBA',
-          home_team_key: String(t1.teamId || ''),
-          event_away_team: t2.teamName || 'TBA',
-          away_team_key: String(t2.teamId || ''),
-          event_service_home: '',
-          event_service_away: '',
-          event_home_final_result: buildScoreStr(score?.team1Score),
-          event_away_final_result: buildScoreStr(score?.team2Score),
-          event_home_rr: null,
-          event_away_rr: null,
-          event_status: info.state || info.stateTitle || 'Scheduled',
-          event_status_info: info.status || '',
-          country_name: matchType,
-          league_name: info.seriesName || wrapper.seriesName || '',
-          league_key: String(info.seriesId || wrapper.seriesId || ''),
-          league_round: info.matchDesc || '',
-          league_season: new Date(startMs || Date.now()).getFullYear().toString(),
-          event_live: isLive ? '1' : '0',
-          event_type: info.matchFormat || matchType,
-          event_stadium: venue.ground ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}` : undefined,
-          event_home_team_logo: t1.imageId ? CRICBUZZ_IMG(t1.imageId) : undefined,
-          event_away_team_logo: t2.imageId ? CRICBUZZ_IMG(t2.imageId) : undefined,
-        });
+        const ev = mapMatchToEvent(m.matchInfo, m.matchScore, wrapper.seriesName);
+        if (ev) events.push(ev);
       }
     }
   }
@@ -167,11 +234,29 @@ function transformCricbuzzMatches(data: any): any[] {
 }
 
 /**
- * Transform Cricbuzz series/international response into CricketLeague[] format.
- * Cricbuzz returns { seriesMapProto: [{ date: "MONTH YEAR", series: [...] }] }
+ * Extract a flat array of CricketEvent objects from team schedule/results response
+ */
+function transformCricbuzzTeamMatches(data: any): any[] {
+  const teamMatchesData = data?.teamMatchesData;
+  if (!Array.isArray(teamMatchesData)) return [];
+
+  const events: any[] = [];
+  for (const block of teamMatchesData) {
+    const matches = block?.matchDetailsMap?.match;
+    if (!Array.isArray(matches)) continue;
+
+    for (const m of matches) {
+      const ev = mapMatchToEvent(m.matchInfo, m.matchScore);
+      if (ev) events.push(ev);
+    }
+  }
+  return events;
+}
+
+/**
+ * Transform Cricbuzz series response into CricketLeague[] format
  */
 function transformCricbuzzSeries(data: any): any[] {
-  // Cricbuzz uses "seriesMapProto" as the key
   const seriesMap = data?.seriesMapProto || data?.seriesMapProfiles;
   if (!Array.isArray(seriesMap)) return [];
 
@@ -198,37 +283,89 @@ function transformCricbuzzSeries(data: any): any[] {
 }
 
 /**
- * Transform Cricbuzz points-table response into CricketStanding[] format.
+ * Transform Cricbuzz teams/v1 list into CricketTeam[] format
+ * Filters out header items like { teamName: 'Test Teams' } without teamId
  */
-function transformCricbuzzPointsTable(data: any, leagueKey: string): any[] {
-  const pointsTable = data?.pointsTable;
-  if (!Array.isArray(pointsTable)) return [];
+function transformCricbuzzTeamsList(data: any): any[] {
+  const list = data?.list;
+  if (!Array.isArray(list)) return [];
 
-  const standings: any[] = [];
-  for (const group of pointsTable) {
-    const table = group.pointsTableInfo;
-    if (!Array.isArray(table)) continue;
+  return list
+    .filter((t: any) => t && t.teamId)
+    .map((t: any) => ({
+      team_key: String(t.teamId),
+      team_name: t.teamName || '',
+      team_short_name: t.teamSName || (t.teamName || '').slice(0, 3).toUpperCase(),
+      team_logo: t.imageId ? CRICBUZZ_IMG(t.imageId) : undefined,
+      country_name: t.countryName || t.teamName || 'International',
+    }));
+}
 
-    for (const entry of table) {
-      standings.push({
-        standing_place: String(entry.rank || entry.pos || standings.length + 1),
-        standing_place_type: entry.qualifier || '',
-        standing_team: entry.teamName || entry.teamFullName || '',
-        standing_MP: String(entry.matchesPlayed ?? entry.played ?? ''),
-        standing_W: String(entry.matchesWon ?? entry.won ?? ''),
-        standing_L: String(entry.matchesLost ?? entry.lost ?? ''),
-        standing_NR: String(entry.noResult ?? entry.nr ?? '0'),
-        standing_R: '',
-        standing_NRR: String(entry.nrr ?? '0.000'),
-        standing_Pts: String(entry.points ?? entry.pts ?? ''),
-        team_key: String(entry.teamId || ''),
-        league_key: leagueKey,
-        league_round: group.groupName || 'Group',
-        standing_updated: new Date().toISOString().split('T')[0],
+/**
+ * Transform Cricbuzz teams/v1/{id}/players into CricketPlayer[] format
+ */
+function transformCricbuzzTeamSquad(data: any, teamId: string): any[] {
+  const raw = data?.player;
+  if (!Array.isArray(raw)) return [];
+
+  let currentRole = 'Player';
+  const players: any[] = [];
+
+  for (const p of raw) {
+    if (!p.id && p.name) {
+      currentRole = p.name;
+      continue;
+    }
+    if (p.id) {
+      players.push({
+        player_key: String(p.id),
+        player_name: p.name || '',
+        player_image: p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
+        player_type: currentRole,
+        player_role: currentRole,
+        batting_style: p.battingStyle || undefined,
+        bowling_style: p.bowlingStyle || undefined,
+        team_key: teamId,
       });
     }
   }
-  return standings;
+
+  return players;
+}
+
+/**
+ * Transform Cricbuzz player responses (trending list or single player bio)
+ */
+function transformCricbuzzPlayers(data: any): any[] {
+  if (Array.isArray(data?.player)) {
+    return data.player.map((p: any) => ({
+      player_key: String(p.id || ''),
+      player_name: p.name || 'Cricket Player',
+      player_country: p.teamName || 'International',
+      player_image: p.faceImageId ? CRICBUZZ_IMG(p.faceImageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+      player_type: 'International Player',
+      player_role: 'Athlete',
+      team_name: p.teamName || 'International',
+    }));
+  }
+
+  if (data && (data.id || data.name)) {
+    return [{
+      player_key: String(data.id || ''),
+      player_name: data.name || '',
+      player_country: data.intlTeam || data.teamName || 'International',
+      player_image: data.faceImageId || data.imageId ? CRICBUZZ_IMG(data.faceImageId || data.imageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+      player_type: data.role || 'Player',
+      player_role: data.role || 'Player',
+      batting_style: data.bat || data.battingStyle || 'Right-hand bat',
+      bowling_style: data.bowl || data.bowlingStyle || 'Right-arm medium',
+      player_born: data.birthPlace || undefined,
+      bio: data.bio || undefined,
+      team_name: data.intlTeam || data.teamName || undefined,
+    }];
+  }
+
+  return [];
 }
 
 /**
@@ -236,30 +373,48 @@ function transformCricbuzzPointsTable(data: any, leagueKey: string): any[] {
  */
 function transformCricbuzzResponse(endpointParam: string, data: any, searchParams: URLSearchParams): any {
   const ep = endpointParam.toLowerCase();
+  const teamId = searchParams.get('teamId') || searchParams.get('team_id') || searchParams.get('id') || '';
 
-  // Match listing endpoints (live, upcoming, recent, fixtures)
+  // Team Schedule or Results: data.teamMatchesData
+  if (data?.teamMatchesData || ep.includes('schedule') || ep.includes('results')) {
+    const events = transformCricbuzzTeamMatches(data);
+    if (events.length > 0) return { success: 1, result: events };
+  }
+
+  // Team Players Squad: /teams/v1/{id}/players
+  if (ep.includes('teams/get-players') || (ep.includes('teams') && ep.includes('players')) || (data?.player && Array.isArray(data?.player) && data.player.some((x: any) => !x.id && x.name))) {
+    const squad = transformCricbuzzTeamSquad(data, teamId);
+    if (squad.length > 0) return { success: 1, result: squad };
+  }
+
+  // Match listing endpoints
   if (ep === 'livescore' || ep === 'live' || ep === 'fixtures' || ep === 'upcoming' || ep === 'recent' || ep.includes('matches/v1')) {
     const events = transformCricbuzzMatches(data);
     return { success: 1, result: events };
   }
 
-  // Series/Leagues listing
+  // Teams listing: /teams/v1/{type}
+  if (data?.list || ep === 'teams' || ep === 'teams/list') {
+    const teams = transformCricbuzzTeamsList(data);
+    if (teams.length > 0) return { success: 1, result: teams };
+  }
+
+  // Series / Leagues listing
   if (ep === 'leagues' || ep === 'series' || ep.includes('series/v1/international')) {
     const leagues = transformCricbuzzSeries(data);
     return { success: 1, result: leagues };
   }
 
-  // Standings / Points Table
-  if (ep === 'standings' || ep === 'points-table' || ep.includes('points-table')) {
-    const leagueKey = searchParams.get('leagueId') || searchParams.get('seriesId') || '';
-    const standings = transformCricbuzzPointsTable(data, leagueKey);
-    return { success: 1, result: { total: standings } };
+  // Players
+  if (ep.includes('player') || data?.player || (data?.id && data?.name)) {
+    const players = transformCricbuzzPlayers(data);
+    if (players.length > 0) return { success: 1, result: players };
   }
 
-  // Fallthrough: return raw data wrapped in success envelope
+  // Fallthrough
   return {
     success: 1,
-    result: Array.isArray(data) ? data : (data.result ?? data),
+    result: Array.isArray(data) ? data : (data.result ?? data.values ?? data.types ?? data.storyList ?? data),
     ...(!Array.isArray(data) ? data : {}),
   };
 }
@@ -293,7 +448,7 @@ export async function GET(request: NextRequest) {
 
       // Only forward params that Cricbuzz accepts
       searchParams.forEach((value: any, key: any) => {
-        if (!['met', 'endpoint', 'from', 'to', 'timezone', 'leagueId', 'seriesId'].includes(key) && value) {
+        if (!['met', 'endpoint', 'from', 'to', 'timezone', 'leagueId', 'seriesId', 'playerId', 'teamId', 'team_id'].includes(key) && value) {
           apiUrl.searchParams.append(key, value);
         }
       });
@@ -325,7 +480,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // If rate-limited backoff is active, return stale cache or empty fallback
+    // Rate-limited backoff check
     if (now < rateLimitBackoffUntil) {
       if (cached) {
         return NextResponse.json(cached.data, {
@@ -356,10 +511,10 @@ export async function GET(request: NextRequest) {
       console.warn('Cricket API fetch error:', fetchErr);
     }
 
-    if (!response || !response.ok) {
+    if (!response || !response.ok || response.status === 204) {
       const status = response ? response.status : 502;
-      if (status === 404) {
-        console.info(`[Info] Endpoint not found for ${endpointParam} (e.g. bilateral tour with no points table).`);
+      if (status === 404 || status === 204) {
+        console.info(`[Info] Feed unavailable for ${endpointParam} (status ${status}), returning client fallback.`);
       } else {
         console.warn(`Cricket API status ${status} for ${endpointParam}, triggering client fallbacks.`);
       }
@@ -377,7 +532,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const data = await response.json();
+    const text = await response.text();
+    let data: any = {};
+    if (text && text.trim()) {
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.warn('Cricket proxy JSON parse warning:', err);
+        data = {};
+      }
+    }
 
     // ─── TRANSFORM: Convert Cricbuzz nested format → app-compatible flat format
     const standardized = isRapidApi
@@ -394,8 +558,6 @@ export async function GET(request: NextRequest) {
       data: standardized,
       ttl: ttlSeconds,
     });
-
-    console.log(`Cricket API [${endpointParam}] → ${Array.isArray(standardized.result) ? standardized.result.length : 'obj'} items returned`);
 
     return NextResponse.json(standardized, {
       headers: {

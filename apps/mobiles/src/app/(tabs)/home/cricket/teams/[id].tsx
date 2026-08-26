@@ -15,7 +15,8 @@ export default function CricketTeamDetailsScreen() {
     const [loading, setLoading] = useState(true);
     const [team, setTeam] = useState<CricketTeam | null>(null);
     const [players, setPlayers] = useState<CricketPlayer[]>([]);
-    const [matches, setMatches] = useState<CricketEvent[]>([]);
+    const [schedules, setSchedules] = useState<CricketEvent[]>([]);
+    const [results, setResults] = useState<CricketEvent[]>([]);
     const [activeTab, setActiveTab] = useState<TeamTab>('squad');
 
     useEffect(() => {
@@ -23,26 +24,23 @@ export default function CricketTeamDetailsScreen() {
             if (!id) return;
             try {
                 setLoading(true);
-                const [teamRes, playersRes, matchesRes] = await Promise.all([
-                    advancedCricketApi.getTeams({ teamId: Number(id) }),
-                    advancedCricketApi.getPlayers({ teamId: id }),
-                    advancedCricketApi.getFixtures({
-                        from: advancedCricketApi.getFormattedDate(-60),
-                        to: advancedCricketApi.getFormattedDate(60),
-                    }),
+                const [teamsRes, schedRes, resultsRes, playersRes] = await Promise.all([
+                    advancedCricketApi.getTeamsList('international').catch(() => []),
+                    advancedCricketApi.getTeamSchedules(id).catch(() => []),
+                    advancedCricketApi.getTeamResults(id).catch(() => []),
+                    advancedCricketApi.getTeamPlayers(id).catch(() => []),
                 ]);
 
-                if (teamRes.result && teamRes.result.length > 0) {
-                    const found = teamRes.result.find(t => String(t.team_key) === String(id)) || teamRes.result[0];
-                    setTeam(found);
-                }
-
-                setPlayers(playersRes.result || []);
-
-                const teamMatches = (matchesRes.result || []).filter(
-                    m => String(m.home_team_key) === String(id) || String(m.away_team_key) === String(id)
-                );
-                setMatches(teamMatches);
+                const teamList = Array.isArray(teamsRes) ? teamsRes : (teamsRes.result || []);
+                const found = teamList.find((t: any) => String(t.team_key) === String(id)) || {
+                    team_key: String(id),
+                    team_name: `Cricket Team #${id}`,
+                    team_short_name: `T${id}`,
+                };
+                setTeam(found);
+                setSchedules(schedRes || []);
+                setResults(resultsRes || []);
+                setPlayers(playersRes || []);
             } catch (error) {
                 console.error('Error loading mobile team details:', error);
             } finally {
@@ -73,11 +71,7 @@ export default function CricketTeamDetailsScreen() {
         );
     }
 
-    const displayMatches = matches.filter(m => {
-        if (activeTab === 'schedule') return m.event_status === 'Not Started';
-        if (activeTab === 'results') return m.event_status !== 'Not Started';
-        return true;
-    });
+    const currentMatches = activeTab === 'schedule' ? schedules : results;
 
     return (
         <View style={styles.container}>
@@ -106,10 +100,10 @@ export default function CricketTeamDetailsScreen() {
                     </View>
                     <Text style={styles.name}>{team.team_name}</Text>
                     <View style={styles.badge}>
-                        <Text style={styles.badgeText}>OFFICIAL CRICKET SQUAD</Text>
+                        <Text style={styles.badgeText}>{(team as any).country_name || 'OFFICIAL CRICKET SQUAD'}</Text>
                     </View>
                     <Text style={styles.statsOverview}>
-                        {players.length} Squad Athletes • {matches.length} Fixtures Logged
+                        {players.length} Squad Athletes • {schedules.length} Upcoming • {results.length} Completed
                     </Text>
                 </View>
 
@@ -117,8 +111,8 @@ export default function CricketTeamDetailsScreen() {
                 <View style={styles.tabBar}>
                     {[
                         { id: 'squad', label: `Squad (${players.length})` },
-                        { id: 'schedule', label: 'Schedule' },
-                        { id: 'results', label: 'Results' },
+                        { id: 'schedule', label: `Schedule (${schedules.length})` },
+                        { id: 'results', label: `Results (${results.length})` },
                     ].map((tab) => (
                         <TouchableOpacity
                             key={tab.id}
@@ -153,6 +147,9 @@ export default function CricketTeamDetailsScreen() {
                                     <View style={styles.playerInfo}>
                                         <Text style={styles.playerName}>{player.player_name}</Text>
                                         <Text style={styles.playerRole}>{player.player_type || player.player_role || 'Athlete'}</Text>
+                                        {player.batting_style && (
+                                            <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, marginTop: 2 }}>{player.batting_style}</Text>
+                                        )}
                                     </View>
                                     <View style={styles.playerAction}>
                                         <Text style={styles.playerActionText}>Intel</Text>
@@ -175,8 +172,8 @@ export default function CricketTeamDetailsScreen() {
                         <Text style={styles.sectionTitle}>
                             {activeTab === 'schedule' ? '🗓️ Upcoming Schedule' : '📊 Recent Results'}
                         </Text>
-                        {displayMatches.length > 0 ? (
-                            displayMatches.map((m) => (
+                        {currentMatches.length > 0 ? (
+                            currentMatches.map((m) => (
                                 <CricketMatchCard key={m.event_key} match={m} />
                             ))
                         ) : (
@@ -198,6 +195,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#0a0e27',
     },
+    scrollContent: {
+        padding: 16,
+        paddingBottom: 40,
+    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -205,71 +206,66 @@ const styles = StyleSheet.create({
         backgroundColor: '#0a0e27',
     },
     loadingText: {
-        color: COLORS.secondary,
-        fontSize: 10,
-        fontWeight: '800',
+        color: 'rgba(255, 255, 255, 0.6)',
+        fontSize: 12,
+        fontWeight: 'bold',
+        marginTop: 12,
         textTransform: 'uppercase',
-        letterSpacing: 2,
-        marginTop: SPACING.md,
     },
     errorContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: SPACING.xl,
         backgroundColor: '#0a0e27',
+        padding: 20,
     },
     errorTitle: {
-        fontSize: FONT_SIZES.lg,
+        fontSize: 18,
         fontWeight: '900',
         color: '#fff',
-        marginTop: SPACING.md,
+        marginVertical: 12,
         textTransform: 'uppercase',
     },
     btnReturn: {
-        marginTop: SPACING.lg,
-        paddingHorizontal: SPACING.xl,
-        paddingVertical: SPACING.md,
-        borderRadius: BORDER_RADIUS.full,
         backgroundColor: COLORS.secondary,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 20,
     },
     btnReturnText: {
-        color: '#fff',
+        color: '#000',
         fontWeight: '900',
+        fontSize: 12,
         textTransform: 'uppercase',
-    },
-    scrollContent: {
-        padding: 16,
-        paddingBottom: 40,
     },
     heroCard: {
         alignItems: 'center',
-        marginBottom: 16,
         padding: 24,
-        backgroundColor: 'rgba(255,255,255,0.04)',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
         borderRadius: 24,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderColor: 'rgba(255, 255, 255, 0.05)',
+        marginBottom: 20,
     },
     logoContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        width: 88,
+        height: 88,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
         overflow: 'hidden',
     },
     logo: {
-        width: 60,
-        height: 60,
+        width: '100%',
+        height: '100%',
         resizeMode: 'contain',
     },
     logoText: {
-        fontSize: 32,
+        fontSize: 36,
         fontWeight: '900',
         color: COLORS.secondary,
     },
@@ -277,37 +273,39 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '900',
         color: '#fff',
-        textTransform: 'uppercase',
         textAlign: 'center',
-        marginBottom: 6,
+        marginBottom: 8,
+        textTransform: 'uppercase',
+        letterSpacing: -0.5,
     },
     badge: {
-        backgroundColor: 'rgba(245, 158, 11, 0.15)',
-        paddingHorizontal: 12,
+        backgroundColor: 'rgba(0, 240, 255, 0.1)',
+        paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 12,
+        borderRadius: 8,
+        marginBottom: 12,
         borderWidth: 1,
-        borderColor: 'rgba(245, 158, 11, 0.3)',
-        marginBottom: 8,
+        borderColor: 'rgba(0, 240, 255, 0.2)',
     },
     badgeText: {
         color: COLORS.secondary,
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: '900',
-        letterSpacing: 1.5,
+        textTransform: 'uppercase',
     },
     statsOverview: {
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: 11,
-        fontWeight: '700',
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: 12,
+        fontWeight: '600',
     },
     tabBar: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(255,255,255,0.04)',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
         borderRadius: 16,
         padding: 4,
-        gap: 4,
-        marginBottom: 16,
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.05)',
     },
     tabItem: {
         flex: 1,
@@ -319,98 +317,99 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.secondary,
     },
     tabLabel: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
-        color: 'rgba(255,255,255,0.6)',
+        color: 'rgba(255, 255, 255, 0.6)',
         textTransform: 'uppercase',
     },
     tabLabelActive: {
-        color: '#fff',
+        color: '#000',
     },
     sectionContainer: {
-        gap: 8,
+        marginBottom: 20,
     },
     sectionTitle: {
-        color: '#fbbf24',
         fontSize: 12,
         fontWeight: '900',
-        textTransform: 'uppercase',
+        color: 'rgba(255, 255, 255, 0.5)',
         letterSpacing: 1,
-        marginBottom: 8,
+        textTransform: 'uppercase',
+        marginBottom: 12,
     },
     playerCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.04)',
-        borderRadius: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
         padding: 12,
+        borderRadius: 16,
+        marginBottom: 8,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderColor: 'rgba(255, 255, 255, 0.05)',
     },
     playerAvatar: {
         width: 44,
         height: 44,
-        borderRadius: 22,
-        backgroundColor: 'rgba(245, 158, 11, 0.15)',
-        alignItems: 'center',
+        borderRadius: 12,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: COLORS.secondary,
     },
     playerAvatarImage: {
         width: '100%',
         height: '100%',
+        resizeMode: 'cover',
     },
     playerAvatarText: {
         color: COLORS.secondary,
-        fontSize: 18,
         fontWeight: '900',
+        fontSize: 16,
     },
     playerInfo: {
         flex: 1,
-        marginLeft: 12,
     },
     playerName: {
         color: '#fff',
-        fontSize: 13,
-        fontWeight: '800',
-        textTransform: 'uppercase',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     playerRole: {
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: 10,
-        fontWeight: '700',
-        textTransform: 'uppercase',
+        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: 11,
         marginTop: 2,
     },
     playerAction: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 2,
+        gap: 4,
     },
     playerActionText: {
         color: COLORS.secondary,
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
         textTransform: 'uppercase',
     },
     emptyState: {
+        padding: 40,
         alignItems: 'center',
-        padding: 32,
-        backgroundColor: 'rgba(255,255,255,0.02)',
-        borderRadius: 16,
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.02)',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.04)',
     },
     emptyTitle: {
         color: '#fff',
         fontSize: 12,
         fontWeight: '900',
+        letterSpacing: 1,
         marginTop: 12,
-        textTransform: 'uppercase',
+        marginBottom: 4,
     },
     emptyText: {
-        color: 'rgba(255,255,255,0.4)',
-        fontSize: 10,
-        marginTop: 4,
+        color: 'rgba(255, 255, 255, 0.4)',
+        fontSize: 11,
+        textAlign: 'center',
     },
 });

@@ -31,32 +31,65 @@ export function FootballScreen() {
     return dates;
   }, []);
 
-  const adaptFixture = (item: ApiFootballFixtureItem): UnifiedWebMatchEvent => {
-    const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(item.fixture.status.short);
-    const scoreStr =
-      item.goals.home !== null && item.goals.away !== null
-        ? `${item.goals.home} - ${item.goals.away}`
-        : undefined;
+  const adaptFixture = (item: ApiFootballFixtureItem): UnifiedWebMatchEvent | null => {
+    if (!item) return null;
 
-    return {
-      event_key: item.fixture.id,
-      event_date: item.fixture.date.split('T')[0],
-      event_time: item.fixture.date.split('T')[1]?.slice(0, 5) || '',
-      event_status: item.fixture.status.short,
-      event_live: isLiveShort ? '1' : '0',
-      event_home_team: item.teams.home.name,
-      home_team_key: item.teams.home.id,
-      home_team_logo: item.teams.home.logo,
-      event_away_team: item.teams.away.name,
-      away_team_key: item.teams.away.id,
-      away_team_logo: item.teams.away.logo,
-      event_final_result: scoreStr,
-      event_ft_result: scoreStr,
-      league_name: item.league.name,
-      league_key: item.league.id,
-      league_logo: item.league.logo,
-      country_name: item.league.country,
-    };
+    // Format 1: API-Sports / API-Football (item.fixture, item.teams)
+    if (item.fixture) {
+      const shortStatus = item.fixture.status?.short || '';
+      const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(shortStatus);
+      const scoreStr =
+        item.goals && item.goals.home !== null && item.goals.home !== undefined && item.goals.away !== null && item.goals.away !== undefined
+          ? `${item.goals.home} - ${item.goals.away}`
+          : undefined;
+
+      const dateStr = item.fixture.date || '';
+
+      return {
+        event_key: item.fixture.id || String(Math.random()),
+        event_date: dateStr.includes('T') ? dateStr.split('T')[0] : dateStr,
+        event_time: dateStr.includes('T') ? dateStr.split('T')[1]?.slice(0, 5) || '' : '',
+        event_status: shortStatus,
+        event_live: isLiveShort ? '1' : '0',
+        event_home_team: item.teams?.home?.name || 'Home',
+        home_team_key: item.teams?.home?.id || '',
+        home_team_logo: item.teams?.home?.logo,
+        event_away_team: item.teams?.away?.name || 'Away',
+        away_team_key: item.teams?.away?.id || '',
+        away_team_logo: item.teams?.away?.logo,
+        event_final_result: scoreStr,
+        event_ft_result: scoreStr,
+        league_name: item.league?.name || '',
+        league_key: item.league?.id || '',
+        league_logo: item.league?.logo,
+        country_name: item.league?.country,
+      };
+    }
+
+    // Format 2: AllSportsAPI (item.event_key, item.event_home_team)
+    if (item.event_key || item.event_home_team) {
+      return {
+        event_key: item.event_key,
+        event_date: item.event_date || '',
+        event_time: item.event_time || '',
+        event_status: item.event_status || '',
+        event_live: item.event_live || '0',
+        event_home_team: item.event_home_team || 'Home',
+        home_team_key: item.home_team_key || '',
+        home_team_logo: item.home_team_logo,
+        event_away_team: item.event_away_team || 'Away',
+        away_team_key: item.away_team_key || '',
+        away_team_logo: item.away_team_logo,
+        event_final_result: item.event_final_result || item.event_ft_result,
+        event_ft_result: item.event_ft_result,
+        league_name: item.league_name || '',
+        league_key: item.league_key || '',
+        league_logo: item.league_logo,
+        country_name: item.country_name,
+      };
+    }
+
+    return null;
   };
 
   // On-demand fetch (NO auto-refresh intervals)
@@ -73,8 +106,9 @@ export function FootballScreen() {
         } else {
           raw = await webApiFootballService.getFixturesByDate(selectedDate);
         }
-        if (raw && raw.length > 0) {
-          setFixtures(raw.map(adaptFixture));
+        if (raw && Array.isArray(raw) && raw.length > 0) {
+          const adapted = raw.map(adaptFixture).filter((f): f is UnifiedWebMatchEvent => f !== null);
+          setFixtures(adapted);
         } else {
           setFixtures([]);
         }
