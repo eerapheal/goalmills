@@ -21,10 +21,83 @@ import {
   MobileRecentlyViewedItem,
 } from '../../../utils/newsHistory';
 
+// Helper to cleanly split rich HTML article content at ~50% word count (before the next paragraph)
+function splitContentAtMidpoint(content: string): { firstHalf: string; secondHalf: string } {
+  if (!content) return { firstHalf: '', secondHalf: '' };
+
+  const getWordCount = (html: string) => {
+    return html
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+  };
+
+  const totalWords = getWordCount(content);
+  // If article is very short (< 40 words), don't split; render in full first
+  if (totalWords < 40) {
+    return { firstHalf: content, secondHalf: '' };
+  }
+
+  const targetWords = totalWords * 0.5;
+
+  // Split on block closings (paragraphs, blockquotes, figures, headings, divs)
+  const blockRegex = /(<\/(?:p|blockquote|figure|h2|h3|h4|div|section)>)/i;
+  const parts = content.split(blockRegex);
+
+  if (parts.length > 2) {
+    let accumulatedWords = 0;
+    let splitIndex = -1;
+
+    for (let i = 0; i < parts.length; i += 2) {
+      const segment = parts[i] + (parts[i + 1] || '');
+      accumulatedWords += getWordCount(segment);
+
+      // Once we pass ~50% words and have remaining content, split before next paragraph
+      if (accumulatedWords >= targetWords && i + 2 < parts.length) {
+        splitIndex = i + 2;
+        break;
+      }
+    }
+
+    if (splitIndex !== -1) {
+      return {
+        firstHalf: parts.slice(0, splitIndex).join(''),
+        secondHalf: parts.slice(splitIndex).join(''),
+      };
+    }
+  }
+
+  // Fallback: split on double newlines if no HTML block tags
+  const newlineParts = content.split(/(\n\s*\n)/);
+  if (newlineParts.length > 2) {
+    let accumulatedWords = 0;
+    let splitIndex = -1;
+    for (let i = 0; i < newlineParts.length; i += 2) {
+      const segment = newlineParts[i] + (newlineParts[i + 1] || '');
+      accumulatedWords += getWordCount(segment);
+      if (accumulatedWords >= targetWords && i + 2 < newlineParts.length) {
+        splitIndex = i + 2;
+        break;
+      }
+    }
+    if (splitIndex !== -1) {
+      return {
+        firstHalf: newlineParts.slice(0, splitIndex).join(''),
+        secondHalf: newlineParts.slice(splitIndex).join(''),
+      };
+    }
+  }
+
+  return { firstHalf: content, secondHalf: '' };
+}
+
 export default function NewsDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [news, setNews] = useState<BlogPost | null>(null);
   const [youMayAlsoLike, setYouMayAlsoLike] = useState<BlogPost[]>([]);
+  const [moreStories, setMoreStories] = useState<BlogPost[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<MobileRecentlyViewedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { width } = useWindowDimensions();
@@ -47,15 +120,35 @@ export default function NewsDetail() {
         newsHistoryUtil.addRecentlyViewed(data);
         goalmillsApi.incrementNewsView(id);
 
-        // Fetch You May Also Like recommendations (same category or general)
+        // Fetch 3 filtered related articles for in-content recommendation
         const relatedData = await goalmillsApi.getNews({
           category: data.category,
           exclude: id,
-          limit: 3,
+          limit: 8,
         });
+
+        let inContent: BlogPost[] = [];
+        let bottomMore: BlogPost[] = [];
+
         if (Array.isArray(relatedData)) {
-          setYouMayAlsoLike(relatedData.filter((n) => n._id !== id).slice(0, 3));
+          const filtered = relatedData.filter((n: any) => n._id !== id);
+          inContent = filtered.slice(0, 3);
+          bottomMore = filtered.slice(3, 7);
         }
+
+        // If fewer than 3 related found, backfill from general news
+        if (inContent.length < 3) {
+          const allNews = await goalmillsApi.getNews({ limit: 10 });
+          if (Array.isArray(allNews)) {
+            const usedIds = new Set([id, ...inContent.map((n) => n._id)]);
+            const backfill = allNews.filter((n: any) => !usedIds.has(n._id));
+            inContent = [...inContent, ...backfill.slice(0, 3 - inContent.length)];
+            bottomMore = backfill.slice(3 - inContent.length, 7);
+          }
+        }
+
+        setYouMayAlsoLike(inContent);
+        setMoreStories(bottomMore);
 
         // Get Recently Viewed
         const recent = newsHistoryUtil.getRecentlyViewed().filter((r) => r._id !== id);
@@ -103,6 +196,7 @@ export default function NewsDetail() {
   }
 
   const contentSafeWidth = Math.max(260, width - 32);
+  const { firstHalf, secondHalf } = splitContentAtMidpoint(news.content || '');
 
   const tagsStyles = {
     body: {
@@ -176,7 +270,7 @@ export default function NewsDetail() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Cover Image */}
+        {/* Cover Image - Compact height */}
         {news.image ? (
           <View style={styles.coverImageContainer}>
             <Image
@@ -251,16 +345,93 @@ export default function NewsDetail() {
             </View>
           ) : null}
 
-          {/* Content HTML (Strict Mobile Width Constraint) */}
-          <View style={[styles.contentSection, { maxWidth: contentSafeWidth }]}>
-            {news.content ? (
+          {/* First Half of Content HTML */}
+          {firstHalf ? (
+            <View style={[styles.contentSection, { maxWidth: contentSafeWidth }]}>
               <RenderHTML
                 contentWidth={contentSafeWidth}
-                source={{ html: news.content }}
+                source={{ html: firstHalf }}
                 tagsStyles={tagsStyles}
               />
-            ) : null}
-          </View>
+            </View>
+          ) : null}
+
+          {/* In-Article "You May Also Like" - 3 Clickable Filtered Cards at ~50% mark */}
+          {youMayAlsoLike.length > 0 && (
+            <View style={styles.inContentRelatedBox}>
+              <View style={styles.inContentHeader}>
+                <View style={styles.inContentHeaderLeft}>
+                  <View style={styles.inContentIconBadge}>
+                    <Ionicons name="flash" size={12} color="#60A5FA" />
+                  </View>
+                  <View>
+                    <Text style={styles.inContentTitle}>YOU MAY ALSO LIKE</Text>
+                    <Text style={styles.inContentSubtitle}>
+                      Recommended stories related to this article
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.suggestedBadge}>
+                  <Text style={styles.suggestedBadgeText}>SUGGESTED</Text>
+                </View>
+              </View>
+
+              <View style={styles.inContentCardList}>
+                {youMayAlsoLike.map((item) => (
+                  <Pressable
+                    key={item._id}
+                    style={({ pressed }) => [
+                      styles.inContentCard,
+                      pressed && styles.cardPressed,
+                    ]}
+                    onPress={() => router.push(`/news/${item._id}`)}
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          item.image ||
+                          'https://picsum.photos/seed/news/200/200',
+                      }}
+                      style={styles.inContentThumb}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.inContentInfo}>
+                      <View style={styles.inContentMetaRow}>
+                        <Text style={styles.inContentCategory} numberOfLines={1}>
+                          {item.category || 'News'}
+                        </Text>
+                        <Text style={styles.inContentMetaDot}>•</Text>
+                        <View style={styles.inContentTimeRow}>
+                          <Ionicons name="time-outline" size={10} color="#94A3B8" />
+                          <Text style={styles.inContentTimeText}>
+                            {item.readTime || 3}m
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={styles.inContentCardTitle} numberOfLines={2}>
+                        {item.title}
+                      </Text>
+                      <View style={styles.inContentActionRow}>
+                        <Text style={styles.readStoryText}>Read Story</Text>
+                        <Ionicons name="arrow-forward" size={11} color="#60A5FA" />
+                      </View>
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Second Half of Content HTML (Rest of text) */}
+          {secondHalf ? (
+            <View style={[styles.contentSection, { maxWidth: contentSafeWidth }]}>
+              <RenderHTML
+                contentWidth={contentSafeWidth}
+                source={{ html: secondHalf }}
+                tagsStyles={tagsStyles}
+              />
+            </View>
+          ) : null}
 
           {/* Related Team & Tags */}
           {news.relatedTeam || (Array.isArray(news.tags) && news.tags.length > 0) ? (
@@ -284,14 +455,17 @@ export default function NewsDetail() {
           ) : null}
         </View>
 
-        {/* You May Also Like Section */}
-        {youMayAlsoLike.length > 0 && (
+        {/* More Related Stories Section at bottom */}
+        {moreStories.length > 0 && (
           <View style={styles.relatedSection}>
-            <Text style={styles.sectionHeaderTitle}>💡 You May Also Like</Text>
-            {youMayAlsoLike.map((item) => (
+            <Text style={styles.sectionHeaderTitle}>💡 More Related Stories</Text>
+            {moreStories.map((item) => (
               <Pressable
                 key={item._id}
-                style={styles.relatedCard}
+                style={({ pressed }) => [
+                  styles.relatedCard,
+                  pressed && styles.cardPressed,
+                ]}
                 onPress={() => router.push(`/news/${item._id}`)}
               >
                 <Image
@@ -647,5 +821,129 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#F8FAFC',
     lineHeight: 15,
+  },
+  inContentRelatedBox: {
+    marginVertical: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.25)',
+    backgroundColor: '#0A1122',
+    padding: 12,
+  },
+  inContentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 8,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  inContentHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  inContentIconBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inContentTitle: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#F8FAFC',
+    letterSpacing: 0.5,
+  },
+  inContentSubtitle: {
+    fontSize: 9.5,
+    color: '#94A3B8',
+    marginTop: 1,
+  },
+  suggestedBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+  },
+  suggestedBadgeText: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: '#60A5FA',
+    letterSpacing: 0.5,
+  },
+  inContentCardList: {
+    gap: 7,
+  },
+  inContentCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0E1522',
+    borderRadius: 10,
+    padding: 7,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    gap: 9,
+  },
+  cardPressed: {
+    opacity: 0.75,
+  },
+  inContentThumb: {
+    width: 60,
+    height: 48,
+    borderRadius: 6,
+    backgroundColor: '#070B12',
+  },
+  inContentInfo: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  inContentMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 2,
+  },
+  inContentCategory: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: '#60A5FA',
+    textTransform: 'uppercase',
+  },
+  inContentMetaDot: {
+    fontSize: 8.5,
+    color: '#64748B',
+  },
+  inContentTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  inContentTimeText: {
+    fontSize: 8.5,
+    color: '#94A3B8',
+  },
+  inContentCardTitle: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    lineHeight: 15,
+  },
+  inContentActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 3,
+  },
+  readStoryText: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#60A5FA',
   },
 });

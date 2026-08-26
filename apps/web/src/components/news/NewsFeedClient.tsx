@@ -134,12 +134,6 @@ export default function NewsFeedClient({
       {/* Header & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="h-2.5 w-2.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-widest text-blue-400">
-              Live Sports Intelligence
-            </span>
-          </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
             Sports <span className="text-blue-500">Pulse</span> & News
           </h1>

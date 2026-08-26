@@ -73,12 +73,6 @@ export default function HighlightsFeedClient({ initialHighlights }: HighlightsFe
       {/* Header & Live Pulse Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-widest text-red-400">
-              Live Match Replays & Clips
-            </span>
-          </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
             Sports <span className="text-blue-500">Highlights</span>
           </h1>
