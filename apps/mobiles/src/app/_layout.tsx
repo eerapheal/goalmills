@@ -23,8 +23,20 @@ export default function RootLayout() {
         // Listen for user clicking on a notification
         responseListener.current = notificationService.addResponseListener((response) => {
             const data = response?.notification?.request?.content?.data;
-            if (data?.newsId) {
-                router.push(`/(tabs)/news/${data.newsId}` as any);
+            const targetId = data?.id || data?.newsId || data?.videoId;
+
+            if (data?.type === 'video' || data?.videoId) {
+                if (targetId) {
+                    router.push(`/(tabs)/highlight/${targetId}` as any);
+                } else {
+                    router.push('/(tabs)/highlight' as any);
+                }
+            } else if (data?.type === 'news' || data?.newsId || targetId) {
+                if (targetId) {
+                    router.push(`/(tabs)/news/${targetId}` as any);
+                } else {
+                    router.push('/(tabs)/news' as any);
+                }
             } else if (data?.matchId) {
                 router.push(`/(tabs)/home/football/matches/${data.matchId}` as any);
             } else {

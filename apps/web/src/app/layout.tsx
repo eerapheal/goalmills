@@ -5,6 +5,7 @@ import { Header } from '../components/Header';
 import { AuthProvider } from '../components/AuthProvider';
 import { ToastProvider } from '../components/Toast';
 import { Footer } from '../components/Footer';
+import RealtimeListener from '../components/RealtimeListener';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -64,6 +65,7 @@ export default function RootLayout({
             <body className={`${inter.className} antialiased bg-slate-950 text-slate-200`} suppressHydrationWarning>
                 <AuthProvider>
                     <ToastProvider>
+                        <RealtimeListener />
                         <Header />
                         <main>
                             {children}

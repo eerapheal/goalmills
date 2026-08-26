@@ -310,3 +310,70 @@ export async function sendPushNotification(
     notificationId: notificationRecord._id.toString(),
   };
 }
+
+/**
+ * Automatically dispatch push notifications when a new News Article is published
+ */
+export async function notifyOnNewNewsArticle(news: {
+  _id: string | any;
+  title: string;
+  excerpt?: string;
+  image?: string;
+  category?: string;
+  isBreaking?: boolean;
+}) {
+  try {
+    const isBreaking = news.isBreaking;
+    const title = isBreaking ? `🔥 BREAKING: ${news.title}` : `📰 ${news.title}`;
+    const body = news.excerpt || `New ${news.category || 'sports'} story published on GoalMills. Tap to read now!`;
+    const newsId = news._id.toString();
+
+    await sendPushNotification({
+      title,
+      body,
+      imageUrl: news.image,
+      topic: isBreaking ? 'breaking' : 'all',
+      targetPlatform: 'all',
+      data: {
+        type: 'news',
+        id: newsId,
+        url: `/news/${newsId}`,
+      },
+    });
+  } catch (error) {
+    console.error('Failed to dispatch news push notification:', error);
+  }
+}
+
+/**
+ * Automatically dispatch push notifications when a new Video Highlight is uploaded
+ */
+export async function notifyOnNewVideoHighlight(video: {
+  _id: string | any;
+  video_title: string;
+  video_thumbnail?: string;
+  category?: string;
+  source?: string;
+}) {
+  try {
+    const title = `🎥 Highlight: ${video.video_title}`;
+    const body = `Watch match highlights & replay on GoalMills (${video.category || 'Sports'}).`;
+    const videoId = video._id.toString();
+
+    await sendPushNotification({
+      title,
+      body,
+      imageUrl: video.video_thumbnail,
+      topic: 'highlights',
+      targetPlatform: 'all',
+      data: {
+        type: 'video',
+        id: videoId,
+        url: `/highlights/${videoId}`,
+      },
+    });
+  } catch (error) {
+    console.error('Failed to dispatch video push notification:', error);
+  }
+}
+

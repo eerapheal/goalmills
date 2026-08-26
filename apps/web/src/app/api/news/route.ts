@@ -3,6 +3,9 @@ import dbConnect from "@/lib/db";
 import News from "@/models/News";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { cacheGet, cacheSet, cacheInvalidatePattern, getSeoCacheHeaders } from "@/lib/redisCache";
+import { broadcastNewNews } from "@/lib/socketBroadcaster";
+import { notifyOnNewNewsArticle } from "@/lib/pushService";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +21,20 @@ export async function GET(request: NextRequest) {
   const sortParam = searchParams.get('sort'); // 'latest', 'popular', 'oldest'
   const limitParam = parseInt(searchParams.get('limit') || '0', 10);
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
+
+  // Check Redis/Memory cache for public queries
+  const cacheKey = `cache:news:list:${filterType || 'all'}:${categoryParam || 'all'}:${search || ''}:${team || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
+  if (!isAdminRequest) {
+    const cached = await cacheGet(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached, {
+        headers: {
+          ...getSeoCacheHeaders(60, 300),
+          'X-Cache': 'HIT',
+        },
+      });
+    }
+  }
 
   const session = (await getServerSession(authOptions)) as any;
 
@@ -163,7 +180,18 @@ export async function GET(request: NextRequest) {
     }
 
     const news = await newsQuery.lean();
-    return NextResponse.json(news);
+
+    // Cache the result for public queries
+    if (!isAdminRequest) {
+      await cacheSet(cacheKey, news, 180);
+    }
+
+    return NextResponse.json(news, {
+      headers: {
+        ...getSeoCacheHeaders(60, 300),
+        'X-Cache': 'MISS',
+      },
+    });
   } catch (error) {
     console.error('Error fetching news:', error);
     return NextResponse.json({ message: "Error fetching news" }, { status: 500 });
@@ -223,9 +251,19 @@ export async function POST(request: NextRequest) {
       views: 0,
     });
 
+    // 1. Invalidate all News Caches
+    await cacheInvalidatePattern('cache:news:*');
+
+    // 2. Automatically dispatch Push Notification to subscribed users (FCM / Web / Mobile)
+    notifyOnNewNewsArticle(news);
+
+    // 3. Broadcast Realtime Event to connected clients
+    broadcastNewNews(news);
+
     return NextResponse.json(news, { status: 201 });
   } catch (error: any) {
     console.error('Error creating news:', error);
     return NextResponse.json({ message: error.message || "Error creating news" }, { status: 400 });
   }
 }
+
