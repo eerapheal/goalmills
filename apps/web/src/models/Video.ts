@@ -13,6 +13,10 @@ const VideoSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  video_description: {
+    type: String,
+    required: false,
+  },
   event_key: {
     type: String,
     required: false,
@@ -23,7 +27,23 @@ const VideoSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    default: 'General',
+    default: 'Highlights',
+  },
+  league: {
+    type: String,
+    required: false,
+  },
+  duration: {
+    type: String,
+    required: false,
+  },
+  views: {
+    type: Number,
+    default: 0,
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false,
   },
 }, { timestamps: true });
 

@@ -131,27 +131,47 @@ export const mapVideoToHighlight = (video: FootballVideo): VideoHighlight => {
 
 export const mapInternalVideoToHighlight = (video: any): VideoHighlight => {
   let teams: string[] = [];
-  if (video.video_title.includes(' vs ')) {
-      teams = video.video_title.split(' vs ');
+  if (video.video_title && video.video_title.includes(' vs ')) {
+    teams = video.video_title.split(' vs ');
   } else {
-      teams = [video.video_title];
+    teams = [video.video_title || 'Match'];
   }
 
+  let thumb = video.video_thumbnail;
+  if (!thumb && video.video_url) {
+    const match = video.video_url.match(/(?:youtu\.be\/|watch\?v=|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+    if (match && match[1]) {
+      thumb = `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
+    }
+  }
+
+  const leagueStr = video.league || video.category || 'Football';
+
   return {
-      id: video._id,
-      title: video.video_title,
-      thumbnail: video.video_thumbnail || 'https://via.placeholder.com/640x360',
-      duration: 'Highlights',
-      views: Math.floor(Math.random() * 1000) + 50, // Randomized for UI
-      date: video.createdAt,
-      league: {
-          name: video.category || 'Football',
-          logo: ''
-      },
-      teams: teams,
-      videoUrl: video.video_url,
-      description: video.source || '',
-      createdAt: video.createdAt,
+    id: video._id ? video._id.toString() : video.id,
+    title: video.video_title || 'Match Highlight',
+    thumbnail: thumb || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+    duration: video.duration || 'HD Replay',
+    views: typeof video.views === 'number' ? video.views : 0,
+    date: video.createdAt,
+    league: {
+      name: leagueStr,
+      logo: '',
+    },
+    matchInfo: {
+      league: leagueStr,
+      date: video.createdAt
+        ? new Date(video.createdAt).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })
+        : undefined,
+    } as any,
+    teams: teams,
+    videoUrl: video.video_url,
+    description: video.video_description || video.source || '',
+    createdAt: video.createdAt,
   };
 };
 

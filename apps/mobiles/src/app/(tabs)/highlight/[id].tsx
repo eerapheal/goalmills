@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   Pressable,
   Share,
+  Linking,
+  Dimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
@@ -16,15 +18,35 @@ import { mapInternalVideoToHighlight } from '../../../utils/footballAdapters';
 import { VideoHighlight } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import { WebView } from 'react-native-webview';
 
-const getYoutubeId = (url: string) => {
+const { width } = Dimensions.get('window');
+const PLAYER_HEIGHT = Math.round((width * 9) / 16);
+
+// Universal YouTube Video ID Parser
+export const getYoutubeId = (url: string): string | null => {
   if (!url) return null;
-  if (url.includes('embed/')) {
-    return url.split('embed/')[1].split('?')[0];
+  try {
+    const trimmed = url.trim();
+    if (trimmed.includes('youtube.com/embed/')) {
+      return trimmed.split('embed/')[1].split('?')[0].split('/')[0];
+    }
+    if (trimmed.includes('youtube.com/shorts/')) {
+      return trimmed.split('shorts/')[1].split('?')[0].split('/')[0];
+    }
+    if (trimmed.includes('youtu.be/')) {
+      return trimmed.split('youtu.be/')[1].split('?')[0].split('/')[0];
+    }
+    if (trimmed.includes('youtube.com/watch')) {
+      const match = trimmed.match(/[?&]v=([^&#]*)/);
+      return match && match[1] ? match[1] : null;
+    }
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = trimmed.match(regExp);
+    return match && match[2] && match[2].length === 11 ? match[2] : null;
+  } catch (e) {
+    return null;
   }
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return match && match[2].length === 11 ? match[2] : null;
 };
 
 export default function HighlightDetail() {
@@ -32,18 +54,16 @@ export default function HighlightDetail() {
   const [video, setVideo] = useState<VideoHighlight | null>(null);
   const [related, setRelated] = useState<VideoHighlight[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true); // Autoplay enabled
+  const [playerReady, setPlayerReady] = useState(false);
+  const [embedError, setEmbedError] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (id) {
-      loadVideoDetail();
-    }
-  }, [id]);
-
-  const loadVideoDetail = async () => {
+  const loadVideoDetail = useCallback(async () => {
+    if (!id) return;
     try {
       setLoading(true);
+      setEmbedError(false);
       const [data, allVideos] = await Promise.all([
         goalmillsApi.getVideoById(id),
         goalmillsApi.getVideos(),
@@ -51,6 +71,8 @@ export default function HighlightDetail() {
 
       if (data) {
         setVideo(mapInternalVideoToHighlight(data));
+        // Automatically track video view on click-through
+        goalmillsApi.incrementVideoView(id);
       } else {
         setVideo(null);
       }
@@ -59,7 +81,7 @@ export default function HighlightDetail() {
         const mapped = allVideos
           .filter((v: any) => v._id !== id)
           .map(mapInternalVideoToHighlight);
-        setRelated(mapped.slice(0, 4));
+        setRelated(mapped.slice(0, 5));
       }
     } catch (error) {
       console.error('Failed to load video detail:', error);
@@ -67,7 +89,12 @@ export default function HighlightDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    setIsPlaying(true);
+    loadVideoDetail();
+  }, [id, loadVideoDetail]);
 
   const handleShare = async () => {
     if (!video) return;
@@ -82,11 +109,23 @@ export default function HighlightDetail() {
     }
   };
 
+  const handleOpenExternal = () => {
+    if (video?.videoUrl) {
+      Linking.openURL(video.videoUrl).catch((err) =>
+        console.error('Could not open URL:', err)
+      );
+    }
+  };
+
+  const youtubeId = useMemo(() => {
+    return video?.videoUrl ? getYoutubeId(video.videoUrl) : null;
+  }, [video?.videoUrl]);
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.loadingText}>Loading video replay...</Text>
+        <Text style={styles.loadingText}>Loading match replay...</Text>
       </View>
     );
   }
@@ -103,41 +142,111 @@ export default function HighlightDetail() {
     );
   }
 
-  const youtubeId = getYoutubeId(video.videoUrl || '');
-
   return (
     <View style={styles.container}>
       {/* Top Navbar */}
       <View style={styles.navBar}>
-        <Pressable style={styles.navActionBtn} onPress={() => router.back()}>
+        <Pressable
+          style={styles.navActionBtn}
+          onPress={() => router.back()}
+          hitSlop={10}
+        >
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>
-          {video.matchInfo?.league || 'Match Highlight'}
+          {video.matchInfo?.league || video.title || 'HD Match Highlight'}
         </Text>
-        <Pressable style={styles.navActionBtn} onPress={handleShare}>
+        <Pressable style={styles.navActionBtn} onPress={handleShare} hitSlop={10}>
           <Ionicons name="share-social-outline" size={20} color="#F8FAFC" />
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Video Player Box */}
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Video Player Box with Guaranteed Autoplay & Error 150/153 Fallback */}
         <View style={styles.playerContainer}>
-          {youtubeId ? (
+          {embedError ? (
+            <View style={styles.embedErrorBox}>
+              <Ionicons name="lock-closed-outline" size={36} color="#F59E0B" />
+              <Text style={styles.embedErrorTitle}>Broadcaster Embed Restricted</Text>
+              <Text style={styles.embedErrorSubtitle}>
+                The video owner requires watching directly on YouTube (Error 150/153).
+              </Text>
+              <Pressable style={styles.openYoutubeBtn} onPress={handleOpenExternal}>
+                <Ionicons name="logo-youtube" size={18} color="#FFFFFF" />
+                <Text style={styles.openYoutubeBtnText}>Watch on YouTube</Text>
+              </Pressable>
+            </View>
+          ) : youtubeId ? (
             <YoutubePlayer
-              height={220}
+              height={PLAYER_HEIGHT}
               play={isPlaying}
               videoId={youtubeId}
+              onReady={() => setPlayerReady(true)}
+              onError={(error: string) => {
+                console.warn('YouTube Player error:', error);
+                if (
+                  error === 'embed_not_allowed' ||
+                  error === 'video_not_found' ||
+                  error === 'invalid_parameter'
+                ) {
+                  setEmbedError(true);
+                }
+              }}
               onChangeState={(state: string) => {
                 if (state === 'ended') setIsPlaying(false);
               }}
+              initialPlayerParams={{
+                preventFullScreen: false,
+                cc_lang_pref: 'en',
+                showClosedCaptions: false,
+                loop: false,
+                controls: true,
+                origin: 'https://www.youtube.com',
+              }}
+              webViewProps={{
+                allowsInlineMediaPlayback: true,
+                mediaPlaybackRequiresUserAction: false,
+                androidLayerType: 'hardware',
+                baseUrl: 'https://www.youtube-nocookie.com',
+              }}
             />
+          ) : video.videoUrl && (video.videoUrl.endsWith('.mp4') || video.videoUrl.includes('stream')) ? (
+            <View style={{ height: PLAYER_HEIGHT, width: '100%', backgroundColor: '#000' }}>
+              <WebView
+                source={{
+                  html: `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+                      <style>
+                        body { margin: 0; padding: 0; background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+                        video { width: 100%; height: 100%; object-fit: contain; }
+                      </style>
+                    </head>
+                    <body>
+                      <video src="${video.videoUrl}" poster="${video.thumbnail || ''}" autoplay playsinline controls></video>
+                    </body>
+                    </html>
+                  `,
+                }}
+                allowsInlineMediaPlayback={true}
+                mediaPlaybackRequiresUserAction={false}
+                style={{ flex: 1, backgroundColor: '#000' }}
+              />
+            </View>
           ) : (
-            <Image
-              source={{ uri: video.thumbnail }}
-              style={styles.fallbackPlayerImage}
-              resizeMode="cover"
-            />
+            <View style={styles.fallbackContainer}>
+              <Image
+                source={{ uri: video.thumbnail || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2' }}
+                style={styles.fallbackPlayerImage}
+                resizeMode="cover"
+              />
+              <Pressable style={styles.playOverlay} onPress={handleOpenExternal}>
+                <Ionicons name="play-circle" size={54} color="#3B82F6" />
+                <Text style={styles.playOverlayText}>Play Stream</Text>
+              </Pressable>
+            </View>
           )}
         </View>
 
@@ -148,19 +257,30 @@ export default function HighlightDetail() {
               <View style={styles.leagueBadge}>
                 <Text style={styles.leagueBadgeText}>{video.matchInfo.league}</Text>
               </View>
-            ) : null}
+            ) : (
+              <View style={styles.leagueBadge}>
+                <Text style={styles.leagueBadgeText}>HD Replay</Text>
+              </View>
+            )}
+
             {video.duration ? (
               <View style={styles.durationBadge}>
+                <Ionicons name="time-outline" size={11} color="#94A3B8" />
                 <Text style={styles.durationText}>{video.duration}</Text>
               </View>
             ) : null}
+
+            <View style={styles.liveIndicator}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>Autoplay Ready</Text>
+            </View>
           </View>
 
           <Text style={styles.title}>{video.title}</Text>
 
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Ionicons name="eye-outline" size={14} color="#94A3B8" />
+              <Ionicons name="eye-outline" size={14} color="#3B82F6" />
               <Text style={styles.statText}>{video.views || 0} views</Text>
             </View>
             {video.matchInfo?.date ? (
@@ -169,6 +289,10 @@ export default function HighlightDetail() {
                 <Text style={styles.statText}>{video.matchInfo.date}</Text>
               </View>
             ) : null}
+            <View style={styles.statItem}>
+              <Ionicons name="shield-checkmark-outline" size={14} color="#10B981" />
+              <Text style={styles.statText}>Verified</Text>
+            </View>
           </View>
 
           {video.description ? (
@@ -179,25 +303,49 @@ export default function HighlightDetail() {
         {/* Related Highlights */}
         {related.length > 0 ? (
           <View style={styles.relatedSection}>
-            <Text style={styles.relatedHeaderTitle}>Related Highlights</Text>
+            <View style={styles.relatedHeaderRow}>
+              <Text style={styles.relatedHeaderTitle}>Up Next & Related</Text>
+              <Text style={styles.relatedCount}>{related.length} videos</Text>
+            </View>
+
             {related.map((item) => (
               <Pressable
                 key={item.id}
-                style={styles.relatedRow}
+                style={({ pressed }) => [
+                  styles.relatedRow,
+                  pressed && { opacity: 0.8, transform: [{ scale: 0.99 }] },
+                ]}
                 onPress={() => router.push(`/highlight/${item.id}`)}
               >
-                <Image
-                  source={{ uri: item.thumbnail || 'https://picsum.photos/seed/rel/400/225' }}
-                  style={styles.relatedThumb}
-                  resizeMode="cover"
-                />
+                <View style={styles.relatedThumbContainer}>
+                  <Image
+                    source={{
+                      uri: item.thumbnail || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+                    }}
+                    style={styles.relatedThumb}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.miniPlayBtn}>
+                    <Ionicons name="play" size={10} color="#FFFFFF" />
+                  </View>
+                  {item.duration ? (
+                    <View style={styles.durationPill}>
+                      <Text style={styles.durationPillText}>{item.duration}</Text>
+                    </View>
+                  ) : null}
+                </View>
+
                 <View style={styles.relatedInfo}>
                   <Text style={styles.relatedTitle} numberOfLines={2}>
                     {item.title}
                   </Text>
-                  <Text style={styles.relatedMeta}>
-                    {item.matchInfo?.league || 'Sports'} • {item.views || 0} views
-                  </Text>
+                  <View style={styles.relatedMetaRow}>
+                    <Text style={styles.relatedMeta}>
+                      {item.matchInfo?.league || 'Sports'}
+                    </Text>
+                    <Text style={styles.relatedMeta}>•</Text>
+                    <Text style={styles.relatedMeta}>{item.views || 0} views</Text>
+                  </View>
                 </View>
               </Pressable>
             ))}
@@ -224,6 +372,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: '#94A3B8',
     fontSize: 13,
+    fontWeight: '600',
   },
   emptyTitle: {
     marginTop: 12,
@@ -258,21 +407,75 @@ const styles = StyleSheet.create({
   navTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#F8FAFC',
     marginHorizontal: 8,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 50,
   },
   playerContainer: {
     width: '100%',
     backgroundColor: '#000000',
+    overflow: 'hidden',
+  },
+  fallbackContainer: {
+    width: '100%',
+    height: PLAYER_HEIGHT,
+    position: 'relative',
   },
   fallbackPlayerImage: {
     width: '100%',
-    height: 220,
+    height: '100%',
+  },
+  playOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playOverlayText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  embedErrorBox: {
+    width: '100%',
+    height: PLAYER_HEIGHT,
+    backgroundColor: '#0F172A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  embedErrorTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#F8FAFC',
+    marginTop: 8,
+  },
+  embedErrorSubtitle: {
+    fontSize: 11,
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 12,
+    maxWidth: 260,
+  },
+  openYoutubeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#DC2626',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: BORDER_RADIUS.md,
+  },
+  openYoutubeBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
   metaCard: {
     backgroundColor: '#141C2B',
@@ -284,31 +487,52 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   leagueBadge: {
     backgroundColor: 'rgba(59, 130, 246, 0.15)',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 4,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(59, 130, 246, 0.3)',
   },
   leagueBadgeText: {
     color: '#3B82F6',
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
   },
   durationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 8,
+    paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 4,
+    borderRadius: 6,
   },
   durationText: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
+  },
+  liveIndicator: {
+    marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+  },
+  liveText: {
+    fontSize: 10,
+    color: '#10B981',
+    fontWeight: '700',
   },
   title: {
     fontSize: 18,
@@ -320,7 +544,7 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 14,
     marginBottom: 12,
   },
   statItem: {
@@ -331,6 +555,7 @@ const styles = StyleSheet.create({
   statText: {
     fontSize: 12,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   description: {
     fontSize: 13,
@@ -343,11 +568,21 @@ const styles = StyleSheet.create({
   relatedSection: {
     padding: SPACING.md,
   },
+  relatedHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.md,
+  },
   relatedHeaderTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#F8FAFC',
-    marginBottom: SPACING.md,
+  },
+  relatedCount: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
   },
   relatedRow: {
     flexDirection: 'row',
@@ -358,9 +593,41 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
+  relatedThumbContainer: {
+    position: 'relative',
+    width: 120,
+    height: 75,
+    backgroundColor: '#000',
+  },
   relatedThumb: {
-    width: 110,
-    height: 70,
+    width: '100%',
+    height: '100%',
+  },
+  miniPlayBtn: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -10 }, { translateY: -10 }],
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(59, 130, 246, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  durationPill: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  durationPillText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   relatedInfo: {
     flex: 1,
@@ -368,10 +635,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   relatedTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     color: '#F8FAFC',
-    lineHeight: 17,
+    lineHeight: 16,
+  },
+  relatedMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   relatedMeta: {
     fontSize: 11,

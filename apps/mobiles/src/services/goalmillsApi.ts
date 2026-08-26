@@ -72,9 +72,16 @@ export const goalmillsApi = {
     }
   },
 
-  getVideos: async (): Promise<any[]> => {
+  getVideos: async (params?: { category?: string; search?: string }): Promise<any[]> => {
     try {
-      const response = await fetch(`${BASE_URL}/videos`);
+      const url = new URL(`${BASE_URL}/videos`);
+      if (params?.category && params.category !== 'All') {
+        url.searchParams.append('category', params.category);
+      }
+      if (params?.search) {
+        url.searchParams.append('search', params.search);
+      }
+      const response = await fetch(url.toString());
       if (!response.ok) throw new Error('Failed to fetch videos');
       return await response.json();
     } catch (error) {
@@ -85,13 +92,28 @@ export const goalmillsApi = {
 
   getVideoById: async (id: string): Promise<any | null> => {
     try {
-      const response = await fetch(`${BASE_URL}/videos`);
-      if (!response.ok) throw new Error('Failed to fetch videos');
-      const videos: any[] = await response.json();
-      return videos.find((v) => v._id === id) || null;
+      const response = await fetch(`${BASE_URL}/videos/${id}`);
+      if (response.ok) {
+        return await response.json();
+      }
+      // Fallback to searching the list
+      const listRes = await fetch(`${BASE_URL}/videos`);
+      if (listRes.ok) {
+        const videos: any[] = await listRes.json();
+        return videos.find((v) => v._id === id) || null;
+      }
+      return null;
     } catch (error) {
       console.error('Error fetching video by id:', error);
       return null;
+    }
+  },
+
+  incrementVideoView: async (id: string): Promise<void> => {
+    try {
+      await fetch(`${BASE_URL}/videos/${id}/view`, { method: 'POST' });
+    } catch (error) {
+      console.error('Error incrementing video view:', error);
     }
   },
 };

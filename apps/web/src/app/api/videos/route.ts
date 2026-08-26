@@ -4,10 +4,35 @@ import Video from "@/models/Video";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET() {
+export async function GET(request: Request) {
   await dbConnect();
   try {
-    const videos = await Video.find({}).sort({ createdAt: -1 });
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    const search = searchParams.get('search');
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
+
+    const query: any = {};
+
+    if (category && category !== 'All' && category !== 'all') {
+      query.category = { $regex: new RegExp(category, 'i') };
+    }
+
+    if (search && search.trim()) {
+      const q = search.trim();
+      query.$or = [
+        { video_title: { $regex: q, $options: 'i' } },
+        { video_description: { $regex: q, $options: 'i' } },
+        { league: { $regex: q, $options: 'i' } },
+        { category: { $regex: q, $options: 'i' } },
+      ];
+    }
+
+    const videos = await Video.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
     return NextResponse.json(videos);
   } catch (error) {
     return NextResponse.json({ message: "Error fetching videos" }, { status: 500 });

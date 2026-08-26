@@ -3,6 +3,24 @@ import dbConnect from "@/lib/db";
 import Video from "@/models/Video";
 import { getServerSession } from "next-auth/next";
 
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return NextResponse.json({ message: "Invalid Video ID" }, { status: 400 });
+  }
+
+  await dbConnect();
+  try {
+    const video = await Video.findById(id).lean();
+    if (!video) {
+      return NextResponse.json({ message: "Video not found" }, { status: 404 });
+    }
+    return NextResponse.json(video);
+  } catch (error) {
+    return NextResponse.json({ message: "Error fetching video" }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getServerSession();
