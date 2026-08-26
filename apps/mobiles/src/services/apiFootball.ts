@@ -23,6 +23,12 @@ export interface ApiFootballResponse<T> {
   response: T;
 }
 
+export type ApiFootballFixtureItem = any;
+export type ApiFootballEvent = any;
+export type ApiFootballLineup = any;
+export type ApiFootballTeamStats = any;
+export type ApiFootballStandingItem = any;
+
 // -------------------------------------------------------------
 // Type Definitions for Endpoints & Parameter Options
 // -------------------------------------------------------------

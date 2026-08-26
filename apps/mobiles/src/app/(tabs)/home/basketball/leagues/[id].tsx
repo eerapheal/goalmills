@@ -24,7 +24,7 @@ export default function BasketballLeagueDetailsPage() {
 
             // Fetch league info
             const leaguesRes = await basketballApi.getLeagues({});
-            const foundLeague = leaguesRes.result.find(l => Number(l.league_key) === leagueId);
+            const foundLeague = leaguesRes.result.find((l: any) => Number(l.league_key) === leagueId);
             setLeague(foundLeague);
 
             // Fetch matches

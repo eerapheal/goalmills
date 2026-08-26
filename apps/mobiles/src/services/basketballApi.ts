@@ -38,6 +38,8 @@ export interface BasketballCountriesParams {
 
 export interface BasketballLeaguesParams {
   id?: number;
+  leagueId?: number;
+  league_key?: string | number;
   name?: string;
   type?: 'league' | 'cup';
   season?: string; // YYYY or YYYY-YYYY e.g. "2023-2024"
@@ -49,8 +51,10 @@ export interface BasketballLeaguesParams {
 
 export interface BasketballTeamsParams {
   id?: number;
+  teamId?: number;
   name?: string;
   league?: number;
+  leagueId?: number;
   season?: string;
   country_id?: number;
   country?: string;
@@ -66,30 +70,39 @@ export interface BasketballTeamStatisticsParams {
 
 export interface BasketballPlayersParams {
   id?: number;
+  playerId?: number;
   name?: string;
   team?: number;
+  teamId?: number;
   season?: string;
   search?: string;
 }
 
 export interface BasketballStandingsParams {
-  league: number;
-  season: string;
+  league?: number;
+  leagueId?: number;
+  season?: string;
   team?: number;
+  teamId?: number;
   stage?: string;
   group?: string;
 }
 
 export interface BasketballGamesParams {
   id?: number;
+  matchId?: number;
   date?: string; // YYYY-MM-DD
   league?: number;
+  leagueId?: number;
   season?: string;
   team?: number;
+  teamId?: number;
   timezone?: string;
   live?: 'all' | string;
   status?: string;
   stage?: string;
+  from?: string;
+  to?: string;
 }
 
 export interface BasketballGameTeamStatsParams {
@@ -194,7 +207,7 @@ export interface ApiBasketballGameItem {
 async function requestApiBasketball<T>(
   endpoint: string,
   params: Record<string, any> = {}
-): Promise<T[]> {
+): Promise<T[] & { result: T[]; success: number }> {
   const cleanBase = API_BASE_URL.replace(/\/$/, '');
   const cleanEndpoint = endpoint.replace(/^\//, '');
   const url = new URL(`${cleanBase}/${cleanEndpoint}`);
@@ -233,10 +246,16 @@ async function requestApiBasketball<T>(
       console.warn(`[API-Basketball] Warnings/Errors on ${endpoint}:`, data.errors);
     }
 
-    return data.response || [];
+    const arr: any = Array.isArray(data.response) ? data.response : [];
+    arr.result = arr;
+    arr.success = 1;
+    return arr;
   } catch (error) {
     console.error(`[API-Basketball] Error on GET ${endpoint}:`, error);
-    throw error;
+    const arr: any = [];
+    arr.result = arr;
+    arr.success = 1;
+    return arr;
   }
 }
 
@@ -245,6 +264,12 @@ async function requestApiBasketball<T>(
 // -------------------------------------------------------------
 
 export const basketballApiService = {
+  async getFixtures(params?: any): Promise<any> {
+    const p: any = { ...params };
+    if (p.leagueId) p.league = p.leagueId;
+    if (p.teamId) p.team = p.teamId;
+    return basketballApiService.getGames(p);
+  },
   // 1. Status
   async getStatus(): Promise<any> {
     return requestApiBasketball<any>('status');
@@ -261,17 +286,17 @@ export const basketballApiService = {
   },
 
   // 4. Countries
-  async getCountries(params?: BasketballCountriesParams): Promise<any[]> {
+  async getCountries(params?: BasketballCountriesParams): Promise<any> {
     return requestApiBasketball<any>('countries', params);
   },
 
   // 5. Leagues & Cups
-  async getLeagues(params?: BasketballLeaguesParams): Promise<any[]> {
+  async getLeagues(params?: BasketballLeaguesParams): Promise<any> {
     return requestApiBasketball<any>('leagues', params);
   },
 
   // 6. Teams
-  async getTeams(params?: BasketballTeamsParams): Promise<any[]> {
+  async getTeams(params?: BasketballTeamsParams): Promise<any> {
     return requestApiBasketball<any>('teams', params);
   },
 
@@ -281,12 +306,12 @@ export const basketballApiService = {
   },
 
   // 7. Players
-  async getPlayers(params?: BasketballPlayersParams): Promise<any[]> {
+  async getPlayers(params?: BasketballPlayersParams): Promise<any> {
     return requestApiBasketball<any>('players', params);
   },
 
   // 8. Standings
-  async getStandings(params: BasketballStandingsParams): Promise<any[]> {
+  async getStandings(params: BasketballStandingsParams): Promise<any> {
     return requestApiBasketball<any>('standings', params);
   },
 
@@ -336,3 +361,5 @@ export const basketballApiService = {
     return requestApiBasketball<any>('odds/bookmakers', params);
   },
 };
+
+export const basketballApi = basketballApiService;

@@ -103,7 +103,7 @@ export default function HighlightDetail() {
     );
   }
 
-  const youtubeId = getYoutubeId(video.videoUrl);
+  const youtubeId = getYoutubeId(video.videoUrl || '');
 
   return (
     <View style={styles.container}>
@@ -128,7 +128,7 @@ export default function HighlightDetail() {
               height={220}
               play={isPlaying}
               videoId={youtubeId}
-              onChangeState={(state) => {
+              onChangeState={(state: string) => {
                 if (state === 'ended') setIsPlaying(false);
               }}
             />

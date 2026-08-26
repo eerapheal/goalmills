@@ -140,7 +140,7 @@ export default function BasketballScreen() {
     }));
   }, [filteredGames]);
 
-  const tabs: { id: BasketballTab; label: string; icon: any } = [
+  const tabs: { id: BasketballTab; label: string; icon: any }[] = [
     { id: 'live', label: 'Live', icon: 'radio-outline' },
     { id: 'upcoming', label: 'Upcoming', icon: 'calendar-outline' },
     { id: 'results', label: 'Results', icon: 'checkmark-circle-outline' },

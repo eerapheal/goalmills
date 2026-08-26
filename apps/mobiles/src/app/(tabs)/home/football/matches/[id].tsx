@@ -292,7 +292,7 @@ export default function MatchDetailsScreen() {
                       {lineups[0]?.team.name} ({lineups[0]?.formation})
                     </Text>
                     <View style={styles.pitchGrid}>
-                      {lineups[0]?.startXI.slice(0, 11).map((p, idx) => (
+                      {lineups[0]?.startXI.slice(0, 11).map((p: any, idx: number) => (
                         <View key={idx} style={styles.pitchPlayerNode}>
                           <View style={[styles.pitchJersey, { backgroundColor: '#3B82F6' }]}>
                             <Text style={styles.pitchJerseyNum}>{p.player.number}</Text>
@@ -312,7 +312,7 @@ export default function MatchDetailsScreen() {
                         {lineups[1]?.team.name} ({lineups[1]?.formation})
                       </Text>
                       <View style={styles.pitchGrid}>
-                        {lineups[1]?.startXI.slice(0, 11).map((p, idx) => (
+                        {lineups[1]?.startXI.slice(0, 11).map((p: any, idx: number) => (
                           <View key={idx} style={styles.pitchPlayerNode}>
                             <View style={[styles.pitchJersey, { backgroundColor: '#EF4444' }]}>
                               <Text style={styles.pitchJerseyNum}>{p.player.number}</Text>
@@ -333,7 +333,7 @@ export default function MatchDetailsScreen() {
                   <View style={styles.benchRow}>
                     <View style={{ flex: 1, marginRight: 8 }}>
                       <Text style={styles.benchTeamHeader}>{lineups[0]?.team.name}</Text>
-                      {lineups[0]?.substitutes.map((s, idx) => (
+                      {lineups[0]?.substitutes.map((s: any, idx: number) => (
                         <Text key={idx} style={styles.benchPlayerText}>
                           {s.player.number}. {s.player.name} ({s.player.pos})
                         </Text>
@@ -342,7 +342,7 @@ export default function MatchDetailsScreen() {
                     {lineups[1] && (
                       <View style={{ flex: 1 }}>
                         <Text style={styles.benchTeamHeader}>{lineups[1]?.team.name}</Text>
-                        {lineups[1]?.substitutes.map((s, idx) => (
+                        {lineups[1]?.substitutes.map((s: any, idx: number) => (
                           <Text key={idx} style={styles.benchPlayerText}>
                             {s.player.number}. {s.player.name} ({s.player.pos})
                           </Text>
@@ -366,8 +366,8 @@ export default function MatchDetailsScreen() {
             ) : (
               <View style={styles.card}>
                 <Text style={styles.cardHeaderTitle}>Team Statistics</Text>
-                {stats[0]?.statistics.map((st, idx) => {
-                  const awayStat = stats[1]?.statistics.find(s => s.type === st.type);
+                {stats[0]?.statistics.map((st: any, idx: number) => {
+                  const awayStat = stats[1]?.statistics.find((s: any) => s.type === st.type);
                   const homeVal = String(st.value ?? 0).replace('%', '');
                   const awayVal = String(awayStat?.value ?? 0).replace('%', '');
                   const numHome = Number(homeVal) || 1;

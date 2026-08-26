@@ -1200,8 +1200,8 @@ export const advancedCricketApi = {
         event_toss: baseMatch?.event_toss || (header.tossResults ? `${header.tossResults.tossWinnerName} won toss & elected to ${header.tossResults.decision}` : undefined),
         event_man_of_match: baseMatch?.event_man_of_match || scardRes?.man_of_match,
         event_stadium: baseMatch?.event_stadium || header.venueInfo?.ground || 'International Cricket Ground',
-        event_home_team_logo: baseMatch?.event_home_team_logo || (header.team1?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team1.imageId}/i.jpg` : undefined),
-        event_away_team_logo: baseMatch?.event_away_team_logo || (header.team2?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team2.imageId}/i.jpg` : undefined),
+        event_home_team_logo: baseMatch?.event_home_team_logo || (header.team1?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team1.imageId}/i.jpg` : `https://ui-avatars.com/api/?name=${encodeURIComponent(homeName)}&background=0D8ABC&color=fff&size=128&bold=true`),
+        event_away_team_logo: baseMatch?.event_away_team_logo || (header.team2?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team2.imageId}/i.jpg` : `https://ui-avatars.com/api/?name=${encodeURIComponent(awayName)}&background=0D8ABC&color=fff&size=128&bold=true`),
         scorecard: scardRes?.scorecard || baseMatch?.scorecard || {},
         wickets: scardRes?.wickets || baseMatch?.wickets || {},
         extra: scardRes?.extra || baseMatch?.extra || {},
@@ -1216,6 +1216,120 @@ export const advancedCricketApi = {
     } catch (error) {
       console.error('Error fetching full match details (mobile):', error);
       return null;
+    }
+  },
+
+  /**
+   * 1. GET series/list (international, league, domestic, women)
+   */
+  getSeriesList: async (type: string = 'international'): Promise<{ success: number; result: CricketLeague[] }> => {
+    try {
+      return await fetchFromAPI<{ success: number; result: CricketLeague[] }>('series/list', { type });
+    } catch (error) {
+      return await advancedCricketApi.getLeagues();
+    }
+  },
+
+  /**
+   * 2. GET series/list-archives
+   */
+  getSeriesArchives: async (params?: { year?: string; type?: string }): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/list-archives', params || {});
+    } catch (error) {
+      return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * 3. GET series/get-matches
+   */
+  getSeriesMatches: async (seriesId: string | number): Promise<{ success: number; result: CricketEvent[] }> => {
+    try {
+      const res = await fetchFromAPI<{ success: number; result: CricketEvent[] }>('series/get-matches', { seriesId: Number(seriesId) });
+      if (res && res.result && Array.isArray(res.result) && res.result.length > 0) {
+        return res;
+      }
+      return await advancedCricketApi.getFixtures({ leagueId: Number(seriesId) });
+    } catch (error) {
+      return await advancedCricketApi.getFixtures({ leagueId: Number(seriesId) });
+    }
+  },
+
+  /**
+   * 4. GET series/get-news
+   */
+  getSeriesNews: async (seriesId: string | number): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-news', { seriesId: Number(seriesId) });
+    } catch (error) {
+      return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * 5. GET series/get-squads
+   */
+  getSeriesSquads: async (seriesId: string | number): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-squads', { seriesId: Number(seriesId) });
+    } catch (error) {
+      return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * 6. GET series/get-players (players in a specific squad)
+   */
+  getSeriesSquadPlayers: async (seriesId: string | number, squadId: string | number): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-players', { seriesId: Number(seriesId), squadId: Number(squadId) });
+    } catch (error) {
+      return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * 7. GET series/get-venues
+   */
+  getSeriesVenues: async (seriesId: string | number): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-venues', { seriesId: Number(seriesId) });
+    } catch (error) {
+      return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * 8. GET series/get-points-table
+   */
+  getSeriesPointsTable: async (seriesId: string | number): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-points-table', { seriesId: Number(seriesId) });
+    } catch (error) {
+      return await advancedCricketApi.getStandings({ leagueId: Number(seriesId) });
+    }
+  },
+
+  /**
+   * 9. GET series/get-stats-filters
+   */
+  getSeriesStatsFilters: async (seriesId: string | number): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-stats-filters', { seriesId: Number(seriesId) });
+    } catch (error) {
+      return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * 10. GET series/get-stats
+   */
+  getSeriesStats: async (seriesId: string | number, statType: string = 'mostRuns'): Promise<any> => {
+    try {
+      return await fetchFromAPI('series/get-stats', { seriesId: Number(seriesId), statType });
+    } catch (error) {
+      return { success: 1, result: [] };
     }
   },
 

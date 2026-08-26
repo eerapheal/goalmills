@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ApiBasketballGameItem } from '../services/basketballApi';
 
 interface BasketballMatchCardProps {
-  match: ApiBasketballGameItem;
+  match: any;
   onPress?: () => void;
   hideLeague?: boolean;
 }
