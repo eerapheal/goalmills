@@ -188,11 +188,11 @@ export interface ApiBasketballGameItem {
 async function requestWebBasketball<T>(
   endpoint: string,
   params: Record<string, any> = {},
-  revalidate: number = 60
+  _revalidate: number = 60 // kept for signature compat; TTL is managed by the proxy
 ): Promise<T[]> {
-  const cleanBase = API_BASE_URL.replace(/\/$/, '');
-  const cleanEndpoint = endpoint.replace(/^\//, '');
-  const url = new URL(`${cleanBase}/${cleanEndpoint}`);
+  // Build URL to our own Next.js proxy route
+  const url = new URL('/api/basketball', typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  url.searchParams.append('met', endpoint);
 
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -200,36 +200,33 @@ async function requestWebBasketball<T>(
     }
   });
 
-  const headers: Record<string, string> = {
-    'x-apisports-key': API_KEY,
-    Accept: 'application/json',
-  };
-
   try {
     const response = await fetch(url.toString(), {
       method: 'GET',
-      headers,
-      next: { revalidate },
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       throw new Error(
-        `[API-Basketball Web] Request to ${endpoint} failed: ${response.status} ${response.statusText}`
+        `[API-Basketball Web] Proxy request to ${endpoint} failed: ${response.status} ${response.statusText}`
       );
     }
 
-    const data: ApiBasketballResponse<T[]> = await response.json();
+    const data = await response.json();
 
-    if (
-      data.errors &&
-      (Array.isArray(data.errors)
-        ? data.errors.length > 0
-        : Object.keys(data.errors).length > 0)
-    ) {
-      console.warn(`[API-Basketball Web] Warnings/Errors on ${endpoint}:`, data.errors);
+    // The proxy wraps responses as { success, result, ... } or { response, ... }
+    if (data.response && Array.isArray(data.response)) {
+      return data.response;
+    }
+    if (data.result && Array.isArray(data.result)) {
+      return data.result;
+    }
+    if (Array.isArray(data)) {
+      return data;
     }
 
-    return data.response || [];
+    return data.response || data.result || [];
   } catch (error) {
     console.error(`[API-Basketball Web] Error on GET ${endpoint}:`, error);
     throw error;

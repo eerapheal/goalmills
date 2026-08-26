@@ -12,6 +12,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'img.youtube.com',
       },
+       {
+        protocol: 'https',
+        hostname: 'static.cricbuzz.com',
+      },
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
