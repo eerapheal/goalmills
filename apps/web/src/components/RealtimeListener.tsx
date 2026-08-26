@@ -23,7 +23,11 @@ export default function RealtimeListener() {
           try {
             const data = JSON.parse(e.data);
             toast.info(`📰 New Story: "${data.title}"`);
-            router.refresh();
+            if (document.visibilityState === 'visible') {
+              setTimeout(() => {
+                router.refresh();
+              }, 300);
+            }
           } catch (err) {
             // ignore
           }
@@ -34,7 +38,11 @@ export default function RealtimeListener() {
           try {
             const data = JSON.parse(e.data);
             toast.success(`🎥 New Highlight: "${data.video_title}"`);
-            router.refresh();
+            if (document.visibilityState === 'visible') {
+              setTimeout(() => {
+                router.refresh();
+              }, 300);
+            }
           } catch (err) {
             // ignore
           }
