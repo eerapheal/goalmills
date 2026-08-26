@@ -25,6 +25,9 @@ export default function AdminDashboard() {
                                 User Management
                             </Link>
                         )}
+                        <Link href="/admin/categories" className="px-4 md:px-6 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-bold border border-purple-500/20 transition-colors text-sm md:text-base">
+                            Categories
+                        </Link>
                         <Link href="/admin/news" className="px-4 md:px-6 py-2 rounded-xl bg-secondary/10 hover:bg-secondary/20 text-secondary font-bold border border-secondary/20 transition-colors text-sm md:text-base">
                             Manage Posts
                         </Link>

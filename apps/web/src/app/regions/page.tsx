@@ -59,7 +59,7 @@ export default function RegionsPage() {
                         >
                             <div className="relative w-12 h-12 bg-white/5 rounded-lg p-2">
                                 {league.logo ? (
-                                    <Image src={league.logo} alt={league.name} fill className="object-contain p-1" />
+                                    <Image src={league.logo} alt={league.name} fill sizes="48px" className="object-contain p-1" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white/20">
                                         {league.name.charAt(0)}
@@ -71,7 +71,7 @@ export default function RegionsPage() {
                                 <div className="flex items-center gap-1.5 mt-1">
                                     <div className="relative w-4 h-3 overflow-hidden rounded-[2px] opacity-70">
                                         {league.flag ? (
-                                            <Image src={league.flag} alt={league.country || ''} fill className="object-cover" />
+                                            <Image src={league.flag} alt={league.country || ''} fill sizes="16px" className="object-cover" />
                                         ) : null}
                                     </div>
                                     <span className="text-xs text-text-muted">{league.country}</span>

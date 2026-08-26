@@ -11,16 +11,21 @@ import {
   Share,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
+import { SPACING, BORDER_RADIUS } from '@goalmills/ui';
 import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
 import RenderHTML from 'react-native-render-html';
+import {
+  newsHistoryUtil,
+  MobileRecentlyViewedItem,
+} from '../../../utils/newsHistory';
 
 export default function NewsDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [news, setNews] = useState<BlogPost | null>(null);
-  const [related, setRelated] = useState<BlogPost[]>([]);
+  const [youMayAlsoLike, setYouMayAlsoLike] = useState<BlogPost[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<MobileRecentlyViewedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { width } = useWindowDimensions();
   const router = useRouter();
@@ -34,16 +39,27 @@ export default function NewsDetail() {
   const loadNewsDetail = async () => {
     try {
       setLoading(true);
-      const [data, allNews] = await Promise.all([
-        goalmillsApi.getNewsById(id),
-        goalmillsApi.getNews(),
-      ]);
-
+      const data = await goalmillsApi.getNewsById(id);
       setNews(data);
 
-      if (Array.isArray(allNews)) {
-        const filtered = allNews.filter((n: any) => n._id !== id);
-        setRelated(filtered.slice(0, 3));
+      if (data) {
+        // Track view and history
+        newsHistoryUtil.addRecentlyViewed(data);
+        goalmillsApi.incrementNewsView(id);
+
+        // Fetch You May Also Like recommendations (same category or general)
+        const relatedData = await goalmillsApi.getNews({
+          category: data.category,
+          exclude: id,
+          limit: 3,
+        });
+        if (Array.isArray(relatedData)) {
+          setYouMayAlsoLike(relatedData.filter((n) => n._id !== id).slice(0, 3));
+        }
+
+        // Get Recently Viewed
+        const recent = newsHistoryUtil.getRecentlyViewed().filter((r) => r._id !== id);
+        setRecentlyViewed(recent.slice(0, 4));
       }
     } catch (error) {
       console.error('Failed to load news detail:', error);
@@ -58,7 +74,7 @@ export default function NewsDetail() {
     try {
       await Share.share({
         title: news.title,
-        message: `${news.title} - Read on GoalMills!`,
+        message: `${news.title}\n\nRead full story on GoalMills: https://goalmills-web.vercel.app/news/${id}`,
       });
     } catch (e) {
       console.error('Share error:', e);
@@ -69,7 +85,7 @@ export default function NewsDetail() {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.loadingText}>Loading article...</Text>
+        <Text style={styles.loadingText}>Loading story...</Text>
       </View>
     );
   }
@@ -86,24 +102,46 @@ export default function NewsDetail() {
     );
   }
 
+  const contentSafeWidth = Math.max(260, width - 32);
+
   const tagsStyles = {
     body: {
       color: '#CBD5E1',
       fontSize: 15,
       lineHeight: 24,
+      maxWidth: contentSafeWidth,
     },
     p: {
       marginBottom: 16,
+      lineHeight: 24,
+      color: '#CBD5E1',
     },
-    h1: { color: '#F8FAFC', fontSize: 22, fontWeight: 'bold' as const, marginBottom: 12 },
-    h2: { color: '#F8FAFC', fontSize: 18, fontWeight: 'bold' as const, marginBottom: 10 },
-    h3: { color: '#F8FAFC', fontSize: 16, fontWeight: 'bold' as const, marginBottom: 8 },
+    h1: {
+      color: '#F8FAFC',
+      fontSize: 20,
+      fontWeight: '800' as const,
+      marginBottom: 12,
+      marginTop: 8,
+    },
+    h2: {
+      color: '#F8FAFC',
+      fontSize: 18,
+      fontWeight: '800' as const,
+      marginBottom: 10,
+      marginTop: 8,
+    },
+    h3: {
+      color: '#F8FAFC',
+      fontSize: 16,
+      fontWeight: '700' as const,
+      marginBottom: 8,
+    },
     strong: { color: '#F8FAFC', fontWeight: 'bold' as const },
-    a: { color: '#3B82F6', textDecorationLine: 'none' as const },
-    li: { marginBottom: 6, color: '#CBD5E1' },
+    a: { color: '#60A5FA', textDecorationLine: 'none' as const },
+    li: { marginBottom: 6, color: '#CBD5E1', lineHeight: 22 },
     blockquote: {
       borderLeftColor: '#3B82F6',
-      borderLeftWidth: 4,
+      borderLeftWidth: 3,
       paddingLeft: 12,
       fontStyle: 'italic' as const,
       color: '#94A3B8',
@@ -113,37 +151,71 @@ export default function NewsDetail() {
 
   return (
     <View style={styles.container}>
-      {/* Navbar */}
+      {/* Top Navbar */}
       <View style={styles.navBar}>
-        <Pressable style={styles.navActionBtn} onPress={() => router.back()}>
+        <Pressable
+          style={styles.navActionBtn}
+          onPress={() => router.back()}
+          hitSlop={8}
+        >
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>
           {news.category || 'Article'}
         </Text>
-        <Pressable style={styles.navActionBtn} onPress={handleShare}>
+        <Pressable
+          style={styles.navActionBtn}
+          onPress={handleShare}
+          hitSlop={8}
+        >
           <Ionicons name="share-social-outline" size={20} color="#F8FAFC" />
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Cover Image */}
         {news.image ? (
-          <Image source={{ uri: news.image }} style={styles.coverImage} resizeMode="cover" />
+          <View style={styles.coverImageContainer}>
+            <Image
+              source={{ uri: news.image }}
+              style={styles.coverImage}
+              resizeMode="cover"
+            />
+          </View>
         ) : null}
 
         <View style={styles.bodyContainer}>
-          {/* Category & Read Time Badge */}
+          {/* Badge & Read Time Meta */}
           <View style={styles.badgeRow}>
+            {news.isBreaking ? (
+              <View style={styles.breakingBadge}>
+                <Ionicons name="flame" size={12} color="#EF4444" />
+                <Text style={styles.breakingBadgeText}>BREAKING</Text>
+              </View>
+            ) : null}
+
             {news.category ? (
               <View style={styles.categoryBadge}>
                 <Text style={styles.categoryText}>{news.category}</Text>
               </View>
             ) : null}
-            <View style={styles.readTimeBadge}>
+
+            <View style={styles.metaBadge}>
               <Ionicons name="time-outline" size={12} color="#94A3B8" />
-              <Text style={styles.readTimeText}>{news.readTime || 3} min read</Text>
+              <Text style={styles.metaBadgeText}>
+                {news.readTime || 3} min read
+              </Text>
             </View>
+
+            {typeof news.views === 'number' && (
+              <View style={styles.metaBadge}>
+                <Ionicons name="eye-outline" size={12} color="#94A3B8" />
+                <Text style={styles.metaBadgeText}>{news.views}</Text>
+              </View>
+            )}
           </View>
 
           {/* Article Title */}
@@ -156,59 +228,131 @@ export default function NewsDetail() {
                 {news.author ? news.author.charAt(0).toUpperCase() : 'G'}
               </Text>
             </View>
-            <View>
-              <Text style={styles.authorName}>{news.author || 'GoalMills Staff'}</Text>
+            <View style={styles.authorMeta}>
+              <Text style={styles.authorName}>
+                {news.author || 'GoalMills Staff'}
+              </Text>
               <Text style={styles.publishDate}>
-                {news.createdAt ? new Date(news.createdAt).toLocaleDateString() : 'Today'}
+                {news.createdAt
+                  ? new Date(news.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : 'Today'}
               </Text>
             </View>
           </View>
 
           {/* Excerpt Lead */}
           {news.excerpt ? (
-            <Text style={styles.leadExcerpt}>{news.excerpt}</Text>
+            <View style={styles.leadContainer}>
+              <Text style={styles.leadExcerpt}>{news.excerpt}</Text>
+            </View>
           ) : null}
 
-          {/* Content HTML */}
-          <View style={styles.contentSection}>
+          {/* Content HTML (Strict Mobile Width Constraint) */}
+          <View style={[styles.contentSection, { maxWidth: contentSafeWidth }]}>
             {news.content ? (
               <RenderHTML
-                contentWidth={width - 32}
+                contentWidth={contentSafeWidth}
                 source={{ html: news.content }}
                 tagsStyles={tagsStyles}
               />
             ) : null}
           </View>
+
+          {/* Related Team & Tags */}
+          {news.relatedTeam || (Array.isArray(news.tags) && news.tags.length > 0) ? (
+            <View style={styles.tagsContainer}>
+              {news.relatedTeam ? (
+                <View style={styles.teamTag}>
+                  <Ionicons name="shield-checkmark" size={13} color="#60A5FA" />
+                  <Text style={styles.teamTagText}>
+                    Team: {news.relatedTeam}
+                  </Text>
+                </View>
+              ) : null}
+
+              {Array.isArray(news.tags) &&
+                news.tags.map((tag, idx) => (
+                  <View key={idx} style={styles.tagChip}>
+                    <Text style={styles.tagChipText}>#{tag}</Text>
+                  </View>
+                ))}
+            </View>
+          ) : null}
         </View>
 
-        {/* Related Articles */}
-        {related.length > 0 ? (
+        {/* You May Also Like Section */}
+        {youMayAlsoLike.length > 0 && (
           <View style={styles.relatedSection}>
-            <Text style={styles.relatedHeaderTitle}>More Stories</Text>
-            {related.map((item) => (
+            <Text style={styles.sectionHeaderTitle}>💡 You May Also Like</Text>
+            {youMayAlsoLike.map((item) => (
               <Pressable
                 key={item._id}
                 style={styles.relatedCard}
                 onPress={() => router.push(`/news/${item._id}`)}
               >
                 <Image
-                  source={{ uri: item.image || 'https://picsum.photos/seed/news/200/200' }}
+                  source={{
+                    uri:
+                      item.image ||
+                      'https://picsum.photos/seed/news/200/200',
+                  }}
                   style={styles.relatedThumb}
                   resizeMode="cover"
                 />
                 <View style={styles.relatedInfo}>
-                  <Text style={styles.relatedCategory}>{item.category || 'News'}</Text>
+                  <Text style={styles.relatedCategory}>
+                    {item.category || 'News'}
+                  </Text>
                   <Text style={styles.relatedTitle} numberOfLines={2}>
                     {item.title}
                   </Text>
                   <Text style={styles.relatedDate}>
-                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}
+                    {item.createdAt
+                      ? new Date(item.createdAt).toLocaleDateString()
+                      : ''}
                   </Text>
                 </View>
               </Pressable>
             ))}
           </View>
-        ) : null}
+        )}
+
+        {/* Recently Viewed Section */}
+        {recentlyViewed.length > 0 && (
+          <View style={styles.recentlyViewedSection}>
+            <Text style={styles.sectionHeaderTitle}>👁️ Recently Viewed</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.recentSlider}
+            >
+              {recentlyViewed.map((item) => (
+                <Pressable
+                  key={item._id}
+                  style={styles.recentMiniCard}
+                  onPress={() => router.push(`/news/${item._id}`)}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        item.image ||
+                        'https://picsum.photos/seed/news/200/200',
+                    }}
+                    style={styles.recentMiniThumb}
+                    resizeMode="cover"
+                  />
+                  <Text style={styles.recentMiniTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -217,11 +361,11 @@ export default function NewsDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: '#070B12',
   },
   centerContainer: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: '#070B12',
     alignItems: 'center',
     justifyContent: 'center',
     padding: SPACING.xl,
@@ -257,6 +401,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#070B12',
   },
   navActionBtn: {
     padding: 6,
@@ -270,21 +415,43 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 50,
+  },
+  coverImageContainer: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    backgroundColor: '#0E1522',
   },
   coverImage: {
     width: '100%',
-    aspectRatio: 16 / 9,
-    backgroundColor: '#0F172A',
+    height: '100%',
   },
   bodyContainer: {
     padding: SPACING.md,
+    overflow: 'hidden',
   },
   badgeRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: 8,
     marginBottom: 12,
+  },
+  breakingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.4)',
+  },
+  breakingBadgeText: {
+    color: '#EF4444',
+    fontSize: 10,
+    fontWeight: '900',
   },
   categoryBadge: {
     backgroundColor: 'rgba(59, 130, 246, 0.15)',
@@ -295,19 +462,19 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(59, 130, 246, 0.3)',
   },
   categoryText: {
-    color: '#3B82F6',
+    color: '#60A5FA',
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     textTransform: 'uppercase',
   },
-  readTimeBadge: {
+  metaBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  readTimeText: {
+  metaBadgeText: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
   },
   articleTitle: {
@@ -329,7 +496,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#2563EB',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -338,6 +505,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '800',
+  },
+  authorMeta: {
+    flex: 1,
   },
   authorName: {
     fontSize: 14,
@@ -349,26 +519,74 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 2,
   },
-  leadExcerpt: {
-    fontSize: 15,
-    fontStyle: 'italic',
-    color: '#94A3B8',
-    lineHeight: 22,
-    marginBottom: 16,
-    paddingLeft: 10,
+  leadContainer: {
+    backgroundColor: 'rgba(59, 130, 246, 0.05)',
     borderLeftWidth: 3,
     borderLeftColor: '#3B82F6',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  leadExcerpt: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: '#E2E8F0',
+    lineHeight: 22,
   },
   contentSection: {
-    marginTop: 8,
+    marginTop: 4,
+    overflow: 'hidden',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 16,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  teamTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+  },
+  teamTagText: {
+    color: '#93C5FD',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  tagChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  tagChipText: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '600',
   },
   relatedSection: {
     padding: SPACING.md,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    marginTop: 16,
+    marginTop: 8,
   },
-  relatedHeaderTitle: {
+  recentlyViewedSection: {
+    padding: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  sectionHeaderTitle: {
     fontSize: 16,
     fontWeight: '800',
     color: '#F8FAFC',
@@ -376,7 +594,7 @@ const styles = StyleSheet.create({
   },
   relatedCard: {
     flexDirection: 'row',
-    backgroundColor: '#141C2B',
+    backgroundColor: '#0E1522',
     borderRadius: BORDER_RADIUS.md,
     overflow: 'hidden',
     marginBottom: 10,
@@ -407,5 +625,27 @@ const styles = StyleSheet.create({
   relatedDate: {
     fontSize: 10,
     color: '#64748B',
+  },
+  recentSlider: {
+    gap: 10,
+  },
+  recentMiniCard: {
+    width: 140,
+    backgroundColor: '#0E1522',
+    borderRadius: BORDER_RADIUS.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  recentMiniThumb: {
+    width: 140,
+    height: 80,
+  },
+  recentMiniTitle: {
+    padding: 6,
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    lineHeight: 15,
   },
 });

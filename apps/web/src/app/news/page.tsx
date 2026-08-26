@@ -1,66 +1,51 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import { Suspense } from 'react';
 import dbConnect from '@/lib/db';
 import News from '@/models/News';
+import Category from '@/models/Category';
+import NewsFeedClient from '@/components/news/NewsFeedClient';
+import { BlogPost, Category as ICategory } from '@goalmills/types';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Sports News, Transfers & Pulse | GoalMills',
+  description:
+    'Stay ahead with breaking sports news, transfer intel, tactical analysis, and live updates across world football, NBA, cricket, and more.',
+};
+
 export default async function NewsPage() {
-    let news: any[] = [];
-    try {
-        await dbConnect();
-        news = await News.find({}).sort({ createdAt: -1 });
-    } catch (err) {
-        console.error('Error fetching news:', err);
-    }
+  let initialNews: BlogPost[] = [];
+  let initialCategories: ICategory[] = [];
 
-    return (
-        <div className="min-h-screen bg-slate-950 px-6 py-12 md:px-12 pt-[115px]">
-            <div className="max-w-7xl mx-auto">
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight">
-                    Latest <span className="text-blue-500">News</span>
-                </h1>
+  try {
+    await dbConnect();
+    const [newsDocs, catDocs] = await Promise.all([
+      News.find({}).sort({ createdAt: -1 }).lean(),
+      Category.find({}).sort({ order: 1, createdAt: 1 }).lean(),
+    ]);
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {news.map((item) => (
-                        <Link
-                            href={`/news/${item._id}`}
-                            key={item._id.toString()}
-                            className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/20"
-                        >
-                            <div className="relative h-48 w-full overflow-hidden">
-                                <Image
-                                    src={item.image || `https://picsum.photos/seed/${item._id}/800/600`}
-                                    alt={item.title}
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60" />
-                            </div>
-                            <div className="p-6">
-                                <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                                    {new Date(item.createdAt).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })}
-                                </span>
-                                <h2 className="mt-2 text-xl font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2">
-                                    {item.title}
-                                </h2>
-                                <p className="mt-3 text-slate-400 text-sm line-clamp-3">
-                                    {item.excerpt}
-                                </p>
-                            </div>
-                        </Link>
-                    ))}
-                    {news.length === 0 && (
-                        <div className="col-span-full py-12 text-center text-slate-500">
-                            No news articles found.
-                        </div>
-                    )}
-                </div>
+    initialNews = JSON.parse(JSON.stringify(newsDocs));
+    initialCategories = JSON.parse(JSON.stringify(catDocs));
+  } catch (err) {
+    console.error('Error fetching initial news data:', err);
+  }
+
+  return (
+    <main className="min-h-screen bg-[#070B12] px-4 sm:px-6 lg:px-12 pt-[105px] pb-20">
+      <div className="max-w-7xl mx-auto">
+        <Suspense
+          fallback={
+            <div className="py-24 text-center text-slate-400">
+              Loading sports pulse...
             </div>
-        </div>
-    );
+          }
+        >
+          <NewsFeedClient
+            initialNews={initialNews}
+            initialCategories={initialCategories}
+          />
+        </Suspense>
+      </div>
+    </main>
+  );
 }

@@ -172,7 +172,7 @@ export default function TennisMatchDetailsPage() {
                         {/* Player 1 */}
                         <Link href={`/tennis/players/${match.first_player_key}`} className="flex-1 flex flex-col items-center group">
                             <div className="relative w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-white/10 group-hover:border-yellow-500/50 transition-colors">
-                                <Image src={match.event_first_player_logo || ''} alt={match.event_first_player} fill className="object-cover" />
+                                <Image src={match.event_first_player_logo || ''} alt={match.event_first_player} fill sizes="80px" priority className="object-cover" />
                             </div>
                             <p className="font-bold text-white text-center group-hover:text-yellow-500 transition-colors">{match.event_first_player}</p>
                         </Link>
@@ -186,7 +186,7 @@ export default function TennisMatchDetailsPage() {
                         {/* Player 2 */}
                         <Link href={`/tennis/players/${match.second_player_key}`} className="flex-1 flex flex-col items-center group">
                             <div className="relative w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-white/10 group-hover:border-yellow-500/50 transition-colors">
-                                <Image src={match.event_second_player_logo || ''} alt={match.event_second_player} fill className="object-cover" />
+                                <Image src={match.event_second_player_logo || ''} alt={match.event_second_player} fill sizes="80px" priority className="object-cover" />
                             </div>
                             <p className="font-bold text-white text-center group-hover:text-yellow-500 transition-colors">{match.event_second_player}</p>
                         </Link>

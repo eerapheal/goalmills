@@ -34,10 +34,35 @@ const NewsSchema = new mongoose.Schema({
     type: String,
     default: 'General',
   },
+  categorySlug: {
+    type: String,
+    default: 'general',
+  },
   source: {
+    type: String,
+    required: false,
+  },
+  views: {
+    type: Number,
+    default: 0,
+  },
+  isBreaking: {
+    type: Boolean,
+    default: false,
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
+  tags: {
+    type: [String],
+    default: [],
+  },
+  relatedTeam: {
     type: String,
     required: false,
   },
 }, { timestamps: true });
 
 export default mongoose.models.News || mongoose.model('News', NewsSchema);
+

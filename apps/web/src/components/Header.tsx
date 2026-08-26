@@ -53,6 +53,7 @@ export function Header() {
                 alt="GoalMills Logo"
                 width={40}
                 height={40}
+                priority
                 className="w-full h-full object-cover"
               />
             </div>
@@ -123,6 +124,7 @@ export function Header() {
                     src={session.user.image}
                     alt={session.user.name || 'Profile'}
                     fill
+                    sizes="40px"
                     className="object-cover"
                   />
                 ) : (

@@ -81,6 +81,8 @@ export default function TennisPlayerDetailsPage() {
                             src={player.player_logo || 'https://via.placeholder.com/128'}
                             alt={player.player_name}
                             fill
+                            sizes="128px"
+                            priority
                             className="object-cover"
                         />
                     </div>

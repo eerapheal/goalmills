@@ -1,14 +1,31 @@
-import { BlogPost, VideoHighlight } from '@goalmills/types';
+import { BlogPost, Category, VideoHighlight } from '@goalmills/types';
 
-// In a real environment, this should be in an .env file or config
-// For development with Android emulator, use 10.0.2.2. For iOS, use localhost.
-// Or use your local machine's IP address.
 const BASE_URL = 'https://goalmills-web.vercel.app/api';
 
+export interface NewsQueryParams {
+  filter?: string;
+  category?: string;
+  search?: string;
+  team?: string;
+  ids?: string;
+  exclude?: string;
+  sort?: string;
+  limit?: number;
+}
+
 export const goalmillsApi = {
-  getNews: async (): Promise<BlogPost[]> => {
+  getNews: async (params?: NewsQueryParams): Promise<BlogPost[]> => {
     try {
-      const response = await fetch(`${BASE_URL}/news`);
+      const url = new URL(`${BASE_URL}/news`);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+
+      const response = await fetch(url.toString());
       if (!response.ok) throw new Error('Failed to fetch news');
       return await response.json();
     } catch (error) {
@@ -19,18 +36,39 @@ export const goalmillsApi = {
 
   getNewsById: async (id: string): Promise<BlogPost | null> => {
     try {
-      // The web app doesn't have a specific GET /api/news/[id] route that returns a single item
-      // but news/[id]/page.tsx fetches from DB.
-      // However, we can fetch all and filter, or we can assume there might be a route.
-      // Looking at web app, it seems News.findById(id) is used in the Page, not a shared API.
-      // Let's check web routes again to see if there's a dynamic GET.
-      const response = await fetch(`${BASE_URL}/news`);
-      if (!response.ok) throw new Error('Failed to fetch news');
-      const news: BlogPost[] = await response.json();
-      return news.find(n => n._id === id) || null;
+      const response = await fetch(`${BASE_URL}/news/${id}`);
+      if (response.ok) {
+        return await response.json();
+      }
+      // Fallback
+      const all = await fetch(`${BASE_URL}/news`);
+      if (all.ok) {
+        const list: BlogPost[] = await all.json();
+        return list.find((n) => n._id === id) || null;
+      }
+      return null;
     } catch (error) {
       console.error('Error fetching news by id:', error);
       return null;
+    }
+  },
+
+  getCategories: async (): Promise<Category[]> => {
+    try {
+      const response = await fetch(`${BASE_URL}/categories`);
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
+  },
+
+  incrementNewsView: async (id: string): Promise<void> => {
+    try {
+      await fetch(`${BASE_URL}/news/${id}/view`, { method: 'POST' });
+    } catch (error) {
+      console.error('Error incrementing view:', error);
     }
   },
 
@@ -44,16 +82,16 @@ export const goalmillsApi = {
       return [];
     }
   },
-  
+
   getVideoById: async (id: string): Promise<any | null> => {
     try {
       const response = await fetch(`${BASE_URL}/videos`);
       if (!response.ok) throw new Error('Failed to fetch videos');
       const videos: any[] = await response.json();
-      return videos.find(v => v._id === id) || null;
+      return videos.find((v) => v._id === id) || null;
     } catch (error) {
       console.error('Error fetching video by id:', error);
       return null;
     }
-  }
+  },
 };

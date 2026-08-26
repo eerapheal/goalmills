@@ -9,7 +9,20 @@ export interface User {
   updatedAt: string;
 }
 
-// Blog and Video Types
+// Blog, Category and Video Types
+export interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  isFeatured?: boolean;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface BlogPost {
   _id: string;
   title: string;
@@ -17,9 +30,18 @@ export interface BlogPost {
   content?: string;
   image: string;
   author: string;
+  authorId?: string;
   readTime: number;
   createdAt: string;
+  updatedAt?: string;
   category: string;
+  categorySlug?: string;
+  source?: string;
+  views?: number;
+  isBreaking?: boolean;
+  isFeatured?: boolean;
+  tags?: string[];
+  relatedTeam?: string;
 }
 
 export interface VideoHighlight {

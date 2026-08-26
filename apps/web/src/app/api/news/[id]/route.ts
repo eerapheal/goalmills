@@ -34,6 +34,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const body = await request.json();
+    if (body.category && !body.categorySlug) {
+      body.categorySlug = body.category
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+    if (body.tags && typeof body.tags === 'string') {
+      body.tags = body.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+    }
     const updatedNews = await News.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

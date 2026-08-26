@@ -91,6 +91,7 @@ export default function BasketballTeamPage() {
                                 alt={team.team_name}
                                 width={80}
                                 height={80}
+                                priority
                                 className="object-cover"
                             />
                         </div>

@@ -112,6 +112,7 @@ export default function ProfilePage() {
                                         src={image}
                                         alt="Profile"
                                         fill
+                                        sizes="128px"
                                         className="object-cover"
                                     />
                                 ) : (

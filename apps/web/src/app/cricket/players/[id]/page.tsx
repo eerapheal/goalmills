@@ -90,6 +90,7 @@ export default function CricketPlayerDetailsPage() {
                                     alt={player.player_name}
                                     fill
                                     sizes="(max-width: 768px) 144px, 176px"
+                                    priority
                                     className="object-cover"
                                 />
                             ) : (

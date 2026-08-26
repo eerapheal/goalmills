@@ -72,6 +72,7 @@ export default function BasketballPlayerPage() {
                                 alt={player.player_name}
                                 width={96}
                                 height={96}
+                                priority
                                 className="object-cover"
                             />
                         </div>
