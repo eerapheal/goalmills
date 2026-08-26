@@ -125,10 +125,10 @@ export default function CricketMatchDetailsScreen() {
                                         <TouchableOpacity
                                             key={`${batter.player}-${idx}`}
                                             style={styles.tableRow}
-                                            onPress={() => router.push(`/home/cricket/players/${batter.player_id || batter.player_key || encodeURIComponent(batter.player)}`)}
+                                            onPress={() => router.push(`/home/cricket/players/${(batter as any).player_id || (batter as any).player_key || encodeURIComponent(batter.player)}`)}
                                         >
                                             <View style={{ flex: 3 }}>
-                                                <Text style={[styles.playerName, { color: COLORS.white }]}>{batter.player}</Text>
+                                                <Text style={[styles.playerName, { color: '#fff' }]}>{batter.player}</Text>
                                                 <Text style={styles.dismissal}>{batter.status}</Text>
                                             </View>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right', fontWeight: 'bold' }]}>{batter.R}</Text>
@@ -159,10 +159,10 @@ export default function CricketMatchDetailsScreen() {
                                         <TouchableOpacity
                                             key={`bowler-${bowler.player}-${idx}`}
                                             style={styles.tableRow}
-                                            onPress={() => router.push(`/home/cricket/players/${bowler.player_id || bowler.player_key || encodeURIComponent(bowler.player)}`)}
+                                            onPress={() => router.push(`/home/cricket/players/${(bowler as any).player_id || (bowler as any).player_key || encodeURIComponent(bowler.player)}`)}
                                         >
                                             <View style={{ flex: 3 }}>
-                                                <Text style={[styles.playerName, { color: COLORS.white }]}>{bowler.player}</Text>
+                                                <Text style={[styles.playerName, { color: '#fff' }]}>{bowler.player}</Text>
                                             </View>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.O}</Text>
                                             <Text style={[styles.tableText, { flex: 1, textAlign: 'right' }]}>{bowler.M || '0'}</Text>
@@ -230,13 +230,13 @@ export default function CricketMatchDetailsScreen() {
             <View style={{ gap: 12 }}>
                 <View style={styles.card}>
                     <TouchableOpacity onPress={() => match.home_team_key && router.push(`/home/cricket/teams/${match.home_team_key}`)}>
-                        <Text style={[styles.sectionTitle, { color: COLORS.white }]}>{match.event_home_team} Playing XI →</Text>
+                        <Text style={[styles.sectionTitle, { color: '#fff' }]}>{match.event_home_team} Playing XI →</Text>
                     </TouchableOpacity>
                     {match.lineups.home_team.starting_lineups.map((p, i) => (
                         <TouchableOpacity
                             key={i}
                             style={styles.lineupRow}
-                            onPress={() => router.push(`/home/cricket/players/${p.player_id || p.player_key || encodeURIComponent(p.player)}`)}
+                            onPress={() => router.push(`/home/cricket/players/${(p as any).player_id || (p as any).player_key || encodeURIComponent(p.player)}`)}
                         >
                             <Text style={styles.lineupNumber}>{i + 1}</Text>
                             <Text style={styles.lineupName}>{p.player}</Text>
@@ -247,13 +247,13 @@ export default function CricketMatchDetailsScreen() {
 
                 <View style={styles.card}>
                     <TouchableOpacity onPress={() => match.away_team_key && router.push(`/home/cricket/teams/${match.away_team_key}`)}>
-                        <Text style={[styles.sectionTitle, { color: COLORS.white }]}>{match.event_away_team} Playing XI →</Text>
+                        <Text style={[styles.sectionTitle, { color: '#fff' }]}>{match.event_away_team} Playing XI →</Text>
                     </TouchableOpacity>
                     {match.lineups.away_team.starting_lineups.map((p, i) => (
                         <TouchableOpacity
                             key={i}
                             style={styles.lineupRow}
-                            onPress={() => router.push(`/home/cricket/players/${p.player_id || p.player_key || encodeURIComponent(p.player)}`)}
+                            onPress={() => router.push(`/home/cricket/players/${(p as any).player_id || (p as any).player_key || encodeURIComponent(p.player)}`)}
                         >
                             <Text style={styles.lineupNumber}>{i + 1}</Text>
                             <Text style={styles.lineupName}>{p.player}</Text>

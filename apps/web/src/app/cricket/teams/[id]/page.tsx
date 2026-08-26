@@ -26,21 +26,54 @@ export default function CricketTeamDetailsPage() {
             const teamId = String(params.id);
             try {
                 setLoading(true);
-                // Fetch team metadata, schedule, results, and squad in parallel
-                const [teamsRes, schedRes, resultsRes, playersRes] = await Promise.all([
-                    advancedCricketApi.getTeamsList('international').catch(() => ({ result: [] })),
+                // Fetch team metadata across all categories, schedule, results, and squad in parallel
+                const [intTeams, leagueTeams, womenTeams, schedRes, resultsRes, playersRes] = await Promise.all([
+                    advancedCricketApi.getTeamsList('international').catch(() => []),
+                    advancedCricketApi.getTeamsList('league').catch(() => []),
+                    advancedCricketApi.getTeamsList('women').catch(() => []),
                     advancedCricketApi.getTeamSchedules(teamId).catch(() => []),
                     advancedCricketApi.getTeamResults(teamId).catch(() => []),
                     advancedCricketApi.getTeamPlayers(teamId).catch(() => []),
                 ]);
 
-                const teamList = Array.isArray(teamsRes) ? teamsRes : (teamsRes.result || []);
-                const foundTeam = teamList.find((t: any) => String(t.team_key) === teamId) || {
-                    team_key: teamId,
-                    team_name: `Cricket Team #${teamId}`,
-                    team_short_name: `T${teamId}`,
-                    team_logo: undefined,
-                };
+                const teamList = [
+                    ...(Array.isArray(intTeams) ? intTeams : ((intTeams as any).result || [])),
+                    ...(Array.isArray(leagueTeams) ? leagueTeams : ((leagueTeams as any).result || [])),
+                    ...(Array.isArray(womenTeams) ? womenTeams : ((womenTeams as any).result || [])),
+                ];
+
+                let foundTeam = teamList.find((t: any) => String(t.team_key) === teamId);
+
+                // Check if any match fixture in schedules or results has the team logo and name
+                const allMatches = [...(schedRes || []), ...(resultsRes || [])];
+                const matchFixture = allMatches.find(
+                    (m: any) => String(m.home_team_key) === teamId || String(m.away_team_key) === teamId
+                );
+
+                if (!foundTeam) {
+                    const isHome = matchFixture ? String(matchFixture.home_team_key) === teamId : false;
+                    const inferredName = matchFixture
+                        ? (isHome ? matchFixture.event_home_team : matchFixture.event_away_team)
+                        : `Cricket Team #${teamId}`;
+                    const inferredLogo = matchFixture
+                        ? (isHome ? matchFixture.event_home_team_logo : matchFixture.event_away_team_logo)
+                        : undefined;
+
+                    foundTeam = {
+                        team_key: teamId,
+                        team_name: inferredName,
+                        team_short_name: (inferredName || '').slice(0, 3).toUpperCase(),
+                        team_logo: inferredLogo,
+                        country_name: matchFixture?.country_name || matchFixture?.league_name || 'Official Team',
+                    };
+                } else if (!foundTeam.team_logo && matchFixture) {
+                    const isHome = String(matchFixture.home_team_key) === teamId;
+                    const matchLogo = isHome ? matchFixture.event_home_team_logo : matchFixture.event_away_team_logo;
+                    if (matchLogo) {
+                        foundTeam = { ...foundTeam, team_logo: matchLogo };
+                    }
+                }
+
                 setTeam(foundTeam);
                 setSchedules(schedRes || []);
                 setResults(resultsRes || []);

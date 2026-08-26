@@ -19,24 +19,59 @@ export default function CricketTeamDetailsScreen() {
     const [results, setResults] = useState<CricketEvent[]>([]);
     const [activeTab, setActiveTab] = useState<TeamTab>('squad');
 
+    const [logoError, setLogoError] = useState(false);
+
     useEffect(() => {
         const loadTeamData = async () => {
             if (!id) return;
             try {
                 setLoading(true);
-                const [teamsRes, schedRes, resultsRes, playersRes] = await Promise.all([
+                const [intTeams, leagueTeams, womenTeams, schedRes, resultsRes, playersRes] = await Promise.all([
                     advancedCricketApi.getTeamsList('international').catch(() => []),
+                    advancedCricketApi.getTeamsList('league').catch(() => []),
+                    advancedCricketApi.getTeamsList('women').catch(() => []),
                     advancedCricketApi.getTeamSchedules(id).catch(() => []),
                     advancedCricketApi.getTeamResults(id).catch(() => []),
                     advancedCricketApi.getTeamPlayers(id).catch(() => []),
                 ]);
 
-                const teamList = Array.isArray(teamsRes) ? teamsRes : (teamsRes.result || []);
-                const found = teamList.find((t: any) => String(t.team_key) === String(id)) || {
-                    team_key: String(id),
-                    team_name: `Cricket Team #${id}`,
-                    team_short_name: `T${id}`,
-                };
+                const teamList = [
+                    ...(Array.isArray(intTeams) ? intTeams : ((intTeams as any).result || [])),
+                    ...(Array.isArray(leagueTeams) ? leagueTeams : ((leagueTeams as any).result || [])),
+                    ...(Array.isArray(womenTeams) ? womenTeams : ((womenTeams as any).result || [])),
+                ];
+
+                let found = teamList.find((t: any) => String(t.team_key) === String(id));
+
+                const allMatches = [...(schedRes || []), ...(resultsRes || [])];
+                const matchFixture = allMatches.find(
+                    (m: any) => String(m.home_team_key) === String(id) || String(m.away_team_key) === String(id)
+                );
+
+                if (!found) {
+                    const isHome = matchFixture ? String(matchFixture.home_team_key) === String(id) : false;
+                    const inferredName = matchFixture
+                        ? (isHome ? matchFixture.event_home_team : matchFixture.event_away_team)
+                        : `Cricket Team #${id}`;
+                    const inferredLogo = matchFixture
+                        ? (isHome ? matchFixture.event_home_team_logo : matchFixture.event_away_team_logo)
+                        : undefined;
+
+                    found = {
+                        team_key: String(id),
+                        team_name: inferredName,
+                        team_short_name: (inferredName || '').slice(0, 3).toUpperCase(),
+                        team_logo: inferredLogo,
+                        country_name: matchFixture?.country_name || matchFixture?.league_name || 'Official Team',
+                    };
+                } else if (!found.team_logo && matchFixture) {
+                    const isHome = String(matchFixture.home_team_key) === String(id);
+                    const matchLogo = isHome ? matchFixture.event_home_team_logo : matchFixture.event_away_team_logo;
+                    if (matchLogo) {
+                        found = { ...found, team_logo: matchLogo };
+                    }
+                }
+
                 setTeam(found);
                 setSchedules(schedRes || []);
                 setResults(resultsRes || []);
@@ -77,7 +112,7 @@ export default function CricketTeamDetailsScreen() {
         <View style={styles.container}>
             <Stack.Screen
                 options={{
-                    title: team.team_name,
+                    title: team.team_name || 'Cricket Squad',
                     headerStyle: { backgroundColor: '#0a0e27' },
                     headerTintColor: '#fff',
                     headerLeft: () => (
@@ -92,10 +127,14 @@ export default function CricketTeamDetailsScreen() {
                 {/* Hero Header */}
                 <View style={styles.heroCard}>
                     <View style={styles.logoContainer}>
-                        {team.team_logo ? (
-                            <Image source={{ uri: team.team_logo }} style={styles.logo} />
+                        {team.team_logo && !logoError ? (
+                            <Image
+                                source={{ uri: team.team_logo }}
+                                style={styles.logo}
+                                onError={() => setLogoError(true)}
+                            />
                         ) : (
-                            <Text style={styles.logoText}>{team.team_name.charAt(0)}</Text>
+                            <Text style={styles.logoText}>{(team.team_name || 'T').charAt(0)}</Text>
                         )}
                     </View>
                     <Text style={styles.name}>{team.team_name}</Text>

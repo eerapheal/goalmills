@@ -141,6 +141,14 @@ function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): strin
 const CRICBUZZ_IMG = (id: number | string) =>
   `https://static.cricbuzz.com/a/img/v1/i1/c${id}/i.jpg`;
 
+const resolveImgUrl = (img: any): string | undefined => {
+  if (!img) return undefined;
+  const str = String(img).trim();
+  if (str.startsWith('http://') || str.startsWith('https://')) return str;
+  if (/^\d+$/.test(str)) return `https://static.cricbuzz.com/a/img/v1/i1/c${str}/i.jpg`;
+  return undefined;
+};
+
 /**
  * Build score strings from innings data
  */
@@ -177,16 +185,18 @@ function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): an
     : null;
 
   const isLive = info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
+  const t1Img = t1.imageId || t1.faceImageId || t1.image || t1.team_logo || t1.logo;
+  const t2Img = t2.imageId || t2.faceImageId || t2.image || t2.team_logo || t2.logo;
 
   return {
-    event_key: String(info.matchId),
+    event_key: String(info.matchId || info.id || ''),
     event_date_start: startDate,
     event_date_stop: endDate,
     event_time: startTime,
-    event_home_team: t1.teamName || 'TBA',
-    home_team_key: String(t1.teamId || ''),
-    event_away_team: t2.teamName || 'TBA',
-    away_team_key: String(t2.teamId || ''),
+    event_home_team: t1.teamName || t1.name || 'TBA',
+    home_team_key: String(t1.teamId || t1.id || ''),
+    event_away_team: t2.teamName || t2.name || 'TBA',
+    away_team_key: String(t2.teamId || t2.id || ''),
     event_service_home: '',
     event_service_away: '',
     event_home_final_result: buildScoreStr(score?.team1Score),
@@ -203,8 +213,8 @@ function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): an
     event_live: isLive ? '1' : '0',
     event_type: info.matchFormat || 'Cricket',
     event_stadium: venue.ground ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}` : undefined,
-    event_home_team_logo: t1.imageId ? CRICBUZZ_IMG(t1.imageId) : undefined,
-    event_away_team_logo: t2.imageId ? CRICBUZZ_IMG(t2.imageId) : undefined,
+    event_home_team_logo: resolveImgUrl(t1Img),
+    event_away_team_logo: resolveImgUrl(t2Img),
   };
 }
 
@@ -237,19 +247,33 @@ function transformCricbuzzMatches(data: any): any[] {
  * Extract a flat array of CricketEvent objects from team schedule/results response
  */
 function transformCricbuzzTeamMatches(data: any): any[] {
-  const teamMatchesData = data?.teamMatchesData;
-  if (!Array.isArray(teamMatchesData)) return [];
-
+  if (!data) return [];
   const events: any[] = [];
-  for (const block of teamMatchesData) {
-    const matches = block?.matchDetailsMap?.match;
-    if (!Array.isArray(matches)) continue;
 
-    for (const m of matches) {
-      const ev = mapMatchToEvent(m.matchInfo, m.matchScore);
+  const teamMatchesData = data?.teamMatchesData || data?.matchScheduleMap || data?.scheduleData;
+  if (Array.isArray(teamMatchesData)) {
+    for (const block of teamMatchesData) {
+      const matches = block?.matchDetailsMap?.match || block?.match || block?.matches || block?.scheduleAdWrapper?.matches;
+      if (Array.isArray(matches)) {
+        for (const m of matches) {
+          const ev = mapMatchToEvent(m.matchInfo || m, m.matchScore);
+          if (ev) events.push(ev);
+        }
+      }
+    }
+  }
+
+  if (events.length === 0 && Array.isArray(data?.matches)) {
+    for (const m of data.matches) {
+      const ev = mapMatchToEvent(m.matchInfo || m, m.matchScore);
       if (ev) events.push(ev);
     }
   }
+
+  if (events.length === 0 && Array.isArray(data?.typeMatches)) {
+    return transformCricbuzzMatches(data);
+  }
+
   return events;
 }
 
@@ -287,18 +311,22 @@ function transformCricbuzzSeries(data: any): any[] {
  * Filters out header items like { teamName: 'Test Teams' } without teamId
  */
 function transformCricbuzzTeamsList(data: any): any[] {
-  const list = data?.list;
+  const list = data?.list || data?.teams || (Array.isArray(data) ? data : []);
   if (!Array.isArray(list)) return [];
 
   return list
-    .filter((t: any) => t && t.teamId)
-    .map((t: any) => ({
-      team_key: String(t.teamId),
-      team_name: t.teamName || '',
-      team_short_name: t.teamSName || (t.teamName || '').slice(0, 3).toUpperCase(),
-      team_logo: t.imageId ? CRICBUZZ_IMG(t.imageId) : undefined,
-      country_name: t.countryName || t.teamName || 'International',
-    }));
+    .filter((t: any) => t && (t.teamId || t.team_key || t.id))
+    .map((t: any) => {
+      const tid = String(t.teamId || t.team_key || t.id);
+      const img = t.imageId || t.faceImageId || t.image || t.team_logo || t.logo;
+      return {
+        team_key: tid,
+        team_name: t.teamName || t.name || '',
+        team_short_name: t.teamSName || t.shortName || (t.teamName || t.name || '').slice(0, 3).toUpperCase(),
+        team_logo: resolveImgUrl(img),
+        country_name: t.countryName || t.country || t.teamName || 'International',
+      };
+    });
 }
 
 /**
