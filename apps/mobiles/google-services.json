@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "185577819107",
+    "project_id": "goalmills-39156",
+    "storage_bucket": "goalmills-39156.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185577819107:android:c125a1d00c300acb51eed6",
+        "android_client_info": {
+          "package_name": "com.goalmills.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvqJk-oG_B-hlV2KHILIMU477t3xh8o6M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

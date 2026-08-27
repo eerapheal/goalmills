@@ -41,7 +41,7 @@ MONGODB_URL="mongodb+srv://goalmills:G8jQXggyUTu5Dk45@goalmills.7oliki1.mongodb.
 FIREBASE_SERVER_KEY="your_firebase_fcm_server_key_here"
 
 # Web Push VAPID Public Key (from Firebase Console > Cloud Messaging > Web Push certificates)
-NEXT_PUBLIC_FIREBASE_VAPID_KEY="your_web_push_vapid_public_key_here"
+
 
 # Optional: Admin API Key to protect /api/notifications/send endpoint
 ADMIN_NOTIFICATION_KEY="your_admin_secret_key"
