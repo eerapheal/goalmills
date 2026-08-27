@@ -22,9 +22,7 @@ type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
 export function AdvancedFootballScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -38,7 +36,14 @@ export function AdvancedFootballScreen() {
       const d = new Date();
       d.setDate(today.getDate() + i);
       const iso = d.toISOString().split('T')[0];
-      const dayName = i === 0 ? 'Today' : i === -1 ? 'Yest' : i === 1 ? 'Tmrw' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayName =
+        i === 0
+          ? 'Today'
+          : i === -1
+            ? 'Yest'
+            : i === 1
+              ? 'Tmrw'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNumber = d.getDate();
       dates.push({ iso, dayName, dayNumber });
     }
@@ -48,9 +53,10 @@ export function AdvancedFootballScreen() {
   // Adapt API-Football Fixture to UnifiedMatchEvent
   const adaptFixture = (item: ApiFootballFixtureItem): UnifiedMatchEvent => {
     const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(item.fixture.status.short);
-    const scoreStr = item.goals.home !== null && item.goals.away !== null
-      ? `${item.goals.home} - ${item.goals.away}`
-      : undefined;
+    const scoreStr =
+      item.goals.home !== null && item.goals.away !== null
+        ? `${item.goals.home} - ${item.goals.away}`
+        : undefined;
 
     return {
       event_key: item.fixture.id,
@@ -112,17 +118,19 @@ export function AdvancedFootballScreen() {
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter(f => f.event_live === '1');
+      list = list.filter((f) => f.event_live === '1');
     } else if (activeTab === 'upcoming') {
-      list = list.filter(f => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished');
+      list = list.filter(
+        (f) => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished'
+      );
     } else if (activeTab === 'results') {
-      list = list.filter(f => f.event_status === 'FT' || f.event_status === 'Finished');
+      list = list.filter((f) => f.event_status === 'FT' || f.event_status === 'Finished');
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
-        f =>
+        (f) =>
           f.event_home_team.toLowerCase().includes(q) ||
           f.event_away_team.toLowerCase().includes(q) ||
           (f.league_name && f.league_name.toLowerCase().includes(q))
@@ -134,9 +142,10 @@ export function AdvancedFootballScreen() {
 
   // Group by league for SectionList
   const sections = useMemo(() => {
-    const groups: { [key: string]: { title: string; logo?: string; data: UnifiedMatchEvent[] } } = {};
+    const groups: { [key: string]: { title: string; logo?: string; data: UnifiedMatchEvent[] } } =
+      {};
 
-    filteredFixtures.forEach(item => {
+    filteredFixtures.forEach((item) => {
       const leagueTitle = item.league_name || 'Other Matches';
       if (!groups[leagueTitle]) {
         groups[leagueTitle] = {
@@ -185,7 +194,7 @@ export function AdvancedFootballScreen() {
 
       {/* Tabs */}
       <View style={styles.tabBar}>
-        {tabs.map(tab => {
+        {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <Pressable
@@ -199,9 +208,7 @@ export function AdvancedFootballScreen() {
                 color={isActive ? '#10B981' : '#94A3B8'}
                 style={{ marginRight: 6 }}
               />
-              <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>
-                {tab.label}
-              </Text>
+              <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{tab.label}</Text>
             </Pressable>
           );
         })}
@@ -214,7 +221,7 @@ export function AdvancedFootballScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={dateStrip}
-            keyExtractor={item => item.iso}
+            keyExtractor={(item) => item.iso}
             contentContainerStyle={styles.dateStripContent}
             renderItem={({ item }) => {
               const isSelected = selectedDate === item.iso;
@@ -260,7 +267,7 @@ export function AdvancedFootballScreen() {
       ) : (
         <SectionList
           sections={sections}
-          keyExtractor={item => String(item.event_key)}
+          keyExtractor={(item) => String(item.event_key)}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
@@ -273,9 +280,18 @@ export function AdvancedFootballScreen() {
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
               {section.logo ? (
-                <Image source={{ uri: section.logo }} style={styles.sectionLogo} resizeMode="contain" />
+                <Image
+                  source={{ uri: section.logo }}
+                  style={styles.sectionLogo}
+                  resizeMode="contain"
+                />
               ) : (
-                <Ionicons name="trophy-outline" size={14} color="#3B82F6" style={{ marginRight: 6 }} />
+                <Ionicons
+                  name="trophy-outline"
+                  size={14}
+                  color="#3B82F6"
+                  style={{ marginRight: 6 }}
+                />
               )}
               <Text style={styles.sectionTitle}>{section.title}</Text>
               <Text style={styles.sectionCount}>({section.data.length})</Text>

@@ -1,25 +1,25 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import dbConnect from "@/lib/db";
-import User from "@/models/User";
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcryptjs';
+import dbConnect from '@/lib/db';
+import User from '@/models/User';
 
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions } from 'next-auth';
 
 export const authOptions: NextAuthOptions = {
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Please enter an email and password");
+          throw new Error('Please enter an email and password');
         }
 
         await dbConnect();
@@ -27,13 +27,13 @@ export const authOptions: NextAuthOptions = {
         const user = await User.findOne({ email: credentials.email });
 
         if (!user) {
-          throw new Error("No user found with this email");
+          throw new Error('No user found with this email');
         }
 
         const isMatch = await bcrypt.compare(credentials.password, user.password);
 
         if (!isMatch) {
-          throw new Error("Incorrect password");
+          throw new Error('Incorrect password');
         }
 
         return {
@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/signin",
+    signIn: '/signin',
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
@@ -56,13 +56,13 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role;
         token.picture = user.image ?? undefined;
       }
-      
+
       // Allow updating the token when session is updated
-      if (trigger === "update" && session) {
+      if (trigger === 'update' && session) {
         if (session.user.image) token.picture = session.user.image;
         if (session.user.name) token.name = session.user.name;
       }
-      
+
       return token;
     },
     async session({ session, token }) {
@@ -74,7 +74,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "supersecretkey123",
+  secret: process.env.NEXTAUTH_SECRET || 'supersecretkey123',
 };
 
 const handler = NextAuth(authOptions);

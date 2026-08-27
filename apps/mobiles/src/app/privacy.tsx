@@ -16,9 +16,7 @@ export default function PrivacyScreen() {
   const router = useRouter();
 
   const openWebUrl = (url: string) => {
-    Linking.openURL(url).catch((err) =>
-      console.error('Error opening URL:', err)
-    );
+    Linking.openURL(url).catch((err) => console.error('Error opening URL:', err));
   };
 
   return (
@@ -37,10 +35,7 @@ export default function PrivacyScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Badge & Title */}
         <View style={styles.badgeContainer}>
           <Ionicons name="shield-checkmark" size={16} color="#10b981" />
@@ -49,7 +44,8 @@ export default function PrivacyScreen() {
 
         <Text style={styles.mainTitle}>GoalMills Privacy &amp; Data Safety</Text>
         <Text style={styles.subtitle}>
-          We are committed to full transparency regarding what data is collected, how it is secured, and your rights over your data.
+          We are committed to full transparency regarding what data is collected, how it is secured,
+          and your rights over your data.
         </Text>
 
         {/* Highlight Cards */}
@@ -59,7 +55,8 @@ export default function PrivacyScreen() {
             <Text style={styles.cardTitle}>Encrypted in Transit</Text>
           </View>
           <Text style={styles.cardText}>
-            All network communication between the GoalMills app, servers, and third-party APIs is encrypted using industry-standard HTTPS/TLS protocols.
+            All network communication between the GoalMills app, servers, and third-party APIs is
+            encrypted using industry-standard HTTPS/TLS protocols.
           </Text>
         </View>
 
@@ -69,7 +66,9 @@ export default function PrivacyScreen() {
             <Text style={styles.cardTitle}>Zero Sensitive Tracking</Text>
           </View>
           <Text style={styles.cardText}>
-            GoalMills does <Text style={styles.bold}>NOT</Text> track your GPS location, access your contacts, collect financial details, or record audio. Basic sports scores and highlights require no personal data.
+            GoalMills does <Text style={styles.bold}>NOT</Text> track your GPS location, access your
+            contacts, collect financial details, or record audio. Basic sports scores and highlights
+            require no personal data.
           </Text>
         </View>
 
@@ -79,7 +78,8 @@ export default function PrivacyScreen() {
             <Text style={styles.cardTitle}>Third-Party Video Highlights</Text>
           </View>
           <Text style={styles.cardText}>
-            Our match video highlights are delivered via YouTube API Services. By viewing highlights, you acknowledge the{' '}
+            Our match video highlights are delivered via YouTube API Services. By viewing
+            highlights, you acknowledge the{' '}
             <Text
               style={styles.linkText}
               onPress={() => openWebUrl('https://www.youtube.com/t/terms')}
@@ -92,7 +92,8 @@ export default function PrivacyScreen() {
               onPress={() => openWebUrl('https://policies.google.com/privacy')}
             >
               Google Privacy Policy
-            </Text>.
+            </Text>
+            .
           </Text>
         </View>
 
@@ -102,18 +103,15 @@ export default function PrivacyScreen() {
             <Text style={styles.cardTitle}>Data Deletion &amp; Account Control</Text>
           </View>
           <Text style={styles.cardText}>
-            You have the right to request permanent deletion of your account credentials, preferences, and all associated personal data at any time.
+            You have the right to request permanent deletion of your account credentials,
+            preferences, and all associated personal data at any time.
           </Text>
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() =>
-              openWebUrl('https://goalmills-web.vercel.app/data-deletion')
-            }
+            onPress={() => openWebUrl('https://goalmills-web.vercel.app/data-deletion')}
           >
             <Ionicons name="open-outline" size={16} color="#fff" />
-            <Text style={styles.secondaryButtonText}>
-              View Data Deletion Instructions
-            </Text>
+            <Text style={styles.secondaryButtonText}>View Data Deletion Instructions</Text>
           </TouchableOpacity>
         </View>
 
@@ -146,14 +144,10 @@ export default function PrivacyScreen() {
         <View style={styles.actionSection}>
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() =>
-              openWebUrl('https://goalmills-web.vercel.app/privacy-policy')
-            }
+            onPress={() => openWebUrl('https://goalmills-web.vercel.app/privacy-policy')}
           >
             <Ionicons name="globe-outline" size={18} color="#fff" />
-            <Text style={styles.primaryButtonText}>
-              Read Full Official Privacy Policy
-            </Text>
+            <Text style={styles.primaryButtonText}>Read Full Official Privacy Policy</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -167,12 +161,8 @@ export default function PrivacyScreen() {
 
         {/* Footer info */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            GoalMills • Version 1.0.0 (Play Store Edition)
-          </Text>
-          <Text style={styles.footerText}>
-            Last Policy Revision: April 2026
-          </Text>
+          <Text style={styles.footerText}>GoalMills • Version 1.0.0 (Play Store Edition)</Text>
+          <Text style={styles.footerText}>Last Policy Revision: April 2026</Text>
         </View>
       </ScrollView>
     </View>

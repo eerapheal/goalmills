@@ -27,11 +27,41 @@ import {
 // Mock Data
 
 const mockLeagues: TennisLeague[] = [
-  { league_key: 1, league_name: 'Wimbledon', country_key: 1, country_name: 'United Kingdom', league_surface: 'Grass' },
-  { league_key: 2, league_name: 'French Open', country_key: 2, country_name: 'France', league_surface: 'Clay' },
-  { league_key: 3, league_name: 'US Open', country_key: 3, country_name: 'USA', league_surface: 'Hard' },
-  { league_key: 4, league_name: 'Australian Open', country_key: 4, country_name: 'Australia', league_surface: 'Hard' },
-  { league_key: 5, league_name: 'ATP Finals', country_key: 5, country_name: 'Italy', league_surface: 'Hard (indoor)' },
+  {
+    league_key: 1,
+    league_name: 'Wimbledon',
+    country_key: 1,
+    country_name: 'United Kingdom',
+    league_surface: 'Grass',
+  },
+  {
+    league_key: 2,
+    league_name: 'French Open',
+    country_key: 2,
+    country_name: 'France',
+    league_surface: 'Clay',
+  },
+  {
+    league_key: 3,
+    league_name: 'US Open',
+    country_key: 3,
+    country_name: 'USA',
+    league_surface: 'Hard',
+  },
+  {
+    league_key: 4,
+    league_name: 'Australian Open',
+    country_key: 4,
+    country_name: 'Australia',
+    league_surface: 'Hard',
+  },
+  {
+    league_key: 5,
+    league_name: 'ATP Finals',
+    country_key: 5,
+    country_name: 'Italy',
+    league_surface: 'Hard (indoor)',
+  },
 ];
 
 const mockPlayers: TennisPlayer[] = [
@@ -41,8 +71,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Serbia',
     player_logo: 'https://randomuser.me/api/portraits/men/10.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '1', titles: '3', matches_won: '45', matches_lost: '5', hard_won: '20', hard_lost: '2', clay_won: '15', clay_lost: '2', grass_won: '10', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '1',
+        titles: '3',
+        matches_won: '45',
+        matches_lost: '5',
+        hard_won: '20',
+        hard_lost: '2',
+        clay_won: '15',
+        clay_lost: '2',
+        grass_won: '10',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 2,
@@ -50,8 +93,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Spain',
     player_logo: 'https://randomuser.me/api/portraits/men/11.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '2', titles: '2', matches_won: '40', matches_lost: '6', hard_won: '18', hard_lost: '3', clay_won: '12', clay_lost: '2', grass_won: '10', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '2',
+        titles: '2',
+        matches_won: '40',
+        matches_lost: '6',
+        hard_won: '18',
+        hard_lost: '3',
+        clay_won: '12',
+        clay_lost: '2',
+        grass_won: '10',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 3,
@@ -59,8 +115,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Italy',
     player_logo: 'https://randomuser.me/api/portraits/men/12.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '3', titles: '2', matches_won: '38', matches_lost: '7', hard_won: '22', hard_lost: '4', clay_won: '10', clay_lost: '2', grass_won: '6', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '3',
+        titles: '2',
+        matches_won: '38',
+        matches_lost: '7',
+        hard_won: '22',
+        hard_lost: '4',
+        clay_won: '10',
+        clay_lost: '2',
+        grass_won: '6',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 4,
@@ -68,8 +137,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Russia',
     player_logo: 'https://randomuser.me/api/portraits/men/13.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '4', titles: '1', matches_won: '35', matches_lost: '9', hard_won: '25', hard_lost: '5', clay_won: '5', clay_lost: '3', grass_won: '5', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '4',
+        titles: '1',
+        matches_won: '35',
+        matches_lost: '9',
+        hard_won: '25',
+        hard_lost: '5',
+        clay_won: '5',
+        clay_lost: '3',
+        grass_won: '5',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 5,
@@ -77,8 +159,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Germany',
     player_logo: 'https://randomuser.me/api/portraits/men/14.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '5', titles: '2', matches_won: '42', matches_lost: '8', hard_won: '20', hard_lost: '4', clay_won: '15', clay_lost: '3', grass_won: '7', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '5',
+        titles: '2',
+        matches_won: '42',
+        matches_lost: '8',
+        hard_won: '20',
+        hard_lost: '4',
+        clay_won: '15',
+        clay_lost: '3',
+        grass_won: '7',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 6,
@@ -86,8 +181,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Russia',
     player_logo: 'https://randomuser.me/api/portraits/men/15.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '6', titles: '1', matches_won: '38', matches_lost: '10', hard_won: '22', hard_lost: '6', clay_won: '10', clay_lost: '3', grass_won: '6', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '6',
+        titles: '1',
+        matches_won: '38',
+        matches_lost: '10',
+        hard_won: '22',
+        hard_lost: '6',
+        clay_won: '10',
+        clay_lost: '3',
+        grass_won: '6',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 7,
@@ -95,8 +203,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Greece',
     player_logo: 'https://randomuser.me/api/portraits/men/16.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '7', titles: '1', matches_won: '36', matches_lost: '11', hard_won: '18', hard_lost: '6', clay_won: '12', clay_lost: '4', grass_won: '6', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '7',
+        titles: '1',
+        matches_won: '36',
+        matches_lost: '11',
+        hard_won: '18',
+        hard_lost: '6',
+        clay_won: '12',
+        clay_lost: '4',
+        grass_won: '6',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 8,
@@ -104,8 +225,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Denmark',
     player_logo: 'https://randomuser.me/api/portraits/men/17.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '8', titles: '1', matches_won: '34', matches_lost: '12', hard_won: '16', hard_lost: '6', clay_won: '12', clay_lost: '5', grass_won: '6', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '8',
+        titles: '1',
+        matches_won: '34',
+        matches_lost: '12',
+        hard_won: '16',
+        hard_lost: '6',
+        clay_won: '12',
+        clay_lost: '5',
+        grass_won: '6',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 9,
@@ -113,8 +247,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Poland',
     player_logo: 'https://randomuser.me/api/portraits/women/10.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '1', titles: '4', matches_won: '52', matches_lost: '4', hard_won: '20', hard_lost: '2', clay_won: '25', clay_lost: '1', grass_won: '7', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '1',
+        titles: '4',
+        matches_won: '52',
+        matches_lost: '4',
+        hard_won: '20',
+        hard_lost: '2',
+        clay_won: '25',
+        clay_lost: '1',
+        grass_won: '7',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 10,
@@ -122,8 +269,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Belarus',
     player_logo: 'https://randomuser.me/api/portraits/women/11.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '2', titles: '3', matches_won: '46', matches_lost: '6', hard_won: '28', hard_lost: '3', clay_won: '12', clay_lost: '2', grass_won: '6', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '2',
+        titles: '3',
+        matches_won: '46',
+        matches_lost: '6',
+        hard_won: '28',
+        hard_lost: '3',
+        clay_won: '12',
+        clay_lost: '2',
+        grass_won: '6',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 11,
@@ -131,8 +291,21 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'USA',
     player_logo: 'https://randomuser.me/api/portraits/women/12.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '3', titles: '2', matches_won: '44', matches_lost: '7', hard_won: '26', hard_lost: '4', clay_won: '12', clay_lost: '2', grass_won: '6', grass_lost: '1' }
-    ]
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '3',
+        titles: '2',
+        matches_won: '44',
+        matches_lost: '7',
+        hard_won: '26',
+        hard_lost: '4',
+        clay_won: '12',
+        clay_lost: '2',
+        grass_won: '6',
+        grass_lost: '1',
+      },
+    ],
   },
   {
     player_key: 12,
@@ -140,9 +313,22 @@ const mockPlayers: TennisPlayer[] = [
     player_country: 'Kazakhstan',
     player_logo: 'https://randomuser.me/api/portraits/women/13.jpg',
     stats: [
-        { season: '2024', type: 'singles', rank: '4', titles: '2', matches_won: '40', matches_lost: '8', hard_won: '20', hard_lost: '4', clay_won: '10', clay_lost: '3', grass_won: '10', grass_lost: '1' }
-    ]
-  }
+      {
+        season: '2024',
+        type: 'singles',
+        rank: '4',
+        titles: '2',
+        matches_won: '40',
+        matches_lost: '8',
+        hard_won: '20',
+        hard_lost: '4',
+        clay_won: '10',
+        clay_lost: '3',
+        grass_won: '10',
+        grass_lost: '1',
+      },
+    ],
+  },
 ];
 
 // Helper function to get date strings
@@ -181,7 +367,7 @@ const mockEvents: TennisEvent[] = [
       { score_first: '1', score_second: '6', score_set: '3' },
       { score_first: '6', score_second: '3', score_set: '4' },
       { score_first: '4', score_second: '6', score_set: '5' },
-    ]
+    ],
   },
   {
     event_key: 102,
@@ -208,7 +394,7 @@ const mockEvents: TennisEvent[] = [
       { score_first: '6', score_second: '3', score_set: '1' },
       { score_first: '6', score_second: '4', score_set: '2' },
       { score_first: '7', score_second: '6', score_set: '3' },
-    ]
+    ],
   },
   {
     event_key: 103,
@@ -236,7 +422,7 @@ const mockEvents: TennisEvent[] = [
       { score_first: '3', score_second: '6', score_set: '2' },
       { score_first: '6', score_second: '2', score_set: '3' },
       { score_first: '6', score_second: '4', score_set: '4' },
-    ]
+    ],
   },
   {
     event_key: 104,
@@ -263,7 +449,7 @@ const mockEvents: TennisEvent[] = [
       { score_first: '6', score_second: '2', score_set: '1' },
       { score_first: '4', score_second: '6', score_set: '2' },
       { score_first: '6', score_second: '4', score_set: '3' },
-    ]
+    ],
   },
   {
     event_key: 105,
@@ -289,7 +475,7 @@ const mockEvents: TennisEvent[] = [
     scores: [
       { score_first: '7', score_second: '6', score_set: '1' },
       { score_first: '6', score_second: '4', score_set: '2' },
-    ]
+    ],
   },
   {
     event_key: 106,
@@ -318,7 +504,7 @@ const mockEvents: TennisEvent[] = [
       { score_first: '4', score_second: '6', score_set: '3' },
       { score_first: '6', score_second: '3', score_set: '4' },
       { score_first: '7', score_second: '6', score_set: '5' },
-    ]
+    ],
   },
   {
     event_key: 107,
@@ -346,7 +532,7 @@ const mockEvents: TennisEvent[] = [
       { score_first: '4', score_second: '6', score_set: '2' },
       { score_first: '6', score_second: '4', score_set: '3' },
       { score_first: '6', score_second: '3', score_set: '4' },
-    ]
+    ],
   },
 
   // LIVE MATCHES (Currently in progress)
@@ -384,9 +570,9 @@ const mockEvents: TennisEvent[] = [
         serve_winner: null,
         serve_lost: null,
         score: '15 - 30',
-        points: []
-      }
-    ]
+        points: [],
+      },
+    ],
   },
   {
     event_key: 202,
@@ -421,9 +607,9 @@ const mockEvents: TennisEvent[] = [
         serve_winner: null,
         serve_lost: null,
         score: '40 - 15',
-        points: []
-      }
-    ]
+        points: [],
+      },
+    ],
   },
 
   // UPCOMING MATCHES (Scheduled for future)
@@ -650,204 +836,236 @@ const mockEvents: TennisEvent[] = [
 ];
 
 const mockStandings: TennisStanding[] = [
-  { place: '1', player: 'Novak Djokovic', player_key: 1, league: 'ATP', movement: 'same', country: 'Serbia', points: '11245' },
-  { place: '2', player: 'Carlos Alcaraz', player_key: 2, league: 'ATP', movement: 'up', country: 'Spain', points: '9845' },
-  { place: '3', player: 'Jannik Sinner', player_key: 3, league: 'ATP', movement: 'down', country: 'Italy', points: '8570' },
-  { place: '4', player: 'Daniil Medvedev', player_key: 4, league: 'ATP', movement: 'same', country: 'Russia', points: '7650' },
+  {
+    place: '1',
+    player: 'Novak Djokovic',
+    player_key: 1,
+    league: 'ATP',
+    movement: 'same',
+    country: 'Serbia',
+    points: '11245',
+  },
+  {
+    place: '2',
+    player: 'Carlos Alcaraz',
+    player_key: 2,
+    league: 'ATP',
+    movement: 'up',
+    country: 'Spain',
+    points: '9845',
+  },
+  {
+    place: '3',
+    player: 'Jannik Sinner',
+    player_key: 3,
+    league: 'ATP',
+    movement: 'down',
+    country: 'Italy',
+    points: '8570',
+  },
+  {
+    place: '4',
+    player: 'Daniil Medvedev',
+    player_key: 4,
+    league: 'ATP',
+    movement: 'same',
+    country: 'Russia',
+    points: '7650',
+  },
 ];
 
 const mockOdds: { [matchId: string]: any } = {
   // Past matches odds
   '101': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.80', 'Bwin': '1.75' },
-      'Away': { 'Bet365': '2.00', 'Bwin': '2.10' }
+      Home: { Bet365: '1.80', Bwin: '1.75' },
+      Away: { Bet365: '2.00', Bwin: '2.10' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.70', 'Bwin': '1.65' },
-      'Away': { 'Bet365': '2.10', 'Bwin': '2.20' }
-    }
+      Home: { Bet365: '1.70', Bwin: '1.65' },
+      Away: { Bet365: '2.10', Bwin: '2.20' },
+    },
   },
   '102': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.65', 'Bwin': '1.60', '1xBet': '1.68' },
-      'Away': { 'Bet365': '2.20', 'Bwin': '2.25', '1xBet': '2.18' }
-    }
+      Home: { Bet365: '1.65', Bwin: '1.60', '1xBet': '1.68' },
+      Away: { Bet365: '2.20', Bwin: '2.25', '1xBet': '2.18' },
+    },
   },
   '103': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.75', 'Bwin': '1.72', '1xBet': '1.78' },
-      'Away': { 'Bet365': '2.05', 'Bwin': '2.10', '1xBet': '2.02' }
-    }
+      Home: { Bet365: '1.75', Bwin: '1.72', '1xBet': '1.78' },
+      Away: { Bet365: '2.05', Bwin: '2.10', '1xBet': '2.02' },
+    },
   },
   '104': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.45', 'Bwin': '1.42', '1xBet': '1.48' },
-      'Away': { 'Bet365': '2.70', 'Bwin': '2.75', '1xBet': '2.65' }
-    }
+      Home: { Bet365: '1.45', Bwin: '1.42', '1xBet': '1.48' },
+      Away: { Bet365: '2.70', Bwin: '2.75', '1xBet': '2.65' },
+    },
   },
   '105': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.90', 'Bwin': '1.88', '1xBet': '1.92' },
-      'Away': { 'Bet365': '1.85', 'Bwin': '1.87', '1xBet': '1.83' }
-    }
+      Home: { Bet365: '1.90', Bwin: '1.88', '1xBet': '1.92' },
+      Away: { Bet365: '1.85', Bwin: '1.87', '1xBet': '1.83' },
+    },
   },
   '106': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.70', 'Bwin': '1.68', '1xBet': '1.72' },
-      'Away': { 'Bet365': '2.10', 'Bwin': '2.15', '1xBet': '2.08' }
-    }
+      Home: { Bet365: '1.70', Bwin: '1.68', '1xBet': '1.72' },
+      Away: { Bet365: '2.10', Bwin: '2.15', '1xBet': '2.08' },
+    },
   },
   '107': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.55', 'Bwin': '1.52', '1xBet': '1.58' },
-      'Away': { 'Bet365': '2.40', 'Bwin': '2.45', '1xBet': '2.35' }
-    }
+      Home: { Bet365: '1.55', Bwin: '1.52', '1xBet': '1.58' },
+      Away: { Bet365: '2.40', Bwin: '2.45', '1xBet': '2.35' },
+    },
   },
-  
+
   // Live match odds
   '201': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.50', 'Bwin': '1.55' },
-      'Away': { 'Bet365': '2.50', 'Bwin': '2.40' }
-    }
+      Home: { Bet365: '1.50', Bwin: '1.55' },
+      Away: { Bet365: '2.50', Bwin: '2.40' },
+    },
   },
   '202': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.35', 'Bwin': '1.38', '1xBet': '1.33' },
-      'Away': { 'Bet365': '3.10', 'Bwin': '3.00', '1xBet': '3.15' }
-    }
+      Home: { Bet365: '1.35', Bwin: '1.38', '1xBet': '1.33' },
+      Away: { Bet365: '3.10', Bwin: '3.00', '1xBet': '3.15' },
+    },
   },
 
   // Upcoming matches odds
   '301': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.60', 'Bwin': '1.58', '1xBet': '1.62' },
-      'Away': { 'Bet365': '2.30', 'Bwin': '2.35', '1xBet': '2.28' }
+      Home: { Bet365: '1.60', Bwin: '1.58', '1xBet': '1.62' },
+      Away: { Bet365: '2.30', Bwin: '2.35', '1xBet': '2.28' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.55', 'Bwin': '1.52', '1xBet': '1.57' },
-      'Away': { 'Bet365': '2.40', 'Bwin': '2.45', '1xBet': '2.38' }
+      Home: { Bet365: '1.55', Bwin: '1.52', '1xBet': '1.57' },
+      Away: { Bet365: '2.40', Bwin: '2.45', '1xBet': '2.38' },
     },
     'Total Sets': {
-      'Over 2.5': { 'Bet365': '1.85', 'Bwin': '1.88', '1xBet': '1.83' },
-      'Under 2.5': { 'Bet365': '1.95', 'Bwin': '1.92', '1xBet': '1.97' }
-    }
+      'Over 2.5': { Bet365: '1.85', Bwin: '1.88', '1xBet': '1.83' },
+      'Under 2.5': { Bet365: '1.95', Bwin: '1.92', '1xBet': '1.97' },
+    },
   },
   '302': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.75', 'Bwin': '1.72', '1xBet': '1.78' },
-      'Away': { 'Bet365': '2.05', 'Bwin': '2.10', '1xBet': '2.02' }
+      Home: { Bet365: '1.75', Bwin: '1.72', '1xBet': '1.78' },
+      Away: { Bet365: '2.05', Bwin: '2.10', '1xBet': '2.02' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.70', 'Bwin': '1.68', '1xBet': '1.72' },
-      'Away': { 'Bet365': '2.10', 'Bwin': '2.15', '1xBet': '2.08' }
-    }
+      Home: { Bet365: '1.70', Bwin: '1.68', '1xBet': '1.72' },
+      Away: { Bet365: '2.10', Bwin: '2.15', '1xBet': '2.08' },
+    },
   },
   '303': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.85', 'Bwin': '1.82', '1xBet': '1.88' },
-      'Away': { 'Bet365': '1.95', 'Bwin': '1.98', '1xBet': '1.92' }
+      Home: { Bet365: '1.85', Bwin: '1.82', '1xBet': '1.88' },
+      Away: { Bet365: '1.95', Bwin: '1.98', '1xBet': '1.92' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.80', 'Bwin': '1.78', '1xBet': '1.82' },
-      'Away': { 'Bet365': '2.00', 'Bwin': '2.05', '1xBet': '1.98' }
-    }
+      Home: { Bet365: '1.80', Bwin: '1.78', '1xBet': '1.82' },
+      Away: { Bet365: '2.00', Bwin: '2.05', '1xBet': '1.98' },
+    },
   },
   '304': {
     'Match Winner': {
-      'Home': { 'Bet365': '2.20', 'Bwin': '2.25', '1xBet': '2.18' },
-      'Away': { 'Bet365': '1.65', 'Bwin': '1.62', '1xBet': '1.68' }
+      Home: { Bet365: '2.20', Bwin: '2.25', '1xBet': '2.18' },
+      Away: { Bet365: '1.65', Bwin: '1.62', '1xBet': '1.68' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '2.10', 'Bwin': '2.15', '1xBet': '2.08' },
-      'Away': { 'Bet365': '1.70', 'Bwin': '1.68', '1xBet': '1.72' }
-    }
+      Home: { Bet365: '2.10', Bwin: '2.15', '1xBet': '2.08' },
+      Away: { Bet365: '1.70', Bwin: '1.68', '1xBet': '1.72' },
+    },
   },
   '305': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.55', 'Bwin': '1.52', '1xBet': '1.58' },
-      'Away': { 'Bet365': '2.40', 'Bwin': '2.45', '1xBet': '2.35' }
+      Home: { Bet365: '1.55', Bwin: '1.52', '1xBet': '1.58' },
+      Away: { Bet365: '2.40', Bwin: '2.45', '1xBet': '2.35' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.50', 'Bwin': '1.48', '1xBet': '1.52' },
-      'Away': { 'Bet365': '2.50', 'Bwin': '2.55', '1xBet': '2.45' }
+      Home: { Bet365: '1.50', Bwin: '1.48', '1xBet': '1.52' },
+      Away: { Bet365: '2.50', Bwin: '2.55', '1xBet': '2.45' },
     },
     'Total Sets': {
-      'Over 2.5': { 'Bet365': '1.90', 'Bwin': '1.92', '1xBet': '1.88' },
-      'Under 2.5': { 'Bet365': '1.90', 'Bwin': '1.88', '1xBet': '1.92' }
-    }
+      'Over 2.5': { Bet365: '1.90', Bwin: '1.92', '1xBet': '1.88' },
+      'Under 2.5': { Bet365: '1.90', Bwin: '1.88', '1xBet': '1.92' },
+    },
   },
   '306': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.40', 'Bwin': '1.38', '1xBet': '1.42' },
-      'Away': { 'Bet365': '2.90', 'Bwin': '2.95', '1xBet': '2.85' }
+      Home: { Bet365: '1.40', Bwin: '1.38', '1xBet': '1.42' },
+      Away: { Bet365: '2.90', Bwin: '2.95', '1xBet': '2.85' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.35', 'Bwin': '1.33', '1xBet': '1.37' },
-      'Away': { 'Bet365': '3.10', 'Bwin': '3.15', '1xBet': '3.05' }
-    }
+      Home: { Bet365: '1.35', Bwin: '1.33', '1xBet': '1.37' },
+      Away: { Bet365: '3.10', Bwin: '3.15', '1xBet': '3.05' },
+    },
   },
   '307': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.50', 'Bwin': '1.48', '1xBet': '1.52' },
-      'Away': { 'Bet365': '2.50', 'Bwin': '2.55', '1xBet': '2.45' }
+      Home: { Bet365: '1.50', Bwin: '1.48', '1xBet': '1.52' },
+      Away: { Bet365: '2.50', Bwin: '2.55', '1xBet': '2.45' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.45', 'Bwin': '1.43', '1xBet': '1.47' },
-      'Away': { 'Bet365': '2.65', 'Bwin': '2.70', '1xBet': '2.60' }
-    }
+      Home: { Bet365: '1.45', Bwin: '1.43', '1xBet': '1.47' },
+      Away: { Bet365: '2.65', Bwin: '2.70', '1xBet': '2.60' },
+    },
   },
   '308': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.70', 'Bwin': '1.68', '1xBet': '1.72' },
-      'Away': { 'Bet365': '2.10', 'Bwin': '2.15', '1xBet': '2.08' }
+      Home: { Bet365: '1.70', Bwin: '1.68', '1xBet': '1.72' },
+      Away: { Bet365: '2.10', Bwin: '2.15', '1xBet': '2.08' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.65', 'Bwin': '1.63', '1xBet': '1.67' },
-      'Away': { 'Bet365': '2.20', 'Bwin': '2.25', '1xBet': '2.18' }
+      Home: { Bet365: '1.65', Bwin: '1.63', '1xBet': '1.67' },
+      Away: { Bet365: '2.20', Bwin: '2.25', '1xBet': '2.18' },
     },
     'Total Sets': {
-      'Over 2.5': { 'Bet365': '1.95', 'Bwin': '1.98', '1xBet': '1.92' },
-      'Under 2.5': { 'Bet365': '1.85', 'Bwin': '1.82', '1xBet': '1.88' }
-    }
+      'Over 2.5': { Bet365: '1.95', Bwin: '1.98', '1xBet': '1.92' },
+      'Under 2.5': { Bet365: '1.85', Bwin: '1.82', '1xBet': '1.88' },
+    },
   },
   '309': {
     'Match Winner': {
-      'Home': { 'Bet365': '2.00', 'Bwin': '2.05', '1xBet': '1.98' },
-      'Away': { 'Bet365': '1.80', 'Bwin': '1.78', '1xBet': '1.82' }
+      Home: { Bet365: '2.00', Bwin: '2.05', '1xBet': '1.98' },
+      Away: { Bet365: '1.80', Bwin: '1.78', '1xBet': '1.82' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.95', 'Bwin': '1.98', '1xBet': '1.92' },
-      'Away': { 'Bet365': '1.85', 'Bwin': '1.82', '1xBet': '1.88' }
-    }
+      Home: { Bet365: '1.95', Bwin: '1.98', '1xBet': '1.92' },
+      Away: { Bet365: '1.85', Bwin: '1.82', '1xBet': '1.88' },
+    },
   },
   '310': {
     'Match Winner': {
-      'Home': { 'Bet365': '1.65', 'Bwin': '1.62', '1xBet': '1.68' },
-      'Away': { 'Bet365': '2.20', 'Bwin': '2.25', '1xBet': '2.18' }
+      Home: { Bet365: '1.65', Bwin: '1.62', '1xBet': '1.68' },
+      Away: { Bet365: '2.20', Bwin: '2.25', '1xBet': '2.18' },
     },
     'Set 1 Winner': {
-      'Home': { 'Bet365': '1.60', 'Bwin': '1.58', '1xBet': '1.62' },
-      'Away': { 'Bet365': '2.30', 'Bwin': '2.35', '1xBet': '2.28' }
+      Home: { Bet365: '1.60', Bwin: '1.58', '1xBet': '1.62' },
+      Away: { Bet365: '2.30', Bwin: '2.35', '1xBet': '2.28' },
     },
     'Total Sets': {
-      'Over 2.5': { 'Bet365': '1.88', 'Bwin': '1.90', '1xBet': '1.86' },
-      'Under 2.5': { 'Bet365': '1.92', 'Bwin': '1.90', '1xBet': '1.94' }
-    }
-  }
+      'Over 2.5': { Bet365: '1.88', Bwin: '1.90', '1xBet': '1.86' },
+      'Under 2.5': { Bet365: '1.92', Bwin: '1.90', '1xBet': '1.94' },
+    },
+  },
 };
 
 const mockLiveOdds: { [matchId: string]: any } = {
   '201': {
-    ...mockEvents.find(e => e.event_key === 201),
+    ...mockEvents.find((e) => e.event_key === 201),
     live_odds: [
       { odd_name: 'Match Winner', suspended: 'No', type: 'Home', value: '1.65', handicap: '' },
       { odd_name: 'Match Winner', suspended: 'No', type: 'Away', value: '2.20', handicap: '' },
       { odd_name: 'Set 3 Winner', suspended: 'No', type: 'Home', value: '1.40', handicap: '' },
-      { odd_name: 'Set 3 Winner', suspended: 'No', type: 'Away', value: '2.80', handicap: '' }
-    ]
-  }
+      { odd_name: 'Set 3 Winner', suspended: 'No', type: 'Away', value: '2.80', handicap: '' },
+    ],
+  },
 };
 
 // API Configuration - Using Next.js API route as proxy to avoid CORS issues
@@ -855,15 +1073,18 @@ const API_PROXY_URL = '/api/tennis';
 
 // Helper function to build URL with parameters
 const buildUrl = (method: string, params: Record<string, any> = {}): string => {
-  const url = new URL(API_PROXY_URL, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  const url = new URL(
+    API_PROXY_URL,
+    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+  );
   url.searchParams.append('met', method);
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       url.searchParams.append(key, String(value));
     }
   });
-  
+
   return url.toString();
 };
 
@@ -874,7 +1095,7 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 

@@ -131,9 +131,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
           ) : (
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                isFinished
-                  ? 'bg-slate-700/50 text-slate-400'
-                  : 'bg-white/5 text-slate-300'
+                isFinished ? 'bg-slate-700/50 text-slate-400' : 'bg-white/5 text-slate-300'
               }`}
             >
               {statusDisplay}

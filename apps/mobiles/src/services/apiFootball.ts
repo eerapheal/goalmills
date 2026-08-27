@@ -7,9 +7,7 @@ const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_FOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
 
 const API_KEY =
-  process.env.EXPO_PUBLIC_API_FOOTBALL_KEY_MOBILE ||
-  process.env.EXPO_PUBLIC_API_FOOTBALL_KEY ||
-  '';
+  process.env.EXPO_PUBLIC_API_FOOTBALL_KEY_MOBILE || process.env.EXPO_PUBLIC_API_FOOTBALL_KEY || '';
 
 export interface ApiFootballResponse<T> {
   get: string;
@@ -304,9 +302,7 @@ async function requestApiFootball<T>(
 
     if (
       data.errors &&
-      (Array.isArray(data.errors)
-        ? data.errors.length > 0
-        : Object.keys(data.errors).length > 0)
+      (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)
     ) {
       console.warn(`[API-Football] Warnings/Errors on ${endpoint}:`, data.errors);
     }

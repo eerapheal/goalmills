@@ -38,7 +38,9 @@ export function GoalmillsLoader({
   }[size];
 
   const content = (
-    <div className={`flex flex-col items-center justify-center p-6 text-center select-none ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center p-6 text-center select-none ${className}`}
+    >
       {/* Dynamic Multi-Orbit Radar Pulse */}
       <div className={`relative flex items-center justify-center ${ringDimensions.outer} mb-4`}>
         {/* Ambient Glow */}
@@ -54,7 +56,9 @@ export function GoalmillsLoader({
         <div className="absolute inset-3 rounded-full border border-transparent border-t-amber-400 border-r-amber-500 animate-spin [animation-duration:0.8s]" />
 
         {/* Pulsing Core Sports Monogram */}
-        <div className={`relative ${ringDimensions.core} rounded-full bg-slate-900/90 border border-white/15 flex items-center justify-center shadow-lg shadow-black/50 backdrop-blur-sm`}>
+        <div
+          className={`relative ${ringDimensions.core} rounded-full bg-slate-900/90 border border-white/15 flex items-center justify-center shadow-lg shadow-black/50 backdrop-blur-sm`}
+        >
           <span className="text-xs font-black tracking-tighter bg-gradient-to-br from-white via-blue-200 to-emerald-400 bg-clip-text text-transparent animate-pulse">
             GM
           </span>
@@ -69,11 +73,15 @@ export function GoalmillsLoader({
       {/* Brand & Progress Subtitle */}
       {label && (
         <div className="space-y-1">
-          <h4 className={`${ringDimensions.title} font-black uppercase tracking-wider text-white flex items-center justify-center gap-2`}>
+          <h4
+            className={`${ringDimensions.title} font-black uppercase tracking-wider text-white flex items-center justify-center gap-2`}
+          >
             <span>{label}</span>
           </h4>
           {sublabel && (
-            <p className={`${ringDimensions.text} text-slate-400 max-w-xs font-medium tracking-wide flex items-center justify-center gap-1.5`}>
+            <p
+              className={`${ringDimensions.text} text-slate-400 max-w-xs font-medium tracking-wide flex items-center justify-center gap-1.5`}
+            >
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>{sublabel}</span>
             </p>
@@ -99,7 +107,13 @@ export function GoalmillsLoader({
 /**
  * GoalmillsCardSkeleton - Unified shimmer card skeleton for feeds, tables, and match rows
  */
-export function GoalmillsCardSkeleton({ count = 3, className = '' }: { count?: number; className?: string }) {
+export function GoalmillsCardSkeleton({
+  count = 3,
+  className = '',
+}: {
+  count?: number;
+  className?: string;
+}) {
   return (
     <div className={`space-y-4 w-full ${className}`}>
       {Array.from({ length: count }).map((_, idx) => (

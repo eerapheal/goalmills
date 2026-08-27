@@ -20,7 +20,7 @@ async function rateLimitedFetch(url: string, options: RequestInit): Promise<Resp
   if (timeSinceLast < MIN_FETCH_GAP_MS) {
     const delay = MIN_FETCH_GAP_MS - timeSinceLast;
     lastFetchTime = now + delay;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   } else {
     lastFetchTime = Date.now();
   }
@@ -50,35 +50,77 @@ const API_KEY =
 function getTtlForEndpoint(endpoint: string): number {
   const ep = endpoint.toLowerCase();
   if (ep.includes('live') || ep.includes('score')) return 15;
-  if (ep.includes('fixture') || ep.includes('match') || ep.includes('schedule') || ep.includes('upcoming') || ep.includes('recent') || ep.includes('results')) return 60;
-  if (ep.includes('standing') || ep.includes('table') || ep.includes('rank') || ep.includes('points-table')) return 300;
-  if (ep.includes('team') || ep.includes('league') || ep.includes('series') || ep.includes('player') || ep.includes('news') || ep.includes('stats')) return 600;
+  if (
+    ep.includes('fixture') ||
+    ep.includes('match') ||
+    ep.includes('schedule') ||
+    ep.includes('upcoming') ||
+    ep.includes('recent') ||
+    ep.includes('results')
+  )
+    return 60;
+  if (
+    ep.includes('standing') ||
+    ep.includes('table') ||
+    ep.includes('rank') ||
+    ep.includes('points-table')
+  )
+    return 300;
+  if (
+    ep.includes('team') ||
+    ep.includes('league') ||
+    ep.includes('series') ||
+    ep.includes('player') ||
+    ep.includes('news') ||
+    ep.includes('stats')
+  )
+    return 600;
   return 60;
 }
 
 // ─── Cricbuzz Path Mapping ────────────────────────────────────────────────────
 function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): string {
   const ep = endpoint.toLowerCase().trim();
-  const playerId = searchParams.get('playerId') || searchParams.get('id') || searchParams.get('player_id');
-  const seriesId = searchParams.get('leagueId') || searchParams.get('seriesId') || searchParams.get('id');
-  const teamId = searchParams.get('teamId') || searchParams.get('team_id') || searchParams.get('team');
-  const matchId = searchParams.get('matchId') || searchParams.get('match_id') || searchParams.get('id');
+  const playerId =
+    searchParams.get('playerId') || searchParams.get('id') || searchParams.get('player_id');
+  const seriesId =
+    searchParams.get('leagueId') || searchParams.get('seriesId') || searchParams.get('id');
+  const teamId =
+    searchParams.get('teamId') || searchParams.get('team_id') || searchParams.get('team');
+  const matchId =
+    searchParams.get('matchId') || searchParams.get('match_id') || searchParams.get('id');
 
   // Direct paths starting with '/'
   if (endpoint.startsWith('/')) return endpoint;
 
   // Match Center: Scorecard, Commentary, Lineups, Overs, Leanback, Info
-  if (ep === 'matches/get-scorecard' || ep === 'matches/get-scorecard-v2' || ep === 'scorecard' || ep === 'scard' || ep.includes('scard')) {
+  if (
+    ep === 'matches/get-scorecard' ||
+    ep === 'matches/get-scorecard-v2' ||
+    ep === 'scorecard' ||
+    ep === 'scard' ||
+    ep.includes('scard')
+  ) {
     return matchId ? `/mcenter/v1/${matchId}/scard` : '/matches/v1/recent';
   }
-  if (ep === 'matches/get-commentaries' || ep === 'matches/get-commentaries-v2' || ep === 'commentary' || ep === 'comments' || ep === 'comm') {
+  if (
+    ep === 'matches/get-commentaries' ||
+    ep === 'matches/get-commentaries-v2' ||
+    ep === 'commentary' ||
+    ep === 'comments' ||
+    ep === 'comm'
+  ) {
     return matchId ? `/mcenter/v1/${matchId}/comm` : '/matches/v1/live';
   }
   if (ep === 'matches/get-hcomm' || ep === 'hcomm' || ep === 'highlights-commentary') {
     return matchId ? `/mcenter/v1/${matchId}/hcomm` : '/matches/v1/live';
   }
   if (ep === 'matches/get-team' || ep === 'matches/team' || ep === 'match-team') {
-    return matchId && teamId ? `/mcenter/v1/${matchId}/team/${teamId}` : (matchId ? `/mcenter/v1/${matchId}/scard` : '/matches/v1/recent');
+    return matchId && teamId
+      ? `/mcenter/v1/${matchId}/team/${teamId}`
+      : matchId
+        ? `/mcenter/v1/${matchId}/scard`
+        : '/matches/v1/recent';
   }
   if (ep === 'matches/get-overs' || ep === 'overs' || ep === 'miniscore') {
     return matchId ? `/mcenter/v1/${matchId}/overs` : '/matches/v1/live';
@@ -86,12 +128,19 @@ function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): strin
   if (ep === 'matches/get-leanback' || ep === 'leanback' || ep === 'odds' || ep === 'predictions') {
     return matchId ? `/mcenter/v1/${matchId}/leanback` : '/matches/v1/live';
   }
-  if (ep === 'matches/get-info' || ep === 'match/info' || ep === 'match_info' || ep === 'matchinfo' || ep === 'mcenter') {
+  if (
+    ep === 'matches/get-info' ||
+    ep === 'match/info' ||
+    ep === 'match_info' ||
+    ep === 'matchinfo' ||
+    ep === 'mcenter'
+  ) {
     return matchId ? `/mcenter/v1/${matchId}` : '/matches/v1/live';
   }
 
   // Live / Matches / Fixtures / Recent / List
-  if (ep === 'matches/list' || ep === 'matches' || ep === 'livescore' || ep === 'live') return '/matches/v1/live';
+  if (ep === 'matches/list' || ep === 'matches' || ep === 'livescore' || ep === 'live')
+    return '/matches/v1/live';
   if (ep === 'fixtures' || ep === 'upcoming') return '/matches/v1/upcoming';
   if (ep === 'recent') return '/matches/v1/recent';
 
@@ -102,7 +151,9 @@ function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): strin
   }
   if (ep === 'series/list-archives' || ep === 'series/archives' || ep === 'series/archive') {
     const year = searchParams.get('year') || '2025';
-    return searchParams.get('year') ? `/series/v1/archives/${year}` : `/series/v1/archive/${searchParams.get('type') || 'international'}`;
+    return searchParams.get('year')
+      ? `/series/v1/archives/${year}`
+      : `/series/v1/archive/${searchParams.get('type') || 'international'}`;
   }
   if (ep === 'series/get-matches' || ep === 'series/matches') {
     return seriesId ? `/series/v1/${seriesId}` : '/matches/v1/upcoming';
@@ -114,20 +165,37 @@ function mapCricbuzzPath(endpoint: string, searchParams: URLSearchParams): strin
     return seriesId ? `/series/v1/${seriesId}/squads` : '/series/v1/international';
   }
   if (ep === 'series/get-players' || ep === 'series/players' || ep === 'series/squad-players') {
-    const squadId = searchParams.get('squadId') || searchParams.get('squad_id') || searchParams.get('teamId') || searchParams.get('id');
-    return seriesId && squadId ? `/series/v1/${seriesId}/squads/${squadId}` : (seriesId ? `/series/v1/${seriesId}/squads` : '/stats/v1/player/trending');
+    const squadId =
+      searchParams.get('squadId') ||
+      searchParams.get('squad_id') ||
+      searchParams.get('teamId') ||
+      searchParams.get('id');
+    return seriesId && squadId
+      ? `/series/v1/${seriesId}/squads/${squadId}`
+      : seriesId
+        ? `/series/v1/${seriesId}/squads`
+        : '/stats/v1/player/trending';
   }
   if (ep === 'series/get-venues' || ep === 'series/venues') {
     return seriesId ? `/series/v1/${seriesId}/venues` : '/series/v1/international';
   }
-  if (ep === 'series/get-points-table' || ep === 'series/points-table' || ep === 'standings' || ep === 'points-table') {
+  if (
+    ep === 'series/get-points-table' ||
+    ep === 'series/points-table' ||
+    ep === 'standings' ||
+    ep === 'points-table'
+  ) {
     return seriesId ? `/stats/v1/series/${seriesId}/points-table` : '/series/v1/international';
   }
   if (ep === 'series/get-stats-filters' || ep === 'series/stats-filters') {
     return seriesId ? `/stats/v1/series/${seriesId}` : '/series/v1/international';
   }
   if (ep === 'series/get-stats' || ep === 'series/stats') {
-    const statType = searchParams.get('statType') || searchParams.get('stat_type') || searchParams.get('stat') || 'mostRuns';
+    const statType =
+      searchParams.get('statType') ||
+      searchParams.get('stat_type') ||
+      searchParams.get('stat') ||
+      'mostRuns';
     return seriesId ? `/stats/v1/series/${seriesId}/${statType}` : '/series/v1/international';
   }
 
@@ -197,64 +265,64 @@ const CRICBUZZ_IMG = (id: number | string) =>
 
 const KNOWN_CRICKET_TEAM_LOGOS: Record<string, string> = {
   // Flag CDN - 100% Reliable, never blocked by CORS/Referer
-  'india': 'https://flagcdn.com/w160/in.png',
-  'ind': 'https://flagcdn.com/w160/in.png',
-  'australia': 'https://flagcdn.com/w160/au.png',
-  'aus': 'https://flagcdn.com/w160/au.png',
-  'england': 'https://flagcdn.com/w160/gb-eng.png',
-  'eng': 'https://flagcdn.com/w160/gb-eng.png',
+  india: 'https://flagcdn.com/w160/in.png',
+  ind: 'https://flagcdn.com/w160/in.png',
+  australia: 'https://flagcdn.com/w160/au.png',
+  aus: 'https://flagcdn.com/w160/au.png',
+  england: 'https://flagcdn.com/w160/gb-eng.png',
+  eng: 'https://flagcdn.com/w160/gb-eng.png',
   'south africa': 'https://flagcdn.com/w160/za.png',
-  'sa': 'https://flagcdn.com/w160/za.png',
-  'rsa': 'https://flagcdn.com/w160/za.png',
+  sa: 'https://flagcdn.com/w160/za.png',
+  rsa: 'https://flagcdn.com/w160/za.png',
   'new zealand': 'https://flagcdn.com/w160/nz.png',
-  'nz': 'https://flagcdn.com/w160/nz.png',
-  'pakistan': 'https://flagcdn.com/w160/pk.png',
-  'pak': 'https://flagcdn.com/w160/pk.png',
+  nz: 'https://flagcdn.com/w160/nz.png',
+  pakistan: 'https://flagcdn.com/w160/pk.png',
+  pak: 'https://flagcdn.com/w160/pk.png',
   'sri lanka': 'https://flagcdn.com/w160/lk.png',
-  'sl': 'https://flagcdn.com/w160/lk.png',
+  sl: 'https://flagcdn.com/w160/lk.png',
   'west indies': 'https://flagcdn.com/w160/jm.png',
-  'wi': 'https://flagcdn.com/w160/jm.png',
-  'bangladesh': 'https://flagcdn.com/w160/bd.png',
-  'ban': 'https://flagcdn.com/w160/bd.png',
-  'afghanistan': 'https://flagcdn.com/w160/af.png',
-  'afg': 'https://flagcdn.com/w160/af.png',
-  'ireland': 'https://flagcdn.com/w160/ie.png',
-  'ire': 'https://flagcdn.com/w160/ie.png',
-  'zimbabwe': 'https://flagcdn.com/w160/zw.png',
-  'zim': 'https://flagcdn.com/w160/zw.png',
-  'scotland': 'https://flagcdn.com/w160/gb-sct.png',
-  'netherlands': 'https://flagcdn.com/w160/nl.png',
-  'ned': 'https://flagcdn.com/w160/nl.png',
-  'usa': 'https://flagcdn.com/w160/us.png',
-  'nepal': 'https://flagcdn.com/w160/np.png',
-  'namibia': 'https://flagcdn.com/w160/na.png',
-  'canada': 'https://flagcdn.com/w160/ca.png',
-  'oman': 'https://flagcdn.com/w160/om.png',
+  wi: 'https://flagcdn.com/w160/jm.png',
+  bangladesh: 'https://flagcdn.com/w160/bd.png',
+  ban: 'https://flagcdn.com/w160/bd.png',
+  afghanistan: 'https://flagcdn.com/w160/af.png',
+  afg: 'https://flagcdn.com/w160/af.png',
+  ireland: 'https://flagcdn.com/w160/ie.png',
+  ire: 'https://flagcdn.com/w160/ie.png',
+  zimbabwe: 'https://flagcdn.com/w160/zw.png',
+  zim: 'https://flagcdn.com/w160/zw.png',
+  scotland: 'https://flagcdn.com/w160/gb-sct.png',
+  netherlands: 'https://flagcdn.com/w160/nl.png',
+  ned: 'https://flagcdn.com/w160/nl.png',
+  usa: 'https://flagcdn.com/w160/us.png',
+  nepal: 'https://flagcdn.com/w160/np.png',
+  namibia: 'https://flagcdn.com/w160/na.png',
+  canada: 'https://flagcdn.com/w160/ca.png',
+  oman: 'https://flagcdn.com/w160/om.png',
   'papua new guinea': 'https://flagcdn.com/w160/pg.png',
-  'png': 'https://flagcdn.com/w160/pg.png',
-  'uae': 'https://flagcdn.com/w160/ae.png',
+  png: 'https://flagcdn.com/w160/pg.png',
+  uae: 'https://flagcdn.com/w160/ae.png',
   // IPL & Franchise Teams
   'chennai super kings': 'https://static.cricbuzz.com/a/img/v1/i1/c776310/i.jpg',
-  'csk': 'https://static.cricbuzz.com/a/img/v1/i1/c776310/i.jpg',
+  csk: 'https://static.cricbuzz.com/a/img/v1/i1/c776310/i.jpg',
   'mumbai indians': 'https://static.cricbuzz.com/a/img/v1/i1/c776320/i.jpg',
-  'mi': 'https://static.cricbuzz.com/a/img/v1/i1/c776320/i.jpg',
+  mi: 'https://static.cricbuzz.com/a/img/v1/i1/c776320/i.jpg',
   'royal challengers bengaluru': 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
   'royal challengers bangalore': 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
-  'rcb': 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
+  rcb: 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
   'kolkata knight riders': 'https://static.cricbuzz.com/a/img/v1/i1/c776340/i.jpg',
-  'kkr': 'https://static.cricbuzz.com/a/img/v1/i1/c776340/i.jpg',
+  kkr: 'https://static.cricbuzz.com/a/img/v1/i1/c776340/i.jpg',
   'sunrisers hyderabad': 'https://static.cricbuzz.com/a/img/v1/i1/c776350/i.jpg',
-  'srh': 'https://static.cricbuzz.com/a/img/v1/i1/c776350/i.jpg',
+  srh: 'https://static.cricbuzz.com/a/img/v1/i1/c776350/i.jpg',
   'delhi capitals': 'https://static.cricbuzz.com/a/img/v1/i1/c776360/i.jpg',
-  'dc': 'https://static.cricbuzz.com/a/img/v1/i1/c776360/i.jpg',
+  dc: 'https://static.cricbuzz.com/a/img/v1/i1/c776360/i.jpg',
   'rajasthan royals': 'https://static.cricbuzz.com/a/img/v1/i1/c776370/i.jpg',
-  'rr': 'https://static.cricbuzz.com/a/img/v1/i1/c776370/i.jpg',
+  rr: 'https://static.cricbuzz.com/a/img/v1/i1/c776370/i.jpg',
   'gujarat titans': 'https://static.cricbuzz.com/a/img/v1/i1/c776380/i.jpg',
-  'gt': 'https://static.cricbuzz.com/a/img/v1/i1/c776380/i.jpg',
+  gt: 'https://static.cricbuzz.com/a/img/v1/i1/c776380/i.jpg',
   'lucknow super giants': 'https://static.cricbuzz.com/a/img/v1/i1/c776390/i.jpg',
-  'lsg': 'https://static.cricbuzz.com/a/img/v1/i1/c776390/i.jpg',
+  lsg: 'https://static.cricbuzz.com/a/img/v1/i1/c776390/i.jpg',
   'punjab kings': 'https://static.cricbuzz.com/a/img/v1/i1/c776400/i.jpg',
-  'pbks': 'https://static.cricbuzz.com/a/img/v1/i1/c776400/i.jpg',
+  pbks: 'https://static.cricbuzz.com/a/img/v1/i1/c776400/i.jpg',
   // BBL Teams
   'sydney sixers': 'https://static.cricbuzz.com/a/img/v1/i1/c776410/i.jpg',
   'sydney thunder': 'https://static.cricbuzz.com/a/img/v1/i1/c776412/i.jpg',
@@ -283,7 +351,12 @@ const resolveImgUrl = (img: any): string | undefined => {
 };
 
 const resolveTeamLogo = (teamObj: any, teamNameFallback?: string): string => {
-  const direct = teamObj?.imageId || teamObj?.faceImageId || teamObj?.image || teamObj?.team_logo || teamObj?.logo;
+  const direct =
+    teamObj?.imageId ||
+    teamObj?.faceImageId ||
+    teamObj?.image ||
+    teamObj?.team_logo ||
+    teamObj?.logo;
   const resolvedDirect = resolveImgUrl(direct);
   if (resolvedDirect) return resolvedDirect;
 
@@ -334,10 +407,15 @@ function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): an
   const startDate = startMs ? new Date(startMs).toISOString().split('T')[0] : null;
   const endDate = endMs ? new Date(endMs).toISOString().split('T')[0] : null;
   const startTime = startMs
-    ? new Date(startMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+    ? new Date(startMs).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
     : null;
 
-  const isLive = info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
+  const isLive =
+    info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
   const t1Name = t1.teamName || t1.name || 'TBA';
   const t2Name = t2.teamName || t2.name || 'TBA';
 
@@ -365,7 +443,9 @@ function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): an
     league_season: new Date(startMs || Date.now()).getFullYear().toString(),
     event_live: isLive ? '1' : '0',
     event_type: info.matchFormat || 'Cricket',
-    event_stadium: venue.ground ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}` : undefined,
+    event_stadium: venue.ground
+      ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}`
+      : undefined,
     event_home_team_logo: resolveTeamLogo(t1, t1Name),
     event_away_team_logo: resolveTeamLogo(t2, t2Name),
   };
@@ -406,7 +486,11 @@ function transformCricbuzzTeamMatches(data: any): any[] {
   const teamMatchesData = data?.teamMatchesData || data?.matchScheduleMap || data?.scheduleData;
   if (Array.isArray(teamMatchesData)) {
     for (const block of teamMatchesData) {
-      const matches = block?.matchDetailsMap?.match || block?.match || block?.matches || block?.scheduleAdWrapper?.matches;
+      const matches =
+        block?.matchDetailsMap?.match ||
+        block?.match ||
+        block?.matches ||
+        block?.scheduleAdWrapper?.matches;
       if (Array.isArray(matches)) {
         for (const m of matches) {
           const ev = mapMatchToEvent(m.matchInfo || m, m.matchScore);
@@ -449,9 +533,7 @@ function transformCricbuzzSeries(data: any): any[] {
         league_year: s.startDt
           ? new Date(Number(s.startDt)).getFullYear().toString()
           : new Date().getFullYear().toString(),
-        league_season: s.startDt
-          ? new Date(Number(s.startDt)).getFullYear().toString()
-          : undefined,
+        league_season: s.startDt ? new Date(Number(s.startDt)).getFullYear().toString() : undefined,
         country_name: group.date || 'International',
       });
     }
@@ -475,7 +557,8 @@ function transformCricbuzzTeamsList(data: any): any[] {
       return {
         team_key: tid,
         team_name: t.teamName || t.name || '',
-        team_short_name: t.teamSName || t.shortName || (t.teamName || t.name || '').slice(0, 3).toUpperCase(),
+        team_short_name:
+          t.teamSName || t.shortName || (t.teamName || t.name || '').slice(0, 3).toUpperCase(),
         team_logo: resolveTeamLogo(t, t.teamName || t.name),
         country_name: t.countryName || t.country || t.teamName || 'International',
       };
@@ -501,7 +584,8 @@ function transformCricbuzzTeamSquad(data: any, teamId: string): any[] {
       players.push({
         player_key: String(p.id),
         player_name: p.name || '',
-        player_image: p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
+        player_image:
+          p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
         player_type: currentRole,
         player_role: currentRole,
         batting_style: p.battingStyle || undefined,
@@ -523,7 +607,9 @@ function transformCricbuzzPlayers(data: any): any[] {
       player_key: String(p.id || ''),
       player_name: p.name || 'Cricket Player',
       player_country: p.teamName || 'International',
-      player_image: p.faceImageId ? CRICBUZZ_IMG(p.faceImageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+      player_image: p.faceImageId
+        ? CRICBUZZ_IMG(p.faceImageId)
+        : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
       player_type: 'International Player',
       player_role: 'Athlete',
       team_name: p.teamName || 'International',
@@ -531,19 +617,24 @@ function transformCricbuzzPlayers(data: any): any[] {
   }
 
   if (data && (data.id || data.name)) {
-    return [{
-      player_key: String(data.id || ''),
-      player_name: data.name || '',
-      player_country: data.intlTeam || data.teamName || 'International',
-      player_image: data.faceImageId || data.imageId ? CRICBUZZ_IMG(data.faceImageId || data.imageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
-      player_type: data.role || 'Player',
-      player_role: data.role || 'Player',
-      batting_style: data.bat || data.battingStyle || 'Right-hand bat',
-      bowling_style: data.bowl || data.bowlingStyle || 'Right-arm medium',
-      player_born: data.birthPlace || undefined,
-      bio: data.bio || undefined,
-      team_name: data.intlTeam || data.teamName || undefined,
-    }];
+    return [
+      {
+        player_key: String(data.id || ''),
+        player_name: data.name || '',
+        player_country: data.intlTeam || data.teamName || 'International',
+        player_image:
+          data.faceImageId || data.imageId
+            ? CRICBUZZ_IMG(data.faceImageId || data.imageId)
+            : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+        player_type: data.role || 'Player',
+        player_role: data.role || 'Player',
+        batting_style: data.bat || data.battingStyle || 'Right-hand bat',
+        bowling_style: data.bowl || data.bowlingStyle || 'Right-arm medium',
+        player_born: data.birthPlace || undefined,
+        bio: data.bio || undefined,
+        team_name: data.intlTeam || data.teamName || undefined,
+      },
+    ];
   }
 
   return [];
@@ -553,7 +644,13 @@ function transformCricbuzzPlayers(data: any): any[] {
  * Transform Cricbuzz /mcenter/v1/{matchId}/scard into complete scorecard, wickets, extras, and lineups
  */
 function transformCricbuzzScorecard(data: any): any {
-  if (!data) return { scorecard: {}, wickets: {}, extra: {}, lineups: { home_team: { starting_lineups: [] }, away_team: { starting_lineups: [] } } };
+  if (!data)
+    return {
+      scorecard: {},
+      wickets: {},
+      extra: {},
+      lineups: { home_team: { starting_lineups: [] }, away_team: { starting_lineups: [] } },
+    };
 
   const rawScorecard = data.scoreCard || data.scorecard || (Array.isArray(data) ? data : []);
   const matchHeader = data.matchHeader || {};
@@ -705,14 +802,34 @@ function transformCricbuzzCommentary(data: any): Record<string, any[]> {
 
     const text = c.commText || c.commentary || '';
     let runs = '0';
-    if (c.event === 'FOUR' || text.toLowerCase().includes('four') || text.toLowerCase().includes('4 runs')) runs = '4';
-    else if (c.event === 'SIX' || text.toLowerCase().includes('six') || text.toLowerCase().includes('6 runs')) runs = '6';
-    else if (c.event === 'WICKET' || text.toLowerCase().includes('out') || text.toLowerCase().includes('wicket')) runs = 'W';
+    if (
+      c.event === 'FOUR' ||
+      text.toLowerCase().includes('four') ||
+      text.toLowerCase().includes('4 runs')
+    )
+      runs = '4';
+    else if (
+      c.event === 'SIX' ||
+      text.toLowerCase().includes('six') ||
+      text.toLowerCase().includes('6 runs')
+    )
+      runs = '6';
+    else if (
+      c.event === 'WICKET' ||
+      text.toLowerCase().includes('out') ||
+      text.toLowerCase().includes('wicket')
+    )
+      runs = 'W';
     else if (c.runs !== undefined) runs = String(c.runs);
 
     commentsByInnings[innKey].push({
       innings: innKey,
-      overs: c.overNumber !== undefined ? String(c.overNumber) : (c.ballNbr ? `${Math.floor(c.ballNbr / 6)}.${c.ballNbr % 6}` : '0.0'),
+      overs:
+        c.overNumber !== undefined
+          ? String(c.overNumber)
+          : c.ballNbr
+            ? `${Math.floor(c.ballNbr / 6)}.${c.ballNbr % 6}`
+            : '0.0',
       balls: String(c.ballNbr || ''),
       runs,
       post: text,
@@ -797,7 +914,8 @@ function transformCricbuzzSeriesSquadPlayers(data: any, squadId?: string): any[]
       player_name: p.name || 'Player',
       player_role: p.role || 'Player',
       player_type: p.role || 'Player',
-      player_image: p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
+      player_image:
+        p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
       batting_style: p.battingStyle || undefined,
       bowling_style: p.bowlingStyle || undefined,
       is_captain: Boolean(p.captain || p.isCaptain),
@@ -881,10 +999,16 @@ function transformCricbuzzSeriesStats(data: any): any {
 /**
  * Detect the type of endpoint and apply the correct Cricbuzz → app transformation.
  */
-function transformCricbuzzResponse(endpointParam: string, data: any, searchParams: URLSearchParams): any {
+function transformCricbuzzResponse(
+  endpointParam: string,
+  data: any,
+  searchParams: URLSearchParams
+): any {
   const ep = endpointParam.toLowerCase();
-  const matchId = searchParams.get('matchId') || searchParams.get('match_id') || searchParams.get('id') || '0';
-  const teamId = searchParams.get('teamId') || searchParams.get('team_id') || searchParams.get('id') || '';
+  const matchId =
+    searchParams.get('matchId') || searchParams.get('match_id') || searchParams.get('id') || '0';
+  const teamId =
+    searchParams.get('teamId') || searchParams.get('team_id') || searchParams.get('id') || '';
   const squadId = searchParams.get('squadId') || searchParams.get('squad_id') || '';
 
   // Match Scorecard: /mcenter/v1/{id}/scard
@@ -906,25 +1030,40 @@ function transformCricbuzzResponse(endpointParam: string, data: any, searchParam
   }
 
   // Series Matches: /series/v1/{seriesId}
-  if (data?.matchDetails || ep.includes('series/get-matches') || (ep.includes('series') && ep.includes('matches'))) {
+  if (
+    data?.matchDetails ||
+    ep.includes('series/get-matches') ||
+    (ep.includes('series') && ep.includes('matches'))
+  ) {
     const events = transformCricbuzzSeriesMatches(data);
     if (events.length > 0) return { success: 1, result: events };
   }
 
   // Series Squads: /series/v1/{seriesId}/squads
-  if (data?.squads || ep.includes('series/get-squads') || (ep.includes('series') && ep.includes('squads') && !squadId)) {
+  if (
+    data?.squads ||
+    ep.includes('series/get-squads') ||
+    (ep.includes('series') && ep.includes('squads') && !squadId)
+  ) {
     const squads = transformCricbuzzSeriesSquads(data);
     return { success: 1, result: squads };
   }
 
   // Series Squad Players: /series/v1/{seriesId}/squads/{squadId}
-  if (ep.includes('series/get-players') || (ep.includes('series') && ep.includes('squads') && squadId)) {
+  if (
+    ep.includes('series/get-players') ||
+    (ep.includes('series') && ep.includes('squads') && squadId)
+  ) {
     const players = transformCricbuzzSeriesSquadPlayers(data, squadId);
     return { success: 1, result: players };
   }
 
   // Series Venues: /series/v1/{seriesId}/venues
-  if (data?.seriesVenue || ep.includes('series/get-venues') || (ep.includes('series') && ep.includes('venues'))) {
+  if (
+    data?.seriesVenue ||
+    ep.includes('series/get-venues') ||
+    (ep.includes('series') && ep.includes('venues'))
+  ) {
     const venues = transformCricbuzzSeriesVenues(data);
     return { success: 1, result: venues };
   }
@@ -948,13 +1087,24 @@ function transformCricbuzzResponse(endpointParam: string, data: any, searchParam
   }
 
   // Team Players Squad: /teams/v1/{id}/players
-  if (ep.includes('teams/get-players') || (ep.includes('teams') && ep.includes('players')) || (data?.player && Array.isArray(data?.player) && data.player.some((x: any) => !x.id && x.name))) {
+  if (
+    ep.includes('teams/get-players') ||
+    (ep.includes('teams') && ep.includes('players')) ||
+    (data?.player && Array.isArray(data?.player) && data.player.some((x: any) => !x.id && x.name))
+  ) {
     const squad = transformCricbuzzTeamSquad(data, teamId);
     if (squad.length > 0) return { success: 1, result: squad };
   }
 
   // Match listing endpoints
-  if (ep === 'livescore' || ep === 'live' || ep === 'fixtures' || ep === 'upcoming' || ep === 'recent' || ep.includes('matches/v1')) {
+  if (
+    ep === 'livescore' ||
+    ep === 'live' ||
+    ep === 'fixtures' ||
+    ep === 'upcoming' ||
+    ep === 'recent' ||
+    ep.includes('matches/v1')
+  ) {
     const events = transformCricbuzzMatches(data);
     return { success: 1, result: events };
   }
@@ -980,7 +1130,9 @@ function transformCricbuzzResponse(endpointParam: string, data: any, searchParam
   // Fallthrough
   return {
     success: 1,
-    result: Array.isArray(data) ? data : (data.result ?? data.values ?? data.types ?? data.storyList ?? data),
+    result: Array.isArray(data)
+      ? data
+      : (data.result ?? data.values ?? data.types ?? data.storyList ?? data),
     ...(!Array.isArray(data) ? data : {}),
   };
 }
@@ -1003,7 +1155,7 @@ export async function GET(request: NextRequest) {
     const apiUrl = new URL(baseUrlStr);
 
     const headers: Record<string, string> = {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json',
     };
 
@@ -1014,7 +1166,21 @@ export async function GET(request: NextRequest) {
 
       // Only forward params that Cricbuzz accepts
       searchParams.forEach((value: any, key: any) => {
-        if (!['met', 'endpoint', 'from', 'to', 'timezone', 'leagueId', 'seriesId', 'playerId', 'teamId', 'team_id'].includes(key) && value) {
+        if (
+          ![
+            'met',
+            'endpoint',
+            'from',
+            'to',
+            'timezone',
+            'leagueId',
+            'seriesId',
+            'playerId',
+            'teamId',
+            'team_id',
+          ].includes(key) &&
+          value
+        ) {
           apiUrl.searchParams.append(key, value);
         }
       });
@@ -1034,7 +1200,7 @@ export async function GET(request: NextRequest) {
 
     // Check in-memory cache
     const cached = CACHE_STORE.get(cacheKey);
-    if (cached && (now - cached.timestamp < cached.ttl * 1000)) {
+    if (cached && now - cached.timestamp < cached.ttl * 1000) {
       return NextResponse.json(cached.data, {
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -1080,9 +1246,13 @@ export async function GET(request: NextRequest) {
     if (!response || !response.ok || response.status === 204) {
       const status = response ? response.status : 502;
       if (status === 404 || status === 204) {
-        console.info(`[Info] Feed unavailable for ${endpointParam} (status ${status}), returning client fallback.`);
+        console.info(
+          `[Info] Feed unavailable for ${endpointParam} (status ${status}), returning client fallback.`
+        );
       } else {
-        console.warn(`Cricket API status ${status} for ${endpointParam}, triggering client fallbacks.`);
+        console.warn(
+          `Cricket API status ${status} for ${endpointParam}, triggering client fallbacks.`
+        );
       }
       if (status === 429) rateLimitBackoffUntil = Date.now() + 15_000;
 

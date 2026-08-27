@@ -3,16 +3,16 @@
 import { useRouter } from 'next/navigation';
 
 interface BackButtonProps {
-    className?: string;
+  className?: string;
 }
 
 export function BackButton({ className = '' }: BackButtonProps) {
-    const router = useRouter();
+  const router = useRouter();
 
-    return (
-        <button
-            onClick={() => router.back()}
-            className={`
+  return (
+    <button
+      onClick={() => router.back()}
+      className={`
                 group flex items-center justify-center w-10 h-10 rounded-full 
                 bg-surfaceHighlight/80 backdrop-blur-md border border-white/10
                 hover:bg-secondary hover:border-secondary transition-all duration-300
@@ -20,21 +20,21 @@ export function BackButton({ className = '' }: BackButtonProps) {
                 active:scale-95 z-50
                 ${className}
             `}
-            aria-label="Go back"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-5 h-5 text-white group-hover:text-surface transition-colors"
-            >
-                <path d="M19 12H5" />
-                <path d="M12 19l-7-7 7-7" />
-            </svg>
-        </button>
-    );
+      aria-label="Go back"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-5 h-5 text-white group-hover:text-surface transition-colors"
+      >
+        <path d="M19 12H5" />
+        <path d="M12 19l-7-7 7-7" />
+      </svg>
+    </button>
+  );
 }

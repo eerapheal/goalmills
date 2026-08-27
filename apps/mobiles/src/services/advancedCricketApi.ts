@@ -52,7 +52,7 @@ async function rateLimitedFetch(url: string, options: RequestInit): Promise<Resp
   if (timeSinceLast < MIN_FETCH_GAP_MS) {
     const delay = MIN_FETCH_GAP_MS - timeSinceLast;
     lastFetchTime = now + delay;
-    await new Promise<void>(resolve => setTimeout(() => resolve(), delay));
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), delay));
   } else {
     lastFetchTime = Date.now();
   }
@@ -60,9 +60,7 @@ async function rateLimitedFetch(url: string, options: RequestInit): Promise<Resp
 }
 
 function getApiBaseUrl(): string {
-  let raw =
-    process.env.EXPO_PUBLIC_CRICKET_BASE_URL ||
-    'https://cricbuzz-cricket.p.rapidapi.com';
+  let raw = process.env.EXPO_PUBLIC_CRICKET_BASE_URL || 'https://cricbuzz-cricket.p.rapidapi.com';
 
   raw = raw.trim();
   if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
@@ -100,17 +98,33 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   if (method.startsWith('/')) return method;
 
   // Match Center: Scorecard, Commentary, Lineups, Overs, Leanback, Info
-  if (ep === 'matches/get-scorecard' || ep === 'matches/get-scorecard-v2' || ep === 'scorecard' || ep === 'scard' || ep.includes('scard')) {
+  if (
+    ep === 'matches/get-scorecard' ||
+    ep === 'matches/get-scorecard-v2' ||
+    ep === 'scorecard' ||
+    ep === 'scard' ||
+    ep.includes('scard')
+  ) {
     return matchId ? `/mcenter/v1/${matchId}/scard` : '/matches/v1/recent';
   }
-  if (ep === 'matches/get-commentaries' || ep === 'matches/get-commentaries-v2' || ep === 'commentary' || ep === 'comments' || ep === 'comm') {
+  if (
+    ep === 'matches/get-commentaries' ||
+    ep === 'matches/get-commentaries-v2' ||
+    ep === 'commentary' ||
+    ep === 'comments' ||
+    ep === 'comm'
+  ) {
     return matchId ? `/mcenter/v1/${matchId}/comm` : '/matches/v1/live';
   }
   if (ep === 'matches/get-hcomm' || ep === 'hcomm' || ep === 'highlights-commentary') {
     return matchId ? `/mcenter/v1/${matchId}/hcomm` : '/matches/v1/live';
   }
   if (ep === 'matches/get-team' || ep === 'matches/team' || ep === 'match-team') {
-    return matchId && teamId ? `/mcenter/v1/${matchId}/team/${teamId}` : (matchId ? `/mcenter/v1/${matchId}/scard` : '/matches/v1/recent');
+    return matchId && teamId
+      ? `/mcenter/v1/${matchId}/team/${teamId}`
+      : matchId
+        ? `/mcenter/v1/${matchId}/scard`
+        : '/matches/v1/recent';
   }
   if (ep === 'matches/get-overs' || ep === 'overs' || ep === 'miniscore') {
     return matchId ? `/mcenter/v1/${matchId}/overs` : '/matches/v1/live';
@@ -118,7 +132,13 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   if (ep === 'matches/get-leanback' || ep === 'leanback' || ep === 'odds' || ep === 'predictions') {
     return matchId ? `/mcenter/v1/${matchId}/leanback` : '/matches/v1/live';
   }
-  if (ep === 'matches/get-info' || ep === 'match/info' || ep === 'match_info' || ep === 'matchinfo' || ep === 'mcenter') {
+  if (
+    ep === 'matches/get-info' ||
+    ep === 'match/info' ||
+    ep === 'match_info' ||
+    ep === 'matchinfo' ||
+    ep === 'mcenter'
+  ) {
     return matchId ? `/mcenter/v1/${matchId}` : '/matches/v1/live';
   }
 
@@ -126,7 +146,8 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   if (ep === 'fixtures' || ep === 'upcoming') return '/matches/v1/upcoming';
   if (ep === 'recent') return '/matches/v1/recent';
 
-  if (ep === 'leagues' || ep === 'series' || ep === 'series/v1/international') return '/series/v1/international';
+  if (ep === 'leagues' || ep === 'series' || ep === 'series/v1/international')
+    return '/series/v1/international';
   if (ep === 'standings' || ep === 'points-table') {
     return seriesId ? `/series/v1/${seriesId}/points-table` : '/series/v1/international';
   }
@@ -184,62 +205,62 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
 }
 
 const KNOWN_CRICKET_TEAM_LOGOS: Record<string, string> = {
-  'india': 'https://static.cricbuzz.com/a/img/v1/i1/c776162/i.jpg',
-  'ind': 'https://static.cricbuzz.com/a/img/v1/i1/c776162/i.jpg',
-  'australia': 'https://static.cricbuzz.com/a/img/v1/i1/c776202/i.jpg',
-  'aus': 'https://static.cricbuzz.com/a/img/v1/i1/c776202/i.jpg',
-  'england': 'https://static.cricbuzz.com/a/img/v1/i1/c776237/i.jpg',
-  'eng': 'https://static.cricbuzz.com/a/img/v1/i1/c776237/i.jpg',
+  india: 'https://static.cricbuzz.com/a/img/v1/i1/c776162/i.jpg',
+  ind: 'https://static.cricbuzz.com/a/img/v1/i1/c776162/i.jpg',
+  australia: 'https://static.cricbuzz.com/a/img/v1/i1/c776202/i.jpg',
+  aus: 'https://static.cricbuzz.com/a/img/v1/i1/c776202/i.jpg',
+  england: 'https://static.cricbuzz.com/a/img/v1/i1/c776237/i.jpg',
+  eng: 'https://static.cricbuzz.com/a/img/v1/i1/c776237/i.jpg',
   'south africa': 'https://static.cricbuzz.com/a/img/v1/i1/c776249/i.jpg',
-  'sa': 'https://static.cricbuzz.com/a/img/v1/i1/c776249/i.jpg',
-  'rsa': 'https://static.cricbuzz.com/a/img/v1/i1/c776249/i.jpg',
+  sa: 'https://static.cricbuzz.com/a/img/v1/i1/c776249/i.jpg',
+  rsa: 'https://static.cricbuzz.com/a/img/v1/i1/c776249/i.jpg',
   'new zealand': 'https://static.cricbuzz.com/a/img/v1/i1/c776214/i.jpg',
-  'nz': 'https://static.cricbuzz.com/a/img/v1/i1/c776214/i.jpg',
-  'pakistan': 'https://static.cricbuzz.com/a/img/v1/i1/c776228/i.jpg',
-  'pak': 'https://static.cricbuzz.com/a/img/v1/i1/c776228/i.jpg',
+  nz: 'https://static.cricbuzz.com/a/img/v1/i1/c776214/i.jpg',
+  pakistan: 'https://static.cricbuzz.com/a/img/v1/i1/c776228/i.jpg',
+  pak: 'https://static.cricbuzz.com/a/img/v1/i1/c776228/i.jpg',
   'sri lanka': 'https://static.cricbuzz.com/a/img/v1/i1/c776254/i.jpg',
-  'sl': 'https://static.cricbuzz.com/a/img/v1/i1/c776254/i.jpg',
+  sl: 'https://static.cricbuzz.com/a/img/v1/i1/c776254/i.jpg',
   'west indies': 'https://static.cricbuzz.com/a/img/v1/i1/c776267/i.jpg',
-  'wi': 'https://static.cricbuzz.com/a/img/v1/i1/c776267/i.jpg',
-  'bangladesh': 'https://static.cricbuzz.com/a/img/v1/i1/c776274/i.jpg',
-  'ban': 'https://static.cricbuzz.com/a/img/v1/i1/c776274/i.jpg',
-  'afghanistan': 'https://static.cricbuzz.com/a/img/v1/i1/c776282/i.jpg',
-  'afg': 'https://static.cricbuzz.com/a/img/v1/i1/c776282/i.jpg',
-  'ireland': 'https://static.cricbuzz.com/a/img/v1/i1/c776290/i.jpg',
-  'ire': 'https://static.cricbuzz.com/a/img/v1/i1/c776290/i.jpg',
-  'zimbabwe': 'https://static.cricbuzz.com/a/img/v1/i1/c776300/i.jpg',
-  'zim': 'https://static.cricbuzz.com/a/img/v1/i1/c776300/i.jpg',
-  'scotland': 'https://static.cricbuzz.com/a/img/v1/i1/c776302/i.jpg',
-  'netherlands': 'https://static.cricbuzz.com/a/img/v1/i1/c776304/i.jpg',
-  'ned': 'https://static.cricbuzz.com/a/img/v1/i1/c776304/i.jpg',
-  'usa': 'https://static.cricbuzz.com/a/img/v1/i1/c776306/i.jpg',
-  'nepal': 'https://static.cricbuzz.com/a/img/v1/i1/c776308/i.jpg',
-  'namibia': 'https://static.cricbuzz.com/a/img/v1/i1/c776312/i.jpg',
-  'canada': 'https://static.cricbuzz.com/a/img/v1/i1/c776314/i.jpg',
-  'oman': 'https://static.cricbuzz.com/a/img/v1/i1/c776316/i.jpg',
+  wi: 'https://static.cricbuzz.com/a/img/v1/i1/c776267/i.jpg',
+  bangladesh: 'https://static.cricbuzz.com/a/img/v1/i1/c776274/i.jpg',
+  ban: 'https://static.cricbuzz.com/a/img/v1/i1/c776274/i.jpg',
+  afghanistan: 'https://static.cricbuzz.com/a/img/v1/i1/c776282/i.jpg',
+  afg: 'https://static.cricbuzz.com/a/img/v1/i1/c776282/i.jpg',
+  ireland: 'https://static.cricbuzz.com/a/img/v1/i1/c776290/i.jpg',
+  ire: 'https://static.cricbuzz.com/a/img/v1/i1/c776290/i.jpg',
+  zimbabwe: 'https://static.cricbuzz.com/a/img/v1/i1/c776300/i.jpg',
+  zim: 'https://static.cricbuzz.com/a/img/v1/i1/c776300/i.jpg',
+  scotland: 'https://static.cricbuzz.com/a/img/v1/i1/c776302/i.jpg',
+  netherlands: 'https://static.cricbuzz.com/a/img/v1/i1/c776304/i.jpg',
+  ned: 'https://static.cricbuzz.com/a/img/v1/i1/c776304/i.jpg',
+  usa: 'https://static.cricbuzz.com/a/img/v1/i1/c776306/i.jpg',
+  nepal: 'https://static.cricbuzz.com/a/img/v1/i1/c776308/i.jpg',
+  namibia: 'https://static.cricbuzz.com/a/img/v1/i1/c776312/i.jpg',
+  canada: 'https://static.cricbuzz.com/a/img/v1/i1/c776314/i.jpg',
+  oman: 'https://static.cricbuzz.com/a/img/v1/i1/c776316/i.jpg',
   'papua new guinea': 'https://static.cricbuzz.com/a/img/v1/i1/c776318/i.jpg',
-  'uae': 'https://static.cricbuzz.com/a/img/v1/i1/c776322/i.jpg',
+  uae: 'https://static.cricbuzz.com/a/img/v1/i1/c776322/i.jpg',
   'chennai super kings': 'https://static.cricbuzz.com/a/img/v1/i1/c776310/i.jpg',
-  'csk': 'https://static.cricbuzz.com/a/img/v1/i1/c776310/i.jpg',
+  csk: 'https://static.cricbuzz.com/a/img/v1/i1/c776310/i.jpg',
   'mumbai indians': 'https://static.cricbuzz.com/a/img/v1/i1/c776320/i.jpg',
-  'mi': 'https://static.cricbuzz.com/a/img/v1/i1/c776320/i.jpg',
+  mi: 'https://static.cricbuzz.com/a/img/v1/i1/c776320/i.jpg',
   'royal challengers bengaluru': 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
   'royal challengers bangalore': 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
-  'rcb': 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
+  rcb: 'https://static.cricbuzz.com/a/img/v1/i1/c776330/i.jpg',
   'kolkata knight riders': 'https://static.cricbuzz.com/a/img/v1/i1/c776340/i.jpg',
-  'kkr': 'https://static.cricbuzz.com/a/img/v1/i1/c776340/i.jpg',
+  kkr: 'https://static.cricbuzz.com/a/img/v1/i1/c776340/i.jpg',
   'sunrisers hyderabad': 'https://static.cricbuzz.com/a/img/v1/i1/c776350/i.jpg',
-  'srh': 'https://static.cricbuzz.com/a/img/v1/i1/c776350/i.jpg',
+  srh: 'https://static.cricbuzz.com/a/img/v1/i1/c776350/i.jpg',
   'delhi capitals': 'https://static.cricbuzz.com/a/img/v1/i1/c776360/i.jpg',
-  'dc': 'https://static.cricbuzz.com/a/img/v1/i1/c776360/i.jpg',
+  dc: 'https://static.cricbuzz.com/a/img/v1/i1/c776360/i.jpg',
   'rajasthan royals': 'https://static.cricbuzz.com/a/img/v1/i1/c776370/i.jpg',
-  'rr': 'https://static.cricbuzz.com/a/img/v1/i1/c776370/i.jpg',
+  rr: 'https://static.cricbuzz.com/a/img/v1/i1/c776370/i.jpg',
   'gujarat titans': 'https://static.cricbuzz.com/a/img/v1/i1/c776380/i.jpg',
-  'gt': 'https://static.cricbuzz.com/a/img/v1/i1/c776380/i.jpg',
+  gt: 'https://static.cricbuzz.com/a/img/v1/i1/c776380/i.jpg',
   'lucknow super giants': 'https://static.cricbuzz.com/a/img/v1/i1/c776390/i.jpg',
-  'lsg': 'https://static.cricbuzz.com/a/img/v1/i1/c776390/i.jpg',
+  lsg: 'https://static.cricbuzz.com/a/img/v1/i1/c776390/i.jpg',
   'punjab kings': 'https://static.cricbuzz.com/a/img/v1/i1/c776400/i.jpg',
-  'pbks': 'https://static.cricbuzz.com/a/img/v1/i1/c776400/i.jpg',
+  pbks: 'https://static.cricbuzz.com/a/img/v1/i1/c776400/i.jpg',
   'sydney sixers': 'https://static.cricbuzz.com/a/img/v1/i1/c776410/i.jpg',
   'sydney thunder': 'https://static.cricbuzz.com/a/img/v1/i1/c776412/i.jpg',
   'perth scorchers': 'https://static.cricbuzz.com/a/img/v1/i1/c776414/i.jpg',
@@ -257,7 +278,12 @@ const KNOWN_CRICKET_TEAM_LOGOS: Record<string, string> = {
 };
 
 const resolveTeamLogo = (teamObj: any, teamNameFallback?: string): string => {
-  const direct = teamObj?.imageId || teamObj?.faceImageId || teamObj?.image || teamObj?.team_logo || teamObj?.logo;
+  const direct =
+    teamObj?.imageId ||
+    teamObj?.faceImageId ||
+    teamObj?.image ||
+    teamObj?.team_logo ||
+    teamObj?.logo;
   const resolvedDirect = resolveImgUrl(direct);
   if (resolvedDirect) return resolvedDirect;
 
@@ -301,10 +327,15 @@ function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): Cr
   const startDate = startMs ? new Date(startMs).toISOString().split('T')[0] : null;
   const endDate = endMs ? new Date(endMs).toISOString().split('T')[0] : null;
   const startTime = startMs
-    ? new Date(startMs).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+    ? new Date(startMs).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
     : null;
 
-  const isLive = info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
+  const isLive =
+    info.state === 'In Progress' || info.state === 'Live' || info.stateTitle === 'In Progress';
   const t1Name = t1.teamName || t1.name || 'TBA';
   const t2Name = t2.teamName || t2.name || 'TBA';
 
@@ -332,7 +363,9 @@ function mapMatchToEvent(info: any, score: any, seriesNameFallback?: string): Cr
     league_season: new Date(startMs || Date.now()).getFullYear().toString(),
     event_live: isLive ? '1' : '0',
     event_type: info.matchFormat || 'Cricket',
-    event_stadium: venue.ground ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}` : undefined,
+    event_stadium: venue.ground
+      ? `${venue.ground}${venue.city ? ', ' + venue.city : ''}`
+      : undefined,
     event_home_team_logo: resolveTeamLogo(t1, t1Name),
     event_away_team_logo: resolveTeamLogo(t2, t2Name),
   };
@@ -373,7 +406,11 @@ function transformCricbuzzTeamMatches(data: any): CricketEvent[] {
   const teamMatchesData = data?.teamMatchesData || data?.matchScheduleMap || data?.scheduleData;
   if (Array.isArray(teamMatchesData)) {
     for (const block of teamMatchesData) {
-      const matches = block?.matchDetailsMap?.match || block?.match || block?.matches || block?.scheduleAdWrapper?.matches;
+      const matches =
+        block?.matchDetailsMap?.match ||
+        block?.match ||
+        block?.matches ||
+        block?.scheduleAdWrapper?.matches;
       if (Array.isArray(matches)) {
         for (const m of matches) {
           const ev = mapMatchToEvent(m.matchInfo || m, m.matchScore);
@@ -416,9 +453,7 @@ function transformCricbuzzSeries(data: any): CricketLeague[] {
         league_year: s.startDt
           ? new Date(Number(s.startDt)).getFullYear().toString()
           : new Date().getFullYear().toString(),
-        league_season: s.startDt
-          ? new Date(Number(s.startDt)).getFullYear().toString()
-          : undefined,
+        league_season: s.startDt ? new Date(Number(s.startDt)).getFullYear().toString() : undefined,
         country_name: group.date || 'International',
       });
     }
@@ -441,7 +476,8 @@ function transformCricbuzzTeamsList(data: any): CricketTeam[] {
       return {
         team_key: tid,
         team_name: t.teamName || t.name || '',
-        team_short_name: t.teamSName || t.shortName || (t.teamName || t.name || '').slice(0, 3).toUpperCase(),
+        team_short_name:
+          t.teamSName || t.shortName || (t.teamName || t.name || '').slice(0, 3).toUpperCase(),
         team_logo: (resolveImgUrl(img) || null) as any,
         country_name: t.countryName || t.country || t.teamName || 'International',
       };
@@ -467,7 +503,8 @@ function transformCricbuzzTeamSquad(data: any, teamId: string): CricketPlayer[] 
       players.push({
         player_key: String(p.id),
         player_name: p.name || '',
-        player_image: p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
+        player_image:
+          p.imageId || p.faceImageId ? CRICBUZZ_IMG(p.imageId || p.faceImageId) : undefined,
         player_type: currentRole,
         player_role: currentRole,
         batting_style: p.battingStyle || undefined,
@@ -489,7 +526,9 @@ function transformCricbuzzPlayers(data: any): CricketPlayer[] {
       player_key: String(p.id || ''),
       player_name: p.name || 'Cricket Player',
       player_country: p.teamName || 'International',
-      player_image: p.faceImageId ? CRICBUZZ_IMG(p.faceImageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+      player_image: p.faceImageId
+        ? CRICBUZZ_IMG(p.faceImageId)
+        : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
       player_type: 'International Player',
       player_role: 'Athlete',
       team_name: p.teamName || 'International',
@@ -497,19 +536,24 @@ function transformCricbuzzPlayers(data: any): CricketPlayer[] {
   }
 
   if (data && (data.id || data.name)) {
-    return [{
-      player_key: String(data.id || ''),
-      player_name: data.name || '',
-      player_country: data.intlTeam || data.teamName || 'International',
-      player_image: data.faceImageId || data.imageId ? CRICBUZZ_IMG(data.faceImageId || data.imageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
-      player_type: data.role || 'Player',
-      player_role: data.role || 'Player',
-      batting_style: data.bat || data.battingStyle || 'Right-hand bat',
-      bowling_style: data.bowl || data.bowlingStyle || 'Right-arm medium',
-      player_born: data.birthPlace || undefined,
-      bio: data.bio || undefined,
-      team_name: data.intlTeam || data.teamName || undefined,
-    }];
+    return [
+      {
+        player_key: String(data.id || ''),
+        player_name: data.name || '',
+        player_country: data.intlTeam || data.teamName || 'International',
+        player_image:
+          data.faceImageId || data.imageId
+            ? CRICBUZZ_IMG(data.faceImageId || data.imageId)
+            : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+        player_type: data.role || 'Player',
+        player_role: data.role || 'Player',
+        batting_style: data.bat || data.battingStyle || 'Right-hand bat',
+        bowling_style: data.bowl || data.bowlingStyle || 'Right-arm medium',
+        player_born: data.birthPlace || undefined,
+        bio: data.bio || undefined,
+        team_name: data.intlTeam || data.teamName || undefined,
+      },
+    ];
   }
 
   return [];
@@ -519,7 +563,13 @@ function transformCricbuzzPlayers(data: any): CricketPlayer[] {
  * Transform Cricbuzz /mcenter/v1/{matchId}/scard into complete scorecard, wickets, extras, and lineups
  */
 function transformCricbuzzScorecard(data: any): any {
-  if (!data) return { scorecard: {}, wickets: {}, extra: {}, lineups: { home_team: { starting_lineups: [] }, away_team: { starting_lineups: [] } } };
+  if (!data)
+    return {
+      scorecard: {},
+      wickets: {},
+      extra: {},
+      lineups: { home_team: { starting_lineups: [] }, away_team: { starting_lineups: [] } },
+    };
 
   const rawScorecard = data.scoreCard || data.scorecard || (Array.isArray(data) ? data : []);
   const matchHeader = data.matchHeader || {};
@@ -670,14 +720,34 @@ function transformCricbuzzCommentary(data: any): Record<string, any[]> {
 
     const text = c.commText || c.commentary || '';
     let runs = '0';
-    if (c.event === 'FOUR' || text.toLowerCase().includes('four') || text.toLowerCase().includes('4 runs')) runs = '4';
-    else if (c.event === 'SIX' || text.toLowerCase().includes('six') || text.toLowerCase().includes('6 runs')) runs = '6';
-    else if (c.event === 'WICKET' || text.toLowerCase().includes('out') || text.toLowerCase().includes('wicket')) runs = 'W';
+    if (
+      c.event === 'FOUR' ||
+      text.toLowerCase().includes('four') ||
+      text.toLowerCase().includes('4 runs')
+    )
+      runs = '4';
+    else if (
+      c.event === 'SIX' ||
+      text.toLowerCase().includes('six') ||
+      text.toLowerCase().includes('6 runs')
+    )
+      runs = '6';
+    else if (
+      c.event === 'WICKET' ||
+      text.toLowerCase().includes('out') ||
+      text.toLowerCase().includes('wicket')
+    )
+      runs = 'W';
     else if (c.runs !== undefined) runs = String(c.runs);
 
     commentsByInnings[innKey].push({
       innings: innKey,
-      overs: c.overNumber !== undefined ? String(c.overNumber) : (c.ballNbr ? `${Math.floor(c.ballNbr / 6)}.${c.ballNbr % 6}` : '0.0'),
+      overs:
+        c.overNumber !== undefined
+          ? String(c.overNumber)
+          : c.ballNbr
+            ? `${Math.floor(c.ballNbr / 6)}.${c.ballNbr % 6}`
+            : '0.0',
       balls: String(c.ballNbr || ''),
       runs,
       post: text,
@@ -730,7 +800,21 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
 
     // Append supported params
     Object.entries(params).forEach(([key, value]) => {
-      if (!['met', 'endpoint', 'from', 'to', 'timezone', 'leagueId', 'seriesId', 'playerId', 'teamId', 'team_id'].includes(key) && value) {
+      if (
+        ![
+          'met',
+          'endpoint',
+          'from',
+          'to',
+          'timezone',
+          'leagueId',
+          'seriesId',
+          'playerId',
+          'teamId',
+          'team_id',
+        ].includes(key) &&
+        value
+      ) {
         url.searchParams.append(key, String(value));
       }
     });
@@ -800,13 +884,26 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
       } else if (data?.teamMatchesData || ep.includes('schedule') || ep.includes('results')) {
         const events = transformCricbuzzTeamMatches(data);
         standardized = { success: 1, result: events };
-      } else if (ep.includes('teams/get-players') || (ep.includes('teams') && ep.includes('players')) || (data?.player && Array.isArray(data?.player) && data.player.some((x: any) => !x.id && x.name))) {
+      } else if (
+        ep.includes('teams/get-players') ||
+        (ep.includes('teams') && ep.includes('players')) ||
+        (data?.player &&
+          Array.isArray(data?.player) &&
+          data.player.some((x: any) => !x.id && x.name))
+      ) {
         const squad = transformCricbuzzTeamSquad(data, teamId);
         standardized = { success: 1, result: squad };
       } else if (data?.list || ep === 'teams' || ep === 'teams/list') {
         const teams = transformCricbuzzTeamsList(data);
         standardized = { success: 1, result: teams };
-      } else if (ep === 'livescore' || ep === 'live' || ep === 'fixtures' || ep === 'upcoming' || ep === 'recent' || ep.includes('matches/v1')) {
+      } else if (
+        ep === 'livescore' ||
+        ep === 'live' ||
+        ep === 'fixtures' ||
+        ep === 'upcoming' ||
+        ep === 'recent' ||
+        ep.includes('matches/v1')
+      ) {
         const events = transformCricbuzzMatches(data);
         standardized = { success: 1, result: events };
       } else if (ep === 'leagues' || ep === 'series' || ep.includes('series/v1/international')) {
@@ -818,7 +915,9 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
       } else {
         standardized = {
           success: 1,
-          result: Array.isArray(data) ? data : (data.result ?? data.values ?? data.types ?? data.storyList ?? data),
+          result: Array.isArray(data)
+            ? data
+            : (data.result ?? data.values ?? data.types ?? data.storyList ?? data),
           ...(!Array.isArray(data) ? data : {}),
         };
       }
@@ -881,7 +980,9 @@ export const advancedCricketApi = {
     return d.toISOString().split('T')[0];
   },
 
-  getLeagues: async (params?: Omit<CricketLeaguesParams, 'met'>): Promise<CricketLeaguesResponse> => {
+  getLeagues: async (
+    params?: Omit<CricketLeaguesParams, 'met'>
+  ): Promise<CricketLeaguesResponse> => {
     try {
       const res = await fetchFromAPI<CricketLeaguesResponse>('Leagues', params || {});
       if (res && res.result && Array.isArray(res.result) && res.result.length > 0) return res;
@@ -890,20 +991,42 @@ export const advancedCricketApi = {
       return {
         success: 1,
         result: [
-          { league_key: '12687', league_name: 'India tour of Sri Lanka 2026', league_year: '2026', league_season: '2026', country_name: 'International' },
-          { league_key: '9785', league_name: 'Indian Premier League (IPL)', league_year: '2026', league_season: '2026', country_name: 'India' },
-          { league_key: '9843', league_name: 'ICC Men’s T20 World Cup', league_year: '2026', league_season: '2026', country_name: 'International' },
+          {
+            league_key: '12687',
+            league_name: 'India tour of Sri Lanka 2026',
+            league_year: '2026',
+            league_season: '2026',
+            country_name: 'International',
+          },
+          {
+            league_key: '9785',
+            league_name: 'Indian Premier League (IPL)',
+            league_year: '2026',
+            league_season: '2026',
+            country_name: 'India',
+          },
+          {
+            league_key: '9843',
+            league_name: 'ICC Men’s T20 World Cup',
+            league_year: '2026',
+            league_season: '2026',
+            country_name: 'International',
+          },
         ],
       };
     }
   },
 
-  getFixtures: async (params: Omit<CricketFixturesParams, 'met'> = {}): Promise<CricketFixturesResponse> => {
+  getFixtures: async (
+    params: Omit<CricketFixturesParams, 'met'> = {}
+  ): Promise<CricketFixturesResponse> => {
     try {
       const res = await fetchFromAPI<CricketFixturesResponse>('Fixtures', params);
       if (res && res.result && Array.isArray(res.result) && res.result.length > 0) {
         if (params.leagueId) {
-          const filtered = res.result.filter(m => String(m.league_key) === String(params.leagueId));
+          const filtered = res.result.filter(
+            (m) => String(m.league_key) === String(params.leagueId)
+          );
           if (filtered.length > 0) return { success: 1, result: filtered };
         }
         return res;
@@ -943,15 +1066,17 @@ export const advancedCricketApi = {
     }
   },
 
-  getLivescore: async (params?: Omit<CricketLivescoreParams, 'met'>): Promise<CricketLivescoreResponse> => {
+  getLivescore: async (
+    params?: Omit<CricketLivescoreParams, 'met'>
+  ): Promise<CricketLivescoreResponse> => {
     try {
       const res = await fetchFromAPI<CricketLivescoreResponse>('Livescore', params || {});
       if (res && res.result && Array.isArray(res.result) && res.result.length > 0) return res;
       throw new Error('Fallback livescore');
     } catch (error) {
       const fixtures = await advancedCricketApi.getFixtures({});
-      const live = (fixtures.result || []).filter(m => m.event_live === '1');
-      return { success: 1, result: live.length > 0 ? live : (fixtures.result || []) };
+      const live = (fixtures.result || []).filter((m) => m.event_live === '1');
+      return { success: 1, result: live.length > 0 ? live : fixtures.result || [] };
     }
   },
 
@@ -963,10 +1088,17 @@ export const advancedCricketApi = {
     }
   },
 
-  getStandings: async (params?: Omit<CricketStandingsParams, 'met'>): Promise<CricketStandingsResponse> => {
+  getStandings: async (
+    params?: Omit<CricketStandingsParams, 'met'>
+  ): Promise<CricketStandingsResponse> => {
     try {
       const response = await fetchFromAPI<CricketStandingsResponse>('Standings', params || {});
-      if (response && response.result && (response.result.total?.length || (Array.isArray(response.result) && response.result.length))) {
+      if (
+        response &&
+        response.result &&
+        (response.result.total?.length ||
+          (Array.isArray(response.result) && response.result.length))
+      ) {
         return {
           success: 1,
           result: {
@@ -977,12 +1109,102 @@ export const advancedCricketApi = {
       throw new Error('Empty standings');
     } catch (error) {
       const mockIPLStandings: CricketStanding[] = [
-        { standing_place: '1', standing_place_type: 'Playoffs Qualifier', standing_team: 'Kolkata Knight Riders', standing_MP: '14', standing_W: '10', standing_L: '3', standing_NR: '1', standing_R: '2640', standing_NRR: '+1.428', standing_Pts: '21', team_key: '13', league_key: '9785', league_round: 'Group', standing_updated: '2026-03-01' },
-        { standing_place: '2', standing_place_type: 'Playoffs Qualifier', standing_team: 'Sunrisers Hyderabad', standing_MP: '14', standing_W: '9', standing_L: '4', standing_NR: '1', standing_R: '2820', standing_NRR: '+1.115', standing_Pts: '19', team_key: '14', league_key: '9785', league_round: 'Group', standing_updated: '2026-03-01' },
-        { standing_place: '3', standing_place_type: 'Eliminator', standing_team: 'Rajasthan Royals', standing_MP: '14', standing_W: '8', standing_L: '5', standing_NR: '1', standing_R: '2410', standing_NRR: '+0.273', standing_Pts: '17', team_key: '15', league_key: '9785', league_round: 'Group', standing_updated: '2026-03-01' },
-        { standing_place: '4', standing_place_type: 'Eliminator', standing_team: 'Royal Challengers Bengaluru', standing_MP: '14', standing_W: '7', standing_L: '7', standing_NR: '0', standing_R: '2725', standing_NRR: '+0.459', standing_Pts: '14', team_key: '11', league_key: '9785', league_round: 'Group', standing_updated: '2026-03-01' },
-        { standing_place: '5', standing_place_type: 'Eliminated', standing_team: 'Chennai Super Kings', standing_MP: '14', standing_W: '7', standing_L: '7', standing_NR: '0', standing_R: '2510', standing_NRR: '+0.392', standing_Pts: '14', team_key: '12', league_key: '9785', league_round: 'Group', standing_updated: '2026-03-01' },
-        { standing_place: '6', standing_place_type: 'Eliminated', standing_team: 'Mumbai Indians', standing_MP: '14', standing_W: '6', standing_L: '8', standing_NR: '0', standing_R: '2540', standing_NRR: '-0.210', standing_Pts: '12', team_key: '16', league_key: '9785', league_round: 'Group', standing_updated: '2026-03-01' },
+        {
+          standing_place: '1',
+          standing_place_type: 'Playoffs Qualifier',
+          standing_team: 'Kolkata Knight Riders',
+          standing_MP: '14',
+          standing_W: '10',
+          standing_L: '3',
+          standing_NR: '1',
+          standing_R: '2640',
+          standing_NRR: '+1.428',
+          standing_Pts: '21',
+          team_key: '13',
+          league_key: '9785',
+          league_round: 'Group',
+          standing_updated: '2026-03-01',
+        },
+        {
+          standing_place: '2',
+          standing_place_type: 'Playoffs Qualifier',
+          standing_team: 'Sunrisers Hyderabad',
+          standing_MP: '14',
+          standing_W: '9',
+          standing_L: '4',
+          standing_NR: '1',
+          standing_R: '2820',
+          standing_NRR: '+1.115',
+          standing_Pts: '19',
+          team_key: '14',
+          league_key: '9785',
+          league_round: 'Group',
+          standing_updated: '2026-03-01',
+        },
+        {
+          standing_place: '3',
+          standing_place_type: 'Eliminator',
+          standing_team: 'Rajasthan Royals',
+          standing_MP: '14',
+          standing_W: '8',
+          standing_L: '5',
+          standing_NR: '1',
+          standing_R: '2410',
+          standing_NRR: '+0.273',
+          standing_Pts: '17',
+          team_key: '15',
+          league_key: '9785',
+          league_round: 'Group',
+          standing_updated: '2026-03-01',
+        },
+        {
+          standing_place: '4',
+          standing_place_type: 'Eliminator',
+          standing_team: 'Royal Challengers Bengaluru',
+          standing_MP: '14',
+          standing_W: '7',
+          standing_L: '7',
+          standing_NR: '0',
+          standing_R: '2725',
+          standing_NRR: '+0.459',
+          standing_Pts: '14',
+          team_key: '11',
+          league_key: '9785',
+          league_round: 'Group',
+          standing_updated: '2026-03-01',
+        },
+        {
+          standing_place: '5',
+          standing_place_type: 'Eliminated',
+          standing_team: 'Chennai Super Kings',
+          standing_MP: '14',
+          standing_W: '7',
+          standing_L: '7',
+          standing_NR: '0',
+          standing_R: '2510',
+          standing_NRR: '+0.392',
+          standing_Pts: '14',
+          team_key: '12',
+          league_key: '9785',
+          league_round: 'Group',
+          standing_updated: '2026-03-01',
+        },
+        {
+          standing_place: '6',
+          standing_place_type: 'Eliminated',
+          standing_team: 'Mumbai Indians',
+          standing_MP: '14',
+          standing_W: '6',
+          standing_L: '8',
+          standing_NR: '0',
+          standing_R: '2540',
+          standing_NRR: '-0.210',
+          standing_Pts: '12',
+          team_key: '16',
+          league_key: '9785',
+          league_round: 'Group',
+          standing_updated: '2026-03-01',
+        },
       ];
       return { success: 1, result: { total: mockIPLStandings } };
     }
@@ -996,9 +1218,16 @@ export const advancedCricketApi = {
         return list.map((item: any, idx: number) => ({
           id: String(item.story?.id || item.id || idx),
           title: item.story?.hline || item.title || 'Cricket Headline',
-          summary: item.story?.intro || item.summary || 'Global tournament insights, squad analysis, and tactical highlights.',
-          image: item.story?.imageId ? CRICBUZZ_IMG(item.story.imageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
-          published_at: item.story?.pubTime ? new Date(Number(item.story.pubTime)).toLocaleDateString() : 'Today',
+          summary:
+            item.story?.intro ||
+            item.summary ||
+            'Global tournament insights, squad analysis, and tactical highlights.',
+          image: item.story?.imageId
+            ? CRICBUZZ_IMG(item.story.imageId)
+            : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
+          published_at: item.story?.pubTime
+            ? new Date(Number(item.story.pubTime)).toLocaleDateString()
+            : 'Today',
           author: item.story?.source || 'Cricbuzz Bureau',
           read_time: '3 min read',
           category: 'World Cricket',
@@ -1011,7 +1240,8 @@ export const advancedCricketApi = {
       {
         id: 'n1',
         title: 'ICC World Test Championship: Tactics, Wickets, and Final Projections',
-        summary: 'A statistical breakdown of how the top four test nations stand in the race to Lord’s.',
+        summary:
+          'A statistical breakdown of how the top four test nations stand in the race to Lord’s.',
         image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
         published_at: 'Today',
         author: 'Goalmills Cricket Bureau',
@@ -1021,7 +1251,8 @@ export const advancedCricketApi = {
       {
         id: 'n2',
         title: 'Franchise Squad Matrix: Auction Trends and Key Signings for 2026',
-        summary: 'Deep dive into franchise auction spends and all-rounder tactical valuation models.',
+        summary:
+          'Deep dive into franchise auction spends and all-rounder tactical valuation models.',
         image: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
         published_at: 'Yesterday',
         author: 'Analytics Desk',
@@ -1040,10 +1271,26 @@ export const advancedCricketApi = {
       return {
         success: 1,
         result: [
-          { team_key: '2', team_name: 'India', team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776162/i.jpg' },
-          { team_key: '4', team_name: 'Australia', team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776202/i.jpg' },
-          { team_key: '9', team_name: 'England', team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776237/i.jpg' },
-          { team_key: '5', team_name: 'Sri Lanka', team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776254/i.jpg' },
+          {
+            team_key: '2',
+            team_name: 'India',
+            team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776162/i.jpg',
+          },
+          {
+            team_key: '4',
+            team_name: 'Australia',
+            team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776202/i.jpg',
+          },
+          {
+            team_key: '9',
+            team_name: 'England',
+            team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776237/i.jpg',
+          },
+          {
+            team_key: '5',
+            team_name: 'Sri Lanka',
+            team_logo: 'https://static.cricbuzz.com/a/img/v1/i1/c776254/i.jpg',
+          },
         ],
       };
     }
@@ -1062,7 +1309,7 @@ export const advancedCricketApi = {
   getPlayerById: async (playerId: string | number): Promise<CricketPlayer | null> => {
     try {
       const players = await advancedCricketApi.getPlayers({ playerId });
-      const found = players.result.find(p => String(p.player_key) === String(playerId));
+      const found = players.result.find((p) => String(p.player_key) === String(playerId));
       return found || CRICKET_PLAYERS_DATABASE[0];
     } catch (error) {
       return CRICKET_PLAYERS_DATABASE[0];
@@ -1095,7 +1342,10 @@ export const advancedCricketApi = {
   /**
    * Get match commentary from Cricbuzz /mcenter/v1/{matchId}/comm or /hcomm
    */
-  getMatchCommentary: async (matchId: string | number, isHighlights: boolean = false): Promise<Record<string, any[]>> => {
+  getMatchCommentary: async (
+    matchId: string | number,
+    isHighlights: boolean = false
+  ): Promise<Record<string, any[]>> => {
     try {
       const endpoint = isHighlights ? 'matches/get-hcomm' : 'matches/get-commentaries';
       const res = await fetchFromAPI<any>(endpoint, { matchId: String(matchId) });
@@ -1111,7 +1361,10 @@ export const advancedCricketApi = {
    */
   getMatchTeam: async (matchId: string | number, teamId: string | number): Promise<any> => {
     try {
-      const res = await fetchFromAPI<any>('matches/get-team', { matchId: String(matchId), teamId: String(teamId) });
+      const res = await fetchFromAPI<any>('matches/get-team', {
+        matchId: String(matchId),
+        teamId: String(teamId),
+      });
       return res?.result || res || {};
     } catch (e) {
       console.warn('Error fetching mobile match team:', e);
@@ -1154,11 +1407,13 @@ export const advancedCricketApi = {
     try {
       const [liveRes, fixturesRes, scardRes, commRes, oddsRes] = await Promise.all([
         advancedCricketApi.getLivescore({ matchId: Number(mid) }).catch(() => ({ result: [] })),
-        advancedCricketApi.getFixtures({
-          matchId: Number(mid),
-          from: advancedCricketApi.getFormattedDate(-30),
-          to: advancedCricketApi.getFormattedDate(30),
-        }).catch(() => ({ result: [] })),
+        advancedCricketApi
+          .getFixtures({
+            matchId: Number(mid),
+            from: advancedCricketApi.getFormattedDate(-30),
+            to: advancedCricketApi.getFormattedDate(30),
+          })
+          .catch(() => ({ result: [] })),
         advancedCricketApi.getMatchScorecard(mid).catch(() => ({})),
         advancedCricketApi.getMatchCommentary(mid).catch(() => ({})),
         advancedCricketApi.getOdds({ matchId: Number(mid) }).catch(() => null),
@@ -1197,18 +1452,32 @@ export const advancedCricketApi = {
         league_season: baseMatch?.league_season || '2026',
         event_live: baseMatch?.event_live || (header.state === 'In Progress' ? '1' : '0'),
         event_type: baseMatch?.event_type || header.matchFormat || 'T20',
-        event_toss: baseMatch?.event_toss || (header.tossResults ? `${header.tossResults.tossWinnerName} won toss & elected to ${header.tossResults.decision}` : undefined),
+        event_toss:
+          baseMatch?.event_toss ||
+          (header.tossResults
+            ? `${header.tossResults.tossWinnerName} won toss & elected to ${header.tossResults.decision}`
+            : undefined),
         event_man_of_match: baseMatch?.event_man_of_match || scardRes?.man_of_match,
-        event_stadium: baseMatch?.event_stadium || header.venueInfo?.ground || 'International Cricket Ground',
-        event_home_team_logo: baseMatch?.event_home_team_logo || (header.team1?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team1.imageId}/i.jpg` : `https://ui-avatars.com/api/?name=${encodeURIComponent(homeName)}&background=0D8ABC&color=fff&size=128&bold=true`),
-        event_away_team_logo: baseMatch?.event_away_team_logo || (header.team2?.imageId ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team2.imageId}/i.jpg` : `https://ui-avatars.com/api/?name=${encodeURIComponent(awayName)}&background=0D8ABC&color=fff&size=128&bold=true`),
+        event_stadium:
+          baseMatch?.event_stadium || header.venueInfo?.ground || 'International Cricket Ground',
+        event_home_team_logo:
+          baseMatch?.event_home_team_logo ||
+          (header.team1?.imageId
+            ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team1.imageId}/i.jpg`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(homeName)}&background=0D8ABC&color=fff&size=128&bold=true`),
+        event_away_team_logo:
+          baseMatch?.event_away_team_logo ||
+          (header.team2?.imageId
+            ? `https://static.cricbuzz.com/a/img/v1/i1/c${header.team2.imageId}/i.jpg`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(awayName)}&background=0D8ABC&color=fff&size=128&bold=true`),
         scorecard: scardRes?.scorecard || baseMatch?.scorecard || {},
         wickets: scardRes?.wickets || baseMatch?.wickets || {},
         extra: scardRes?.extra || baseMatch?.extra || {},
-        lineups: scardRes?.lineups || baseMatch?.lineups || {
-          home_team: { starting_lineups: [] },
-          away_team: { starting_lineups: [] },
-        },
+        lineups: scardRes?.lineups ||
+          baseMatch?.lineups || {
+            home_team: { starting_lineups: [] },
+            away_team: { starting_lineups: [] },
+          },
         comments: commRes || baseMatch?.comments || {},
       };
 
@@ -1222,9 +1491,13 @@ export const advancedCricketApi = {
   /**
    * 1. GET series/list (international, league, domestic, women)
    */
-  getSeriesList: async (type: string = 'international'): Promise<{ success: number; result: CricketLeague[] }> => {
+  getSeriesList: async (
+    type: string = 'international'
+  ): Promise<{ success: number; result: CricketLeague[] }> => {
     try {
-      return await fetchFromAPI<{ success: number; result: CricketLeague[] }>('series/list', { type });
+      return await fetchFromAPI<{ success: number; result: CricketLeague[] }>('series/list', {
+        type,
+      });
     } catch (error) {
       return await advancedCricketApi.getLeagues();
     }
@@ -1244,9 +1517,14 @@ export const advancedCricketApi = {
   /**
    * 3. GET series/get-matches
    */
-  getSeriesMatches: async (seriesId: string | number): Promise<{ success: number; result: CricketEvent[] }> => {
+  getSeriesMatches: async (
+    seriesId: string | number
+  ): Promise<{ success: number; result: CricketEvent[] }> => {
     try {
-      const res = await fetchFromAPI<{ success: number; result: CricketEvent[] }>('series/get-matches', { seriesId: Number(seriesId) });
+      const res = await fetchFromAPI<{ success: number; result: CricketEvent[] }>(
+        'series/get-matches',
+        { seriesId: Number(seriesId) }
+      );
       if (res && res.result && Array.isArray(res.result) && res.result.length > 0) {
         return res;
       }
@@ -1281,9 +1559,15 @@ export const advancedCricketApi = {
   /**
    * 6. GET series/get-players (players in a specific squad)
    */
-  getSeriesSquadPlayers: async (seriesId: string | number, squadId: string | number): Promise<any> => {
+  getSeriesSquadPlayers: async (
+    seriesId: string | number,
+    squadId: string | number
+  ): Promise<any> => {
     try {
-      return await fetchFromAPI('series/get-players', { seriesId: Number(seriesId), squadId: Number(squadId) });
+      return await fetchFromAPI('series/get-players', {
+        seriesId: Number(seriesId),
+        squadId: Number(squadId),
+      });
     } catch (error) {
       return { success: 1, result: [] };
     }
@@ -1325,7 +1609,10 @@ export const advancedCricketApi = {
   /**
    * 10. GET series/get-stats
    */
-  getSeriesStats: async (seriesId: string | number, statType: string = 'mostRuns'): Promise<any> => {
+  getSeriesStats: async (
+    seriesId: string | number,
+    statType: string = 'mostRuns'
+  ): Promise<any> => {
     try {
       return await fetchFromAPI('series/get-stats', { seriesId: Number(seriesId), statType });
     } catch (error) {
@@ -1360,7 +1647,9 @@ export const advancedCricketApi = {
     };
   },
 
-  getProbabilities: async (params: Omit<CricketProbabilitiesParams, 'met'>): Promise<CricketProbabilitiesResponse> => {
+  getProbabilities: async (
+    params: Omit<CricketProbabilitiesParams, 'met'>
+  ): Promise<CricketProbabilitiesResponse> => {
     try {
       return await fetchFromAPI<CricketProbabilitiesResponse>('Probabilities', params);
     } catch (error) {
@@ -1373,7 +1662,9 @@ export const advancedCricketApi = {
     }
   },
 
-  getLiveOdds: async (params?: Omit<CricketLiveOddsParams, 'met'>): Promise<CricketLiveOddsResponse> => {
+  getLiveOdds: async (
+    params?: Omit<CricketLiveOddsParams, 'met'>
+  ): Promise<CricketLiveOddsResponse> => {
     try {
       return await fetchFromAPI<CricketLiveOddsResponse>('LiveOdds', params || {});
     } catch (error) {
@@ -1381,7 +1672,9 @@ export const advancedCricketApi = {
     }
   },
 
-  getComments: async (params: Omit<CricketCommentsParams, 'met'>): Promise<CricketCommentsResponse> => {
+  getComments: async (
+    params: Omit<CricketCommentsParams, 'met'>
+  ): Promise<CricketCommentsResponse> => {
     try {
       const comms = await advancedCricketApi.getMatchCommentary(params.matchId || 0);
       return { success: 1, result: comms as any };
@@ -1409,7 +1702,9 @@ export const advancedCricketApi = {
           team_name: p.teamName || p.team_name || 'National Team',
           player_country: p.country || p.player_country || 'International',
           player_type: p.role || p.player_type || 'Batsman',
-          player_image: p.faceImageId ? CRICBUZZ_IMG(p.faceImageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
+          player_image: p.faceImageId
+            ? CRICBUZZ_IMG(p.faceImageId)
+            : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=400',
         }));
       }
     } catch (e) {
@@ -1437,8 +1732,12 @@ export const advancedCricketApi = {
           id: String(item.story?.id || item.id || idx),
           title: item.story?.hline || item.title || 'Player Performance Analysis',
           summary: item.story?.intro || item.summary || 'Tactical breakdown and tournament form.',
-          image: item.story?.imageId ? CRICBUZZ_IMG(item.story.imageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
-          published_at: item.story?.pubTime ? new Date(Number(item.story.pubTime)).toLocaleDateString() : 'Today',
+          image: item.story?.imageId
+            ? CRICBUZZ_IMG(item.story.imageId)
+            : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
+          published_at: item.story?.pubTime
+            ? new Date(Number(item.story.pubTime)).toLocaleDateString()
+            : 'Today',
           author: item.story?.source || 'Cricbuzz Editorial',
           read_time: '3 min read',
           category: 'Player Spotlight',
@@ -1474,7 +1773,9 @@ export const advancedCricketApi = {
     return await advancedCricketApi.getPlayerById(playerId);
   },
 
-  getTeamsList: async (type: 'international' | 'league' | 'women' | 'domestic' = 'international'): Promise<CricketTeam[]> => {
+  getTeamsList: async (
+    type: 'international' | 'league' | 'women' | 'domestic' = 'international'
+  ): Promise<CricketTeam[]> => {
     try {
       const res = await fetchFromAPI<any>('teams/list', { type });
       const rawList = res.list || res.result || res.teams || (Array.isArray(res) ? res : []);
@@ -1482,7 +1783,8 @@ export const advancedCricketApi = {
         return rawList.map((t: any) => ({
           team_key: String(t.teamId || t.team_key || t.id),
           team_name: t.teamName || t.team_name || t.name,
-          team_short_name: t.teamSName || t.team_short_name || (t.teamName || '').slice(0, 3).toUpperCase(),
+          team_short_name:
+            t.teamSName || t.team_short_name || (t.teamName || '').slice(0, 3).toUpperCase(),
           team_logo: t.imageId ? CRICBUZZ_IMG(t.imageId) : t.team_logo,
           country_name: t.countryName || t.teamName || 'International',
         }));
@@ -1497,7 +1799,8 @@ export const advancedCricketApi = {
   getTeamSchedules: async (teamId: string | number): Promise<CricketEvent[]> => {
     try {
       const res = await fetchFromAPI<any>('teams/get-schedules', { teamId: String(teamId) });
-      const matches = res.result || res.teamMatchesData || res.matches || (Array.isArray(res) ? res : []);
+      const matches =
+        res.result || res.teamMatchesData || res.matches || (Array.isArray(res) ? res : []);
       if (Array.isArray(matches) && matches.length > 0) return matches;
     } catch (e) {
       console.warn('Error in getTeamSchedules (mobile):', e);
@@ -1508,7 +1811,8 @@ export const advancedCricketApi = {
   getTeamResults: async (teamId: string | number): Promise<CricketEvent[]> => {
     try {
       const res = await fetchFromAPI<any>('teams/get-results', { teamId: String(teamId) });
-      const matches = res.result || res.teamMatchesData || res.matches || (Array.isArray(res) ? res : []);
+      const matches =
+        res.result || res.teamMatchesData || res.matches || (Array.isArray(res) ? res : []);
       if (Array.isArray(matches) && matches.length > 0) return matches;
     } catch (e) {
       console.warn('Error in getTeamResults (mobile):', e);
@@ -1524,9 +1828,14 @@ export const advancedCricketApi = {
         return list.map((item: any, i: number) => ({
           id: String(item.story?.id || item.id || i),
           title: item.story?.hline || item.title || 'Franchise Squad News',
-          summary: item.story?.intro || item.summary || 'Team tactical updates and player selections.',
-          image: item.story?.imageId ? CRICBUZZ_IMG(item.story.imageId) : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
-          published_at: item.story?.pubTime ? new Date(Number(item.story.pubTime)).toLocaleDateString() : 'Today',
+          summary:
+            item.story?.intro || item.summary || 'Team tactical updates and player selections.',
+          image: item.story?.imageId
+            ? CRICBUZZ_IMG(item.story.imageId)
+            : 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200',
+          published_at: item.story?.pubTime
+            ? new Date(Number(item.story.pubTime)).toLocaleDateString()
+            : 'Today',
           author: item.story?.source || 'Cricbuzz Bureau',
           read_time: '3 min read',
           category: 'Team Intel',
@@ -1553,7 +1862,15 @@ export const advancedCricketApi = {
   getTeamStatsFilters: async (teamId: string | number): Promise<any> => {
     try {
       const res = await fetchFromAPI<any>('teams/get-stats-filters', { teamId: String(teamId) });
-      return res.types || res.result || ['Most Runs', 'Most Wickets', 'Highest Individual Score', 'Best Bowling Figures'];
+      return (
+        res.types ||
+        res.result || [
+          'Most Runs',
+          'Most Wickets',
+          'Highest Individual Score',
+          'Best Bowling Figures',
+        ]
+      );
     } catch (e) {
       return ['Most Runs', 'Most Wickets', 'Highest Individual Score', 'Best Bowling Figures'];
     }

@@ -14,10 +14,15 @@ export default function EditNewsPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="flex justify-between items-center glass-card p-6 rounded-2xl">
           <div>
-            <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Edit Article</h1>
+            <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
+              Edit Article
+            </h1>
             <p className="text-text-muted">Modify your news post</p>
           </div>
-          <Link href="/admin/dashboard" className="flex items-center px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-colors">
+          <Link
+            href="/admin/dashboard"
+            className="flex items-center px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-colors"
+          >
             <FiArrowLeft className="mr-2" />
           </Link>
         </div>

@@ -44,7 +44,10 @@ if (redisUrl || redisHost) {
     redisClient.on('error', (err) => {
       isRedisConnected = false;
       // Soft log to avoid crashing on transient connection drops
-      console.warn('⚠️ Redis Cache: Connection unavailable, falling back to in-memory cache.', err.message);
+      console.warn(
+        '⚠️ Redis Cache: Connection unavailable, falling back to in-memory cache.',
+        err.message
+      );
     });
 
     // Initiate connection asynchronously
@@ -160,6 +163,6 @@ export function getSeoCacheHeaders(
   return {
     'Cache-Control': `public, s-maxage=${sMaxAge}, stale-while-revalidate=${staleWhileRevalidate}`,
     'CDN-Cache-Control': `public, s-maxage=${sMaxAge}`,
-    'Vary': 'Accept-Encoding',
+    Vary: 'Accept-Encoding',
   };
 }

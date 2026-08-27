@@ -67,9 +67,7 @@ export function VideoCard({ video, onPress }: VideoCardProps) {
             <span>👁️</span>
             <span>{formatViews(video.views)} views</span>
           </div>
-          {dateStr ? (
-            <div className="text-[11px] text-slate-500">{dateStr}</div>
-          ) : null}
+          {dateStr ? <div className="text-[11px] text-slate-500">{dateStr}</div> : null}
         </div>
       </div>
     </div>

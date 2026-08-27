@@ -127,7 +127,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           image,
           source,
           category: finalCategory,
-          tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+          tags: tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
           relatedTeam: relatedTeam.trim(),
           isBreaking,
           isFeatured,
@@ -311,7 +314,9 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
             />
           </div>
         </div>
-        {uploading && <div className="text-xs text-blue-400 animate-pulse font-bold">Uploading image...</div>}
+        {uploading && (
+          <div className="text-xs text-blue-400 animate-pulse font-bold">Uploading image...</div>
+        )}
 
         {/* Flags & Toggles */}
         <div className="flex flex-wrap items-center gap-6 py-3 border-t border-b border-white/5">

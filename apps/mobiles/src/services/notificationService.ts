@@ -13,8 +13,7 @@ function getNotifications(): any {
   }
 
   const isExpoGo =
-    Constants.appOwnership === 'expo' ||
-    (Constants as any).executionEnvironment === 'storeClient';
+    Constants.appOwnership === 'expo' || (Constants as any).executionEnvironment === 'storeClient';
   const isAndroidExpoGo = Platform.OS === 'android' && isExpoGo;
 
   // Never require expo-notifications on Android inside Expo Go (SDK 53+ restriction)

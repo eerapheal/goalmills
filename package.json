@@ -6,9 +6,14 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "test": "turbo run test",
     "lint": "turbo run lint",
+    "lint:all": "turbo run lint",
+    "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "ci": "turbo run lint test build",
     "web": "turbo run dev --filter=web",
     "mobile": "turbo run dev --filter=mobiles"
   },

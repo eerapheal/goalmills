@@ -89,11 +89,7 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        styles.card,
-        pressed && styles.pressed,
-        isLive && styles.liveCard,
-      ]}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed, isLive && styles.liveCard]}
       onPress={() => {
         if (event.event_key) {
           router.push(`/home/football/matches/${String(event.event_key)}` as any);
@@ -104,9 +100,18 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
       <View style={styles.leagueHeader}>
         <View style={styles.leagueLeft}>
           {event.league_logo ? (
-            <Image source={{ uri: event.league_logo }} style={styles.leagueLogo} resizeMode="contain" />
+            <Image
+              source={{ uri: event.league_logo }}
+              style={styles.leagueLogo}
+              resizeMode="contain"
+            />
           ) : (
-            <Ionicons name="trophy-outline" size={14} color={COLORS.brandBlue} style={{ marginRight: 6 }} />
+            <Ionicons
+              name="trophy-outline"
+              size={14}
+              color={COLORS.brandBlue}
+              style={{ marginRight: 6 }}
+            />
           )}
           <Text style={styles.leagueTitle} numberOfLines={1}>
             {event.league_name || 'Football'}
@@ -138,7 +143,11 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
           }}
         >
           {event.home_team_logo ? (
-            <Image source={{ uri: event.home_team_logo }} style={styles.teamLogo} resizeMode="contain" />
+            <Image
+              source={{ uri: event.home_team_logo }}
+              style={styles.teamLogo}
+              resizeMode="contain"
+            />
           ) : (
             <View style={styles.teamLogoFallback}>
               <Ionicons name="shield-outline" size={18} color="#94A3B8" />
@@ -158,9 +167,7 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
             </View>
           ) : (
             <View style={styles.scoreNumbersContainer}>
-              <Text style={[styles.scoreText, isLive && styles.liveScoreText]}>
-                {scoreDisplay}
-              </Text>
+              <Text style={[styles.scoreText, isLive && styles.liveScoreText]}>{scoreDisplay}</Text>
             </View>
           )}
         </View>
@@ -176,7 +183,11 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
           }}
         >
           {event.away_team_logo ? (
-            <Image source={{ uri: event.away_team_logo }} style={styles.teamLogo} resizeMode="contain" />
+            <Image
+              source={{ uri: event.away_team_logo }}
+              style={styles.teamLogo}
+              resizeMode="contain"
+            />
           ) : (
             <View style={styles.teamLogoFallback}>
               <Ionicons name="shield-outline" size={18} color="#94A3B8" />

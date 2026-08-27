@@ -6,9 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.goalmills.app"
@@ -19,12 +17,7 @@
         "backgroundColor": "#001f3f"
       },
       "package": "com.goalmills.app",
-      "permissions": [
-        "INTERNET",
-        "RECEIVE_BOOT_COMPLETED",
-        "POST_NOTIFICATIONS",
-        "VIBRATE"
-      ],
+      "permissions": ["INTERNET", "RECEIVE_BOOT_COMPLETED", "POST_NOTIFICATIONS", "VIBRATE"],
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {

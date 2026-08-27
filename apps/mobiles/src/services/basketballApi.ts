@@ -4,8 +4,7 @@
  */
 
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASKETBALL_BASE_URL ||
-  'https://v1.basketball.api-sports.io';
+  process.env.EXPO_PUBLIC_API_BASKETBALL_BASE_URL || 'https://v1.basketball.api-sports.io';
 
 const API_KEY =
   process.env.EXPO_PUBLIC_API_BASKETBALL_KEY_MOBILE ||
@@ -239,9 +238,7 @@ async function requestApiBasketball<T>(
 
     if (
       data.errors &&
-      (Array.isArray(data.errors)
-        ? data.errors.length > 0
-        : Object.keys(data.errors).length > 0)
+      (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)
     ) {
       console.warn(`[API-Basketball] Warnings/Errors on ${endpoint}:`, data.errors);
     }

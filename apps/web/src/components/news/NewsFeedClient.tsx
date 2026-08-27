@@ -31,10 +31,7 @@ interface NewsFeedClientProps {
   initialCategories: Category[];
 }
 
-export default function NewsFeedClient({
-  initialNews,
-  initialCategories,
-}: NewsFeedClientProps) {
+export default function NewsFeedClient({ initialNews, initialCategories }: NewsFeedClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -44,12 +41,8 @@ export default function NewsFeedClient({
   const [selectedCategory, setSelectedCategory] = useState<string>(
     searchParams.get('category') || 'All'
   );
-  const [searchQuery, setSearchQuery] = useState<string>(
-    searchParams.get('search') || ''
-  );
-  const [selectedTeam, setSelectedTeam] = useState<string>(
-    searchParams.get('team') || ''
-  );
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
+  const [selectedTeam, setSelectedTeam] = useState<string>(searchParams.get('team') || '');
   const [favoriteTeams, setFavoriteTeamsState] = useState<string[]>([]);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -313,7 +306,11 @@ export default function NewsFeedClient({
       {/* Loading State */}
       {loading ? (
         <div className="py-16">
-          <GoalmillsLoader size="md" label="News Pulse" sublabel="Fetching latest sports stories & transfer news..." />
+          <GoalmillsLoader
+            size="md"
+            label="News Pulse"
+            sublabel="Fetching latest sports stories & transfer news..."
+          />
         </div>
       ) : news.length === 0 ? (
         <div className="rounded-2xl border border-white/10 bg-white/[0.02] py-16 text-center text-slate-400 space-y-3">
@@ -343,7 +340,10 @@ export default function NewsFeedClient({
               <div className="grid grid-cols-1 lg:grid-cols-12">
                 <div className="relative aspect-[16/9] lg:aspect-auto lg:col-span-7 h-64 sm:h-80 lg:h-[420px] overflow-hidden">
                   <Image
-                    src={featuredArticle.image || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=1200'}
+                    src={
+                      featuredArticle.image ||
+                      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=1200'
+                    }
                     alt={featuredArticle.title}
                     fill
                     priority
@@ -413,10 +413,7 @@ export default function NewsFeedClient({
                   {/* Image */}
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-900">
                     <Image
-                      src={
-                        item.image ||
-                        `https://picsum.photos/seed/${item._id}/800/600`
-                      }
+                      src={item.image || `https://picsum.photos/seed/${item._id}/800/600`}
                       alt={item.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

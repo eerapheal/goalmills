@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "clean": "rm -rf .next"
   },
   "dependencies": {
@@ -32,16 +36,22 @@
   "devDependencies": {
     "@goalmills/config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.10.5",
     "@types/react": "~19.2.18",
     "@types/react-dom": "~19.2.4",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.22",
     "baseline-browser-mapping": "^2.10.16",
     "dotenv": "^17.2.3",
     "eslint": "^8.56.0",
     "eslint-config-next": "^16.0.0",
+    "jsdom": "^26.0.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^3.0.7"
   }
 }

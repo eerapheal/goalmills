@@ -119,7 +119,10 @@ export default function EnterpriseNewsEditor({
 
   // Calculate metrics whenever value changes
   useEffect(() => {
-    const text = (value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const text = (value || '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
     const words = text.length === 0 ? 0 : text.split(/\s+/).length;
     const chars = text.length;
     const readingTime = Math.max(1, Math.ceil(words / 200));
@@ -235,7 +238,10 @@ export default function EnterpriseNewsEditor({
     clean = clean.replace(/color:\s*(#[0-9a-fA-F]{3,6}|rgba?\([^)]+\)|black|windowtext);?/gi, '');
 
     // Strip background-colors from pasted elements (background-color: #fff, rgb(255,255,255), transparent, white)
-    clean = clean.replace(/background(-color)?:\s*(#[0-9a-fA-F]{3,6}|rgba?\([^)]+\)|white|transparent);?/gi, '');
+    clean = clean.replace(
+      /background(-color)?:\s*(#[0-9a-fA-F]{3,6}|rgba?\([^)]+\)|white|transparent);?/gi,
+      ''
+    );
 
     // Strip hardcoded font families and font sizes from docs
     clean = clean.replace(/font-family:\s*[^;"]+;?/gi, '');
@@ -243,7 +249,10 @@ export default function EnterpriseNewsEditor({
     clean = clean.replace(/line-height:\s*[^;"]+;?/gi, '');
 
     // Replace span wrappers that only had bold/italic with semantic tags
-    clean = clean.replace(/<span style="font-weight:\s*bold;?">(.*?)<\/span>/gi, '<strong>$1</strong>');
+    clean = clean.replace(
+      /<span style="font-weight:\s*bold;?">(.*?)<\/span>/gi,
+      '<strong>$1</strong>'
+    );
     clean = clean.replace(/<span style="font-style:\s*italic;?">(.*?)<\/span>/gi, '<em>$1</em>');
 
     // Remove empty style attributes: style="" or style="  "
@@ -256,10 +265,7 @@ export default function EnterpriseNewsEditor({
     clean = clean.replace(/<table[^>]*>/gi, '<table class="article-table">');
 
     // Wrap bare pasted blockquotes nicely
-    clean = clean.replace(
-      /<blockquote[^>]*>/gi,
-      '<blockquote class="article-blockquote">'
-    );
+    clean = clean.replace(/<blockquote[^>]*>/gi, '<blockquote class="article-blockquote">');
 
     return clean;
   };
@@ -344,15 +350,16 @@ export default function EnterpriseNewsEditor({
       imageOptions.alignment === 'full'
         ? 'w-full my-6'
         : imageOptions.alignment === 'center'
-        ? 'max-w-2xl mx-auto my-6'
-        : imageOptions.alignment === 'left'
-        ? 'sm:float-left sm:mr-6 sm:max-w-sm w-full my-4'
-        : 'sm:float-right sm:ml-6 sm:max-w-sm w-full my-4';
+          ? 'max-w-2xl mx-auto my-6'
+          : imageOptions.alignment === 'left'
+            ? 'sm:float-left sm:mr-6 sm:max-w-sm w-full my-4'
+            : 'sm:float-right sm:ml-6 sm:max-w-sm w-full my-4';
 
     const badgeHtml =
       imageOptions.badge && imageOptions.badge !== 'None'
         ? `<span class="signed-image-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black tracking-wider uppercase bg-gradient-to-r ${
-            BADGE_OPTIONS.find((b) => b.label === imageOptions.badge)?.color || 'from-blue-600 to-indigo-600'
+            BADGE_OPTIONS.find((b) => b.label === imageOptions.badge)?.color ||
+            'from-blue-600 to-indigo-600'
           } text-white shadow-md backdrop-blur-md">
             <span>🛡️</span> ${imageOptions.badge}
           </span>`
@@ -479,7 +486,12 @@ export default function EnterpriseNewsEditor({
     }
 
     let formattedUrl = linkUrl.trim();
-    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://') && !formattedUrl.startsWith('/') && !formattedUrl.startsWith('#')) {
+    if (
+      !formattedUrl.startsWith('http://') &&
+      !formattedUrl.startsWith('https://') &&
+      !formattedUrl.startsWith('/') &&
+      !formattedUrl.startsWith('#')
+    ) {
       formattedUrl = `https://${formattedUrl}`;
     }
 
@@ -519,7 +531,8 @@ export default function EnterpriseNewsEditor({
     if (!editorRef.current) return;
     editorRef.current.focus();
 
-    let tableHtml = '<div class="overflow-x-auto my-6"><table class="article-table w-full border-collapse rounded-xl overflow-hidden border border-white/10 bg-slate-900/50 text-sm text-slate-200"><thead><tr class="bg-blue-600/20 text-white font-bold border-b border-white/10">';
+    let tableHtml =
+      '<div class="overflow-x-auto my-6"><table class="article-table w-full border-collapse rounded-xl overflow-hidden border border-white/10 bg-slate-900/50 text-sm text-slate-200"><thead><tr class="bg-blue-600/20 text-white font-bold border-b border-white/10">';
     for (let c = 0; c < tableCols; c++) {
       tableHtml += `<th class="p-3 text-left">Header ${c + 1}</th>`;
     }
@@ -564,7 +577,9 @@ export default function EnterpriseNewsEditor({
   return (
     <div
       className={`enterprise-editor-container bg-[#0B111E] rounded-2xl border border-white/10 shadow-2xl transition-all duration-300 flex flex-col ${
-        isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen p-4 sm:p-6 bg-[#070D18]' : 'relative w-full'
+        isFullscreen
+          ? 'fixed inset-0 z-50 rounded-none h-screen p-4 sm:p-6 bg-[#070D18]'
+          : 'relative w-full'
       }`}
     >
       {/* ----------------- Top Master Bar & Mode Toggles ----------------- */}
@@ -872,7 +887,9 @@ export default function EnterpriseNewsEditor({
       </div>
 
       {/* ----------------- Main Work Area: Editor / Split / Live Preview ----------------- */}
-      <div className={`flex-1 grid ${activeTab === 'split' ? 'grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10' : 'grid-cols-1'} overflow-hidden`}>
+      <div
+        className={`flex-1 grid ${activeTab === 'split' ? 'grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10' : 'grid-cols-1'} overflow-hidden`}
+      >
         {/* Rich Editable Content Canvas - Strictly enforced white text & clean dark background */}
         {(activeTab === 'edit' || activeTab === 'split') && (
           <div className="relative flex flex-col h-full bg-[#050A14]/90">
@@ -928,7 +945,9 @@ export default function EnterpriseNewsEditor({
                   [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-4
                   [&_table]:w-full [&_table]:overflow-x-auto [&_table]:block [&_table]:my-4
                   [&_a]:text-blue-400 [&_a]:underline [&_a]:break-all"
-                dangerouslySetInnerHTML={{ __html: value || '<p class="text-slate-400 italic">No content yet...</p>' }}
+                dangerouslySetInnerHTML={{
+                  __html: value || '<p class="text-slate-400 italic">No content yet...</p>',
+                }}
               />
             </div>
           </div>
@@ -974,7 +993,9 @@ export default function EnterpriseNewsEditor({
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">Attach Signed Media</h3>
-                  <p className="text-xs text-slate-400">Official photo credit & verification badge</p>
+                  <p className="text-xs text-slate-400">
+                    Official photo credit & verification badge
+                  </p>
                 </div>
               </div>
               <button
@@ -1103,7 +1124,9 @@ export default function EnterpriseNewsEditor({
                   <input
                     type="text"
                     value={imageOptions.signature}
-                    onChange={(e) => setImageOptions({ ...imageOptions, signature: e.target.value })}
+                    onChange={(e) =>
+                      setImageOptions({ ...imageOptions, signature: e.target.value })
+                    }
                     placeholder="e.g. GoalMills / Reuters / Getty"
                     className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
                   />

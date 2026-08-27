@@ -12,10 +12,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  basketballApiService,
-  ApiBasketballGameItem,
-} from '../../../../../services/basketballApi';
+import { basketballApiService, ApiBasketballGameItem } from '../../../../../services/basketballApi';
 
 type BasketballDetailTab = 'overview' | 'quarters' | 'stats' | 'h2h' | 'standings';
 
@@ -51,7 +48,7 @@ export default function BasketballMatchDetailsPage() {
             .getHeadToHead({
               h2h: `${g.value.teams.home.id}-${g.value.teams.away.id}`,
             })
-            .then(res => setH2H(res || []))
+            .then((res) => setH2H(res || []))
             .catch(() => {});
         }
 
@@ -61,7 +58,7 @@ export default function BasketballMatchDetailsPage() {
               league: g.value.league.id,
               season: g.value.league.season,
             })
-            .then(res => setStandings(res || []))
+            .then((res) => setStandings(res || []))
             .catch(() => {});
         }
       }
@@ -129,7 +126,11 @@ export default function BasketballMatchDetailsPage() {
         <View style={styles.scoreBanner}>
           <View style={styles.leagueBannerInfo}>
             {game?.league.logo && (
-              <Image source={{ uri: game.league.logo }} style={styles.bannerLeagueLogo} resizeMode="contain" />
+              <Image
+                source={{ uri: game.league.logo }}
+                style={styles.bannerLeagueLogo}
+                resizeMode="contain"
+              />
             )}
             <Text style={styles.bannerLeagueText}>
               {game?.league.name} • {game?.country.name}
@@ -140,9 +141,15 @@ export default function BasketballMatchDetailsPage() {
             {/* Home Team */}
             <View style={styles.bannerTeam}>
               {game?.teams.home.logo ? (
-                <Image source={{ uri: game.teams.home.logo }} style={styles.bannerTeamLogo} resizeMode="contain" />
+                <Image
+                  source={{ uri: game.teams.home.logo }}
+                  style={styles.bannerTeamLogo}
+                  resizeMode="contain"
+                />
               ) : (
-                <View style={styles.fallbackLogo}><Ionicons name="basketball-outline" size={28} color="#F97316" /></View>
+                <View style={styles.fallbackLogo}>
+                  <Ionicons name="basketball-outline" size={28} color="#F97316" />
+                </View>
               )}
               <Text style={styles.bannerTeamName} numberOfLines={2}>
                 {game?.teams.home.name || 'Home'}
@@ -170,9 +177,15 @@ export default function BasketballMatchDetailsPage() {
             {/* Away Team */}
             <View style={styles.bannerTeam}>
               {game?.teams.away.logo ? (
-                <Image source={{ uri: game.teams.away.logo }} style={styles.bannerTeamLogo} resizeMode="contain" />
+                <Image
+                  source={{ uri: game.teams.away.logo }}
+                  style={styles.bannerTeamLogo}
+                  resizeMode="contain"
+                />
               ) : (
-                <View style={styles.fallbackLogo}><Ionicons name="basketball-outline" size={28} color="#F97316" /></View>
+                <View style={styles.fallbackLogo}>
+                  <Ionicons name="basketball-outline" size={28} color="#F97316" />
+                </View>
               )}
               <Text style={styles.bannerTeamName} numberOfLines={2}>
                 {game?.teams.away.name || 'Away'}
@@ -183,17 +196,21 @@ export default function BasketballMatchDetailsPage() {
 
         {/* 5 Tabs Segment */}
         <View style={styles.tabSegments}>
-          {(['overview', 'quarters', 'stats', 'h2h', 'standings'] as BasketballDetailTab[]).map(tab => (
-            <Pressable
-              key={tab}
-              style={[styles.segmentBtn, activeTab === tab && styles.activeSegmentBtn]}
-              onPress={() => setActiveTab(tab)}
-            >
-              <Text style={[styles.segmentBtnText, activeTab === tab && styles.activeSegmentBtnText]}>
-                {tab.toUpperCase()}
-              </Text>
-            </Pressable>
-          ))}
+          {(['overview', 'quarters', 'stats', 'h2h', 'standings'] as BasketballDetailTab[]).map(
+            (tab) => (
+              <Pressable
+                key={tab}
+                style={[styles.segmentBtn, activeTab === tab && styles.activeSegmentBtn]}
+                onPress={() => setActiveTab(tab)}
+              >
+                <Text
+                  style={[styles.segmentBtnText, activeTab === tab && styles.activeSegmentBtnText]}
+                >
+                  {tab.toUpperCase()}
+                </Text>
+              </Pressable>
+            )
+          )}
         </View>
 
         {/* Tab 1: Overview */}
@@ -211,7 +228,9 @@ export default function BasketballMatchDetailsPage() {
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Date & Time</Text>
-                <Text style={styles.infoValue}>{game?.date} {game?.time}</Text>
+                <Text style={styles.infoValue}>
+                  {game?.date} {game?.time}
+                </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Status</Text>
@@ -237,7 +256,9 @@ export default function BasketballMatchDetailsPage() {
                   {game?.scores.home.over_time !== null && (
                     <Text style={styles.tableColStatHeader}>OT</Text>
                   )}
-                  <Text style={[styles.tableColStatHeader, { color: '#F97316', fontWeight: '900' }]}>
+                  <Text
+                    style={[styles.tableColStatHeader, { color: '#F97316', fontWeight: '900' }]}
+                  >
                     TOT
                   </Text>
                 </View>
@@ -285,7 +306,9 @@ export default function BasketballMatchDetailsPage() {
           <View style={styles.tabSection}>
             {teamStats.length === 0 ? (
               <View style={styles.emptyCard}>
-                <Text style={styles.emptyText}>Team statistics available for live and completed games.</Text>
+                <Text style={styles.emptyText}>
+                  Team statistics available for live and completed games.
+                </Text>
               </View>
             ) : (
               <View style={styles.card}>
@@ -310,13 +333,19 @@ export default function BasketballMatchDetailsPage() {
             ) : (
               <View style={styles.card}>
                 <Text style={styles.cardHeaderTitle}>Past Head-to-Head Clashes</Text>
-                {h2h.slice(0, 5).map(h => (
+                {h2h.slice(0, 5).map((h) => (
                   <View key={h.id} style={styles.h2hRow}>
                     <Text style={styles.h2hDate}>{h.date}</Text>
                     <View style={styles.h2hMatch}>
-                      <Text style={styles.h2hTeam} numberOfLines={1}>{h.teams.home.name}</Text>
-                      <Text style={styles.h2hScore}>{h.scores.home.total ?? '-'}:{h.scores.away.total ?? '-'}</Text>
-                      <Text style={styles.h2hTeam} numberOfLines={1}>{h.teams.away.name}</Text>
+                      <Text style={styles.h2hTeam} numberOfLines={1}>
+                        {h.teams.home.name}
+                      </Text>
+                      <Text style={styles.h2hScore}>
+                        {h.scores.home.total ?? '-'}:{h.scores.away.total ?? '-'}
+                      </Text>
+                      <Text style={styles.h2hTeam} numberOfLines={1}>
+                        {h.teams.away.name}
+                      </Text>
                     </View>
                   </View>
                 ))}

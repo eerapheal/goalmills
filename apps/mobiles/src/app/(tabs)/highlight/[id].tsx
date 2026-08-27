@@ -78,9 +78,7 @@ export default function HighlightDetail() {
       }
 
       if (Array.isArray(allVideos)) {
-        const mapped = allVideos
-          .filter((v: any) => v._id !== id)
-          .map(mapInternalVideoToHighlight);
+        const mapped = allVideos.filter((v: any) => v._id !== id).map(mapInternalVideoToHighlight);
         setRelated(mapped.slice(0, 5));
       }
     } catch (error) {
@@ -111,9 +109,7 @@ export default function HighlightDetail() {
 
   const handleOpenExternal = () => {
     if (video?.videoUrl) {
-      Linking.openURL(video.videoUrl).catch((err) =>
-        console.error('Could not open URL:', err)
-      );
+      Linking.openURL(video.videoUrl).catch((err) => console.error('Could not open URL:', err));
     }
   };
 
@@ -146,11 +142,7 @@ export default function HighlightDetail() {
     <View style={styles.container}>
       {/* Top Navbar */}
       <View style={styles.navBar}>
-        <Pressable
-          style={styles.navActionBtn}
-          onPress={() => router.back()}
-          hitSlop={10}
-        >
+        <Pressable style={styles.navActionBtn} onPress={() => router.back()} hitSlop={10}>
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>
@@ -210,7 +202,8 @@ export default function HighlightDetail() {
                 baseUrl: 'https://www.youtube-nocookie.com',
               }}
             />
-          ) : video.videoUrl && (video.videoUrl.endsWith('.mp4') || video.videoUrl.includes('stream')) ? (
+          ) : video.videoUrl &&
+            (video.videoUrl.endsWith('.mp4') || video.videoUrl.includes('stream')) ? (
             <View style={{ height: PLAYER_HEIGHT, width: '100%', backgroundColor: '#000' }}>
               <WebView
                 source={{
@@ -238,7 +231,11 @@ export default function HighlightDetail() {
           ) : (
             <View style={styles.fallbackContainer}>
               <Image
-                source={{ uri: video.thumbnail || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2' }}
+                source={{
+                  uri:
+                    video.thumbnail ||
+                    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+                }}
                 style={styles.fallbackPlayerImage}
                 resizeMode="cover"
               />
@@ -295,9 +292,7 @@ export default function HighlightDetail() {
             </View>
           </View>
 
-          {video.description ? (
-            <Text style={styles.description}>{video.description}</Text>
-          ) : null}
+          {video.description ? <Text style={styles.description}>{video.description}</Text> : null}
         </View>
 
         {/* Related Highlights */}
@@ -320,7 +315,9 @@ export default function HighlightDetail() {
                 <View style={styles.relatedThumbContainer}>
                   <Image
                     source={{
-                      uri: item.thumbnail || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
+                      uri:
+                        item.thumbnail ||
+                        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2',
                     }}
                     style={styles.relatedThumb}
                     resizeMode="cover"
@@ -340,9 +337,7 @@ export default function HighlightDetail() {
                     {item.title}
                   </Text>
                   <View style={styles.relatedMetaRow}>
-                    <Text style={styles.relatedMeta}>
-                      {item.matchInfo?.league || 'Sports'}
-                    </Text>
+                    <Text style={styles.relatedMeta}>{item.matchInfo?.league || 'Sports'}</Text>
                     <Text style={styles.relatedMeta}>•</Text>
                     <Text style={styles.relatedMeta}>{item.views || 0} views</Text>
                   </View>

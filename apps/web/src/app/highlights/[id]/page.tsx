@@ -66,11 +66,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function HighlightDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function HighlightDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -159,9 +155,7 @@ export default async function HighlightDetailPage({
                 )}
 
                 {formattedDate && (
-                  <span className="text-xs text-slate-400 ml-auto">
-                    📅 {formattedDate}
-                  </span>
+                  <span className="text-xs text-slate-400 ml-auto">📅 {formattedDate}</span>
                 )}
               </div>
 
@@ -191,11 +185,7 @@ export default async function HighlightDetailPage({
               )}
 
               {/* Action Bar (View Tracker, Share, Bookmark) */}
-              <HighlightViewTracker
-                id={id}
-                title={video.video_title}
-                url={shareUrl}
-              />
+              <HighlightViewTracker id={id} title={video.video_title} url={shareUrl} />
             </div>
           </div>
 

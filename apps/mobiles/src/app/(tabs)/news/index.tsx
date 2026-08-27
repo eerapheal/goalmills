@@ -94,9 +94,7 @@ export default function NewsScreen() {
         <View style={styles.titleRow}>
           <View>
             <Text style={styles.heading}>Sports Pulse & News</Text>
-            <Text style={styles.subheading}>
-              Breaking news, transfers & expert analysis
-            </Text>
+            <Text style={styles.subheading}>Breaking news, transfers & expert analysis</Text>
           </View>
           <Pressable style={styles.refreshBtn} onPress={onRefresh}>
             <Ionicons name="refresh-outline" size={20} color="#F8FAFC" />
@@ -105,12 +103,7 @@ export default function NewsScreen() {
 
         {/* Search Box */}
         <View style={styles.searchBox}>
-          <Ionicons
-            name="search-outline"
-            size={18}
-            color="#64748B"
-            style={styles.searchIcon}
-          />
+          <Ionicons name="search-outline" size={18} color="#64748B" style={styles.searchIcon} />
           <TextInput
             placeholder="Search teams, players, topics..."
             placeholderTextColor="#64748B"
@@ -139,12 +132,7 @@ export default function NewsScreen() {
                 style={[styles.filterTab, isSelected && styles.activeFilterTab]}
                 onPress={() => setActiveTab(tab.id)}
               >
-                <Text
-                  style={[
-                    styles.filterTabText,
-                    isSelected && styles.activeFilterTabText,
-                  ]}
-                >
+                <Text style={[styles.filterTabText, isSelected && styles.activeFilterTabText]}>
                   {tab.label}
                 </Text>
               </Pressable>
@@ -167,12 +155,7 @@ export default function NewsScreen() {
                   style={[styles.teamChip, isSelected && styles.activeTeamChip]}
                   onPress={() => setSelectedTeam(team)}
                 >
-                  <Text
-                    style={[
-                      styles.teamChipText,
-                      isSelected && styles.activeTeamChipText,
-                    ]}
-                  >
+                  <Text style={[styles.teamChipText, isSelected && styles.activeTeamChipText]}>
                     ⚽ {team}
                   </Text>
                 </Pressable>
@@ -188,17 +171,11 @@ export default function NewsScreen() {
           contentContainerStyle={styles.categoriesSlider}
         >
           <Pressable
-            style={[
-              styles.categoryChip,
-              selectedCategory === 'All' && styles.activeCategoryChip,
-            ]}
+            style={[styles.categoryChip, selectedCategory === 'All' && styles.activeCategoryChip]}
             onPress={() => setSelectedCategory('All')}
           >
             <Text
-              style={[
-                styles.categoryText,
-                selectedCategory === 'All' && styles.activeCategoryText,
-              ]}
+              style={[styles.categoryText, selectedCategory === 'All' && styles.activeCategoryText]}
             >
               All Topics
             </Text>
@@ -208,18 +185,10 @@ export default function NewsScreen() {
             return (
               <Pressable
                 key={cat._id}
-                style={[
-                  styles.categoryChip,
-                  isSelected && styles.activeCategoryChip,
-                ]}
+                style={[styles.categoryChip, isSelected && styles.activeCategoryChip]}
                 onPress={() => setSelectedCategory(cat.name)}
               >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    isSelected && styles.activeCategoryText,
-                  ]}
-                >
+                <Text style={[styles.categoryText, isSelected && styles.activeCategoryText]}>
                   {cat.name}
                 </Text>
               </Pressable>
@@ -231,15 +200,17 @@ export default function NewsScreen() {
       {/* Articles List */}
       {loading && !refreshing ? (
         <View style={styles.center}>
-          <GoalmillsLoader size="md" label="News Pulse" sublabel="Fetching sports headlines & rumors..." />
+          <GoalmillsLoader
+            size="md"
+            label="News Pulse"
+            sublabel="Fetching sports headlines & rumors..."
+          />
         </View>
       ) : (
         <FlatList
           data={news}
           keyExtractor={(item) => item._id || Math.random().toString()}
-          renderItem={({ item }) => (
-            <NewsCard item={item} onPress={() => handlePress(item._id)} />
-          )}
+          renderItem={({ item }) => <NewsCard item={item} onPress={() => handlePress(item._id)} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={

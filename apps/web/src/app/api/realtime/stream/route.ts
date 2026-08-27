@@ -10,7 +10,9 @@ export async function GET(req: NextRequest) {
     start(controller) {
       // Send initial heartbeat
       controller.enqueue(
-        encoder.encode(`event: connected\ndata: ${JSON.stringify({ status: 'connected', time: Date.now() })}\n\n`)
+        encoder.encode(
+          `event: connected\ndata: ${JSON.stringify({ status: 'connected', time: Date.now() })}\n\n`
+        )
       );
 
       // Subscribe to realtime hub
@@ -50,7 +52,7 @@ export async function GET(req: NextRequest) {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'X-Accel-Buffering': 'no',
     },
   });

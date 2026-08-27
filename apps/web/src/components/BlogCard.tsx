@@ -66,7 +66,9 @@ export function BlogCard({ post, onPress }: BlogCardProps) {
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
               {post.author ? post.author.charAt(0).toUpperCase() : 'G'}
             </div>
-            <span className="text-xs font-medium text-slate-400">By {post.author || 'GoalMills'}</span>
+            <span className="text-xs font-medium text-slate-400">
+              By {post.author || 'GoalMills'}
+            </span>
           </div>
           <span className="text-xs font-bold text-blue-400 transition-transform group-hover:translate-x-1">
             Read →

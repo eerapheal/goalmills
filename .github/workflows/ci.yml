@@ -1,0 +1,63 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  validate:
+    name: Code Quality & Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.10.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prettier Format Check
+        run: pnpm format:check
+
+      - name: Monorepo Linting (Web, Mobiles, Packages)
+        run: pnpm lint:all
+
+      - name: TypeScript Typecheck
+        run: pnpm typecheck
+
+      - name: Run Unit Tests (APIs & Frontend)
+        run: pnpm test
+
+      - name: Build All Workspaces
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          MONGODB_URI: "mongodb://localhost:27017/goalmills_test"
+          NEXTAUTH_SECRET: "ci_nextauth_test_secret_key_12345"
+          NEXTAUTH_URL: "http://localhost:3000"

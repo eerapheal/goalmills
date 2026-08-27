@@ -80,9 +80,7 @@ export function BasketballMatchCard({
           ) : (
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                isFinished
-                  ? 'bg-slate-700/50 text-slate-400'
-                  : 'bg-white/5 text-slate-300'
+                isFinished ? 'bg-slate-700/50 text-slate-400' : 'bg-white/5 text-slate-300'
               }`}
             >
               {getStatusDisplay()}
@@ -117,12 +115,12 @@ export function BasketballMatchCard({
               isLive
                 ? 'text-orange-400'
                 : isFinished &&
-                  (match?.scores?.home?.total || 0) > (match?.scores?.away?.total || 0)
-                ? 'text-white'
-                : 'text-slate-400'
+                    (match?.scores?.home?.total || 0) > (match?.scores?.away?.total || 0)
+                  ? 'text-white'
+                  : 'text-slate-400'
             }`}
           >
-            {isUpcoming ? '-' : match?.scores?.home?.total ?? 0}
+            {isUpcoming ? '-' : (match?.scores?.home?.total ?? 0)}
           </span>
         </div>
 
@@ -150,12 +148,12 @@ export function BasketballMatchCard({
               isLive
                 ? 'text-orange-400'
                 : isFinished &&
-                  (match?.scores?.away?.total || 0) > (match?.scores?.home?.total || 0)
-                ? 'text-white'
-                : 'text-slate-400'
+                    (match?.scores?.away?.total || 0) > (match?.scores?.home?.total || 0)
+                  ? 'text-white'
+                  : 'text-slate-400'
             }`}
           >
-            {isUpcoming ? '-' : match?.scores?.away?.total ?? 0}
+            {isUpcoming ? '-' : (match?.scores?.away?.total ?? 0)}
           </span>
         </div>
       </div>
@@ -165,24 +163,34 @@ export function BasketballMatchCard({
         <div className="mt-3 flex items-center justify-around border-t border-white/5 pt-2 text-[10px] text-slate-400">
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q1</span>
-            <span>{match.scores.home?.quarter_1 ?? '-'}:{match.scores.away?.quarter_1 ?? '-'}</span>
+            <span>
+              {match.scores.home?.quarter_1 ?? '-'}:{match.scores.away?.quarter_1 ?? '-'}
+            </span>
           </div>
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q2</span>
-            <span>{match.scores.home?.quarter_2 ?? '-'}:{match.scores.away?.quarter_2 ?? '-'}</span>
+            <span>
+              {match.scores.home?.quarter_2 ?? '-'}:{match.scores.away?.quarter_2 ?? '-'}
+            </span>
           </div>
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q3</span>
-            <span>{match.scores.home?.quarter_3 ?? '-'}:{match.scores.away?.quarter_3 ?? '-'}</span>
+            <span>
+              {match.scores.home?.quarter_3 ?? '-'}:{match.scores.away?.quarter_3 ?? '-'}
+            </span>
           </div>
           <div className="text-center">
             <span className="block text-[9px] uppercase text-slate-500 font-bold">Q4</span>
-            <span>{match.scores.home?.quarter_4 ?? '-'}:{match.scores.away?.quarter_4 ?? '-'}</span>
+            <span>
+              {match.scores.home?.quarter_4 ?? '-'}:{match.scores.away?.quarter_4 ?? '-'}
+            </span>
           </div>
           {match.scores.home?.over_time !== null && match.scores.home?.over_time !== undefined && (
             <div className="text-center">
               <span className="block text-[9px] uppercase text-slate-500 font-bold">OT</span>
-              <span>{match.scores.home.over_time}:{match.scores.away?.over_time ?? '-'}</span>
+              <span>
+                {match.scores.home.over_time}:{match.scores.away?.over_time ?? '-'}
+              </span>
             </div>
           )}
         </div>

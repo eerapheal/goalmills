@@ -74,10 +74,7 @@ async function sendExpoPushNotifications(
 
         if (ticket.status === 'ok') {
           successTokens.push(token);
-        } else if (
-          ticket.status === 'error' &&
-          ticket.details?.error === 'DeviceNotRegistered'
-        ) {
+        } else if (ticket.status === 'error' && ticket.details?.error === 'DeviceNotRegistered') {
           invalidTokens.push(token);
         }
       });
@@ -108,9 +105,7 @@ async function sendFcmPushNotifications(
 
   if (!serverKey) {
     // If direct server key is not configured, we record tokens as queued
-    console.log(
-      'FCM Server Key not set in environment. Push notification queued for FCM tokens.'
-    );
+    console.log('FCM Server Key not set in environment. Push notification queued for FCM tokens.');
     return { successTokens: tokens, invalidTokens: [] };
   }
 
@@ -154,10 +149,7 @@ async function sendFcmPushNotifications(
 
         if (res.message_id) {
           successTokens.push(token);
-        } else if (
-          res.error === 'NotRegistered' ||
-          res.error === 'InvalidRegistration'
-        ) {
+        } else if (res.error === 'NotRegistered' || res.error === 'InvalidRegistration') {
           invalidTokens.push(token);
         }
       });
@@ -172,9 +164,7 @@ async function sendFcmPushNotifications(
 /**
  * Universal Push Dispatcher: sends notifications across Mobile (Expo & FCM) and Web
  */
-export async function sendPushNotification(
-  options: SendPushOptions
-): Promise<PushResult> {
+export async function sendPushNotification(options: SendPushOptions): Promise<PushResult> {
   await dbConnect();
 
   const {
@@ -277,10 +267,7 @@ export async function sendPushNotification(
   // 3. Clean up invalid / unregistered tokens from DB
   if (allInvalid.length > 0) {
     try {
-      await PushToken.updateMany(
-        { token: { $in: allInvalid } },
-        { $set: { enabled: false } }
-      );
+      await PushToken.updateMany({ token: { $in: allInvalid } }, { $set: { enabled: false } });
       console.log(`Deactivated ${allInvalid.length} unregistered tokens.`);
     } catch (cleanupErr) {
       console.error('Failed to deactivate invalid tokens:', cleanupErr);
@@ -325,7 +312,9 @@ export async function notifyOnNewNewsArticle(news: {
   try {
     const isBreaking = news.isBreaking;
     const title = isBreaking ? `🔥 BREAKING: ${news.title}` : `📰 ${news.title}`;
-    const body = news.excerpt || `New ${news.category || 'sports'} story published on GoalMills. Tap to read now!`;
+    const body =
+      news.excerpt ||
+      `New ${news.category || 'sports'} story published on GoalMills. Tap to read now!`;
     const newsId = news._id.toString();
 
     await sendPushNotification({
@@ -376,4 +365,3 @@ export async function notifyOnNewVideoHighlight(video: {
     console.error('Failed to dispatch video push notification:', error);
   }
 }
-

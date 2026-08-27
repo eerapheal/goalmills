@@ -149,9 +149,7 @@ export default function HighlightScreen() {
         <FlatList
           data={filteredHighlights}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <VideoCard item={item} onPress={() => handlePress(item.id)} />
-          )}
+          renderItem={({ item }) => <VideoCard item={item} onPress={() => handlePress(item.id)} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={

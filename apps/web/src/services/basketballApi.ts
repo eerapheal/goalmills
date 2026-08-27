@@ -191,7 +191,10 @@ async function requestWebBasketball<T>(
   _revalidate: number = 60 // kept for signature compat; TTL is managed by the proxy
 ): Promise<T[]> {
   // Build URL to our own Next.js proxy route
-  const url = new URL('/api/basketball', typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  const url = new URL(
+    '/api/basketball',
+    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+  );
   url.searchParams.append('met', endpoint);
 
   Object.entries(params).forEach(([key, value]) => {
@@ -264,7 +267,10 @@ export const webBasketballApiService = {
 
   async getTeams(params?: BasketballTeamsParams | any): Promise<any> {
     const p: any = { ...params };
-    if (p.teamId) { p.id = p.teamId; delete p.teamId; }
+    if (p.teamId) {
+      p.id = p.teamId;
+      delete p.teamId;
+    }
     const res = await requestWebBasketball<any>('teams', p, 86400);
     return wrapResult(res);
   },
@@ -276,15 +282,24 @@ export const webBasketballApiService = {
 
   async getPlayers(params?: BasketballPlayersParams | any): Promise<any> {
     const p: any = { ...params };
-    if (p.playerId) { p.id = p.playerId; delete p.playerId; }
-    if (p.teamId) { p.team = p.teamId; delete p.teamId; }
+    if (p.playerId) {
+      p.id = p.playerId;
+      delete p.playerId;
+    }
+    if (p.teamId) {
+      p.team = p.teamId;
+      delete p.teamId;
+    }
     const res = await requestWebBasketball<any>('players', p, 86400);
     return wrapResult(res);
   },
 
   async getStandings(params: BasketballStandingsParams | any): Promise<any> {
     const p: any = { ...params };
-    if (p.leagueId) { p.league = p.leagueId; delete p.leagueId; }
+    if (p.leagueId) {
+      p.league = p.leagueId;
+      delete p.leagueId;
+    }
     if (!p.season) p.season = '2023-2024';
     const res = await requestWebBasketball<any>('standings', p, 300);
     const wrapped = wrapResult(res);
@@ -294,8 +309,14 @@ export const webBasketballApiService = {
 
   async getFixtures(params?: any): Promise<any> {
     const p: any = { ...params };
-    if (p.leagueId) { p.league = p.leagueId; delete p.leagueId; }
-    if (p.teamId) { p.team = p.teamId; delete p.teamId; }
+    if (p.leagueId) {
+      p.league = p.leagueId;
+      delete p.leagueId;
+    }
+    if (p.teamId) {
+      p.team = p.teamId;
+      delete p.teamId;
+    }
     if (!p.season && (p.league || p.team)) p.season = '2023-2024';
     const res = await requestWebBasketball<ApiBasketballGameItem>('games', p, 60);
     return wrapResult(res);
@@ -305,9 +326,12 @@ export const webBasketballApiService = {
     return requestWebBasketball<ApiBasketballGameItem>('games', params, 60);
   },
 
-
   async getLiveGames(leaguesFilter?: string): Promise<ApiBasketballGameItem[]> {
-    return requestWebBasketball<ApiBasketballGameItem>('games', { live: leaguesFilter || 'all' }, 15);
+    return requestWebBasketball<ApiBasketballGameItem>(
+      'games',
+      { live: leaguesFilter || 'all' },
+      15
+    );
   },
 
   async getGamesByDate(date: string, timezone?: string): Promise<ApiBasketballGameItem[]> {
@@ -346,4 +370,3 @@ export const webBasketballApiService = {
 
 export const basketballApi = webBasketballApiService;
 export default webBasketballApiService;
-

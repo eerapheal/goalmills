@@ -56,10 +56,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               t.type === 'success'
                 ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-100'
                 : t.type === 'error'
-                ? 'bg-red-950/90 border-red-500/30 text-red-100'
-                : t.type === 'warning'
-                ? 'bg-amber-950/90 border-amber-500/30 text-amber-100'
-                : 'bg-slate-900/90 border-blue-500/30 text-blue-100'
+                  ? 'bg-red-950/90 border-red-500/30 text-red-100'
+                  : t.type === 'warning'
+                    ? 'bg-amber-950/90 border-amber-500/30 text-amber-100'
+                    : 'bg-slate-900/90 border-blue-500/30 text-blue-100'
             }`}
           >
             <div className="flex items-center gap-3">

@@ -9,9 +9,7 @@ const API_BASE_URL =
   'https://v3.football.api-sports.io';
 
 const API_KEY =
-  process.env.API_FOOTBALL_KEY_WEB ||
-  process.env.NEXT_PUBLIC_API_FOOTBALL_KEY_WEB ||
-  '';
+  process.env.API_FOOTBALL_KEY_WEB || process.env.NEXT_PUBLIC_API_FOOTBALL_KEY_WEB || '';
 
 export interface ApiFootballResponse<T> {
   get: string;
@@ -271,7 +269,10 @@ async function requestApiFootball<T>(
   _revalidate: number = 60 // kept for signature compat; TTL is managed by the proxy
 ): Promise<T[]> {
   // Build URL to our own Next.js proxy route
-  const url = new URL('/api/football', typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  const url = new URL(
+    '/api/football',
+    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+  );
   url.searchParams.append('met', endpoint);
 
   Object.entries(params).forEach(([key, value]) => {
@@ -513,4 +514,3 @@ export type ApiFootballTeamStats = any;
 export type ApiFootballStandingItem = any;
 export const apiFootball = webApiFootballService;
 export default webApiFootballService;
-

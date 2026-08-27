@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  webBasketballApiService,
-  ApiBasketballGameItem,
-} from '../../../../services/basketballApi';
+import { webBasketballApiService, ApiBasketballGameItem } from '../../../../services/basketballApi';
 
 type BasketballDetailTab = 'overview' | 'quarters' | 'stats' | 'h2h' | 'standings';
 
@@ -120,7 +117,9 @@ export default function BasketballMatchPage() {
                 className="h-16 w-16 object-contain drop-shadow"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">🏀</div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">
+                🏀
+              </div>
             )}
             <h2 className="mt-2 text-base font-bold text-white">{game?.teams.home.name}</h2>
           </div>
@@ -155,7 +154,9 @@ export default function BasketballMatchPage() {
                 className="h-16 w-16 object-contain drop-shadow"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">🏀</div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">
+                🏀
+              </div>
             )}
             <h2 className="mt-2 text-base font-bold text-white">{game?.teams.away.name}</h2>
           </div>
@@ -164,22 +165,24 @@ export default function BasketballMatchPage() {
 
       {/* Tabs */}
       <div className="mb-6 flex space-x-2 rounded-xl bg-[#141C2B] p-1 border border-white/5">
-        {(['overview', 'quarters', 'stats', 'h2h', 'standings'] as BasketballDetailTab[]).map((tab) => {
-          const isActive = activeTab === tab;
-          return (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 rounded-lg py-2.5 text-xs font-bold uppercase transition ${
-                isActive
-                  ? 'bg-[#1E293B] text-orange-400 shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {tab}
-            </button>
-          );
-        })}
+        {(['overview', 'quarters', 'stats', 'h2h', 'standings'] as BasketballDetailTab[]).map(
+          (tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 rounded-lg py-2.5 text-xs font-bold uppercase transition ${
+                  isActive
+                    ? 'bg-[#1E293B] text-orange-400 shadow-md'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {tab}
+              </button>
+            );
+          }
+        )}
       </div>
 
       {/* Tab 1: Overview */}
@@ -199,11 +202,15 @@ export default function BasketballMatchPage() {
             </div>
             <div className="flex justify-between border-b border-white/5 py-2">
               <span className="text-slate-400">Date & Time</span>
-              <span className="font-semibold text-white">{game?.date} {game?.time}</span>
+              <span className="font-semibold text-white">
+                {game?.date} {game?.time}
+              </span>
             </div>
             <div className="flex justify-between border-b border-white/5 py-2">
               <span className="text-slate-400">Status</span>
-              <span className="font-semibold text-white">{game?.status.long || game?.status.short}</span>
+              <span className="font-semibold text-white">
+                {game?.status.long || game?.status.short}
+              </span>
             </div>
           </div>
         </div>
@@ -239,7 +246,9 @@ export default function BasketballMatchPage() {
                 {game?.scores.home.over_time !== null && (
                   <td className="py-3 px-3 text-center">{game?.scores.home.over_time ?? '-'}</td>
                 )}
-                <td className="py-3 px-3 text-center font-black text-orange-400">{game?.scores.home.total ?? '-'}</td>
+                <td className="py-3 px-3 text-center font-black text-orange-400">
+                  {game?.scores.home.total ?? '-'}
+                </td>
               </tr>
               <tr>
                 <td className="py-3 px-3 font-bold text-white">{game?.teams.away.name}</td>
@@ -250,7 +259,9 @@ export default function BasketballMatchPage() {
                 {game?.scores.away.over_time !== null && (
                   <td className="py-3 px-3 text-center">{game?.scores.away.over_time ?? '-'}</td>
                 )}
-                <td className="py-3 px-3 text-center font-black text-orange-400">{game?.scores.away.total ?? '-'}</td>
+                <td className="py-3 px-3 text-center font-black text-orange-400">
+                  {game?.scores.away.total ?? '-'}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -270,7 +281,10 @@ export default function BasketballMatchPage() {
           ) : (
             <div className="space-y-3">
               {teamStats.map((st, idx) => (
-                <div key={idx} className="flex justify-between border-b border-white/5 py-2 text-sm">
+                <div
+                  key={idx}
+                  className="flex justify-between border-b border-white/5 py-2 text-sm"
+                >
                   <span className="text-slate-400">{st.type || `Stat #${idx + 1}`}</span>
                   <span className="font-bold text-white">{st.value || '-'}</span>
                 </div>
@@ -291,11 +305,16 @@ export default function BasketballMatchPage() {
           ) : (
             <div className="space-y-3">
               {h2h.slice(0, 5).map((h) => (
-                <div key={h.id} className="flex items-center justify-between rounded-lg bg-white/[0.02] p-3 border border-white/5">
+                <div
+                  key={h.id}
+                  className="flex items-center justify-between rounded-lg bg-white/[0.02] p-3 border border-white/5"
+                >
                   <span className="text-xs text-slate-400">{h.date}</span>
                   <div className="flex items-center space-x-3 text-sm font-bold">
                     <span className="text-slate-200">{h.teams.home.name}</span>
-                    <span className="text-orange-400">{h.scores.home.total ?? '-'}:{h.scores.away.total ?? '-'}</span>
+                    <span className="text-orange-400">
+                      {h.scores.home.total ?? '-'}:{h.scores.away.total ?? '-'}
+                    </span>
                     <span className="text-slate-200">{h.teams.away.name}</span>
                   </div>
                 </div>
@@ -312,7 +331,9 @@ export default function BasketballMatchPage() {
             {game?.league.name} Standings
           </h3>
           {standings.length === 0 ? (
-            <p className="text-center text-sm text-slate-500 py-8">Standings not available for this league.</p>
+            <p className="text-center text-sm text-slate-500 py-8">
+              Standings not available for this league.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-300">
@@ -328,16 +349,28 @@ export default function BasketballMatchPage() {
                 <tbody className="divide-y divide-white/5">
                   {standings.map((row, idx) => (
                     <tr key={idx} className="hover:bg-white/5">
-                      <td className="py-2.5 px-2 font-bold text-slate-400">{row.position || idx + 1}</td>
+                      <td className="py-2.5 px-2 font-bold text-slate-400">
+                        {row.position || idx + 1}
+                      </td>
                       <td className="flex items-center space-x-2.5 py-2.5 px-4 font-bold text-white">
                         {row.team?.logo && (
-                          <img src={row.team.logo} alt={row.team.name} className="h-4 w-4 object-contain" />
+                          <img
+                            src={row.team.logo}
+                            alt={row.team.name}
+                            className="h-4 w-4 object-contain"
+                          />
                         )}
                         <span>{row.team?.name || 'Team'}</span>
                       </td>
-                      <td className="py-2.5 px-3 text-center font-bold text-emerald-400">{row.games?.win?.total ?? 0}</td>
-                      <td className="py-2.5 px-3 text-center font-bold text-red-400">{row.games?.lose?.total ?? 0}</td>
-                      <td className="py-2.5 px-3 text-center font-medium">{row.games?.win?.percentage ?? '-'}</td>
+                      <td className="py-2.5 px-3 text-center font-bold text-emerald-400">
+                        {row.games?.win?.total ?? 0}
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-bold text-red-400">
+                        {row.games?.lose?.total ?? 0}
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-medium">
+                        {row.games?.win?.percentage ?? '-'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

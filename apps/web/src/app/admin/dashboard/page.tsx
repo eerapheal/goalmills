@@ -7,14 +7,7 @@ import UploadVideoForm from '@/components/admin/UploadVideoForm';
 import NewsList from '@/components/admin/NewsList';
 import VideoList from '@/components/admin/VideoList';
 import Link from 'next/link';
-import {
-  FiLogOut,
-  FiFileText,
-  FiVideo,
-  FiList,
-  FiLayers,
-  FiUsers,
-} from 'react-icons/fi';
+import { FiLogOut, FiFileText, FiVideo, FiList, FiLayers, FiUsers } from 'react-icons/fi';
 
 type CreationTab = 'news' | 'video' | 'manage';
 type ManageSubTab = 'news' | 'video';
@@ -35,7 +28,8 @@ export default function AdminDashboard() {
               <span>⚡</span> Admin Command Center
             </h1>
             <p className="text-xs sm:text-sm text-text-muted mt-0.5">
-              Welcome back, <span className="text-secondary font-bold">{session?.user?.name}</span> ({session?.user?.role})
+              Welcome back, <span className="text-secondary font-bold">{session?.user?.name}</span>{' '}
+              ({session?.user?.role})
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
@@ -212,4 +206,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-

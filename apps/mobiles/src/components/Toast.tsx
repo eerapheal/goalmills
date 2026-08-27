@@ -119,20 +119,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 currentToast.type === 'success'
                   ? 'checkmark-circle'
                   : currentToast.type === 'error'
-                  ? 'alert-circle'
-                  : currentToast.type === 'warning'
-                  ? 'warning'
-                  : 'information-circle'
+                    ? 'alert-circle'
+                    : currentToast.type === 'warning'
+                      ? 'warning'
+                      : 'information-circle'
               }
               size={20}
               color={
                 currentToast.type === 'success'
                   ? '#10b981'
                   : currentToast.type === 'error'
-                  ? '#ef4444'
-                  : currentToast.type === 'warning'
-                  ? '#f59e0b'
-                  : '#4f9bff'
+                    ? '#ef4444'
+                    : currentToast.type === 'warning'
+                      ? '#f59e0b'
+                      : '#4f9bff'
               }
             />
             <Text style={styles.toastText} numberOfLines={3}>

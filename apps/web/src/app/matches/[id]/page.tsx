@@ -99,7 +99,11 @@ export default function MatchDetailsPage() {
         {/* League Info */}
         <div className="mb-6 flex items-center justify-center space-x-2 text-xs font-semibold text-slate-400">
           {fixture?.league.logo && (
-            <img src={fixture.league.logo} alt={fixture.league.name} className="h-4 w-4 object-contain" />
+            <img
+              src={fixture.league.logo}
+              alt={fixture.league.name}
+              className="h-4 w-4 object-contain"
+            />
           )}
           <span>
             {fixture?.league.name} • {fixture?.league.round}
@@ -117,7 +121,9 @@ export default function MatchDetailsPage() {
                 className="h-16 w-16 object-contain drop-shadow"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">🛡️</div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">
+                🛡️
+              </div>
             )}
             <h2 className="mt-2 text-base font-bold text-white">{fixture?.teams.home.name}</h2>
           </div>
@@ -134,11 +140,18 @@ export default function MatchDetailsPage() {
               {fixture?.fixture.status.short || 'VS'}
             </span>
             <div className="text-4xl font-black tracking-widest text-white">
-              {fixture?.goals.home !== null && fixture?.goals.home !== undefined ? fixture.goals.home : '-'} :{' '}
-              {fixture?.goals.away !== null && fixture?.goals.away !== undefined ? fixture.goals.away : '-'}
+              {fixture?.goals.home !== null && fixture?.goals.home !== undefined
+                ? fixture.goals.home
+                : '-'}{' '}
+              :{' '}
+              {fixture?.goals.away !== null && fixture?.goals.away !== undefined
+                ? fixture.goals.away
+                : '-'}
             </div>
             {fixture?.fixture.venue.name && (
-              <span className="mt-2 text-[11px] text-slate-500">📍 {fixture.fixture.venue.name}</span>
+              <span className="mt-2 text-[11px] text-slate-500">
+                📍 {fixture.fixture.venue.name}
+              </span>
             )}
           </div>
 
@@ -151,7 +164,9 @@ export default function MatchDetailsPage() {
                 className="h-16 w-16 object-contain drop-shadow"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">🛡️</div>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-2xl">
+                🛡️
+              </div>
             )}
             <h2 className="mt-2 text-base font-bold text-white">{fixture?.teams.away.name}</h2>
           </div>
@@ -193,7 +208,9 @@ export default function MatchDetailsPage() {
             </div>
             <div className="flex justify-between border-b border-white/5 py-2">
               <span className="text-slate-400">Referee</span>
-              <span className="font-semibold text-white">{fixture?.fixture.referee || 'Not Assigned'}</span>
+              <span className="font-semibold text-white">
+                {fixture?.fixture.referee || 'Not Assigned'}
+              </span>
             </div>
             <div className="flex justify-between border-b border-white/5 py-2">
               <span className="text-slate-400">Stadium</span>
@@ -395,7 +412,9 @@ export default function MatchDetailsPage() {
             {fixture?.league.name} Standings
           </h3>
           {standings.length === 0 ? (
-            <p className="text-center text-sm text-slate-500 py-8">Standings table not available.</p>
+            <p className="text-center text-sm text-slate-500 py-8">
+              Standings table not available.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-300">
@@ -414,15 +433,26 @@ export default function MatchDetailsPage() {
                       row.team.id === fixture?.teams.home.id ||
                       row.team.id === fixture?.teams.away.id;
                     return (
-                      <tr key={row.rank} className={isCurrent ? 'bg-emerald-500/10' : 'hover:bg-white/5'}>
+                      <tr
+                        key={row.rank}
+                        className={isCurrent ? 'bg-emerald-500/10' : 'hover:bg-white/5'}
+                      >
                         <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
                         <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
-                          <img src={row.team.logo} alt={row.team.name} className="h-5 w-5 object-contain" />
-                          <span className={isCurrent ? 'text-emerald-400 font-black' : ''}>{row.team.name}</span>
+                          <img
+                            src={row.team.logo}
+                            alt={row.team.name}
+                            className="h-5 w-5 object-contain"
+                          />
+                          <span className={isCurrent ? 'text-emerald-400 font-black' : ''}>
+                            {row.team.name}
+                          </span>
                         </td>
                         <td className="py-3 px-3 text-center">{row.all.played}</td>
                         <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
-                        <td className="py-3 px-4 text-right font-black text-emerald-400">{row.points}</td>
+                        <td className="py-3 px-4 text-right font-black text-emerald-400">
+                          {row.points}
+                        </td>
                       </tr>
                     );
                   })}

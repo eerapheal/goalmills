@@ -1,326 +1,334 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { basketballApi } from '../../../../../services/basketballApi';
 import { BasketballEvent, BasketballTeam } from '@goalmills/types';
 import { BasketballMatchCard } from '../../../../../components/BasketballMatchCard';
 
 export default function BasketballTeamDetailsPage() {
-    const params = useLocalSearchParams();
-    const [team, setTeam] = useState<BasketballTeam | null>(null);
-    const [matches, setMatches] = useState<BasketballEvent[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedTab, setSelectedTab] = useState<'upcoming' | 'results'>('upcoming');
+  const params = useLocalSearchParams();
+  const [team, setTeam] = useState<BasketballTeam | null>(null);
+  const [matches, setMatches] = useState<BasketballEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedTab, setSelectedTab] = useState<'upcoming' | 'results'>('upcoming');
 
-    useEffect(() => {
-        loadData();
-    }, [params.id]);
+  useEffect(() => {
+    loadData();
+  }, [params.id]);
 
-    const loadData = async () => {
-        if (!params.id) return;
-        try {
-            const teamId = Number(params.id);
+  const loadData = async () => {
+    if (!params.id) return;
+    try {
+      const teamId = Number(params.id);
 
-            // Fetch team info
-            const teamsRes = await basketballApi.getTeams({ teamId });
-            const foundTeam = teamsRes.result[0];
-            setTeam(foundTeam || null);
+      // Fetch team info
+      const teamsRes = await basketballApi.getTeams({ teamId });
+      const foundTeam = teamsRes.result[0];
+      setTeam(foundTeam || null);
 
-            // Fetch team matches
-            const today = new Date();
-            const from = new Date(today);
-            from.setDate(today.getDate() - 30);
-            const to = new Date(today);
-            to.setDate(today.getDate() + 30);
+      // Fetch team matches
+      const today = new Date();
+      const from = new Date(today);
+      from.setDate(today.getDate() - 30);
+      const to = new Date(today);
+      to.setDate(today.getDate() + 30);
 
-            const formatDate = (date: Date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
+      const formatDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
 
-            const matchesRes = await basketballApi.getFixtures({
-                teamId,
-                from: formatDate(from),
-                to: formatDate(to)
-            });
-            setMatches(matchesRes.result);
-        } catch (error) {
-            console.error('Error loading team details:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#f59e0b" />
-            </View>
-        );
+      const matchesRes = await basketballApi.getFixtures({
+        teamId,
+        from: formatDate(from),
+        to: formatDate(to),
+      });
+      setMatches(matchesRes.result);
+    } catch (error) {
+      console.error('Error loading team details:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!team) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Team Not Found</Text>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
-
-    const upcomingMatches = matches.filter(m => m.event_status === 'Not Started' || m.event_live === '1');
-    const finishedMatches = matches.filter(m => m.event_status === 'Finished');
-
-    // Calculate team stats
-    const totalMatches = finishedMatches.length;
-    const wins = finishedMatches.filter(m => {
-        const [homeScore, awayScore] = m.event_final_result.split(' - ').map(s => parseInt(s.trim()));
-        if (m.home_team_key === params.id) {
-            return homeScore > awayScore;
-        } else {
-            return awayScore > homeScore;
-        }
-    }).length;
-    const losses = totalMatches - wins;
-    const winPercentage = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) : '0.0';
-
+  if (loading) {
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Text style={styles.backBtnText}>←</Text>
-                </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                {/* Team Info Card */}
-                <View style={styles.teamCard}>
-                    {team.team_logo ? (
-                        <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />
-                    ) : (
-                        <View style={styles.teamLogoPlaceholder} />
-                    )}
-                    <Text style={styles.teamName}>{team.team_name}</Text>
-
-                    {/* Team Stats */}
-                    <View style={styles.statsContainer}>
-                        <View style={styles.statBox}>
-                            <Text style={styles.statValue}>{totalMatches}</Text>
-                            <Text style={styles.statLabel}>Matches</Text>
-                        </View>
-                        <View style={styles.statBox}>
-                            <Text style={[styles.statValue, styles.winText]}>{wins}</Text>
-                            <Text style={styles.statLabel}>Wins</Text>
-                        </View>
-                        <View style={styles.statBox}>
-                            <Text style={[styles.statValue, styles.lossText]}>{losses}</Text>
-                            <Text style={styles.statLabel}>Losses</Text>
-                        </View>
-                        <View style={styles.statBox}>
-                            <Text style={[styles.statValue, styles.pctText]}>{winPercentage}%</Text>
-                            <Text style={styles.statLabel}>Win %</Text>
-                        </View>
-                    </View>
-                </View>
-
-                {/* Tabs */}
-                <View style={styles.tabsContainer}>
-                    <TouchableOpacity
-                        style={[styles.tab, selectedTab === 'upcoming' && styles.activeTab]}
-                        onPress={() => setSelectedTab('upcoming')}
-                    >
-                        <Text style={[styles.tabText, selectedTab === 'upcoming' && styles.activeTabText]}>
-                            Upcoming ({upcomingMatches.length})
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.tab, selectedTab === 'results' && styles.activeTab]}
-                        onPress={() => setSelectedTab('results')}
-                    >
-                        <Text style={[styles.tabText, selectedTab === 'results' && styles.activeTabText]}>
-                            Results ({finishedMatches.length})
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Matches */}
-                <View style={styles.matchesContainer}>
-                    {selectedTab === 'upcoming' ? (
-                        upcomingMatches.length > 0 ? (
-                            upcomingMatches.map(match => (
-                                <BasketballMatchCard key={match.event_key} match={match} />
-                            ))
-                        ) : (
-                            <Text style={styles.emptyText}>No upcoming matches</Text>
-                        )
-                    ) : (
-                        finishedMatches.length > 0 ? (
-                            finishedMatches.map(match => (
-                                <BasketballMatchCard key={match.event_key} match={match} />
-                            ))
-                        ) : (
-                            <Text style={styles.emptyText}>No recent results</Text>
-                        )
-                    )}
-                </View>
-            </ScrollView>
-        </View>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f59e0b" />
+      </View>
     );
+  }
+
+  if (!team) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Team Not Found</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const upcomingMatches = matches.filter(
+    (m) => m.event_status === 'Not Started' || m.event_live === '1'
+  );
+  const finishedMatches = matches.filter((m) => m.event_status === 'Finished');
+
+  // Calculate team stats
+  const totalMatches = finishedMatches.length;
+  const wins = finishedMatches.filter((m) => {
+    const [homeScore, awayScore] = m.event_final_result.split(' - ').map((s) => parseInt(s.trim()));
+    if (m.home_team_key === params.id) {
+      return homeScore > awayScore;
+    } else {
+      return awayScore > homeScore;
+    }
+  }).length;
+  const losses = totalMatches - wins;
+  const winPercentage = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) : '0.0';
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <Text style={styles.backBtnText}>←</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Team Info Card */}
+        <View style={styles.teamCard}>
+          {team.team_logo ? (
+            <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />
+          ) : (
+            <View style={styles.teamLogoPlaceholder} />
+          )}
+          <Text style={styles.teamName}>{team.team_name}</Text>
+
+          {/* Team Stats */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statBox}>
+              <Text style={styles.statValue}>{totalMatches}</Text>
+              <Text style={styles.statLabel}>Matches</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={[styles.statValue, styles.winText]}>{wins}</Text>
+              <Text style={styles.statLabel}>Wins</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={[styles.statValue, styles.lossText]}>{losses}</Text>
+              <Text style={styles.statLabel}>Losses</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={[styles.statValue, styles.pctText]}>{winPercentage}%</Text>
+              <Text style={styles.statLabel}>Win %</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === 'upcoming' && styles.activeTab]}
+            onPress={() => setSelectedTab('upcoming')}
+          >
+            <Text style={[styles.tabText, selectedTab === 'upcoming' && styles.activeTabText]}>
+              Upcoming ({upcomingMatches.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === 'results' && styles.activeTab]}
+            onPress={() => setSelectedTab('results')}
+          >
+            <Text style={[styles.tabText, selectedTab === 'results' && styles.activeTabText]}>
+              Results ({finishedMatches.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Matches */}
+        <View style={styles.matchesContainer}>
+          {selectedTab === 'upcoming' ? (
+            upcomingMatches.length > 0 ? (
+              upcomingMatches.map((match) => (
+                <BasketballMatchCard key={match.event_key} match={match} />
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No upcoming matches</Text>
+            )
+          ) : finishedMatches.length > 0 ? (
+            finishedMatches.map((match) => (
+              <BasketballMatchCard key={match.event_key} match={match} />
+            ))
+          ) : (
+            <Text style={styles.emptyText}>No recent results</Text>
+          )}
+        </View>
+      </ScrollView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-    },
-    loadingContainer: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorContainer: {
-        flex: 1,
-        backgroundColor: '#0a0e27',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-    },
-    errorText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 16,
-    },
-    backButton: {
-        backgroundColor: '#f59e0b',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        paddingTop: 48,
-    },
-    backBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#1a1f3a',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    backBtnText: {
-        color: '#fff',
-        fontSize: 24,
-    },
-    content: {
-        flex: 1,
-    },
-    teamCard: {
-        backgroundColor: '#1a1f3a',
-        borderRadius: 16,
-        padding: 24,
-        marginHorizontal: 16,
-        marginBottom: 16,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#2a3150',
-    },
-    teamLogo: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 16,
-    },
-    teamLogoPlaceholder: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#2a3150',
-        marginBottom: 16,
-    },
-    teamName: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: '700',
-        textAlign: 'center',
-        marginBottom: 24,
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'space-around',
-    },
-    statBox: {
-        alignItems: 'center',
-    },
-    statValue: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: '700',
-        marginBottom: 4,
-    },
-    statLabel: {
-        color: '#8b92b0',
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    winText: {
-        color: '#10b981',
-    },
-    lossText: {
-        color: '#ef4444',
-    },
-    pctText: {
-        color: '#f59e0b',
-    },
-    tabsContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        marginBottom: 16,
-        gap: 8,
-    },
-    tab: {
-        flex: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-        backgroundColor: '#1a1f3a',
-        alignItems: 'center',
-    },
-    activeTab: {
-        backgroundColor: '#f59e0b',
-    },
-    tabText: {
-        color: '#8b92b0',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    activeTabText: {
-        color: '#fff',
-    },
-    matchesContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 16,
-    },
-    emptyText: {
-        color: '#8b92b0',
-        fontSize: 14,
-        textAlign: 'center',
-        fontStyle: 'italic',
-        padding: 32,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#0a0e27',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#0a0e27',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    backgroundColor: '#0a0e27',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+  },
+  backButton: {
+    backgroundColor: '#f59e0b',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    paddingTop: 48,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1a1f3a',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backBtnText: {
+    color: '#fff',
+    fontSize: 24,
+  },
+  content: {
+    flex: 1,
+  },
+  teamCard: {
+    backgroundColor: '#1a1f3a',
+    borderRadius: 16,
+    padding: 24,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2a3150',
+  },
+  teamLogo: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 16,
+  },
+  teamLogoPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#2a3150',
+    marginBottom: 16,
+  },
+  teamName: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-around',
+  },
+  statBox: {
+    alignItems: 'center',
+  },
+  statValue: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  statLabel: {
+    color: '#8b92b0',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  winText: {
+    color: '#10b981',
+  },
+  lossText: {
+    color: '#ef4444',
+  },
+  pctText: {
+    color: '#f59e0b',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    gap: 8,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#1a1f3a',
+    alignItems: 'center',
+  },
+  activeTab: {
+    backgroundColor: '#f59e0b',
+  },
+  tabText: {
+    color: '#8b92b0',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  activeTabText: {
+    color: '#fff',
+  },
+  matchesContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  emptyText: {
+    color: '#8b92b0',
+    fontSize: 14,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    padding: 32,
+  },
 });

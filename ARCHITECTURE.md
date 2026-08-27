@@ -66,6 +66,7 @@ Both applications utilize an "Advanced Service" pattern. While the services resi
 ```
 
 ### ⚽ Football Domain
+
 - **AdvancedFootballApi**: Handles complex data relationships.
   - **Fixtures**: Live, Upcoming, Finished flows with minute-by-minute updates.
   - **Entities**: Detailed parsing for Teams, Players, Officials, and Coaches.
@@ -73,18 +74,21 @@ Both applications utilize an "Advanced Service" pattern. While the services resi
   - **Multimedia**: Integration of video highlights and news feeds.
 
 ### 🏏 Cricket Domain
+
 - **AdvancedCricketApi**: Specialized for cricket scoring nuances.
   - **Scoring**: In-depth inning processing, ball-by-ball commentary, and fall of wickets.
   - **Rankings**: ICC compliant ranking tables for Teams and Players (Test, ODI, T20).
   - **Series**: Tournament aggregation, points tables, and Net Run Rate (NRR) calculators.
 
 ### 🏀 Basketball Domain
+
 - **BasketballApi**: Optimized for high-frequency scoring updates.
   - **Game State**: Quarter-by-quarter tracking and live clock management.
   - **Statistics**: Granular player efficiency metrics (FG%, +/-) and team comparisons.
   - **Markets**: Betting odds integration for Spreads and Totals.
 
 ### 🎾 Tennis Domain
+
 - **TennisApi**: Focused on set and game-level granularity.
   - **Match Flow**: Point-by-point tracking (15-30, Deuce, Ad) and tie-break logic.
   - **Tournaments**: Hierarchy support for Grand Slams, ATP/WTA tours, and surface types.
@@ -112,6 +116,7 @@ packages/ui/
 ## 📱 Platform Specifics
 
 ### Web (apps/web)
+
 - **Framework**: Next.js 14 App Router.
 - **Styling**: TailwindCSS with Custom Config.
 - **Key Routes**:
@@ -119,6 +124,7 @@ packages/ui/
   - `/cricket/*`: Dedicated cricket hub.
 
 ### Mobile (apps/mobile)
+
 - **Framework**: React Native with Expo Router.
 - **Styling**: Native StyleSheet + Token Abstractions.
 - **Navigation**: Tab-based root with Stack navigators for deep features.
@@ -126,11 +132,13 @@ packages/ui/
 ## 🔧 Technology Stack
 
 ### Core
+
 - **Monorepo Manager**: Turborepo
 - **Package Manager**: PNPM
 - **Language**: TypeScript 5.x
 
 ### State Management
+
 - **Pattern**: Service-based fetching with clean separation of concerns.
 - **Data**: Comprehensive Mock Data generation for reliable dev/demo environments.
 

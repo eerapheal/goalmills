@@ -298,15 +298,19 @@ export interface FootballGoalScorer {
 
 export interface FootballSubstitute {
   time: string;
-  home_scorer: {
-    in: string;
-    out: string;
-  } | [];
+  home_scorer:
+    | {
+        in: string;
+        out: string;
+      }
+    | [];
   score: string;
-  away_scorer: {
-    in: string;
-    out: string;
-  } | [];
+  away_scorer:
+    | {
+        in: string;
+        out: string;
+      }
+    | [];
 }
 
 export interface FootballCard {
@@ -467,8 +471,8 @@ export interface FootballOdds {
   'ah-1.5_2': string | null;
   'ah-1_1': string | null;
   'ah-1_2': string | null;
-  'ah0_1': string | null;
-  'ah0_2': string | null;
+  ah0_1: string | null;
+  ah0_2: string | null;
   'ah+0.5_1': string | null;
   'ah+1_1': string | null;
   'ah+1_2': string | null;
@@ -874,7 +878,9 @@ export interface FootballAPIClient {
   /**
    * Get match probabilities
    */
-  getProbabilities(params: Omit<FootballProbabilitiesParams, 'met'>): Promise<FootballProbabilitiesResponse>;
+  getProbabilities(
+    params: Omit<FootballProbabilitiesParams, 'met'>
+  ): Promise<FootballProbabilitiesResponse>;
 
   /**
    * Get live odds for ongoing events
@@ -893,25 +899,12 @@ export interface FootballAPIClient {
 }
 
 // Utility Types
-export type FootballEventStatus = 
-  | 'Finished' 
-  | 'Live'
-  | 'Not Started'
-  | 'Postponed'
-  | 'Cancelled'
-  | 'Abandoned'
-  | string; // Can be minute number like "45", "73"
+export type FootballEventStatus =
+  'Finished' | 'Live' | 'Not Started' | 'Postponed' | 'Cancelled' | 'Abandoned' | string; // Can be minute number like "45", "73"
 
-export type FootballCardType = 
-  | 'yellow card'
-  | 'red card'
-  | 'yellow red card';
+export type FootballCardType = 'yellow card' | 'red card' | 'yellow red card';
 
-export type FootballPlayerType = 
-  | 'Goalkeepers'
-  | 'Defenders'
-  | 'Midfielders'
-  | 'Forwards';
+export type FootballPlayerType = 'Goalkeepers' | 'Defenders' | 'Midfielders' | 'Forwards';
 
 export type FootballStatisticType =
   | 'Shots Total'
@@ -956,7 +949,7 @@ export interface CricketTeam {
   team_key: string;
   team_name: string;
   team_logo: string | null;
-} 
+}
 
 export interface CricketScorecardPlayer {
   innings: string;
@@ -1180,7 +1173,6 @@ export interface CricketBaseParams {
   [key: string]: any;
 }
 
-
 export interface CricketLeaguesParams extends CricketBaseParams {
   met: 'Leagues';
 }
@@ -1289,7 +1281,9 @@ export interface CricketAPIClient {
   /**
    * Get match outcome probabilities
    */
-  getProbabilities(params: Omit<CricketProbabilitiesParams, 'met'>): Promise<CricketProbabilitiesResponse>;
+  getProbabilities(
+    params: Omit<CricketProbabilitiesParams, 'met'>
+  ): Promise<CricketProbabilitiesResponse>;
 
   /**
    * Get live odds for ongoing events
@@ -1308,7 +1302,7 @@ export interface CricketAPIClient {
 }
 
 // Utility Types
-export type CricketEventStatus = 
+export type CricketEventStatus =
   | 'Finished'
   | 'In Progress'
   | 'Stumps'
@@ -1318,24 +1312,11 @@ export type CricketEventStatus =
   | 'Abandoned'
   | string;
 
-export type CricketEventType = 
-  | 'TEST'
-  | 'ODI'
-  | 'T20'
-  | 'T20I'
-  | 'First-class'
-  | 'List A'
-  | string;
+export type CricketEventType = 'TEST' | 'ODI' | 'T20' | 'T20I' | 'First-class' | 'List A' | string;
 
-export type CricketPlayerType = 
-  | 'Batsman'
-  | 'Bowler';
+export type CricketPlayerType = 'Batsman' | 'Bowler';
 
-export type CricketInningsName = 
-  | 'Live'
-  | `${string} 1 INN`
-  | `${string} 2 INN`
-  | string;
+export type CricketInningsName = 'Live' | `${string} 1 INN` | `${string} 2 INN` | string;
 
 // Extended Types for Detailed Match Data
 export interface CricketDetailedEvent extends CricketEvent {
@@ -1670,14 +1651,8 @@ export interface TennisAPIClient {
   getLiveOdds(params: Omit<TennisLiveOddsParams, 'met'>): Promise<TennisLiveOddsResponse>;
 }
 
-export type TennisEventStatus = 
-  | 'Finished' 
-  | 'Set 1' 
-  | 'Set 2' 
-  | 'Set 3' 
-  | 'Set 4' 
-  | 'Set 5' 
-  | string;
+export type TennisEventStatus =
+  'Finished' | 'Set 1' | 'Set 2' | 'Set 3' | 'Set 4' | 'Set 5' | string;
 
 export type TennisEventWinner = 'First Player' | 'Second Player' | null;
 
@@ -1718,7 +1693,7 @@ export interface BasketballScores {
   '2ndQuarter'?: QuarterScore[];
   '3rdQuarter'?: QuarterScore[];
   '4thQuarter'?: QuarterScore[];
-  'Overtime'?: QuarterScore[];
+  Overtime?: QuarterScore[];
 }
 
 export interface BasketballStatistic {
@@ -2040,7 +2015,9 @@ export interface BasketballAPIClient {
   /**
    * Get list of supported countries
    */
-  getCountries(params: Omit<BasketballCountriesParams, 'met'>): Promise<BasketballCountriesResponse>;
+  getCountries(
+    params: Omit<BasketballCountriesParams, 'met'>
+  ): Promise<BasketballCountriesResponse>;
 
   /**
    * Get list of supported leagues/competitions
@@ -2060,12 +2037,16 @@ export interface BasketballAPIClient {
   /**
    * Get live basketball matches
    */
-  getLivescore(params: Omit<BasketballLivescoreParams, 'met'>): Promise<BasketballLivescoreResponse>;
+  getLivescore(
+    params: Omit<BasketballLivescoreParams, 'met'>
+  ): Promise<BasketballLivescoreResponse>;
 
   /**
    * Get league standings
    */
-  getStandings(params: Omit<BasketballStandingsParams, 'met'>): Promise<BasketballStandingsResponse>;
+  getStandings(
+    params: Omit<BasketballStandingsParams, 'met'>
+  ): Promise<BasketballStandingsResponse>;
 
   /**
    * Get teams information
@@ -2085,7 +2066,9 @@ export interface BasketballAPIClient {
   /**
    * Get match statistics
    */
-  getStatistics(params: Omit<BasketballStatisticsParams, 'met'>): Promise<BasketballStatisticsResponse>;
+  getStatistics(
+    params: Omit<BasketballStatisticsParams, 'met'>
+  ): Promise<BasketballStatisticsResponse>;
 
   /**
    * Get pre-match odds for events
@@ -2094,24 +2077,24 @@ export interface BasketballAPIClient {
 }
 
 // Utility Types
-export type BasketballEventStatus = 
-  | 'Finished' 
+export type BasketballEventStatus =
+  | 'Finished'
   | 'Live'
-  | '1st Quarter' 
-  | '2nd Quarter' 
-  | '3rd Quarter' 
+  | '1st Quarter'
+  | '2nd Quarter'
+  | '3rd Quarter'
   | '4th Quarter'
   | 'Overtime'
   | 'Halftime'
   | 'Not Started'
   | string;
 
-export type BasketballPlayerPosition = 
+export type BasketballPlayerPosition =
   | 'PG' // Point Guard
   | 'SG' // Shooting Guard
   | 'SF' // Small Forward
   | 'PF' // Power Forward
-  | 'C'  // Center
+  | 'C' // Center
   | string;
 
 export type BasketballStatisticType =
@@ -2137,7 +2120,7 @@ export interface BasketballDetailedEvent extends BasketballEvent {
 }
 
 // Helper type for odds markets
-export type BasketballOddsMarketType = 
+export type BasketballOddsMarketType =
   | '3Way Result'
   | 'Home/Away'
   | 'Total'
@@ -2147,13 +2130,7 @@ export type BasketballOddsMarketType =
   | string;
 
 // Helper type for odds outcomes
-export type BasketballOddsOutcome = 
-  | 'Home'
-  | 'Away'
-  | 'Draw'
-  | 'Over'
-  | 'Under'
-  | string;
+export type BasketballOddsOutcome = 'Home' | 'Away' | 'Draw' | 'Over' | 'Under' | string;
 
 export type SportType = 'football' | 'cricket' | 'tennis' | 'basketball' | 'baseball' | 'hockey';
 
@@ -2400,6 +2377,3 @@ export interface CricbuzzAPIClient {
   getBlogPosts(): Promise<any[]>;
   getVideoHighlights(): Promise<any[]>;
 }
-
-
-

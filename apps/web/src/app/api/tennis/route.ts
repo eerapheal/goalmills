@@ -19,7 +19,7 @@ async function rateLimitedFetch(url: string, options: RequestInit): Promise<Resp
   if (timeSinceLast < MIN_FETCH_GAP_MS) {
     const delay = MIN_FETCH_GAP_MS - timeSinceLast;
     lastFetchTime = now + delay;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   } else {
     lastFetchTime = Date.now();
   }
@@ -59,7 +59,13 @@ function getTtlForMethod(method: string): number {
   if (m.includes('standing') || m.includes('odds') || m.includes('rank')) {
     return 300; // 5 minutes for standings & rankings
   }
-  if (m.includes('league') || m.includes('team') || m.includes('country') || m.includes('player') || m.includes('h2h')) {
+  if (
+    m.includes('league') ||
+    m.includes('team') ||
+    m.includes('country') ||
+    m.includes('player') ||
+    m.includes('h2h')
+  ) {
     return 600; // 10 minutes for static metadata
   }
   return 60;
@@ -71,10 +77,7 @@ export async function GET(request: NextRequest) {
     const method = searchParams.get('met');
 
     if (!method) {
-      return NextResponse.json(
-        { error: 'Method parameter (met) is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Method parameter (met) is required' }, { status: 400 });
     }
 
     // Some endpoints in Tennis API require mandatory parameters other than APIkey
@@ -86,7 +89,11 @@ export async function GET(request: NextRequest) {
     ) {
       console.warn(`Tennis API: Skipping ${method} due to missing mandatory parameters`);
       return NextResponse.json(
-        { success: 1, result: method === 'Odds' ? {} : [], message: 'Mandatory parameters missing, skipping external call' },
+        {
+          success: 1,
+          result: method === 'Odds' ? {} : [],
+          message: 'Mandatory parameters missing, skipping external call',
+        },
         { status: 200 }
       );
     }
@@ -112,7 +119,7 @@ export async function GET(request: NextRequest) {
 
     // Check in-memory cache
     const cached = CACHE_STORE.get(cacheKey);
-    if (cached && (now - cached.timestamp < cached.ttl * 1000)) {
+    if (cached && now - cached.timestamp < cached.ttl * 1000) {
       return NextResponse.json(cached.data, {
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -138,7 +145,11 @@ export async function GET(request: NextRequest) {
         });
       }
       return NextResponse.json(
-        { success: 1, result: [], message: 'Tennis API rate-limited backoff active, returning client fallback' },
+        {
+          success: 1,
+          result: [],
+          message: 'Tennis API rate-limited backoff active, returning client fallback',
+        },
         {
           status: 200,
           headers: {
@@ -163,7 +174,7 @@ export async function GET(request: NextRequest) {
         response = await rateLimitedFetch(apiUrl.toString(), {
           method: 'GET',
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
           },
           next: { revalidate: ttlSeconds },
         });
@@ -172,8 +183,10 @@ export async function GET(request: NextRequest) {
 
         // If 500 or 503, wait and retry
         if (response.status >= 500 && attempts < maxAttempts) {
-          console.warn(`Tennis API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`);
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+          console.warn(
+            `Tennis API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempts));
           continue;
         }
 
@@ -183,7 +196,7 @@ export async function GET(request: NextRequest) {
           console.warn('Tennis API fetch error after retries:', err);
           break;
         }
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempts));
       }
     }
 

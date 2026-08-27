@@ -46,13 +46,13 @@ const buildUrl = (method: string, params: Record<string, any> = {}): string => {
   const url = new URL(API_BASE_URL);
   url.searchParams.append('met', method);
   url.searchParams.append('APIkey', API_KEY);
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       url.searchParams.append(key, String(value));
     }
   });
-  
+
   return url.toString();
 };
 
@@ -62,17 +62,19 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
     const url = buildUrl(method, params);
     // Be less noisy with dev logs
     // console.log(`Fetching from API: ${method}`, params);
-    
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
     if (!response.ok) {
       if (response.status >= 500) {
-        console.warn(`Upstream API ${method} failed with ${response.status}. This is likely a temporary issue with the provider.`);
+        console.warn(
+          `Upstream API ${method} failed with ${response.status}. This is likely a temporary issue with the provider.`
+        );
       }
       throw new Error(`API request failed: ${response.status}`);
     }
@@ -81,9 +83,9 @@ async function fetchFromAPI<T>(method: string, params: Record<string, any> = {})
     return data;
   } catch (error) {
     if ((error as any).message?.includes('500')) {
-        // Already warned above
+      // Already warned above
     } else {
-        console.warn(`Error fetching ${method}:`, error);
+      console.warn(`Error fetching ${method}:`, error);
     }
     // Return undefined instead of throwing to avoid loud console Errors
     return undefined as any;
@@ -97,12 +99,12 @@ const getDateRange = (daysBack: number = 7, daysForward: number = 7) => {
   past.setDate(past.getDate() - daysBack);
   const future = new Date(today);
   future.setDate(future.getDate() + daysForward);
-  
+
   const formatDate = (date: Date) => date.toISOString().split('T')[0];
-  
+
   return {
     from: formatDate(past),
-    to: formatDate(future)
+    to: formatDate(future),
   };
 };
 
@@ -111,9 +113,12 @@ const mockBlogPosts: BlogPost[] = [
   {
     _id: '1',
     title: 'Manchester City Secure Premier League Title in Thrilling Finale',
-    excerpt: 'Pep Guardiola\'s side came back from two goals down to beat Aston Villa and clinch the title on the final day of the season.',
-    content: 'Manchester City have been crowned 2023/24 Premier League champions after a dramatic final day victory over West Ham. Phil Foden scored twice early on to settle any nerves at the Etihad Stadium before Rodri sealed the win with a controlled finish.',
-    image: 'https://images.unsplash.com/photo-1629255655767-f26b528659d6?auto=format&fit=crop&q=80&w=1000',
+    excerpt:
+      "Pep Guardiola's side came back from two goals down to beat Aston Villa and clinch the title on the final day of the season.",
+    content:
+      'Manchester City have been crowned 2023/24 Premier League champions after a dramatic final day victory over West Ham. Phil Foden scored twice early on to settle any nerves at the Etihad Stadium before Rodri sealed the win with a controlled finish.',
+    image:
+      'https://images.unsplash.com/photo-1629255655767-f26b528659d6?auto=format&fit=crop&q=80&w=1000',
     author: 'James Ducker',
     readTime: 5,
     createdAt: new Date().toISOString(),
@@ -122,9 +127,12 @@ const mockBlogPosts: BlogPost[] = [
   {
     _id: '2',
     title: 'Real Madrid King of Europe: The 15th UCL Title',
-    excerpt: 'Vinicius Jr and Dani Carvajal score as Real Madrid beat Borussia Dortmund to win the Champions League at Wembley.',
-    content: 'Real Madrid extended their record as the most successful club in European history by winning their 15th Champions League title with a 2-0 victory over Borussia Dortmund at Wembley. After a difficult first half where Dortmund missed several chances, Madrid showed their pedigree in the second half.',
-    image: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=1000',
+    excerpt:
+      'Vinicius Jr and Dani Carvajal score as Real Madrid beat Borussia Dortmund to win the Champions League at Wembley.',
+    content:
+      'Real Madrid extended their record as the most successful club in European history by winning their 15th Champions League title with a 2-0 victory over Borussia Dortmund at Wembley. After a difficult first half where Dortmund missed several chances, Madrid showed their pedigree in the second half.',
+    image:
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=1000',
     author: 'Sid Lowe',
     readTime: 7,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -133,9 +141,12 @@ const mockBlogPosts: BlogPost[] = [
   {
     _id: '3',
     title: 'Transfer News: Mbappe Finally Joins Real Madrid',
-    excerpt: 'The French superstar has officially signed a five-year contract with Los Blancos after years of speculation.',
-    content: 'Kylian Mbappe has completed his long-awaited move to Real Madrid, signing a five-year deal with the Spanish champions. The 25-year-old forward leaves Paris Saint-Germain as a free agent after his contract expired.',
-    image: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&q=80&w=1000',
+    excerpt:
+      'The French superstar has officially signed a five-year contract with Los Blancos after years of speculation.',
+    content:
+      'Kylian Mbappe has completed his long-awaited move to Real Madrid, signing a five-year deal with the Spanish champions. The 25-year-old forward leaves Paris Saint-Germain as a free agent after his contract expired.',
+    image:
+      'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&q=80&w=1000',
     author: 'Fabrizio Romano',
     readTime: 4,
     createdAt: new Date(Date.now() - 172800000).toISOString(),
@@ -145,21 +156,92 @@ const mockBlogPosts: BlogPost[] = [
 
 // Mock Data for Coaches (not available in API)
 const mockCoaches: FootballCoach[] = [
-  { coache: 'Pep Guardiola', coache_country: 'Spain', team_name: 'Manchester City', trophies: 38, coache_image: 'https://ui-avatars.com/api/?name=Pep+Guardiola&background=random&size=200' },
-  { coache: 'Jürgen Klopp', coache_country: 'Germany', team_name: 'Liverpool', trophies: 12, coache_image: 'https://ui-avatars.com/api/?name=Jurgen+Klopp&background=random&size=200' },
-  { coache: 'Carlo Ancelotti', coache_country: 'Italy', team_name: 'Real Madrid', trophies: 28, coache_image: 'https://ui-avatars.com/api/?name=Carlo+Ancelotti&background=random&size=200' },
-  { coache: 'Mikel Arteta', coache_country: 'Spain', team_name: 'Arsenal', trophies: 2, coache_image: 'https://ui-avatars.com/api/?name=Mikel+Arteta&background=random&size=200' },
-  { coache: 'Erik ten Hag', coache_country: 'Netherlands', team_name: 'Manchester United', trophies: 6, coache_image: 'https://ui-avatars.com/api/?name=Erik+ten+Hag&background=random&size=200' },
-  { coache: 'Thomas Tuchel', coache_country: 'Germany', team_name: 'Bayern Munich', trophies: 11, coache_image: 'https://ui-avatars.com/api/?name=Thomas+Tuchel&background=random&size=200' },
+  {
+    coache: 'Pep Guardiola',
+    coache_country: 'Spain',
+    team_name: 'Manchester City',
+    trophies: 38,
+    coache_image: 'https://ui-avatars.com/api/?name=Pep+Guardiola&background=random&size=200',
+  },
+  {
+    coache: 'Jürgen Klopp',
+    coache_country: 'Germany',
+    team_name: 'Liverpool',
+    trophies: 12,
+    coache_image: 'https://ui-avatars.com/api/?name=Jurgen+Klopp&background=random&size=200',
+  },
+  {
+    coache: 'Carlo Ancelotti',
+    coache_country: 'Italy',
+    team_name: 'Real Madrid',
+    trophies: 28,
+    coache_image: 'https://ui-avatars.com/api/?name=Carlo+Ancelotti&background=random&size=200',
+  },
+  {
+    coache: 'Mikel Arteta',
+    coache_country: 'Spain',
+    team_name: 'Arsenal',
+    trophies: 2,
+    coache_image: 'https://ui-avatars.com/api/?name=Mikel+Arteta&background=random&size=200',
+  },
+  {
+    coache: 'Erik ten Hag',
+    coache_country: 'Netherlands',
+    team_name: 'Manchester United',
+    trophies: 6,
+    coache_image: 'https://ui-avatars.com/api/?name=Erik+ten+Hag&background=random&size=200',
+  },
+  {
+    coache: 'Thomas Tuchel',
+    coache_country: 'Germany',
+    team_name: 'Bayern Munich',
+    trophies: 11,
+    coache_image: 'https://ui-avatars.com/api/?name=Thomas+Tuchel&background=random&size=200',
+  },
 ];
 
 // Mock Data for Officials (not available in API)
 const mockOfficials: FootballOfficial[] = [
-  { name: 'Michael Oliver', country: 'England', matches: 245, image: 'https://ui-avatars.com/api/?name=Michael+Oliver&background=random&size=200', yellowCards: 1234, redCards: 89 },
-  { name: 'Anthony Taylor', country: 'England', matches: 198, image: 'https://ui-avatars.com/api/?name=Anthony+Taylor&background=random&size=200', yellowCards: 987, redCards: 67 },
-  { name: 'Björn Kuipers', country: 'Netherlands', matches: 312, image: 'https://ui-avatars.com/api/?name=Bjorn+Kuipers&background=random&size=200', yellowCards: 1567, redCards: 102 },
-  { name: 'Daniele Orsato', country: 'Italy', matches: 267, image: 'https://ui-avatars.com/api/?name=Daniele+Orsato&background=random&size=200', yellowCards: 1345, redCards: 95 },
-  { name: 'Clément Turpin', country: 'France', matches: 189, image: 'https://ui-avatars.com/api/?name=Clement+Turpin&background=random&size=200', yellowCards: 876, redCards: 54 },
+  {
+    name: 'Michael Oliver',
+    country: 'England',
+    matches: 245,
+    image: 'https://ui-avatars.com/api/?name=Michael+Oliver&background=random&size=200',
+    yellowCards: 1234,
+    redCards: 89,
+  },
+  {
+    name: 'Anthony Taylor',
+    country: 'England',
+    matches: 198,
+    image: 'https://ui-avatars.com/api/?name=Anthony+Taylor&background=random&size=200',
+    yellowCards: 987,
+    redCards: 67,
+  },
+  {
+    name: 'Björn Kuipers',
+    country: 'Netherlands',
+    matches: 312,
+    image: 'https://ui-avatars.com/api/?name=Bjorn+Kuipers&background=random&size=200',
+    yellowCards: 1567,
+    redCards: 102,
+  },
+  {
+    name: 'Daniele Orsato',
+    country: 'Italy',
+    matches: 267,
+    image: 'https://ui-avatars.com/api/?name=Daniele+Orsato&background=random&size=200',
+    yellowCards: 1345,
+    redCards: 95,
+  },
+  {
+    name: 'Clément Turpin',
+    country: 'France',
+    matches: 189,
+    image: 'https://ui-avatars.com/api/?name=Clement+Turpin&background=random&size=200',
+    yellowCards: 876,
+    redCards: 54,
+  },
 ];
 
 // Mock Data for Fixtures (for fallback when API is down)
@@ -196,7 +278,7 @@ const mockFixtures: FootballEvent[] = [
     home_team_logo: 'https://apiv2.allsportsapi.com/logo/teams/3_real-madrid.png',
     away_team_logo: 'https://apiv2.allsportsapi.com/logo/teams/4_barcelona.png',
     event_live: '0',
-  }
+  },
 ] as any[];
 
 // API Implementation
@@ -248,11 +330,11 @@ export const advancedFootballApi = {
   }): Promise<FootballFixturesResponse> => {
     try {
       // If no date range provided, use default
-      const dateRange = (params?.from && params?.to) ? {} : getDateRange(7, 7);
-      
+      const dateRange = params?.from && params?.to ? {} : getDateRange(7, 7);
+
       const apiParams: Record<string, any> = {
         ...dateRange,
-        ...params
+        ...params,
       };
 
       const response = await fetchFromAPI<FootballFixturesResponse>('Fixtures', apiParams);
@@ -267,7 +349,11 @@ export const advancedFootballApi = {
    * Get head to head results between two teams
    * Endpoint: ?met=H2H&firstTeamId={id}&secondTeamId={id}
    */
-  getH2H: async (firstTeamId: number, secondTeamId: number, timezone?: string): Promise<FootballH2HResponse> => {
+  getH2H: async (
+    firstTeamId: number,
+    secondTeamId: number,
+    timezone?: string
+  ): Promise<FootballH2HResponse> => {
     try {
       const params: Record<string, any> = {
         firstTeamId,
@@ -393,28 +479,31 @@ export const advancedFootballApi = {
       if (eventId) params.eventId = eventId;
 
       // 1. Fetch from External API
-      const externalPromise = fetchFromAPI<FootballVideosResponse>('Videos', params)
-        .catch((err) => {
+      const externalPromise = fetchFromAPI<FootballVideosResponse>('Videos', params).catch(
+        (err) => {
           console.warn('External API video fetch failed (likely 500):', err.message);
           return { success: 1, result: [] as FootballVideo[] };
-        });
+        }
+      );
 
       // 2. Fetch from Internal Database (matching web app behavior)
-      const internalPromise = goalmillsApi.getVideos()
-        .catch((err) => {
-          console.warn('Internal DB video fetch failed:', err.message);
-          return [] as any[];
-        });
+      const internalPromise = goalmillsApi.getVideos().catch((err) => {
+        console.warn('Internal DB video fetch failed:', err.message);
+        return [] as any[];
+      });
 
       const [externalRes, internalRes] = await Promise.all([externalPromise, internalPromise]);
 
       // Map internal videos to FootballVideo structure
-      const mappedInternal = internalRes.map(v => ({
-        event_key: v.event_key || v._id,
-        video_title: v.video_title,
-        video_title_full: v.video_title, // Reuse title if full title not available
-        video_url: v.video_url,
-      } as unknown as FootballVideo));
+      const mappedInternal = internalRes.map(
+        (v) =>
+          ({
+            event_key: v.event_key || v._id,
+            video_title: v.video_title,
+            video_title_full: v.video_title, // Reuse title if full title not available
+            video_url: v.video_url,
+          }) as unknown as FootballVideo
+      );
 
       return {
         success: 1,
@@ -460,7 +549,10 @@ export const advancedFootballApi = {
     try {
       const apiParams: Record<string, any> = params || {};
 
-      const response = await fetchFromAPI<FootballProbabilitiesResponse>('Probabilities', apiParams);
+      const response = await fetchFromAPI<FootballProbabilitiesResponse>(
+        'Probabilities',
+        apiParams
+      );
       return response;
     } catch (error) {
       return { success: 1, result: [] };

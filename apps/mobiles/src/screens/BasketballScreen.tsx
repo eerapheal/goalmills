@@ -13,10 +13,7 @@ import {
 } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  basketballApiService,
-  ApiBasketballGameItem,
-} from '../services/basketballApi';
+import { basketballApiService, ApiBasketballGameItem } from '../services/basketballApi';
 import { BasketballMatchCard } from '../components/BasketballMatchCard';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
@@ -24,9 +21,7 @@ type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export default function BasketballScreen() {
   const [activeTab, setActiveTab] = useState<BasketballTab>('live');
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -45,10 +40,10 @@ export default function BasketballScreen() {
         i === 0
           ? 'Today'
           : i === -1
-          ? 'Yest'
-          : i === 1
-          ? 'Tmrw'
-          : d.toLocaleDateString('en-US', { weekday: 'short' });
+            ? 'Yest'
+            : i === 1
+              ? 'Tmrw'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNumber = d.getDate();
       dates.push({ iso, dayName, dayNumber });
     }
@@ -95,17 +90,17 @@ export default function BasketballScreen() {
     let list = Array.isArray(games) ? games : [];
 
     if (activeTab === 'live') {
-      list = list.filter(g => {
+      list = list.filter((g) => {
         const short = g?.status?.short || '';
         return ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(short);
       });
     } else if (activeTab === 'upcoming') {
-      list = list.filter(g => {
+      list = list.filter((g) => {
         const short = g?.status?.short || '';
         return !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(short);
       });
     } else if (activeTab === 'results') {
-      list = list.filter(g => {
+      list = list.filter((g) => {
         const short = g?.status?.short || '';
         return ['FT', 'AOT'].includes(short);
       });
@@ -114,7 +109,7 @@ export default function BasketballScreen() {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
-        g =>
+        (g) =>
           (g?.teams?.home?.name || '').toLowerCase().includes(q) ||
           (g?.teams?.away?.name || '').toLowerCase().includes(q) ||
           (g?.league?.name || '').toLowerCase().includes(q)
@@ -128,7 +123,7 @@ export default function BasketballScreen() {
   const sections = useMemo(() => {
     const map = new Map<string, { league: any; data: ApiBasketballGameItem[] }>();
 
-    filteredGames.forEach(game => {
+    filteredGames.forEach((game) => {
       if (!game) return;
       const key = `${game?.league?.id || 'other'}_${game?.league?.name || 'Other'}`;
       if (!map.has(key)) {
@@ -140,7 +135,7 @@ export default function BasketballScreen() {
       map.get(key)!.data.push(game);
     });
 
-    return Array.from(map.values()).map(entry => ({
+    return Array.from(map.values()).map((entry) => ({
       title: entry?.league?.name || 'Competition',
       logo: entry?.league?.logo,
       data: entry?.data || [],
@@ -181,7 +176,7 @@ export default function BasketballScreen() {
 
       {/* Tabs */}
       <View style={styles.tabContainer}>
-        {tabs.map(t => {
+        {tabs.map((t) => {
           const isActive = activeTab === t.id;
           return (
             <Pressable
@@ -210,7 +205,7 @@ export default function BasketballScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.dateSlider}
         >
-          {dateStrip.map(item => {
+          {dateStrip.map((item) => {
             const isSelected = selectedDate === item.iso;
             return (
               <Pressable
@@ -233,7 +228,11 @@ export default function BasketballScreen() {
       {/* Main Content */}
       {loading && !refreshing ? (
         <View style={styles.centerContainer}>
-          <GoalmillsLoader size="md" label="Basketball Live" sublabel="Syncing NBA court action & standings..." />
+          <GoalmillsLoader
+            size="md"
+            label="Basketball Live"
+            sublabel="Syncing NBA court action & standings..."
+          />
         </View>
       ) : activeTab === 'standings' ? (
         <ScrollView
@@ -287,7 +286,7 @@ export default function BasketballScreen() {
       ) : (
         <SectionList
           sections={sections}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.listContainer}
           refreshControl={
             <RefreshControl

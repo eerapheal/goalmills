@@ -71,16 +71,10 @@ export function Header() {
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="relative group py-2"
-              >
+              <Link key={item.name} href={item.href} className="relative group py-2">
                 <span
                   className={`text-sm font-medium transition-colors duration-300 ${
-                    isActive
-                      ? 'text-blue-400'
-                      : 'text-slate-300 group-hover:text-white'
+                    isActive ? 'text-blue-400' : 'text-slate-300 group-hover:text-white'
                   }`}
                 >
                   {item.name}
@@ -88,9 +82,7 @@ export function Header() {
                 {/* Animated Underline */}
                 <span
                   className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-600 to-cyan-400 transform origin-left transition-transform duration-300 ${
-                    isActive
-                      ? 'scale-x-100'
-                      : 'scale-x-0 group-hover:scale-x-100'
+                    isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                   }`}
                 />
 

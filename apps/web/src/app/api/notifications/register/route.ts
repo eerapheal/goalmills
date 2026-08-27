@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '../../../../lib/db';
-import PushToken from '../../../../models/PushToken';
+import dbConnect from '@/lib/db';
+import PushToken from '@/models/PushToken';
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,24 +8,19 @@ export async function POST(req: NextRequest) {
     const { token, platform, topics, userId, deviceInfo, enabled = true } = body;
 
     if (!token || typeof token !== 'string') {
-      return NextResponse.json(
-        { error: 'Valid push token is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Valid push token is required' }, { status: 400 });
     }
 
     if (!platform || !['android', 'ios', 'web'].includes(platform)) {
-      return NextResponse.json(
-        { error: 'Platform must be android, ios, or web' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Platform must be android, ios, or web' }, { status: 400 });
     }
 
     await dbConnect();
 
-    const normalizedTopics = Array.isArray(topics) && topics.length > 0
-      ? Array.from(new Set(topics))
-      : ['all', 'breaking_news', 'live_scores'];
+    const normalizedTopics =
+      Array.isArray(topics) && topics.length > 0
+        ? Array.from(new Set(topics))
+        : ['all', 'breaking_news', 'live_scores'];
 
     const updated = await PushToken.findOneAndUpdate(
       { token: token.trim() },
@@ -54,10 +49,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error registering push token:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -71,10 +63,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     await dbConnect();
-    await PushToken.findOneAndUpdate(
-      { token: token.trim() },
-      { $set: { enabled: false } }
-    );
+    await PushToken.findOneAndUpdate({ token: token.trim() }, { $set: { enabled: false } });
 
     return NextResponse.json({
       success: true,
@@ -82,9 +71,6 @@ export async function DELETE(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error unregistering push token:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

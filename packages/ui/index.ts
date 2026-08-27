@@ -2,22 +2,22 @@
 
 export const THEME = {
   dark: {
-    background: '#0B0F17',         // Deep Obsidian
-    surface: '#141C2B',            // Dark Slate Card
-    surfaceElevated: '#1E293B',    // Elevated Card / Modal
-    surfaceHighlight: '#27354A',   // Active / Hover State
+    background: '#0B0F17', // Deep Obsidian
+    surface: '#141C2B', // Dark Slate Card
+    surfaceElevated: '#1E293B', // Elevated Card / Modal
+    surfaceHighlight: '#27354A', // Active / Hover State
     border: 'rgba(255, 255, 255, 0.08)',
     borderStrong: 'rgba(255, 255, 255, 0.16)',
     textPrimary: '#F8FAFC',
     textSecondary: '#94A3B8',
     textMuted: '#64748B',
-    accent: '#00E599',             // Live Neon Emerald
+    accent: '#00E599', // Live Neon Emerald
     accentGlow: 'rgba(0, 229, 153, 0.25)',
-    live: '#10B981',               // Live Match Green
+    live: '#10B981', // Live Match Green
     livePulse: 'rgba(16, 185, 129, 0.2)',
     brandBlue: '#3B82F6',
-    warning: '#F59E0B',            // Yellow Card
-    danger: '#EF4444',             // Red Card / Cancelled
+    warning: '#F59E0B', // Yellow Card
+    danger: '#EF4444', // Red Card / Cancelled
     info: '#06B6D4',
   },
   light: {
@@ -149,4 +149,3 @@ export const LOADER_THEME = {
   liveDot: '#10B981',
   glow: 'rgba(59, 130, 246, 0.35)',
 };
-

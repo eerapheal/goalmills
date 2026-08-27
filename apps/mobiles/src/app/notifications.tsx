@@ -116,11 +116,7 @@ export default function NotificationsScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#4f9bff"
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4f9bff" />
         }
       >
         {/* Master Push Toggle Card */}
@@ -177,13 +173,19 @@ export default function NotificationsScreen() {
 
         {/* Notifications List */}
         {loading ? (
-          <GoalmillsLoader size="md" label="GoalMills Alerts" sublabel="Syncing recent notifications..." style={{ marginTop: 20 }} />
+          <GoalmillsLoader
+            size="md"
+            label="GoalMills Alerts"
+            sublabel="Syncing recent notifications..."
+            style={{ marginTop: 20 }}
+          />
         ) : notifications.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="notifications-off-outline" size={48} color="#64748b" />
             <Text style={styles.emptyTitle}>No Notifications Yet</Text>
             <Text style={styles.emptyText}>
-              Turn on push alerts above to receive instant scores, goal updates, and sports highlights.
+              Turn on push alerts above to receive instant scores, goal updates, and sports
+              highlights.
             </Text>
           </View>
         ) : (
@@ -196,11 +198,7 @@ export default function NotificationsScreen() {
             >
               <View style={styles.itemIconWrapper}>
                 <Ionicons
-                  name={
-                    item.topic === 'live_scores'
-                      ? 'football-outline'
-                      : 'newspaper-outline'
-                  }
+                  name={item.topic === 'live_scores' ? 'football-outline' : 'newspaper-outline'}
                   size={20}
                   color="#4f9bff"
                 />

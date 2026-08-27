@@ -104,7 +104,7 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
                 styles.winningScore,
             ]}
           >
-            {isUpcoming ? '-' : match?.scores?.home?.total ?? 0}
+            {isUpcoming ? '-' : (match?.scores?.home?.total ?? 0)}
           </Text>
         </View>
 
@@ -133,7 +133,7 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
                 styles.winningScore,
             ]}
           >
-            {isUpcoming ? '-' : match?.scores?.away?.total ?? 0}
+            {isUpcoming ? '-' : (match?.scores?.away?.total ?? 0)}
           </Text>
         </View>
       </View>

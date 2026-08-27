@@ -2,7 +2,14 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { FiVolume2, FiVolumeX, FiMaximize, FiRefreshCw, FiPlay, FiExternalLink } from 'react-icons/fi';
+import {
+  FiVolume2,
+  FiVolumeX,
+  FiMaximize,
+  FiRefreshCw,
+  FiPlay,
+  FiExternalLink,
+} from 'react-icons/fi';
 import { FaYoutube } from 'react-icons/fa6';
 
 import { extractYouTubeId } from '@/lib/videoUtils';
@@ -74,7 +81,8 @@ export default function VideoPlayer({
           {playerError ? 'Broadcaster Embed Restricted' : 'Video Source Unavailable'}
         </p>
         <p className="text-slate-400 text-xs max-w-sm mb-4">
-          This match highlight has external website embed restrictions (Error 150/153) set by the content owner.
+          This match highlight has external website embed restrictions (Error 150/153) set by the
+          content owner.
         </p>
         <div className="flex items-center gap-3">
           {ytId && (

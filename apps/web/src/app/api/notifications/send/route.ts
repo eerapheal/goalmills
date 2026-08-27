@@ -22,10 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!title || !content) {
-      return NextResponse.json(
-        { error: 'Title and body are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Title and body are required' }, { status: 400 });
     }
 
     const result = await sendPushNotification({
@@ -45,9 +42,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error sending push notification:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

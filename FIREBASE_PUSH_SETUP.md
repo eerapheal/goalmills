@@ -8,6 +8,7 @@
 ## 1. Architecture Summary
 
 GoalMills is equipped with a unified push notification system:
+
 1. **Mobile App (`apps/mobiles`)**:
    - Integrated with `expo-notifications` and FCM.
    - Automatically registers push tokens to `/api/notifications/register`.
@@ -31,6 +32,7 @@ GoalMills is equipped with a unified push notification system:
 Add the following keys to your `.env` files:
 
 ### Web App (`apps/web/.env`)
+
 ```env
 # MongoDB Connection (Already Configured)
 MONGODB_URL="mongodb+srv://goalmills:G8jQXggyUTu5Dk45@goalmills.7oliki1.mongodb.net/?appName=goalmills"
@@ -52,6 +54,7 @@ ADMIN_NOTIFICATION_KEY="your_admin_secret_key"
 You can trigger a push notification to all users or specific topics using `POST /api/notifications/send`:
 
 ### Example 1: Broadcast a Live Match Score Alert
+
 ```bash
 curl -X POST https://goalmills-web.vercel.app/api/notifications/send \
   -H "Content-Type: application/json" \
@@ -68,6 +71,7 @@ curl -X POST https://goalmills-web.vercel.app/api/notifications/send \
 ```
 
 ### Example 2: Broadcast Breaking Sports News
+
 ```bash
 curl -X POST https://goalmills-web.vercel.app/api/notifications/send \
   -H "Content-Type: application/json" \

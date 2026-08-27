@@ -295,7 +295,9 @@ export default function CategoryManager() {
                   type="button"
                   onClick={() => setColor(c)}
                   className={`w-7 h-7 rounded-full border-2 transition-transform ${
-                    color === c ? 'scale-125 border-white shadow-md shadow-white/20' : 'border-transparent'
+                    color === c
+                      ? 'scale-125 border-white shadow-md shadow-white/20'
+                      : 'border-transparent'
                   }`}
                   style={{ backgroundColor: c }}
                 />
@@ -320,7 +322,10 @@ export default function CategoryManager() {
               onChange={(e) => setIsFeatured(e.target.checked)}
               className="w-4 h-4 rounded text-blue-600 focus:ring-0 bg-white/10 border-white/20"
             />
-            <label htmlFor="isFeaturedCat" className="text-sm font-semibold text-slate-200 cursor-pointer">
+            <label
+              htmlFor="isFeaturedCat"
+              className="text-sm font-semibold text-slate-200 cursor-pointer"
+            >
               Pin as Featured / Navigation Pill
             </label>
           </div>
@@ -340,7 +345,9 @@ export default function CategoryManager() {
               className="flex items-center gap-2 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50"
             >
               <FiCheck />
-              <span>{saving ? 'Saving...' : editingId ? 'Update Category' : 'Create Category'}</span>
+              <span>
+                {saving ? 'Saving...' : editingId ? 'Update Category' : 'Create Category'}
+              </span>
             </button>
           </div>
         </form>
@@ -386,9 +393,7 @@ export default function CategoryManager() {
                 </div>
 
                 {cat.description && (
-                  <p className="text-xs text-slate-400 line-clamp-2 mb-3">
-                    {cat.description}
-                  </p>
+                  <p className="text-xs text-slate-400 line-clamp-2 mb-3">{cat.description}</p>
                 )}
               </div>
 

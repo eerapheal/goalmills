@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
-import { FootballLeague, FootballEvent, FootballStanding, FootballTopscorer, FootballTeam } from '@goalmills/types';
+import {
+  FootballLeague,
+  FootballEvent,
+  FootballStanding,
+  FootballTopscorer,
+  FootballTeam,
+} from '@goalmills/types';
 import { FootballMatchCard } from '../../../components/FootballMatchCard';
 import { FootballStandingsTable } from '../../../components/FootballStandingsTable';
 import { FootballTopScorers } from '../../../components/FootballTopScorers';
@@ -37,44 +43,49 @@ export default function LeagueDetailsPage() {
 
         // Determine season start year (July to June)
         let seasonStartYear = currentYear;
-        if (currentMonth < 6) { // Jan - Jun
+        if (currentMonth < 6) {
+          // Jan - Jun
           seasonStartYear = currentYear - 1;
         }
 
         const fromDate = `${seasonStartYear}-07-01`;
         const toDate = `${seasonStartYear + 1}-06-30`;
 
-        console.log(`🔄 Loading league data for ${leagueId} (Season: ${seasonStartYear}/${seasonStartYear + 1})...`);
+        console.log(
+          `🔄 Loading league data for ${leagueId} (Season: ${seasonStartYear}/${seasonStartYear + 1})...`
+        );
 
         const [leaguesRes, fixturesRes, standingsRes, topscorersRes, teamsRes] = await Promise.all([
-          advancedFootballApi.getLeagues(undefined, leagueId).catch(err => {
+          advancedFootballApi.getLeagues(undefined, leagueId).catch((err) => {
             console.error('❌ Leagues API error:', err);
             return { success: 1, result: [] };
           }),
-          advancedFootballApi.getFixtures({
-            from: fromDate,
-            to: toDate,
-            leagueId: leagueId
-          }).catch(err => {
-            console.error('❌ Fixtures API error:', err);
-            return { success: 1, result: [] };
-          }),
-          advancedFootballApi.getStandings(leagueId).catch(err => {
+          advancedFootballApi
+            .getFixtures({
+              from: fromDate,
+              to: toDate,
+              leagueId: leagueId,
+            })
+            .catch((err) => {
+              console.error('❌ Fixtures API error:', err);
+              return { success: 1, result: [] };
+            }),
+          advancedFootballApi.getStandings(leagueId).catch((err) => {
             console.error('❌ Standings API error:', err);
             return { success: 1, result: { total: [], home: [], away: [] } };
           }),
-          advancedFootballApi.getTopscorers(leagueId).catch(err => {
+          advancedFootballApi.getTopscorers(leagueId).catch((err) => {
             console.error('❌ Topscorers API error:', err);
             return { success: 1, result: [] };
           }),
-          advancedFootballApi.getTeams({ leagueId: leagueId }).catch(err => {
+          advancedFootballApi.getTeams({ leagueId: leagueId }).catch((err) => {
             console.error('❌ Teams API error:', err);
             return { success: 1, result: [] };
-          })
+          }),
         ]);
 
         const leagues = leaguesRes?.result || [];
-        const foundLeague = leagues.find(l => l.league_key === String(leagueId));
+        const foundLeague = leagues.find((l) => l.league_key === String(leagueId));
 
         // If league not found in leagues list, try to get it from fixtures
         const fixtures = fixturesRes?.result || [];
@@ -113,7 +124,7 @@ export default function LeagueDetailsPage() {
         }
         const groupedStandings: { [key: string]: FootballStanding[] } = {};
 
-        rawStandings.forEach(s => {
+        rawStandings.forEach((s) => {
           let groupName = s.stage_name || 'League Table';
 
           // Normalize variations
@@ -143,16 +154,17 @@ export default function LeagueDetailsPage() {
           if (!groupedStandings[groupName]) {
             groupedStandings[groupName] = [];
           }
-          
+
           // Deduplicate: Check if team already in this group by ID or Name
-          const teamExists = groupedStandings[groupName].some(existing => 
-            existing.team_key === s.team_key || 
-            existing.standing_team.toLowerCase() === s.standing_team.toLowerCase()
+          const teamExists = groupedStandings[groupName].some(
+            (existing) =>
+              existing.team_key === s.team_key ||
+              existing.standing_team.toLowerCase() === s.standing_team.toLowerCase()
           );
 
           // Position uniqueness: Check if rank already taken
-          const rankExists = groupedStandings[groupName].some(existing => 
-            existing.standing_place === s.standing_place
+          const rankExists = groupedStandings[groupName].some(
+            (existing) => existing.standing_place === s.standing_place
           );
 
           if (!teamExists && !rankExists) {
@@ -168,7 +180,7 @@ export default function LeagueDetailsPage() {
         // Convert to array and sort groups
         const standingsData = Object.entries(groupedStandings).map(([name, teams]) => ({
           name,
-          teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place))
+          teams: teams.sort((a, b) => parseInt(a.standing_place) - parseInt(b.standing_place)),
         }));
 
         // Sort groups alphabetically (e.g. Group A, Group B, ...)
@@ -191,9 +203,9 @@ export default function LeagueDetailsPage() {
               teamMap.set(key, {
                 team_key: key,
                 team_name: f.event_home_team,
-                team_logo: f.home_team_logo
+                team_logo: f.home_team_logo,
               } as FootballTeam);
-            } else if (!existing.team_logo || existing.team_logo === "") {
+            } else if (!existing.team_logo || existing.team_logo === '') {
               existing.team_logo = f.home_team_logo;
             }
           }
@@ -204,9 +216,9 @@ export default function LeagueDetailsPage() {
               teamMap.set(key, {
                 team_key: key,
                 team_name: f.event_away_team,
-                team_logo: f.away_team_logo
+                team_logo: f.away_team_logo,
               } as FootballTeam);
-            } else if (!existing.team_logo || existing.team_logo === "") {
+            } else if (!existing.team_logo || existing.team_logo === '') {
               existing.team_logo = f.away_team_logo;
             }
           }
@@ -219,9 +231,8 @@ export default function LeagueDetailsPage() {
           fixtures: fixturesRes.result?.length || 0,
           standings: standingsRes.result?.total?.length || 0,
           topscorers: topscorersRes.result?.length || 0,
-          teams: finalTeams.length
+          teams: finalTeams.length,
         });
-
       } catch (error) {
         console.error('❌ Error loading league data:', error);
       } finally {
@@ -245,7 +256,7 @@ export default function LeagueDetailsPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-4">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="h-24 bg-surfaceHighlight/30 rounded-xl" />
               ))}
             </div>
@@ -272,7 +283,7 @@ export default function LeagueDetailsPage() {
   const liveStatuses = ['Live', 'In Play', '1H', '2H', 'HT', 'ET', 'P'];
 
   const upcomingEvents = events
-    .filter(e => {
+    .filter((e) => {
       const isFinished = finishedStatuses.includes(e.event_status);
       const isLive = liveStatuses.includes(e.event_status);
       // Strictly upcoming: Not finished AND (either it's today+ or it's currently live/not started)
@@ -288,14 +299,14 @@ export default function LeagueDetailsPage() {
       // Then sort by date and time
       const dateA = new Date(`${a.event_date} ${a.event_time}`).getTime();
       const dateB = new Date(`${b.event_date} ${b.event_time}`).getTime();
-      
+
       // If same date/time, keep order
       if (dateA === dateB) return 0;
       return dateA - dateB;
     });
 
   const finishedEvents = events
-    .filter(e => {
+    .filter((e) => {
       const isFinished = finishedStatuses.includes(e.event_status);
       return isFinished || (e.event_date < todayStr && !liveStatuses.includes(e.event_status));
     })
@@ -309,11 +320,11 @@ export default function LeagueDetailsPage() {
   const formatDateHeader = (dateStr: string) => {
     const date = new Date(dateStr);
     const today = new Date();
-    
+
     // Reset hours to compare dates only
     const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+
     const diffTime = d.getTime() - t.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -321,28 +332,34 @@ export default function LeagueDetailsPage() {
     if (diffDays === 1) return 'Tomorrow';
     if (diffDays === -1) return 'Yesterday';
 
-    return new Date(dateStr).toLocaleDateString('en-GB', { 
-      weekday: 'long', 
-      day: 'numeric', 
-      month: 'long' 
+    return new Date(dateStr).toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
     });
   };
 
   // Group events by date for upcoming
-  const groupedUpcoming = upcomingEvents.reduce((groups, event) => {
-    const date = event.event_date;
-    if (!groups[date]) groups[date] = [];
-    groups[date].push(event);
-    return groups;
-  }, {} as Record<string, FootballEvent[]>);
+  const groupedUpcoming = upcomingEvents.reduce(
+    (groups, event) => {
+      const date = event.event_date;
+      if (!groups[date]) groups[date] = [];
+      groups[date].push(event);
+      return groups;
+    },
+    {} as Record<string, FootballEvent[]>
+  );
 
   // Group events by date for results
-  const groupedResults = finishedEvents.reduce((groups, event) => {
-    const date = event.event_date;
-    if (!groups[date]) groups[date] = [];
-    groups[date].push(event);
-    return groups;
-  }, {} as Record<string, FootballEvent[]>);
+  const groupedResults = finishedEvents.reduce(
+    (groups, event) => {
+      const date = event.event_date;
+      if (!groups[date]) groups[date] = [];
+      groups[date].push(event);
+      return groups;
+    },
+    {} as Record<string, FootballEvent[]>
+  );
 
   return (
     <div className="min-h-screen bg-background pt-[90px] pb-20">
@@ -351,13 +368,21 @@ export default function LeagueDetailsPage() {
         <BackButton className="absolute top-4 left-4 z-20" />
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
           <div className="relative w-24 h-24 p-4 bg-white/5 rounded-2xl border border-white/10">
-            <img src={league.league_logo || undefined} alt={league.league_name} className="w-full h-full object-contain p-2" />
+            <img
+              src={league.league_logo || undefined}
+              alt={league.league_name}
+              className="w-full h-full object-contain p-2"
+            />
           </div>
           <div className="text-center md:text-left">
             <h1 className="text-3xl font-black text-white mb-2">{league.league_name}</h1>
             <div className="flex items-center justify-center md:justify-start gap-3 text-text-muted font-medium">
               <span className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full text-sm">
-                <img src={league.country_logo || undefined} alt={league.country_name} className="w-4 h-3 object-cover rounded-sm" />
+                <img
+                  src={league.country_logo || undefined}
+                  alt={league.country_name}
+                  className="w-4 h-3 object-cover rounded-sm"
+                />
                 {league.country_name}
               </span>
             </div>
@@ -375,9 +400,11 @@ export default function LeagueDetailsPage() {
                 onClick={() => setActiveTab(tab)}
                 className={`
                                     py-4 px-2 border-b-2 text-sm font-bold uppercase tracking-wider transition-colors whitespace-nowrap
-                                    ${activeTab === tab
-                    ? 'border-secondary text-secondary'
-                    : 'border-transparent text-text-muted hover:text-white'}
+                                    ${
+                                      activeTab === tab
+                                        ? 'border-secondary text-secondary'
+                                        : 'border-transparent text-text-muted hover:text-white'
+                                    }
                                 `}
               >
                 {tab}
@@ -391,39 +418,47 @@ export default function LeagueDetailsPage() {
         {activeTab === 'fixtures' && (
           <div className="space-y-8 animate-fade-in">
             <h3 className="text-xl font-bold text-white mb-4">Upcoming Matches</h3>
-            {Object.keys(groupedUpcoming).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(date => (
-              <div key={date} className="space-y-3">
-                <div className="flex items-center gap-4 px-2">
-                  <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
-                    {formatDateHeader(date)}
-                  </span>
-                  <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+            {Object.keys(groupedUpcoming)
+              .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+              .map((date) => (
+                <div key={date} className="space-y-3">
+                  <div className="flex items-center gap-4 px-2">
+                    <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
+                      {formatDateHeader(date)}
+                    </span>
+                    <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+                  </div>
+                  {groupedUpcoming[date].map((event, index) => (
+                    <FootballMatchCard key={`fixture-${event.event_key}-${index}`} event={event} />
+                  ))}
                 </div>
-                {groupedUpcoming[date].map((event, index) => (
-                  <FootballMatchCard key={`fixture-${event.event_key}-${index}`} event={event} />
-                ))}
-              </div>
-            ))}
-            {upcomingEvents.length === 0 && <p className="text-text-muted text-center py-8">No upcoming matches.</p>}
+              ))}
+            {upcomingEvents.length === 0 && (
+              <p className="text-text-muted text-center py-8">No upcoming matches.</p>
+            )}
           </div>
         )}
         {activeTab === 'results' && (
           <div className="space-y-8 animate-fade-in">
             <h3 className="text-xl font-bold text-white mb-4">Recent Results</h3>
-            {Object.keys(groupedResults).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()).map(date => (
-              <div key={date} className="space-y-3">
-                <div className="flex items-center gap-4 px-2">
-                  <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
-                    {formatDateHeader(date)}
-                  </span>
-                  <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+            {Object.keys(groupedResults)
+              .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+              .map((date) => (
+                <div key={date} className="space-y-3">
+                  <div className="flex items-center gap-4 px-2">
+                    <span className="text-sm font-black text-secondary uppercase tracking-[0.2em] whitespace-nowrap">
+                      {formatDateHeader(date)}
+                    </span>
+                    <div className="h-px w-full bg-gradient-to-r from-secondary/30 to-transparent" />
+                  </div>
+                  {groupedResults[date].map((event, index) => (
+                    <FootballMatchCard key={`result-${event.event_key}-${index}`} event={event} />
+                  ))}
                 </div>
-                {groupedResults[date].map((event, index) => (
-                  <FootballMatchCard key={`result-${event.event_key}-${index}`} event={event} />
-                ))}
-              </div>
-            ))}
-            {finishedEvents.length === 0 && <p className="text-text-muted text-center py-8">No recent results.</p>}
+              ))}
+            {finishedEvents.length === 0 && (
+              <p className="text-text-muted text-center py-8">No recent results.</p>
+            )}
           </div>
         )}
         {activeTab === 'standings' && (
@@ -434,7 +469,11 @@ export default function LeagueDetailsPage() {
                   {(standings.length > 1 || group.name !== 'League Table') && (
                     <h3 className="text-xl font-bold text-white pl-2">{group.name}</h3>
                   )}
-                  <FootballStandingsTable standings={group.teams} teams={teams} leagueId={leagueId} />
+                  <FootballStandingsTable
+                    standings={group.teams}
+                    teams={teams}
+                    leagueId={leagueId}
+                  />
                 </div>
               ))
             ) : (
@@ -449,7 +488,6 @@ export default function LeagueDetailsPage() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

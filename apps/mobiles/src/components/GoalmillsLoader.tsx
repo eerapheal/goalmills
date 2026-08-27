@@ -85,7 +85,14 @@ export function GoalmillsLoader({
   const content = (
     <View style={[styles.container, style]}>
       {/* Orb Orbit */}
-      <View style={{ width: dimensions.outer, height: dimensions.outer, alignItems: 'center', justifyContent: 'center' }}>
+      <View
+        style={{
+          width: dimensions.outer,
+          height: dimensions.outer,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         {/* Outer Ring (Electric Blue) */}
         <Animated.View
           style={[

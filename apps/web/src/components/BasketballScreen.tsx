@@ -2,19 +2,14 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { BasketballMatchCard } from './BasketballMatchCard';
-import {
-  webBasketballApiService,
-  ApiBasketballGameItem,
-} from '../services/basketballApi';
+import { webBasketballApiService, ApiBasketballGameItem } from '../services/basketballApi';
 import { GoalmillsLoader } from './GoalmillsLoader';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export function BasketballScreen() {
   const [activeTab, setActiveTab] = useState<BasketballTab>('live');
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [games, setGames] = useState<ApiBasketballGameItem[]>([]);
@@ -32,10 +27,10 @@ export function BasketballScreen() {
         i === 0
           ? 'Today'
           : i === -1
-          ? 'Yesterday'
-          : i === 1
-          ? 'Tomorrow'
-          : d.toLocaleDateString('en-US', { weekday: 'short' });
+            ? 'Yesterday'
+            : i === 1
+              ? 'Tomorrow'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNumber = d.getDate();
       dates.push({ iso, dayName, dayNumber });
     }
@@ -208,7 +203,9 @@ export function BasketballScreen() {
                 }`}
               >
                 <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
-                <span className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}>
+                <span
+                  className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
+                >
                   {item.dayNumber}
                 </span>
               </button>
@@ -219,12 +216,18 @@ export function BasketballScreen() {
 
       {/* Content */}
       {loading ? (
-        <GoalmillsLoader size="md" label="Basketball Hub" sublabel="Syncing NBA scores & court action..." />
+        <GoalmillsLoader
+          size="md"
+          label="Basketball Hub"
+          sublabel="Syncing NBA scores & court action..."
+        />
       ) : activeTab === 'standings' ? (
         <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
           <h2 className="mb-4 text-lg font-bold text-white">NBA Standings</h2>
           {standings.length === 0 ? (
-            <p className="text-sm text-slate-400 py-4 text-center">Standings data currently not available.</p>
+            <p className="text-sm text-slate-400 py-4 text-center">
+              Standings data currently not available.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-300">
@@ -240,16 +243,28 @@ export function BasketballScreen() {
                 <tbody className="divide-y divide-white/5">
                   {standings.map((row, idx) => (
                     <tr key={idx} className="hover:bg-white/5">
-                      <td className="py-3 px-2 font-bold text-slate-400">{row.position || idx + 1}</td>
+                      <td className="py-3 px-2 font-bold text-slate-400">
+                        {row.position || idx + 1}
+                      </td>
                       <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
                         {row.team?.logo && (
-                          <img src={row.team.logo} alt={row.team.name} className="h-5 w-5 object-contain" />
+                          <img
+                            src={row.team.logo}
+                            alt={row.team.name}
+                            className="h-5 w-5 object-contain"
+                          />
                         )}
                         <span>{row.team?.name || 'Team'}</span>
                       </td>
-                      <td className="py-3 px-3 text-center font-bold text-emerald-400">{row.games?.win?.total ?? 0}</td>
-                      <td className="py-3 px-3 text-center font-bold text-red-400">{row.games?.lose?.total ?? 0}</td>
-                      <td className="py-3 px-3 text-center font-medium">{row.games?.win?.percentage ?? '-'}</td>
+                      <td className="py-3 px-3 text-center font-bold text-emerald-400">
+                        {row.games?.win?.total ?? 0}
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-red-400">
+                        {row.games?.lose?.total ?? 0}
+                      </td>
+                      <td className="py-3 px-3 text-center font-medium">
+                        {row.games?.win?.percentage ?? '-'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

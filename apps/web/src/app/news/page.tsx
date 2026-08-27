@@ -34,16 +34,9 @@ export default async function NewsPage() {
     <main className="min-h-screen bg-[#070B12] px-4 sm:px-6 lg:px-12 pt-[105px] pb-20">
       <div className="max-w-7xl mx-auto">
         <Suspense
-          fallback={
-            <div className="py-24 text-center text-slate-400">
-              Loading sports pulse...
-            </div>
-          }
+          fallback={<div className="py-24 text-center text-slate-400">Loading sports pulse...</div>}
         >
-          <NewsFeedClient
-            initialNews={initialNews}
-            initialCategories={initialCategories}
-          />
+          <NewsFeedClient initialNews={initialNews} initialCategories={initialCategories} />
         </Suspense>
       </div>
     </main>

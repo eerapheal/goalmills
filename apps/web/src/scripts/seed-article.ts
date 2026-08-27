@@ -116,18 +116,20 @@ const CATEGORIES = [
 const ARTICLES = [
   {
     title: "Arsenal Dominance: Arteta's Tactical Masterclass Seals North London Victory",
-    excerpt: "Arsenal delivered a masterclass in pressing and defensive organisation to overcome rivals Tottenham, cementing their title ambitions with a commanding display.",
-    category: "Premier League",
-    categorySlug: "premier-league",
-    tags: ["Arsenal", "Premier League", "Mikel Arteta", "Bukayo Saka", "Tactics"],
-    relatedTeam: "Arsenal",
+    excerpt:
+      'Arsenal delivered a masterclass in pressing and defensive organisation to overcome rivals Tottenham, cementing their title ambitions with a commanding display.',
+    category: 'Premier League',
+    categorySlug: 'premier-league',
+    tags: ['Arsenal', 'Premier League', 'Mikel Arteta', 'Bukayo Saka', 'Tactics'],
+    relatedTeam: 'Arsenal',
     views: 3420,
     isBreaking: true,
     isFeatured: true,
-    author: "Gabriel Martin",
+    author: 'Gabriel Martin',
     readTime: 4,
-    source: "GoalMills Football Desk",
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200",
+    source: 'GoalMills Football Desk',
+    image:
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>The Blueprint for Domination</h2>
       <p>From the opening whistle, Arsenal executed an aggressive high-press system that completely disconnected Tottenham's midfield conductors. Mikel Arteta set his side up in an asymmetrical 4-3-3 shape that morphed into a compact 3-2-5 in possession.</p>
@@ -147,19 +149,21 @@ const ARTICLES = [
     `,
   },
   {
-    title: "Real Madrid Agree Record Deal for Sensational Wonderkid in Mega Summer Move",
-    excerpt: "Los Blancos have finalised terms on an astonishing €95M summer transfer package, securing Europe's most coveted attacking talent ahead of Premier League suitors.",
-    category: "Transfers & Rumours",
-    categorySlug: "transfers",
-    tags: ["Real Madrid", "Transfers", "La Liga", "Champions League", "Breaking"],
-    relatedTeam: "Real Madrid",
+    title: 'Real Madrid Agree Record Deal for Sensational Wonderkid in Mega Summer Move',
+    excerpt:
+      "Los Blancos have finalised terms on an astonishing €95M summer transfer package, securing Europe's most coveted attacking talent ahead of Premier League suitors.",
+    category: 'Transfers & Rumours',
+    categorySlug: 'transfers',
+    tags: ['Real Madrid', 'Transfers', 'La Liga', 'Champions League', 'Breaking'],
+    relatedTeam: 'Real Madrid',
     views: 5120,
     isBreaking: true,
     isFeatured: true,
-    author: "Fabrizio Romano Desk",
+    author: 'Fabrizio Romano Desk',
     readTime: 3,
-    source: "European Transfer Intel",
-    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=1200",
+    source: 'European Transfer Intel',
+    image:
+      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Deal Agreed: The Summer's Biggest Blockbuster</h2>
       <p>Real Madrid have reached a total agreement in principle following extensive negotiations in Madrid. The transfer package includes €75m fixed fee plus €20m in performance-related add-ons.</p>
@@ -171,19 +175,21 @@ const ARTICLES = [
     `,
   },
   {
-    title: "Champions League Quarterfinal Draw: Heavyweight Collisions Await in Europe",
-    excerpt: "The Champions League last-eight draw has delivered mouthwatering fixtures, pitching reigning champions against formidable challengers in classic European showdowns.",
-    category: "Champions League",
-    categorySlug: "champions-league",
-    tags: ["Champions League", "Real Madrid", "Man City", "Bayern Munich", "UEFA"],
-    relatedTeam: "Man City",
+    title: 'Champions League Quarterfinal Draw: Heavyweight Collisions Await in Europe',
+    excerpt:
+      'The Champions League last-eight draw has delivered mouthwatering fixtures, pitching reigning champions against formidable challengers in classic European showdowns.',
+    category: 'Champions League',
+    categorySlug: 'champions-league',
+    tags: ['Champions League', 'Real Madrid', 'Man City', 'Bayern Munich', 'UEFA'],
+    relatedTeam: 'Man City',
     views: 4210,
     isBreaking: false,
     isFeatured: true,
-    author: "Sophia Sterling",
+    author: 'Sophia Sterling',
     readTime: 5,
-    source: "UEFA Intelligence",
-    image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=1200",
+    source: 'UEFA Intelligence',
+    image:
+      'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Blockbuster Ties on European Nights</h2>
       <p>The road to Wembley has become clearer following the official quarterfinal draw in Nyon. Defending champions Manchester City face a titanic rematch against Spanish giants Real Madrid, while Bayern Munich square off against a resurgent Arsenal.</p>
@@ -193,19 +199,22 @@ const ARTICLES = [
     `,
   },
   {
-    title: "Tactical Breakdown: How False Nines and Inverted Full-Backs are Reshaping 2026 Football",
-    excerpt: "An in-depth tactical study exploring how modern managers create numerical overloads in the central third by transforming full-backs into playmaking midfielders.",
-    category: "Tactical Analysis",
-    categorySlug: "tactical-analysis",
-    tags: ["Tactics", "Tactical Analysis", "Pep Guardiola", "Arsenal", "Man City"],
-    relatedTeam: "Arsenal",
+    title:
+      'Tactical Breakdown: How False Nines and Inverted Full-Backs are Reshaping 2026 Football',
+    excerpt:
+      'An in-depth tactical study exploring how modern managers create numerical overloads in the central third by transforming full-backs into playmaking midfielders.',
+    category: 'Tactical Analysis',
+    categorySlug: 'tactical-analysis',
+    tags: ['Tactics', 'Tactical Analysis', 'Pep Guardiola', 'Arsenal', 'Man City'],
+    relatedTeam: 'Arsenal',
     views: 2890,
     isBreaking: false,
     isFeatured: true,
-    author: "Tactical Lab",
+    author: 'Tactical Lab',
     readTime: 6,
-    source: "GoalMills Analytics",
-    image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=1200",
+    source: 'GoalMills Analytics',
+    image:
+      'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>The Evolution of Positional Play</h2>
       <p>The traditional chalk-on-the-boots full-back is practically extinct among top-flight European contenders. Today's elite full-backs step directly into the midfield pivot upon possession turnover.</p>
@@ -215,19 +224,21 @@ const ARTICLES = [
     `,
   },
   {
-    title: "AFCON 2025: Nigeria vs Algeria Quarterfinal Showdown Analysis",
-    excerpt: "Nigeria’s 2–0 victory over Algeria in the AFCON quarterfinal was a statement win that underlined the Super Eagles’ status as genuine title contenders.",
-    category: "AFCON 2025",
-    categorySlug: "afcon-2025",
-    tags: ["AFCON 2025", "Nigeria", "Algeria", "Victor Osimhen", "Africa Cup of Nations"],
-    relatedTeam: "Nigeria",
+    title: 'AFCON 2025: Nigeria vs Algeria Quarterfinal Showdown Analysis',
+    excerpt:
+      'Nigeria’s 2–0 victory over Algeria in the AFCON quarterfinal was a statement win that underlined the Super Eagles’ status as genuine title contenders.',
+    category: 'AFCON 2025',
+    categorySlug: 'afcon-2025',
+    tags: ['AFCON 2025', 'Nigeria', 'Algeria', 'Victor Osimhen', 'Africa Cup of Nations'],
+    relatedTeam: 'Nigeria',
     views: 4890,
     isBreaking: true,
     isFeatured: false,
-    author: "GoalMills Africa Desk",
+    author: 'GoalMills Africa Desk',
     readTime: 4,
-    source: "AFCON Central",
-    image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=1200",
+    source: 'AFCON Central',
+    image:
+      'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Dominant Display in Marrakech</h2>
       <p>Nigeria produced a commanding 2-0 quarterfinal victory against Algeria in Marrakech. Victor Osimhen opened the scoring with a thunderous header before Akor Adams sealed the semifinal berth with an acrobatic finish.</p>
@@ -236,19 +247,22 @@ const ARTICLES = [
     `,
   },
   {
-    title: "NBA Finals Preview: Lakers vs Celtics Rivalry Rekindled in High-Stakes Championship Duel",
-    excerpt: "The NBA’s two most decorated franchises clash in a marquee 7-game series featuring superstar clashes, explosive perimeter shooting and defensive grit.",
-    category: "NBA & Basketball",
-    categorySlug: "nba-basketball",
-    tags: ["NBA", "Lakers", "Celtics", "Basketball", "LeBron James"],
-    relatedTeam: "Lakers",
+    title:
+      'NBA Finals Preview: Lakers vs Celtics Rivalry Rekindled in High-Stakes Championship Duel',
+    excerpt:
+      'The NBA’s two most decorated franchises clash in a marquee 7-game series featuring superstar clashes, explosive perimeter shooting and defensive grit.',
+    category: 'NBA & Basketball',
+    categorySlug: 'nba-basketball',
+    tags: ['NBA', 'Lakers', 'Celtics', 'Basketball', 'LeBron James'],
+    relatedTeam: 'Lakers',
     views: 3180,
     isBreaking: false,
     isFeatured: false,
-    author: "Hoops Insider",
+    author: 'Hoops Insider',
     readTime: 4,
-    source: "CourtSide Report",
-    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=1200",
+    source: 'CourtSide Report',
+    image:
+      'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Historic Battle for 18th Banner</h2>
       <p>The historic rivalry resumes with both Los Angeles and Boston locked at 17 championships each. The series promises tactical adjustments on pick-and-roll defense and transition pace.</p>
@@ -258,19 +272,21 @@ const ARTICLES = [
     `,
   },
   {
-    title: "IPL 2026 Season Kickoff: Thrilling Super Over Finale Lights Up Opening Night",
-    excerpt: "A sensational opening match of IPL 2026 culminated in a nail-biting Super Over finish before 80,000 roaring cricket fans in Ahmedabad.",
-    category: "Cricket & IPL",
-    categorySlug: "cricket-ipl",
-    tags: ["Cricket", "IPL", "India", "T20", "Cricket & IPL"],
-    relatedTeam: "India",
+    title: 'IPL 2026 Season Kickoff: Thrilling Super Over Finale Lights Up Opening Night',
+    excerpt:
+      'A sensational opening match of IPL 2026 culminated in a nail-biting Super Over finish before 80,000 roaring cricket fans in Ahmedabad.',
+    category: 'Cricket & IPL',
+    categorySlug: 'cricket-ipl',
+    tags: ['Cricket', 'IPL', 'India', 'T20', 'Cricket & IPL'],
+    relatedTeam: 'India',
     views: 6240,
     isBreaking: true,
     isFeatured: true,
-    author: "Rohan Sharma",
+    author: 'Rohan Sharma',
     readTime: 3,
-    source: "CricIntel",
-    image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&q=80&w=1200",
+    source: 'CricIntel',
+    image:
+      'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Unbelievable Drama in the Desert of Runs</h2>
       <p>The 2026 Indian Premier League began with a breath-taking encounter that went down to the absolute wire. Tied at 214 runs apiece after 40 pulsating overs, the match was decided in a dramatic Super Over.</p>
@@ -280,18 +296,20 @@ const ARTICLES = [
   },
   {
     title: "Chelsea's Next Era: Youth Project Reaches Turning Point as Stars Mature",
-    excerpt: "Chelsea's multi-million youth recruitment strategy is beginning to bear fruit as tactical stability and individual growth power a top-four charge.",
-    category: "Premier League",
-    categorySlug: "premier-league",
-    tags: ["Chelsea", "Premier League", "Transfers", "Cole Palmer"],
-    relatedTeam: "Chelsea",
+    excerpt:
+      "Chelsea's multi-million youth recruitment strategy is beginning to bear fruit as tactical stability and individual growth power a top-four charge.",
+    category: 'Premier League',
+    categorySlug: 'premier-league',
+    tags: ['Chelsea', 'Premier League', 'Transfers', 'Cole Palmer'],
+    relatedTeam: 'Chelsea',
     views: 2950,
     isBreaking: false,
     isFeatured: false,
-    author: "Liam Vance",
+    author: 'Liam Vance',
     readTime: 4,
-    source: "London Football Review",
-    image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&q=80&w=1200",
+    source: 'London Football Review',
+    image:
+      'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Patience Rewarded at Stamford Bridge</h2>
       <p>After periods of transition, Chelsea's young squad is showing the defensive cohesion and attacking dynamism required to contend at the very highest level of English football.</p>
@@ -299,18 +317,20 @@ const ARTICLES = [
   },
   {
     title: "Editor's Pick: The Unsung Heroes Who Dictate the Tempo of Global Sport",
-    excerpt: "From deep-lying playmakers to defensive stoppers, we celebrate the tactical architects whose quiet brilliance turns good teams into dynasties.",
+    excerpt:
+      'From deep-lying playmakers to defensive stoppers, we celebrate the tactical architects whose quiet brilliance turns good teams into dynasties.',
     category: "Editor's Picks",
-    categorySlug: "editors-picks",
-    tags: ["Editor's Picks", "Tactics", "Football", "Champions League", "Deep Dive"],
-    relatedTeam: "Real Madrid",
+    categorySlug: 'editors-picks',
+    tags: ["Editor's Picks", 'Tactics', 'Football', 'Champions League', 'Deep Dive'],
+    relatedTeam: 'Real Madrid',
     views: 3900,
     isBreaking: false,
     isFeatured: true,
-    author: "Chief Sports Editor",
+    author: 'Chief Sports Editor',
     readTime: 5,
-    source: "GoalMills Longform",
-    image: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&q=80&w=1200",
+    source: 'GoalMills Longform',
+    image:
+      'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&q=80&w=1200',
     content: `
       <h2>Beyond the Glamour of the Goalscorers</h2>
       <p>While strikers grab the headlines and Ballon d'Or podiums, tactical superiority is won in the subtle battles of tempo, body shape, and defensive recovery runs.</p>
@@ -340,11 +360,7 @@ async function seed() {
     // 2. Seed Articles
     console.log('Seeding News Articles...');
     for (const art of ARTICLES) {
-      await News.findOneAndUpdate(
-        { title: art.title },
-        { $set: art },
-        { upsert: true, new: true }
-      );
+      await News.findOneAndUpdate({ title: art.title }, { $set: art }, { upsert: true, new: true });
     }
     console.log(`Successfully seeded ${ARTICLES.length} news articles.`);
 

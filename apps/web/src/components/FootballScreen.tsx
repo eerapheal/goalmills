@@ -2,16 +2,18 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { FootballMatchCard, UnifiedWebMatchEvent } from './FootballMatchCard';
-import { webApiFootballService, ApiFootballFixtureItem, ApiFootballStandingItem } from '../services/apiFootball';
+import {
+  webApiFootballService,
+  ApiFootballFixtureItem,
+  ApiFootballStandingItem,
+} from '../services/apiFootball';
 import { GoalmillsLoader } from './GoalmillsLoader';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export function FootballScreen() {
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
-  const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [fixtures, setFixtures] = useState<UnifiedWebMatchEvent[]>([]);
@@ -25,7 +27,14 @@ export function FootballScreen() {
       const d = new Date();
       d.setDate(today.getDate() + i);
       const iso = d.toISOString().split('T')[0];
-      const dayName = i === 0 ? 'Today' : i === -1 ? 'Yesterday' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayName =
+        i === 0
+          ? 'Today'
+          : i === -1
+            ? 'Yesterday'
+            : i === 1
+              ? 'Tomorrow'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNumber = d.getDate();
       dates.push({ iso, dayName, dayNumber });
     }
@@ -40,7 +49,11 @@ export function FootballScreen() {
       const shortStatus = item.fixture.status?.short || '';
       const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(shortStatus);
       const scoreStr =
-        item.goals && item.goals.home !== null && item.goals.home !== undefined && item.goals.away !== null && item.goals.away !== undefined
+        item.goals &&
+        item.goals.home !== null &&
+        item.goals.home !== undefined &&
+        item.goals.away !== null &&
+        item.goals.away !== undefined
           ? `${item.goals.home} - ${item.goals.away}`
           : undefined;
 
@@ -98,7 +111,10 @@ export function FootballScreen() {
     setLoading(true);
     try {
       if (activeTab === 'standings') {
-        const res = await webApiFootballService.getStandings({ league: 39, season: new Date().getFullYear() });
+        const res = await webApiFootballService.getStandings({
+          league: 39,
+          season: new Date().getFullYear(),
+        });
         setStandings(res || []);
       } else {
         let raw: ApiFootballFixtureItem[] = [];
@@ -108,7 +124,9 @@ export function FootballScreen() {
           raw = await webApiFootballService.getFixturesByDate(selectedDate);
         }
         if (raw && Array.isArray(raw) && raw.length > 0) {
-          const adapted = raw.map(adaptFixture).filter((f): f is UnifiedWebMatchEvent => f !== null);
+          const adapted = raw
+            .map(adaptFixture)
+            .filter((f): f is UnifiedWebMatchEvent => f !== null);
           setFixtures(adapted);
         } else {
           setFixtures([]);
@@ -129,17 +147,19 @@ export function FootballScreen() {
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter(f => f.event_live === '1');
+      list = list.filter((f) => f.event_live === '1');
     } else if (activeTab === 'upcoming') {
-      list = list.filter(f => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished');
+      list = list.filter(
+        (f) => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished'
+      );
     } else if (activeTab === 'results') {
-      list = list.filter(f => f.event_status === 'FT' || f.event_status === 'Finished');
+      list = list.filter((f) => f.event_status === 'FT' || f.event_status === 'Finished');
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
-        f =>
+        (f) =>
           f.event_home_team.toLowerCase().includes(q) ||
           f.event_away_team.toLowerCase().includes(q) ||
           (f.league_name && f.league_name.toLowerCase().includes(q))
@@ -151,9 +171,11 @@ export function FootballScreen() {
 
   // Group by league
   const leagueGroups = useMemo(() => {
-    const groups: { [key: string]: { title: string; logo?: string; matches: UnifiedWebMatchEvent[] } } = {};
+    const groups: {
+      [key: string]: { title: string; logo?: string; matches: UnifiedWebMatchEvent[] };
+    } = {};
 
-    filteredFixtures.forEach(item => {
+    filteredFixtures.forEach((item) => {
       const leagueTitle = item.league_name || 'Other Matches';
       if (!groups[leagueTitle]) {
         groups[leagueTitle] = {
@@ -249,7 +271,9 @@ export function FootballScreen() {
                 }`}
               >
                 <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
-                <span className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}>
+                <span
+                  className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
+                >
                   {item.dayNumber}
                 </span>
               </button>
@@ -260,7 +284,11 @@ export function FootballScreen() {
 
       {/* Content Area */}
       {loading ? (
-        <GoalmillsLoader size="md" label="Football Hub" sublabel="Syncing live scores & league standings..." />
+        <GoalmillsLoader
+          size="md"
+          label="Football Hub"
+          sublabel="Syncing live scores & league standings..."
+        />
       ) : activeTab === 'standings' ? (
         <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
           <h2 className="mb-4 text-lg font-bold text-white">League Table Standings</h2>
@@ -283,7 +311,11 @@ export function FootballScreen() {
                   <tr key={row.rank} className="hover:bg-white/5">
                     <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
                     <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
-                      <img src={row.team.logo} alt={row.team.name} className="h-5 w-5 object-contain" />
+                      <img
+                        src={row.team.logo}
+                        alt={row.team.name}
+                        className="h-5 w-5 object-contain"
+                      />
                       <span>{row.team.name}</span>
                     </td>
                     <td className="py-3 px-3 text-center">{row.all.played}</td>
@@ -291,7 +323,9 @@ export function FootballScreen() {
                     <td className="py-3 px-3 text-center">{row.all.draw}</td>
                     <td className="py-3 px-3 text-center">{row.all.lose}</td>
                     <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
-                    <td className="py-3 px-4 text-right font-black text-emerald-400">{row.points}</td>
+                    <td className="py-3 px-4 text-right font-black text-emerald-400">
+                      {row.points}
+                    </td>
                   </tr>
                 ))}
               </tbody>

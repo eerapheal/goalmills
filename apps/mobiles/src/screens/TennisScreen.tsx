@@ -39,47 +39,51 @@ export function TennisScreen() {
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
-      const [live, fixtures, results, leaguesData, standingsData, oddsData, liveOddsData] = await Promise.all([
-        tennisApi.getLivescore({}),
-        tennisApi.getFixtures({ from: tomorrow, to: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0] }),
-        tennisApi.getFixtures({ from: yesterday, to: yesterday }),
-        tennisApi.getLeagues({}),
-        tennisApi.getStandings({ league: 'ATP' }),
-        tennisApi.getOdds({}),
-        tennisApi.getLiveOdds({})
-      ]);
+      const [live, fixtures, results, leaguesData, standingsData, oddsData, liveOddsData] =
+        await Promise.all([
+          tennisApi.getLivescore({}),
+          tennisApi.getFixtures({
+            from: tomorrow,
+            to: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+          }),
+          tennisApi.getFixtures({ from: yesterday, to: yesterday }),
+          tennisApi.getLeagues({}),
+          tennisApi.getStandings({ league: 'ATP' }),
+          tennisApi.getOdds({}),
+          tennisApi.getLiveOdds({}),
+        ]);
 
       const allFixtures = fixtures.result || [];
       const upcoming = allFixtures.filter((m: TennisEvent) => {
-          const status = (m.event_status || '').toUpperCase();
-          const isFinished = status === 'FINISHED' || status === 'FT' || status === 'RET' || status === 'W/O';
-          return m.event_live !== '1' && !isFinished;
+        const status = (m.event_status || '').toUpperCase();
+        const isFinished =
+          status === 'FINISHED' || status === 'FT' || status === 'RET' || status === 'W/O';
+        return m.event_live !== '1' && !isFinished;
       });
 
       const allResults = results.result || [];
       const finished = allResults.filter((m: TennisEvent) => {
-          const status = (m.event_status || '').toUpperCase();
-          return status === 'FINISHED' || status === 'FT' || status === 'RET' || status === 'W/O';
+        const status = (m.event_status || '').toUpperCase();
+        return status === 'FINISHED' || status === 'FT' || status === 'RET' || status === 'W/O';
       });
 
       setLiveMatches(live.result || []);
       setUpcomingMatches(upcoming);
       setRecentMatches(finished);
       setLeagues(leaguesData.result || []);
-      
+
       const rawStandings = standingsData.result || [];
       const uniqueStandings = rawStandings.reduce((acc: any[], curr: any) => {
-          const isDuplicate = acc.some(item => 
-              item.player_key === curr.player_key || 
-              item.place === curr.place
-          );
-          if (!isDuplicate) {
-              acc.push(curr);
-          }
-          return acc;
+        const isDuplicate = acc.some(
+          (item) => item.player_key === curr.player_key || item.place === curr.place
+        );
+        if (!isDuplicate) {
+          acc.push(curr);
+        }
+        return acc;
       }, []);
       setStandings(uniqueStandings);
-      
+
       setOdds(oddsData.result || {});
       setLiveOdds(liveOddsData.result || {});
     } catch (error) {
@@ -111,7 +115,11 @@ export function TennisScreen() {
     if (loading) {
       return (
         <View style={styles.loadingContainer}>
-          <GoalmillsLoader size="md" label="Tennis Live" sublabel="Syncing ATP/WTA live matches & rankings..." />
+          <GoalmillsLoader
+            size="md"
+            label="Tennis Live"
+            sublabel="Syncing ATP/WTA live matches & rankings..."
+          />
         </View>
       );
     }
@@ -127,21 +135,30 @@ export function TennisScreen() {
                   <TennisMatchCard
                     key={match.event_key}
                     match={match}
-                    odds={liveOdds[String(match.event_key)]?.live_odds ?
-                      // Transform array specific to match winner or just pass raw data and let component handle?
-                      // The component expects structure matching mockOdds. live_odds is array.
-                      // Let's adapt data or just pass simple structure.
-                      // Mock data structure: { 'Match Winner': { 'Home': ..., 'Away': ... } }
-                      // Live odds structure: live_odds array.
-                      // Let's map live odds to component expected format for simplicity or update component.
-                      // Updating component is harder now. Let's transform here.
-                      {
-                        'Match Winner': {
-                          'Home': { 'Bet365': liveOdds[String(match.event_key)].live_odds.find((o: any) => o.type === 'Home' && o.odd_name === 'Match Winner')?.value },
-                          'Away': { 'Bet365': liveOdds[String(match.event_key)].live_odds.find((o: any) => o.type === 'Away' && o.odd_name === 'Match Winner')?.value }
-                        }
-                      }
-                      : undefined
+                    odds={
+                      liveOdds[String(match.event_key)]?.live_odds
+                        ? // Transform array specific to match winner or just pass raw data and let component handle?
+                          // The component expects structure matching mockOdds. live_odds is array.
+                          // Let's adapt data or just pass simple structure.
+                          // Mock data structure: { 'Match Winner': { 'Home': ..., 'Away': ... } }
+                          // Live odds structure: live_odds array.
+                          // Let's map live odds to component expected format for simplicity or update component.
+                          // Updating component is harder now. Let's transform here.
+                          {
+                            'Match Winner': {
+                              Home: {
+                                Bet365: liveOdds[String(match.event_key)].live_odds.find(
+                                  (o: any) => o.type === 'Home' && o.odd_name === 'Match Winner'
+                                )?.value,
+                              },
+                              Away: {
+                                Bet365: liveOdds[String(match.event_key)].live_odds.find(
+                                  (o: any) => o.type === 'Away' && o.odd_name === 'Match Winner'
+                                )?.value,
+                              },
+                            },
+                          }
+                        : undefined
                     }
                   />
                 ))}
@@ -160,9 +177,15 @@ export function TennisScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.sectionTitle}>📅 Upcoming Matches</Text>
-            {upcomingMatches.length > 0 ? upcomingMatches.map((match) => (
-              <TennisMatchCard key={match.event_key} match={match} odds={odds[String(match.event_key)]} />
-            )) : (
+            {upcomingMatches.length > 0 ? (
+              upcomingMatches.map((match) => (
+                <TennisMatchCard
+                  key={match.event_key}
+                  match={match}
+                  odds={odds[String(match.event_key)]}
+                />
+              ))
+            ) : (
               <Text style={styles.emptySubtext}>No upcoming matches found.</Text>
             )}
           </View>
@@ -172,9 +195,9 @@ export function TennisScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.sectionTitle}>✅ Recent Results</Text>
-            {recentMatches.length > 0 ? recentMatches.map((match) => (
-              <TennisMatchCard key={match.event_key} match={match} />
-            )) : (
+            {recentMatches.length > 0 ? (
+              recentMatches.map((match) => <TennisMatchCard key={match.event_key} match={match} />)
+            ) : (
               <Text style={styles.emptySubtext}>No recent results found.</Text>
             )}
           </View>
@@ -213,7 +236,9 @@ export function TennisScreen() {
             </View>
             {standings.map((player) => (
               <View key={player.player_key} style={styles.standingRow}>
-                <Text style={[styles.cellText, { width: 40, fontWeight: 'bold' }]}>{player.place}.</Text>
+                <Text style={[styles.cellText, { width: 40, fontWeight: 'bold' }]}>
+                  {player.place}.
+                </Text>
                 <Pressable
                   style={{ flex: 1 }}
                   onPress={() => router.push(`/home/tennis/players/${player.player_key}`)}
@@ -221,7 +246,14 @@ export function TennisScreen() {
                   <Text style={styles.cellText}>{player.player}</Text>
                   <Text style={styles.cellSubtext}>{player.country}</Text>
                 </Pressable>
-                <Text style={[styles.cellText, { width: 60, textAlign: 'right', color: COLORS.secondary }]}>{player.points}</Text>
+                <Text
+                  style={[
+                    styles.cellText,
+                    { width: 60, textAlign: 'right', color: COLORS.secondary },
+                  ]}
+                >
+                  {player.points}
+                </Text>
               </View>
             ))}
           </View>
@@ -443,5 +475,5 @@ const styles = StyleSheet.create({
   cellSubtext: {
     color: COLORS.textLight,
     fontSize: FONT_SIZES.xs,
-  }
+  },
 });

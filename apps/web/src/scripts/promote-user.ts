@@ -15,15 +15,11 @@ const MONGODB_URL = process.env.MONGODB_URL;
 
 async function promote(email: string) {
   try {
-    if (!MONGODB_URL) throw new Error("MONGODB_URL not found");
+    if (!MONGODB_URL) throw new Error('MONGODB_URL not found');
     await mongoose.connect(MONGODB_URL);
     console.log('Connected to MongoDB');
 
-    const user = await User.findOneAndUpdate(
-      { email },
-      { role: 'super-admin' },
-      { new: true }
-    );
+    const user = await User.findOneAndUpdate({ email }, { role: 'super-admin' }, { new: true });
 
     if (user) {
       console.log(`User ${email} promoted to super-admin successfully`);
@@ -40,7 +36,7 @@ async function promote(email: string) {
 
 const email = process.argv[2];
 if (!email) {
-  console.log("Usage: npx tsx src/scripts/promote-user.ts <email>");
+  console.log('Usage: npx tsx src/scripts/promote-user.ts <email>');
   process.exit(1);
 }
 

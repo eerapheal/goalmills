@@ -12,11 +12,7 @@ const DEFAULT_TOPICS = ['all', 'breaking_news', 'live_scores'];
  */
 export function isPushNotificationSupported(): boolean {
   if (typeof window === 'undefined') return false;
-  return (
-    'serviceWorker' in navigator &&
-    'Notification' in window &&
-    'PushManager' in window
-  );
+  return 'serviceWorker' in navigator && 'Notification' in window && 'PushManager' in window;
 }
 
 /**
@@ -68,7 +64,6 @@ export async function requestAndRegisterWebPush(
           applicationServerKey: vapidKey ? (urlBase64ToUint8Array(vapidKey) as any) : undefined,
         });
       }
-
 
       if (pushSub) {
         token = JSON.stringify(pushSub);

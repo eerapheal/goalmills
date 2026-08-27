@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/db";
-import News from "@/models/News";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { cacheGet, cacheSet, cacheInvalidatePattern, getSeoCacheHeaders } from "@/lib/redisCache";
-import { broadcastNewNews } from "@/lib/socketBroadcaster";
-import { notifyOnNewNewsArticle } from "@/lib/pushService";
+import { NextRequest, NextResponse } from 'next/server';
+import dbConnect from '@/lib/db';
+import News from '@/models/News';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { cacheGet, cacheSet, cacheInvalidatePattern, getSeoCacheHeaders } from '@/lib/redisCache';
+import { broadcastNewNews } from '@/lib/socketBroadcaster';
+import { notifyOnNewNewsArticle } from '@/lib/pushService';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     // If it's an admin request, enforce role-based filtering
     if (isAdminRequest) {
       if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
       }
       if (session.user.role === 'staff') {
         query.authorId = session.user.id;
@@ -194,14 +194,17 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching news:', error);
-    return NextResponse.json({ message: "Error fetching news" }, { status: 500 });
+    return NextResponse.json({ message: 'Error fetching news' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   const session = (await getServerSession(authOptions)) as any;
   if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
-    return NextResponse.json({ message: "Unauthorized: staff or Super Admin role required" }, { status: 401 });
+    return NextResponse.json(
+      { message: 'Unauthorized: staff or Super Admin role required' },
+      { status: 401 }
+    );
   }
 
   await dbConnect();
@@ -230,8 +233,11 @@ export async function POST(request: NextRequest) {
     const parsedTags = Array.isArray(tags)
       ? tags
       : typeof tags === 'string'
-      ? tags.split(',').map((t: string) => t.trim()).filter(Boolean)
-      : [];
+        ? tags
+            .split(',')
+            .map((t: string) => t.trim())
+            .filter(Boolean)
+        : [];
 
     const news = await News.create({
       title,
@@ -263,7 +269,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(news, { status: 201 });
   } catch (error: any) {
     console.error('Error creating news:', error);
-    return NextResponse.json({ message: error.message || "Error creating news" }, { status: 400 });
+    return NextResponse.json({ message: error.message || 'Error creating news' }, { status: 400 });
   }
 }
-

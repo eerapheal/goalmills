@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import dbConnect from "@/lib/db";
-import User from "@/models/User";
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import dbConnect from '@/lib/db';
+import User from '@/models/User';
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
     if (!username || !email || !password) {
       return NextResponse.json(
-        { message: "Username, email, and password are required" },
+        { message: 'Username, email, and password are required' },
         { status: 400 }
       );
     }
@@ -17,13 +17,13 @@ export async function POST(request: Request) {
     await dbConnect();
 
     // Check if user exists
-    const existingUser = await User.findOne({ 
-      $or: [{ email }, { username }] 
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { message: "User with this email or username already exists" },
+        { message: 'User with this email or username already exists' },
         { status: 400 }
       );
     }
@@ -38,14 +38,11 @@ export async function POST(request: Request) {
       password: hashedPassword,
     });
 
-    return NextResponse.json(
-      { message: "User registered successfully" },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
   } catch (error) {
-    console.error("Registration Error:", error);
+    console.error('Registration Error:', error);
     return NextResponse.json(
-      { message: "An error occurred while registering the user" },
+      { message: 'An error occurred while registering the user' },
       { status: 500 }
     );
   }

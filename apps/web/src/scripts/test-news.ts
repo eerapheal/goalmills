@@ -44,11 +44,7 @@ async function verify() {
 
   // 5. Team Filter (Arsenal)
   const arsenalNews = await News.find({
-    $or: [
-      { relatedTeam: /Arsenal/i },
-      { tags: { $in: [/Arsenal/i] } },
-      { title: /Arsenal/i },
-    ],
+    $or: [{ relatedTeam: /Arsenal/i }, { tags: { $in: [/Arsenal/i] } }, { title: /Arsenal/i }],
   });
   console.log(`\n✅ ARSENAL NEWS (${arsenalNews.length}):`);
   arsenalNews.forEach((a) => console.log(`  - ${a.title}`));

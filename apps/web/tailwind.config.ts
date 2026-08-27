@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   darkMode: 'class',
@@ -11,7 +11,7 @@ const config: Config = {
     extend: {
       colors: {
         background: '#020617', // Very dark slate/navy
-        surface: '#0f172a',    // Dark slate for cards
+        surface: '#0f172a', // Dark slate for cards
         surfaceHighlight: '#1e293b', // Lighter slate for hovers
         primary: {
           DEFAULT: '#3b82f6',
@@ -25,13 +25,13 @@ const config: Config = {
         },
         accent: {
           green: '#10b981', // For live scores/wins
-          red: '#ef4444',   // For losses/alerts
+          red: '#ef4444', // For losses/alerts
         },
         text: {
           primary: '#f8fafc',
           secondary: '#94a3b8',
           muted: '#64748b',
-        }
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -62,5 +62,5 @@ const config: Config = {
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;

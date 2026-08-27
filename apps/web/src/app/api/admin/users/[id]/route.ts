@@ -1,30 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/db";
-import User from "@/models/User";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NextRequest, NextResponse } from 'next/server';
+import dbConnect from '@/lib/db';
+import User from '@/models/User';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
-  const session = await getServerSession(authOptions) as any;
-  
+  const session = (await getServerSession(authOptions)) as any;
+
   if (!session || session.user.role !== 'super-admin') {
-    return NextResponse.json({ message: "Unauthorized: Super Admin role required" }, { status: 401 });
+    return NextResponse.json(
+      { message: 'Unauthorized: Super Admin role required' },
+      { status: 401 }
+    );
   }
 
   // Prevent self-deletion
   if (id === session.user.id) {
-    return NextResponse.json({ message: "Forbidden: You cannot delete your own account" }, { status: 403 });
+    return NextResponse.json(
+      { message: 'Forbidden: You cannot delete your own account' },
+      { status: 403 }
+    );
   }
 
   await dbConnect();
   try {
     const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
-    return NextResponse.json({ message: "User deleted successfully" });
+    return NextResponse.json({ message: 'User deleted successfully' });
   } catch (error) {
-    return NextResponse.json({ message: "Error deleting user" }, { status: 500 });
+    return NextResponse.json({ message: 'Error deleting user' }, { status: 500 });
   }
 }

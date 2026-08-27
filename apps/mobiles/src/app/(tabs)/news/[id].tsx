@@ -17,10 +17,7 @@ import { BlogPost } from '@goalmills/types';
 import { Ionicons } from '@expo/vector-icons';
 import { GoalmillsLoader } from '../../../components/GoalmillsLoader';
 import RenderHTML from 'react-native-render-html';
-import {
-  newsHistoryUtil,
-  MobileRecentlyViewedItem,
-} from '../../../utils/newsHistory';
+import { newsHistoryUtil, MobileRecentlyViewedItem } from '../../../utils/newsHistory';
 
 // Helper to cleanly split rich HTML article content at ~50% word count (before the next paragraph)
 function splitContentAtMidpoint(content: string): { firstHalf: string; secondHalf: string } {
@@ -178,7 +175,11 @@ export default function NewsDetail() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <GoalmillsLoader size="fullscreen" label="GoalMills News" sublabel="Loading story & exclusive analysis..." />
+        <GoalmillsLoader
+          size="fullscreen"
+          label="GoalMills News"
+          sublabel="Loading story & exclusive analysis..."
+        />
       </View>
     );
   }
@@ -247,37 +248,22 @@ export default function NewsDetail() {
     <View style={styles.container}>
       {/* Top Navbar */}
       <View style={styles.navBar}>
-        <Pressable
-          style={styles.navActionBtn}
-          onPress={() => router.back()}
-          hitSlop={8}
-        >
+        <Pressable style={styles.navActionBtn} onPress={() => router.back()} hitSlop={8}>
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>
           {news.category || 'Article'}
         </Text>
-        <Pressable
-          style={styles.navActionBtn}
-          onPress={handleShare}
-          hitSlop={8}
-        >
+        <Pressable style={styles.navActionBtn} onPress={handleShare} hitSlop={8}>
           <Ionicons name="share-social-outline" size={20} color="#F8FAFC" />
         </Pressable>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Cover Image - Compact height */}
         {news.image ? (
           <View style={styles.coverImageContainer}>
-            <Image
-              source={{ uri: news.image }}
-              style={styles.coverImage}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: news.image }} style={styles.coverImage} resizeMode="cover" />
           </View>
         ) : null}
 
@@ -299,9 +285,7 @@ export default function NewsDetail() {
 
             <View style={styles.metaBadge}>
               <Ionicons name="time-outline" size={12} color="#94A3B8" />
-              <Text style={styles.metaBadgeText}>
-                {news.readTime || 3} min read
-              </Text>
+              <Text style={styles.metaBadgeText}>{news.readTime || 3} min read</Text>
             </View>
 
             {typeof news.views === 'number' && (
@@ -323,9 +307,7 @@ export default function NewsDetail() {
               </Text>
             </View>
             <View style={styles.authorMeta}>
-              <Text style={styles.authorName}>
-                {news.author || 'GoalMills Staff'}
-              </Text>
+              <Text style={styles.authorName}>{news.author || 'GoalMills Staff'}</Text>
               <Text style={styles.publishDate}>
                 {news.createdAt
                   ? new Date(news.createdAt).toLocaleDateString('en-US', {
@@ -380,17 +362,12 @@ export default function NewsDetail() {
                 {youMayAlsoLike.map((item) => (
                   <Pressable
                     key={item._id}
-                    style={({ pressed }) => [
-                      styles.inContentCard,
-                      pressed && styles.cardPressed,
-                    ]}
+                    style={({ pressed }) => [styles.inContentCard, pressed && styles.cardPressed]}
                     onPress={() => router.push(`/news/${item._id}`)}
                   >
                     <Image
                       source={{
-                        uri:
-                          item.image ||
-                          'https://picsum.photos/seed/news/200/200',
+                        uri: item.image || 'https://picsum.photos/seed/news/200/200',
                       }}
                       style={styles.inContentThumb}
                       resizeMode="cover"
@@ -403,9 +380,7 @@ export default function NewsDetail() {
                         <Text style={styles.inContentMetaDot}>•</Text>
                         <View style={styles.inContentTimeRow}>
                           <Ionicons name="time-outline" size={10} color="#94A3B8" />
-                          <Text style={styles.inContentTimeText}>
-                            {item.readTime || 3}m
-                          </Text>
+                          <Text style={styles.inContentTimeText}>{item.readTime || 3}m</Text>
                         </View>
                       </View>
                       <Text style={styles.inContentCardTitle} numberOfLines={2}>
@@ -439,9 +414,7 @@ export default function NewsDetail() {
               {news.relatedTeam ? (
                 <View style={styles.teamTag}>
                   <Ionicons name="shield-checkmark" size={13} color="#60A5FA" />
-                  <Text style={styles.teamTagText}>
-                    Team: {news.relatedTeam}
-                  </Text>
+                  <Text style={styles.teamTagText}>Team: {news.relatedTeam}</Text>
                 </View>
               ) : null}
 
@@ -462,32 +435,23 @@ export default function NewsDetail() {
             {moreStories.map((item) => (
               <Pressable
                 key={item._id}
-                style={({ pressed }) => [
-                  styles.relatedCard,
-                  pressed && styles.cardPressed,
-                ]}
+                style={({ pressed }) => [styles.relatedCard, pressed && styles.cardPressed]}
                 onPress={() => router.push(`/news/${item._id}`)}
               >
                 <Image
                   source={{
-                    uri:
-                      item.image ||
-                      'https://picsum.photos/seed/news/200/200',
+                    uri: item.image || 'https://picsum.photos/seed/news/200/200',
                   }}
                   style={styles.relatedThumb}
                   resizeMode="cover"
                 />
                 <View style={styles.relatedInfo}>
-                  <Text style={styles.relatedCategory}>
-                    {item.category || 'News'}
-                  </Text>
+                  <Text style={styles.relatedCategory}>{item.category || 'News'}</Text>
                   <Text style={styles.relatedTitle} numberOfLines={2}>
                     {item.title}
                   </Text>
                   <Text style={styles.relatedDate}>
-                    {item.createdAt
-                      ? new Date(item.createdAt).toLocaleDateString()
-                      : ''}
+                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}
                   </Text>
                 </View>
               </Pressable>
@@ -512,9 +476,7 @@ export default function NewsDetail() {
                 >
                   <Image
                     source={{
-                      uri:
-                        item.image ||
-                        'https://picsum.photos/seed/news/200/200',
+                      uri: item.image || 'https://picsum.photos/seed/news/200/200',
                     }}
                     style={styles.recentMiniThumb}
                     resizeMode="cover"

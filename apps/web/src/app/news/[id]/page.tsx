@@ -144,11 +144,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function NewsDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -227,8 +223,14 @@ export default async function NewsDetailPage({
     headline: news.title,
     description: news.excerpt || news.title,
     image: [news.image || 'https://res.cloudinary.com/demo/image/upload/sample.jpg'],
-    datePublished: news.createdAt ? new Date(news.createdAt).toISOString() : new Date().toISOString(),
-    dateModified: news.updatedAt ? new Date(news.updatedAt).toISOString() : (news.createdAt ? new Date(news.createdAt).toISOString() : new Date().toISOString()),
+    datePublished: news.createdAt
+      ? new Date(news.createdAt).toISOString()
+      : new Date().toISOString(),
+    dateModified: news.updatedAt
+      ? new Date(news.updatedAt).toISOString()
+      : news.createdAt
+        ? new Date(news.createdAt).toISOString()
+        : new Date().toISOString(),
     author: [
       {
         '@type': 'Person',
@@ -452,7 +454,10 @@ export default async function NewsDetailPage({
                           </div>
                           <div className="hidden sm:flex mt-2.5 pt-2 border-t border-white/5 items-center justify-between text-[11px] font-bold text-blue-400 group-hover:text-blue-300">
                             <span>Read Story</span>
-                            <FiArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                            <FiArrowRight
+                              size={12}
+                              className="group-hover:translate-x-1 transition-transform"
+                            />
                           </div>
                         </Link>
                       ))}
@@ -619,17 +624,23 @@ export default async function NewsDetailPage({
                   Browse by Sport
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {['Premier League', 'Champions League', 'Transfers', 'Tactical Analysis', 'AFCON 2025', 'NBA', 'Cricket'].map(
-                    (cat) => (
-                      <Link
-                        key={cat}
-                        href={`/news?category=${encodeURIComponent(cat)}`}
-                        className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
-                      >
-                        {cat}
-                      </Link>
-                    )
-                  )}
+                  {[
+                    'Premier League',
+                    'Champions League',
+                    'Transfers',
+                    'Tactical Analysis',
+                    'AFCON 2025',
+                    'NBA',
+                    'Cricket',
+                  ].map((cat) => (
+                    <Link
+                      key={cat}
+                      href={`/news?category=${encodeURIComponent(cat)}`}
+                      className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                    >
+                      {cat}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>

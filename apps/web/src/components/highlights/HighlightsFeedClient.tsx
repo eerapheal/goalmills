@@ -3,7 +3,17 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FiSearch, FiX, FiPlay, FiClock, FiEye, FiActivity, FiShare2, FiStar, FiFilter } from 'react-icons/fi';
+import {
+  FiSearch,
+  FiX,
+  FiPlay,
+  FiClock,
+  FiEye,
+  FiActivity,
+  FiShare2,
+  FiStar,
+  FiFilter,
+} from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
 
 import { getHighlightThumbnail, HIGHLIGHT_CATEGORIES } from '@/lib/videoUtils';
@@ -77,7 +87,8 @@ export default function HighlightsFeedClient({ initialHighlights }: HighlightsFe
             Sports <span className="text-blue-500">Highlights</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Decisive goals, buzzer beaters, tactical breakdowns, and HD game replays with instant autoplay.
+            Decisive goals, buzzer beaters, tactical breakdowns, and HD game replays with instant
+            autoplay.
           </p>
         </div>
 
@@ -210,7 +221,9 @@ export default function HighlightsFeedClient({ initialHighlights }: HighlightsFe
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-black text-white flex items-center gap-2">
-            <span>{selectedCategory === 'All' ? 'All Match Highlights' : `${selectedCategory} Replays`}</span>
+            <span>
+              {selectedCategory === 'All' ? 'All Match Highlights' : `${selectedCategory} Replays`}
+            </span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-slate-400">
               {filteredHighlights.length}
             </span>

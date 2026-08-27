@@ -329,9 +329,7 @@ export default function VideoList({ refreshTrigger = 0 }: VideoListProps) {
                         {item.category || 'Highlights'}
                       </span>
                       {item.source && (
-                        <span className="text-[10px] text-slate-400 truncate">
-                          • {item.source}
-                        </span>
+                        <span className="text-[10px] text-slate-400 truncate">• {item.source}</span>
                       )}
                     </div>
 

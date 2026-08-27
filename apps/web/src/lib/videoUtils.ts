@@ -17,7 +17,8 @@ export function extractYouTubeId(url: string): string | null {
       const parsed = new URL(trimmed);
       return parsed.searchParams.get('v');
     }
-    const regex = /(?:youtube(?:-nocookie)?\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const regex =
+      /(?:youtube(?:-nocookie)?\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
     const match = trimmed.match(regex);
     return match ? match[1] : null;
   } catch (e) {
