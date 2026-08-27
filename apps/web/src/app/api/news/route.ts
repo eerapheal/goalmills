@@ -6,6 +6,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { cacheGet, cacheSet, cacheInvalidatePattern, getSeoCacheHeaders } from '@/lib/redisCache';
 import { broadcastNewNews } from '@/lib/socketBroadcaster';
 import { notifyOnNewNewsArticle } from '@/lib/pushService';
+import { hasPermission } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,16 +15,22 @@ export async function GET(request: NextRequest) {
   const isAdminRequest = searchParams.get('admin') === 'true';
   const filterType = searchParams.get('filter'); // 'trending', 'breaking', 'transfers', 'analysis', 'popular', 'featured', 'team', etc.
   const categoryParam = searchParams.get('category');
-  const search = searchParams.get('search');
+  const sportParam = searchParams.get('sport');
+  const competitionParam = searchParams.get('competition');
   const team = searchParams.get('team');
-  const ids = searchParams.get('ids'); // Comma-separated IDs (e.g. recently viewed)
+  const player = searchParams.get('player');
+  const articleType = searchParams.get('articleType');
+  const authorParam = searchParams.get('author');
+  const search = searchParams.get('search');
+  const ids = searchParams.get('ids'); // Comma-separated IDs
   const exclude = searchParams.get('exclude'); // Comma-separated IDs to exclude
   const sortParam = searchParams.get('sort'); // 'latest', 'popular', 'oldest'
   const limitParam = parseInt(searchParams.get('limit') || '0', 10);
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
 
   // Check Redis/Memory cache for public queries
-  const cacheKey = `cache:news:list:${filterType || 'all'}:${categoryParam || 'all'}:${search || ''}:${team || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
+  const cacheKey = `cache:news:list:${filterType || 'all'}:${categoryParam || 'all'}:${sportParam || 'all'}:${competitionParam || 'all'}:${team || ''}:${player || ''}:${articleType || ''}:${authorParam || ''}:${search || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
+
   if (!isAdminRequest) {
     const cached = await cacheGet(cacheKey);
     if (cached) {
@@ -44,10 +51,10 @@ export async function GET(request: NextRequest) {
 
     // If it's an admin request, enforce role-based filtering
     if (isAdminRequest) {
-      if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+      if (!session || !hasPermission(session.user?.role, 'articles:read')) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
       }
-      if (session.user.role === 'staff') {
+      if (session.user.role === 'contributor') {
         query.authorId = session.user.id;
       }
     }
@@ -60,12 +67,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Include specific IDs (e.g., Recently Viewed or Favorites)
+    // Include specific IDs
     if (ids) {
       const idList = ids.split(',').filter((id) => id.match(/^[0-9a-fA-F]{24}$/));
       if (idList.length > 0) {
         query._id = { ...query._id, $in: idList };
       }
+    }
+
+    // Sport filter
+    if (sportParam && sportParam !== 'all') {
+      const sRegex = new RegExp(sportParam, 'i');
+      query.$or = [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }];
+    }
+
+    // Competition filter
+    if (competitionParam && competitionParam !== 'all') {
+      const cRegex = new RegExp(competitionParam.replace(/-/g, ' '), 'i');
+      query.$or = [
+        { competitionSlug: competitionParam.toLowerCase() },
+        { competition: { $regex: cRegex } },
+      ];
     }
 
     // Category filter
@@ -77,10 +99,12 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Team filter (specific favorite team or parameter)
+    // Team filter
     if (team) {
       const teamRegex = new RegExp(team.trim(), 'i');
       const teamConditions = [
+        { 'teams.slug': team.toLowerCase() },
+        { 'teams.name': { $regex: teamRegex } },
         { relatedTeam: { $regex: teamRegex } },
         { tags: { $in: [teamRegex] } },
         { title: { $regex: teamRegex } },
@@ -91,6 +115,34 @@ export async function GET(request: NextRequest) {
       } else {
         query.$or = teamConditions;
       }
+    }
+
+    // Player filter
+    if (player) {
+      const playerRegex = new RegExp(player.trim().replace(/-/g, ' '), 'i');
+      const playerConditions = [
+        { 'players.slug': player.toLowerCase() },
+        { 'players.name': { $regex: playerRegex } },
+        { tags: { $in: [playerRegex] } },
+        { title: { $regex: playerRegex } },
+      ];
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, { $or: playerConditions }];
+        delete query.$or;
+      } else {
+        query.$or = playerConditions;
+      }
+    }
+
+    // Article Type filter
+    if (articleType) {
+      query.articleType = articleType;
+    }
+
+    // Author filter
+    if (authorParam) {
+      const aRegex = new RegExp(authorParam.replace(/-/g, ' '), 'i');
+      query.$or = [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: aRegex } }];
     }
 
     // Keyword Search
@@ -112,60 +164,26 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Professional Predefined Filter Modes
+    // Predefined Filter Modes
     let sortOptions: any = { createdAt: -1 };
 
     if (filterType === 'trending' || filterType === 'breaking') {
-      // Prioritize breaking news and highest views
       sortOptions = { isBreaking: -1, views: -1, createdAt: -1 };
     } else if (filterType === 'popular' || sortParam === 'popular') {
       sortOptions = { views: -1, createdAt: -1 };
     } else if (filterType === 'transfers') {
-      const transferRegex = /transfer|rumour|rumor|signing|deal|agrees|bid|target/i;
-      const transferCondition = [
+      query.$or = [
+        { articleType: 'transfer' },
         { category: { $regex: /transfer/i } },
         { categorySlug: 'transfers' },
-        { title: { $regex: transferRegex } },
-        { tags: { $in: [transferRegex] } },
       ];
-      if (query.$and) {
-        query.$and.push({ $or: transferCondition });
-      } else if (query.$or) {
-        query.$and = [{ $or: query.$or }, { $or: transferCondition }];
-        delete query.$or;
-      } else {
-        query.$or = transferCondition;
-      }
     } else if (filterType === 'analysis') {
-      const analysisRegex = /analysis|tactics|tactical|preview|breakdown|verdict|column/i;
-      const analysisCondition = [
-        { category: { $regex: /tactical|analysis/i } },
-        { categorySlug: 'tactical-analysis' },
-        { title: { $regex: analysisRegex } },
-        { tags: { $in: [analysisRegex] } },
+      query.$or = [
+        { articleType: { $in: ['tactical_analysis', 'player_analysis'] } },
+        { category: { $regex: /analysis|tactics/i } },
       ];
-      if (query.$and) {
-        query.$and.push({ $or: analysisCondition });
-      } else if (query.$or) {
-        query.$and = [{ $or: query.$or }, { $or: analysisCondition }];
-        delete query.$or;
-      } else {
-        query.$or = analysisCondition;
-      }
-    } else if (filterType === 'featured' || filterType === 'editors_picks') {
-      const featuredCondition = [
-        { isFeatured: true },
-        { category: { $regex: /editor/i } },
-        { categorySlug: 'editors-picks' },
-      ];
-      if (query.$and) {
-        query.$and.push({ $or: featuredCondition });
-      } else if (query.$or) {
-        query.$and = [{ $or: query.$or }, { $or: featuredCondition }];
-        delete query.$or;
-      } else {
-        query.$or = featuredCondition;
-      }
+    } else if (filterType === 'featured') {
+      query.isFeatured = true;
     }
 
     if (sortParam === 'oldest') {
@@ -200,9 +218,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+  if (!session || !hasPermission(session.user?.role, 'articles:draft')) {
     return NextResponse.json(
-      { message: 'Unauthorized: staff or Super Admin role required' },
+      { message: 'Unauthorized: Contributor, Staff, or Super Admin role required' },
       { status: 401 }
     );
   }
@@ -218,6 +236,14 @@ export async function POST(request: NextRequest) {
       source,
       category,
       categorySlug,
+      sport,
+      sportSlug,
+      competition,
+      competitionSlug,
+      teams,
+      players,
+      relatedMatch,
+      articleType,
       tags,
       relatedTeam,
       isBreaking,
@@ -239,6 +265,11 @@ export async function POST(request: NextRequest) {
             .filter(Boolean)
         : [];
 
+    const authorSlug = (session.user.name || 'goalmills-editorial')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-');
+
     const news = await News.create({
       title,
       excerpt,
@@ -247,12 +278,22 @@ export async function POST(request: NextRequest) {
       source,
       category: category || 'General',
       categorySlug: catSlug,
+      sport: sport || 'Football',
+      sportSlug: (sportSlug || 'football').toLowerCase(),
+      competition: competition || undefined,
+      competitionSlug: competitionSlug ? competitionSlug.toLowerCase() : undefined,
+      teams: Array.isArray(teams) ? teams : [],
+      players: Array.isArray(players) ? players : [],
+      relatedMatch: relatedMatch || undefined,
+      articleType: articleType || 'news',
       tags: parsedTags,
       relatedTeam: relatedTeam || '',
       isBreaking: Boolean(isBreaking),
       isFeatured: Boolean(isFeatured),
-      author: session.user.name || 'Admin',
+      author: session.user.name || 'GoalMills Staff',
       authorId: session.user.id,
+      authorSlug,
+      authorRole: session.user.role || 'staff',
       readTime: Math.ceil((content || '').split(' ').length / 200) || 3,
       views: 0,
     });
@@ -260,10 +301,10 @@ export async function POST(request: NextRequest) {
     // 1. Invalidate all News Caches
     await cacheInvalidatePattern('cache:news:*');
 
-    // 2. Automatically dispatch Push Notification to subscribed users (FCM / Web / Mobile)
+    // 2. Automatically dispatch Push Notification to subscribed users
     notifyOnNewNewsArticle(news);
 
-    // 3. Broadcast Realtime Event to connected clients
+    // 3. Broadcast Realtime Event
     broadcastNewNews(news);
 
     return NextResponse.json(news, { status: 201 });

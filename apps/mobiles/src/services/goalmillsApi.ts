@@ -5,8 +5,13 @@ const BASE_URL = 'https://goalmills-web.vercel.app/api';
 export interface NewsQueryParams {
   filter?: string;
   category?: string;
-  search?: string;
+  sport?: string;
+  competition?: string;
   team?: string;
+  player?: string;
+  articleType?: string;
+  author?: string;
+  search?: string;
   ids?: string;
   exclude?: string;
   sort?: string;
@@ -40,7 +45,6 @@ export const goalmillsApi = {
       if (response.ok) {
         return await response.json();
       }
-      // Fallback
       const all = await fetch(`${BASE_URL}/news`);
       if (all.ok) {
         const list: BlogPost[] = await all.json();
@@ -96,7 +100,6 @@ export const goalmillsApi = {
       if (response.ok) {
         return await response.json();
       }
-      // Fallback to searching the list
       const listRes = await fetch(`${BASE_URL}/videos`);
       if (listRes.ok) {
         const videos: any[] = await listRes.json();

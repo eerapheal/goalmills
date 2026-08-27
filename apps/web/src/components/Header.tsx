@@ -29,8 +29,12 @@ export function Header() {
   }, [pathname]);
 
   const navItems = [
+    { name: 'Football', href: '/football' },
+    { name: 'Transfers', href: '/transfers' },
+    { name: 'Analysis', href: '/analysis' },
+    { name: 'Stats', href: '/stats' },
     { name: 'News', href: '/news' },
-    { name: 'Highlight', href: '/highlights' },
+    { name: 'Highlights', href: '/highlights' },
   ];
 
   if (!mounted) return null;

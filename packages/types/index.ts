@@ -1,10 +1,30 @@
-export type UserRole = 'user' | 'staff' | 'super-admin';
+export type UserRole = 'user' | 'contributor' | 'staff' | 'super-admin';
+
+export interface AuthorProfile {
+  id?: string;
+  name: string;
+  slug: string;
+  email?: string;
+  role: UserRole;
+  image?: string;
+  bio?: string;
+  specialization?: string[];
+  socialLinks?: {
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+  };
+  articleCount?: number;
+}
 
 export interface User {
   _id: string;
   username: string;
   email: string;
   role: UserRole;
+  image?: string;
+  bio?: string;
+  specialization?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -23,25 +43,94 @@ export interface Category {
   updatedAt?: string;
 }
 
+export type ArticleType =
+  | 'news'
+  | 'transfer'
+  | 'tactical_analysis'
+  | 'player_analysis'
+  | 'match_report'
+  | 'feature'
+  | 'interview'
+  | 'prediction';
+
+export interface EntityRef {
+  id?: number | string;
+  name: string;
+  slug: string;
+  logo?: string;
+  photo?: string;
+}
+
 export interface BlogPost {
   _id: string;
   title: string;
+  slug?: string;
   excerpt: string;
   content?: string;
   image: string;
   author: string;
   authorId?: string;
+  authorSlug?: string;
+  authorBio?: string;
+  authorPhoto?: string;
+  authorRole?: UserRole;
   readTime: number;
   createdAt: string;
   updatedAt?: string;
+  publishedAt?: string;
   category: string;
   categorySlug?: string;
+  sport?: string;
+  sportSlug?: string;
+  competition?: string;
+  competitionSlug?: string;
+  competitionId?: number | string;
+  teams?: EntityRef[];
+  players?: EntityRef[];
+  relatedMatch?: {
+    id: number | string;
+    name: string;
+    slug?: string;
+    date?: string;
+  };
+  articleType?: ArticleType;
   source?: string;
   views?: number;
   isBreaking?: boolean;
   isFeatured?: boolean;
   tags?: string[];
   relatedTeam?: string;
+}
+
+export type TransferStatus = 'rumour' | 'negotiation' | 'agreement' | 'done_deal' | 'medical';
+
+export interface TransferItem {
+  id: string;
+  playerName: string;
+  playerSlug: string;
+  playerPhoto?: string;
+  fromTeam: {
+    name: string;
+    slug: string;
+    logo?: string;
+  };
+  toTeam: {
+    name: string;
+    slug: string;
+    logo?: string;
+  };
+  fee?: string;
+  status: TransferStatus;
+  date: string;
+  tier?: number; // 1 = Official/Tier 1, 2 = Highly Reliable, 3 = Rumour
+  competitionSlug?: string;
+  relatedArticleId?: string;
+  description?: string;
+}
+
+export interface EntityBreadcrumbItem {
+  name: string;
+  url: string;
 }
 
 export interface VideoHighlight {

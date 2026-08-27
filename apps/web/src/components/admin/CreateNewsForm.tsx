@@ -3,8 +3,22 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../Toast';
 import { POPULAR_TEAMS } from '@/lib/newsUtils';
+import { COMPETITIONS_REGISTRY, CLUBS_REGISTRY, PLAYERS_REGISTRY } from '@/lib/entityService';
 import EnterpriseNewsEditor from './EnterpriseNewsEditor';
-import { FiUploadCloud, FiFileText, FiStar, FiZap, FiTag, FiLayers, FiImage } from 'react-icons/fi';
+import {
+  FiUploadCloud,
+  FiFileText,
+  FiStar,
+  FiZap,
+  FiTag,
+  FiLayers,
+  FiImage,
+  FiAward,
+  FiShield,
+  FiUser,
+  FiCompass,
+} from 'react-icons/fi';
+import { ArticleType } from '@goalmills/types';
 
 interface CategoryOption {
   _id: string;
@@ -22,6 +36,15 @@ export default function CreateNewsForm() {
   const [source, setSource] = useState('');
   const [category, setCategory] = useState('Premier League');
   const [customCategory, setCustomCategory] = useState('');
+
+  // 4-Level Content Ecosystem Selectors
+  const [sport, setSport] = useState('Football');
+  const [sportSlug, setSportSlug] = useState('football');
+  const [competitionSlug, setCompetitionSlug] = useState('premier-league');
+  const [selectedClubSlug, setSelectedClubSlug] = useState('arsenal');
+  const [selectedPlayerSlug, setSelectedPlayerSlug] = useState('victor-osimhen');
+  const [articleType, setArticleType] = useState<ArticleType>('news');
+
   const [tags, setTags] = useState('');
   const [relatedTeam, setRelatedTeam] = useState('');
   const [isBreaking, setIsBreaking] = useState(false);
@@ -36,7 +59,6 @@ export default function CreateNewsForm() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setCategories(data);
-          setCategory(data[0].name);
         }
       })
       .catch((err) => console.error('Error fetching categories:', err));
@@ -86,6 +108,18 @@ export default function CreateNewsForm() {
       return;
     }
 
+    // Resolve entities
+    const comp = COMPETITIONS_REGISTRY[competitionSlug];
+    const club = CLUBS_REGISTRY[selectedClubSlug];
+    const player = PLAYERS_REGISTRY[selectedPlayerSlug];
+
+    const teams = club
+      ? [{ id: club.id, name: club.name, slug: club.slug, logo: club.logo }]
+      : [];
+    const players = player
+      ? [{ id: player.id, name: player.name, slug: player.slug, photo: player.photo }]
+      : [];
+
     try {
       const res = await fetch('/api/news', {
         method: 'POST',
@@ -99,11 +133,18 @@ export default function CreateNewsForm() {
           image,
           source,
           category: finalCategory,
+          sport,
+          sportSlug,
+          competition: comp?.name || undefined,
+          competitionSlug: comp?.slug || undefined,
+          teams,
+          players,
+          articleType,
           tags: tags
             .split(',')
             .map((t) => t.trim())
             .filter(Boolean),
-          relatedTeam: relatedTeam.trim(),
+          relatedTeam: club?.shortName || relatedTeam.trim(),
           isBreaking,
           isFeatured,
         }),
@@ -111,7 +152,7 @@ export default function CreateNewsForm() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success('News article created successfully!');
+        toast.success('News story created and cross-distributed across entity hubs!');
         setTitle('');
         setExcerpt('');
         setContent('');
@@ -136,10 +177,11 @@ export default function CreateNewsForm() {
       <div className="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <span>📰</span> Create News Story
+            <span>⚡</span> Entity-First Publishing Engine
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Enterprise news publishing with document copy-paste, signed media & advanced SEO
+            Content is tagged to sports, competitions, clubs, and player profiles for instant
+            cross-distribution.
           </p>
         </div>
       </div>
@@ -157,7 +199,7 @@ export default function CreateNewsForm() {
               onChange={(e) => setTitle(e.target.value)}
               required
               className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-base font-semibold focus:outline-none focus:border-blue-500 transition-colors"
-              placeholder="e.g. Real Madrid Secure Thrilling Comeback Victory..."
+              placeholder="e.g. Victor Osimhen Scores Twice in Thrilling Match..."
             />
           </div>
           <div>
@@ -169,85 +211,155 @@ export default function CreateNewsForm() {
               value={source}
               onChange={(e) => setSource(e.target.value)}
               className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-              placeholder="e.g. GoalMills Desk, Reuters, Sky"
+              placeholder="e.g. GoalMills Desk, Sky Sports"
             />
           </div>
         </div>
 
-        {/* Dynamic Category Selector & Related Team */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <FiLayers className="text-blue-400" /> Category *
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
-            >
-              {categories.map((c) => (
-                <option key={c._id} value={c.name}>
-                  {c.name}
-                </option>
-              ))}
-              <option value="__custom__">+ Custom Category...</option>
-            </select>
+        {/* 4-Level Content Ecosystem Mapping Grid */}
+        <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 space-y-4">
+          <span className="text-xs font-black uppercase text-blue-400 tracking-wider flex items-center gap-1.5">
+            <FiCompass /> Content Ecosystem Mapping (Auto-Distribution)
+          </span>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Sport Selector */}
+            <div>
+              <label className="block text-slate-400 text-[11px] font-bold uppercase mb-1">
+                Level 1: Sport
+              </label>
+              <select
+                value={sportSlug}
+                onChange={(e) => {
+                  setSportSlug(e.target.value);
+                  setSport(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1));
+                }}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+              >
+                <option value="football">Football</option>
+                <option value="basketball">Basketball</option>
+                <option value="cricket">Cricket</option>
+                <option value="tennis">Tennis</option>
+              </select>
+            </div>
+
+            {/* Competition Selector */}
+            <div>
+              <label className="block text-slate-400 text-[11px] font-bold uppercase mb-1">
+                Level 2: Competition
+              </label>
+              <select
+                value={competitionSlug}
+                onChange={(e) => setCompetitionSlug(e.target.value)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+              >
+                {Object.values(COMPETITIONS_REGISTRY).map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Club Selector */}
+            <div>
+              <label className="block text-slate-400 text-[11px] font-bold uppercase mb-1">
+                Level 3: Primary Club
+              </label>
+              <select
+                value={selectedClubSlug}
+                onChange={(e) => setSelectedClubSlug(e.target.value)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+              >
+                <option value="">None / General</option>
+                {Object.values(CLUBS_REGISTRY).map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Player Selector */}
+            <div>
+              <label className="block text-slate-400 text-[11px] font-bold uppercase mb-1">
+                Level 3: Featured Player
+              </label>
+              <select
+                value={selectedPlayerSlug}
+                onChange={(e) => setSelectedPlayerSlug(e.target.value)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+              >
+                <option value="">None / Squad General</option>
+                {Object.values(PLAYERS_REGISTRY).map((p) => (
+                  <option key={p.slug} value={p.slug}>
+                    {p.name} ({p.nationality})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {category === '__custom__' ? (
+          {/* Article Type Selector */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             <div>
-              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
-                Custom Category Name *
+              <label className="block text-slate-400 text-[11px] font-bold uppercase mb-1">
+                Article Type
               </label>
-              <input
-                type="text"
-                value={customCategory}
-                onChange={(e) => setCustomCategory(e.target.value)}
-                required
-                className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="e.g. World Cup 2026"
-              />
+              <select
+                value={articleType}
+                onChange={(e) => setArticleType(e.target.value as ArticleType)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+              >
+                <option value="news">Breaking News / Standard Story</option>
+                <option value="transfer">Transfer News / Rumour / Done Deal</option>
+                <option value="tactical_analysis">Tactical Match Analysis</option>
+                <option value="player_analysis">Player Scouting Deep Dive</option>
+                <option value="match_report">Official Match Report</option>
+                <option value="feature">Editorial Feature / Long Read</option>
+                <option value="interview">Exclusive Interview</option>
+                <option value="prediction">Match Preview & Prediction</option>
+              </select>
             </div>
-          ) : (
+
             <div>
-              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
-                Related Team (For Team Hub Feeds)
+              <label className="block text-slate-400 text-[11px] font-bold uppercase mb-1">
+                Category
               </label>
-              <input
-                type="text"
-                list="teams-list"
-                value={relatedTeam}
-                onChange={(e) => setRelatedTeam(e.target.value)}
-                className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="e.g. Arsenal, Real Madrid, Lakers"
-              />
-              <datalist id="teams-list">
-                {POPULAR_TEAMS.map((t) => (
-                  <option key={t} value={t} />
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+              >
+                {categories.map((c) => (
+                  <option key={c._id} value={c.name}>
+                    {c.name}
+                  </option>
                 ))}
-              </datalist>
+                <option value="__custom__">+ Custom Category...</option>
+              </select>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Tags */}
+        {/* Keywords & Tags */}
         <div>
           <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <FiTag className="text-blue-400" /> Keywords & SEO Tags (Comma separated)
+            <FiTag className="text-blue-400" /> Keywords & Entity Tags (Comma separated)
           </label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             className="w-full bg-slate-900/80 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-            placeholder="e.g. Arsenal, Premier League, Bukayo Saka, Champions League, Transfer News"
+            placeholder="e.g. Victor Osimhen, Arsenal, Champions League, Done Deal"
           />
         </div>
 
-        {/* Excerpt */}
+        {/* Lead Excerpt */}
         <div>
           <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
-            Lead Excerpt / Social Summary *
+            Lead Excerpt / Social Meta Summary *
           </label>
           <textarea
             value={excerpt}
@@ -263,7 +375,7 @@ export default function CreateNewsForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end bg-slate-900/40 p-4 rounded-2xl border border-white/5">
           <div>
             <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <FiImage className="text-blue-400" /> Cover Hero Image URL
+              <FiImage className="text-blue-400" /> Cover Image URL
             </label>
             <input
               type="url"
@@ -323,7 +435,7 @@ export default function CreateNewsForm() {
           <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
             <span>Article Body (Enterprise Studio) *</span>
             <span className="text-[11px] text-blue-400 font-normal">
-              Copy-paste formatted docs or click to attach signed media
+              Copy-paste formatted docs or attach media
             </span>
           </label>
           <EnterpriseNewsEditor
@@ -341,7 +453,7 @@ export default function CreateNewsForm() {
             disabled={loading || uploading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <span>{loading ? 'Publishing Story...' : 'Publish News Story'}</span>
+            <span>{loading ? 'Publishing & Distributing...' : 'Publish to Sports Network'}</span>
           </button>
         </div>
       </form>
