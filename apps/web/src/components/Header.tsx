@@ -104,7 +104,7 @@ export function Header() {
 
           {session?.user ? (
             <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-              {(session.user.role === 'super-admin' || session.user.role === 'admin') && (
+              {['super-admin', 'manager', 'editor'].includes(session.user.role as any) && (
                 <Link
                   href="/admin/dashboard"
                   className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 transition-all text-xs flex items-center gap-1"
@@ -112,6 +112,7 @@ export function Header() {
                   <span>⚡</span> Admin Hub
                 </Link>
               )}
+
               <Link href="/profile" className="flex items-center gap-3 group">
                 <div className="text-right hidden lg:block">
                   <p className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">
@@ -198,7 +199,7 @@ export function Header() {
 
             {session?.user ? (
               <>
-                {(session.user.role === 'super-admin' || session.user.role === 'admin') && (
+                {['super-admin', 'manager', 'editor'].includes(session.user.role as any) && (
                   <Link
                     href="/admin/dashboard"
                     className={`text-2xl font-black text-amber-400 transition-all duration-300 ${
@@ -208,6 +209,7 @@ export function Header() {
                     ⚡ Admin & EMS Hub
                   </Link>
                 )}
+
                 <Link
                   href="/admin/portal"
                   className={`text-2xl font-bold text-cyan-400 transition-all duration-300 ${

@@ -2,28 +2,58 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Payroll from '@/models/Payroll';
 import Employee from '@/models/Employee';
-import { requirePermission } from '@/lib/rbac';
+import { requirePermission, hasPermission } from '@/lib/rbac';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { isValidObjectId } from '@/lib/security';
+import type { UserRole } from '@goalmills/types';
 
 export async function GET(req: NextRequest) {
   try {
-    const { error } = await requirePermission('payroll:read');
-    if (error) return error;
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
     await dbConnect();
+    const userRole = session.user.role as UserRole;
+    const canManageAll = hasPermission(userRole, 'payroll:read');
+
     const { searchParams } = new URL(req.url);
-    const employeeId = searchParams.get('employeeId');
+    const requestedEmployeeId = searchParams.get('employeeId');
     const period = searchParams.get('period');
     const status = searchParams.get('status');
 
     const query: any = {};
-    if (employeeId) query.employeeId = employeeId;
     if (period) query.period = period;
     if (status && status !== 'all') query.status = status;
 
+    if (canManageAll) {
+      // Super admin / manager: can filter by any employee or see all
+      if (requestedEmployeeId && isValidObjectId(requestedEmployeeId)) {
+        query.employeeId = requestedEmployeeId;
+      }
+    } else {
+      // Regular staff: find their own employee record and force filter
+      const myEmployee = await Employee.findOne({
+        $or: [
+          { userId: session.user.id },
+          { email: session.user.email?.toLowerCase() },
+        ],
+      });
+
+      if (!myEmployee) {
+        return NextResponse.json({ success: true, count: 0, data: [] });
+      }
+
+      // Lock query to the current staff member's ID
+      query.employeeId = myEmployee._id;
+    }
+
     let records = await Payroll.find(query).sort({ createdAt: -1 });
 
-    // If no payroll records exist, generate current period records for active/training staff
-    if (records.length === 0 && !employeeId) {
+    // If no payroll records exist and super admin is querying all, seed current period records
+    if (records.length === 0 && canManageAll && !requestedEmployeeId) {
       const employees = await Employee.find({
         status: { $in: ['training', 'probation', 'active'] },
       });
@@ -60,6 +90,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 
 export async function POST(req: NextRequest) {
   try {

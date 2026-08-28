@@ -3,19 +3,52 @@ import dbConnect from '@/lib/db';
 import PerformanceEvaluation from '@/models/PerformanceEvaluation';
 import Employee from '@/models/Employee';
 import { OFFICIAL_SCORECARD_METRICS } from '@/lib/trainingCurriculum';
-import { requirePermission } from '@/lib/rbac';
+import { requirePermission, hasPermission } from '@/lib/rbac';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { isValidObjectId } from '@/lib/security';
+import type { UserRole } from '@goalmills/types';
 
 export async function GET(req: NextRequest) {
   try {
-    const { error } = await requirePermission('evaluations:read');
-    if (error) return error;
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
     await dbConnect();
+    const userRole = session.user.role as UserRole;
+    const canManageAll = hasPermission(userRole, 'evaluations:read');
+
     const { searchParams } = new URL(req.url);
-    const employeeId = searchParams.get('employeeId');
+    const requestedEmployeeId = searchParams.get('employeeId');
 
     const query: any = {};
-    if (employeeId) query.employeeId = employeeId;
+
+    if (canManageAll) {
+      if (requestedEmployeeId && isValidObjectId(requestedEmployeeId)) {
+        query.employeeId = requestedEmployeeId;
+      }
+    } else {
+      // Regular staff: only own evaluations
+      const myEmployee = await Employee.findOne({
+        $or: [
+          { userId: session.user.id },
+          { email: session.user.email?.toLowerCase() },
+        ],
+      });
+
+      if (!myEmployee) {
+        return NextResponse.json({
+          success: true,
+          count: 0,
+          data: [],
+          defaultMetrics: OFFICIAL_SCORECARD_METRICS,
+        });
+      }
+
+      query.employeeId = myEmployee._id;
+    }
 
     const evaluations = await PerformanceEvaluation.find(query).sort({ evaluationDate: -1 });
 
@@ -32,6 +65,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 
 export async function POST(req: NextRequest) {
   try {

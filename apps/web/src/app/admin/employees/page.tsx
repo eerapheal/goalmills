@@ -5,6 +5,8 @@ import Link from 'next/link';
 import AdminNavBar from '@/components/admin/AdminNavBar';
 import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { Employee } from '@goalmills/types';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { setLastCreatedCredentials, clearCreatedCredentials } from '@/store/slices/employeeSlice';
 import {
   FiUsers,
   FiUserPlus,
@@ -24,22 +26,30 @@ import {
   FiChevronDown,
   FiMoreVertical,
   FiCheck,
+  FiCopy,
+  FiLock,
+  FiKey,
 } from 'react-icons/fi';
 
 export default function EmployeesPage() {
+  const dispatch = useAppDispatch();
+  const createdCredentials = useAppSelector((state) => state.employees.lastCreatedCredentials);
+
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deptFilter, setDeptFilter] = useState('all');
   const [showOnboardModal, setShowOnboardModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // New Employee Form State
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    residentialAddress: '',
+    address: '',
+    password: '',
     jobTitle: 'Sports Media & Social Media Content Officer',
     department: 'Editorial & Digital Media',
     workArrangement: 'Remote',
@@ -51,6 +61,7 @@ export default function EmployeesPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
 
   const fetchEmployees = async () => {
     try {
@@ -93,11 +104,16 @@ export default function EmployeesPage() {
       }
 
       setShowOnboardModal(false);
+      if (json.credentials) {
+        dispatch(setLastCreatedCredentials(json.credentials));
+      }
+
       setFormData({
         fullName: '',
         email: '',
         phone: '',
-        residentialAddress: '',
+        address: '',
+        password: '',
         jobTitle: 'Sports Media & Social Media Content Officer',
         department: 'Editorial & Digital Media',
         workArrangement: 'Remote',
@@ -114,6 +130,15 @@ export default function EmployeesPage() {
       setSubmitting(false);
     }
   };
+
+  const handleCopyCredentials = () => {
+    if (!createdCredentials) return;
+    const text = `GoalMills Staff Login Credentials:\nPortal: https://goalmills-web.vercel.app/signin\nEmail: ${createdCredentials.email}\nTemporary Password: ${createdCredentials.tempPassword}\nRole: ${createdCredentials.role}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+
 
   const filteredEmployees = employees.filter((emp) => {
     if (deptFilter !== 'all' && emp.department !== deptFilter) return false;
@@ -572,9 +597,9 @@ export default function EmployeesPage() {
                       type="text"
                       required
                       placeholder="e.g. No 35 church street, Jos, Plateau State"
-                      value={formData.residentialAddress}
+                      value={formData.address}
                       onChange={(e) =>
-                        setFormData({ ...formData, residentialAddress: e.target.value })
+                        setFormData({ ...formData, address: e.target.value })
                       }
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
@@ -582,6 +607,22 @@ export default function EmployeesPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Initial Staff Password (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Auto-generated if left blank"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
+                    />
+                    <span className="text-[10px] text-text-muted mt-1 block">
+                      A login account will be automatically provisioned for dashboard access.
+                    </span>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
                       Job Title *
@@ -594,7 +635,9 @@ export default function EmployeesPage() {
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
                   </div>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
                       Department *
@@ -613,9 +656,7 @@ export default function EmployeesPage() {
                       </option>
                     </select>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
                       30-Day Training Allowance (₦) *
@@ -630,7 +671,9 @@ export default function EmployeesPage() {
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
                   </div>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
                       Post-Training Starting Salary (₦) *
@@ -661,10 +704,72 @@ export default function EmployeesPage() {
                     disabled={submitting}
                     className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 disabled:opacity-50"
                   >
-                    {submitting ? 'Generating Contract...' : 'Issue Contract & Onboard'}
+                    {submitting ? 'Generating Account & Contract...' : 'Create Account & Onboard'}
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Credentials Delivery Modal */}
+        {createdCredentials && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div className="glass-card w-full max-w-md p-6 sm:p-8 rounded-3xl border border-amber-500/40 shadow-2xl space-y-6">
+              <div className="flex items-start justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <FiKey size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-white">Staff Login Account Created</h3>
+                    <p className="text-xs text-text-muted">Deliver these credentials to the staff member</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => dispatch(clearCreatedCredentials())}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <FiX size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-3 bg-slate-950/80 p-4 rounded-2xl border border-white/10">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Full Name</span>
+                  <p className="text-sm font-bold text-white">{createdCredentials.fullName}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Login Email</span>
+                  <p className="text-sm font-mono text-amber-300">{createdCredentials.email}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Temporary Password</span>
+                  <p className="text-sm font-mono font-bold text-emerald-400">{createdCredentials.tempPassword}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Assigned Role</span>
+                  <p className="text-xs uppercase font-black text-slate-300">{createdCredentials.role}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleCopyCredentials}
+                  className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/25 transition-all"
+                >
+                  {copied ? <FiCheck size={16} /> : <FiCopy size={16} />}
+                  <span>{copied ? 'Copied to Clipboard!' : 'Copy Credentials'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => dispatch(clearCreatedCredentials())}
+                  className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase"
+                >
+                  Done
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -672,3 +777,4 @@ export default function EmployeesPage() {
     </div>
   );
 }
+

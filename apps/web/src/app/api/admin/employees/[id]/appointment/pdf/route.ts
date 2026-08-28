@@ -5,6 +5,7 @@ import Employee from '@/models/Employee';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { hasPermission } from '@/lib/rbac';
+import { isValidObjectId, SECURITY_HEADERS } from '@/lib/security';
 import { UserRole } from '@goalmills/types';
 
 const PAGE_WIDTH = 595.28;
@@ -51,8 +52,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    await dbConnect();
     const { id } = await params;
+    if (!isValidObjectId(id)) {
+      return NextResponse.json({ success: false, error: 'Invalid employee ID format' }, { status: 400 });
+    }
+
+    await dbConnect();
     const employee = await Employee.findById(id);
 
     if (!employee) {
@@ -62,11 +67,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // Permission check: Manager/Super-admin or self employee
     const userRole = session.user.role as UserRole;
     const isManagerOrAdmin = hasPermission(userRole, 'employees:read');
-    const isSelf = employee.userId?.toString() === session.user.id || employee.email?.toLowerCase() === session.user.email?.toLowerCase();
+    const isSelf =
+      (employee.userId && employee.userId.toString() === session.user.id) ||
+      (employee.email && session.user.email && employee.email.toLowerCase() === session.user.email.toLowerCase());
 
     if (!isManagerOrAdmin && !isSelf) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Forbidden: You are not authorized to view or download another staff member\'s appointment letter.',
+        },
+        { status: 403 }
+      );
     }
+
 
     // Build appointment data (same as the GET route in appointment/route.ts)
     const data = {

@@ -1,9 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
+vi.mock('next-auth/next', () => ({
+  getServerSession: vi.fn().mockResolvedValue({
+    user: {
+      id: 'admin-1',
+      name: 'Super Admin',
+      email: 'admin@goalmills.com',
+      role: 'super-admin',
+    },
+  }),
+}));
+
+vi.mock('@/models/User', () => ({
+  default: {
+    findOne: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockImplementation((data) => Promise.resolve({ _id: 'user-new', ...data })),
+  },
+}));
+
 vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
+
 
 const { mockEmployee } = vi.hoisted(() => ({
   mockEmployee: {

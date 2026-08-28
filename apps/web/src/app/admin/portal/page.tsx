@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import AdminNavBar from '@/components/admin/AdminNavBar';
 import GoalmillsLoader from '@/components/GoalmillsLoader';
 import {
@@ -11,7 +12,9 @@ import {
   StandupMeeting,
   PerformanceScorecard,
   PayrollRecord,
+  UserRole,
 } from '@goalmills/types';
+import { hasPermission } from '@/lib/rbac';
 import { GOALMILLS_TRAINING_MODULES } from '@/lib/trainingCurriculum';
 import {
   FiUserCheck,
@@ -36,6 +39,10 @@ import {
 type PortalTab = 'daily_report' | 'training_checklist' | 'standup' | 'payroll_contract';
 
 export default function StaffPortalPage() {
+  const { data: session } = useSession();
+  const userRole = (session?.user?.role as UserRole) || undefined;
+  const canSwitchEmployee = hasPermission(userRole, 'employees:read');
+
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   const [training, setTraining] = useState<EmployeeTrainingProgress | null>(null);
@@ -45,6 +52,7 @@ export default function StaffPortalPage() {
   const [payroll, setPayroll] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<PortalTab>('daily_report');
+
 
   // Daily Submission Form State
   const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0]);
@@ -253,30 +261,33 @@ export default function StaffPortalPage() {
                 </div>
               </div>
 
-              {/* Employee Switcher Dropdown */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-text-muted font-bold whitespace-nowrap hidden sm:inline">
-                  Viewing Profile:
-                </span>
-                <div className="relative w-full sm:w-auto">
-                  <select
-                    value={currentEmployee._id}
-                    onChange={(e) => handleSwitchEmployee(e.target.value)}
-                    className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs sm:text-sm font-bold text-slate-200 focus:border-amber-500 focus:outline-none pr-8 shadow-inner"
-                  >
-                    {employees.map((e) => (
-                      <option key={e._id} value={e._id}>
-                        {e.fullName}
-                      </option>
-                    ))}
-                  </select>
-                  <FiChevronDown
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                    size={14}
-                  />
+              {/* Employee Switcher Dropdown (Managers & Admins only) */}
+              {canSwitchEmployee && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-text-muted font-bold whitespace-nowrap hidden sm:inline">
+                    Viewing Profile:
+                  </span>
+                  <div className="relative w-full sm:w-auto">
+                    <select
+                      value={currentEmployee._id}
+                      onChange={(e) => handleSwitchEmployee(e.target.value)}
+                      className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs sm:text-sm font-bold text-slate-200 focus:border-amber-500 focus:outline-none pr-8 shadow-inner"
+                    >
+                      {employees.map((e) => (
+                        <option key={e._id} value={e._id}>
+                          {e.fullName}
+                        </option>
+                      ))}
+                    </select>
+                    <FiChevronDown
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      size={14}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
+
 
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 border-t border-white/5">

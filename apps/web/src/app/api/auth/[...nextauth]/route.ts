@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 import { NextAuthOptions } from 'next-auth';
 
@@ -22,19 +23,32 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Please enter an email and password');
         }
 
+        const normalizedEmail = credentials.email.toLowerCase().trim();
+
+        // Rate limiting check to prevent brute force credential stuffing
+        const rateLimit = checkRateLimit(`login:${normalizedEmail}`, {
+          maxRequests: 10,
+          windowSeconds: 60,
+        });
+
+        if (!rateLimit.success) {
+          throw new Error('Too many login attempts. Please wait 1 minute before trying again.');
+        }
+
         await dbConnect();
 
-        const user = await User.findOne({ email: credentials.email });
+        const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
-          throw new Error('No user found with this email');
+          throw new Error('Invalid email or password');
         }
 
         const isMatch = await bcrypt.compare(credentials.password, user.password);
 
         if (!isMatch) {
-          throw new Error('Incorrect password');
+          throw new Error('Invalid email or password');
         }
+
 
         return {
           id: user._id.toString(),

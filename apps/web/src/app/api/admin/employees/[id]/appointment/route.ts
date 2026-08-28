@@ -5,6 +5,7 @@ import { AppointmentLetterData, UserRole } from '@goalmills/types';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { hasPermission } from '@/lib/rbac';
+import { isValidObjectId, sanitizeHtml } from '@/lib/security';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,8 +14,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    await dbConnect();
     const { id } = await params;
+    if (!isValidObjectId(id)) {
+      return NextResponse.json({ success: false, error: 'Invalid employee ID' }, { status: 400 });
+    }
+
+    await dbConnect();
     const employee = await Employee.findById(id);
 
     if (!employee) {
@@ -24,10 +29,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // Permission check: Manager/Super-admin or self employee
     const userRole = session.user.role as UserRole;
     const isManagerOrAdmin = hasPermission(userRole, 'employees:read');
-    const isSelf = employee.userId?.toString() === session.user.id || employee.email?.toLowerCase() === session.user.email?.toLowerCase();
+    const isSelf =
+      (employee.userId && employee.userId.toString() === session.user.id) ||
+      (employee.email && session.user.email && employee.email.toLowerCase() === session.user.email.toLowerCase());
 
     if (!isManagerOrAdmin && !isSelf) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: You cannot access another staff member\'s appointment letter' },
+        { status: 403 }
+      );
     }
 
     const appointmentData: AppointmentLetterData = {
@@ -67,10 +77,37 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await dbConnect();
-    const { id } = await params;
-    const body = await req.json();
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
+    const { id } = await params;
+    if (!isValidObjectId(id)) {
+      return NextResponse.json({ success: false, error: 'Invalid employee ID' }, { status: 400 });
+    }
+
+    await dbConnect();
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
+    }
+
+    // Permission check: Self or Manager+
+    const userRole = session.user.role as UserRole;
+    const isManagerOrAdmin = hasPermission(userRole, 'employees:manage');
+    const isSelf =
+      (employee.userId && employee.userId.toString() === session.user.id) ||
+      (employee.email && session.user.email && employee.email.toLowerCase() === session.user.email.toLowerCase());
+
+    if (!isManagerOrAdmin && !isSelf) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: You cannot sign an appointment letter for another employee' },
+        { status: 403 }
+      );
+    }
+
+    const body = await req.json();
     if (!body.employeeSignature) {
       return NextResponse.json(
         { success: false, error: 'Signature is required to accept the appointment' },
@@ -78,6 +115,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       );
     }
 
+    const cleanSignature = sanitizeHtml(body.employeeSignature);
     const signedAt = new Date().toLocaleDateString('en-GB');
 
     const updatedEmployee = await Employee.findByIdAndUpdate(
@@ -86,15 +124,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         $set: {
           appointmentSigned: true,
           appointmentSignedAt: signedAt,
-          employeeSignature: body.employeeSignature,
+          employeeSignature: cleanSignature,
         },
       },
       { new: true }
     );
-
-    if (!updatedEmployee) {
-      return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
-    }
 
     return NextResponse.json({
       success: true,
@@ -108,3 +142,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     );
   }
 }
+
