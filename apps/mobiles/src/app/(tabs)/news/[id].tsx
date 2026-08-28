@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GoalmillsLoader } from '../../../components/GoalmillsLoader';
 import RenderHTML from 'react-native-render-html';
 import { newsHistoryUtil, MobileRecentlyViewedItem } from '../../../utils/newsHistory';
+import { goalmillsApi } from '../../../services/goalmillsApi';
 
 function splitContentAtMidpoint(content: string): { firstHalf: string; secondHalf: string } {
   if (!content) return { firstHalf: '', secondHalf: '' };

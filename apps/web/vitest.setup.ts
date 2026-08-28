@@ -62,3 +62,12 @@ vi.mock('next/image', () => ({
     return React.createElement('img', { ...props, alt: props.alt || '' });
   },
 }));
+
+// Mock global fetch for relative URLs in jsdom tests
+global.fetch = vi.fn().mockImplementation(() => {
+  return Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ success: true, data: [] }),
+    text: () => Promise.resolve(''),
+  });
+});

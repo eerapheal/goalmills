@@ -16,6 +16,7 @@ import { BlogPost } from '@goalmills/types';
 export const dynamic = 'force-dynamic';
 
 function resolvePlayer(identifier: string) {
+  if (!identifier) return undefined;
   let player = EntityService.getPlayer(identifier);
   if (!player) {
     player = EntityService.getAllPlayers().find(
@@ -30,7 +31,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const slug = resolvedParams?.slug;
   const player = resolvePlayer(slug);
   if (!player) return { title: 'Player Profile | GoalMills' };
 
@@ -41,7 +43,8 @@ export async function generateMetadata({
 }
 
 export default async function PlayerHubPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const slug = resolvedParams?.slug;
   const player = resolvePlayer(slug);
 
   if (!player) {

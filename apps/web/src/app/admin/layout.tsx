@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { GoalmillsLoader } from '@/components/GoalmillsLoader';
+
 function AdminAuth({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -17,8 +19,12 @@ function AdminAuth({ children }: { children: React.ReactNode }) {
 
   if (status === 'loading') {
     return (
-      <div className="flex bg-background min-h-screen items-center justify-center text-white">
-        Loading...
+      <div className="flex bg-background min-h-screen items-center justify-center">
+        <GoalmillsLoader
+          size="fullscreen"
+          label="GoalMills Admin"
+          sublabel="Authenticating security session..."
+        />
       </div>
     );
   }

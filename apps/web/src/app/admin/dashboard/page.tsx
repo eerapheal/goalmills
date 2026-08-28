@@ -7,7 +7,20 @@ import UploadVideoForm from '@/components/admin/UploadVideoForm';
 import NewsList from '@/components/admin/NewsList';
 import VideoList from '@/components/admin/VideoList';
 import Link from 'next/link';
-import { FiLogOut, FiFileText, FiVideo, FiList, FiLayers, FiUsers } from 'react-icons/fi';
+import AdminNavBar from '@/components/admin/AdminNavBar';
+import {
+  FiLogOut,
+  FiFileText,
+  FiVideo,
+  FiList,
+  FiLayers,
+  FiUsers,
+  FiAward,
+  FiDollarSign,
+  FiCalendar,
+  FiCheckSquare,
+  FiUserCheck,
+} from 'react-icons/fi';
 
 type CreationTab = 'news' | 'video' | 'manage';
 type ManageSubTab = 'news' | 'video';
@@ -21,48 +34,88 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6 pt-[85px] sm:pt-[95px]">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
-        {/* Header Profile & Quick Links */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center glass-card p-5 sm:p-6 rounded-3xl gap-4 border border-white/10 shadow-2xl">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <span>⚡</span> Admin Command Center
-            </h1>
-            <p className="text-xs sm:text-sm text-text-muted mt-0.5">
-              Welcome back, <span className="text-secondary font-bold">{session?.user?.name}</span>{' '}
-              ({session?.user?.role})
+        {/* Navigation Bar with Employee Management Links */}
+        <AdminNavBar />
+
+        {/* EMS Quick Launch Matrix */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <Link
+            href="/admin/employees"
+            className="glass-card p-4 rounded-2xl border border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-2.5 group-hover:scale-110 transition-transform">
+              <FiUsers size={20} />
+            </div>
+            <p className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors">
+              Staff & Trainees
             </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            {session?.user?.role === 'super-admin' && (
-              <Link
-                href="/admin/users"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-all text-xs sm:text-sm"
-              >
-                <FiUsers size={14} />
-                <span>Users</span>
-              </Link>
-            )}
-            <Link
-              href="/admin/categories"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-bold border border-purple-500/20 transition-all text-xs sm:text-sm"
-            >
-              <FiLayers size={14} />
-              <span>Categories</span>
-            </Link>
-            <Link
-              href="/"
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-all text-xs sm:text-sm"
-            >
-              View Site
-            </Link>
-            <button
-              onClick={() => signOut({ callbackUrl: '/signin' })}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold border border-red-500/20 transition-all text-xs sm:text-sm"
-            >
-              <FiLogOut size={14} />
-              <span>Sign Out</span>
-            </button>
-          </div>
+            <p className="text-[10px] text-text-muted mt-0.5">Directory & Contracts</p>
+          </Link>
+
+          <Link
+            href="/admin/reports"
+            className="glass-card p-4 rounded-2xl border border-white/10 hover:border-blue-500/40 hover:bg-blue-500/5 transition-all group shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-2.5 group-hover:scale-110 transition-transform">
+              <FiCheckSquare size={20} />
+            </div>
+            <p className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">
+              Daily Reports
+            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">Submissions & Review</p>
+          </Link>
+
+          <Link
+            href="/admin/standup"
+            className="glass-card p-4 rounded-2xl border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all group shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2.5 group-hover:scale-110 transition-transform">
+              <FiCalendar size={20} />
+            </div>
+            <p className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
+              5:00 PM Stand-up
+            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">Meet & Roll Call</p>
+          </Link>
+
+          <Link
+            href="/admin/evaluations"
+            className="glass-card p-4 rounded-2xl border border-white/10 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-2.5 group-hover:scale-110 transition-transform">
+              <FiAward size={20} />
+            </div>
+            <p className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors">
+              Scorecards
+            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">100% Weighted Metric</p>
+          </Link>
+
+          <Link
+            href="/admin/payroll"
+            className="glass-card p-4 rounded-2xl border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all group shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2.5 group-hover:scale-110 transition-transform">
+              <FiDollarSign size={20} />
+            </div>
+            <p className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
+              Payroll & Allowances
+            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">₦30k / ₦50k Ledger</p>
+          </Link>
+
+          <Link
+            href="/admin/portal"
+            className="glass-card p-4 rounded-2xl border border-white/10 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition-all group shadow-lg"
+          >
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-2.5 group-hover:scale-110 transition-transform">
+              <FiUserCheck size={20} />
+            </div>
+            <p className="text-xs font-bold text-white group-hover:text-cyan-400 transition-colors">
+              Staff Portal
+            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">Trainee Self-Service</p>
+          </Link>
         </div>
 
         {/* ------------------------------------------------------------- */}

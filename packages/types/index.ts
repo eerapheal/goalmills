@@ -2466,3 +2466,257 @@ export interface CricbuzzAPIClient {
   getBlogPosts(): Promise<any[]>;
   getVideoHighlights(): Promise<any[]>;
 }
+
+// ============================================================================
+// GOALMILLS EMPLOYEE MANAGEMENT & TRAINING SYSTEM (EMS) TYPES
+// ============================================================================
+
+export type EmploymentStatus =
+  | 'training'
+  | 'probation'
+  | 'active'
+  | 'review'
+  | 'suspended'
+  | 'resigned'
+  | 'terminated';
+
+export type WorkArrangement = 'Remote' | 'Hybrid' | 'Office';
+
+export interface EmployeeEmergencyContact {
+  name: string;
+  relationship: string;
+  phone: string;
+  address?: string;
+}
+
+export interface Employee {
+  _id?: string;
+  userId?: string; // Reference to User if linked
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  jobTitle: string; // e.g., 'Sports Media & Social Media Content Officer'
+  department: string; // e.g., 'Editorial & Digital Media'
+  workArrangement: WorkArrangement;
+  reportsTo: string; // e.g., 'Ekpenisi Erue Raphael (Founder / Managing Editor)'
+  startDate: string; // ISO string e.g., '2026-09-01'
+  trainingEndDate: string; // ISO string e.g., '2026-09-30'
+  status: EmploymentStatus;
+  trainingAllowance: number; // ₦30,000
+  startingSalary: number; // ₦50,000
+  currentSalary: number;
+  currency: string; // 'NGN'
+  appointmentSigned: boolean;
+  appointmentSignedAt?: string;
+  employeeSignature?: string;
+  companySignature?: string;
+  companyRepresentative?: string;
+  emergencyContact?: EmployeeEmergencyContact;
+  socialHandles?: {
+    twitter?: string;
+    instagram?: string;
+    facebook?: string;
+    linkedin?: string;
+    tiktok?: string;
+  };
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AppointmentLetterData {
+  companyName: string;
+  companyPhone: string;
+  companyEmail: string;
+  companyWebsite: string;
+  date: string;
+  candidateName: string;
+  candidateAddress: string;
+  candidateEmail: string;
+  candidatePhone: string;
+  position: string;
+  department: string;
+  startDate: string;
+  trainingPeriod: string;
+  workArrangement: WorkArrangement;
+  reportsTo: string;
+  trainingSalary: number;
+  startingSalary: number;
+  founderName: string;
+  founderPosition: string;
+  founderSignatureDate: string;
+  employeeSignature?: string;
+  employeeSignatureDate?: string;
+  isAccepted: boolean;
+}
+
+export type TrainingModuleKey =
+  | 'sports_writing'
+  | 'sports_research_factcheck'
+  | 'journalism_editorial_standards'
+  | 'seo_optimization'
+  | 'content_planning_breaking'
+  | 'matchday_coverage'
+  | 'social_community_management'
+  | 'canva_graphic_design'
+  | 'short_form_video'
+  | 'audience_growth_analytics'
+  | 'repurposing_newsroom_ops';
+
+export interface TrainingModuleItem {
+  id: TrainingModuleKey;
+  title: string;
+  category: 'Writing & Journalism' | 'Design & Video' | 'Growth & Operations';
+  description: string;
+  weightPercent: number;
+  checklist: string[];
+  resources: string[];
+}
+
+export interface EmployeeModuleProgress {
+  moduleId: TrainingModuleKey;
+  status: 'not_started' | 'in_progress' | 'submitted' | 'completed';
+  completedTasks: string[];
+  submissionLinks: string[];
+  score?: number; // 0 - 100
+  feedback?: string;
+  completedAt?: string;
+}
+
+export interface EmployeeTrainingProgress {
+  _id?: string;
+  employeeId: string;
+  modules: EmployeeModuleProgress[];
+  overallProgressPercent: number;
+  finalAssessmentCompleted: boolean;
+  finalAssessmentScore?: number;
+  finalAssessmentNotes?: string;
+  transitionRecommended?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DailyPublishedArticle {
+  title: string;
+  url: string;
+  category: string;
+  wordCount?: number;
+  sourcesVerified: boolean;
+}
+
+export interface DailySocialPost {
+  platform: 'X' | 'Facebook' | 'Instagram' | 'TikTok' | 'YouTube' | 'WhatsApp';
+  url: string;
+  captionExcerpt?: string;
+}
+
+export interface DailyMediaAsset {
+  type: 'canva_graphic' | 'short_video' | 'youtube_video' | 'reel' | 'thumbnail';
+  title: string;
+  link: string;
+  previewUrl?: string;
+}
+
+export interface DailyContentReport {
+  _id?: string;
+  employeeId: string;
+  employeeName: string;
+  reportDate: string; // YYYY-MM-DD
+  articles: DailyPublishedArticle[];
+  socialPosts: DailySocialPost[];
+  mediaAssets: DailyMediaAsset[];
+  sourcesUsed: string[];
+  engagementSummary: string;
+  problemsEncountered?: string;
+  correctionsMade?: string;
+  lessonsLearned?: string;
+  tasksCompleted: string;
+  reviewStatus: 'pending' | 'reviewed' | 'approved' | 'needs_revision';
+  editorScore?: number; // 1 - 10
+  editorFeedback?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StandupAttendee {
+  employeeId: string;
+  employeeName: string;
+  status: 'present' | 'late' | 'absent' | 'excused';
+  talkingPoints?: string;
+}
+
+export interface StandupMeeting {
+  _id?: string;
+  meetingDate: string; // YYYY-MM-DD
+  time: string; // '5:00 PM – 5:30 PM WAT'
+  platform: string; // 'Google Meet'
+  meetUrl: string;
+  hostName: string;
+  attendees: StandupAttendee[];
+  agenda: string[];
+  editorialPriorities: string[];
+  nextDayAssignments: {
+    employeeId: string;
+    employeeName: string;
+    assignment: string;
+  }[];
+  meetingNotes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ScorecardMetric {
+  key: string;
+  name: string;
+  weight: number; // e.g. 15 for 15%
+  score: number; // 0 - 100
+  notes?: string;
+}
+
+export interface PerformanceScorecard {
+  _id?: string;
+  employeeId: string;
+  employeeName: string;
+  period: string; // e.g. '30-Day Training Assessment' or 'Month 1'
+  evaluationDate: string;
+  evaluatorName: string;
+  evaluatorRole: string;
+  metrics: ScorecardMetric[];
+  totalWeightedScore: number; // 0 - 100%
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  strengths: string;
+  areasForImprovement: string;
+  transitionRecommendation:
+    | 'promote_to_regular'
+    | 'extend_training'
+    | 'renegotiate_salary'
+    | 'terminate';
+  recommendedSalary?: number; // e.g., 50000
+  managementDecision?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PayrollRecord {
+  _id?: string;
+  employeeId: string;
+  employeeName: string;
+  jobTitle: string;
+  period: string; // e.g. 'September 2026'
+  paymentType: 'training_allowance' | 'regular_salary' | 'bonus' | 'adjustment';
+  baseAmount: number; // ₦30,000 or ₦50,000
+  bonusAmount: number;
+  deductions: number;
+  netPay: number;
+  currency: string; // 'NGN'
+  status: 'draft' | 'approved' | 'processing' | 'paid';
+  paymentDate?: string;
+  paymentMethod?: string; // 'Bank Transfer'
+  referenceNumber?: string;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

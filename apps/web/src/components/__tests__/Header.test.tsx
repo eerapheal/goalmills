@@ -22,7 +22,7 @@ describe('Header Component', () => {
     );
     const newsLinks = screen.getAllByText('News');
     expect(newsLinks.length).toBeGreaterThan(0);
-    const highlightLinks = screen.getAllByText('Highlight');
+    const highlightLinks = screen.getAllByText('Highlights');
     expect(highlightLinks.length).toBeGreaterThan(0);
   });
 
