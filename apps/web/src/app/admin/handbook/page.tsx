@@ -74,7 +74,7 @@ export default function AdminHandbookPage() {
     const element = document.createElement('a');
     const file = new Blob([content], { type: 'text/plain;charset=utf-8' });
     element.href = URL.createObjectURL(file);
-    element.download = `${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.pdf`;
+    element.download = `${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);

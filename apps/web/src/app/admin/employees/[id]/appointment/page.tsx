@@ -12,6 +12,7 @@ import {
   FiPenTool,
   FiShield,
   FiFileText,
+  FiDownload,
 } from 'react-icons/fi';
 
 export default function AppointmentLetterPage({ params }: { params: Promise<{ id: string }> }) {
@@ -119,6 +120,14 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
           </Link>
 
           <div className="flex items-center gap-3">
+            <a
+              href={`/api/admin/employees/${id}/appointment/pdf`}
+              download
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95"
+            >
+              <FiDownload size={14} />
+              <span>Download PDF</span>
+            </a>
             <button
               onClick={() => window.print()}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all"
