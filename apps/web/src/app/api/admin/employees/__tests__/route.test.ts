@@ -5,18 +5,20 @@ vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
-const mockEmployee = {
-  _id: 'emp-1',
-  fullName: 'Ibeh Udochukwu Gift Temitope',
-  email: 'giftibeh585@gmail.com',
-  phone: '08134336192',
-  address: 'No 35 church street, Jos, Plateau State',
-  jobTitle: 'Sports Media & Social Media Content Officer',
-  department: 'Editorial & Digital Media',
-  status: 'training',
-  currentSalary: 30000,
-  startingSalary: 50000,
-};
+const { mockEmployee } = vi.hoisted(() => ({
+  mockEmployee: {
+    _id: 'emp-1',
+    fullName: 'Ibeh Udochukwu Gift Temitope',
+    email: 'giftibeh585@gmail.com',
+    phone: '08134336192',
+    address: 'No 35 church street, Jos, Plateau State',
+    jobTitle: 'Sports Media & Social Media Content Officer',
+    department: 'Editorial & Digital Media',
+    status: 'training',
+    currentSalary: 30000,
+    startingSalary: 50000,
+  },
+}));
 
 vi.mock('@/models/Employee', () => ({
   default: {

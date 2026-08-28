@@ -5,20 +5,22 @@ vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
-const mockPayrollRecord = {
-  _id: 'pay-1',
-  employeeId: 'emp-1',
-  employeeName: 'Ibeh Udochukwu Gift Temitope',
-  jobTitle: 'Sports Media & Social Media Content Officer',
-  period: 'September 2026',
-  paymentType: 'training_allowance',
-  baseAmount: 30000,
-  bonusAmount: 0,
-  deductions: 0,
-  netPay: 30000,
-  currency: 'NGN',
-  status: 'approved',
-};
+const { mockPayrollRecord } = vi.hoisted(() => ({
+  mockPayrollRecord: {
+    _id: 'pay-1',
+    employeeId: 'emp-1',
+    employeeName: 'Ibeh Udochukwu Gift Temitope',
+    jobTitle: 'Sports Media & Social Media Content Officer',
+    period: 'September 2026',
+    paymentType: 'training_allowance',
+    baseAmount: 30000,
+    bonusAmount: 0,
+    deductions: 0,
+    netPay: 30000,
+    currency: 'NGN',
+    status: 'approved',
+  },
+}));
 
 vi.mock('@/models/Payroll', () => ({
   default: {

@@ -70,9 +70,9 @@ export function CricketScreen() {
           advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: [] })),
           advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: [] })),
           advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: [] })),
-          advancedCricketApi.getIccRankings({ format: 'test', category: 'teams' }).catch(() => ({ result: [] })),
-          advancedCricketApi.getIccRankings({ format: 'odi', category: 'teams' }).catch(() => ({ result: [] })),
-          advancedCricketApi.getIccRankings({ format: 't20', category: 'teams' }).catch(() => ({ result: [] })),
+          advancedCricketApi.getRankings('test', 'teams', 'men').catch(() => ({ format: 'test' as const, category: 'teams' as const, gender: 'men' as const, rankings: [] })),
+          advancedCricketApi.getRankings('odi', 'teams', 'men').catch(() => ({ format: 'odi' as const, category: 'teams' as const, gender: 'men' as const, rankings: [] })),
+          advancedCricketApi.getRankings('t20', 'teams', 'men').catch(() => ({ format: 't20' as const, category: 'teams' as const, gender: 'men' as const, rankings: [] })),
         ]);
 
         setStandings({
@@ -82,9 +82,9 @@ export function CricketScreen() {
         });
 
         setIccRankings([
-          { key: 'ICC_TEST', title: 'ICC Test Rankings', data: iccTest.result || [] },
-          { key: 'ICC_ODI', title: 'ICC ODI Rankings', data: iccOdi.result || [] },
-          { key: 'ICC_T20', title: 'ICC T20I Rankings', data: iccT20.result || [] },
+          { key: 'ICC_TEST', title: 'ICC Test Rankings', data: iccTest.rankings || [] },
+          { key: 'ICC_ODI', title: 'ICC ODI Rankings', data: iccOdi.rankings || [] },
+          { key: 'ICC_T20', title: 'ICC T20I Rankings', data: iccT20.rankings || [] },
         ]);
       } else if (activeTab === 'series') {
         const res = await advancedCricketApi.getLeagues();
@@ -374,13 +374,13 @@ export function CricketScreen() {
                             <span className="text-amber-400">🛡️</span>
                             <span>{row.standing_team}</span>
                           </td>
-                          <td className="py-3 px-3 text-center">{row.standing_P || 0}</td>
+                          <td className="py-3 px-3 text-center">{row.standing_MP || 0}</td>
                           <td className="py-3 px-3 text-center text-emerald-400 font-bold">{row.standing_W || 0}</td>
                           <td className="py-3 px-3 text-center text-red-400 font-bold">{row.standing_L || 0}</td>
-                          <td className="py-3 px-3 text-center text-slate-400">{row.standing_D || 0}</td>
-                          <td className="py-3 px-3 text-center font-mono text-xs">{row.standing_GD || '0.00'}</td>
+                          <td className="py-3 px-3 text-center text-slate-400">{row.standing_NR || 0}</td>
+                          <td className="py-3 px-3 text-center font-mono text-xs">{row.standing_NRR || '0.00'}</td>
                           <td className="py-3 px-4 text-right font-black text-amber-400 text-base">
-                            {row.standing_PTS || 0}
+                            {row.standing_Pts || 0}
                           </td>
                         </tr>
                       ))}

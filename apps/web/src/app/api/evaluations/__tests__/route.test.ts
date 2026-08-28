@@ -5,15 +5,17 @@ vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
-const mockEvaluation = {
-  _id: 'eval-1',
-  employeeId: 'emp-1',
-  employeeName: 'Ibeh Udochukwu Gift Temitope',
-  period: '30-Day Training Assessment',
-  totalWeightedScore: 88,
-  grade: 'A',
-  transitionRecommendation: 'promote_to_regular',
-};
+const { mockEvaluation } = vi.hoisted(() => ({
+  mockEvaluation: {
+    _id: 'eval-1',
+    employeeId: 'emp-1',
+    employeeName: 'Ibeh Udochukwu Gift Temitope',
+    period: '30-Day Training Assessment',
+    totalWeightedScore: 88,
+    grade: 'A',
+    transitionRecommendation: 'promote_to_regular',
+  },
+}));
 
 vi.mock('@/models/PerformanceEvaluation', () => ({
   default: {

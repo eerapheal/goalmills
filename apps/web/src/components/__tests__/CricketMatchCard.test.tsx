@@ -22,14 +22,17 @@ const mockMatch: CricketEvent = {
   event_service_away: '2',
   event_home_final_result: '280/6 (50.0)',
   event_away_final_result: '275/9 (50.0)',
+  event_home_rr: '5.60',
+  event_away_rr: '5.50',
   event_status: 'Finished',
   event_status_info: 'India won by 5 runs',
   country_name: 'International',
   league_name: 'ICC Cricket World Cup',
   league_key: '9843',
+  league_round: 'Final',
+  league_season: '2026',
   event_live: '0',
   event_type: 'ODI',
-  event_tier: 'international',
 };
 
 describe('CricketMatchCard Component', () => {

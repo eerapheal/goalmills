@@ -5,21 +5,23 @@ vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
-const mockStandup = {
-  _id: 'standup-1',
-  meetingDate: '2026-09-01',
-  time: '5:00 PM – 5:30 PM WAT',
-  meetUrl: 'https://meet.google.com/goalmills-newsroom',
-  hostName: 'Ekpenisi Erue Raphael',
-  attendees: [
-    {
-      employeeId: 'emp-1',
-      employeeName: 'Ibeh Udochukwu Gift Temitope',
-      status: 'present',
-    },
-  ],
-  editorialPriorities: ['Breaking Transfer Updates'],
-};
+const { mockStandup } = vi.hoisted(() => ({
+  mockStandup: {
+    _id: 'standup-1',
+    meetingDate: '2026-09-01',
+    time: '5:00 PM – 5:30 PM WAT',
+    meetUrl: 'https://meet.google.com/goalmills-newsroom',
+    hostName: 'Ekpenisi Erue Raphael',
+    attendees: [
+      {
+        employeeId: 'emp-1',
+        employeeName: 'Ibeh Udochukwu Gift Temitope',
+        status: 'present',
+      },
+    ],
+    editorialPriorities: ['Breaking Transfer Updates'],
+  },
+}));
 
 vi.mock('@/models/Standup', () => ({
   default: {
