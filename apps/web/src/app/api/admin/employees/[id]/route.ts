@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Employee from '@/models/Employee';
+import { requirePermission } from '@/lib/rbac';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { error } = await requirePermission('employees:read');
+    if (error) return error;
+
     await dbConnect();
     const { id } = await params;
     const employee = await Employee.findById(id);
@@ -23,6 +27,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { error } = await requirePermission('employees:manage');
+    if (error) return error;
+
     await dbConnect();
     const { id } = await params;
     const body = await req.json();
@@ -48,6 +55,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { error } = await requirePermission('employees:manage');
+    if (error) return error;
+
     await dbConnect();
     const { id } = await params;
     const employee = await Employee.findByIdAndDelete(id);

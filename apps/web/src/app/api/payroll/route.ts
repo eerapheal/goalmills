@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Payroll from '@/models/Payroll';
 import Employee from '@/models/Employee';
+import { requirePermission } from '@/lib/rbac';
 
 export async function GET(req: NextRequest) {
   try {
+    const { error } = await requirePermission('payroll:read');
+    if (error) return error;
+
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get('employeeId');
@@ -59,6 +63,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { error } = await requirePermission('payroll:manage');
+    if (error) return error;
+
     await dbConnect();
     const body = await req.json();
     const { employeeId, period, paymentType, baseAmount, bonusAmount, deductions, notes } = body;
@@ -109,6 +116,9 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const { error } = await requirePermission('payroll:manage');
+    if (error) return error;
+
     await dbConnect();
     const body = await req.json();
     const { payrollId, status, paymentDate, referenceNumber, notes } = body;

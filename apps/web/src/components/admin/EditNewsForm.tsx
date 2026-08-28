@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useToast } from '../Toast';
+import { canDirectPublish } from '@/lib/rbac';
+import { UserRole } from '@goalmills/types';
 import { POPULAR_TEAMS } from '@/lib/newsUtils';
 import EnterpriseNewsEditor from './EnterpriseNewsEditor';
 import { FiUploadCloud, FiFileText, FiStar, FiZap, FiTag, FiLayers, FiImage } from 'react-icons/fi';
@@ -18,8 +21,13 @@ interface CategoryOption {
 }
 
 export default function EditNewsForm({ id }: EditNewsFormProps) {
+  const { data: session } = useSession();
   const toast = useToast();
   const router = useRouter();
+
+  const userRole = (session?.user?.role as UserRole) || undefined;
+  const isDirectPublisher = canDirectPublish(userRole);
+
   const [title, setTitle] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
@@ -29,6 +37,7 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
   const [customCategory, setCustomCategory] = useState('');
   const [tags, setTags] = useState('');
   const [relatedTeam, setRelatedTeam] = useState('');
+  const [status, setStatus] = useState<'draft' | 'pending_approval' | 'published'>('published');
   const [isBreaking, setIsBreaking] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
@@ -55,6 +64,7 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           setCategory(article.category || 'General');
           setTags(Array.isArray(article.tags) ? article.tags.join(', ') : '');
           setRelatedTeam(article.relatedTeam || '');
+          setStatus(article.status || 'published');
           setIsBreaking(Boolean(article.isBreaking));
           setIsFeatured(Boolean(article.isFeatured));
         } else {
@@ -134,6 +144,7 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           relatedTeam: relatedTeam.trim(),
           isBreaking,
           isFeatured,
+          status: isDirectPublisher ? status : (status === 'draft' ? 'draft' : 'pending_approval'),
         }),
       });
 
@@ -343,6 +354,29 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
               <FiStar className="text-amber-400" /> Feature on Top Picks
             </span>
           </label>
+
+          {/* Editorial Publication Status */}
+          <div className="flex items-center gap-2 ml-auto">
+            <label className="text-xs font-bold uppercase text-slate-400">Publication Status:</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as any)}
+              className="bg-slate-900 border border-white/15 rounded-xl px-3 py-1.5 text-xs text-white font-bold focus:outline-none focus:border-blue-500"
+            >
+              {isDirectPublisher ? (
+                <>
+                  <option value="published">✅ Published (Live)</option>
+                  <option value="pending_approval">⏳ Pending Approval</option>
+                  <option value="draft">📝 Draft</option>
+                </>
+              ) : (
+                <>
+                  <option value="pending_approval">⏳ Submit for Approval</option>
+                  <option value="draft">📝 Draft Only</option>
+                </>
+              )}
+            </select>
+          </div>
         </div>
 
         {/* Enterprise Rich News Editor */}

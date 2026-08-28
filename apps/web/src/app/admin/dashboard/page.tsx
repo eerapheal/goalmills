@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import CreateNewsForm from '@/components/admin/CreateNewsForm';
 import UploadVideoForm from '@/components/admin/UploadVideoForm';
@@ -21,6 +21,28 @@ import {
   FiChevronDown,
   FiBookOpen,
 } from 'react-icons/fi';
+import type { UserRole } from '@goalmills/types';
+import type { PermissionAction } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
+
+interface QuickLinkCard {
+  href: string;
+  label: string;
+  sublabel: string;
+  icon: typeof FiBookOpen;
+  colorClass: string;
+  requiredPermission: PermissionAction;
+}
+
+const EMS_QUICK_LINKS: QuickLinkCard[] = [
+  { href: '/admin/handbook', label: 'Handbook & SOPs', sublabel: 'Curriculum & Guide', icon: FiBookOpen, colorClass: 'amber', requiredPermission: 'handbook:read' },
+  { href: '/admin/employees', label: 'Staff & Trainees', sublabel: 'Directory & Contracts', icon: FiUsers, colorClass: 'amber', requiredPermission: 'employees:read' },
+  { href: '/admin/reports', label: 'Daily Reports', sublabel: 'Review & Grading', icon: FiCheckSquare, colorClass: 'blue', requiredPermission: 'reports:read_own' },
+  { href: '/admin/standup', label: '5:00 PM Stand-up', sublabel: 'Meet & Roll-Call', icon: FiCalendar, colorClass: 'emerald', requiredPermission: 'standup:attend' },
+  { href: '/admin/evaluations', label: 'Scorecards', sublabel: '100% Metric Matrix', icon: FiAward, colorClass: 'purple', requiredPermission: 'evaluations:read' },
+  { href: '/admin/payroll', label: 'Payroll Ledger', sublabel: '₦30k / ₦50k Stipends', icon: FiDollarSign, colorClass: 'emerald', requiredPermission: 'payroll:read' },
+  { href: '/admin/portal', label: 'Staff Portal', sublabel: 'Candidate Self-Service', icon: FiUserCheck, colorClass: 'cyan', requiredPermission: 'articles:read' },
+];
 
 type CreationTab = 'news' | 'video' | 'manage';
 type ManageSubTab = 'news' | 'video';
@@ -31,119 +53,57 @@ export default function AdminDashboard() {
   const [manageSubTab, setManageSubTab] = useState<ManageSubTab>('news');
   const [videoRefreshTrigger, setVideoRefreshTrigger] = useState(0);
 
+  const userRole = (session?.user?.role as UserRole) || undefined;
+  const visibleQuickLinks = useMemo(
+    () => EMS_QUICK_LINKS.filter((card) => hasPermission(userRole, card.requiredPermission)),
+    [userRole]
+  );
+
   return (
     <div className="min-h-screen bg-background p-3.5 sm:p-6 pt-[80px] sm:pt-[95px]">
       <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6">
         {/* Navigation Bar with Mobile Dropdown & Desktop Pills */}
         <AdminNavBar />
 
-        {/* EMS Quick Launch Hub */}
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <span>⚡</span> Employee Management & Training Operations
-            </h2>
-            <Link
-              href="/admin/handbook"
-              className="text-[11px] sm:text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
-            >
-              Open Handbook &rarr;
-            </Link>
+        {/* EMS Quick Launch Hub — filtered by user role */}
+        {visibleQuickLinks.length > 0 && (
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <span>⚡</span> Employee Management & Training Operations
+              </h2>
+              {hasPermission(userRole, 'handbook:read') && (
+                <Link
+                  href="/admin/handbook"
+                  className="text-[11px] sm:text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
+                >
+                  Open Handbook &rarr;
+                </Link>
+              )}
+            </div>
+
+            <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(visibleQuickLinks.length, 7)} gap-2.5 sm:gap-3`}>
+              {visibleQuickLinks.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <Link
+                    key={card.href}
+                    href={card.href}
+                    className={`glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-${card.colorClass}-500/40 hover:bg-${card.colorClass}-500/5 transition-all group shadow-md`}
+                  >
+                    <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-${card.colorClass}-500/10 border border-${card.colorClass}-500/20 flex items-center justify-center text-${card.colorClass}-400 mb-2 group-hover:scale-110 transition-transform`}>
+                      <Icon size={18} />
+                    </div>
+                    <p className={`text-xs font-bold text-white group-hover:text-${card.colorClass}-400 transition-colors truncate`}>
+                      {card.label}
+                    </p>
+                    <p className="text-[10px] text-text-muted mt-0.5 truncate">{card.sublabel}</p>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5 sm:gap-3">
-            <Link
-              href="/admin/handbook"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiBookOpen size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors truncate">
-                Handbook & SOPs
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">Curriculum & Guide</p>
-            </Link>
-
-            <Link
-              href="/admin/employees"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiUsers size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors truncate">
-                Staff & Trainees
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">Directory & Contracts</p>
-            </Link>
-
-            <Link
-              href="/admin/reports"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-blue-500/40 hover:bg-blue-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiCheckSquare size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">
-                Daily Reports
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">Review & Grading</p>
-            </Link>
-
-            <Link
-              href="/admin/standup"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiCalendar size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
-                5:00 PM Stand-up
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">Meet & Roll-Call</p>
-            </Link>
-
-            <Link
-              href="/admin/evaluations"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-purple-500/40 hover:bg-purple-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiAward size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors truncate">
-                Scorecards
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">100% Metric Matrix</p>
-            </Link>
-
-            <Link
-              href="/admin/payroll"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiDollarSign size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
-                Payroll Ledger
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">₦30k / ₦50k Stipends</p>
-            </Link>
-
-            <Link
-              href="/admin/portal"
-              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition-all group shadow-md"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-2 group-hover:scale-110 transition-transform">
-                <FiUserCheck size={18} />
-              </div>
-              <p className="text-xs font-bold text-white group-hover:text-cyan-400 transition-colors truncate">
-                Staff Portal
-              </p>
-              <p className="text-[10px] text-text-muted mt-0.5 truncate">Candidate Self-Service</p>
-            </Link>
-          </div>
-        </div>
+        )}
 
         {/* ------------------------------------------------------------- */}
         {/* Mobile-First Segmented / Dropdown Content Creation Selector */}

@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useToast } from '../Toast';
+import { canDirectPublish } from '@/lib/rbac';
+import { UserRole } from '@goalmills/types';
 import { POPULAR_TEAMS } from '@/lib/newsUtils';
 import { COMPETITIONS_REGISTRY, CLUBS_REGISTRY, PLAYERS_REGISTRY } from '@/lib/entityService';
 import EnterpriseNewsEditor from './EnterpriseNewsEditor';
@@ -28,7 +31,11 @@ interface CategoryOption {
 }
 
 export default function CreateNewsForm() {
+  const { data: session } = useSession();
   const toast = useToast();
+  const userRole = (session?.user?.role as UserRole) || undefined;
+  const isDirectPublisher = canDirectPublish(userRole);
+
   const [title, setTitle] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
@@ -145,12 +152,17 @@ export default function CreateNewsForm() {
           relatedTeam: club?.shortName || relatedTeam.trim(),
           isBreaking,
           isFeatured,
+          status: isDirectPublisher ? 'published' : 'pending_approval',
         }),
       });
 
       const data = await res.json();
       if (res.ok) {
-        toast.success('News story created and cross-distributed across entity hubs!');
+        if (isDirectPublisher) {
+          toast.success('News story published & cross-distributed across entity hubs!');
+        } else {
+          toast.success('Article submitted for editorial approval!');
+        }
         setTitle('');
         setExcerpt('');
         setContent('');
@@ -451,8 +463,19 @@ export default function CreateNewsForm() {
             disabled={loading || uploading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <span>{loading ? 'Publishing & Distributing...' : 'Publish to Sports Network'}</span>
+            <span>
+              {loading
+                ? 'Processing Submission...'
+                : isDirectPublisher
+                  ? 'Publish to Sports Network'
+                  : 'Submit for Editorial Approval'}
+            </span>
           </button>
+          {!isDirectPublisher && (
+            <p className="text-[11px] text-amber-400 text-center mt-2 font-medium">
+              ℹ️ Your role submits drafts for review. An Editor, Manager, or Super Admin will review and publish.
+            </p>
+          )}
         </div>
       </form>
     </div>

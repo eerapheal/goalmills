@@ -132,9 +132,15 @@ export default function UserManagementPage() {
                         className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
                           user.role === 'super-admin'
                             ? 'bg-purple-500/20 text-purple-400'
-                            : user.role === 'staff'
-                              ? 'bg-blue-500/20 text-blue-400'
-                              : 'bg-slate-500/20 text-slate-400'
+                            : user.role === 'manager'
+                              ? 'bg-amber-500/20 text-amber-400'
+                              : user.role === 'editor'
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : user.role === 'staff'
+                                  ? 'bg-blue-500/20 text-blue-400'
+                                  : user.role === 'contributor'
+                                    ? 'bg-cyan-500/20 text-cyan-400'
+                                    : 'bg-slate-500/20 text-slate-400'
                         }`}
                       >
                         {user.role}
@@ -148,8 +154,11 @@ export default function UserManagementPage() {
                           disabled={user._id === session?.user?.id}
                           className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-secondary transition-colors"
                         >
-                          <option value="user">User</option>
+                          <option value="user">User (Reader)</option>
+                          <option value="contributor">Contributor</option>
                           <option value="staff">Staff</option>
+                          <option value="editor">Editor</option>
+                          <option value="manager">Manager</option>
                           <option value="super-admin">Super Admin</option>
                         </select>
                         <button

@@ -10,6 +10,8 @@ import {
   cacheInvalidatePattern,
   getSeoCacheHeaders,
 } from '@/lib/redisCache';
+import { canEditArticle, canDirectPublish, hasPermission } from '@/lib/rbac';
+import { UserRole } from '@goalmills/types';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+  if (!session?.user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -58,15 +60,21 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const news = await News.findById(id);
     if (!news) return NextResponse.json({ message: 'News not found' }, { status: 404 });
 
-    // RBAC: super-admin can edit anything; staff can only edit their own
-    if (session.user.role === 'staff' && news.authorId?.toString() !== session.user.id) {
+    const userRole = session.user.role as UserRole;
+    // RBAC: Check if user can edit this article
+    if (!canEditArticle(session.user, news.authorId?.toString())) {
       return NextResponse.json(
-        { message: 'Forbidden: You can only edit your own posts' },
+        { message: 'Forbidden: You do not have permission to edit this article' },
         { status: 403 }
       );
     }
 
     const body = await request.json();
+
+    // Enforce approval workflow: contributors & staff cannot directly publish
+    if (body.status === 'published' && !canDirectPublish(userRole)) {
+      body.status = 'pending_approval';
+    }
     if (body.category && !body.categorySlug) {
       body.categorySlug = body.category
         .toLowerCase()
@@ -101,7 +109,7 @@ export async function DELETE(
 ) {
   const { id } = await params;
   const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+  if (!session?.user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -110,10 +118,14 @@ export async function DELETE(
     const news = await News.findById(id);
     if (!news) return NextResponse.json({ message: 'News not found' }, { status: 404 });
 
-    // RBAC check
-    if (session.user.role === 'staff' && news.authorId?.toString() !== session.user.id) {
+    const userRole = session.user.role as UserRole;
+    const canDeleteAny = hasPermission(userRole, 'articles:delete');
+    const isAuthor = news.authorId?.toString() === session.user.id;
+    const isDraftOrPending = news.status === 'draft' || news.status === 'pending_approval';
+
+    if (!canDeleteAny && !(isAuthor && isDraftOrPending)) {
       return NextResponse.json(
-        { message: 'Forbidden: You can only delete your own posts' },
+        { message: 'Forbidden: You do not have permission to delete this article' },
         { status: 403 }
       );
     }

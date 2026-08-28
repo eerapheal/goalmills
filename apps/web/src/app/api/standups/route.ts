@@ -2,15 +2,46 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Standup from '@/models/Standup';
 import Employee from '@/models/Employee';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { hasPermission, requirePermission } from '@/lib/rbac';
+import { UserRole } from '@goalmills/types';
 
 export async function GET(req: NextRequest) {
   try {
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userRole = session.user.role as UserRole;
+    if (!hasPermission(userRole, 'standup:attend')) {
+      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
+
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const date = searchParams.get('date');
 
     const query: any = {};
     if (date) query.meetingDate = date;
+
+    const canViewAll = hasPermission(userRole, 'standup:view_all');
+    if (!canViewAll) {
+      // Staff: only view their own standups for the last 3 months (90 days)
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+      const minDateStr = threeMonthsAgo.toISOString().split('T')[0];
+
+      query.createdAt = { $gte: threeMonthsAgo };
+
+      const myEmployee = await Employee.findOne({
+        $or: [{ userId: session.user.id }, { email: session.user.email?.toLowerCase() }],
+      });
+      if (myEmployee) {
+        query['attendees.employeeId'] = myEmployee._id;
+      }
+    }
 
     const standups = await Standup.find(query).sort({ meetingDate: -1, createdAt: -1 });
 
@@ -25,6 +56,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { error } = await requirePermission('standup:schedule');
+    if (error) return error;
+
     await dbConnect();
     const body = await req.json();
 

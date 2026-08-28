@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useToast } from '../Toast';
+import type { UserRole } from '@goalmills/types';
+import { hasPermission, canEditArticle } from '@/lib/rbac';
 
 interface NewsArticle {
   _id: string;
@@ -12,6 +14,7 @@ interface NewsArticle {
   authorId?: string;
   createdAt: string;
   category: string;
+  status?: 'draft' | 'pending_approval' | 'published';
 }
 
 export default function NewsList() {
@@ -19,6 +22,10 @@ export default function NewsList() {
   const { data: session } = useSession();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const userRole = (session?.user?.role as UserRole) || undefined;
+  const canApprove = hasPermission(userRole, 'articles:approve');
+  const canDeleteAny = hasPermission(userRole, 'articles:delete');
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -36,6 +43,25 @@ export default function NewsList() {
     };
     fetchNews();
   }, []);
+
+  const handleApprove = async (id: string) => {
+    try {
+      const res = await fetch(`/api/news/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'published' }),
+      });
+      if (res.ok) {
+        setNews(news.map((n) => (n._id === id ? { ...n, status: 'published' } : n)));
+        toast.success('Article approved and published live!');
+      } else {
+        const data = await res.json();
+        toast.error(data.message || 'Error approving article');
+      }
+    } catch (err) {
+      toast.error('An error occurred');
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this article?')) return;
@@ -63,15 +89,35 @@ export default function NewsList() {
       </h2>
       <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
         {news.map((item) => {
-          const canEdit =
-            session?.user?.role === 'super-admin' || item.authorId === (session?.user as any)?.id;
+          const canEdit = canEditArticle(session?.user, item.authorId);
+          const isAuthor = item.authorId === (session?.user as any)?.id;
+          const canDelete = canDeleteAny || (isAuthor && item.status !== 'published');
+          const isPending = item.status === 'pending_approval';
+
           return (
             <div
               key={item._id}
               className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-white/10 transition-colors"
             >
               <div className="flex-1 min-w-0 w-full">
-                <h3 className="text-white font-bold break-words">{item.title}</h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-white font-bold break-words">{item.title}</h3>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                      item.status === 'pending_approval'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : item.status === 'draft'
+                          ? 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    }`}
+                  >
+                    {item.status === 'pending_approval'
+                      ? '⏳ Pending Approval'
+                      : item.status === 'draft'
+                        ? '📝 Draft'
+                        : '✅ Published'}
+                  </span>
+                </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-text-muted uppercase font-black">
                   <span className="break-all">By {item.author}</span>
                   {item.category && <span className="text-blue-400">{item.category}</span>}
@@ -79,6 +125,14 @@ export default function NewsList() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {isPending && canApprove && (
+                  <button
+                    onClick={() => handleApprove(item._id)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-all"
+                  >
+                    Approve
+                  </button>
+                )}
                 <Link
                   href={canEdit ? `/admin/news/${item._id}/edit` : `#`}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -91,9 +145,9 @@ export default function NewsList() {
                 </Link>
                 <button
                   onClick={() => handleDelete(item._id)}
-                  disabled={!canEdit}
+                  disabled={!canDelete}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    canEdit
+                    canDelete
                       ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20'
                       : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
                   }`}

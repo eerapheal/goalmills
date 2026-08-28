@@ -3,9 +3,14 @@ import dbConnect from '@/lib/db';
 import Employee from '@/models/Employee';
 import TrainingProgress from '@/models/TrainingProgress';
 import { GOALMILLS_TRAINING_MODULES } from '@/lib/trainingCurriculum';
+import { requirePermission } from '@/lib/rbac';
 
 export async function GET(req: NextRequest) {
   try {
+    // RBAC: Only manager+ can view employee directory
+    const { error } = await requirePermission('employees:read');
+    if (error) return error;
+
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
@@ -80,6 +85,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // RBAC: Only manager+ can onboard new staff
+    const { error } = await requirePermission('employees:onboard');
+    if (error) return error;
+
     await dbConnect();
     const body = await req.json();
 

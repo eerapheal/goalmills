@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -20,6 +20,41 @@ import {
   FiChevronDown,
   FiBookOpen,
 } from 'react-icons/fi';
+import type { UserRole } from '@goalmills/types';
+import type { PermissionAction } from '@/lib/rbac';
+import { hasPermission, hasMinRole } from '@/lib/rbac';
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: typeof FiFileText;
+  group: string;
+  requiredPermission: PermissionAction;
+}
+
+const ALL_NAV_ITEMS: NavItem[] = [
+  { label: 'News & Media', href: '/admin/dashboard', icon: FiFileText, group: 'editorial', requiredPermission: 'articles:draft' },
+  { label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen, group: 'ems', requiredPermission: 'handbook:read' },
+  { label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers, group: 'ems', requiredPermission: 'employees:read' },
+  { label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare, group: 'ems', requiredPermission: 'reports:read_own' },
+  { label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar, group: 'ems', requiredPermission: 'standup:attend' },
+  { label: 'Evaluations', href: '/admin/evaluations', icon: FiAward, group: 'ems', requiredPermission: 'evaluations:read' },
+  { label: 'Payroll & Allowances', href: '/admin/payroll', icon: FiDollarSign, group: 'ems', requiredPermission: 'payroll:read' },
+  { label: 'Staff Portal', href: '/admin/portal', icon: FiUserCheck, group: 'portal', requiredPermission: 'articles:read' },
+];
+
+/** Human-readable role label */
+function getRoleBadge(role?: string): string {
+  const labels: Record<string, string> = {
+    'super-admin': 'Super Admin',
+    manager: 'Manager',
+    editor: 'Editor',
+    staff: 'Staff',
+    contributor: 'Contributor',
+    user: 'Reader',
+  };
+  return labels[role || ''] || role || 'admin';
+}
 
 export default function AdminNavBar() {
   const pathname = usePathname();
@@ -27,16 +62,13 @@ export default function AdminNavBar() {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { label: 'News & Media', href: '/admin/dashboard', icon: FiFileText, group: 'editorial' },
-    { label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen, group: 'ems' },
-    { label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers, group: 'ems' },
-    { label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare, group: 'ems' },
-    { label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar, group: 'ems' },
-    { label: 'Evaluations', href: '/admin/evaluations', icon: FiAward, group: 'ems' },
-    { label: 'Payroll & Allowances', href: '/admin/payroll', icon: FiDollarSign, group: 'ems' },
-    { label: 'Staff Portal', href: '/admin/portal', icon: FiUserCheck, group: 'portal' },
-  ];
+  const userRole = (session?.user?.role as UserRole) || undefined;
+
+  // Filter nav items based on user's permissions
+  const navItems = useMemo(
+    () => ALL_NAV_ITEMS.filter((item) => hasPermission(userRole, item.requiredPermission)),
+    [userRole]
+  );
 
   const currentNav =
     navItems.find(
@@ -44,6 +76,9 @@ export default function AdminNavBar() {
         pathname === item.href ||
         (item.href !== '/admin/dashboard' && pathname.startsWith(item.href))
     ) || navItems[0];
+
+  const canManageUsers = hasPermission(userRole, 'users:manage');
+  const canManageCategories = hasPermission(userRole, 'categories:manage');
 
   return (
     <header className="glass-card border-b border-white/10 rounded-2xl sm:rounded-3xl mb-5 sm:mb-6 shadow-2xl backdrop-blur-2xl bg-slate-950/85">
@@ -64,7 +99,7 @@ export default function AdminNavBar() {
               <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[150px] sm:max-w-[240px]">
                 {session?.user?.name || 'Managing Director'}{' '}
                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/10 text-amber-300 font-mono">
-                  {session?.user?.role || 'admin'}
+                  {getRoleBadge(session?.user?.role as string)}
                 </span>
               </p>
             </div>
@@ -72,7 +107,7 @@ export default function AdminNavBar() {
 
           {/* Desktop Right Global Actions */}
           <div className="hidden lg:flex items-center gap-2">
-            {session?.user?.role === 'super-admin' && (
+            {canManageUsers && (
               <Link
                 href="/admin/users"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-all text-xs"
@@ -81,13 +116,15 @@ export default function AdminNavBar() {
                 <span>User Roles</span>
               </Link>
             )}
-            <Link
-              href="/admin/categories"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-bold border border-purple-500/20 transition-all text-xs"
-            >
-              <FiLayers size={13} />
-              <span>Categories</span>
-            </Link>
+            {canManageCategories && (
+              <Link
+                href="/admin/categories"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-bold border border-purple-500/20 transition-all text-xs"
+              >
+                <FiLayers size={13} />
+                <span>Categories</span>
+              </Link>
+            )}
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-all text-xs"
@@ -123,28 +160,47 @@ export default function AdminNavBar() {
           </div>
         </div>
 
-        {/* Mobile Module Quick Dropdown Selector */}
+        {/* Mobile Module Quick Dropdown Selector — only shows permitted items */}
         <div className="mt-3 block lg:hidden">
           <div className="relative">
             <select
-              value={currentNav.href}
+              value={currentNav?.href || '/admin/dashboard'}
               onChange={(e) => router.push(e.target.value)}
               className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-500 pr-9 transition-colors shadow-inner"
             >
-              <optgroup label="Editorial & Content Hub">
-                <option value="/admin/dashboard">📰 News & Media Publishing</option>
-              </optgroup>
-              <optgroup label="Employee Management & 30-Day Training">
-                <option value="/admin/handbook">📖 Training Handbook & SOPs</option>
-                <option value="/admin/employees">👥 Employees & Staff Directory</option>
-                <option value="/admin/reports">📋 Daily Content Reports</option>
-                <option value="/admin/standup">📹 5:00 PM Newsroom Stand-Up</option>
-                <option value="/admin/evaluations">🏆 100% Weighted Scorecards</option>
-                <option value="/admin/payroll">💵 Payroll & Training Allowances</option>
-              </optgroup>
-              <optgroup label="Self-Service Portal">
-                <option value="/admin/portal">⚡ Staff & Trainee Portal</option>
-              </optgroup>
+              {navItems.filter((i) => i.group === 'editorial').length > 0 && (
+                <optgroup label="Editorial & Content Hub">
+                  {navItems
+                    .filter((i) => i.group === 'editorial')
+                    .map((item) => (
+                      <option key={item.href} value={item.href}>
+                        {item.label}
+                      </option>
+                    ))}
+                </optgroup>
+              )}
+              {navItems.filter((i) => i.group === 'ems').length > 0 && (
+                <optgroup label="Employee Management & Training">
+                  {navItems
+                    .filter((i) => i.group === 'ems')
+                    .map((item) => (
+                      <option key={item.href} value={item.href}>
+                        {item.label}
+                      </option>
+                    ))}
+                </optgroup>
+              )}
+              {navItems.filter((i) => i.group === 'portal').length > 0 && (
+                <optgroup label="Self-Service Portal">
+                  {navItems
+                    .filter((i) => i.group === 'portal')
+                    .map((item) => (
+                      <option key={item.href} value={item.href}>
+                        {item.label}
+                      </option>
+                    ))}
+                </optgroup>
+              )}
             </select>
             <FiChevronDown
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
@@ -153,7 +209,7 @@ export default function AdminNavBar() {
           </div>
         </div>
 
-        {/* Desktop Navigation Pills */}
+        {/* Desktop Navigation Pills — only shows permitted items */}
         <div className="hidden lg:flex items-center gap-1.5 mt-4 pt-3 border-t border-white/10 overflow-x-auto no-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -205,7 +261,7 @@ export default function AdminNavBar() {
             </div>
 
             <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-              {session?.user?.role === 'super-admin' && (
+              {canManageUsers && (
                 <Link
                   href="/admin/users"
                   onClick={() => setMobileMenuOpen(false)}
@@ -214,13 +270,15 @@ export default function AdminNavBar() {
                   Users
                 </Link>
               )}
-              <Link
-                href="/admin/categories"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-purple-500/10 text-purple-400 text-xs font-bold"
-              >
-                Categories
-              </Link>
+              {canManageCategories && (
+                <Link
+                  href="/admin/categories"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 text-center py-2 rounded-xl bg-purple-500/10 text-purple-400 text-xs font-bold"
+                >
+                  Categories
+                </Link>
+              )}
               <button
                 onClick={() => signOut({ callbackUrl: '/signin' })}
                 className="flex-1 text-center py-2 rounded-xl bg-red-500/10 text-red-400 text-xs font-bold"

@@ -1,16 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Employee from '@/models/Employee';
-import { AppointmentLetterData } from '@goalmills/types';
+import { AppointmentLetterData, UserRole } from '@goalmills/types';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { hasPermission } from '@/lib/rbac';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     await dbConnect();
     const { id } = await params;
     const employee = await Employee.findById(id);
 
     if (!employee) {
       return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
+    }
+
+    // Permission check: Manager/Super-admin or self employee
+    const userRole = session.user.role as UserRole;
+    const isManagerOrAdmin = hasPermission(userRole, 'employees:read');
+    const isSelf = employee.userId?.toString() === session.user.id || employee.email?.toLowerCase() === session.user.email?.toLowerCase();
+
+    if (!isManagerOrAdmin && !isSelf) {
+      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
     }
 
     const appointmentData: AppointmentLetterData = {

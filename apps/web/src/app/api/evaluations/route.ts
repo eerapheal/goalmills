@@ -3,9 +3,13 @@ import dbConnect from '@/lib/db';
 import PerformanceEvaluation from '@/models/PerformanceEvaluation';
 import Employee from '@/models/Employee';
 import { OFFICIAL_SCORECARD_METRICS } from '@/lib/trainingCurriculum';
+import { requirePermission } from '@/lib/rbac';
 
 export async function GET(req: NextRequest) {
   try {
+    const { error } = await requirePermission('evaluations:read');
+    if (error) return error;
+
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get('employeeId');
@@ -31,6 +35,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { error } = await requirePermission('evaluations:manage');
+    if (error) return error;
+
     await dbConnect();
     const body = await req.json();
     const {

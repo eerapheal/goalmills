@@ -148,6 +148,12 @@ const NewsSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    status: {
+      type: String,
+      enum: ['draft', 'pending_approval', 'published'],
+      default: 'published',
+      index: true,
+    },
   },
   { timestamps: true }
 );

@@ -1,4 +1,4 @@
-export type UserRole = 'user' | 'contributor' | 'staff' | 'super-admin';
+export type UserRole = 'user' | 'contributor' | 'staff' | 'editor' | 'manager' | 'super-admin';
 
 export interface AuthorProfile {
   id?: string;
@@ -100,6 +100,7 @@ export interface BlogPost {
   isFeatured?: boolean;
   tags?: string[];
   relatedTeam?: string;
+  status?: 'draft' | 'pending_approval' | 'published';
 }
 
 export type TransferStatus = 'rumour' | 'negotiation' | 'agreement' | 'done_deal' | 'medical';

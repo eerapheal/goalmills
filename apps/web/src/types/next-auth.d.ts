@@ -1,3 +1,4 @@
+import { UserRole } from '@goalmills/types';
 import NextAuth, { DefaultSession } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 
@@ -7,15 +8,16 @@ declare module 'next-auth' {
    */
   interface Session {
     user: {
-      /** The user's role. */
+      /** The user's database ID. */
       id?: string;
-      role?: string;
+      /** The user's RBAC role. */
+      role?: UserRole;
     } & DefaultSession['user'];
   }
 
   interface User {
     id: string;
-    role?: string;
+    role?: UserRole;
   }
 }
 
@@ -24,7 +26,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     /** OpenID ID Token */
     id?: string;
-    role?: string;
+    role?: UserRole;
     picture?: string;
   }
 }

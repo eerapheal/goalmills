@@ -6,7 +6,8 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { cacheGet, cacheSet, cacheInvalidatePattern, getSeoCacheHeaders } from '@/lib/redisCache';
 import { broadcastNewNews } from '@/lib/socketBroadcaster';
 import { notifyOnNewNewsArticle } from '@/lib/pushService';
-import { hasPermission } from '@/lib/rbac';
+import { hasPermission, canDirectPublish } from '@/lib/rbac';
+import { UserRole } from '@goalmills/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,9 +55,18 @@ export async function GET(request: NextRequest) {
       if (!session || !hasPermission(session.user?.role, 'articles:read')) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
       }
-      if (session.user.role === 'contributor') {
-        query.authorId = session.user.id;
+      const userRole = session.user.role as UserRole;
+      if (userRole === 'contributor' || userRole === 'staff') {
+        // Staff and contributors see their own drafts/pending + all published
+        query.$or = [
+          { authorId: session.user.id },
+          { status: 'published' },
+          { status: { $exists: false } },
+        ];
       }
+    } else {
+      // Public visitors only see published articles
+      query.$or = [{ status: 'published' }, { status: { $exists: false } }];
     }
 
     // Exclude IDs
@@ -248,7 +258,17 @@ export async function POST(request: NextRequest) {
       relatedTeam,
       isBreaking,
       isFeatured,
+      status: requestedStatus,
     } = body;
+
+    const userRole = session.user.role as UserRole;
+    // Contributors and staff MUST seek approval before publishing
+    let articleStatus: 'draft' | 'pending_approval' | 'published' = 'published';
+    if (!canDirectPublish(userRole)) {
+      articleStatus = requestedStatus === 'draft' ? 'draft' : 'pending_approval';
+    } else if (requestedStatus && ['draft', 'pending_approval', 'published'].includes(requestedStatus)) {
+      articleStatus = requestedStatus;
+    }
 
     const catSlug = (categorySlug || category || 'general')
       .toLowerCase()
@@ -290,6 +310,7 @@ export async function POST(request: NextRequest) {
       relatedTeam: relatedTeam || '',
       isBreaking: Boolean(isBreaking),
       isFeatured: Boolean(isFeatured),
+      status: articleStatus,
       author: session.user.name || 'GoalMills Staff',
       authorId: session.user.id,
       authorSlug,
@@ -298,14 +319,17 @@ export async function POST(request: NextRequest) {
       views: 0,
     });
 
-    // 1. Invalidate all News Caches
-    await cacheInvalidatePattern('cache:news:*');
+    // Only notify and broadcast if article is published directly
+    if (articleStatus === 'published') {
+      // 1. Invalidate all News Caches
+      await cacheInvalidatePattern('cache:news:*');
 
-    // 2. Automatically dispatch Push Notification to subscribed users
-    notifyOnNewNewsArticle(news);
+      // 2. Automatically dispatch Push Notification to subscribed users
+      notifyOnNewNewsArticle(news);
 
-    // 3. Broadcast Realtime Event
-    broadcastNewNews(news);
+      // 3. Broadcast Realtime Event
+      broadcastNewNews(news);
+    }
 
     return NextResponse.json(news, { status: 201 });
   } catch (error: any) {

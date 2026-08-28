@@ -2,9 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import DailyReport from '@/models/DailyReport';
 import Employee from '@/models/Employee';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { hasPermission, requirePermission } from '@/lib/rbac';
+import { UserRole } from '@goalmills/types';
 
 export async function GET(req: NextRequest) {
   try {
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userRole = session.user.role as UserRole;
+    if (!hasPermission(userRole, 'reports:read_own')) {
+      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+    }
+
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get('employeeId');
@@ -12,9 +26,23 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
 
     const query: any = {};
-    if (employeeId) query.employeeId = employeeId;
     if (date) query.reportDate = date;
     if (status && status !== 'all') query.reviewStatus = status;
+
+    const canViewAll = hasPermission(userRole, 'reports:read_all');
+    if (canViewAll) {
+      if (employeeId) query.employeeId = employeeId;
+    } else {
+      // Staff/Editor: only see their own reports
+      const myEmployee = await Employee.findOne({
+        $or: [{ userId: session.user.id }, { email: session.user.email?.toLowerCase() }],
+      });
+      if (myEmployee) {
+        query.employeeId = myEmployee._id;
+      } else if (employeeId) {
+        query.employeeId = employeeId;
+      }
+    }
 
     const reports = await DailyReport.find(query).sort({ reportDate: -1, createdAt: -1 });
 
@@ -29,6 +57,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { error } = await requirePermission('reports:submit');
+    if (error) return error;
+
     await dbConnect();
     const body = await req.json();
 
@@ -62,6 +93,15 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const session = (await getServerSession(authOptions)) as any;
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    const userRole = session.user.role as UserRole;
+    if (!hasPermission(userRole, 'handbook:manage') && !hasPermission(userRole, 'evaluations:manage')) {
+      return NextResponse.json({ success: false, error: 'Forbidden: Editor or Manager role required to review reports' }, { status: 403 });
+    }
+
     await dbConnect();
     const body = await req.json();
     const { reportId, reviewStatus, editorScore, editorFeedback, reviewedBy } = body;
