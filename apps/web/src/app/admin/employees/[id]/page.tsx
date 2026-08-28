@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import AdminNavBar from '@/components/admin/AdminNavBar';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { Employee, EmployeeTrainingProgress, TrainingModuleItem } from '@goalmills/types';
 import {
   FiArrowLeft,
@@ -86,8 +87,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-white">
-        Loading employee profile...
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <GoalmillsLoader
+          size="fullscreen"
+          label="GoalMills Staff Hub"
+          sublabel="Loading employee training profile & performance records..."
+        />
       </div>
     );
   }

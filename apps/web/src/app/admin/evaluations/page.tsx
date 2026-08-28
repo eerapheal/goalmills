@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminNavBar from '@/components/admin/AdminNavBar';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { PerformanceScorecard, Employee, ScorecardMetric } from '@goalmills/types';
 import { OFFICIAL_SCORECARD_METRICS } from '@/lib/trainingCurriculum';
 import {
@@ -160,7 +161,13 @@ export default function EvaluationsAdminPage() {
 
         {/* Evaluations History List */}
         {loading ? (
-          <div className="p-12 text-center text-text-muted">Loading evaluation scorecards...</div>
+          <div className="p-12 flex justify-center">
+            <GoalmillsLoader
+              size="md"
+              label="Performance Scoring Matrix"
+              sublabel="Fetching 100% weighted scorecards & metrics..."
+            />
+          </div>
         ) : evaluations.length === 0 ? (
           <div className="glass-card p-12 rounded-3xl border border-white/10 text-center space-y-3">
             <FiAward className="mx-auto text-slate-600" size={40} />

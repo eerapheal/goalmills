@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminNavBar from '@/components/admin/AdminNavBar';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { StandupMeeting, Employee } from '@goalmills/types';
 import {
   FiCalendar,
@@ -126,7 +127,13 @@ export default function StandupAdminPage() {
 
         {/* Standups List */}
         {loading ? (
-          <div className="p-12 text-center text-text-muted">Loading stand-up logs...</div>
+          <div className="p-12 flex justify-center">
+            <GoalmillsLoader
+              size="md"
+              label="Newsroom Stand-Up Desk"
+              sublabel="Fetching 5:00 PM WAT roll-call & meeting logs..."
+            />
+          </div>
         ) : standups.length === 0 ? (
           <div className="glass-card p-12 rounded-3xl border border-white/10 text-center space-y-3">
             <FiCalendar className="mx-auto text-slate-600" size={40} />

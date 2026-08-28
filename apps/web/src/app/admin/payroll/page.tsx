@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminNavBar from '@/components/admin/AdminNavBar';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { PayrollRecord, Employee } from '@goalmills/types';
 import {
   FiDollarSign,
@@ -201,7 +202,13 @@ export default function PayrollAdminPage() {
         {/* Payroll Table */}
         <div className="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
           {loading ? (
-            <div className="p-12 text-center text-text-muted">Loading payroll records...</div>
+            <div className="p-12 flex justify-center">
+              <GoalmillsLoader
+                size="md"
+                label="Payroll & Compensation Ledger"
+                sublabel="Fetching allowance records & disbursement status..."
+              />
+            </div>
           ) : payrollList.length === 0 ? (
             <div className="p-12 text-center space-y-3">
               <FiDollarSign className="mx-auto text-slate-600" size={40} />

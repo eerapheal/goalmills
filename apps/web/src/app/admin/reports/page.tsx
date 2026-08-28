@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminNavBar from '@/components/admin/AdminNavBar';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { DailyContentReport } from '@goalmills/types';
 import {
   FiCheckSquare,
@@ -114,7 +115,13 @@ export default function DailyReportsAdminPage() {
 
         {/* Reports List */}
         {loading ? (
-          <div className="p-12 text-center text-text-muted">Loading daily reports...</div>
+          <div className="p-12 flex justify-center">
+            <GoalmillsLoader
+              size="md"
+              label="Newsroom Daily Submissions"
+              sublabel="Fetching content production reports..."
+            />
+          </div>
         ) : reports.length === 0 ? (
           <div className="glass-card p-12 rounded-3xl border border-white/10 text-center space-y-3">
             <FiCheckSquare className="mx-auto text-slate-600" size={40} />

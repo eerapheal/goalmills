@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdminNavBar from '@/components/admin/AdminNavBar';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import {
   Employee,
   DailyContentReport,
@@ -191,8 +192,12 @@ export default function StaffPortalPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-white">
-        Loading Staff Workspace & Portal...
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <GoalmillsLoader
+          size="fullscreen"
+          label="GoalMills Staff Workspace"
+          sublabel="Syncing trainee profile, curriculum checklist & daily assignments..."
+        />
       </div>
     );
   }

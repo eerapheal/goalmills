@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { AppointmentLetterData } from '@goalmills/types';
+import GoalmillsLoader from '@/components/GoalmillsLoader';
 import {
   FiArrowLeft,
   FiPrinter,
@@ -81,8 +82,12 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
-        Loading Appointment Contract...
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <GoalmillsLoader
+          size="fullscreen"
+          label="GoalMills Legal & Contracts"
+          sublabel="Generating official 30-clause appointment letter..."
+        />
       </div>
     );
   }
