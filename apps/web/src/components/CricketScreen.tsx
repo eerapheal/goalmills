@@ -1,708 +1,603 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { advancedCricketApi } from '../services/advancedCricketApi';
 import {
   CricketEvent,
   CricketLeague,
   CricketTeam,
   CricketStanding,
-  CricketNewsItem,
   CricketPlayer,
 } from '@goalmills/types';
 import { CricketMatchCard } from './CricketMatchCard';
 import { GoalmillsLoader } from './GoalmillsLoader';
-import Image from 'next/image';
 import Link from 'next/link';
 
-type TabType =
-  'live' | 'upcoming' | 'recent' | 'series' | 'teams' | 'athletes' | 'rankings' | 'news';
+type CricketTab = 'live' | 'upcoming' | 'results' | 'standings' | 'series' | 'teams';
 type FormatFilter = 'all' | 'international' | 'franchise' | 'domestic' | 'women';
 
 export function CricketScreen() {
-  const [activeTab, setActiveTab] = useState<TabType>('live');
+  const [activeTab, setActiveTab] = useState<CricketTab>('live');
   const [formatFilter, setFormatFilter] = useState<FormatFilter>('all');
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const [liveMatches, setLiveMatches] = useState<CricketEvent[]>([]);
-  const [upcomingMatches, setUpcomingMatches] = useState<CricketEvent[]>([]);
-  const [recentMatches, setRecentMatches] = useState<CricketEvent[]>([]);
+  const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
   const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
   const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
-  const [athletesList, setAthletesList] = useState<CricketPlayer[]>([]);
-  const [rankings, setRankings] = useState<Record<string, CricketStanding[]>>({});
-  const [newsList, setNewsList] = useState<CricketNewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [timezone, setTimezone] = useState('GMT');
+  const [playersList, setPlayersList] = useState<CricketPlayer[]>([]);
+  const [standingsTab, setStandingsTab] = useState<'IPL' | 'T20_WC' | 'BBL' | 'ICC_TEST' | 'ICC_ODI' | 'ICC_T20'>('IPL');
+  const [standings, setStandings] = useState<Record<string, CricketStanding[]>>({});
+  const [iccRankings, setIccRankings] = useState<any[]>([]);
 
-  // Priority ranking for major cricket competitions
-  const LEAGUE_PRIORITY: Record<string, number> = {
-    'ICC World Cup': 1,
-    'ICC T20 World Cup': 1,
-    'Indian Premier League': 2,
-    IPL: 2,
-    'Big Bash League': 3,
-    BBL: 3,
-    'Pakistan Super League': 4,
-    PSL: 4,
-    SA20: 5,
-    'The Hundred': 6,
-    'Caribbean Premier League': 7,
-    CPL: 7,
-    Women: 8,
-    International: 10,
-  };
-
-  const getLeagueRank = (name: string = '') => {
-    for (const [key, rank] of Object.entries(LEAGUE_PRIORITY)) {
-      if (name.toLowerCase().includes(key.toLowerCase())) return rank;
+  // 7-day date slider
+  const dateStrip = useMemo(() => {
+    const dates = [];
+    const today = new Date();
+    for (let i = -3; i <= 3; i++) {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      const iso = d.toISOString().split('T')[0];
+      const dayName =
+        i === 0
+          ? 'Today'
+          : i === -1
+            ? 'Yesterday'
+            : i === 1
+              ? 'Tomorrow'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayNumber = d.getDate();
+      dates.push({ iso, dayName, dayNumber });
     }
-    return 100;
-  };
+    return dates;
+  }, []);
 
-  const sortMatches = (matches: CricketEvent[]) => {
-    return [...matches].sort((a, b) => {
-      const rankA = getLeagueRank(a.league_name);
-      const rankB = getLeagueRank(b.league_name);
-      if (rankA !== rankB) return rankA - rankB;
-      return (
-        new Date(a.event_date_start + ' ' + (a.event_time || '00:00')).getTime() -
-        new Date(b.event_date_start + ' ' + (b.event_time || '00:00')).getTime()
-      );
-    });
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [timezone]);
-
-  const loadData = async () => {
+  const fetchCricketData = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const today = advancedCricketApi.getFormattedDate();
-      const futureDate = advancedCricketApi.getFormattedDate(14);
-      const pastDate = advancedCricketApi.getFormattedDate(-14);
+      if (activeTab === 'live') {
+        const res = await advancedCricketApi.getLivescore({ timezone: 'GMT' });
+        setLiveMatches(res.result || []);
+      } else if (activeTab === 'upcoming' || activeTab === 'results') {
+        const fromDate = selectedDate;
+        const toDate = selectedDate;
+        const res = await advancedCricketApi.getFixtures({ from: fromDate, to: toDate, timezone: 'GMT' });
+        setFixtures(res.result || []);
+      } else if (activeTab === 'standings') {
+        const [iplRank, t20WorldCupRank, bblRank, iccTest, iccOdi, iccT20] = await Promise.all([
+          advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: [] })),
+          advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: [] })),
+          advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: [] })),
+          advancedCricketApi.getIccRankings({ format: 'test', category: 'teams' }).catch(() => ({ result: [] })),
+          advancedCricketApi.getIccRankings({ format: 'odi', category: 'teams' }).catch(() => ({ result: [] })),
+          advancedCricketApi.getIccRankings({ format: 't20', category: 'teams' }).catch(() => ({ result: [] })),
+        ]);
 
-      const [
-        live,
-        upcoming,
-        recent,
-        series,
-        teams,
-        athletes,
-        iplRank,
-        t20WorldCupRank,
-        bblRank,
-        news,
-      ] = await Promise.all([
-        advancedCricketApi.getLivescore({ timezone }),
-        advancedCricketApi.getFixtures({ from: today, to: futureDate, timezone }),
-        advancedCricketApi.getFixtures({ from: pastDate, to: today, timezone }),
-        advancedCricketApi.getLeagues(),
-        advancedCricketApi.getTeams(),
-        advancedCricketApi.getTrendingPlayers(),
-        advancedCricketApi.getStandings({ leagueId: 9785 }),
-        advancedCricketApi.getStandings({ leagueId: 9843 }),
-        advancedCricketApi.getStandings({ leagueId: 9779 }),
-        advancedCricketApi.getNews(),
-      ]);
+        setStandings({
+          IPL: (iplRank as any)?.result?.total || (Array.isArray(iplRank?.result) ? iplRank.result : []),
+          T20_WC: (t20WorldCupRank as any)?.result?.total || (Array.isArray(t20WorldCupRank?.result) ? t20WorldCupRank.result : []),
+          BBL: (bblRank as any)?.result?.total || (Array.isArray(bblRank?.result) ? bblRank.result : []),
+        });
 
-      setLiveMatches(sortMatches(live.result || []));
-      setUpcomingMatches(sortMatches(upcoming.result || []));
-      setRecentMatches(sortMatches(recent.result || []).reverse());
-      setSeriesList(series.result || []);
-      setTeamsList(teams.result || []);
-      setAthletesList(athletes || []);
-      setNewsList(news || []);
-
-      setRankings({
-        IPL: iplRank.result?.total || (Array.isArray(iplRank.result) ? iplRank.result : []),
-        'T20 WC':
-          t20WorldCupRank.result?.total ||
-          (Array.isArray(t20WorldCupRank.result) ? t20WorldCupRank.result : []),
-        BBL: bblRank.result?.total || (Array.isArray(bblRank.result) ? bblRank.result : []),
-      });
-    } catch (error) {
-      console.error('Error loading cricket intelligence:', error);
+        setIccRankings([
+          { key: 'ICC_TEST', title: 'ICC Test Rankings', data: iccTest.result || [] },
+          { key: 'ICC_ODI', title: 'ICC ODI Rankings', data: iccOdi.result || [] },
+          { key: 'ICC_T20', title: 'ICC T20I Rankings', data: iccT20.result || [] },
+        ]);
+      } else if (activeTab === 'series') {
+        const res = await advancedCricketApi.getLeagues();
+        setSeriesList(res.result || []);
+      } else if (activeTab === 'teams') {
+        const [teamsRes, playersRes] = await Promise.all([
+          advancedCricketApi.getTeams().catch(() => ({ result: [] })),
+          advancedCricketApi.getTrendingPlayers().catch(() => []),
+        ]);
+        setTeamsList(teamsRes.result || []);
+        setPlayersList(playersRes || []);
+      }
+    } catch (err) {
+      console.error('[Web CricketScreen] Error loading cricket data:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab, selectedDate]);
 
-  const filterMatchesByFormat = (matches: CricketEvent[]) => {
-    return matches.filter((m) => {
-      const league = (m.league_name || '').toLowerCase();
-      const type = (m.event_type || '').toLowerCase();
-      const query = searchQuery.toLowerCase();
+  useEffect(() => {
+    fetchCricketData();
+  }, [fetchCricketData]);
 
-      const matchesSearch =
-        !query ||
-        (m.event_home_team && m.event_home_team.toLowerCase().includes(query)) ||
-        (m.event_away_team && m.event_away_team.toLowerCase().includes(query)) ||
-        league.includes(query);
+  // Filtering matches by format & search
+  const currentMatchesList = useMemo(() => {
+    let list: CricketEvent[] = [];
+    if (activeTab === 'live') {
+      list = liveMatches;
+    } else if (activeTab === 'upcoming') {
+      list = fixtures.filter((m) => m.event_live !== '1' && m.event_status !== 'Finished' && m.event_status !== 'FT');
+    } else if (activeTab === 'results') {
+      list = fixtures.filter((m) => m.event_status === 'Finished' || m.event_status === 'FT');
+    }
 
-      if (!matchesSearch) return false;
-
-      if (formatFilter === 'all') return true;
-      if (formatFilter === 'international') {
-        return (
-          league.includes('icc') ||
-          league.includes('international') ||
-          type.includes('t20i') ||
-          type.includes('odi') ||
-          type.includes('test')
-        );
-      }
-      if (formatFilter === 'franchise') {
-        return (
-          league.includes('ipl') ||
-          league.includes('bbl') ||
-          league.includes('psl') ||
-          league.includes('sa20') ||
-          league.includes('hundred') ||
-          league.includes('cpl')
-        );
-      }
-      if (formatFilter === 'women') {
-        return league.includes('women') || league.includes('wpl') || league.includes('wbbl');
-      }
-      if (formatFilter === 'domestic') {
-        return !league.includes('icc') && !league.includes('ipl') && !league.includes('bbl');
-      }
-      return true;
-    });
-  };
-
-  const filteredSeries = useMemo(() => {
-    const currentYear = new Date().getFullYear();
-    return seriesList
-      .filter((s) => {
-        const name = s.league_name?.toLowerCase() || '';
-        const search = searchQuery.toLowerCase();
-        const matchesSearch =
-          name.includes(search) || s.country_name?.toLowerCase().includes(search);
-
-        const seasonStr = s.league_season || name;
-        const years = seasonStr.match(/\d{4}/g) || [];
-        const isModern = years.length === 0 || years.some((y) => parseInt(y) >= currentYear - 1);
-
-        return matchesSearch && isModern;
-      })
-      .sort((a, b) => {
-        const rankA = getLeagueRank(a.league_name);
-        const rankB = getLeagueRank(b.league_name);
-        if (rankA !== rankB) return rankA - rankB;
-        return (a.league_name || '').localeCompare(b.league_name || '');
+    if (formatFilter !== 'all') {
+      list = list.filter((m) => {
+        const league = (m.league_name || '').toLowerCase();
+        const type = (m.event_type || '').toLowerCase();
+        if (formatFilter === 'international') {
+          return league.includes('icc') || league.includes('international') || type.includes('t20i') || type.includes('odi') || type.includes('test');
+        }
+        if (formatFilter === 'franchise') {
+          return league.includes('ipl') || league.includes('bbl') || league.includes('psl') || league.includes('hundred') || league.includes('cpl') || league.includes('sa20') || league.includes('premier league');
+        }
+        if (formatFilter === 'domestic') {
+          return league.includes('trophy') || league.includes('shield') || league.includes('cup') || league.includes('championship');
+        }
+        if (formatFilter === 'women') {
+          return league.includes('women') || type.includes('women') || (m.event_home_team || '').toLowerCase().includes('women');
+        }
+        return true;
       });
-  }, [seriesList, searchQuery]);
+    }
 
-  const filteredTeams = useMemo(() => {
-    return teamsList.filter((t) => t.team_name?.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [teamsList, searchQuery]);
-
-  const filteredLive = filterMatchesByFormat(liveMatches);
-  const filteredUpcoming = filterMatchesByFormat(upcomingMatches);
-  const filteredRecent = filterMatchesByFormat(recentMatches);
-
-  const renderTabContent = () => {
-    if (loading) {
-      return (
-        <div className="py-20">
-          <GoalmillsLoader
-            size="md"
-            label="Cricket Live Arena"
-            sublabel="Syncing worldwide cricket feed & live ball-by-ball..."
-          />
-        </div>
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (m) =>
+          (m.event_home_team && m.event_home_team.toLowerCase().includes(q)) ||
+          (m.event_away_team && m.event_away_team.toLowerCase().includes(q)) ||
+          (m.league_name && m.league_name.toLowerCase().includes(q))
       );
     }
 
-    switch (activeTab) {
-      case 'live':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping"></span>
-                Live Wicket Action ({filteredLive.length})
-              </h2>
-            </div>
-            {filteredLive.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredLive.map((match, idx) => (
-                  <CricketMatchCard key={match.event_key || `live-${idx}`} match={match} />
-                ))}
-              </div>
-            ) : (
-              <div className="glass-card rounded-3xl p-16 text-center border border-white/5">
-                <div className="text-4xl mb-4">🏏</div>
-                <h3 className="text-base font-black text-white uppercase tracking-tight mb-2">
-                  No Live Matches In Session
-                </h3>
-                <p className="text-text-muted font-bold text-xs max-w-md mx-auto">
-                  Check upcoming fixtures or explore recent tournament results and global standings
-                  below.
-                </p>
-              </div>
-            )}
-          </div>
-        );
+    return list;
+  }, [activeTab, liveMatches, fixtures, formatFilter, searchQuery]);
 
-      case 'upcoming':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span>🗓️</span> Upcoming Match Schedule ({filteredUpcoming.length})
-              </h2>
-            </div>
-            {filteredUpcoming.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredUpcoming.map((match, idx) => (
-                  <CricketMatchCard key={match.event_key || `up-${idx}`} match={match} />
-                ))}
-              </div>
-            ) : (
-              <div className="glass-card rounded-3xl p-16 text-center border border-white/5">
-                <p className="text-text-muted font-bold uppercase tracking-widest text-xs">
-                  No upcoming fixtures matching current filter.
-                </p>
-              </div>
-            )}
-          </div>
-        );
+  // Group by league / tournament
+  const leagueGroups = useMemo(() => {
+    const groups: {
+      [key: string]: { title: string; logo?: string; matches: CricketEvent[] };
+    } = {};
 
-      case 'recent':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span>✅</span> Recent Match Results ({filteredRecent.length})
-              </h2>
-            </div>
-            {filteredRecent.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredRecent.map((match, idx) => (
-                  <CricketMatchCard key={match.event_key || `result-${idx}`} match={match} />
-                ))}
-              </div>
-            ) : (
-              <div className="glass-card rounded-3xl p-16 text-center border border-white/5">
-                <p className="text-text-muted font-bold uppercase tracking-widest text-xs">
-                  No recent fixtures found.
-                </p>
-              </div>
-            )}
-          </div>
-        );
+    currentMatchesList.forEach((match) => {
+      const title = match.league_name || 'Cricket Matches';
+      if (!groups[title]) {
+        groups[title] = {
+          title,
+          matches: [],
+        };
+      }
+      groups[title].matches.push(match);
+    });
 
-      case 'series':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span>🏆</span> Global Tournaments & Series ({filteredSeries.length})
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSeries.map((series, idx) => {
-                const leagueName = series.league_name || 'Tournament';
-                return (
-                  <Link
-                    href={`/cricket/series/${series.league_key}`}
-                    key={series.league_key || `series-${idx}`}
-                    className="group glass-card rounded-3xl p-6 border border-white/5 hover:border-secondary/40 transition-all hover:bg-secondary/5 relative overflow-hidden"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="relative w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xl text-secondary flex-shrink-0 group-hover:scale-110 transition-transform">
-                        {leagueName.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-black text-white text-sm uppercase tracking-tight truncate group-hover:text-secondary transition-colors">
-                          {leagueName}
-                        </h3>
-                        <p className="text-[10px] font-bold text-text-muted mt-1 uppercase tracking-wider">
-                          {series.league_season || '2026'} •{' '}
-                          {series.country_name || 'International'}
-                        </p>
-                        <div className="flex items-center gap-2 mt-4">
-                          <span className="text-[9px] font-black uppercase tracking-wider text-secondary flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                            Explore Series <span>→</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        );
+    return Object.values(groups);
+  }, [currentMatchesList]);
 
-      case 'teams':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span>🛡️</span> International & Franchise Squads ({filteredTeams.length})
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {filteredTeams.map((team, idx) => (
-                <Link
-                  href={`/cricket/teams/${team.team_key}`}
-                  key={team.team_key || `team-${idx}`}
-                  className="group glass-card rounded-3xl p-6 border border-white/5 hover:border-secondary/40 transition-all hover:scale-[1.03] flex flex-col items-center text-center"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-secondary/10 transition-colors">
-                    {team.team_logo ? (
-                      <Image
-                        src={team.team_logo}
-                        alt={team.team_name}
-                        width={40}
-                        height={40}
-                        className="object-contain"
-                      />
-                    ) : (
-                      <span className="text-2xl font-black text-secondary">
-                        {team.team_name.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-black text-white text-xs uppercase tracking-tight group-hover:text-secondary transition-colors line-clamp-2">
-                    {team.team_name}
-                  </h3>
-                </Link>
-              ))}
-            </div>
-          </div>
-        );
+  const tabs: { id: CricketTab; label: string; icon: string }[] = [
+    { id: 'live', label: 'Live Matches', icon: '🔴' },
+    { id: 'upcoming', label: 'Upcoming', icon: '📅' },
+    { id: 'results', label: 'Results', icon: '✅' },
+    { id: 'standings', label: 'Standings & Rankings', icon: '🏆' },
+    { id: 'series', label: 'Series', icon: '🏏' },
+    { id: 'teams', label: 'Teams & Players', icon: '👥' },
+  ];
 
-      case 'athletes':
-        const filteredAthletes = athletesList.filter(
-          (p) =>
-            p.player_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (p.player_country &&
-              p.player_country.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (p.team_name && p.team_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (p.player_type && p.player_type.toLowerCase().includes(searchQuery.toLowerCase()))
-        );
-
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span>🏏</span> Global Cricket Icons & Athletes ({filteredAthletes.length})
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredAthletes.map((player) => (
-                <Link
-                  href={`/cricket/players/${player.player_key}`}
-                  key={player.player_key}
-                  className="group glass-card rounded-2xl p-4 border border-white/5 hover:border-secondary/40 transition-all hover:scale-[1.02] flex items-center gap-4 bg-white/[0.02]"
-                >
-                  <div className="relative w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    {player.player_image ? (
-                      <Image
-                        src={player.player_image}
-                        alt={player.player_name}
-                        width={56}
-                        height={56}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <span className="text-lg font-bold text-secondary">
-                        {player.player_name.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-white text-xs uppercase tracking-tight truncate group-hover:text-secondary transition-colors">
-                      {player.player_name}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                        {player.player_country}
-                      </span>
-                      <span className="text-[9px] font-medium text-text-muted truncate">
-                        {player.player_type || 'Athlete'}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'rankings':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <span>📈</span> League Tables & ICC Standings
-                </h2>
-              </div>
-              <Link
-                href="/cricket/rankings"
-                className="px-5 py-2 rounded-xl bg-secondary text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform"
-              >
-                Full ICC Rankings →
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {['IPL', 'T20 WC', 'BBL'].map((format) => {
-                const list = Array.isArray(rankings[format]) ? rankings[format] : [];
-                return (
-                  <div
-                    key={format}
-                    className="glass-card rounded-[2.5rem] p-6 md:p-8 border border-white/5 relative overflow-hidden"
-                  >
-                    <h4 className="text-secondary font-black uppercase tracking-[0.3em] text-xs mb-6 border-b border-white/5 pb-4">
-                      {format} Points Table
-                    </h4>
-
-                    {list.length > 0 ? (
-                      <div className="space-y-3">
-                        {list.slice(0, 8).map((rank, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="w-5 text-[10px] font-black text-text-muted tabular-nums">
-                                {idx + 1}
-                              </span>
-                              <Link
-                                href={`/cricket/teams/${rank.team_key}`}
-                                className="text-xs font-black text-white uppercase tracking-tight hover:text-secondary transition-colors"
-                              >
-                                {rank.standing_team}
-                              </Link>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs font-black text-white tabular-nums">
-                                {rank.standing_Pts} pts
-                              </span>
-                              <span
-                                className={`text-[9px] font-bold px-2 py-0.5 rounded ${parseFloat(rank.standing_NRR) >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}
-                              >
-                                {rank.standing_NRR}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="py-12 text-center text-text-muted text-xs font-bold uppercase tracking-widest">
-                        Tournament Table Initializing
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-
-      case 'news':
-        return (
-          <div className="animate-in fade-in duration-500">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span>📰</span> Cricket Pulse & Editorial Reports
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {newsList.map((item) => (
-                <div
-                  key={item.id}
-                  className="glass-card rounded-[2rem] overflow-hidden border border-white/5 flex flex-col group hover:border-secondary/40 transition-all"
-                >
-                  <div className="relative h-48 w-full overflow-hidden bg-white/5">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-secondary/80 backdrop-blur-md text-[9px] font-black uppercase tracking-wider text-white">
-                      {item.category}
-                    </div>
-                  </div>
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <p className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-2">
-                        {item.author} • {item.read_time}
-                      </p>
-                      <h3 className="font-black text-white text-base leading-snug uppercase tracking-tight mb-3 group-hover:text-secondary transition-colors">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs text-text-secondary line-clamp-3 leading-relaxed mb-4">
-                        {item.summary}
-                      </p>
-                    </div>
-                    <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-black text-secondary uppercase tracking-widest">
-                      <span>Read Analysis</span>
-                      <span>→</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-    }
-  };
+  const formatFilters: { id: FormatFilter; label: string }[] = [
+    { id: 'all', label: 'All Formats' },
+    { id: 'international', label: 'ICC & International' },
+    { id: 'franchise', label: 'T20 Franchise' },
+    { id: 'domestic', label: 'Domestic' },
+    { id: 'women', label: 'Women' },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#0a0e27] pt-[120px] pb-24">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Hero Banner */}
-        <div className="relative glass-card rounded-3xl p-6 md:p-8 mb-8 border border-white/10 bg-gradient-to-br from-white/[0.07] to-[#0a0e27] overflow-hidden group">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2067')] bg-cover bg-center opacity-[0.10] mix-blend-overlay group-hover:scale-105 transition-transform duration-[15s]"></div>
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <span className="inline-flex px-3 py-1 rounded-full bg-secondary/20 text-secondary text-[10px] font-bold uppercase tracking-wider mb-3 border border-secondary/30">
-                Live Cricket Central
-              </span>
-              <h1 className="text-2xl md:text-4xl font-extrabold text-white uppercase tracking-tight leading-tight mb-2">
-                Cricket Pulse & Intelligence
-              </h1>
-              <p className="text-text-secondary text-xs md:text-sm font-medium max-w-xl leading-relaxed">
-                Real-time ball-by-ball scorecards, tournament standings, franchise leagues, player
-                analytics, and ICC leaderboards.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 shadow-2xl">
-                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-secondary rounded-full"></span>
-                  Timezone Sync
-                </p>
-                <select
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="bg-[#0a0e27] text-white text-[10px] font-black border border-white/10 rounded-lg px-3 py-1.5 w-full focus:outline-none focus:border-secondary cursor-pointer uppercase tracking-widest"
-                >
-                  {[
-                    'GMT',
-                    'UTC',
-                    'Africa/Lagos',
-                    'Europe/London',
-                    'Asia/Kolkata',
-                    'Asia/Dubai',
-                    'Australia/Sydney',
-                    'America/New_York',
-                  ].map((tz) => (
-                    <option key={tz} value={tz}>
-                      {tz.replace('_', ' ')}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 shadow-2xl flex flex-col justify-center">
-                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">
-                  Status
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <span className="text-white font-black uppercase text-xs">
-                    Live Matrix Active
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      {/* Header Bar */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+            Cricket LiveScore
+          </h1>
+          <p className="text-sm text-slate-400">
+            Real-time ball-by-ball fixtures, tournament tables, series summaries, and ICC rankings
+          </p>
         </div>
 
-        {/* Primary Tabs Navigation */}
-        <div className="flex overflow-x-auto no-scrollbar gap-2 mb-8 bg-white/5 backdrop-blur-md rounded-2xl p-2 border border-white/5 sticky top-[100px] z-[40]">
-          {[
-            { id: 'live', label: 'Live Action', icon: '⚡' },
-            { id: 'upcoming', label: 'Schedule', icon: '🗓️' },
-            { id: 'recent', label: 'Results', icon: '📊' },
-            { id: 'series', label: 'Series', icon: '🏆' },
-            { id: 'teams', label: 'Squads', icon: '🛡️' },
-            { id: 'athletes', label: 'Athletes', icon: '👤' },
-            { id: 'rankings', label: 'Standings', icon: '📈' },
-            { id: 'news', label: 'News & Pulse', icon: '📰' },
-          ].map((tab) => (
+        {/* Search & Refresh */}
+        <div className="flex items-center space-x-3">
+          <div className="relative flex-1 sm:w-64">
+            <input
+              type="text"
+              placeholder="Search teams, series or venues..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#141C2B] px-4 py-2.5 pl-9 text-sm text-white placeholder-slate-500 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+            <span className="absolute left-3 top-3 text-xs text-slate-400">🔍</span>
+          </div>
+
+          <button
+            onClick={fetchCricketData}
+            className="flex items-center space-x-2 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+            title="Refresh on demand"
+          >
+            <span>🔄</span>
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Tabs */}
+      <div className="mb-4 flex space-x-2 overflow-x-auto border-b border-white/10 pb-2">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
             <button
               key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id as TabType);
-                setSearchQuery('');
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all duration-300 whitespace-nowrap
-                                ${activeTab === tab.id ? 'bg-secondary text-white shadow-lg scale-[1.02]' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+                isActive
+                  ? 'border border-amber-500/50 bg-[#1A2333] text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+              }`}
             >
               <span>{tab.icon}</span>
-              {tab.label}
+              <span>{tab.label}</span>
             </button>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        {/* Format Filter Pills & Search Bar */}
-        <div className="glass-card rounded-2xl p-4 mb-8 border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* Format Filter Pills */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {[
-              { id: 'all', label: 'All Formats' },
-              { id: 'international', label: 'International (ICC)' },
-              { id: 'franchise', label: 'IPL & T20 Leagues' },
-              { id: 'domestic', label: 'Domestic' },
-              { id: 'women', label: 'Women’s' },
-            ].map((fmt) => (
+      {/* Format Filter Pills for Matches */}
+      {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
+        <div className="mb-4 flex space-x-2 overflow-x-auto pb-2">
+          {formatFilters.map((fmt) => {
+            const isFmtActive = formatFilter === fmt.id;
+            return (
               <button
                 key={fmt.id}
-                onClick={() => setFormatFilter(fmt.id as FormatFilter)}
-                className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all whitespace-nowrap ${
-                  formatFilter === fmt.id
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-white/5 text-text-muted hover:text-white hover:bg-white/10'
+                onClick={() => setFormatFilter(fmt.id)}
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                  isFmtActive
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
+                    : 'bg-[#141C2B] text-slate-400 border border-white/10 hover:border-white/20 hover:text-white'
                 }`}
               >
                 {fmt.label}
               </button>
-            ))}
+            );
+          })}
+        </div>
+      )}
+
+      {/* Date Strip for upcoming & results */}
+      {activeTab !== 'live' && activeTab !== 'standings' && activeTab !== 'series' && activeTab !== 'teams' && (
+        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
+          {dateStrip.map((item) => {
+            const isSelected = selectedDate === item.iso;
+            return (
+              <button
+                key={item.iso}
+                onClick={() => setSelectedDate(item.iso)}
+                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
+                  isSelected
+                    ? 'border-amber-500 bg-amber-500 text-slate-950 font-bold'
+                    : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
+                }`}
+              >
+                <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
+                <span
+                  className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
+                >
+                  {item.dayNumber}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Content Area */}
+      {loading ? (
+        <GoalmillsLoader
+          size="md"
+          label="Cricket Desk"
+          sublabel="Fetching live overs, wickets & tournament tables..."
+        />
+      ) : activeTab === 'standings' ? (
+        /* Standings & Rankings Hub */
+        <div className="space-y-6">
+          {/* Sub-selector for tournaments & ICC rankings */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'IPL', label: 'IPL Table' },
+              { id: 'T20_WC', label: 'ICC T20 World Cup' },
+              { id: 'BBL', label: 'Big Bash League' },
+              { id: 'ICC_TEST', label: 'ICC Test Rankings' },
+              { id: 'ICC_ODI', label: 'ICC ODI Rankings' },
+              { id: 'ICC_T20', label: 'ICC T20I Rankings' },
+            ].map((sub) => {
+              const isSubActive = standingsTab === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => setStandingsTab(sub.id as any)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                    isSubActive
+                      ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
+                      : 'bg-[#141C2B] text-slate-400 border border-white/10 hover:border-white/20 hover:text-white'
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Search Bar */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="SEARCH TEAMS, MATCHES..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black tracking-widest text-white focus:outline-none focus:border-secondary w-full md:w-[260px] transition-all"
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
+          {/* Standings Table View */}
+          {standingsTab === 'IPL' || standingsTab === 'T20_WC' || standingsTab === 'BBL' ? (
+            <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
+              <h2 className="mb-4 text-lg font-bold text-white flex items-center gap-2">
+                <span>🏆</span>
+                <span>
+                  {standingsTab === 'IPL'
+                    ? 'Indian Premier League (IPL) Standings'
+                    : standingsTab === 'T20_WC'
+                      ? 'ICC T20 World Cup Standings'
+                      : 'Big Bash League (BBL) Standings'}
+                </span>
+              </h2>
+
+              {(!standings[standingsTab] || standings[standingsTab].length === 0) ? (
+                <p className="text-sm text-slate-400 py-4 text-center">
+                  Standings for this tournament are currently updating.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-slate-300">
+                    <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                      <tr>
+                        <th className="py-3 px-2">#</th>
+                        <th className="py-3 px-4">Team</th>
+                        <th className="py-3 px-3 text-center">P</th>
+                        <th className="py-3 px-3 text-center">W</th>
+                        <th className="py-3 px-3 text-center">L</th>
+                        <th className="py-3 px-3 text-center">NR</th>
+                        <th className="py-3 px-3 text-center">NRR</th>
+                        <th className="py-3 px-4 text-right">PTS</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {standings[standingsTab].map((row, idx) => (
+                        <tr key={idx} className="hover:bg-white/5">
+                          <td className="py-3 px-2 font-bold text-slate-400">{row.standing_place || idx + 1}</td>
+                          <td className="py-3 px-4 font-bold text-white flex items-center gap-2">
+                            <span className="text-amber-400">🛡️</span>
+                            <span>{row.standing_team}</span>
+                          </td>
+                          <td className="py-3 px-3 text-center">{row.standing_P || 0}</td>
+                          <td className="py-3 px-3 text-center text-emerald-400 font-bold">{row.standing_W || 0}</td>
+                          <td className="py-3 px-3 text-center text-red-400 font-bold">{row.standing_L || 0}</td>
+                          <td className="py-3 px-3 text-center text-slate-400">{row.standing_D || 0}</td>
+                          <td className="py-3 px-3 text-center font-mono text-xs">{row.standing_GD || '0.00'}</td>
+                          <td className="py-3 px-4 text-right font-black text-amber-400 text-base">
+                            {row.standing_PTS || 0}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* ICC Team Rankings Table */
+            <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
+              <h2 className="mb-4 text-lg font-bold text-white flex items-center gap-2">
+                <span>🌍</span>
+                <span>
+                  {standingsTab === 'ICC_TEST'
+                    ? 'Official ICC Men’s Test Team Rankings'
+                    : standingsTab === 'ICC_ODI'
+                      ? 'Official ICC Men’s ODI Team Rankings'
+                      : 'Official ICC Men’s T20I Team Rankings'}
+                </span>
+              </h2>
+
+              {(() => {
+                const targetObj = iccRankings.find((r) => r.key === standingsTab);
+                const data = targetObj?.data || [];
+                if (data.length === 0) {
+                  return (
+                    <p className="text-sm text-slate-400 py-4 text-center">
+                      ICC Rankings are loading...
+                    </p>
+                  );
+                }
+                return (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm text-slate-300">
+                      <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                        <tr>
+                          <th className="py-3 px-2">Rank</th>
+                          <th className="py-3 px-4">Country / Team</th>
+                          <th className="py-3 px-3 text-center">Rating Points</th>
+                          <th className="py-3 px-4 text-right">ICC Rating</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {data.map((item: any, idx: number) => (
+                          <tr key={idx} className="hover:bg-white/5">
+                            <td className="py-3 px-2 font-bold text-slate-400">{item.rank || idx + 1}</td>
+                            <td className="py-3 px-4 font-bold text-white">
+                              {item.country || item.team_name}
+                            </td>
+                            <td className="py-3 px-3 text-center text-slate-300 font-medium">
+                              {item.points ? item.points.toLocaleString() : '-'}
+                            </td>
+                            <td className="py-3 px-4 text-right font-black text-amber-400">
+                              {item.rating || '-'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+        </div>
+      ) : activeTab === 'series' ? (
+        /* Series / Tournament Directory */
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-white">Tournaments & International Tours</h2>
+          {seriesList.length === 0 ? (
+            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
+              <span className="text-4xl">🏏</span>
+              <h3 className="mt-3 text-base font-bold text-white">No Series Found</h3>
+              <button
+                onClick={fetchCricketData}
+                className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-amber-400 hover:bg-slate-700"
+              >
+                Refresh
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {seriesList
+                .filter((s) => !searchQuery || (s.league_name && s.league_name.toLowerCase().includes(searchQuery.toLowerCase())))
+                .map((series) => (
+                  <Link
+                    key={series.league_key}
+                    href={`/cricket/series/${series.league_key}`}
+                    className="group rounded-2xl border border-white/10 bg-[#141C2B] p-5 hover:border-amber-500/40 hover:bg-[#162234] transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-amber-400 text-lg">🏏</span>
+                        <span className="text-[10px] font-black uppercase text-amber-400/90 tracking-wider">
+                          Tournament
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-black text-white group-hover:text-amber-400 transition-colors line-clamp-2">
+                        {series.league_name}
+                      </h3>
+                      {series.country_name && (
+                        <p className="text-xs text-slate-400 mt-1">{series.country_name}</p>
+                      )}
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
+                      <span>View Fixtures & Standings</span>
+                      <span className="text-amber-400 font-bold">&rarr;</span>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          )}
+        </div>
+      ) : activeTab === 'teams' ? (
+        /* Teams & Players Directory */
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-bold text-white mb-3">Trending Cricketers & Profiles</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {playersList
+                .filter((p) => !searchQuery || (p.player_name && p.player_name.toLowerCase().includes(searchQuery.toLowerCase())))
+                .map((player) => (
+                  <Link
+                    key={player.player_key}
+                    href={`/cricket/players/${player.player_key}`}
+                    className="group rounded-2xl border border-white/10 bg-[#141C2B] p-4 hover:border-amber-500/40 hover:bg-[#162234] transition-all flex items-center space-x-3.5"
+                  >
+                    <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                      {player.player_image ? (
+                        <img src={player.player_image} alt={player.player_name} className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-base font-black text-amber-400">{player.player_name.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                        {player.player_name}
+                      </h3>
+                      <p className="text-xs text-slate-400 truncate">{player.player_role || player.player_type || 'Cricket Star'}</p>
+                      <p className="text-[10px] text-amber-400/90 font-medium truncate mt-0.5">{player.player_country || player.team_name}</p>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-bold text-white mb-3">Cricket Teams & Clubs</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {teamsList
+                .filter((t) => !searchQuery || (t.team_name && t.team_name.toLowerCase().includes(searchQuery.toLowerCase())))
+                .map((team) => (
+                  <Link
+                    key={team.team_key}
+                    href={`/cricket/teams/${team.team_key}`}
+                    className="group rounded-2xl border border-white/10 bg-[#141C2B] p-4 hover:border-amber-500/40 hover:bg-[#162234] transition-all flex items-center space-x-3.5"
+                  >
+                    <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 p-1 flex items-center justify-center shrink-0">
+                      {team.team_logo ? (
+                        <img src={team.team_logo} alt={team.team_name} className="h-full w-full object-contain" />
+                      ) : (
+                        <span className="text-sm font-black text-amber-400">{team.team_name.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                        {team.team_name}
+                      </h3>
+                      <p className="text-xs text-slate-400 truncate">View Squad & Match Schedule &rarr;</p>
+                    </div>
+                  </Link>
+                ))}
+            </div>
           </div>
         </div>
+      ) : leagueGroups.length === 0 ? (
+        /* Empty State */
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
+          <span className="text-4xl">🏏</span>
+          <h3 className="mt-3 text-base font-bold text-white">
+            {activeTab === 'live' ? 'No Live Cricket Matches Ongoing' : 'No Matches Found'}
+          </h3>
+          <p className="mt-1 text-xs text-slate-400 max-w-sm">
+            {activeTab === 'live'
+              ? 'Check upcoming fixtures or select another date from the calendar.'
+              : 'Try selecting a different format filter or search query.'}
+          </p>
+          <button
+            onClick={fetchCricketData}
+            className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-amber-400 hover:bg-slate-700"
+          >
+            Refresh Feed
+          </button>
+        </div>
+      ) : (
+        /* Grouped Matches List */
+        <div className="space-y-6">
+          {leagueGroups.map((group) => (
+            <div key={group.title} className="space-y-3">
+              {/* League Header */}
+              <div className="flex items-center space-x-2">
+                <span className="text-amber-400">🏏</span>
+                <h2 className="text-sm font-bold text-slate-200">{group.title}</h2>
+                <span className="text-xs text-slate-500">({group.matches.length})</span>
+              </div>
 
-        {/* Main Content Area */}
-        {renderTabContent()}
-      </div>
+              {/* Match Cards Grid */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+                {group.matches.map((match) => (
+                  <CricketMatchCard key={match.event_key} match={match} hideLeague />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

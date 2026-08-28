@@ -30,6 +30,7 @@ export function Header() {
 
   const navItems = [
     { name: 'Football', href: '/football' },
+    { name: 'Cricket', href: '/cricket' },
     { name: 'Transfers', href: '/transfers' },
     { name: 'Analysis', href: '/analysis' },
     { name: 'Stats', href: '/stats' },
