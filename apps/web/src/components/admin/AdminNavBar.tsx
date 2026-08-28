@@ -19,6 +19,7 @@ import {
   FiX,
   FiChevronDown,
   FiBookOpen,
+  FiKey,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
@@ -174,6 +175,14 @@ export default function AdminNavBar() {
               </Link>
             )}
             <Link
+              href="/profile"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/20 transition-all text-xs"
+              title="Profile & Password Settings"
+            >
+              <FiKey size={13} />
+              <span>Password</span>
+            </Link>
+            <Link
               href="/"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-all text-xs"
             >
@@ -327,6 +336,13 @@ export default function AdminNavBar() {
                   Categories
                 </Link>
               )}
+              <Link
+                href="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 text-center py-2 rounded-xl bg-amber-500/10 text-amber-300 text-xs font-bold"
+              >
+                Password
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/signin' })}
                 className="flex-1 text-center py-2 rounded-xl bg-red-500/10 text-red-400 text-xs font-bold"

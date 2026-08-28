@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { FiArrowLeft, FiLogOut } from 'react-icons/fi';
+import { FiArrowLeft, FiLogOut, FiKey, FiTrash2 } from 'react-icons/fi';
 import { User, UserRole } from '@goalmills/types';
 import { useToast } from '../../../components/Toast';
 
@@ -55,6 +55,37 @@ export default function UserManagementPage() {
     }
   };
 
+  const resetPassword = async (userId: string, username: string) => {
+    const inputPassword = prompt(
+      `Enter new password for ${username} (leave blank to auto-generate a secure temporary password):`
+    );
+
+    if (inputPassword === null) return; // User cancelled
+
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword: inputPassword.trim() || undefined }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        const creds = data.credentials;
+        navigator.clipboard.writeText(creds.newPassword);
+        alert(
+          `Password for ${creds.username} (${creds.email}) has been reset to:\n\n${creds.newPassword}\n\n(Copied to clipboard)`
+        );
+        toast.success('Password reset successfully (copied to clipboard)');
+      } else {
+        toast.error(data.message || 'Failed to reset password');
+      }
+    } catch (err) {
+      toast.error('An error occurred while resetting password');
+    }
+  };
+
   const deleteUser = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.'))
       return;
@@ -87,7 +118,7 @@ export default function UserManagementPage() {
             <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
               User Management
             </h1>
-            <p className="text-text-muted">Manage roles and permissions</p>
+            <p className="text-text-muted">Manage roles, permissions, and passwords</p>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -147,7 +178,7 @@ export default function UserManagementPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <select
                           value={user.role}
                           onChange={(e) => updateRole(user._id, e.target.value)}
@@ -162,24 +193,19 @@ export default function UserManagementPage() {
                           <option value="super-admin">Super Admin</option>
                         </select>
                         <button
+                          onClick={() => resetPassword(user._id, user.username)}
+                          className="p-2 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 rounded-lg transition-colors border border-amber-500/20"
+                          title="Reset User Password"
+                        >
+                          <FiKey size={14} />
+                        </button>
+                        <button
                           onClick={() => deleteUser(user._id)}
                           disabled={user._id === session?.user?.id}
-                          className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-30"
+                          className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-30 border border-red-500/20"
                           title="Delete User"
                         >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
+                          <FiTrash2 size={14} />
                         </button>
                       </div>
                     </td>

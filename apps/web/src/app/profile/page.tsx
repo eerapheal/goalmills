@@ -5,23 +5,43 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import {
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiCheckCircle,
+  FiShield,
+  FiUser,
+  FiMail,
+  FiArrowRight,
+  FiKey,
+} from 'react-icons/fi';
 
 export default function ProfilePage() {
   const { data: session, update } = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
 
+  // Profile Info State
   const [username, setUsername] = useState('');
   const [image, setImage] = useState('');
+  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [pwdMessage, setPwdMessage] = useState({ text: '', type: '' });
 
   useEffect(() => {
     if (session?.user) {
       setUsername(session.user.name || '');
       setImage(session.user.image || '');
     } else if (session === null) {
-      // Redirect if not authenticated
       router.push('/signin');
     }
   }, [session, router]);
@@ -53,7 +73,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', type: '' });
@@ -71,7 +91,6 @@ export default function ProfilePage() {
         throw new Error(data.message || 'Something went wrong');
       }
 
-      // Update session
       await update({
         ...session,
         user: {
@@ -82,8 +101,6 @@ export default function ProfilePage() {
       });
 
       setMessage({ text: 'Profile updated successfully!', type: 'success' });
-
-      // Force router refresh to update header
       router.refresh();
     } catch (error: any) {
       setMessage({ text: error.message, type: 'error' });
@@ -92,108 +109,278 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdMessage({ text: '', type: '' });
+
+    if (newPassword.length < 6) {
+      setPwdMessage({ text: 'New password must be at least 6 characters long', type: 'error' });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPwdMessage({ text: 'New passwords do not match', type: 'error' });
+      return;
+    }
+
+    setChangingPassword(true);
+
+    try {
+      const res = await fetch('/api/user/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to change password');
+      }
+
+      setPwdMessage({ text: 'Password changed successfully!', type: 'success' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      setPwdMessage({ text: error.message || 'Error changing password', type: 'error' });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   if (!session) return null;
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 pt-[100px] pb-12">
-      <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-black text-white mb-8 tracking-tight">
-          My <span className="text-blue-500">Profile</span>
-        </h1>
+    <div className="min-h-screen bg-slate-950 px-4 pt-[100px] pb-16 text-white">
+      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+          <div>
+            <h1 className="text-3xl font-black uppercase tracking-tight">
+              My <span className="text-amber-400">Account</span>
+            </h1>
+            <p className="text-xs text-text-muted mt-1">
+              Manage your personal credentials, identity, and security preferences
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 uppercase tracking-wider">
+              {session.user.role || 'user'}
+            </span>
+            {session.user.role !== 'user' && (
+              <Link
+                href="/admin/dashboard"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold border border-blue-500/30 transition-colors"
+              >
+                <span>Workspace</span>
+                <FiArrowRight size={14} />
+              </Link>
+            )}
+          </div>
+        </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Image Upload Section */}
-            <div className="flex flex-col items-center gap-4 mb-8">
-              <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-slate-800 bg-slate-900 group">
-                {image ? (
-                  <Image src={image} alt="Profile" fill sizes="128px" className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-slate-700 bg-slate-800">
-                    {username?.charAt(0)?.toUpperCase() || '?'}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Card 1: Profile & Identity */}
+          <div className="bg-slate-900/60 border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                  <FiUser size={16} />
+                </div>
+                <h2 className="text-base font-bold uppercase tracking-wider">Identity & Avatar</h2>
+              </div>
+
+              <form onSubmit={handleProfileSubmit} className="space-y-5">
+                {/* Image Upload Section */}
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative w-28 h-28 rounded-2xl overflow-hidden border-2 border-white/15 bg-slate-900 group shadow-lg">
+                    {image ? (
+                      <Image src={image} alt="Profile" fill sizes="112px" className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-3xl font-black text-slate-400 bg-slate-800">
+                        {username?.charAt(0)?.toUpperCase() || 'GM'}
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <span className="text-white text-[11px] font-bold uppercase">Change</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
+                  <p className="text-[11px] text-text-muted">
+                    {uploading ? 'Uploading image...' : 'Click avatar to upload photo'}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1.5">
+                    Display Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
+                      placeholder="Enter username"
+                      required
+                    />
+                    <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1.5">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={session.user?.email || ''}
+                      disabled
+                      className="w-full bg-slate-950/50 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-slate-500 text-sm cursor-not-allowed"
+                    />
+                    <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">Managed by system administration</p>
+                </div>
+
+                {message.text && (
+                  <div
+                    className={`p-3.5 rounded-xl text-xs font-bold ${
+                      message.type === 'success'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                    }`}
+                  >
+                    {message.text}
                   </div>
                 )}
 
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                  <span className="text-white text-xs font-bold uppercase">Change</span>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-              </div>
-
-              <div className="text-center">
-                <p className="text-sm text-slate-400">Allowed formats: JPG, PNG, GIF</p>
-                {uploading && (
-                  <p className="text-blue-400 text-xs mt-1 animate-pulse">Uploading...</p>
-                )}
-              </div>
-            </div>
-
-            {/* Form Fields */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                  placeholder="Enter username"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={session.user?.email || ''}
-                  disabled
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3 text-slate-500 cursor-not-allowed"
-                />
-                <p className="text-xs text-slate-600 mt-1">Email cannot be changed</p>
-              </div>
-            </div>
-
-            {message.text && (
-              <div
-                className={`p-4 rounded-xl text-sm font-bold ${
-                  message.type === 'success'
-                    ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-                    : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                }`}
-              >
-                {message.text}
-              </div>
-            )}
-
-            <div className="pt-4 flex items-center justify-between gap-4">
-              {session.user.role?.includes('admin') && (
-                <Link
-                  href="/admin/dashboard"
-                  className="px-6 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition-colors text-sm"
+                <button
+                  type="submit"
+                  disabled={loading || uploading}
+                  className="w-full px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
                 >
-                  Admin Dashboard
-                </Link>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading || uploading}
-                className="flex-1 px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Saving...' : 'Save Changes'}
-              </button>
+                  {loading ? 'Saving Changes...' : 'Save Profile Changes'}
+                </button>
+              </form>
             </div>
-          </form>
+          </div>
+
+          {/* Card 2: Security & Password Management */}
+          <div className="bg-slate-900/60 border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <FiKey size={16} />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold uppercase tracking-wider">Change Password</h2>
+                </div>
+              </div>
+
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div>
+                  <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1.5">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrent ? 'text' : 'password'}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                      className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-11 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
+                      placeholder="••••••••"
+                    />
+                    <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrent(!showCurrent)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                    >
+                      {showCurrent ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1.5">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNew ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-11 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
+                      placeholder="At least 6 characters"
+                    />
+                    <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <button
+                      type="button"
+                      onClick={() => setShowNew(!showNew)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                    >
+                      {showNew ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-text-muted text-xs font-bold uppercase tracking-widest mb-1.5">
+                    Confirm New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNew ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
+                      placeholder="Re-enter new password"
+                    />
+                    <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  </div>
+                </div>
+
+                {pwdMessage.text && (
+                  <div
+                    className={`p-3.5 rounded-xl text-xs font-bold ${
+                      pwdMessage.type === 'success'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                    }`}
+                  >
+                    {pwdMessage.text}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50"
+                >
+                  {changingPassword ? 'Updating Password...' : 'Update Password'}
+                </button>
+              </form>
+            </div>
+
+            <div className="pt-3 border-t border-white/5 text-[11px] text-text-muted flex items-center gap-2">
+              <FiShield className="text-amber-400" size={14} />
+              <span>Passwords are encrypted using one-way bcrypt hashing.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
