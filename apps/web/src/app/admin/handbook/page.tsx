@@ -74,7 +74,7 @@ export default function AdminHandbookPage() {
     const element = document.createElement('a');
     const file = new Blob([content], { type: 'text/plain;charset=utf-8' });
     element.href = URL.createObjectURL(file);
-    element.download = `${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.txt`;
+    element.download = `${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}.pdf`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -114,30 +114,21 @@ export default function AdminHandbookPage() {
             {/* Download & Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5 print:hidden">
               <a
-                href="/api/admin/handbook/download?format=md"
-                download="GoalMills_Sports_Media_Training_Handbook_2026.md"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95"
+                href="/api/admin/handbook/download"
+                download="GOALMILLS-Training-Resources-&-Handbooks.pdf"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95"
               >
-                <FiDownload size={15} />
-                <span>Download Handbook (.MD)</span>
-              </a>
-
-              <a
-                href="/api/admin/handbook/download?format=txt"
-                download="GoalMills_Sports_Media_Training_Handbook_2026.txt"
-                className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm border border-white/15 transition-all"
-              >
-                <FiFileText size={15} />
-                <span>Text (.TXT)</span>
+                <FiDownload size={16} />
+                <span>Download Official PDF</span>
               </a>
 
               <button
                 onClick={handlePrint}
-                className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold text-xs sm:text-sm border border-blue-500/20 transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm border border-white/15 transition-all"
                 title="Print or Save as PDF"
               >
                 <FiPrinter size={15} />
-                <span>Print / Save PDF</span>
+                <span>Print / Save as PDF</span>
               </button>
             </div>
           </div>

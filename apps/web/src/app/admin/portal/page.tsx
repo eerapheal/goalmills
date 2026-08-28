@@ -711,12 +711,12 @@ export default function StaffPortalPage() {
                   <span>Read Handbook</span>
                 </Link>
                 <a
-                  href="/api/admin/handbook/download?format=md"
-                  download="GoalMills_Sports_Media_Training_Handbook_2026.md"
+                  href="/api/admin/handbook/download"
+                  download="GOALMILLS-Training-Resources-&-Handbooks.pdf"
                   className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-all"
                 >
                   <FiDownload size={14} />
-                  <span>Download (.MD)</span>
+                  <span>Download PDF</span>
                 </a>
               </div>
             </div>
