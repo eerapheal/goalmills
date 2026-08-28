@@ -2673,6 +2673,7 @@ export interface ScorecardMetric {
   name: string;
   weight: number; // e.g. 15 for 15%
   score: number; // 0 - 100
+  weightedScore?: number;
   notes?: string;
 }
 

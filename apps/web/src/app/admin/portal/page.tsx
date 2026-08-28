@@ -26,7 +26,12 @@ import {
   FiClock,
   FiPlus,
   FiTrash2,
+  FiChevronDown,
+  FiAlertCircle,
+  FiEdit3,
 } from 'react-icons/fi';
+
+type PortalTab = 'daily_report' | 'training_checklist' | 'standup' | 'payroll_contract';
 
 export default function StaffPortalPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -37,29 +42,27 @@ export default function StaffPortalPage() {
   const [evaluations, setEvaluations] = useState<PerformanceScorecard[]>([]);
   const [payroll, setPayroll] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<PortalTab>('daily_report');
 
   // Daily Submission Form State
   const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0]);
   const [tasksCompleted, setTasksCompleted] = useState('');
-  const [sourcesUsedInput, setSourcesUsedInput] = useState('');
-  const [engagementSummary, setEngagementSummary] = useState('');
-  const [problemsEncountered, setProblemsEncountered] = useState('');
-  const [lessonsLearned, setLessonsLearned] = useState('');
-
+  const [sourcesUsed, setSourcesUsed] = useState('GoalMills Newsroom Wire, Opta Sports Data');
+  const [blockers, setBlockers] = useState('None');
+  const [learningTakeaway, setLearningTakeaway] = useState('');
   const [articles, setArticles] = useState<{ title: string; url: string; category: string }[]>([
     { title: '', url: '', category: 'Football' },
   ]);
-  const [socialPosts, setSocialPosts] = useState<
-    { platform: 'X' | 'Facebook' | 'Instagram' | 'TikTok' | 'YouTube' | 'WhatsApp'; url: string }[]
-  >([{ platform: 'X', url: '' }]);
-  const [mediaAssets, setMediaAssets] = useState<
-    { type: 'canva_graphic' | 'short_video' | 'youtube_video' | 'reel'; title: string; link: string }[]
-  >([{ type: 'canva_graphic', title: '', link: '' }]);
-
+  const [socialPosts, setSocialPosts] = useState<{ platform: string; url: string }[]>([
+    { platform: 'X', url: '' },
+  ]);
+  const [mediaAssets, setMediaAssets] = useState<{ type: string; title: string; link: string }[]>([
+    { type: 'canva_graphic', title: '', link: '' },
+  ]);
   const [submittingReport, setSubmittingReport] = useState(false);
-  const [reportSuccessMsg, setReportSuccessMsg] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const fetchStaffData = async (employeeId?: string) => {
+  const fetchStaffData = async (empId?: string) => {
     try {
       setLoading(true);
       const empRes = await fetch('/api/admin/employees');
@@ -67,37 +70,37 @@ export default function StaffPortalPage() {
 
       if (empJson.success && empJson.data.length > 0) {
         setEmployees(empJson.data);
-        const emp = employeeId
-          ? empJson.data.find((e: any) => e._id === employeeId)
+        const targetEmp = empId
+          ? empJson.data.find((e: Employee) => e._id === empId) || empJson.data[0]
           : empJson.data[0];
-        setCurrentEmployee(emp);
+        setCurrentEmployee(targetEmp);
 
-        if (emp) {
-          const [trainRes, repRes, standupRes, evalRes, payRes] = await Promise.all([
-            fetch(`/api/training?employeeId=${emp._id}`),
-            fetch(`/api/reports/daily?employeeId=${emp._id}`),
-            fetch('/api/standups'),
-            fetch(`/api/evaluations?employeeId=${emp._id}`),
-            fetch(`/api/payroll?employeeId=${emp._id}`),
-          ]);
+        const [trainRes, repRes, standRes, evalRes, payRes] = await Promise.all([
+          fetch(`/api/training?employeeId=${targetEmp._id}`),
+          fetch(`/api/reports/daily?employeeId=${targetEmp._id}`),
+          fetch('/api/standups'),
+          fetch('/api/evaluations'),
+          fetch(`/api/payroll?employeeId=${targetEmp._id}`),
+        ]);
 
-          const [tJson, rJson, sJson, evJson, pJson] = await Promise.all([
-            trainRes.json(),
-            repRes.json(),
-            standupRes.json(),
-            evalRes.json(),
-            payRes.json(),
-          ]);
+        const [trainJson, repJson, standJson, evalJson, payJson] = await Promise.all([
+          trainRes.json(),
+          repRes.json(),
+          standRes.json(),
+          evalRes.json(),
+          payRes.json(),
+        ]);
 
-          if (tJson.success) setTraining(tJson.data);
-          if (rJson.success) setReports(rJson.data);
-          if (sJson.success && sJson.data.length > 0) setLatestStandup(sJson.data[0]);
-          if (evJson.success) setEvaluations(evJson.data);
-          if (pJson.success) setPayroll(pJson.data);
+        if (trainJson.success) setTraining(trainJson.data);
+        if (repJson.success) setReports(repJson.data);
+        if (standJson.success && standJson.data.length > 0) setLatestStandup(standJson.data[0]);
+        if (evalJson.success) {
+          setEvaluations(evalJson.data.filter((e: PerformanceScorecard) => e.employeeId === targetEmp._id));
         }
+        if (payJson.success) setPayroll(payJson.data);
       }
     } catch (err) {
-      console.error('Error fetching staff portal data:', err);
+      console.error('Error loading staff portal data:', err);
     } finally {
       setLoading(false);
     }
@@ -107,17 +110,22 @@ export default function StaffPortalPage() {
     fetchStaffData();
   }, []);
 
-  const handleTaskToggle = async (moduleId: string, task: string, currentCompleted: string[]) => {
+  const handleSwitchEmployee = (empId: string) => {
+    fetchStaffData(empId);
+  };
+
+  const handleToggleTask = async (moduleId: string, task: string, completed: boolean) => {
     if (!currentEmployee) return;
     try {
-      const exists = currentCompleted.includes(task);
-      const updated = exists
-        ? currentCompleted.filter((t) => t !== task)
-        : [...currentCompleted, task];
+      const currentMod = training?.modules?.find((m) => m.moduleId === moduleId);
+      const currentTasks = currentMod?.completedTasks || [];
+      const updatedTasks = completed
+        ? [...currentTasks, task]
+        : currentTasks.filter((t) => t !== task);
 
-      const modItem = GOALMILLS_TRAINING_MODULES.find((c) => c.id === moduleId);
-      const totalTasks = modItem ? modItem.checklist.length : 5;
-      const isComplete = updated.length === totalTasks;
+      const modMeta = GOALMILLS_TRAINING_MODULES.find((m) => m.id === moduleId);
+      const isComplete = modMeta ? updatedTasks.length >= modMeta.checklist.length : false;
+      const status = isComplete ? 'completed' : updatedTasks.length > 0 ? 'in_progress' : 'not_started';
 
       await fetch('/api/training', {
         method: 'POST',
@@ -125,32 +133,39 @@ export default function StaffPortalPage() {
         body: JSON.stringify({
           employeeId: currentEmployee._id,
           moduleId,
-          completedTasks: updated,
-          status: isComplete ? 'completed' : updated.length > 0 ? 'in_progress' : 'not_started',
+          completedTasks: updatedTasks,
+          status,
         }),
       });
-
       fetchStaffData(currentEmployee._id);
     } catch (err) {
-      console.error('Error updating task checklist:', err);
+      console.error('Error toggling training item:', err);
     }
   };
 
-  const handleReportSubmit = async (e: React.FormEvent) => {
+  const handleAddArticle = () => {
+    setArticles([...articles, { title: '', url: '', category: 'Football' }]);
+  };
+
+  const handleAddSocial = () => {
+    setSocialPosts([...socialPosts, { platform: 'X', url: '' }]);
+  };
+
+  const handleAddMedia = () => {
+    setMediaAssets([...mediaAssets, { type: 'canva_graphic', title: '', link: '' }]);
+  };
+
+  const handleSubmitDailyReport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentEmployee) return;
 
     try {
       setSubmittingReport(true);
-      setReportSuccessMsg('');
+      setSubmitSuccess(false);
 
-      const validArticles = articles.filter((a) => a.title.trim() && a.url.trim());
-      const validSocial = socialPosts.filter((s) => s.url.trim());
-      const validMedia = mediaAssets.filter((m) => m.title.trim() && m.link.trim());
-      const sources = sourcesUsedInput
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const validArticles = articles.filter((a) => a.title && a.url);
+      const validSocial = socialPosts.filter((s) => s.url);
+      const validMedia = mediaAssets.filter((m) => m.link);
 
       const res = await fetch('/api/reports/daily', {
         method: 'POST',
@@ -159,25 +174,21 @@ export default function StaffPortalPage() {
           employeeId: currentEmployee._id,
           employeeName: currentEmployee.fullName,
           reportDate,
+          tasksCompleted,
           articles: validArticles,
           socialPosts: validSocial,
           mediaAssets: validMedia,
-          sourcesUsed: sources,
-          engagementSummary,
-          problemsEncountered,
-          lessonsLearned,
-          tasksCompleted,
+          sourcesUsed,
+          learningTakeaway,
+          blockers,
         }),
       });
 
       const json = await res.json();
       if (json.success) {
-        setReportSuccessMsg('Daily Content Report submitted successfully for editorial review!');
+        setSubmitSuccess(true);
         setTasksCompleted('');
-        setSourcesUsedInput('');
-        setEngagementSummary('');
-        setProblemsEncountered('');
-        setLessonsLearned('');
+        setLearningTakeaway('');
         setArticles([{ title: '', url: '', category: 'Football' }]);
         setSocialPosts([{ platform: 'X', url: '' }]);
         setMediaAssets([{ type: 'canva_graphic', title: '', link: '' }]);
@@ -205,105 +216,189 @@ export default function StaffPortalPage() {
   const progressPercent = training?.overallProgressPercent || 0;
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 pt-[85px] sm:pt-[95px] text-white">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-3.5 sm:p-6 pt-[80px] sm:pt-[95px] text-white">
+      <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6">
         <AdminNavBar />
 
-        {/* Staff Switcher Header */}
-        <div className="glass-card p-6 rounded-3xl border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xl">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
-              {currentEmployee?.fullName.slice(0, 2)}
-            </div>
-            <div>
+        {/* Top Profile & Active Staff Member Card */}
+        {currentEmployee && (
+          <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 sm:gap-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center text-slate-950 font-black text-xl sm:text-2xl shadow-lg shadow-amber-500/20 flex-shrink-0">
+                  {currentEmployee.fullName.slice(0, 2)}
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="text-lg sm:text-2xl font-black text-white">{currentEmployee.fullName}</h1>
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] sm:text-xs font-bold uppercase">
+                      {currentEmployee.status === 'training' ? '⚡ 30-Day Trainee' : currentEmployee.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {currentEmployee.jobTitle} • {currentEmployee.department}
+                  </p>
+                </div>
+              </div>
+
+              {/* Employee Switcher Dropdown */}
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black text-white">{currentEmployee?.fullName}</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
-                  {currentEmployee?.status === 'training' ? '⚡ 30-Day Trainee' : 'Staff Member'}
+                <span className="text-xs text-text-muted font-bold whitespace-nowrap hidden sm:inline">
+                  Viewing Profile:
+                </span>
+                <div className="relative w-full sm:w-auto">
+                  <select
+                    value={currentEmployee._id}
+                    onChange={(e) => handleSwitchEmployee(e.target.value)}
+                    className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-xs sm:text-sm font-bold text-slate-200 focus:border-amber-500 focus:outline-none pr-8 shadow-inner"
+                  >
+                    {employees.map((e) => (
+                      <option key={e._id} value={e._id}>
+                        {e.fullName}
+                      </option>
+                    ))}
+                  </select>
+                  <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 border-t border-white/5">
+              <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Curriculum Progress</span>
+                <span className="text-sm sm:text-base font-black text-amber-400 mt-0.5 block">{progressPercent}% Completed</span>
+              </div>
+
+              <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Daily Reports</span>
+                <span className="text-sm sm:text-base font-black text-white mt-0.5 block">{reports.length} Submitted</span>
+              </div>
+
+              <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Monthly Stipend</span>
+                <span className="text-sm sm:text-base font-black text-emerald-400 mt-0.5 block">
+                  ₦{(currentEmployee.currentSalary || 30000).toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-text-muted mt-0.5">
-                {currentEmployee?.jobTitle} • {currentEmployee?.department}
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            {employees.length > 1 && (
-              <select
-                value={currentEmployee?._id}
-                onChange={(e) => fetchStaffData(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 focus:outline-none"
-              >
-                {employees.map((emp) => (
-                  <option key={emp._id} value={emp._id}>
-                    Switch to: {emp.fullName}
-                  </option>
-                ))}
-              </select>
-            )}
-
-            <Link
-              href={`/admin/employees/${currentEmployee?._id}/appointment`}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-md"
-            >
-              <FiFileText size={14} />
-              <span>{currentEmployee?.appointmentSigned ? 'View Signed Contract' : 'Sign Contract'}</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* 5 PM Standup & Notification Banner */}
-        {latestStandup && (
-          <div className="glass-card p-5 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                <FiVideo size={20} />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-sm">
-                  Daily Newsroom Stand-Up: {latestStandup.time} (Google Meet)
-                </h3>
-                <p className="text-xs text-emerald-300 mt-0.5">
-                  Host: {latestStandup.hostName} • Review daily stories, Canva assets & assignments
-                </p>
+              <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Appointment Contract</span>
+                <Link
+                  href={`/admin/employees/${currentEmployee._id}/appointment`}
+                  className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1 mt-0.5"
+                >
+                  <span>{currentEmployee.appointmentSigned ? '✓ Signed' : 'Sign Now'}</span>
+                  <FiExternalLink size={11} />
+                </Link>
               </div>
             </div>
-
-            <a
-              href={latestStandup.meetUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md whitespace-nowrap"
-            >
-              <span>Join 5:00 PM Meet</span>
-              <FiExternalLink size={12} />
-            </a>
           </div>
         )}
 
-        {/* Main Grid: Daily Report Submission & Training Checklist */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Daily Content Report Form */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-6">
+        {/* ------------------------------------------------------------- */}
+        {/* Mobile Dropdown & Desktop Tab Controls */}
+        {/* ------------------------------------------------------------- */}
+        <div className="space-y-4">
+          {/* Mobile Dropdown View Selector */}
+          <div className="block sm:hidden">
+            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">
+              Workspace Module
+            </label>
+            <div className="relative">
+              <select
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value as PortalTab)}
+                className="w-full appearance-none px-4 py-3 rounded-2xl bg-slate-900 border border-white/15 text-white font-bold text-sm focus:outline-none focus:border-amber-500 transition-colors"
+              >
+                <option value="daily_report">📝 Submit Daily Report</option>
+                <option value="training_checklist">🎓 30-Day Training Modules</option>
+                <option value="standup">📹 5:00 PM Newsroom Standup</option>
+                <option value="payroll_contract">💼 Contract & Pay Slips</option>
+              </select>
+              <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
+          </div>
+
+          {/* Desktop Navigation Tabs */}
+          <div className="hidden sm:flex items-center gap-2 p-1 bg-slate-900/80 rounded-2xl border border-white/10 backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => setActiveTab('daily_report')}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'daily_report'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <FiCheckSquare size={15} />
+              <span>Submit Daily Report</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('training_checklist')}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'training_checklist'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <FiAward size={15} />
+              <span>30-Day Curriculum</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('standup')}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'standup'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <FiVideo size={15} />
+              <span>5:00 PM Standup</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('payroll_contract')}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+                activeTab === 'payroll_contract'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <FiFileText size={15} />
+              <span>Contract & Pay Slips</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tab 1: Submit Daily Report */}
+        {activeTab === 'daily_report' && (
+          <div className="glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <FiCheckSquare className="text-amber-400" /> End-of-Day Daily Content Submission
+                <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
+                  <FiCheckSquare className="text-blue-400" /> End-of-Day Content Production Submission
                 </h2>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Submit all published stories, social media posts, Canva graphics & video links for editorial review
+                  Submit articles, social posts, Canva graphics, and short video links produced today
                 </p>
               </div>
+            </div>
 
-              {reportSuccessMsg && (
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
-                  <FiCheckCircle size={16} />
-                  <span>{reportSuccessMsg}</span>
-                </div>
-              )}
+            {submitSuccess && (
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-bold flex items-center gap-2 animate-fade-in">
+                <FiCheckCircle size={18} />
+                <span>Daily content report submitted successfully! Editorial review is in progress.</span>
+              </div>
+            )}
 
-              <form onSubmit={handleReportSubmit} className="space-y-5">
+            <form onSubmit={handleSubmitDailyReport} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">Report Date *</label>
                   <input
@@ -311,346 +406,412 @@ export default function StaffPortalPage() {
                     required
                     value={reportDate}
                     onChange={(e) => setReportDate(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
-                {/* Articles Published Section */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-blue-400">Articles Published Today</label>
-                    <button
-                      type="button"
-                      onClick={() => setArticles([...articles, { title: '', url: '', category: 'Football' }])}
-                      className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-bold"
-                    >
-                      <FiPlus size={12} /> Add Article
-                    </button>
-                  </div>
-
-                  {articles.map((art, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="Article Headline"
-                        value={art.title}
-                        onChange={(e) => {
-                          const copy = [...articles];
-                          copy[idx].title = e.target.value;
-                          setArticles(copy);
-                        }}
-                        className="flex-1 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:border-blue-500 focus:outline-none"
-                      />
-                      <input
-                        type="url"
-                        placeholder="https://goalmills.com/..."
-                        value={art.url}
-                        onChange={(e) => {
-                          const copy = [...articles];
-                          copy[idx].url = e.target.value;
-                          setArticles(copy);
-                        }}
-                        className="flex-1 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:border-blue-500 focus:outline-none"
-                      />
-                      {articles.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => setArticles(articles.filter((_, i) => i !== idx))}
-                          className="p-2 text-slate-500 hover:text-red-400"
-                        >
-                          <FiTrash2 size={14} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Social Posts Section */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-purple-400">Social Media Posts (X, FB, IG, TikTok, YouTube)</label>
-                    <button
-                      type="button"
-                      onClick={() => setSocialPosts([...socialPosts, { platform: 'X', url: '' }])}
-                      className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 font-bold"
-                    >
-                      <FiPlus size={12} /> Add Social Post
-                    </button>
-                  </div>
-
-                  {socialPosts.map((post, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <select
-                        value={post.platform}
-                        onChange={(e: any) => {
-                          const copy = [...socialPosts];
-                          copy[idx].platform = e.target.value;
-                          setSocialPosts(copy);
-                        }}
-                        className="p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:outline-none"
-                      >
-                        <option value="X">X (Twitter)</option>
-                        <option value="Facebook">Facebook</option>
-                        <option value="Instagram">Instagram</option>
-                        <option value="TikTok">TikTok</option>
-                        <option value="YouTube">YouTube</option>
-                        <option value="WhatsApp">WhatsApp</option>
-                      </select>
-                      <input
-                        type="url"
-                        placeholder="Post Direct URL"
-                        value={post.url}
-                        onChange={(e) => {
-                          const copy = [...socialPosts];
-                          copy[idx].url = e.target.value;
-                          setSocialPosts(copy);
-                        }}
-                        className="flex-1 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:border-blue-500 focus:outline-none"
-                      />
-                      {socialPosts.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => setSocialPosts(socialPosts.filter((_, i) => i !== idx))}
-                          className="p-2 text-slate-500 hover:text-red-400"
-                        >
-                          <FiTrash2 size={14} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Canva Graphics & Videos */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-amber-400">Canva Graphics & Video Assets</label>
-                    <button
-                      type="button"
-                      onClick={() => setMediaAssets([...mediaAssets, { type: 'canva_graphic', title: '', link: '' }])}
-                      className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 font-bold"
-                    >
-                      <FiPlus size={12} /> Add Graphic / Video
-                    </button>
-                  </div>
-
-                  {mediaAssets.map((media, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <select
-                        value={media.type}
-                        onChange={(e: any) => {
-                          const copy = [...mediaAssets];
-                          copy[idx].type = e.target.value;
-                          setMediaAssets(copy);
-                        }}
-                        className="p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:outline-none"
-                      >
-                        <option value="canva_graphic">Canva Graphic</option>
-                        <option value="short_video">Short Video (Reel/TikTok)</option>
-                        <option value="youtube_video">YouTube Video</option>
-                      </select>
-                      <input
-                        type="text"
-                        placeholder="Asset Title"
-                        value={media.title}
-                        onChange={(e) => {
-                          const copy = [...mediaAssets];
-                          copy[idx].title = e.target.value;
-                          setMediaAssets(copy);
-                        }}
-                        className="flex-1 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:border-blue-500 focus:outline-none"
-                      />
-                      <input
-                        type="url"
-                        placeholder="Canva / Drive / Video Link"
-                        value={media.link}
-                        onChange={(e) => {
-                          const copy = [...mediaAssets];
-                          copy[idx].link = e.target.value;
-                          setMediaAssets(copy);
-                        }}
-                        className="flex-1 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:border-blue-500 focus:outline-none"
-                      />
-                      {mediaAssets.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => setMediaAssets(mediaAssets.filter((_, i) => i !== idx))}
-                          className="p-2 text-slate-500 hover:text-red-400"
-                        >
-                          <FiTrash2 size={14} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Sources Used */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Fact-Checking & Sources Verified (One per line)
-                  </label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Research Sources Used *</label>
+                  <input
+                    type="text"
+                    required
+                    value={sourcesUsed}
+                    onChange={(e) => setSourcesUsed(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Summary of Tasks Completed Today *
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="Detail published sports match previews, social breaking news threads, Canva graphics created, and SEO optimization..."
+                  value={tasksCompleted}
+                  onChange={(e) => setTasksCompleted(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              {/* Dynamic Articles Array */}
+              <div className="space-y-2.5 pt-2 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Published Website Articles
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAddArticle}
+                    className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                  >
+                    <FiPlus size={14} /> Add Article Link
+                  </button>
+                </div>
+                {articles.map((art, idx) => (
+                  <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Article Headline"
+                      value={art.title}
+                      onChange={(e) => {
+                        const next = [...articles];
+                        next[idx].title = e.target.value;
+                        setArticles(next);
+                      }}
+                      className="sm:col-span-6 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    />
+                    <input
+                      type="url"
+                      placeholder="https://goalmills-web.vercel.app/news/..."
+                      value={art.url}
+                      onChange={(e) => {
+                        const next = [...articles];
+                        next[idx].url = e.target.value;
+                        setArticles(next);
+                      }}
+                      className="sm:col-span-5 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    />
+                    {articles.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setArticles(articles.filter((_, i) => i !== idx))}
+                        className="sm:col-span-1 p-2 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center"
+                      >
+                        <FiTrash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Dynamic Social Media Array */}
+              <div className="space-y-2.5 pt-2 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Social Media Posts (X / Facebook / Instagram / TikTok)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAddSocial}
+                    className="text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                  >
+                    <FiPlus size={14} /> Add Social Link
+                  </button>
+                </div>
+                {socialPosts.map((post, idx) => (
+                  <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <select
+                      value={post.platform}
+                      onChange={(e) => {
+                        const next = [...socialPosts];
+                        next[idx].platform = e.target.value;
+                        setSocialPosts(next);
+                      }}
+                      className="sm:col-span-3 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    >
+                      <option value="X">X (Twitter)</option>
+                      <option value="Facebook">Facebook</option>
+                      <option value="Instagram">Instagram</option>
+                      <option value="TikTok">TikTok</option>
+                    </select>
+                    <input
+                      type="url"
+                      placeholder="Post live link..."
+                      value={post.url}
+                      onChange={(e) => {
+                        const next = [...socialPosts];
+                        next[idx].url = e.target.value;
+                        setSocialPosts(next);
+                      }}
+                      className="sm:col-span-8 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    />
+                    {socialPosts.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setSocialPosts(socialPosts.filter((_, i) => i !== idx))}
+                        className="sm:col-span-1 p-2 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center"
+                      >
+                        <FiTrash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Dynamic Media Assets Array */}
+              <div className="space-y-2.5 pt-2 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Canva Graphics & Video Match Highlights
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAddMedia}
+                    className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    <FiPlus size={14} /> Add Media Link
+                  </button>
+                </div>
+                {mediaAssets.map((media, idx) => (
+                  <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <select
+                      value={media.type}
+                      onChange={(e) => {
+                        const next = [...mediaAssets];
+                        next[idx].type = e.target.value;
+                        setMediaAssets(next);
+                      }}
+                      className="sm:col-span-3 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    >
+                      <option value="canva_graphic">Canva Graphic</option>
+                      <option value="video_clip">Video Clip</option>
+                      <option value="infographic">Match Infographic</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Asset Title / Caption"
+                      value={media.title}
+                      onChange={(e) => {
+                        const next = [...mediaAssets];
+                        next[idx].title = e.target.value;
+                        setMediaAssets(next);
+                      }}
+                      className="sm:col-span-4 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    />
+                    <input
+                      type="url"
+                      placeholder="Asset Link / Google Drive / Cloudinary..."
+                      value={media.link}
+                      onChange={(e) => {
+                        const next = [...mediaAssets];
+                        next[idx].link = e.target.value;
+                        setMediaAssets(next);
+                      }}
+                      className="sm:col-span-4 p-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white"
+                    />
+                    {mediaAssets.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setMediaAssets(mediaAssets.filter((_, i) => i !== idx))}
+                        className="sm:col-span-1 p-2 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center"
+                      >
+                        <FiTrash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Key Learning Takeaway</label>
                   <textarea
                     rows={2}
-                    placeholder="e.g. Official Premier League press release, Fabrizio Romano club confirmation..."
-                    value={sourcesUsedInput}
-                    onChange={(e) => setSourcesUsedInput(e.target.value)}
+                    placeholder="What new editorial technique, tool or insight did you apply today?"
+                    value={learningTakeaway}
+                    onChange={(e) => setLearningTakeaway(e.target.value)}
                     className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs focus:border-blue-500 focus:outline-none"
                   />
                 </div>
 
-                {/* Tasks Completed & Reflections */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Summary of Tasks Completed *
-                  </label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Blockers / Editorial Questions</label>
                   <textarea
-                    rows={3}
-                    required
-                    placeholder="Detailed summary of all writing, social publishing, graphic design, and audience engagement completed today..."
-                    value={tasksCompleted}
-                    onChange={(e) => setTasksCompleted(e.target.value)}
+                    rows={2}
+                    placeholder="Any technical or editorial challenges?"
+                    value={blockers}
+                    onChange={(e) => setBlockers(e.target.value)}
                     className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs focus:border-blue-500 focus:outline-none"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Problems Encountered</label>
-                    <input
-                      type="text"
-                      placeholder="Any hurdles, delays or issues"
-                      value={problemsEncountered}
-                      onChange={(e) => setProblemsEncountered(e.target.value)}
-                      className="w-full p-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Lessons Learned</label>
-                    <input
-                      type="text"
-                      placeholder="New skills or takeaways today"
-                      value={lessonsLearned}
-                      onChange={(e) => setLessonsLearned(e.target.value)}
-                      className="w-full p-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
+              <div className="pt-4 border-t border-white/10 flex items-center justify-end">
                 <button
                   type="submit"
                   disabled={submittingReport}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-blue-500/25 disabled:opacity-50 transition-all"
+                  className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-blue-500/20 disabled:opacity-50 transition-all"
                 >
                   {submittingReport ? 'Submitting Report...' : 'Submit End-of-Day Report'}
                 </button>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
+        )}
 
-          {/* Right Column: Training Curriculum & Recent Reports */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* 30-Day Training Progress Box */}
-            <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-5 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div>
-                  <h3 className="font-bold text-white text-base flex items-center gap-2">
-                    <FiAward className="text-amber-400" /> 30-Day Training Checklist
-                  </h3>
-                  <p className="text-xs text-text-muted">Interactive Practical Curriculum</p>
-                </div>
-                <span className="text-sm font-black text-emerald-400">{progressPercent}%</span>
-              </div>
+        {/* Tab 2: 30-Day Training Curriculum */}
+        {activeTab === 'training_checklist' && (
+          <div className="space-y-6 animate-fade-in">
+            {GOALMILLS_TRAINING_MODULES.map((mod, idx) => {
+              const modProgress = training?.modules?.find((m) => m.moduleId === mod.id);
+              const completedCount = modProgress?.completedTasks?.length || 0;
+              const isDone = modProgress?.status === 'completed' || (completedCount >= mod.checklist.length && mod.checklist.length > 0);
 
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-                {GOALMILLS_TRAINING_MODULES.map((mod) => {
-                  const userMod = training?.modules?.find((m) => m.moduleId === mod.id);
-                  const completedTasks = userMod?.completedTasks || [];
-                  const isDone = userMod?.status === 'completed';
-
-                  return (
-                    <div
-                      key={mod.id}
-                      className={`p-3.5 rounded-2xl border text-xs space-y-2 ${
-                        isDone
-                          ? 'bg-emerald-950/20 border-emerald-500/30'
-                          : 'bg-slate-950/60 border-white/5'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between font-bold">
-                        <span className="text-slate-200">{mod.title}</span>
-                        <span className="text-[10px] text-amber-400">{mod.weightPercent}%</span>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        {mod.checklist.map((task, i) => {
-                          const checked = completedTasks.includes(task);
-                          return (
-                            <label
-                              key={i}
-                              className="flex items-start gap-2 text-slate-300 hover:text-white cursor-pointer"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={() => handleTaskToggle(mod.id, task, completedTasks)}
-                                className="mt-0.5 rounded border-white/20 bg-slate-950 text-emerald-500 focus:ring-0"
-                              />
-                              <span className={checked ? 'line-through text-slate-500' : ''}>{task}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
+              return (
+                <div key={mod.id} className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl space-y-4">
+                  <div className="border-b border-white/10 pb-3 flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">
+                        Module {idx + 1} • {mod.category} ({mod.weightPercent}%)
+                      </span>
+                      <h3 className="text-base sm:text-lg font-black text-white mt-0.5">{mod.title}</h3>
+                      <p className="text-xs text-text-muted mt-0.5">{mod.description}</p>
                     </div>
-                  );
-                })}
+                    {isDone && (
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold flex-shrink-0">
+                        ✓ Completed
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Curriculum Tasks ({completedCount}/{mod.checklist.length}):
+                    </span>
+                    <div className="space-y-2">
+                      {mod.checklist.map((taskStr: string, tIdx: number) => {
+                        const isTaskDone = modProgress?.completedTasks?.includes(taskStr) || false;
+                        return (
+                          <button
+                            key={tIdx}
+                            type="button"
+                            onClick={() => handleToggleTask(mod.id, taskStr, !isTaskDone)}
+                            className={`w-full flex items-start gap-3 p-2.5 rounded-lg border text-left text-xs transition-all ${
+                              isTaskDone
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300 font-medium line-through'
+                                : 'bg-slate-950/40 border-white/5 text-slate-300 hover:border-white/20'
+                            }`}
+                          >
+                            <span
+                              className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded flex items-center justify-center text-xs ${
+                                isTaskDone ? 'bg-emerald-500 text-slate-950 font-bold' : 'border border-slate-600'
+                              }`}
+                            >
+                              {isTaskDone && '✓'}
+                            </span>
+                            <span>{taskStr}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Tab 3: 5:00 PM Standup */}
+        {activeTab === 'standup' && (
+          <div className="glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+              <div>
+                <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
+                  <FiVideo className="text-emerald-400" /> Daily 5:00 PM WAT Newsroom Stand-Up
+                </h2>
+                <p className="text-xs text-text-muted mt-0.5">
+                  Join Google Meet sync with managing editor Raphael Ekpenisi
+                </p>
               </div>
+
+              <a
+                href={latestStandup?.meetUrl || 'https://meet.google.com/goalmills-newsroom'}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all"
+              >
+                <span>Launch Google Meet</span>
+                <FiExternalLink size={16} />
+              </a>
             </div>
 
-            {/* Recent Submissions & Feedback */}
-            <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-2xl">
-              <h3 className="font-bold text-white text-base flex items-center gap-2">
-                <FiCheckSquare className="text-blue-400" /> Recent Daily Reports
-              </h3>
+            {latestStandup && (
+              <div className="bg-slate-900/60 p-4 sm:p-6 rounded-2xl border border-white/5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-400 uppercase">Today's Meeting Brief</span>
+                  <span className="text-xs text-text-muted">{latestStandup.meetingDate} • {latestStandup.time}</span>
+                </div>
 
-              {reports.length === 0 ? (
-                <p className="text-xs text-text-muted italic">No previous daily reports submitted.</p>
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-slate-300">Editorial Priorities & Assignment Focus:</p>
+                  <ul className="space-y-1.5 text-xs text-slate-200">
+                    {latestStandup.editorialPriorities?.map((p, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 4: Contracts & Pay Slips */}
+        {activeTab === 'payroll_contract' && (
+          <div className="space-y-6 animate-fade-in">
+            {currentEmployee && (
+              <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                    <FiFileText size={22} />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-white">Employment & Training Contract</h3>
+                    <p className="text-xs text-text-muted">30-Clause Appointment Letter & Digital e-Signature</p>
+                  </div>
+                </div>
+
+                <Link
+                  href={`/admin/employees/${currentEmployee._id}/appointment`}
+                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 text-center"
+                >
+                  {currentEmployee.appointmentSigned ? 'View Signed Contract' : 'Review & Sign Contract'}
+                </Link>
+              </div>
+            )}
+
+            {/* Payout History */}
+            <div className="glass-card rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+              <div className="p-4 sm:p-5 border-b border-white/10">
+                <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                  <FiDollarSign className="text-emerald-400" /> Allowance & Payout History
+                </h3>
+              </div>
+
+              {payroll.length === 0 ? (
+                <div className="p-8 text-center text-xs text-text-muted">
+                  No payout records generated yet for this period.
+                </div>
               ) : (
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {reports.map((rep) => (
-                    <div
-                      key={rep._id}
-                      className="p-3 bg-slate-950 rounded-2xl border border-white/5 text-xs space-y-1"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-200">{rep.reportDate}</span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                            rep.reviewStatus === 'approved'
-                              ? 'bg-emerald-500/20 text-emerald-400'
-                              : 'bg-amber-500/20 text-amber-400'
-                          }`}
-                        >
-                          {rep.reviewStatus}
+                <div className="divide-y divide-white/5">
+                  {payroll.map((p) => (
+                    <div key={p._id} className="p-4 flex items-center justify-between gap-3 text-xs">
+                      <div>
+                        <span className="font-bold text-white text-sm block">{p.period}</span>
+                        <span className="text-text-muted">Base: ₦{p.baseAmount.toLocaleString()}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-black text-emerald-400 block">
+                          ₦{p.netPay.toLocaleString()}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          p.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                        }`}>
+                          {p.status}
                         </span>
                       </div>
-
-                      {rep.editorScore && (
-                        <p className="text-amber-400 font-bold">
-                          Score: {rep.editorScore} / 10
-                        </p>
-                      )}
-                      {rep.editorFeedback && (
-                        <p className="text-slate-400 italic text-[11px]">
-                          Editor Note: {rep.editorFeedback}
-                        </p>
-                      )}
                     </div>
                   ))}
                 </div>
               )}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
