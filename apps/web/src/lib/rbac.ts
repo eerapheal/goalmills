@@ -1,7 +1,5 @@
 import { UserRole } from '@goalmills/types';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { NextResponse } from 'next/server';
+
 
 // ---------------------------------------------------------------------------
 // Permission Actions — every gated action in the system
@@ -275,47 +273,9 @@ export function canAccessPath(role: UserRole | undefined | null, pathname: strin
 }
 
 // ---------------------------------------------------------------------------
-// API route guard — reusable server-side session + permission check
-// ---------------------------------------------------------------------------
-/**
- * Verify the current session has the required permission.
- * Returns `{ session, error }` — if `error` is set, return it immediately from the route.
- */
-export async function requirePermission(requiredAction: PermissionAction) {
-  const session = (await getServerSession(authOptions)) as any;
-
-  if (!session || !session.user) {
-    return {
-      session: null,
-      error: NextResponse.json(
-        { message: 'Unauthorized: Authentication required' },
-        { status: 401 }
-      ),
-    };
-  }
-
-  const role = session.user.role as UserRole | undefined;
-
-  if (!hasPermission(role, requiredAction)) {
-    return {
-      session,
-      error: NextResponse.json(
-        {
-          message: `Forbidden: Insufficient permissions. Required: ${requiredAction}`,
-          requiredRole: requiredAction,
-          currentRole: role,
-        },
-        { status: 403 }
-      ),
-    };
-  }
-
-  return { session, error: null };
-}
-
-// ---------------------------------------------------------------------------
 // Route ➜ Permission mapping for middleware
 // ---------------------------------------------------------------------------
+
 export const ROUTE_PERMISSION_MAP: { pathPrefix: string; permission: PermissionAction }[] = [
   { pathPrefix: '/admin/users', permission: 'users:manage' },
   { pathPrefix: '/api/admin/users', permission: 'users:manage' },

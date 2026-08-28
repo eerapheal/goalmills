@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Payroll from '@/models/Payroll';
 import Employee from '@/models/Employee';
-import { requirePermission, hasPermission } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
+import { requirePermission } from '@/lib/serverAuth';
+
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { isValidObjectId } from '@/lib/security';

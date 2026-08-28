@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Employee from '@/models/Employee';
-import { requirePermission } from '@/lib/rbac';
+import { requirePermission } from '@/lib/serverAuth';
+
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

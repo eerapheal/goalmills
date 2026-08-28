@@ -5,7 +5,9 @@ import Employee from '@/models/Employee';
 import User from '@/models/User';
 import TrainingProgress from '@/models/TrainingProgress';
 import { GOALMILLS_TRAINING_MODULES } from '@/lib/trainingCurriculum';
-import { requirePermission, hasPermission } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
+import { requirePermission } from '@/lib/serverAuth';
+
 import { sanitizeObject, escapeRegex } from '@/lib/security';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';

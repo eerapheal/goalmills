@@ -4,7 +4,9 @@ import DailyReport from '@/models/DailyReport';
 import Employee from '@/models/Employee';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { hasPermission, requirePermission } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
+import { requirePermission } from '@/lib/serverAuth';
+
 import { UserRole } from '@goalmills/types';
 
 export async function GET(req: NextRequest) {

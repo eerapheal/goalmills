@@ -3,7 +3,9 @@ import dbConnect from '@/lib/db';
 import PerformanceEvaluation from '@/models/PerformanceEvaluation';
 import Employee from '@/models/Employee';
 import { OFFICIAL_SCORECARD_METRICS } from '@/lib/trainingCurriculum';
-import { requirePermission, hasPermission } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
+import { requirePermission } from '@/lib/serverAuth';
+
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { isValidObjectId } from '@/lib/security';
