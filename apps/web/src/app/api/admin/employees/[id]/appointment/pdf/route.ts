@@ -170,7 +170,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const badgeX = (PAGE_WIDTH - badgeWidth) / 2;
     page.drawRectangle({
       x: badgeX, y: PAGE_HEIGHT - 100, width: badgeWidth, height: 22,
-      color: rgb(245 / 255, 158 / 255, 11 / 255),
+      color: rgb(255 / 255, 251 / 255, 235 / 255),
       borderColor: GOLD, borderWidth: 1,
     });
     page.drawText(badgeText, {
