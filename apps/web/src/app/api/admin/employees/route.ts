@@ -60,59 +60,7 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    let employees = await Employee.find(query).sort({ createdAt: -1 });
-
-    // If no employees exist yet, seed initial employee (Ibeh Udochukwu Gift Temitope)
-    if (employees.length === 0 && !search && (!status || status === 'all')) {
-      const defaultEmail = 'giftibeh585@gmail.com';
-      let defaultUser = await User.findOne({ email: defaultEmail });
-      if (!defaultUser) {
-        const hashedPassword = await bcrypt.hash('GoalMills2026!', 10);
-        defaultUser = await User.create({
-          username: 'Ibeh Udochukwu Gift Temitope',
-          email: defaultEmail,
-          password: hashedPassword,
-          role: 'staff',
-        });
-      }
-
-      const defaultEmployee = await Employee.create({
-        userId: defaultUser._id,
-        fullName: 'Ibeh Udochukwu Gift Temitope',
-        email: defaultEmail,
-        phone: '08134336192',
-        address: 'No 35 church street, Jos, Plateau State',
-        jobTitle: 'Sports Media & Social Media Content Officer',
-        department: 'Editorial & Digital Media',
-        workArrangement: 'Remote',
-        reportsTo: 'Ekpenisi Erue Raphael (Founder / Managing Editor)',
-        startDate: '2026-09-01',
-        trainingEndDate: '2026-09-30',
-        status: 'training',
-        trainingAllowance: 30000,
-        startingSalary: 50000,
-        currentSalary: 30000,
-        currency: 'NGN',
-        appointmentSigned: false,
-        companySignature: 'Ekpenisi Erue Raphael',
-        companyRepresentative: 'Founder',
-      });
-
-      // Initialize training progress
-      await TrainingProgress.create({
-        employeeId: defaultEmployee._id,
-        modules: GOALMILLS_TRAINING_MODULES.map((m) => ({
-          moduleId: m.id,
-          status: 'in_progress',
-          completedTasks: [],
-          submissionLinks: [],
-        })),
-        overallProgressPercent: 0,
-        finalAssessmentCompleted: false,
-      });
-
-      employees = [defaultEmployee];
-    }
+    const employees = await Employee.find(query).sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, count: employees.length, data: employees });
   } catch (error: any) {

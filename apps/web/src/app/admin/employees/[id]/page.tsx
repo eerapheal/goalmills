@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import AdminNavBar from '@/components/admin/AdminNavBar';
 import GoalmillsLoader from '@/components/GoalmillsLoader';
 import { Employee, EmployeeTrainingProgress } from '@goalmills/types';
@@ -15,15 +16,43 @@ import {
   FiCheckSquare,
   FiChevronDown,
   FiChevronUp,
+  FiTrash2,
 } from 'react-icons/fi';
 import { GOALMILLS_TRAINING_MODULES } from '@/lib/trainingCurriculum';
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [training, setTraining] = useState<EmployeeTrainingProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({});
+
+  const handleDelete = async () => {
+    if (!employee) return;
+    if (
+      !confirm(
+        `Are you sure you want to completely delete ${employee.fullName} from the database?\n\nThis will remove their user account, employee profile, training progress, reports, evaluations, and payroll records.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/employees/${id}`, {
+        method: 'DELETE',
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        router.push('/admin/employees');
+      } else {
+        alert(json.error || 'Failed to delete employee');
+      }
+    } catch (err) {
+      console.error('Error deleting employee:', err);
+      alert('An error occurred while deleting employee');
+    }
+  };
 
   const fetchEmployeeData = async () => {
     try {
@@ -138,6 +167,14 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <FiFileText size={14} />
               <span>{employee.appointmentSigned ? 'View Signed Contract' : 'Sign Contract'}</span>
             </Link>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold text-xs uppercase tracking-wider transition-all w-full sm:w-auto"
+            >
+              <FiTrash2 size={14} />
+              <span>Delete Employee</span>
+            </button>
           </div>
         </div>
 

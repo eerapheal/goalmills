@@ -29,6 +29,7 @@ import {
   FiCopy,
   FiLock,
   FiKey,
+  FiTrash2,
 } from 'react-icons/fi';
 
 export default function EmployeesPage() {
@@ -136,6 +137,33 @@ export default function EmployeesPage() {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
+  };
+
+  const handleDeleteEmployee = async (empId?: string, name?: string) => {
+    if (!empId) return;
+    const employeeName = name || 'this employee';
+    if (
+      !confirm(
+        `Are you sure you want to completely delete ${employeeName} from the system?\n\nThis will remove their user account, employee profile, training progress, reports, evaluations, and payroll records from the database.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/employees/${empId}`, {
+        method: 'DELETE',
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setEmployees((prev) => prev.filter((e) => e._id !== empId));
+      } else {
+        alert(json.error || 'Failed to delete employee');
+      }
+    } catch (err) {
+      console.error('Error deleting employee:', err);
+      alert('An error occurred while deleting the employee');
+    }
   };
 
   const filteredEmployees = employees.filter((emp) => {
@@ -405,6 +433,14 @@ export default function EmployeesPage() {
                         >
                           Contract
                         </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEmployee(emp._id, emp.fullName)}
+                          className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all flex items-center justify-center"
+                          title={`Delete ${emp.fullName}`}
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
                       </div>
                     </div>
                   );
@@ -488,13 +524,23 @@ export default function EmployeesPage() {
                           </td>
 
                           <td className="p-4 text-right">
-                            <Link
-                              href={`/admin/employees/${emp._id}`}
-                              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-600/20"
-                            >
-                              <span>Manage</span>
-                              <FiChevronRight size={14} />
-                            </Link>
+                            <div className="flex items-center justify-end gap-2">
+                              <Link
+                                href={`/admin/employees/${emp._id}`}
+                                className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-600/20"
+                              >
+                                <span>Manage</span>
+                                <FiChevronRight size={14} />
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteEmployee(emp._id, emp.fullName)}
+                                className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all"
+                                title={`Delete ${emp.fullName}`}
+                              >
+                                <FiTrash2 size={14} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );

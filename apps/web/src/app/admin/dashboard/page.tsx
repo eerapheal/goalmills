@@ -1,164 +1,31 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 import CreateNewsForm from '@/components/admin/CreateNewsForm';
 import UploadVideoForm from '@/components/admin/UploadVideoForm';
 import NewsList from '@/components/admin/NewsList';
 import VideoList from '@/components/admin/VideoList';
-import Link from 'next/link';
 import AdminNavBar from '@/components/admin/AdminNavBar';
 import {
   FiFileText,
   FiVideo,
   FiList,
-  FiUsers,
-  FiAward,
-  FiDollarSign,
-  FiCalendar,
-  FiCheckSquare,
-  FiUserCheck,
   FiChevronDown,
-  FiBookOpen,
 } from 'react-icons/fi';
-import type { UserRole } from '@goalmills/types';
-import type { PermissionAction } from '@/lib/rbac';
-import { hasPermission } from '@/lib/rbac';
-
-interface QuickLinkCard {
-  href: string;
-  label: string;
-  sublabel: string;
-  icon: typeof FiBookOpen;
-  colorClass: string;
-  requiredPermission: PermissionAction;
-}
-
-const EMS_QUICK_LINKS: QuickLinkCard[] = [
-  {
-    href: '/admin/handbook',
-    label: 'Handbook & SOPs',
-    sublabel: 'Curriculum & Guide',
-    icon: FiBookOpen,
-    colorClass: 'amber',
-    requiredPermission: 'handbook:read',
-  },
-  {
-    href: '/admin/employees',
-    label: 'Staff & Trainees',
-    sublabel: 'Directory & Contracts',
-    icon: FiUsers,
-    colorClass: 'amber',
-    requiredPermission: 'employees:read',
-  },
-  {
-    href: '/admin/reports',
-    label: 'Daily Reports',
-    sublabel: 'Review & Grading',
-    icon: FiCheckSquare,
-    colorClass: 'blue',
-    requiredPermission: 'reports:read_own',
-  },
-  {
-    href: '/admin/standup',
-    label: '5:00 PM Stand-up',
-    sublabel: 'Meet & Roll-Call',
-    icon: FiCalendar,
-    colorClass: 'emerald',
-    requiredPermission: 'standup:attend',
-  },
-  {
-    href: '/admin/evaluations',
-    label: 'Scorecards',
-    sublabel: '100% Metric Matrix',
-    icon: FiAward,
-    colorClass: 'purple',
-    requiredPermission: 'evaluations:read',
-  },
-  {
-    href: '/admin/payroll',
-    label: 'Payroll Ledger',
-    sublabel: '₦30k / ₦50k Stipends',
-    icon: FiDollarSign,
-    colorClass: 'emerald',
-    requiredPermission: 'payroll:read',
-  },
-  {
-    href: '/admin/portal',
-    label: 'Staff Portal',
-    sublabel: 'Candidate Self-Service',
-    icon: FiUserCheck,
-    colorClass: 'cyan',
-    requiredPermission: 'articles:read',
-  },
-];
 
 type CreationTab = 'news' | 'video' | 'manage';
 type ManageSubTab = 'news' | 'video';
 
 export default function AdminDashboard() {
-  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<CreationTab>('news');
   const [manageSubTab, setManageSubTab] = useState<ManageSubTab>('news');
   const [videoRefreshTrigger, setVideoRefreshTrigger] = useState(0);
-
-  const userRole = (session?.user?.role as UserRole) || undefined;
-  const visibleQuickLinks = useMemo(
-    () => EMS_QUICK_LINKS.filter((card) => hasPermission(userRole, card.requiredPermission)),
-    [userRole]
-  );
 
   return (
     <div className="min-h-screen bg-background p-3.5 sm:p-6 pt-[80px] sm:pt-[95px]">
       <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6">
         {/* Navigation Bar with Mobile Dropdown & Desktop Pills */}
         <AdminNavBar />
-
-        {/* EMS Quick Launch Hub — filtered by user role */}
-        {visibleQuickLinks.length > 0 && (
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <span>⚡</span> Employee Management & Training Operations
-              </h2>
-              {hasPermission(userRole, 'handbook:read') && (
-                <Link
-                  href="/admin/handbook"
-                  className="text-[11px] sm:text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
-                >
-                  Open Handbook &rarr;
-                </Link>
-              )}
-            </div>
-
-            <div
-              className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(visibleQuickLinks.length, 7)} gap-2.5 sm:gap-3`}
-            >
-              {visibleQuickLinks.map((card) => {
-                const Icon = card.icon;
-                return (
-                  <Link
-                    key={card.href}
-                    href={card.href}
-                    className={`glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-${card.colorClass}-500/40 hover:bg-${card.colorClass}-500/5 transition-all group shadow-md`}
-                  >
-                    <div
-                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-${card.colorClass}-500/10 border border-${card.colorClass}-500/20 flex items-center justify-center text-${card.colorClass}-400 mb-2 group-hover:scale-110 transition-transform`}
-                    >
-                      <Icon size={18} />
-                    </div>
-                    <p
-                      className={`text-xs font-bold text-white group-hover:text-${card.colorClass}-400 transition-colors truncate`}
-                    >
-                      {card.label}
-                    </p>
-                    <p className="text-[10px] text-text-muted mt-0.5 truncate">{card.sublabel}</p>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {/* ------------------------------------------------------------- */}
         {/* Mobile-First Segmented / Dropdown Content Creation Selector */}
