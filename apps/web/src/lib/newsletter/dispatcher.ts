@@ -1,9 +1,11 @@
 import dbConnect from '@/lib/db';
 import NewsletterSubscriber from '@/models/NewsletterSubscriber';
 import NewsletterCampaign from '@/models/NewsletterCampaign';
+import CampaignRecipient from '@/models/CampaignRecipient';
 import News from '@/models/News';
 import { generateNewsletterHTML, formatArticlePreview } from './curator';
-import type { NewsletterAudience, NewsletterFrequency, NewsletterArticlePreview } from '@goalmills/types';
+import { generatePreflightReport, createCampaignRecipientSnapshot } from '@/lib/deliverability/healthGate';
+import type { NewsletterAudience, NewsletterArticlePreview, CampaignPreflightReport } from '@goalmills/types';
 
 export interface DispatchCampaignParams {
   campaignId?: string;
@@ -15,19 +17,22 @@ export interface DispatchCampaignParams {
   articleIds?: string[];
   articles?: NewsletterArticlePreview[];
   createdBy?: string;
+  isHighPriority?: boolean;
 }
 
 export interface DispatchResult {
   success: boolean;
   campaignId: string;
   totalRecipients: number;
-  successCount: number;
-  failureCount: number;
+  eligibleCount: number;
+  suppressedCount: number;
   message: string;
+  preflightReport?: CampaignPreflightReport;
 }
 
 /**
- * Dispatches a newsletter campaign to target subscribers
+ * Dispatches a newsletter campaign using the Deliverability Gate,
+ * Recipient Snapshotting, and Go Domain Router.
  */
 export async function dispatchNewsletter(params: DispatchCampaignParams): Promise<DispatchResult> {
   await dbConnect();
@@ -42,19 +47,8 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
     articles = docs.map(formatArticlePreview);
   }
 
-  // 2. Query Target Active Subscribers
-  const query: any = { status: 'active' };
-
-  if (params.targetAudience === 'daily_subscribers') {
-    query.$or = [{ frequency: 'daily' }, { frequency: 'all' }];
-  } else if (params.targetAudience === 'weekly_subscribers') {
-    query.$or = [{ frequency: 'weekly' }, { frequency: 'all' }];
-  } else if (params.targetAudience === 'monthly_subscribers') {
-    query.$or = [{ frequency: 'monthly' }, { frequency: 'all' }];
-  }
-  // 'all_subscribers' includes all active subscribers
-
-  const subscribers = await NewsletterSubscriber.find(query);
+  // 2. Run Pre-Flight Deliverability Gate & Filter Eligible Recipients
+  const { report, eligibleSubscribers } = await generatePreflightReport(params.targetAudience);
 
   // 3. Create or update Campaign document
   let campaign: any;
@@ -71,9 +65,10 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       targetAudience: params.targetAudience,
       articleIds: articles.map((a) => a._id),
       status: 'processing',
+      preflightReport: report,
       createdBy: params.createdBy || 'admin',
       stats: {
-        totalRecipients: subscribers.length,
+        totalRecipients: eligibleSubscribers.length,
         successCount: 0,
         failureCount: 0,
         openCount: 0,
@@ -81,11 +76,12 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
     });
   } else {
     campaign.status = 'processing';
-    campaign.stats.totalRecipients = subscribers.length;
+    campaign.preflightReport = report;
+    campaign.stats.totalRecipients = eligibleSubscribers.length;
     await campaign.save();
   }
 
-  if (subscribers.length === 0) {
+  if (eligibleSubscribers.length === 0) {
     campaign.status = 'sent';
     campaign.sentAt = new Date();
     await campaign.save();
@@ -93,14 +89,23 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
     return {
       success: true,
       campaignId: campaign._id.toString(),
-      totalRecipients: 0,
-      successCount: 0,
-      failureCount: 0,
-      message: 'No active subscribers found for this audience tier.',
+      totalRecipients: report.totalRecipients,
+      eligibleCount: 0,
+      suppressedCount: report.suppressedCount,
+      message: 'No deliverable recipients found after Deliverability Gate filtering.',
+      preflightReport: report,
     };
   }
 
-  // 4. Try Dispatching via Go Mailer Microservice first
+  // 4. Create Immutable Campaign Recipient Snapshot in MongoDB
+  await createCampaignRecipientSnapshot(campaign._id.toString(), eligibleSubscribers);
+
+  // Fetch created recipient records to get recipient IDs for telemetry tracking
+  const recipientRecords = await CampaignRecipient.find({ campaignId: campaign._id }).select('_id email');
+  const recipientIdMap = new Map<string, string>();
+  recipientRecords.forEach((r) => recipientIdMap.set(r.email.toLowerCase(), r._id.toString()));
+
+  // 5. Submit to Go Mailer Domain Queue Engine
   let dispatchedViaGo = false;
   try {
     const goPayload = {
@@ -109,6 +114,7 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       previewText: params.previewText || '',
       editorialNote: params.editorialNote || '',
       frequency: params.frequencyTier,
+      isHighPriority: !!params.isHighPriority,
       articles: articles.map((a) => ({
         id: a._id,
         title: a.title,
@@ -124,17 +130,20 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
         author: a.author,
         url: `${siteUrl}/news/${a.slug || a._id}`,
       })),
-      recipients: subscribers.map((s) => ({
-        email: s.email,
-        unsubscribeToken: s.unsubscribeToken,
-      })),
+      recipients: eligibleSubscribers.map((s) => {
+        const email = (s.emailNormalized || s.email).toLowerCase();
+        return {
+          email,
+          unsubscribeToken: s.unsubscribeToken,
+          recipientId: recipientIdMap.get(email) || '',
+        };
+      }),
     };
 
     const goRes = await fetch(`${mailerServiceUrl}/api/dispatch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(goPayload),
-      // Short timeout to fallback quickly if Go daemon is not currently active
       signal: AbortSignal.timeout(3000),
     });
 
@@ -145,22 +154,22 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       }
     }
   } catch (err) {
-    // Go microservice offline or local - fallback to Node/Next.js batch processor
+    // Go microservice offline or local - proceed with fallback
   }
 
-  // 5. Update last email sent on subscribers
-  const subscriberIds = subscribers.map((s) => s._id);
+  // 6. Update last email sent on subscribers
+  const subscriberIds = eligibleSubscribers.map((s) => s._id);
   await NewsletterSubscriber.updateMany(
     { _id: { $in: subscriberIds } },
-    { $set: { lastEmailSentAt: new Date() } }
+    { $set: { lastSentAt: new Date() } }
   );
 
-  // 6. Complete Campaign Stats
+  // 7. Complete Campaign Status
   campaign.status = 'sent';
   campaign.sentAt = new Date();
   campaign.stats = {
-    totalRecipients: subscribers.length,
-    successCount: subscribers.length,
+    totalRecipients: eligibleSubscribers.length,
+    successCount: eligibleSubscribers.length,
     failureCount: 0,
     openCount: 0,
   };
@@ -169,11 +178,12 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
   return {
     success: true,
     campaignId: campaign._id.toString(),
-    totalRecipients: subscribers.length,
-    successCount: subscribers.length,
-    failureCount: 0,
+    totalRecipients: report.totalRecipients,
+    eligibleCount: eligibleSubscribers.length,
+    suppressedCount: report.suppressedCount,
     message: dispatchedViaGo
-      ? `Dispatched to ${subscribers.length} subscribers via Go Mailer service`
-      : `Dispatched to ${subscribers.length} subscribers successfully`,
+      ? `Dispatched to ${eligibleSubscribers.length} deliverable subscribers via Go Domain Router (${report.suppressedCount} suppressed)`
+      : `Dispatched to ${eligibleSubscribers.length} deliverable subscribers (${report.suppressedCount} suppressed)`,
+    preflightReport: report,
   };
 }

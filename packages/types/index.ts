@@ -2715,29 +2715,159 @@ export interface PayrollRecord {
 }
 
 // ============================================================================
-// GOALMILLS ENTERPRISE NEWSLETTER & MAILING SYSTEM TYPES
+// GOALMILLS ENTERPRISE NEWSLETTER, DELIVERABILITY & REPUTATION TYPES
 // ============================================================================
 
 export type NewsletterFrequency = 'daily' | 'weekly' | 'monthly' | 'all';
-export type NewsletterSubscriberStatus = 'active' | 'unsubscribed' | 'bounced';
-export type NewsletterCampaignStatus = 'draft' | 'scheduled' | 'processing' | 'sent' | 'failed';
+
+export type SubscriberHealthStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'ACTIVE'
+  | 'ENGAGED'
+  | 'INACTIVE'
+  | 'SOFT_BOUNCE'
+  | 'HARD_BOUNCE'
+  | 'COMPLAINT'
+  | 'SUPPRESSED'
+  | 'UNSUBSCRIBED';
+
+export type NewsletterSubscriberStatus = SubscriberHealthStatus | 'active' | 'unsubscribed' | 'bounced';
+
+export type SuppressionReason =
+  | 'HARD_BOUNCE'
+  | 'COMPLAINT'
+  | 'UNSUBSCRIBE'
+  | 'MANUAL'
+  | 'INVALID_EMAIL'
+  | 'POLICY'
+  | 'GLOBAL_SUPPRESSION';
+
+export type CampaignRecipientStatus =
+  | 'PENDING'
+  | 'SKIPPED'
+  | 'QUEUED'
+  | 'SENDING'
+  | 'DELIVERED'
+  | 'DEFERRED'
+  | 'SOFT_BOUNCED'
+  | 'HARD_BOUNCED'
+  | 'COMPLAINED'
+  | 'FAILED';
+
+export type DeliverabilityRisk = 'LOW' | 'MEDIUM' | 'HIGH';
+
+export type EmailEventType =
+  | 'delivered'
+  | 'opened'
+  | 'clicked'
+  | 'soft_bounce'
+  | 'hard_bounce'
+  | 'complaint'
+  | 'unsubscribed'
+  | 'deferred';
+
+export type NewsletterCampaignStatus = 'draft' | 'scheduled' | 'processing' | 'sent' | 'failed' | 'paused';
 export type NewsletterAudience =
   | 'daily_subscribers'
   | 'weekly_subscribers'
   | 'monthly_subscribers'
-  | 'all_subscribers';
+  | 'all_subscribers'
+  | 'engaged_only'
+  | 'reengagement_targets';
 
 export interface NewsletterSubscriber {
   _id?: string;
   email: string;
+  emailNormalized: string;
+  status: SubscriberHealthStatus;
   frequency: NewsletterFrequency;
   categories?: string[];
-  status: NewsletterSubscriberStatus;
+  emailHealthScore: number; // 0 - 100
+  engagementScore: number; // 0 - 100
+  reputationRiskScore: number; // 0 - 100
+  confirmedAt?: string;
+  confirmationToken?: string;
   unsubscribeToken: string;
+  lastOpenedAt?: string;
+  lastClickedAt?: string;
+  lastSentAt?: string;
+  softBounceCount: number;
+  hardBounceCount: number;
+  complaintCount: number;
   source?: string;
-  lastEmailSentAt?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface EmailSuppression {
+  _id?: string;
+  emailNormalized: string;
+  reason: SuppressionReason;
+  source: string;
+  campaignId?: string;
+  metadata?: Record<string, any>;
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CampaignRecipient {
+  _id?: string;
+  campaignId: string;
+  subscriberId: string;
+  email: string;
+  status: CampaignRecipientStatus;
+  domain: string;
+  attempts: number;
+  lastError?: string;
+  sentAt?: string;
+  deliveredAt?: string;
+  openedAt?: string;
+  clickedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface EmailEvent {
+  _id?: string;
+  eventId: string;
+  email: string;
+  eventType: EmailEventType;
+  provider: string;
+  campaignId?: string;
+  recipientId?: string;
+  metadata?: Record<string, any>;
+  timestamp: string;
+  createdAt?: string;
+}
+
+export interface EmailValidationResult {
+  isValid: boolean;
+  isSendable: boolean;
+  emailNormalized: string;
+  domain: string;
+  isDisposable: boolean;
+  isRoleAccount: boolean;
+  hasMxRecord: boolean;
+  hasTypo: boolean;
+  suggestedCorrection?: string;
+  reason?: string;
+}
+
+export interface CampaignPreflightReport {
+  totalRecipients: number;
+  eligibleCount: number;
+  suppressedCount: number;
+  hardBouncedCount: number;
+  lowEngagementCount: number;
+  inactiveCount: number;
+  frequencyCappedCount: number;
+  expectedRisk: DeliverabilityRisk;
+  bounceRiskPercentage: number;
+  complaintRiskPercentage: number;
+  recommendations: string[];
+  canProceed: boolean;
 }
 
 export interface NewsletterArticlePreview {
@@ -2768,14 +2898,20 @@ export interface NewsletterCampaign {
   scheduledFor?: string;
   sentAt?: string;
   status: NewsletterCampaignStatus;
+  preflightReport?: CampaignPreflightReport;
   stats?: {
     totalRecipients: number;
     successCount: number;
     failureCount: number;
     openCount: number;
+    clickCount?: number;
+    softBounceCount?: number;
+    hardBounceCount?: number;
+    complaintCount?: number;
   };
   createdBy: string;
   createdAt?: string;
   updatedAt?: string;
 }
+
 

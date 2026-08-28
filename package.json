@@ -15,7 +15,10 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "ci": "turbo run lint test build",
     "web": "turbo run dev --filter=web",
-    "mobile": "turbo run dev --filter=mobiles"
+    "mobile": "turbo run dev --filter=mobiles",
+    "mailer:docker": "docker compose -f services/mailer/docker-compose.yml up --build",
+    "mailer:docker:down": "docker compose -f services/mailer/docker-compose.yml down",
+    "mailer:dev": "cd services/mailer && go run ./cmd/server/main.go"
   },
   "devDependencies": {
     "@types/react": "~19.2.18",

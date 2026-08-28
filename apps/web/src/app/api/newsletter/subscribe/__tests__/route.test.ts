@@ -5,12 +5,35 @@ vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
+vi.mock('@/lib/deliverability/suppression', () => ({
+  isEmailSuppressed: vi.fn().mockResolvedValue(false),
+}));
+
+vi.mock('@/lib/deliverability/validator', () => ({
+  validateEmail: vi.fn().mockImplementation((email: string) => {
+    if (!email || !email.includes('@')) {
+      return Promise.resolve({ isValid: false, isSendable: false, emailNormalized: '', domain: '', isDisposable: false, isRoleAccount: false, hasMxRecord: false, hasTypo: false, reason: 'Invalid syntax' });
+    }
+    return Promise.resolve({
+      isValid: true,
+      isSendable: true,
+      emailNormalized: email.toLowerCase().trim(),
+      domain: email.split('@')[1],
+      isDisposable: false,
+      isRoleAccount: false,
+      hasMxRecord: true,
+      hasTypo: false,
+    });
+  }),
+}));
+
 const { mockSubscriber } = vi.hoisted(() => ({
   mockSubscriber: {
     _id: 'sub-1',
     email: 'fan@goalmills.com',
+    emailNormalized: 'fan@goalmills.com',
     frequency: 'daily',
-    status: 'active',
+    status: 'CONFIRMED',
     unsubscribeToken: 'mock-unsub-token-123',
     save: vi.fn().mockResolvedValue(true),
   },
@@ -43,7 +66,7 @@ describe('Newsletter Subscribe API (/api/newsletter/subscribe)', () => {
     expect(json.success).toBe(false);
   });
 
-  it('should create new subscriber with selected frequency', async () => {
+  it('should create new subscriber with selected frequency and deliverability scores', async () => {
     const req = new NextRequest('http://localhost:3000/api/newsletter/subscribe', {
       method: 'POST',
       body: JSON.stringify({

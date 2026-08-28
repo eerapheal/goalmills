@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,9 +12,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/goalmills/mailer/pkg/bounce"
 	"github.com/goalmills/mailer/pkg/curator"
 	"github.com/goalmills/mailer/pkg/mailer"
-	"github.com/goalmills/mailer/pkg/worker"
+	"github.com/goalmills/mailer/pkg/queue"
 	"github.com/robfig/cron/v3"
 )
 
@@ -23,6 +25,7 @@ type DispatchRequest struct {
 	PreviewText   string                `json:"previewText"`
 	EditorialNote string                `json:"editorialNote"`
 	Frequency     string                `json:"frequency"` // Daily, Weekly, Monthly, Special Broadcast
+	IsHighPriority bool                 `json:"isHighPriority"`
 	Articles      []curator.ArticleItem `json:"articles"`
 	Recipients    []Recipient           `json:"recipients"`
 }
@@ -30,6 +33,7 @@ type DispatchRequest struct {
 type Recipient struct {
 	Email            string `json:"email"`
 	UnsubscribeToken string `json:"unsubscribeToken"`
+	RecipientID      string `json:"recipientId"`
 }
 
 type DispatchResponse struct {
@@ -42,13 +46,13 @@ func main() {
 	cfg := mailer.LoadConfigFromEnv()
 	mailClient := mailer.NewMailer(cfg)
 
-	// High concurrency pool: 25 workers, 10,000 buffer, 50 emails/sec
-	pool := worker.NewWorkerPool(25, 10000, 50)
-	pool.Start()
-	defer pool.Stop()
+	// Priority-aware queue with 25 concurrent domain workers
+	pqManager := queue.NewPriorityQueueManager(25, 2000, 10000)
+	pqManager.Start()
+	defer pqManager.Stop()
 
 	// Initialize Robfig Cron for 10:00 AM Local Time (WAT / UTC+1)
-	c := cron.New(cron.WithLocation(time.FixedZone("WAT", 3600))) // UTC+1 WAT
+	c := cron.New(cron.WithLocation(time.FixedZone("WAT", 3600)))
 
 	// Daily 10:00 AM: "0 10 * * *"
 	_, err := c.AddFunc("0 10 * * *", func() {
@@ -86,16 +90,14 @@ func main() {
 
 	// Health & Telemetry
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
-		stats := pool.GetStats()
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]any{
-			"status":      "ok",
-			"service":     "goalmills-mailer",
-			"activeWorkers": stats.ActiveWorkers,
-			"totalSent":   stats.TotalSent,
-			"totalFailed": stats.TotalFailed,
-			"totalQueued": stats.TotalQueued,
-			"time":        time.Now().Format(time.RFC3339),
+			"status":            "ok",
+			"service":           "goalmills-mailer-enterprise",
+			"architecture":      "Audience-Intelligence & Deliverability-Gate",
+			"domainRateLimiting": true,
+			"priorityQueuing":   true,
+			"time":              time.Now().Format(time.RFC3339),
 		})
 	})
 
@@ -110,6 +112,11 @@ func main() {
 		if len(req.Recipients) == 0 {
 			http.Error(w, "no recipients provided", http.StatusBadRequest)
 			return
+		}
+
+		priority := queue.PriorityNormal
+		if req.IsHighPriority {
+			priority = queue.PriorityHigh
 		}
 
 		queuedCount := 0
@@ -129,19 +136,35 @@ func main() {
 				continue
 			}
 
-			job := worker.EmailJob{
+			task := queue.EmailTask{
+				ID:               fmt.Sprintf("%s-%s", req.CampaignID, rec.Email),
 				To:               rec.Email,
 				Subject:          req.Subject,
 				HTMLBody:         html,
 				UnsubscribeToken: rec.UnsubscribeToken,
 				CampaignID:       req.CampaignID,
-				MaxRetries:       3,
-				SendFunc: func(ctx context.Context, j worker.EmailJob) error {
-					return mailClient.SendRawEmail(ctx, j.To, j.Subject, j.HTMLBody, j.UnsubscribeToken)
+				RecipientID:      rec.RecipientID,
+				Priority:         priority,
+				Attempt:          1,
+				SendFunc: func(ctx context.Context, t queue.EmailTask) error {
+					return mailClient.SendRawEmail(ctx, t.To, t.Subject, t.HTMLBody, t.UnsubscribeToken)
+				},
+				OnSuccess: func(t queue.EmailTask) {
+					forwardEventToWebhook("delivered", t.To, t.CampaignID, t.RecipientID, nil)
+				},
+				OnFailure: func(t queue.EmailTask, analysis bounce.BounceAnalysis) {
+					eventType := "soft_bounce"
+					if analysis.Type == bounce.BounceTypeHard {
+						eventType = "hard_bounce"
+					}
+					forwardEventToWebhook(eventType, t.To, t.CampaignID, t.RecipientID, map[string]any{
+						"reason":      analysis.Reason,
+						"isPermanent": analysis.IsPermanent,
+					})
 				},
 			}
 
-			if pool.Submit(job) {
+			if pqManager.Submit(task) {
 				queuedCount++
 			}
 		}
@@ -150,7 +173,7 @@ func main() {
 		json.NewEncoder(w).Encode(DispatchResponse{
 			Success:     true,
 			QueuedCount: queuedCount,
-			Message:     fmt.Sprintf("Successfully queued %d emails for delivery", queuedCount),
+			Message:     fmt.Sprintf("Successfully queued %d emails with domain traffic shaping", queuedCount),
 		})
 	})
 
@@ -182,6 +205,31 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	server.Shutdown(ctx)
+}
+
+func forwardEventToWebhook(eventType, email, campaignID, recipientID string, metadata map[string]any) {
+	siteURL := os.Getenv("NEXT_PUBLIC_SITE_URL")
+	if siteURL == "" {
+		siteURL = "http://localhost:3000"
+	}
+
+	eventID := fmt.Sprintf("evt_%d_%s_%s", time.Now().UnixNano(), eventType, email)
+	payload := map[string]any{
+		"eventId":     eventID,
+		"email":       email,
+		"eventType":   eventType,
+		"provider":    "go_mailer",
+		"campaignId":  campaignID,
+		"recipientId": recipientID,
+		"metadata":    metadata,
+		"timestamp":   time.Now().Format(time.RFC3339),
+	}
+
+	body, _ := json.Marshal(payload)
+	go func() {
+		client := &http.Client{Timeout: 5 * time.Second}
+		_, _ = client.Post(fmt.Sprintf("%s/api/webhooks/mailer", siteURL), "application/json", bytes.NewBuffer(body))
+	}()
 }
 
 func triggerCronWebhook(frequency string) {
