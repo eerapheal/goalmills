@@ -18,6 +18,7 @@ import {
   FiMenu,
   FiX,
   FiChevronDown,
+  FiBookOpen,
 } from 'react-icons/fi';
 
 export default function AdminNavBar() {
@@ -28,6 +29,7 @@ export default function AdminNavBar() {
 
   const navItems = [
     { label: 'News & Media', href: '/admin/dashboard', icon: FiFileText, group: 'editorial' },
+    { label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen, group: 'ems' },
     { label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers, group: 'ems' },
     { label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare, group: 'ems' },
     { label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar, group: 'ems' },
@@ -133,6 +135,7 @@ export default function AdminNavBar() {
                 <option value="/admin/dashboard">📰 News & Media Publishing</option>
               </optgroup>
               <optgroup label="Employee Management & 30-Day Training">
+                <option value="/admin/handbook">📖 Training Handbook & SOPs</option>
                 <option value="/admin/employees">👥 Employees & Staff Directory</option>
                 <option value="/admin/reports">📋 Daily Content Reports</option>
                 <option value="/admin/standup">📹 5:00 PM Newsroom Stand-Up</option>

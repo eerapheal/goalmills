@@ -19,6 +19,7 @@ import {
   FiCheckSquare,
   FiUserCheck,
   FiChevronDown,
+  FiBookOpen,
 } from 'react-icons/fi';
 
 type CreationTab = 'news' | 'video' | 'manage';
@@ -43,14 +44,27 @@ export default function AdminDashboard() {
               <span>⚡</span> Employee Management & Training Operations
             </h2>
             <Link
-              href="/admin/employees"
+              href="/admin/handbook"
               className="text-[11px] sm:text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
             >
-              View All Roster &rarr;
+              Open Handbook &rarr;
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5 sm:gap-3">
+            <Link
+              href="/admin/handbook"
+              className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group shadow-md"
+            >
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-2 group-hover:scale-110 transition-transform">
+                <FiBookOpen size={18} />
+              </div>
+              <p className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                Handbook & SOPs
+              </p>
+              <p className="text-[10px] text-text-muted mt-0.5 truncate">Curriculum & Guide</p>
+            </Link>
+
             <Link
               href="/admin/employees"
               className="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group shadow-md"

@@ -29,6 +29,8 @@ import {
   FiChevronDown,
   FiAlertCircle,
   FiEdit3,
+  FiBookOpen,
+  FiDownload,
 } from 'react-icons/fi';
 
 type PortalTab = 'daily_report' | 'training_checklist' | 'standup' | 'payroll_contract';
@@ -685,6 +687,40 @@ export default function StaffPortalPage() {
         {/* Tab 2: 30-Day Training Curriculum */}
         {activeTab === 'training_checklist' && (
           <div className="space-y-6 animate-fade-in">
+            {/* Handbook & Operating SOPs Resource Banner */}
+            <div className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-slate-900 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                  <FiBookOpen size={12} />
+                  <span>Official Reference Manual</span>
+                </div>
+                <h3 className="text-sm sm:text-base font-black text-white">
+                  GoalMills Sports Media Training Resources & Handbooks
+                </h3>
+                <p className="text-xs text-slate-300 max-w-2xl">
+                  First Edition 2026 by Ekpenisi Erue Raphael. Access complete SOPs for sports journalism, verification, Canva design, video creation, SEO, and social distribution.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <Link
+                  href="/admin/handbook"
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md transition-all"
+                >
+                  <FiBookOpen size={14} />
+                  <span>Read Handbook</span>
+                </Link>
+                <a
+                  href="/api/admin/handbook/download?format=md"
+                  download="GoalMills_Sports_Media_Training_Handbook_2026.md"
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-all"
+                >
+                  <FiDownload size={14} />
+                  <span>Download (.MD)</span>
+                </a>
+              </div>
+            </div>
+
             {GOALMILLS_TRAINING_MODULES.map((mod, idx) => {
               const modProgress = training?.modules?.find((m) => m.moduleId === mod.id);
               const completedCount = modProgress?.completedTasks?.length || 0;
