@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { forwardProxyRequest } from '@/proxy';
+import { forwardProxyRequest } from '@/lib/proxyForwarder';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { checkRateLimit } from '@/lib/rateLimit';
