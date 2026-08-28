@@ -20,7 +20,9 @@ export function ContentHubLayout({
   className = '',
 }: ContentHubLayoutProps) {
   return (
-    <main className={`min-h-screen bg-[#070B12] text-white pt-[95px] sm:pt-[105px] pb-24 ${className}`}>
+    <main
+      className={`min-h-screen bg-[#070B12] text-white pt-[95px] sm:pt-[105px] pb-24 ${className}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
         <div className="mb-4 sm:mb-6">

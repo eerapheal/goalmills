@@ -73,16 +73,24 @@ export default async function TransfersPage() {
             </h3>
             <div className="space-y-2.5 text-xs">
               <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <span className="font-bold text-emerald-400 block">Tier 1: Official & Verified</span>
-                <span className="text-slate-300">Direct club announcements and verified signatures.</span>
+                <span className="font-bold text-emerald-400 block">
+                  Tier 1: Official & Verified
+                </span>
+                <span className="text-slate-300">
+                  Direct club announcements and verified signatures.
+                </span>
               </div>
               <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
                 <span className="font-bold text-blue-400 block">Tier 2: Advanced Negotiations</span>
-                <span className="text-slate-300">Personal terms agreed & active fee discussions.</span>
+                <span className="text-slate-300">
+                  Personal terms agreed & active fee discussions.
+                </span>
               </div>
               <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
                 <span className="font-bold text-purple-400 block">Tier 3: Verified Interest</span>
-                <span className="text-slate-300">Scouting inquiries and club monitoring leads.</span>
+                <span className="text-slate-300">
+                  Scouting inquiries and club monitoring leads.
+                </span>
               </div>
             </div>
           </div>

@@ -26,11 +26,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function AuthorProfilePage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function AuthorProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const author = EntityService.getAuthor(slug);
 
@@ -66,12 +62,7 @@ export default async function AuthorProfilePage({
         <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-[#0c1830] via-[#091224] to-[#050b16] p-6 sm:p-10 shadow-2xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-3xl overflow-hidden bg-slate-900 border-2 border-blue-500/40 shadow-xl flex-shrink-0">
-              <Image
-                src={author.photo}
-                alt={author.name}
-                fill
-                className="object-cover"
-              />
+              <Image src={author.photo} alt={author.name} fill className="object-cover" />
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">

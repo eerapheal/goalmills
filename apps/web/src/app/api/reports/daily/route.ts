@@ -79,7 +79,11 @@ export async function PATCH(req: NextRequest) {
     if (editorScore !== undefined) updateData.editorScore = editorScore;
     if (editorFeedback !== undefined) updateData.editorFeedback = editorFeedback;
 
-    const updated = await DailyReport.findByIdAndUpdate(reportId, { $set: updateData }, { new: true });
+    const updated = await DailyReport.findByIdAndUpdate(
+      reportId,
+      { $set: updateData },
+      { new: true }
+    );
 
     if (!updated) {
       return NextResponse.json({ success: false, error: 'Report not found' }, { status: 404 });

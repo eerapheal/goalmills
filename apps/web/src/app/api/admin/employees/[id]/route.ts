@@ -27,7 +27,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const { id } = await params;
     const body = await req.json();
 
-    const employee = await Employee.findByIdAndUpdate(id, { $set: body }, { new: true, runValidators: true });
+    const employee = await Employee.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true, runValidators: true }
+    );
 
     if (!employee) {
       return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });

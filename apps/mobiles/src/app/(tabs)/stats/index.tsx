@@ -22,13 +22,16 @@ export default function StatsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const selectedComp = COMPETITIONS_REGISTRY[selectedCompSlug] || COMPETITIONS_REGISTRY['premier-league'];
+  const selectedComp =
+    COMPETITIONS_REGISTRY[selectedCompSlug] || COMPETITIONS_REGISTRY['premier-league'];
 
   const loadData = async (compMeta = selectedComp) => {
     setLoading(true);
     try {
       const [standingsRes, scorersRes] = await Promise.all([
-        advancedFootballApi.getStandings(compMeta.id).catch(() => ({ success: 0, result: { total: [] } })),
+        advancedFootballApi
+          .getStandings(compMeta.id)
+          .catch(() => ({ success: 0, result: { total: [] } })),
         advancedFootballApi.getTopscorers(compMeta.id).catch(() => ({ success: 0, result: [] })),
       ]);
 
@@ -82,9 +85,7 @@ export default function StatsScreen() {
               onPress={() => setSelectedCompSlug(comp.slug)}
               style={[styles.compButton, isSelected && styles.compButtonActive]}
             >
-              {comp.logo ? (
-                <Image source={{ uri: comp.logo }} style={styles.compLogo} />
-              ) : null}
+              {comp.logo ? <Image source={{ uri: comp.logo }} style={styles.compLogo} /> : null}
               <Text style={[styles.compText, isSelected && styles.compTextActive]}>
                 {comp.name}
               </Text>

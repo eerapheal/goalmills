@@ -63,7 +63,11 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
       const modMeta = GOALMILLS_TRAINING_MODULES.find((m) => m.id === moduleId);
       const isComplete = modMeta ? updatedTasks.length >= modMeta.checklist.length : false;
-      const status = isComplete ? 'completed' : updatedTasks.length > 0 ? 'in_progress' : 'not_started';
+      const status = isComplete
+        ? 'completed'
+        : updatedTasks.length > 0
+          ? 'in_progress'
+          : 'not_started';
 
       const res = await fetch('/api/training', {
         method: 'POST',
@@ -99,7 +103,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     return (
       <div className="min-h-screen bg-background p-6 pt-[95px] text-white flex flex-col items-center justify-center space-y-4">
         <p className="text-red-400 font-bold">Employee not found.</p>
-        <Link href="/admin/employees" className="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold">
+        <Link
+          href="/admin/employees"
+          className="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold"
+        >
           &larr; Back to Employees
         </Link>
       </div>
@@ -154,20 +161,26 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     {isTraining ? '30-Day Training' : employee.status}
                   </span>
                 </div>
-                <p className="text-xs text-text-muted mt-0.5">{employee.jobTitle} • {employee.department}</p>
+                <p className="text-xs text-text-muted mt-0.5">
+                  {employee.jobTitle} • {employee.department}
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-4 bg-slate-900/60 p-3 rounded-2xl border border-white/5">
               <div>
-                <span className="text-[10px] text-text-muted uppercase block font-bold">Monthly Stipend</span>
+                <span className="text-[10px] text-text-muted uppercase block font-bold">
+                  Monthly Stipend
+                </span>
                 <span className="text-base sm:text-lg font-black text-emerald-400">
                   ₦{(employee.currentSalary || 30000).toLocaleString()}
                 </span>
               </div>
               <div className="h-8 w-px bg-white/10" />
               <div>
-                <span className="text-[10px] text-text-muted uppercase block font-bold">Post-Training</span>
+                <span className="text-[10px] text-text-muted uppercase block font-bold">
+                  Post-Training
+                </span>
                 <span className="text-base sm:text-lg font-black text-amber-400">
                   ₦{(employee.startingSalary || 50000).toLocaleString()}
                 </span>
@@ -181,7 +194,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <FiMail className="text-blue-400 flex-shrink-0" size={16} />
               <div className="truncate">
                 <span className="text-text-muted block text-[10px]">Email Address</span>
-                <span className="text-slate-200 font-semibold truncate block">{employee.email}</span>
+                <span className="text-slate-200 font-semibold truncate block">
+                  {employee.email}
+                </span>
               </div>
             </div>
 
@@ -197,7 +212,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <FiCalendar className="text-amber-400 flex-shrink-0" size={16} />
               <div>
                 <span className="text-text-muted block text-[10px]">Training Window</span>
-                <span className="text-slate-200 font-semibold">{employee.startDate} &rarr; {employee.trainingEndDate}</span>
+                <span className="text-slate-200 font-semibold">
+                  {employee.startDate} &rarr; {employee.trainingEndDate}
+                </span>
               </div>
             </div>
 
@@ -205,7 +222,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <FiMapPin className="text-purple-400 flex-shrink-0" size={16} />
               <div className="truncate">
                 <span className="text-text-muted block text-[10px]">Residential Address</span>
-                <span className="text-slate-200 font-semibold truncate block">{employee.address}</span>
+                <span className="text-slate-200 font-semibold truncate block">
+                  {employee.address}
+                </span>
               </div>
             </div>
           </div>
@@ -238,7 +257,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               const isOpen = openModules[module.id] ?? true;
               const modProgress = training?.modules?.find((m) => m.moduleId === module.id);
               const completedCount = modProgress?.completedTasks?.length || 0;
-              const isModuleDone = modProgress?.status === 'completed' || (completedCount >= module.checklist.length && module.checklist.length > 0);
+              const isModuleDone =
+                modProgress?.status === 'completed' ||
+                (completedCount >= module.checklist.length && module.checklist.length > 0);
 
               return (
                 <div
@@ -261,7 +282,9 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                           </span>
                         )}
                       </div>
-                      <h3 className="text-sm sm:text-base font-black text-white mt-0.5">{module.title}</h3>
+                      <h3 className="text-sm sm:text-base font-black text-white mt-0.5">
+                        {module.title}
+                      </h3>
                       <p className="text-xs text-text-muted mt-0.5">{module.description}</p>
                     </div>
                     <div className="p-2 rounded-xl bg-white/5 text-slate-400">
@@ -291,12 +314,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                               >
                                 <span
                                   className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded flex items-center justify-center text-xs ${
-                                    isDone ? 'bg-emerald-500 text-slate-950 font-bold' : 'border border-slate-600'
+                                    isDone
+                                      ? 'bg-emerald-500 text-slate-950 font-bold'
+                                      : 'border border-slate-600'
                                   }`}
                                 >
                                   {isDone && '✓'}
                                 </span>
-                                <span className={isDone ? 'line-through opacity-80' : ''}>{task}</span>
+                                <span className={isDone ? 'line-through opacity-80' : ''}>
+                                  {task}
+                                </span>
                               </button>
                             );
                           })}

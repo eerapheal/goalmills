@@ -118,7 +118,9 @@ export default async function ClubHubPage({
                 <FiUsers className="text-blue-400" />
                 <span>Featured Squad</span>
               </h3>
-              <span className="text-[10px] text-slate-400 uppercase font-bold">Player Profiles</span>
+              <span className="text-[10px] text-slate-400 uppercase font-bold">
+                Player Profiles
+              </span>
             </div>
 
             <div className="space-y-2">

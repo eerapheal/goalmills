@@ -95,7 +95,9 @@ export default function StaffPortalPage() {
         if (repJson.success) setReports(repJson.data);
         if (standJson.success && standJson.data.length > 0) setLatestStandup(standJson.data[0]);
         if (evalJson.success) {
-          setEvaluations(evalJson.data.filter((e: PerformanceScorecard) => e.employeeId === targetEmp._id));
+          setEvaluations(
+            evalJson.data.filter((e: PerformanceScorecard) => e.employeeId === targetEmp._id)
+          );
         }
         if (payJson.success) setPayroll(payJson.data);
       }
@@ -125,7 +127,11 @@ export default function StaffPortalPage() {
 
       const modMeta = GOALMILLS_TRAINING_MODULES.find((m) => m.id === moduleId);
       const isComplete = modMeta ? updatedTasks.length >= modMeta.checklist.length : false;
-      const status = isComplete ? 'completed' : updatedTasks.length > 0 ? 'in_progress' : 'not_started';
+      const status = isComplete
+        ? 'completed'
+        : updatedTasks.length > 0
+          ? 'in_progress'
+          : 'not_started';
 
       await fetch('/api/training', {
         method: 'POST',
@@ -230,9 +236,13 @@ export default function StaffPortalPage() {
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-lg sm:text-2xl font-black text-white">{currentEmployee.fullName}</h1>
+                    <h1 className="text-lg sm:text-2xl font-black text-white">
+                      {currentEmployee.fullName}
+                    </h1>
                     <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] sm:text-xs font-bold uppercase">
-                      {currentEmployee.status === 'training' ? '⚡ 30-Day Trainee' : currentEmployee.status}
+                      {currentEmployee.status === 'training'
+                        ? '⚡ 30-Day Trainee'
+                        : currentEmployee.status}
                     </span>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5">
@@ -258,7 +268,10 @@ export default function StaffPortalPage() {
                       </option>
                     ))}
                   </select>
-                  <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                  <FiChevronDown
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                    size={14}
+                  />
                 </div>
               </div>
             </div>
@@ -266,24 +279,36 @@ export default function StaffPortalPage() {
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 border-t border-white/5">
               <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
-                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Curriculum Progress</span>
-                <span className="text-sm sm:text-base font-black text-amber-400 mt-0.5 block">{progressPercent}% Completed</span>
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">
+                  Curriculum Progress
+                </span>
+                <span className="text-sm sm:text-base font-black text-amber-400 mt-0.5 block">
+                  {progressPercent}% Completed
+                </span>
               </div>
 
               <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
-                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Daily Reports</span>
-                <span className="text-sm sm:text-base font-black text-white mt-0.5 block">{reports.length} Submitted</span>
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">
+                  Daily Reports
+                </span>
+                <span className="text-sm sm:text-base font-black text-white mt-0.5 block">
+                  {reports.length} Submitted
+                </span>
               </div>
 
               <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
-                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Monthly Stipend</span>
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">
+                  Monthly Stipend
+                </span>
                 <span className="text-sm sm:text-base font-black text-emerald-400 mt-0.5 block">
                   ₦{(currentEmployee.currentSalary || 30000).toLocaleString()}
                 </span>
               </div>
 
               <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-white/5">
-                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">Appointment Contract</span>
+                <span className="text-[10px] sm:text-xs text-text-muted font-bold block uppercase">
+                  Appointment Contract
+                </span>
                 <Link
                   href={`/admin/employees/${currentEmployee._id}/appointment`}
                   className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1 mt-0.5"
@@ -316,7 +341,10 @@ export default function StaffPortalPage() {
                 <option value="standup">📹 5:00 PM Newsroom Standup</option>
                 <option value="payroll_contract">💼 Contract & Pay Slips</option>
               </select>
-              <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+              <FiChevronDown
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                size={18}
+              />
             </div>
           </div>
 
@@ -382,10 +410,12 @@ export default function StaffPortalPage() {
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
                 <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
-                  <FiCheckSquare className="text-blue-400" /> End-of-Day Content Production Submission
+                  <FiCheckSquare className="text-blue-400" /> End-of-Day Content Production
+                  Submission
                 </h2>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Submit articles, social posts, Canva graphics, and short video links produced today
+                  Submit articles, social posts, Canva graphics, and short video links produced
+                  today
                 </p>
               </div>
             </div>
@@ -393,14 +423,18 @@ export default function StaffPortalPage() {
             {submitSuccess && (
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-bold flex items-center gap-2 animate-fade-in">
                 <FiCheckCircle size={18} />
-                <span>Daily content report submitted successfully! Editorial review is in progress.</span>
+                <span>
+                  Daily content report submitted successfully! Editorial review is in progress.
+                </span>
               </div>
             )}
 
             <form onSubmit={handleSubmitDailyReport} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Report Date *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Report Date *
+                  </label>
                   <input
                     type="date"
                     required
@@ -411,7 +445,9 @@ export default function StaffPortalPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Research Sources Used *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Research Sources Used *
+                  </label>
                   <input
                     type="text"
                     required
@@ -607,7 +643,9 @@ export default function StaffPortalPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Key Learning Takeaway</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Key Learning Takeaway
+                  </label>
                   <textarea
                     rows={2}
                     placeholder="What new editorial technique, tool or insight did you apply today?"
@@ -618,7 +656,9 @@ export default function StaffPortalPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Blockers / Editorial Questions</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Blockers / Editorial Questions
+                  </label>
                   <textarea
                     rows={2}
                     placeholder="Any technical or editorial challenges?"
@@ -648,16 +688,23 @@ export default function StaffPortalPage() {
             {GOALMILLS_TRAINING_MODULES.map((mod, idx) => {
               const modProgress = training?.modules?.find((m) => m.moduleId === mod.id);
               const completedCount = modProgress?.completedTasks?.length || 0;
-              const isDone = modProgress?.status === 'completed' || (completedCount >= mod.checklist.length && mod.checklist.length > 0);
+              const isDone =
+                modProgress?.status === 'completed' ||
+                (completedCount >= mod.checklist.length && mod.checklist.length > 0);
 
               return (
-                <div key={mod.id} className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl space-y-4">
+                <div
+                  key={mod.id}
+                  className="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl space-y-4"
+                >
                   <div className="border-b border-white/10 pb-3 flex items-start justify-between">
                     <div>
                       <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">
                         Module {idx + 1} • {mod.category} ({mod.weightPercent}%)
                       </span>
-                      <h3 className="text-base sm:text-lg font-black text-white mt-0.5">{mod.title}</h3>
+                      <h3 className="text-base sm:text-lg font-black text-white mt-0.5">
+                        {mod.title}
+                      </h3>
                       <p className="text-xs text-text-muted mt-0.5">{mod.description}</p>
                     </div>
                     {isDone && (
@@ -687,7 +734,9 @@ export default function StaffPortalPage() {
                           >
                             <span
                               className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded flex items-center justify-center text-xs ${
-                                isTaskDone ? 'bg-emerald-500 text-slate-950 font-bold' : 'border border-slate-600'
+                                isTaskDone
+                                  ? 'bg-emerald-500 text-slate-950 font-bold'
+                                  : 'border border-slate-600'
                               }`}
                             >
                               {isTaskDone && '✓'}
@@ -731,12 +780,18 @@ export default function StaffPortalPage() {
             {latestStandup && (
               <div className="bg-slate-900/60 p-4 sm:p-6 rounded-2xl border border-white/5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-400 uppercase">Today's Meeting Brief</span>
-                  <span className="text-xs text-text-muted">{latestStandup.meetingDate} • {latestStandup.time}</span>
+                  <span className="text-xs font-bold text-amber-400 uppercase">
+                    Today's Meeting Brief
+                  </span>
+                  <span className="text-xs text-text-muted">
+                    {latestStandup.meetingDate} • {latestStandup.time}
+                  </span>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-xs font-bold text-slate-300">Editorial Priorities & Assignment Focus:</p>
+                  <p className="text-xs font-bold text-slate-300">
+                    Editorial Priorities & Assignment Focus:
+                  </p>
                   <ul className="space-y-1.5 text-xs text-slate-200">
                     {latestStandup.editorialPriorities?.map((p, i) => (
                       <li key={i} className="flex items-center gap-2">
@@ -761,8 +816,12 @@ export default function StaffPortalPage() {
                     <FiFileText size={22} />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-white">Employment & Training Contract</h3>
-                    <p className="text-xs text-text-muted">30-Clause Appointment Letter & Digital e-Signature</p>
+                    <h3 className="text-base sm:text-lg font-bold text-white">
+                      Employment & Training Contract
+                    </h3>
+                    <p className="text-xs text-text-muted">
+                      30-Clause Appointment Letter & Digital e-Signature
+                    </p>
                   </div>
                 </div>
 
@@ -770,7 +829,9 @@ export default function StaffPortalPage() {
                   href={`/admin/employees/${currentEmployee._id}/appointment`}
                   className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 text-center"
                 >
-                  {currentEmployee.appointmentSigned ? 'View Signed Contract' : 'Review & Sign Contract'}
+                  {currentEmployee.appointmentSigned
+                    ? 'View Signed Contract'
+                    : 'Review & Sign Contract'}
                 </Link>
               </div>
             )}
@@ -790,18 +851,27 @@ export default function StaffPortalPage() {
               ) : (
                 <div className="divide-y divide-white/5">
                   {payroll.map((p) => (
-                    <div key={p._id} className="p-4 flex items-center justify-between gap-3 text-xs">
+                    <div
+                      key={p._id}
+                      className="p-4 flex items-center justify-between gap-3 text-xs"
+                    >
                       <div>
                         <span className="font-bold text-white text-sm block">{p.period}</span>
-                        <span className="text-text-muted">Base: ₦{p.baseAmount.toLocaleString()}</span>
+                        <span className="text-text-muted">
+                          Base: ₦{p.baseAmount.toLocaleString()}
+                        </span>
                       </div>
                       <div className="text-right">
                         <span className="text-sm font-black text-emerald-400 block">
                           ₦{p.netPay.toLocaleString()}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                          p.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                        }`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            p.status === 'paid'
+                              ? 'bg-emerald-500/10 text-emerald-400'
+                              : 'bg-amber-500/10 text-amber-400'
+                          }`}
+                        >
                           {p.status}
                         </span>
                       </div>

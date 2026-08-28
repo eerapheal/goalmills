@@ -88,9 +88,7 @@ export default function AnalysisScreen() {
               style={styles.articleCard}
               onPress={() => router.push(`/(tabs)/news/${item._id}` as any)}
             >
-              {item.image && (
-                <Image source={{ uri: item.image }} style={styles.articleImage} />
-              )}
+              {item.image && <Image source={{ uri: item.image }} style={styles.articleImage} />}
               <View style={styles.articleBody}>
                 <Text style={styles.categoryLabel}>{item.category || 'Tactical Analysis'}</Text>
                 <Text style={styles.articleTitle} numberOfLines={2}>
@@ -114,25 +112,23 @@ export default function AnalysisScreen() {
       {/* Player Deep Dives */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Player Deep Dives & Scouting</Text>
-        {playerStories.length > 0 ? (
-          playerStories.map((item) => (
-            <TouchableOpacity
-              key={item._id}
-              style={styles.articleCard}
-              onPress={() => router.push(`/(tabs)/news/${item._id}` as any)}
-            >
-              {item.image && (
-                <Image source={{ uri: item.image }} style={styles.articleImage} />
-              )}
-              <View style={styles.articleBody}>
-                <Text style={styles.categoryLabel}>{item.category || 'Player Scouting'}</Text>
-                <Text style={styles.articleTitle} numberOfLines={2}>
-                  {item.title}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : null}
+        {playerStories.length > 0
+          ? playerStories.map((item) => (
+              <TouchableOpacity
+                key={item._id}
+                style={styles.articleCard}
+                onPress={() => router.push(`/(tabs)/news/${item._id}` as any)}
+              >
+                {item.image && <Image source={{ uri: item.image }} style={styles.articleImage} />}
+                <View style={styles.articleBody}>
+                  <Text style={styles.categoryLabel}>{item.category || 'Player Scouting'}</Text>
+                  <Text style={styles.articleTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          : null}
       </View>
     </ScrollView>
   );

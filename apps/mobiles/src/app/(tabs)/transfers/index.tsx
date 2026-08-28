@@ -155,9 +155,7 @@ export default function TransfersScreen() {
               style={styles.newsItem}
               onPress={() => router.push(`/(tabs)/news/${news._id}` as any)}
             >
-              {news.image ? (
-                <Image source={{ uri: news.image }} style={styles.newsImage} />
-              ) : null}
+              {news.image ? <Image source={{ uri: news.image }} style={styles.newsImage} /> : null}
               <View style={styles.newsContent}>
                 <Text style={styles.newsCategory}>{news.category || 'Transfer News'}</Text>
                 <Text style={styles.newsTitle} numberOfLines={2}>

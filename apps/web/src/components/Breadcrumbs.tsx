@@ -28,9 +28,7 @@ export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
           const isLast = index === fullItems.length - 1;
           return (
             <li key={item.url + index} className="flex items-center space-x-1.5 sm:space-x-2">
-              {index > 0 && (
-                <FiChevronRight className="text-slate-600 flex-shrink-0" size={13} />
-              )}
+              {index > 0 && <FiChevronRight className="text-slate-600 flex-shrink-0" size={13} />}
               {isLast ? (
                 <span
                   className="font-bold text-white max-w-[200px] sm:max-w-[320px] truncate"

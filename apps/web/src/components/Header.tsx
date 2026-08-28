@@ -111,10 +111,7 @@ export function Header() {
                   <span>⚡</span> Admin Hub
                 </Link>
               )}
-              <Link
-                href="/profile"
-                className="flex items-center gap-3 group"
-              >
+              <Link href="/profile" className="flex items-center gap-3 group">
                 <div className="text-right hidden lg:block">
                   <p className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">
                     {session.user.name}

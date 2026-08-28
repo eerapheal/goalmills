@@ -99,7 +99,7 @@ export const COMPETITIONS_REGISTRY: Record<string, CompetitionMeta> = {
     tier: 1,
     description: 'The top league in Italian football with tactical mastery.',
   },
-  'bundesliga': {
+  bundesliga: {
     id: 175,
     name: 'Bundesliga',
     slug: 'bundesliga',
@@ -124,7 +124,7 @@ export const COMPETITIONS_REGISTRY: Record<string, CompetitionMeta> = {
 };
 
 export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
-  'arsenal': {
+  arsenal: {
     id: 42,
     name: 'Arsenal FC',
     slug: 'arsenal',
@@ -138,7 +138,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 2,
     featuredPlayerSlugs: ['bukayo-saka', 'martin-odegaard', 'declan-rice'],
   },
-  'chelsea': {
+  chelsea: {
     id: 49,
     name: 'Chelsea FC',
     slug: 'chelsea',
@@ -152,7 +152,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 4,
     featuredPlayerSlugs: ['cole-palmer', 'enzo-fernandez', 'moises-caicedo'],
   },
-  'liverpool': {
+  liverpool: {
     id: 40,
     name: 'Liverpool FC',
     slug: 'liverpool',
@@ -194,7 +194,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 1,
     featuredPlayerSlugs: ['jude-bellingham', 'vinicius-junior', 'kylian-mbappe'],
   },
-  'barcelona': {
+  barcelona: {
     id: 529,
     name: 'FC Barcelona',
     slug: 'barcelona',
@@ -208,7 +208,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 2,
     featuredPlayerSlugs: ['lamine-yamal', 'robert-lewandowski', 'pedri'],
   },
-  'galatasaray': {
+  galatasaray: {
     id: 645,
     name: 'Galatasaray SK',
     slug: 'galatasaray',
@@ -550,7 +550,7 @@ export const PLAYERS_REGISTRY: Record<string, PlayerMeta> = {
       rating: 8.12,
     },
   },
-  'pedri': {
+  pedri: {
     id: 114,
     name: 'Pedri',
     slug: 'pedri',
@@ -607,72 +607,116 @@ export const INITIAL_TRANSFERS: TransferItem[] = [
     id: 'tr-1',
     playerName: 'Victor Osimhen',
     playerSlug: 'victor-osimhen',
-    fromTeam: { name: 'Napoli', slug: 'napoli', logo: 'https://media.api-sports.io/football/teams/492.png' },
-    toTeam: { name: 'Arsenal FC', slug: 'arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' },
+    fromTeam: {
+      name: 'Napoli',
+      slug: 'napoli',
+      logo: 'https://media.api-sports.io/football/teams/492.png',
+    },
+    toTeam: {
+      name: 'Arsenal FC',
+      slug: 'arsenal',
+      logo: 'https://media.api-sports.io/football/teams/42.png',
+    },
     fee: '€75M + Add-ons',
     status: 'negotiation',
     date: '2026-08-26',
     tier: 1,
     competitionSlug: 'premier-league',
-    description: 'Arsenal have opened concrete talks with Napoli representatives to agree terms on a permanent summer transfer.',
+    description:
+      'Arsenal have opened concrete talks with Napoli representatives to agree terms on a permanent summer transfer.',
   },
   {
     id: 'tr-2',
     playerName: 'Ademola Lookman',
     playerSlug: 'ademola-lookman',
-    fromTeam: { name: 'Atalanta', slug: 'atalanta', logo: 'https://media.api-sports.io/football/teams/499.png' },
-    toTeam: { name: 'Paris Saint-Germain', slug: 'psg', logo: 'https://media.api-sports.io/football/teams/85.png' },
+    fromTeam: {
+      name: 'Atalanta',
+      slug: 'atalanta',
+      logo: 'https://media.api-sports.io/football/teams/499.png',
+    },
+    toTeam: {
+      name: 'Paris Saint-Germain',
+      slug: 'psg',
+      logo: 'https://media.api-sports.io/football/teams/85.png',
+    },
     fee: '€60M',
     status: 'agreement',
     date: '2026-08-25',
     tier: 2,
     competitionSlug: 'champions-league',
-    description: 'Personal terms agreed between Lookman and PSG on a 4-year contract; final club discussions in progress.',
+    description:
+      'Personal terms agreed between Lookman and PSG on a 4-year contract; final club discussions in progress.',
   },
   {
     id: 'tr-3',
     playerName: 'Martin Zubimendi',
     playerSlug: 'martin-zubimendi',
-    fromTeam: { name: 'Real Sociedad', slug: 'real-sociedad', logo: 'https://media.api-sports.io/football/teams/548.png' },
-    toTeam: { name: 'Arsenal FC', slug: 'arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' },
+    fromTeam: {
+      name: 'Real Sociedad',
+      slug: 'real-sociedad',
+      logo: 'https://media.api-sports.io/football/teams/548.png',
+    },
+    toTeam: {
+      name: 'Arsenal FC',
+      slug: 'arsenal',
+      logo: 'https://media.api-sports.io/football/teams/42.png',
+    },
     fee: '€60M Release Clause',
     status: 'done_deal',
     date: '2026-08-22',
     tier: 1,
     competitionSlug: 'premier-league',
-    description: 'Official announcement completed: Zubimendi signs 5-year contract at Emirates Stadium.',
+    description:
+      'Official announcement completed: Zubimendi signs 5-year contract at Emirates Stadium.',
   },
   {
     id: 'tr-4',
     playerName: 'Florian Wirtz',
     playerSlug: 'florian-wirtz',
-    fromTeam: { name: 'Bayer Leverkusen', slug: 'leverkusen', logo: 'https://media.api-sports.io/football/teams/168.png' },
-    toTeam: { name: 'Manchester City', slug: 'manchester-city', logo: 'https://media.api-sports.io/football/teams/50.png' },
+    fromTeam: {
+      name: 'Bayer Leverkusen',
+      slug: 'leverkusen',
+      logo: 'https://media.api-sports.io/football/teams/168.png',
+    },
+    toTeam: {
+      name: 'Manchester City',
+      slug: 'manchester-city',
+      logo: 'https://media.api-sports.io/football/teams/50.png',
+    },
     fee: '€120M',
     status: 'rumour',
     date: '2026-08-24',
     tier: 3,
     competitionSlug: 'bundesliga',
-    description: 'Man City monitoring Wirtz situation closely as part of long-term succession planning for De Bruyne.',
+    description:
+      'Man City monitoring Wirtz situation closely as part of long-term succession planning for De Bruyne.',
   },
 ];
 
-export const AUTHORS_REGISTRY: Record<string, {
-  name: string;
-  slug: string;
-  role: 'super-admin' | 'staff' | 'contributor';
-  photo: string;
-  bio: string;
-  specialization: string[];
-  socialLinks: { twitter?: string; linkedin?: string };
-}> = {
+export const AUTHORS_REGISTRY: Record<
+  string,
+  {
+    name: string;
+    slug: string;
+    role: 'super-admin' | 'staff' | 'contributor';
+    photo: string;
+    bio: string;
+    specialization: string[];
+    socialLinks: { twitter?: string; linkedin?: string };
+  }
+> = {
   'ekpenisi-raphael': {
     name: 'Ekpenisi Erue Raphael',
     slug: 'ekpenisi-raphael',
     role: 'super-admin',
     photo: 'https://res.cloudinary.com/demo/image/upload/v1689234839/sample.jpg',
     bio: 'Founder & Chief Sports Editor at GoalMills. Veteran analyst covering European tactical innovations, transfer market intelligence, and African football development.',
-    specialization: ['Transfer Market Intelligence', 'Tactical Analysis', 'African Football', 'Premier League'],
+    specialization: [
+      'Transfer Market Intelligence',
+      'Tactical Analysis',
+      'African Football',
+      'Premier League',
+    ],
     socialLinks: {
       twitter: 'https://twitter.com/goalmills',
       linkedin: 'https://linkedin.com/in/goalmills',
@@ -684,7 +728,12 @@ export const AUTHORS_REGISTRY: Record<string, {
     role: 'staff',
     photo: 'https://res.cloudinary.com/demo/image/upload/v1689234839/sample.jpg',
     bio: 'The central sports intelligence newsroom of GoalMills, delivering 24/7 breaking updates, match previews, and statistical breakdowns.',
-    specialization: ['Breaking News', 'Live Match Reports', 'Match Previews', 'Statistical Insights'],
+    specialization: [
+      'Breaking News',
+      'Live Match Reports',
+      'Match Previews',
+      'Statistical Insights',
+    ],
     socialLinks: {
       twitter: 'https://twitter.com/goalmills',
     },
@@ -717,7 +766,9 @@ export class EntityService {
       .join(' ');
 
     return {
-      id: Math.abs(cleanSlug.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)) % 100000,
+      id:
+        Math.abs(cleanSlug.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)) %
+        100000,
       name: formattedName,
       slug: cleanSlug,
       number: 10,

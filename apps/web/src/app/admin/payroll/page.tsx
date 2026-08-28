@@ -36,7 +36,10 @@ export default function PayrollAdminPage() {
       const url = new URL('/api/payroll', window.location.origin);
       if (statusFilter !== 'all') url.searchParams.set('status', statusFilter);
 
-      const [payRes, empRes] = await Promise.all([fetch(url.toString()), fetch('/api/admin/employees')]);
+      const [payRes, empRes] = await Promise.all([
+        fetch(url.toString()),
+        fetch('/api/admin/employees'),
+      ]);
       const payJson = await payRes.json();
       const empJson = await empRes.json();
 
@@ -237,7 +240,10 @@ export default function PayrollAdminPage() {
                 {payrollList.map((p) => {
                   const isPaid = p.status === 'paid';
                   return (
-                    <div key={p._id} className="p-4 space-y-3 hover:bg-white/[0.02] transition-colors">
+                    <div
+                      key={p._id}
+                      className="p-4 space-y-3 hover:bg-white/[0.02] transition-colors"
+                    >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-2.5">
                           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-xs uppercase flex-shrink-0">
@@ -274,13 +280,17 @@ export default function PayrollAdminPage() {
                         {p.bonusAmount > 0 && (
                           <div>
                             <span className="text-slate-500 font-bold block">Bonus / Reward:</span>
-                            <span className="text-emerald-400 font-medium">+₦{p.bonusAmount.toLocaleString()}</span>
+                            <span className="text-emerald-400 font-medium">
+                              +₦{p.bonusAmount.toLocaleString()}
+                            </span>
                           </div>
                         )}
                         {p.deductions > 0 && (
                           <div>
                             <span className="text-slate-500 font-bold block">Deductions:</span>
-                            <span className="text-red-400 font-medium">-₦{p.deductions.toLocaleString()}</span>
+                            <span className="text-red-400 font-medium">
+                              -₦{p.deductions.toLocaleString()}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -335,14 +345,20 @@ export default function PayrollAdminPage() {
 
                           <td className="p-4 font-semibold text-slate-300">{p.period}</td>
 
-                          <td className="p-4 font-medium text-slate-300">₦{p.baseAmount.toLocaleString()}</td>
+                          <td className="p-4 font-medium text-slate-300">
+                            ₦{p.baseAmount.toLocaleString()}
+                          </td>
 
                           <td className="p-4 text-xs">
                             {p.bonusAmount > 0 && (
-                              <span className="text-emerald-400 font-bold block">+₦{p.bonusAmount.toLocaleString()} (Bonus)</span>
+                              <span className="text-emerald-400 font-bold block">
+                                +₦{p.bonusAmount.toLocaleString()} (Bonus)
+                              </span>
                             )}
                             {p.deductions > 0 && (
-                              <span className="text-red-400 font-bold block">-₦{p.deductions.toLocaleString()} (Deduction)</span>
+                              <span className="text-red-400 font-bold block">
+                                -₦{p.deductions.toLocaleString()} (Deduction)
+                              </span>
                             )}
                             {p.bonusAmount === 0 && p.deductions === 0 && (
                               <span className="text-text-muted">Standard</span>
@@ -393,7 +409,9 @@ export default function PayrollAdminPage() {
             <div className="bg-slate-900 border-t sm:border border-white/15 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 space-y-5 shadow-2xl animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-white">Generate Payroll Disbursement</h3>
+                  <h3 className="text-lg sm:text-xl font-black text-white">
+                    Generate Payroll Disbursement
+                  </h3>
                   <p className="text-xs text-text-muted">Issue monthly stipend or salary entry</p>
                 </div>
                 <button
@@ -406,7 +424,9 @@ export default function PayrollAdminPage() {
 
               <form onSubmit={handleGeneratePayroll} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Select Employee *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Select Employee *
+                  </label>
                   <div className="relative">
                     <select
                       value={selectedEmpId}
@@ -415,7 +435,8 @@ export default function PayrollAdminPage() {
                     >
                       {employees.map((emp) => (
                         <option key={emp._id} value={emp._id}>
-                          {emp.fullName} ({emp.status} - ₦{(emp.currentSalary || 30000).toLocaleString()})
+                          {emp.fullName} ({emp.status} - ₦
+                          {(emp.currentSalary || 30000).toLocaleString()})
                         </option>
                       ))}
                     </select>
@@ -424,7 +445,9 @@ export default function PayrollAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Payroll Period *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Payroll Period *
+                  </label>
                   <input
                     type="text"
                     required
@@ -436,7 +459,9 @@ export default function PayrollAdminPage() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Base (₦) *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Base (₦) *
+                    </label>
                     <input
                       type="number"
                       required
@@ -457,7 +482,9 @@ export default function PayrollAdminPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Deduct (₦)</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Deduct (₦)
+                    </label>
                     <input
                       type="number"
                       value={deductions}
@@ -470,7 +497,12 @@ export default function PayrollAdminPage() {
                 <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 flex items-center justify-between text-xs">
                   <span className="font-bold text-emerald-300">Net Calculated Payout:</span>
                   <span className="text-base font-black text-emerald-400">
-                    ₦{(Number(baseAmount) + Number(bonusAmount) - Number(deductions)).toLocaleString()}
+                    ₦
+                    {(
+                      Number(baseAmount) +
+                      Number(bonusAmount) -
+                      Number(deductions)
+                    ).toLocaleString()}
                   </span>
                 </div>
 

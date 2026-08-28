@@ -20,7 +20,9 @@ export async function GET(req: NextRequest) {
 
     // If no payroll records exist, generate current period records for active/training staff
     if (records.length === 0 && !employeeId) {
-      const employees = await Employee.find({ status: { $in: ['training', 'probation', 'active'] } });
+      const employees = await Employee.find({
+        status: { $in: ['training', 'probation', 'active'] },
+      });
       const created = [];
       for (const emp of employees) {
         const isTraining = emp.status === 'training';
@@ -83,7 +85,8 @@ export async function POST(req: NextRequest) {
       employeeName: employee.fullName,
       jobTitle: employee.jobTitle,
       period,
-      paymentType: paymentType || (employee.status === 'training' ? 'training_allowance' : 'regular_salary'),
+      paymentType:
+        paymentType || (employee.status === 'training' ? 'training_allowance' : 'regular_salary'),
       baseAmount: base,
       bonusAmount: bonus,
       deductions: ded,
@@ -111,7 +114,10 @@ export async function PATCH(req: NextRequest) {
     const { payrollId, status, paymentDate, referenceNumber, notes } = body;
 
     if (!payrollId) {
-      return NextResponse.json({ success: false, error: 'Payroll ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Payroll ID is required' },
+        { status: 400 }
+      );
     }
 
     const updateData: any = {};
@@ -127,7 +133,10 @@ export async function PATCH(req: NextRequest) {
     const updated = await Payroll.findByIdAndUpdate(payrollId, { $set: updateData }, { new: true });
 
     if (!updated) {
-      return NextResponse.json({ success: false, error: 'Payroll record not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Payroll record not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ success: true, data: updated });

@@ -96,7 +96,10 @@ export function RelatedArticlesMatrix({
               {/* Action link footer */}
               <div className="mt-4 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs font-bold text-blue-400 group-hover:text-blue-300">
                 <span>Read Story</span>
-                <FiArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                <FiArrowRight
+                  size={13}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
               </div>
             </Link>
           );

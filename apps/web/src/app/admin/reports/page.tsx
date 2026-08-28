@@ -31,7 +31,9 @@ export default function DailyReportsAdminPage() {
   // Review Modal State
   const [editorScore, setEditorScore] = useState(8);
   const [editorFeedback, setEditorFeedback] = useState('');
-  const [reviewStatus, setReviewStatus] = useState<'approved' | 'reviewed' | 'needs_revision'>('approved');
+  const [reviewStatus, setReviewStatus] = useState<'approved' | 'reviewed' | 'needs_revision'>(
+    'approved'
+  );
   const [submittingReview, setSubmittingReview] = useState(false);
 
   const fetchReports = async () => {
@@ -156,7 +158,8 @@ export default function DailyReportsAdminPage() {
               <FiCheckSquare className="text-blue-400" /> Daily Content Review Queue
             </h1>
             <p className="text-xs text-text-muted mt-0.5">
-              Review and grade trainee sports articles, social posts, Canva graphics, and short-form video assets
+              Review and grade trainee sports articles, social posts, Canva graphics, and short-form
+              video assets
             </p>
           </div>
 
@@ -211,9 +214,12 @@ export default function DailyReportsAdminPage() {
                         {rep.employeeName.slice(0, 2)}
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-sm sm:text-base">{rep.employeeName}</h3>
+                        <h3 className="font-bold text-white text-sm sm:text-base">
+                          {rep.employeeName}
+                        </h3>
                         <p className="text-xs text-text-muted flex items-center gap-1.5 mt-0.5">
-                          <FiCalendar size={12} /> Date: <strong className="text-slate-300">{rep.reportDate}</strong>
+                          <FiCalendar size={12} /> Date:{' '}
+                          <strong className="text-slate-300">{rep.reportDate}</strong>
                         </p>
                       </div>
                     </div>
@@ -273,7 +279,10 @@ export default function DailyReportsAdminPage() {
                             className="text-xs text-slate-300 hover:text-white flex items-center justify-between group truncate"
                           >
                             <span className="truncate">{art.title || art.url}</span>
-                            <FiExternalLink size={10} className="text-slate-500 group-hover:text-blue-400 flex-shrink-0 ml-1" />
+                            <FiExternalLink
+                              size={10}
+                              className="text-slate-500 group-hover:text-blue-400 flex-shrink-0 ml-1"
+                            />
                           </a>
                         ))}
                       </div>
@@ -293,8 +302,13 @@ export default function DailyReportsAdminPage() {
                             rel="noreferrer"
                             className="text-xs text-slate-300 hover:text-white flex items-center justify-between group truncate"
                           >
-                            <span className="truncate">{post.platform}: Post #{idx + 1}</span>
-                            <FiExternalLink size={10} className="text-slate-500 group-hover:text-purple-400 flex-shrink-0 ml-1" />
+                            <span className="truncate">
+                              {post.platform}: Post #{idx + 1}
+                            </span>
+                            <FiExternalLink
+                              size={10}
+                              className="text-slate-500 group-hover:text-purple-400 flex-shrink-0 ml-1"
+                            />
                           </a>
                         ))}
                       </div>
@@ -315,7 +329,10 @@ export default function DailyReportsAdminPage() {
                             className="text-xs text-slate-300 hover:text-white flex items-center justify-between group truncate"
                           >
                             <span className="truncate">{media.title || media.type}</span>
-                            <FiExternalLink size={10} className="text-slate-500 group-hover:text-amber-400 flex-shrink-0 ml-1" />
+                            <FiExternalLink
+                              size={10}
+                              className="text-slate-500 group-hover:text-amber-400 flex-shrink-0 ml-1"
+                            />
                           </a>
                         ))}
                       </div>
@@ -345,7 +362,9 @@ export default function DailyReportsAdminPage() {
             <div className="bg-slate-900 border-t sm:border border-white/15 w-full max-w-xl rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 space-y-5 shadow-2xl animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-white">Score & Review Daily Submission</h3>
+                  <h3 className="text-lg sm:text-xl font-black text-white">
+                    Score & Review Daily Submission
+                  </h3>
                   <p className="text-xs text-text-muted mt-0.5">
                     {selectedReport.employeeName} • {selectedReport.reportDate}
                   </p>
@@ -360,7 +379,9 @@ export default function DailyReportsAdminPage() {
 
               <form onSubmit={handleSaveReview} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Review Decision *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                    Review Decision *
+                  </label>
                   <select
                     value={reviewStatus}
                     onChange={(e: any) => setReviewStatus(e.target.value)}
@@ -374,7 +395,9 @@ export default function DailyReportsAdminPage() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-bold text-slate-300">Editor Score (1 – 10)</label>
+                    <label className="text-xs font-bold text-slate-300">
+                      Editor Score (1 – 10)
+                    </label>
                     <span className="text-sm font-black text-amber-400">{editorScore} / 10</span>
                   </div>
                   <input
@@ -394,7 +417,9 @@ export default function DailyReportsAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Editorial Feedback & Actionable Notes</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Editorial Feedback & Actionable Notes
+                  </label>
                   <textarea
                     rows={3}
                     placeholder="Provide constructive feedback on writing quality, SEO optimization, social hooks, or Canva visual standards..."

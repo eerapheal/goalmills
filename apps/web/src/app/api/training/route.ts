@@ -82,12 +82,15 @@ export async function POST(req: NextRequest) {
 
     const moduleIndex = progress.modules.findIndex((m: any) => m.moduleId === moduleId);
     if (moduleIndex >= 0) {
-      if (completedTasks !== undefined) progress.modules[moduleIndex].completedTasks = completedTasks;
-      if (submissionLinks !== undefined) progress.modules[moduleIndex].submissionLinks = submissionLinks;
+      if (completedTasks !== undefined)
+        progress.modules[moduleIndex].completedTasks = completedTasks;
+      if (submissionLinks !== undefined)
+        progress.modules[moduleIndex].submissionLinks = submissionLinks;
       if (status !== undefined) progress.modules[moduleIndex].status = status;
       if (score !== undefined) progress.modules[moduleIndex].score = score;
       if (feedback !== undefined) progress.modules[moduleIndex].feedback = feedback;
-      if (status === 'completed') progress.modules[moduleIndex].completedAt = new Date().toISOString();
+      if (status === 'completed')
+        progress.modules[moduleIndex].completedAt = new Date().toISOString();
     } else {
       progress.modules.push({
         moduleId,

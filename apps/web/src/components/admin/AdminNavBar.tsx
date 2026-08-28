@@ -36,9 +36,12 @@ export default function AdminNavBar() {
     { label: 'Staff Portal', href: '/admin/portal', icon: FiUserCheck, group: 'portal' },
   ];
 
-  const currentNav = navItems.find(
-    (item) => pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href))
-  ) || navItems[0];
+  const currentNav =
+    navItems.find(
+      (item) =>
+        pathname === item.href ||
+        (item.href !== '/admin/dashboard' && pathname.startsWith(item.href))
+    ) || navItems[0];
 
   return (
     <header className="glass-card border-b border-white/10 rounded-2xl sm:rounded-3xl mb-5 sm:mb-6 shadow-2xl backdrop-blur-2xl bg-slate-950/85">
@@ -151,7 +154,9 @@ export default function AdminNavBar() {
         <div className="hidden lg:flex items-center gap-1.5 mt-4 pt-3 border-t border-white/10 overflow-x-auto no-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
@@ -175,7 +180,9 @@ export default function AdminNavBar() {
             <div className="grid grid-cols-2 gap-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href || (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
                 return (
                   <Link
                     key={item.href}

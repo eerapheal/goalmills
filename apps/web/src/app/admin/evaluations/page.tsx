@@ -130,7 +130,8 @@ export default function EvaluationsAdminPage() {
           strengths,
           areasForImprovement,
           transitionRecommendation,
-          newSalary: transitionRecommendation === 'promote_to_regular' ? 50000 : emp.currentSalary || 30000,
+          newSalary:
+            transitionRecommendation === 'promote_to_regular' ? 50000 : emp.currentSalary || 30000,
         }),
       });
 
@@ -174,7 +175,10 @@ export default function EvaluationsAdminPage() {
         {/* Metric Weights Breakdown Summary */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
           {OFFICIAL_SCORECARD_METRICS.map((m) => (
-            <div key={m.key} className="glass-card p-3 rounded-xl sm:rounded-2xl border border-white/5 text-center">
+            <div
+              key={m.key}
+              className="glass-card p-3 rounded-xl sm:rounded-2xl border border-white/5 text-center"
+            >
               <p className="text-[11px] sm:text-xs text-text-muted font-bold truncate">{m.name}</p>
               <p className="text-base sm:text-xl font-black text-amber-400 mt-1">{m.weight}%</p>
               <p className="text-[9px] sm:text-[10px] text-slate-400">Scorecard Weight</p>
@@ -209,17 +213,24 @@ export default function EvaluationsAdminPage() {
                       {ev.grade.slice(0, 1)}
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-xl font-black text-white">{ev.employeeName}</h3>
+                      <h3 className="text-base sm:text-xl font-black text-white">
+                        {ev.employeeName}
+                      </h3>
                       <p className="text-xs text-text-muted mt-0.5">
-                        Period: <span className="text-amber-400 font-semibold">{ev.period}</span> • Evaluator: {ev.evaluatorName}
+                        Period: <span className="text-amber-400 font-semibold">{ev.period}</span> •
+                        Evaluator: {ev.evaluatorName}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between sm:justify-end gap-4">
                     <div className="text-right">
-                      <span className="text-[10px] sm:text-xs text-text-muted block font-bold uppercase">Weighted Score</span>
-                      <span className="text-xl sm:text-2xl font-black text-emerald-400">{ev.totalWeightedScore}%</span>
+                      <span className="text-[10px] sm:text-xs text-text-muted block font-bold uppercase">
+                        Weighted Score
+                      </span>
+                      <span className="text-xl sm:text-2xl font-black text-emerald-400">
+                        {ev.totalWeightedScore}%
+                      </span>
                     </div>
 
                     <div className="p-2.5 sm:p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs">
@@ -231,7 +242,10 @@ export default function EvaluationsAdminPage() {
                 {/* Scorecard 10-Metric Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
                   {ev.metrics?.map((m) => (
-                    <div key={m.key} className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
+                    <div
+                      key={m.key}
+                      className="bg-slate-900/60 p-3 rounded-xl border border-white/5"
+                    >
                       <div className="flex items-center justify-between text-[11px] text-text-muted">
                         <span className="truncate font-semibold">{m.name}</span>
                         <span className="text-amber-400 font-bold">{m.weight}%</span>
@@ -295,8 +309,12 @@ export default function EvaluationsAdminPage() {
             <div className="bg-slate-900 border-t sm:border border-white/15 w-full max-w-3xl rounded-t-3xl sm:rounded-3xl max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl animate-fade-in">
               <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-white">Score Performance (100% Matrix)</h3>
-                  <p className="text-xs text-text-muted">Section 18 Weighted Performance Evaluation</p>
+                  <h3 className="text-lg sm:text-xl font-black text-white">
+                    Score Performance (100% Matrix)
+                  </h3>
+                  <p className="text-xs text-text-muted">
+                    Section 18 Weighted Performance Evaluation
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -306,11 +324,16 @@ export default function EvaluationsAdminPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleCreateEvaluation} className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
+              <form
+                onSubmit={handleCreateEvaluation}
+                className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1"
+              >
                 {/* Employee Selection Dropdown */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Select Employee *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Select Employee *
+                    </label>
                     <div className="relative">
                       <select
                         value={selectedEmployeeId}
@@ -328,7 +351,9 @@ export default function EvaluationsAdminPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Evaluation Period *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Evaluation Period *
+                    </label>
                     <input
                       type="text"
                       required
@@ -346,16 +371,22 @@ export default function EvaluationsAdminPage() {
                       Evaluation Criteria (10 Weighted Factors)
                     </span>
                     <span className="text-xs font-black text-emerald-400">
-                      Current Total: {calculateTotalWeightedScore()}% ({calculateGrade(calculateTotalWeightedScore())})
+                      Current Total: {calculateTotalWeightedScore()}% (
+                      {calculateGrade(calculateTotalWeightedScore())})
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {OFFICIAL_SCORECARD_METRICS.map((metric) => (
-                      <div key={metric.key} className="bg-slate-950/60 p-3 rounded-xl border border-white/5 space-y-1.5">
+                      <div
+                        key={metric.key}
+                        className="bg-slate-950/60 p-3 rounded-xl border border-white/5 space-y-1.5"
+                      >
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-bold text-slate-200">{metric.name}</span>
-                          <span className="text-amber-400 font-bold">{metricScores[metric.key] || 0} / 100 ({metric.weight}%)</span>
+                          <span className="text-amber-400 font-bold">
+                            {metricScores[metric.key] || 0} / 100 ({metric.weight}%)
+                          </span>
                         </div>
                         <input
                           type="range"
@@ -374,7 +405,9 @@ export default function EvaluationsAdminPage() {
                 {/* Strengths & Improvements */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/10">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Key Strengths & Achievements</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Key Strengths & Achievements
+                    </label>
                     <textarea
                       rows={2}
                       placeholder="e.g. Excellent breaking news speed, strong SEO optimization, proactive in daily standups..."
@@ -385,7 +418,9 @@ export default function EvaluationsAdminPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Areas for Development</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Areas for Development
+                    </label>
                     <textarea
                       rows={2}
                       placeholder="e.g. Expand Canva infographics, refine video match highlights..."
@@ -398,14 +433,18 @@ export default function EvaluationsAdminPage() {
 
                 {/* Transition Recommendation */}
                 <div className="pt-2 border-t border-white/10">
-                  <label className="block text-xs font-bold text-slate-300 mb-1">30-Day Transition Verdict *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    30-Day Transition Verdict *
+                  </label>
                   <div className="relative">
                     <select
                       value={transitionRecommendation}
                       onChange={(e: any) => setTransitionRecommendation(e.target.value)}
                       className="w-full appearance-none p-3 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm font-bold focus:border-amber-500 focus:outline-none pr-8"
                     >
-                      <option value="promote_to_regular">🌟 Promote to Regular Staff (₦50,000 / month)</option>
+                      <option value="promote_to_regular">
+                        🌟 Promote to Regular Staff (₦50,000 / month)
+                      </option>
                       <option value="extend_training">⏳ Extend 30-Day Training Period</option>
                       <option value="renegotiate_salary">💵 Renegotiate Compensation</option>
                       <option value="terminate">⛔ Conclude Appointment</option>

@@ -29,7 +29,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (!body.meetingDate) {
-      return NextResponse.json({ success: false, error: 'Meeting date is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Meeting date is required' },
+        { status: 400 }
+      );
     }
 
     // Auto-populate active employees if attendees empty

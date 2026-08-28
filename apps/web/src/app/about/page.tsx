@@ -36,15 +36,18 @@ export default function AboutUsPage() {
               Building the Future of Sports Intelligence
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              GoalMills is a next-generation sports network combining real-time match data,
-              verified transfer market reporting, and elite tactical analysis.
+              GoalMills is a next-generation sports network combining real-time match data, verified
+              transfer market reporting, and elite tactical analysis.
             </p>
           </div>
         </div>
 
         {/* Editorial Standards & Corrections Policy (Section 24) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div id="editorial-standards" className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8 space-y-4">
+          <div
+            id="editorial-standards"
+            className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8 space-y-4"
+          >
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-blue-600/30 text-blue-400 text-sm">
                 <FiFileText />
@@ -53,12 +56,15 @@ export default function AboutUsPage() {
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Every story published on GoalMills undergoes strict fact-checking. We cross-reference
-              transfer claims with multiple Tier-1 industry sources and official club representatives
-              prior to publication.
+              transfer claims with multiple Tier-1 industry sources and official club
+              representatives prior to publication.
             </p>
           </div>
 
-          <div id="corrections-policy" className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8 space-y-4">
+          <div
+            id="corrections-policy"
+            className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8 space-y-4"
+          >
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-600/30 text-emerald-400 text-sm">
                 <FiCheckCircle />
@@ -95,12 +101,7 @@ export default function AboutUsPage() {
                 className="group flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] hover:bg-blue-600/20 border border-white/5 hover:border-blue-500/30 transition-all"
               >
                 <div className="relative h-14 w-14 rounded-2xl overflow-hidden bg-slate-900 flex-shrink-0 border border-white/10">
-                  <Image
-                    src={author.photo}
-                    alt={author.name}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={author.photo} alt={author.name} fill className="object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">

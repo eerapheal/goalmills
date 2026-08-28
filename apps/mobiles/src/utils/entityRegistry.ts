@@ -98,7 +98,7 @@ export const COMPETITIONS_REGISTRY: Record<string, CompetitionMeta> = {
     tier: 1,
     description: 'The top league in Italian football with tactical mastery.',
   },
-  'bundesliga': {
+  bundesliga: {
     id: 175,
     name: 'Bundesliga',
     slug: 'bundesliga',
@@ -123,7 +123,7 @@ export const COMPETITIONS_REGISTRY: Record<string, CompetitionMeta> = {
 };
 
 export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
-  'arsenal': {
+  arsenal: {
     id: 42,
     name: 'Arsenal FC',
     slug: 'arsenal',
@@ -137,7 +137,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 2,
     featuredPlayerSlugs: ['bukayo-saka'],
   },
-  'chelsea': {
+  chelsea: {
     id: 49,
     name: 'Chelsea FC',
     slug: 'chelsea',
@@ -151,7 +151,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 4,
     featuredPlayerSlugs: [],
   },
-  'liverpool': {
+  liverpool: {
     id: 40,
     name: 'Liverpool FC',
     slug: 'liverpool',
@@ -193,7 +193,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 1,
     featuredPlayerSlugs: [],
   },
-  'barcelona': {
+  barcelona: {
     id: 529,
     name: 'FC Barcelona',
     slug: 'barcelona',
@@ -207,7 +207,7 @@ export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
     position: 2,
     featuredPlayerSlugs: [],
   },
-  'galatasaray': {
+  galatasaray: {
     id: 645,
     name: 'Galatasaray SK',
     slug: 'galatasaray',
@@ -331,8 +331,16 @@ export const MOBILE_TRANSFERS: TransferItem[] = [
     id: 'tr-1',
     playerName: 'Victor Osimhen',
     playerSlug: 'victor-osimhen',
-    fromTeam: { name: 'Napoli', slug: 'napoli', logo: 'https://media.api-sports.io/football/teams/492.png' },
-    toTeam: { name: 'Arsenal FC', slug: 'arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' },
+    fromTeam: {
+      name: 'Napoli',
+      slug: 'napoli',
+      logo: 'https://media.api-sports.io/football/teams/492.png',
+    },
+    toTeam: {
+      name: 'Arsenal FC',
+      slug: 'arsenal',
+      logo: 'https://media.api-sports.io/football/teams/42.png',
+    },
     fee: '€75M + Add-ons',
     status: 'negotiation',
     date: '2026-08-26',
@@ -344,8 +352,16 @@ export const MOBILE_TRANSFERS: TransferItem[] = [
     id: 'tr-2',
     playerName: 'Ademola Lookman',
     playerSlug: 'ademola-lookman',
-    fromTeam: { name: 'Atalanta', slug: 'atalanta', logo: 'https://media.api-sports.io/football/teams/499.png' },
-    toTeam: { name: 'Paris Saint-Germain', slug: 'psg', logo: 'https://media.api-sports.io/football/teams/85.png' },
+    fromTeam: {
+      name: 'Atalanta',
+      slug: 'atalanta',
+      logo: 'https://media.api-sports.io/football/teams/499.png',
+    },
+    toTeam: {
+      name: 'Paris Saint-Germain',
+      slug: 'psg',
+      logo: 'https://media.api-sports.io/football/teams/85.png',
+    },
     fee: '€60M',
     status: 'agreement',
     date: '2026-08-25',
@@ -357,8 +373,16 @@ export const MOBILE_TRANSFERS: TransferItem[] = [
     id: 'tr-3',
     playerName: 'Martin Zubimendi',
     playerSlug: 'martin-zubimendi',
-    fromTeam: { name: 'Real Sociedad', slug: 'real-sociedad', logo: 'https://media.api-sports.io/football/teams/548.png' },
-    toTeam: { name: 'Arsenal FC', slug: 'arsenal', logo: 'https://media.api-sports.io/football/teams/42.png' },
+    fromTeam: {
+      name: 'Real Sociedad',
+      slug: 'real-sociedad',
+      logo: 'https://media.api-sports.io/football/teams/548.png',
+    },
+    toTeam: {
+      name: 'Arsenal FC',
+      slug: 'arsenal',
+      logo: 'https://media.api-sports.io/football/teams/42.png',
+    },
     fee: '€60M Clause',
     status: 'done_deal',
     date: '2026-08-22',
@@ -370,8 +394,16 @@ export const MOBILE_TRANSFERS: TransferItem[] = [
     id: 'tr-4',
     playerName: 'Florian Wirtz',
     playerSlug: 'florian-wirtz',
-    fromTeam: { name: 'Bayer Leverkusen', slug: 'leverkusen', logo: 'https://media.api-sports.io/football/teams/168.png' },
-    toTeam: { name: 'Manchester City', slug: 'manchester-city', logo: 'https://media.api-sports.io/football/teams/50.png' },
+    fromTeam: {
+      name: 'Bayer Leverkusen',
+      slug: 'leverkusen',
+      logo: 'https://media.api-sports.io/football/teams/168.png',
+    },
+    toTeam: {
+      name: 'Manchester City',
+      slug: 'manchester-city',
+      logo: 'https://media.api-sports.io/football/teams/50.png',
+    },
     fee: '€120M',
     status: 'rumour',
     date: '2026-08-24',

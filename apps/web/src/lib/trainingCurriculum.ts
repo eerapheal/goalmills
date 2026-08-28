@@ -72,10 +72,7 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Implement internal linking to GoalMills team pages, league tables, and related articles',
       'Apply Google News and Google Discover best practices for sports publishers',
     ],
-    resources: [
-      'GoalMills Sports SEO Playbook',
-      'Google Discover Optimization Blueprint',
-    ],
+    resources: ['GoalMills Sports SEO Playbook', 'Google Discover Optimization Blueprint'],
   },
   {
     id: 'content_planning_breaking',
@@ -91,10 +88,7 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Update rolling live blogs during transfer deadline day and major tournaments',
       'Coordinate with the social media desk for synchronized breaking alerts',
     ],
-    resources: [
-      'Weekly Sports Calendar Template',
-      'Breaking News Fast-Response Protocol',
-    ],
+    resources: ['Weekly Sports Calendar Template', 'Breaking News Fast-Response Protocol'],
   },
   {
     id: 'matchday_coverage',
@@ -110,10 +104,7 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Publish instant full-time match reports and player ratings within 15 minutes',
       'Curate fan reactions and viral match clips within legal guidelines',
     ],
-    resources: [
-      'Live Matchday Coverage Playbook',
-      'Player Ratings Scale & Criteria',
-    ],
+    resources: ['Live Matchday Coverage Playbook', 'Player Ratings Scale & Criteria'],
   },
   {
     id: 'social_community_management',
@@ -167,10 +158,7 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Select royalty-free or platform-licensed audio tracks compliant with copyright rules',
       'Repurpose long-form website articles into 3 distinct vertical video formats',
     ],
-    resources: [
-      'Short-Form Video Scripting Frameworks',
-      'Vertical Video Editing Masterclass',
-    ],
+    resources: ['Short-Form Video Scripting Frameworks', 'Vertical Video Editing Masterclass'],
   },
   {
     id: 'audience_growth_analytics',
@@ -186,10 +174,7 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Produce a weekly content performance report with actionable recommendations',
       'Iterate on underperforming topics using data-driven headline and thumbnail tweaks',
     ],
-    resources: [
-      'GoalMills Analytics Dashboard Guide',
-      'Weekly Growth Report Framework',
-    ],
+    resources: ['GoalMills Analytics Dashboard Guide', 'Weekly Growth Report Framework'],
   },
   {
     id: 'repurposing_newsroom_ops',
@@ -205,10 +190,7 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Incorporate editorial review notes and corrections into next-day assignments',
       'Complete the 30-day comprehensive sports media transition assessment',
     ],
-    resources: [
-      'Newsroom Daily Workflow SOP',
-      'Daily Reporting & Standup Checklist',
-    ],
+    resources: ['Newsroom Daily Workflow SOP', 'Daily Reporting & Standup Checklist'],
   },
 ];
 

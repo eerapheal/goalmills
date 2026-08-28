@@ -63,10 +63,7 @@ export default async function CompetitionHubPage({
         .lean(),
       News.find({
         articleType: 'transfer',
-        $or: [
-          { competitionSlug: comp.slug },
-          { tags: { $in: [comp.name, comp.slug] } },
-        ],
+        $or: [{ competitionSlug: comp.slug }, { tags: { $in: [comp.name, comp.slug] } }],
       })
         .sort({ createdAt: -1 })
         .limit(3)
@@ -85,7 +82,9 @@ export default async function CompetitionHubPage({
 
   try {
     const [standingsRes, scorersRes] = await Promise.all([
-      advancedFootballApi.getStandings(comp.id).catch(() => ({ success: 0, result: { total: [] } })),
+      advancedFootballApi
+        .getStandings(comp.id)
+        .catch(() => ({ success: 0, result: { total: [] } })),
       advancedFootballApi.getTopscorers(comp.id).catch(() => ({ success: 0, result: [] })),
     ]);
 

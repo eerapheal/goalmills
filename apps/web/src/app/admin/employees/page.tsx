@@ -121,7 +121,9 @@ export default function EmployeesPage() {
   });
 
   const trainingCount = employees.filter((e) => e.status === 'training').length;
-  const activeCount = employees.filter((e) => e.status === 'active' || e.status === 'probation').length;
+  const activeCount = employees.filter(
+    (e) => e.status === 'active' || e.status === 'probation'
+  ).length;
   const totalPayrollEst = employees.reduce((acc, e) => acc + (e.currentSalary || 30000), 0);
 
   return (
@@ -204,7 +206,8 @@ export default function EmployeesPage() {
                 <FiUsers className="text-amber-400" /> Staff Directory & Onboarding
               </h1>
               <p className="text-xs text-text-muted mt-0.5">
-                Manage 30-day curriculum trainees, appointment letters, and full-time content officers
+                Manage 30-day curriculum trainees, appointment letters, and full-time content
+                officers
               </p>
             </div>
 
@@ -293,7 +296,9 @@ export default function EmployeesPage() {
           ) : filteredEmployees.length === 0 ? (
             <div className="p-12 text-center space-y-3">
               <FiUsers className="mx-auto text-slate-600" size={40} />
-              <p className="text-slate-400 font-bold">No employee records found matching your filters.</p>
+              <p className="text-slate-400 font-bold">
+                No employee records found matching your filters.
+              </p>
             </div>
           ) : (
             <>
@@ -304,7 +309,10 @@ export default function EmployeesPage() {
                 {filteredEmployees.map((emp) => {
                   const isTraining = emp.status === 'training';
                   return (
-                    <div key={emp._id} className="p-4 space-y-3 hover:bg-white/[0.02] transition-colors">
+                    <div
+                      key={emp._id}
+                      className="p-4 space-y-3 hover:bg-white/[0.02] transition-colors"
+                    >
                       {/* Top Header Row */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -332,7 +340,9 @@ export default function EmployeesPage() {
                       <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-900/60 p-2.5 rounded-xl border border-white/5">
                         <div>
                           <span className="text-slate-500 font-bold block">Department:</span>
-                          <span className="text-slate-200 font-medium truncate block">{emp.department}</span>
+                          <span className="text-slate-200 font-medium truncate block">
+                            {emp.department}
+                          </span>
                         </div>
                         <div>
                           <span className="text-slate-500 font-bold block">Compensation:</span>
@@ -346,7 +356,13 @@ export default function EmployeesPage() {
                         </div>
                         <div>
                           <span className="text-slate-500 font-bold block">Contract:</span>
-                          <span className={emp.appointmentSigned ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                          <span
+                            className={
+                              emp.appointmentSigned
+                                ? 'text-emerald-400 font-bold'
+                                : 'text-amber-400 font-bold'
+                            }
+                          >
                             {emp.appointmentSigned ? '✓ Signed' : '⏳ Pending'}
                           </span>
                         </div>
@@ -424,7 +440,9 @@ export default function EmployeesPage() {
                           </td>
 
                           <td className="p-4 font-semibold text-emerald-400">
-                            <p className="text-sm font-bold">₦{(emp.currentSalary || 30000).toLocaleString()}</p>
+                            <p className="text-sm font-bold">
+                              ₦{(emp.currentSalary || 30000).toLocaleString()}
+                            </p>
                             <p className="text-[11px] text-text-muted">
                               {isTraining ? 'Training Allowance' : 'Regular Salary'}
                             </p>
@@ -440,7 +458,9 @@ export default function EmployeesPage() {
                               }`}
                             >
                               <FiFileText size={12} />
-                              <span>{emp.appointmentSigned ? 'Signed & Active' : 'Sign Contract'}</span>
+                              <span>
+                                {emp.appointmentSigned ? 'Signed & Active' : 'Sign Contract'}
+                              </span>
                             </Link>
                           </td>
 
@@ -472,7 +492,9 @@ export default function EmployeesPage() {
               {/* Modal Header */}
               <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-white">Onboard New Team Member</h3>
+                  <h3 className="text-lg sm:text-xl font-black text-white">
+                    Onboard New Team Member
+                  </h3>
                   <p className="text-xs text-text-muted mt-0.5">
                     Generate official appointment contract & 30-day curriculum tracker
                   </p>
@@ -486,7 +508,10 @@ export default function EmployeesPage() {
               </div>
 
               {/* Modal Body */}
-              <form onSubmit={handleOnboardSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+              <form
+                onSubmit={handleOnboardSubmit}
+                className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1"
+              >
                 {errorMsg && (
                   <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold flex items-center gap-2">
                     <FiAlertCircle size={16} />
@@ -496,7 +521,9 @@ export default function EmployeesPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Full Legal Name *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Full Legal Name *
+                    </label>
                     <input
                       type="text"
                       required
@@ -508,7 +535,9 @@ export default function EmployeesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Email Address *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Email Address *
+                    </label>
                     <input
                       type="email"
                       required
@@ -522,7 +551,9 @@ export default function EmployeesPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Phone Number *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Phone Number *
+                    </label>
                     <input
                       type="tel"
                       required
@@ -534,13 +565,17 @@ export default function EmployeesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Residential Address *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Residential Address *
+                    </label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. No 35 church street, Jos, Plateau State"
                       value={formData.residentialAddress}
-                      onChange={(e) => setFormData({ ...formData, residentialAddress: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, residentialAddress: e.target.value })
+                      }
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
                   </div>
@@ -548,7 +583,9 @@ export default function EmployeesPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Job Title *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Job Title *
+                    </label>
                     <input
                       type="text"
                       required
@@ -559,38 +596,52 @@ export default function EmployeesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Department *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Department *
+                    </label>
                     <select
                       value={formData.department}
                       onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     >
                       <option value="Editorial & Digital Media">Editorial & Digital Media</option>
-                      <option value="Social Media & Content Operations">Social Media & Content Operations</option>
-                      <option value="Graphics & Video Production">Graphics & Video Production</option>
+                      <option value="Social Media & Content Operations">
+                        Social Media & Content Operations
+                      </option>
+                      <option value="Graphics & Video Production">
+                        Graphics & Video Production
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">30-Day Training Allowance (₦) *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      30-Day Training Allowance (₦) *
+                    </label>
                     <input
                       type="number"
                       required
                       value={formData.trainingAllowance}
-                      onChange={(e) => setFormData({ ...formData, trainingAllowance: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, trainingAllowance: Number(e.target.value) })
+                      }
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">Post-Training Starting Salary (₦) *</label>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Post-Training Starting Salary (₦) *
+                    </label>
                     <input
                       type="number"
                       required
                       value={formData.startingSalary}
-                      onChange={(e) => setFormData({ ...formData, startingSalary: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, startingSalary: Number(e.target.value) })
+                      }
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
                   </div>

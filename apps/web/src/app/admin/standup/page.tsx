@@ -97,7 +97,11 @@ export default function StandupAdminPage() {
     }
   };
 
-  const handleToggleAttendance = async (meetingId: string, employeeId: string, currentStatus: string) => {
+  const handleToggleAttendance = async (
+    meetingId: string,
+    employeeId: string,
+    currentStatus: string
+  ) => {
     const meeting = standups.find((m) => m._id === meetingId);
     if (!meeting) return;
 
@@ -225,7 +229,10 @@ export default function StandupAdminPage() {
                   </h4>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200">
                     {meeting.editorialPriorities.map((item, idx) => (
-                      <li key={idx} className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5 flex items-center gap-2">
+                      <li
+                        key={idx}
+                        className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5 flex items-center gap-2"
+                      >
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
                         <span>{item}</span>
                       </li>
@@ -237,7 +244,10 @@ export default function StandupAdminPage() {
                 <div className="space-y-2.5 pt-2 border-t border-white/5">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <FiUsers size={14} /> Attendance Roll-Call ({meeting.attendees?.filter((a: StandupAttendee) => a.status === 'present').length || 0} / {meeting.attendees?.length || 0} Present)
+                      <FiUsers size={14} /> Attendance Roll-Call (
+                      {meeting.attendees?.filter((a: StandupAttendee) => a.status === 'present')
+                        .length || 0}{' '}
+                      / {meeting.attendees?.length || 0} Present)
                     </h4>
                     <span className="text-[11px] text-text-muted">Tap to toggle attendance</span>
                   </div>
@@ -249,7 +259,9 @@ export default function StandupAdminPage() {
                         <button
                           key={att.employeeId}
                           type="button"
-                          onClick={() => handleToggleAttendance(meeting._id!, att.employeeId, att.status)}
+                          onClick={() =>
+                            handleToggleAttendance(meeting._id!, att.employeeId, att.status)
+                          }
                           className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-bold transition-all text-left ${
                             isPresent
                               ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
@@ -259,7 +271,9 @@ export default function StandupAdminPage() {
                           <span className="truncate">{att.employeeName}</span>
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold flex items-center gap-1 ${
-                              isPresent ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                              isPresent
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'bg-red-500/10 text-red-400'
                             }`}
                           >
                             {isPresent ? <FiUserCheck size={10} /> : <FiUserX size={10} />}
@@ -283,8 +297,12 @@ export default function StandupAdminPage() {
             <div className="bg-slate-900 border-t sm:border border-white/15 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 sm:p-8 space-y-5 shadow-2xl animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-white">Schedule 5:00 PM Standup</h3>
-                  <p className="text-xs text-text-muted">Create daily roll-call and assign newsroom stories</p>
+                  <h3 className="text-lg sm:text-xl font-black text-white">
+                    Schedule 5:00 PM Standup
+                  </h3>
+                  <p className="text-xs text-text-muted">
+                    Create daily roll-call and assign newsroom stories
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowScheduleModal(false)}
@@ -296,7 +314,9 @@ export default function StandupAdminPage() {
 
               <form onSubmit={handleCreateStandup} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Meeting Date *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Meeting Date *
+                  </label>
                   <input
                     type="date"
                     required
@@ -307,7 +327,9 @@ export default function StandupAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Meeting Time Slot *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Meeting Time Slot *
+                  </label>
                   <input
                     type="text"
                     required
@@ -318,7 +340,9 @@ export default function StandupAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Google Meet URL *</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Google Meet URL *
+                  </label>
                   <input
                     type="url"
                     required

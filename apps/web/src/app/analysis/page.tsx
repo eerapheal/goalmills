@@ -24,10 +24,7 @@ export default async function AnalysisHubPage() {
     await dbConnect();
     const [tacDocs, playerDocs, statDocs] = await Promise.all([
       News.find({
-        $or: [
-          { articleType: 'tactical_analysis' },
-          { category: { $regex: /tactical|tactics/i } },
-        ],
+        $or: [{ articleType: 'tactical_analysis' }, { category: { $regex: /tactical|tactics/i } }],
       })
         .sort({ views: -1, createdAt: -1 })
         .limit(6)
@@ -108,7 +105,10 @@ export default async function AnalysisHubPage() {
             </h3>
             <div className="space-y-3">
               {analysisCategories.map((cat) => (
-                <div key={cat.slug} className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-1">
+                <div
+                  key={cat.slug}
+                  className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-1"
+                >
                   <div className="flex items-center gap-2.5">
                     {cat.icon}
                     <h4 className="text-xs font-bold text-white">{cat.title}</h4>

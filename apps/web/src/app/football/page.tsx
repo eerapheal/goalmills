@@ -47,10 +47,7 @@ export default async function FootballHubPage() {
         .limit(3)
         .lean(),
       News.find({
-        $or: [
-          { articleType: 'tactical_analysis' },
-          { category: { $regex: /analysis|tactics/i } },
-        ],
+        $or: [{ articleType: 'tactical_analysis' }, { category: { $regex: /analysis|tactics/i } }],
       })
         .sort({ views: -1, createdAt: -1 })
         .limit(3)

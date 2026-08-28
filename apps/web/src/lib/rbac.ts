@@ -48,7 +48,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionAction[]> = {
 /**
  * Check if a given role has permission to execute an action (Single Responsibility Principle)
  */
-export function hasPermission(role: UserRole | undefined | null, action: PermissionAction): boolean {
+export function hasPermission(
+  role: UserRole | undefined | null,
+  action: PermissionAction
+): boolean {
   if (!role) return action === 'articles:read';
   const permissions = ROLE_PERMISSIONS[role] || [];
   return permissions.includes(action);

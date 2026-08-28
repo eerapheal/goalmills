@@ -33,7 +33,15 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
     const body = await req.json();
-    const { employeeId, period, evaluationDate, metrics, strengths, areasForImprovement, transitionRecommendation } = body;
+    const {
+      employeeId,
+      period,
+      evaluationDate,
+      metrics,
+      strengths,
+      areasForImprovement,
+      transitionRecommendation,
+    } = body;
 
     if (!employeeId || !metrics || !Array.isArray(metrics)) {
       return NextResponse.json(
@@ -74,7 +82,8 @@ export async function POST(req: NextRequest) {
       strengths: strengths || '',
       areasForImprovement: areasForImprovement || '',
       transitionRecommendation: transitionRecommendation || 'promote_to_regular',
-      recommendedSalary: transitionRecommendation === 'promote_to_regular' ? 50000 : employee.currentSalary,
+      recommendedSalary:
+        transitionRecommendation === 'promote_to_regular' ? 50000 : employee.currentSalary,
     });
 
     // If promoted to regular, update employee status and salary

@@ -340,9 +340,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
             <div className="flex flex-wrap items-center justify-between gap-4 py-3.5 px-4 rounded-2xl bg-white/[0.03] border border-white/10">
               <Link
                 href={
-                  news.authorSlug
-                    ? `/authors/${news.authorSlug}`
-                    : `/authors/goalmills-editorial`
+                  news.authorSlug ? `/authors/${news.authorSlug}` : `/authors/goalmills-editorial`
                 }
                 className="group flex items-center gap-3"
               >

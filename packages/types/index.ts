@@ -2472,13 +2472,7 @@ export interface CricbuzzAPIClient {
 // ============================================================================
 
 export type EmploymentStatus =
-  | 'training'
-  | 'probation'
-  | 'active'
-  | 'review'
-  | 'suspended'
-  | 'resigned'
-  | 'terminated';
+  'training' | 'probation' | 'active' | 'review' | 'suspended' | 'resigned' | 'terminated';
 
 export type WorkArrangement = 'Remote' | 'Hybrid' | 'Office';
 
@@ -2691,10 +2685,7 @@ export interface PerformanceScorecard {
   strengths: string;
   areasForImprovement: string;
   transitionRecommendation:
-    | 'promote_to_regular'
-    | 'extend_training'
-    | 'renegotiate_salary'
-    | 'terminate';
+    'promote_to_regular' | 'extend_training' | 'renegotiate_salary' | 'terminate';
   recommendedSalary?: number; // e.g., 50000
   managementDecision?: string;
   createdAt?: string;

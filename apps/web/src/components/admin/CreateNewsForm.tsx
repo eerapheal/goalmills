@@ -113,9 +113,7 @@ export default function CreateNewsForm() {
     const club = CLUBS_REGISTRY[selectedClubSlug];
     const player = PLAYERS_REGISTRY[selectedPlayerSlug];
 
-    const teams = club
-      ? [{ id: club.id, name: club.name, slug: club.slug, logo: club.logo }]
-      : [];
+    const teams = club ? [{ id: club.id, name: club.name, slug: club.slug, logo: club.logo }] : [];
     const players = player
       ? [{ id: player.id, name: player.name, slug: player.slug, photo: player.photo }]
       : [];
