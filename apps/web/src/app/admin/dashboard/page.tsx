@@ -35,13 +35,62 @@ interface QuickLinkCard {
 }
 
 const EMS_QUICK_LINKS: QuickLinkCard[] = [
-  { href: '/admin/handbook', label: 'Handbook & SOPs', sublabel: 'Curriculum & Guide', icon: FiBookOpen, colorClass: 'amber', requiredPermission: 'handbook:read' },
-  { href: '/admin/employees', label: 'Staff & Trainees', sublabel: 'Directory & Contracts', icon: FiUsers, colorClass: 'amber', requiredPermission: 'employees:read' },
-  { href: '/admin/reports', label: 'Daily Reports', sublabel: 'Review & Grading', icon: FiCheckSquare, colorClass: 'blue', requiredPermission: 'reports:read_own' },
-  { href: '/admin/standup', label: '5:00 PM Stand-up', sublabel: 'Meet & Roll-Call', icon: FiCalendar, colorClass: 'emerald', requiredPermission: 'standup:attend' },
-  { href: '/admin/evaluations', label: 'Scorecards', sublabel: '100% Metric Matrix', icon: FiAward, colorClass: 'purple', requiredPermission: 'evaluations:read' },
-  { href: '/admin/payroll', label: 'Payroll Ledger', sublabel: '₦30k / ₦50k Stipends', icon: FiDollarSign, colorClass: 'emerald', requiredPermission: 'payroll:read' },
-  { href: '/admin/portal', label: 'Staff Portal', sublabel: 'Candidate Self-Service', icon: FiUserCheck, colorClass: 'cyan', requiredPermission: 'articles:read' },
+  {
+    href: '/admin/handbook',
+    label: 'Handbook & SOPs',
+    sublabel: 'Curriculum & Guide',
+    icon: FiBookOpen,
+    colorClass: 'amber',
+    requiredPermission: 'handbook:read',
+  },
+  {
+    href: '/admin/employees',
+    label: 'Staff & Trainees',
+    sublabel: 'Directory & Contracts',
+    icon: FiUsers,
+    colorClass: 'amber',
+    requiredPermission: 'employees:read',
+  },
+  {
+    href: '/admin/reports',
+    label: 'Daily Reports',
+    sublabel: 'Review & Grading',
+    icon: FiCheckSquare,
+    colorClass: 'blue',
+    requiredPermission: 'reports:read_own',
+  },
+  {
+    href: '/admin/standup',
+    label: '5:00 PM Stand-up',
+    sublabel: 'Meet & Roll-Call',
+    icon: FiCalendar,
+    colorClass: 'emerald',
+    requiredPermission: 'standup:attend',
+  },
+  {
+    href: '/admin/evaluations',
+    label: 'Scorecards',
+    sublabel: '100% Metric Matrix',
+    icon: FiAward,
+    colorClass: 'purple',
+    requiredPermission: 'evaluations:read',
+  },
+  {
+    href: '/admin/payroll',
+    label: 'Payroll Ledger',
+    sublabel: '₦30k / ₦50k Stipends',
+    icon: FiDollarSign,
+    colorClass: 'emerald',
+    requiredPermission: 'payroll:read',
+  },
+  {
+    href: '/admin/portal',
+    label: 'Staff Portal',
+    sublabel: 'Candidate Self-Service',
+    icon: FiUserCheck,
+    colorClass: 'cyan',
+    requiredPermission: 'articles:read',
+  },
 ];
 
 type CreationTab = 'news' | 'video' | 'manage';
@@ -82,7 +131,9 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(visibleQuickLinks.length, 7)} gap-2.5 sm:gap-3`}>
+            <div
+              className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(visibleQuickLinks.length, 7)} gap-2.5 sm:gap-3`}
+            >
               {visibleQuickLinks.map((card) => {
                 const Icon = card.icon;
                 return (
@@ -91,10 +142,14 @@ export default function AdminDashboard() {
                     href={card.href}
                     className={`glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 hover:border-${card.colorClass}-500/40 hover:bg-${card.colorClass}-500/5 transition-all group shadow-md`}
                   >
-                    <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-${card.colorClass}-500/10 border border-${card.colorClass}-500/20 flex items-center justify-center text-${card.colorClass}-400 mb-2 group-hover:scale-110 transition-transform`}>
+                    <div
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-${card.colorClass}-500/10 border border-${card.colorClass}-500/20 flex items-center justify-center text-${card.colorClass}-400 mb-2 group-hover:scale-110 transition-transform`}
+                    >
                       <Icon size={18} />
                     </div>
-                    <p className={`text-xs font-bold text-white group-hover:text-${card.colorClass}-400 transition-colors truncate`}>
+                    <p
+                      className={`text-xs font-bold text-white group-hover:text-${card.colorClass}-400 transition-colors truncate`}
+                    >
                       {card.label}
                     </p>
                     <p className="text-[10px] text-text-muted mt-0.5 truncate">{card.sublabel}</p>

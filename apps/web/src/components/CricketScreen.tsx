@@ -28,7 +28,9 @@ export function CricketScreen() {
   const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
   const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
   const [playersList, setPlayersList] = useState<CricketPlayer[]>([]);
-  const [standingsTab, setStandingsTab] = useState<'IPL' | 'T20_WC' | 'BBL' | 'ICC_TEST' | 'ICC_ODI' | 'ICC_T20'>('IPL');
+  const [standingsTab, setStandingsTab] = useState<
+    'IPL' | 'T20_WC' | 'BBL' | 'ICC_TEST' | 'ICC_ODI' | 'ICC_T20'
+  >('IPL');
   const [standings, setStandings] = useState<Record<string, CricketStanding[]>>({});
   const [iccRankings, setIccRankings] = useState<any[]>([]);
 
@@ -63,22 +65,53 @@ export function CricketScreen() {
       } else if (activeTab === 'upcoming' || activeTab === 'results') {
         const fromDate = selectedDate;
         const toDate = selectedDate;
-        const res = await advancedCricketApi.getFixtures({ from: fromDate, to: toDate, timezone: 'GMT' });
+        const res = await advancedCricketApi.getFixtures({
+          from: fromDate,
+          to: toDate,
+          timezone: 'GMT',
+        });
         setFixtures(res.result || []);
       } else if (activeTab === 'standings') {
         const [iplRank, t20WorldCupRank, bblRank, iccTest, iccOdi, iccT20] = await Promise.all([
           advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: [] })),
           advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: [] })),
           advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: [] })),
-          advancedCricketApi.getRankings('test', 'teams', 'men').catch(() => ({ format: 'test' as const, category: 'teams' as const, gender: 'men' as const, rankings: [] })),
-          advancedCricketApi.getRankings('odi', 'teams', 'men').catch(() => ({ format: 'odi' as const, category: 'teams' as const, gender: 'men' as const, rankings: [] })),
-          advancedCricketApi.getRankings('t20', 'teams', 'men').catch(() => ({ format: 't20' as const, category: 'teams' as const, gender: 'men' as const, rankings: [] })),
+          advancedCricketApi
+            .getRankings('test', 'teams', 'men')
+            .catch(() => ({
+              format: 'test' as const,
+              category: 'teams' as const,
+              gender: 'men' as const,
+              rankings: [],
+            })),
+          advancedCricketApi
+            .getRankings('odi', 'teams', 'men')
+            .catch(() => ({
+              format: 'odi' as const,
+              category: 'teams' as const,
+              gender: 'men' as const,
+              rankings: [],
+            })),
+          advancedCricketApi
+            .getRankings('t20', 'teams', 'men')
+            .catch(() => ({
+              format: 't20' as const,
+              category: 'teams' as const,
+              gender: 'men' as const,
+              rankings: [],
+            })),
         ]);
 
         setStandings({
-          IPL: (iplRank as any)?.result?.total || (Array.isArray(iplRank?.result) ? iplRank.result : []),
-          T20_WC: (t20WorldCupRank as any)?.result?.total || (Array.isArray(t20WorldCupRank?.result) ? t20WorldCupRank.result : []),
-          BBL: (bblRank as any)?.result?.total || (Array.isArray(bblRank?.result) ? bblRank.result : []),
+          IPL:
+            (iplRank as any)?.result?.total ||
+            (Array.isArray(iplRank?.result) ? iplRank.result : []),
+          T20_WC:
+            (t20WorldCupRank as any)?.result?.total ||
+            (Array.isArray(t20WorldCupRank?.result) ? t20WorldCupRank.result : []),
+          BBL:
+            (bblRank as any)?.result?.total ||
+            (Array.isArray(bblRank?.result) ? bblRank.result : []),
         });
 
         setIccRankings([
@@ -114,7 +147,9 @@ export function CricketScreen() {
     if (activeTab === 'live') {
       list = liveMatches;
     } else if (activeTab === 'upcoming') {
-      list = fixtures.filter((m) => m.event_live !== '1' && m.event_status !== 'Finished' && m.event_status !== 'FT');
+      list = fixtures.filter(
+        (m) => m.event_live !== '1' && m.event_status !== 'Finished' && m.event_status !== 'FT'
+      );
     } else if (activeTab === 'results') {
       list = fixtures.filter((m) => m.event_status === 'Finished' || m.event_status === 'FT');
     }
@@ -124,16 +159,39 @@ export function CricketScreen() {
         const league = (m.league_name || '').toLowerCase();
         const type = (m.event_type || '').toLowerCase();
         if (formatFilter === 'international') {
-          return league.includes('icc') || league.includes('international') || type.includes('t20i') || type.includes('odi') || type.includes('test');
+          return (
+            league.includes('icc') ||
+            league.includes('international') ||
+            type.includes('t20i') ||
+            type.includes('odi') ||
+            type.includes('test')
+          );
         }
         if (formatFilter === 'franchise') {
-          return league.includes('ipl') || league.includes('bbl') || league.includes('psl') || league.includes('hundred') || league.includes('cpl') || league.includes('sa20') || league.includes('premier league');
+          return (
+            league.includes('ipl') ||
+            league.includes('bbl') ||
+            league.includes('psl') ||
+            league.includes('hundred') ||
+            league.includes('cpl') ||
+            league.includes('sa20') ||
+            league.includes('premier league')
+          );
         }
         if (formatFilter === 'domestic') {
-          return league.includes('trophy') || league.includes('shield') || league.includes('cup') || league.includes('championship');
+          return (
+            league.includes('trophy') ||
+            league.includes('shield') ||
+            league.includes('cup') ||
+            league.includes('championship')
+          );
         }
         if (formatFilter === 'women') {
-          return league.includes('women') || type.includes('women') || (m.event_home_team || '').toLowerCase().includes('women');
+          return (
+            league.includes('women') ||
+            type.includes('women') ||
+            (m.event_home_team || '').toLowerCase().includes('women')
+          );
         }
         return true;
       });
@@ -270,31 +328,34 @@ export function CricketScreen() {
       )}
 
       {/* Date Strip for upcoming & results */}
-      {activeTab !== 'live' && activeTab !== 'standings' && activeTab !== 'series' && activeTab !== 'teams' && (
-        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
-          {dateStrip.map((item) => {
-            const isSelected = selectedDate === item.iso;
-            return (
-              <button
-                key={item.iso}
-                onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
-                  isSelected
-                    ? 'border-amber-500 bg-amber-500 text-slate-950 font-bold'
-                    : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
-                }`}
-              >
-                <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
-                <span
-                  className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
+      {activeTab !== 'live' &&
+        activeTab !== 'standings' &&
+        activeTab !== 'series' &&
+        activeTab !== 'teams' && (
+          <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
+            {dateStrip.map((item) => {
+              const isSelected = selectedDate === item.iso;
+              return (
+                <button
+                  key={item.iso}
+                  onClick={() => setSelectedDate(item.iso)}
+                  className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
+                    isSelected
+                      ? 'border-amber-500 bg-amber-500 text-slate-950 font-bold'
+                      : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
+                  }`}
                 >
-                  {item.dayNumber}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
+                  <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
+                  <span
+                    className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
+                  >
+                    {item.dayNumber}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
       {/* Content Area */}
       {loading ? (
@@ -347,7 +408,7 @@ export function CricketScreen() {
                 </span>
               </h2>
 
-              {(!standings[standingsTab] || standings[standingsTab].length === 0) ? (
+              {!standings[standingsTab] || standings[standingsTab].length === 0 ? (
                 <p className="text-sm text-slate-400 py-4 text-center">
                   Standings for this tournament are currently updating.
                 </p>
@@ -369,16 +430,26 @@ export function CricketScreen() {
                     <tbody className="divide-y divide-white/5">
                       {standings[standingsTab].map((row, idx) => (
                         <tr key={idx} className="hover:bg-white/5">
-                          <td className="py-3 px-2 font-bold text-slate-400">{row.standing_place || idx + 1}</td>
+                          <td className="py-3 px-2 font-bold text-slate-400">
+                            {row.standing_place || idx + 1}
+                          </td>
                           <td className="py-3 px-4 font-bold text-white flex items-center gap-2">
                             <span className="text-amber-400">🛡️</span>
                             <span>{row.standing_team}</span>
                           </td>
                           <td className="py-3 px-3 text-center">{row.standing_MP || 0}</td>
-                          <td className="py-3 px-3 text-center text-emerald-400 font-bold">{row.standing_W || 0}</td>
-                          <td className="py-3 px-3 text-center text-red-400 font-bold">{row.standing_L || 0}</td>
-                          <td className="py-3 px-3 text-center text-slate-400">{row.standing_NR || 0}</td>
-                          <td className="py-3 px-3 text-center font-mono text-xs">{row.standing_NRR || '0.00'}</td>
+                          <td className="py-3 px-3 text-center text-emerald-400 font-bold">
+                            {row.standing_W || 0}
+                          </td>
+                          <td className="py-3 px-3 text-center text-red-400 font-bold">
+                            {row.standing_L || 0}
+                          </td>
+                          <td className="py-3 px-3 text-center text-slate-400">
+                            {row.standing_NR || 0}
+                          </td>
+                          <td className="py-3 px-3 text-center font-mono text-xs">
+                            {row.standing_NRR || '0.00'}
+                          </td>
                           <td className="py-3 px-4 text-right font-black text-amber-400 text-base">
                             {row.standing_Pts || 0}
                           </td>
@@ -427,7 +498,9 @@ export function CricketScreen() {
                       <tbody className="divide-y divide-white/5">
                         {data.map((item: any, idx: number) => (
                           <tr key={idx} className="hover:bg-white/5">
-                            <td className="py-3 px-2 font-bold text-slate-400">{item.rank || idx + 1}</td>
+                            <td className="py-3 px-2 font-bold text-slate-400">
+                              {item.rank || idx + 1}
+                            </td>
                             <td className="py-3 px-4 font-bold text-white">
                               {item.country || item.team_name}
                             </td>
@@ -465,7 +538,12 @@ export function CricketScreen() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {seriesList
-                .filter((s) => !searchQuery || (s.league_name && s.league_name.toLowerCase().includes(searchQuery.toLowerCase())))
+                .filter(
+                  (s) =>
+                    !searchQuery ||
+                    (s.league_name &&
+                      s.league_name.toLowerCase().includes(searchQuery.toLowerCase()))
+                )
                 .map((series) => (
                   <Link
                     key={series.league_key}
@@ -502,7 +580,12 @@ export function CricketScreen() {
             <h2 className="text-lg font-bold text-white mb-3">Trending Cricketers & Profiles</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {playersList
-                .filter((p) => !searchQuery || (p.player_name && p.player_name.toLowerCase().includes(searchQuery.toLowerCase())))
+                .filter(
+                  (p) =>
+                    !searchQuery ||
+                    (p.player_name &&
+                      p.player_name.toLowerCase().includes(searchQuery.toLowerCase()))
+                )
                 .map((player) => (
                   <Link
                     key={player.player_key}
@@ -511,17 +594,27 @@ export function CricketScreen() {
                   >
                     <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
                       {player.player_image ? (
-                        <img src={player.player_image} alt={player.player_name} className="h-full w-full object-cover" />
+                        <img
+                          src={player.player_image}
+                          alt={player.player_name}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
-                        <span className="text-base font-black text-amber-400">{player.player_name.charAt(0)}</span>
+                        <span className="text-base font-black text-amber-400">
+                          {player.player_name.charAt(0)}
+                        </span>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
                         {player.player_name}
                       </h3>
-                      <p className="text-xs text-slate-400 truncate">{player.player_role || player.player_type || 'Cricket Star'}</p>
-                      <p className="text-[10px] text-amber-400/90 font-medium truncate mt-0.5">{player.player_country || player.team_name}</p>
+                      <p className="text-xs text-slate-400 truncate">
+                        {player.player_role || player.player_type || 'Cricket Star'}
+                      </p>
+                      <p className="text-[10px] text-amber-400/90 font-medium truncate mt-0.5">
+                        {player.player_country || player.team_name}
+                      </p>
                     </div>
                   </Link>
                 ))}
@@ -532,7 +625,11 @@ export function CricketScreen() {
             <h2 className="text-lg font-bold text-white mb-3">Cricket Teams & Clubs</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {teamsList
-                .filter((t) => !searchQuery || (t.team_name && t.team_name.toLowerCase().includes(searchQuery.toLowerCase())))
+                .filter(
+                  (t) =>
+                    !searchQuery ||
+                    (t.team_name && t.team_name.toLowerCase().includes(searchQuery.toLowerCase()))
+                )
                 .map((team) => (
                   <Link
                     key={team.team_key}
@@ -541,16 +638,24 @@ export function CricketScreen() {
                   >
                     <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 p-1 flex items-center justify-center shrink-0">
                       {team.team_logo ? (
-                        <img src={team.team_logo} alt={team.team_name} className="h-full w-full object-contain" />
+                        <img
+                          src={team.team_logo}
+                          alt={team.team_name}
+                          className="h-full w-full object-contain"
+                        />
                       ) : (
-                        <span className="text-sm font-black text-amber-400">{team.team_name.charAt(0)}</span>
+                        <span className="text-sm font-black text-amber-400">
+                          {team.team_name.charAt(0)}
+                        </span>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
                         {team.team_name}
                       </h3>
-                      <p className="text-xs text-slate-400 truncate">View Squad & Match Schedule &rarr;</p>
+                      <p className="text-xs text-slate-400 truncate">
+                        View Squad & Match Schedule &rarr;
+                      </p>
                     </div>
                   </Link>
                 ))}

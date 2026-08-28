@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
 
     const userRole = session.user.role as UserRole;
     if (!hasPermission(userRole, 'reports:read_own')) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Insufficient permissions' },
+        { status: 403 }
+      );
     }
 
     await dbConnect();
@@ -100,8 +103,14 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
     const userRole = session.user.role as UserRole;
-    if (!hasPermission(userRole, 'handbook:manage') && !hasPermission(userRole, 'evaluations:manage')) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Editor or Manager role required to review reports' }, { status: 403 });
+    if (
+      !hasPermission(userRole, 'handbook:manage') &&
+      !hasPermission(userRole, 'evaluations:manage')
+    ) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Editor or Manager role required to review reports' },
+        { status: 403 }
+      );
     }
 
     await dbConnect();

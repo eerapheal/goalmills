@@ -21,7 +21,10 @@ export async function ALL(req: NextRequest) {
 
   const session = await getServerSession(authOptions);
   if (!session) {
-    return NextResponse.json({ success: false, error: 'Unauthorized gateway access' }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized gateway access' },
+      { status: 401 }
+    );
   }
 
   return forwardProxyRequest(req);

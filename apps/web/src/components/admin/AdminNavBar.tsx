@@ -33,14 +33,62 @@ interface NavItem {
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
-  { label: 'News & Media', href: '/admin/dashboard', icon: FiFileText, group: 'editorial', requiredPermission: 'articles:draft' },
-  { label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen, group: 'ems', requiredPermission: 'handbook:read' },
-  { label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers, group: 'ems', requiredPermission: 'employees:read' },
-  { label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare, group: 'ems', requiredPermission: 'reports:read_own' },
-  { label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar, group: 'ems', requiredPermission: 'standup:attend' },
-  { label: 'Evaluations', href: '/admin/evaluations', icon: FiAward, group: 'ems', requiredPermission: 'evaluations:read' },
-  { label: 'Payroll & Allowances', href: '/admin/payroll', icon: FiDollarSign, group: 'ems', requiredPermission: 'payroll:read' },
-  { label: 'Staff Portal', href: '/admin/portal', icon: FiUserCheck, group: 'portal', requiredPermission: 'articles:read' },
+  {
+    label: 'News & Media',
+    href: '/admin/dashboard',
+    icon: FiFileText,
+    group: 'editorial',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Handbook & SOPs',
+    href: '/admin/handbook',
+    icon: FiBookOpen,
+    group: 'ems',
+    requiredPermission: 'handbook:read',
+  },
+  {
+    label: 'Employees & Staff',
+    href: '/admin/employees',
+    icon: FiUsers,
+    group: 'ems',
+    requiredPermission: 'employees:read',
+  },
+  {
+    label: 'Daily Reports',
+    href: '/admin/reports',
+    icon: FiCheckSquare,
+    group: 'ems',
+    requiredPermission: 'reports:read_own',
+  },
+  {
+    label: '5 PM Stand-up',
+    href: '/admin/standup',
+    icon: FiCalendar,
+    group: 'ems',
+    requiredPermission: 'standup:attend',
+  },
+  {
+    label: 'Evaluations',
+    href: '/admin/evaluations',
+    icon: FiAward,
+    group: 'ems',
+    requiredPermission: 'evaluations:read',
+  },
+  {
+    label: 'Payroll & Allowances',
+    href: '/admin/payroll',
+    icon: FiDollarSign,
+    group: 'ems',
+    requiredPermission: 'payroll:read',
+  },
+  {
+    label: 'Staff Portal',
+    href: '/admin/portal',
+    icon: FiUserCheck,
+    group: 'portal',
+    requiredPermission: 'articles:read',
+  },
 ];
 
 /** Human-readable role label */

@@ -28,10 +28,7 @@ export async function GET(req: NextRequest) {
     // If regular staff or self-only requested, return only their own profile
     if (selfOnly || !hasPermission(userRole, 'employees:read')) {
       const myEmployee = await Employee.findOne({
-        $or: [
-          { userId: session.user.id },
-          { email: session.user.email?.toLowerCase() },
-        ],
+        $or: [{ userId: session.user.id }, { email: session.user.email?.toLowerCase() }],
       });
 
       if (!myEmployee) {
@@ -220,4 +217,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

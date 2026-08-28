@@ -266,7 +266,10 @@ export async function POST(request: NextRequest) {
     let articleStatus: 'draft' | 'pending_approval' | 'published' = 'published';
     if (!canDirectPublish(userRole)) {
       articleStatus = requestedStatus === 'draft' ? 'draft' : 'pending_approval';
-    } else if (requestedStatus && ['draft', 'pending_approval', 'published'].includes(requestedStatus)) {
+    } else if (
+      requestedStatus &&
+      ['draft', 'pending_approval', 'published'].includes(requestedStatus)
+    ) {
       articleStatus = requestedStatus;
     }
 

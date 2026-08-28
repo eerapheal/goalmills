@@ -2,7 +2,15 @@ export interface HandbookSection {
   id: string;
   partNumber: number | string;
   title: string;
-  category: 'Curriculum' | 'Journalism' | 'SEO' | 'Social' | 'Design' | 'Video' | 'Operations' | 'Monetization';
+  category:
+    | 'Curriculum'
+    | 'Journalism'
+    | 'SEO'
+    | 'Social'
+    | 'Design'
+    | 'Video'
+    | 'Operations'
+    | 'Monetization';
   summary: string;
   keyPoints: string[];
   template?: {
@@ -19,7 +27,8 @@ export const GOALMILLS_HANDBOOK_SECTIONS: HandbookSection[] = [
     partNumber: 'Curriculum',
     title: '30-Day Sports Media Employee Training Curriculum',
     category: 'Curriculum',
-    summary: 'Standardized 30-day onboarding program with daily 5:00 PM stand-ups, phased progression from observation to independent newsroom operation, and 100-point evaluation criteria.',
+    summary:
+      'Standardized 30-day onboarding program with daily 5:00 PM stand-ups, phased progression from observation to independent newsroom operation, and 100-point evaluation criteria.',
     keyPoints: [
       'Model: Learn → Create → Publish → Submit → Review → Improve',
       'Daily 5:00 PM – 5:30 PM WAT Google Meet stand-up is mandatory',
@@ -80,7 +89,8 @@ The 30-day program transitions new hires from learners into independent sports j
     partNumber: 1,
     title: 'Understanding the Sports Media Business in Full Detail',
     category: 'Operations',
-    summary: 'A sports website is not just a blog; it is a media business, traffic flywheel, and content distribution ecosystem.',
+    summary:
+      'A sports website is not just a blog; it is a media business, traffic flywheel, and content distribution ecosystem.',
     keyPoints: [
       'Transform sports events into multi-format content packages (1 match → 15–30 pieces)',
       'The real long-term asset is not individual articles, but audience, authority, and brand loyalty',
@@ -95,7 +105,8 @@ Transform raw sporting events and verified leads into an ongoing loop of Discove
     partNumber: 2,
     title: 'Choosing & Defining Your Sports Niche',
     category: 'Operations',
-    summary: 'Avoid the mistake of being too broad. Focus on a football-first model with distinctive African and Nigerian coverage.',
+    summary:
+      'Avoid the mistake of being too broad. Focus on a football-first model with distinctive African and Nigerian coverage.',
     keyPoints: [
       'Football-first strategy: 70% Football (EPL, Champions League, AFCON, Nigerian stars abroad) + 30% Other sports (NBA, Cricket, Tennis)',
       'Niche selection formula: Knowledge + Audience Demand + Competition Opportunity + Monetization Potential',
@@ -109,7 +120,8 @@ Own the African perspective on global football and the definitive coverage of Ni
     partNumber: 3,
     title: 'Content Categories & Website Content Architecture',
     category: 'Journalism',
-    summary: 'Design an entity-first website architecture with permanent hubs for competitions, clubs, players, and matches.',
+    summary:
+      'Design an entity-first website architecture with permanent hubs for competitions, clubs, players, and matches.',
     keyPoints: [
       'Entity Hierarchy: Sport → Competition → Club / Team → Player / Match → Article',
       'Category vs Tag: Categories are broad content hubs; tags represent specific entities and relational connections',
@@ -124,7 +136,8 @@ Every article should connect back to its central entities (Player, Team, Competi
     partNumber: 4,
     title: 'Sports News Discovery, Research & Verification System',
     category: 'Journalism',
-    summary: 'Build a rigorous newsroom sourcing hierarchy and verification process to prevent false claims and rumours.',
+    summary:
+      'Build a rigorous newsroom sourcing hierarchy and verification process to prevent false claims and rumours.',
     keyPoints: [
       '5-Tier Sourcing Pyramid: Tier 1 (Official) → Tier 2 (Top Journalists) → Tier 3 (Specialist Media) → Tier 4 (Social) → Tier 5 (Fan Accounts)',
       'The Two-Source Rule: Critical breaking claims require primary verification or 2 independent trusted reports',
@@ -145,7 +158,8 @@ Every article should connect back to its central entities (Player, Team, Competi
     partNumber: 5,
     title: 'How to Write Professional Sports Articles From Scratch',
     category: 'Journalism',
-    summary: 'Comprehensive sports journalism writing guide: inverted pyramid, 3-sentence intros, quote sandwiches, and data integration.',
+    summary:
+      'Comprehensive sports journalism writing guide: inverted pyramid, 3-sentence intros, quote sandwiches, and data integration.',
     keyPoints: [
       'Inverted pyramid: Most important news in lead paragraph, followed by details, evidence, context, and analysis',
       '3-Sentence Intro Formula: What happened? + What was key factor? + Why does it matter?',
@@ -179,7 +193,8 @@ Avoid writing thin fluff like "Football is a beautiful game..." Get straight to 
     partNumber: 6,
     title: 'Sports Social Media Posting & Distribution Management',
     category: 'Social',
-    summary: 'Multi-platform social distribution strategies tailored for X, Facebook, Instagram, TikTok, YouTube, and WhatsApp.',
+    summary:
+      'Multi-platform social distribution strategies tailored for X, Facebook, Instagram, TikTok, YouTube, and WhatsApp.',
     keyPoints: [
       'Never copy-paste identical captions across platforms; adapt to user behaviors',
       'X (Twitter): Fast wire alerts, live commentary, match stats, and debate threads',
@@ -196,7 +211,8 @@ Deliver 80% direct value natively within the social post and 20% traffic calls-t
     partNumber: 7,
     title: 'Canva Sports Graphic Design From Zero',
     category: 'Design',
-    summary: 'Build a professional sports media visual identity using consistent GoalMills brand palettes, typography hierarchy, and reusable templates.',
+    summary:
+      'Build a professional sports media visual identity using consistent GoalMills brand palettes, typography hierarchy, and reusable templates.',
     keyPoints: [
       'Brand Palette: Deep Navy (#0B1220), White (#FFFFFF), GoalMills Green (#10B981), Alert Red (#EF4444), Gold (#F59E0B)',
       'Typography: Clean sans-serif pairings (Montserrat ExtraBold for headlines, Inter for body/stats)',
@@ -218,7 +234,8 @@ Establish a Canva Brand Kit so every graphic feels instantly recognizable as Goa
     partNumber: 8,
     title: 'Sports SEO Foundations & Google Search Ecosystem',
     category: 'SEO',
-    summary: 'Capture high-volume sports search demand through search intent analysis, structured data, Google Trends, and Search Console.',
+    summary:
+      'Capture high-volume sports search demand through search intent analysis, structured data, Google Trends, and Search Console.',
     keyPoints: [
       'Identify the 4 Search Intents: Informational, Navigational, Transactional, and Fresh-News Demand',
       'Head vs Medium vs Long-Tail keywords for sustainable search ranking growth',
@@ -234,7 +251,8 @@ While social media provides immediate burst traffic, authoritative SEO creates a
     partNumber: 13,
     title: 'Sports Website Monetization & Business Architecture',
     category: 'Monetization',
-    summary: 'Transform sports audience traffic into diversified, resilient business revenue streams.',
+    summary:
+      'Transform sports audience traffic into diversified, resilient business revenue streams.',
     keyPoints: [
       'Multiple Revenue Pillars: Programmatic Ads (Ad Manager), Direct Sponsorships, Affiliate Commerce, Pro Memberships, B2B Data APIs',
       'Direct Brand Packages: Matchday Center partners, Transfer Hub sponsors, Newsletter briefs',
@@ -251,7 +269,8 @@ While social media provides immediate burst traffic, authoritative SEO creates a
     partNumber: 20,
     title: 'Sports Video Content Creation (Shorts, Reels, YouTube)',
     category: 'Video',
-    summary: 'Produce faceless and presenter-led sports videos without copyright infringement using structured scripts, data boards, and voiceovers.',
+    summary:
+      'Produce faceless and presenter-led sports videos without copyright infringement using structured scripts, data boards, and voiceovers.',
     keyPoints: [
       'Strict Copyright Compliance: Never pirate or re-upload broadcast TV match clips',
       '30-Second Script Formula: 0–3s Hook → 3–10s What Happened → 10–20s Tactical/Data Reason → 20–27s Why It Matters → 27–30s CTA',
@@ -278,7 +297,8 @@ Combine voiceover recording, clean kinetic captions, licensed photos, tactical a
     partNumber: 21,
     title: 'Building a Scalable Sports Newsroom & Operations',
     category: 'Operations',
-    summary: 'Organize editorial workflows, story queues, role-based responsibilities, error tracking, and editorial style guides.',
+    summary:
+      'Organize editorial workflows, story queues, role-based responsibilities, error tracking, and editorial style guides.',
     keyPoints: [
       'Newsroom Pipeline: Discover → Verify → Assign → Research → Write → Edit → SEO → Publish → Graphics → Social → Analyze',
       'Maintain an Editorial Mistake Database to turn errors into training lessons',

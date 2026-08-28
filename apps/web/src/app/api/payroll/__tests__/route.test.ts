@@ -16,7 +16,6 @@ vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
-
 const { mockPayrollRecord } = vi.hoisted(() => ({
   mockPayrollRecord: {
     _id: 'pay-1',

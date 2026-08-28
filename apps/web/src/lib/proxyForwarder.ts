@@ -14,12 +14,7 @@ export interface ProxyOptions {
   timeoutMs?: number;
 }
 
-const DEFAULT_STRIP_HEADERS = [
-  'host',
-  'connection',
-  'content-length',
-  'transfer-encoding',
-];
+const DEFAULT_STRIP_HEADERS = ['host', 'connection', 'content-length', 'transfer-encoding'];
 
 /**
  * Securely forwards incoming NextRequest to a target service/endpoint

@@ -12,14 +12,17 @@ const rateLimitStore = new Map<string, RateLimitRecord>();
 
 // Cleanup stale entries every 5 minutes
 if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, record] of rateLimitStore.entries()) {
-      if (now > record.resetTime) {
-        rateLimitStore.delete(key);
+  setInterval(
+    () => {
+      const now = Date.now();
+      for (const [key, record] of rateLimitStore.entries()) {
+        if (now > record.resetTime) {
+          rateLimitStore.delete(key);
+        }
       }
-    }
-  }, 5 * 60 * 1000);
+    },
+    5 * 60 * 1000
+  );
 }
 
 export interface RateLimitOptions {

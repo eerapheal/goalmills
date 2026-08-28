@@ -111,9 +111,7 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
             ) : (
               <Text style={styles.yetToBatText}>{isUpcoming ? 'Yet to bat' : '-'}</Text>
             )}
-            {match.event_home_rr && (
-              <Text style={styles.rrText}>RR: {match.event_home_rr}</Text>
-            )}
+            {match.event_home_rr && <Text style={styles.rrText}>RR: {match.event_home_rr}</Text>}
           </View>
         </View>
 
@@ -142,9 +140,7 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
             ) : (
               <Text style={styles.yetToBatText}>{isUpcoming ? 'Yet to bat' : '-'}</Text>
             )}
-            {match.event_away_rr && (
-              <Text style={styles.rrText}>RR: {match.event_away_rr}</Text>
-            )}
+            {match.event_away_rr && <Text style={styles.rrText}>RR: {match.event_away_rr}</Text>}
           </View>
         </View>
       </View>

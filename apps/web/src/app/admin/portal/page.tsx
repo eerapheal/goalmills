@@ -53,7 +53,6 @@ export default function StaffPortalPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<PortalTab>('daily_report');
 
-
   // Daily Submission Form State
   const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0]);
   const [tasksCompleted, setTasksCompleted] = useState('');
@@ -287,7 +286,6 @@ export default function StaffPortalPage() {
                 </div>
               )}
             </div>
-
 
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 border-t border-white/5">
@@ -709,7 +707,9 @@ export default function StaffPortalPage() {
                   GoalMills Sports Media Training Resources & Handbooks
                 </h3>
                 <p className="text-xs text-slate-300 max-w-2xl">
-                  First Edition 2026 by Ekpenisi Erue Raphael. Access complete SOPs for sports journalism, verification, Canva design, video creation, SEO, and social distribution.
+                  First Edition 2026 by Ekpenisi Erue Raphael. Access complete SOPs for sports
+                  journalism, verification, Canva design, video creation, SEO, and social
+                  distribution.
                 </p>
               </div>
 

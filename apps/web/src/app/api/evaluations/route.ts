@@ -34,10 +34,7 @@ export async function GET(req: NextRequest) {
     } else {
       // Regular staff: only own evaluations
       const myEmployee = await Employee.findOne({
-        $or: [
-          { userId: session.user.id },
-          { email: session.user.email?.toLowerCase() },
-        ],
+        $or: [{ userId: session.user.id }, { email: session.user.email?.toLowerCase() }],
       });
 
       if (!myEmployee) {
@@ -67,7 +64,6 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
 
 export async function POST(req: NextRequest) {
   try {

@@ -38,10 +38,7 @@ export async function GET(req: NextRequest) {
     } else {
       // Regular staff: find their own employee record and force filter
       const myEmployee = await Employee.findOne({
-        $or: [
-          { userId: session.user.id },
-          { email: session.user.email?.toLowerCase() },
-        ],
+        $or: [{ userId: session.user.id }, { email: session.user.email?.toLowerCase() }],
       });
 
       if (!myEmployee) {
@@ -92,7 +89,6 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
 
 export async function POST(req: NextRequest) {
   try {

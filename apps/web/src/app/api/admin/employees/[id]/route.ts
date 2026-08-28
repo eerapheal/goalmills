@@ -3,7 +3,6 @@ import dbConnect from '@/lib/db';
 import Employee from '@/models/Employee';
 import { requirePermission } from '@/lib/serverAuth';
 
-
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { error } = await requirePermission('employees:read');

@@ -69,7 +69,9 @@ export function CricketScreen() {
   const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
   const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
   const [playersList, setPlayersList] = useState<CricketPlayer[]>([]);
-  const [standingsTab, setStandingsTab] = useState<'IPL' | 'T20_WC' | 'BBL' | 'ICC_TEST' | 'ICC_ODI' | 'ICC_T20'>('IPL');
+  const [standingsTab, setStandingsTab] = useState<
+    'IPL' | 'T20_WC' | 'BBL' | 'ICC_TEST' | 'ICC_ODI' | 'ICC_T20'
+  >('IPL');
   const [standings, setStandings] = useState<Record<string, CricketStanding[]>>({});
 
   // 7-day date slider
@@ -107,15 +109,27 @@ export function CricketScreen() {
         setFixtures(res.result || []);
       } else if (activeTab === 'standings') {
         const [iplRank, t20WcRank, bblRank] = await Promise.all([
-          advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: { total: [] } })),
-          advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: { total: [] } })),
-          advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: { total: [] } })),
+          advancedCricketApi
+            .getStandings({ leagueId: 9785 })
+            .catch(() => ({ result: { total: [] } })),
+          advancedCricketApi
+            .getStandings({ leagueId: 9843 })
+            .catch(() => ({ result: { total: [] } })),
+          advancedCricketApi
+            .getStandings({ leagueId: 9779 })
+            .catch(() => ({ result: { total: [] } })),
         ]);
 
         setStandings({
-          IPL: (iplRank as any)?.result?.total || (Array.isArray(iplRank?.result) ? iplRank.result : []),
-          T20_WC: (t20WcRank as any)?.result?.total || (Array.isArray(t20WcRank?.result) ? t20WcRank.result : []),
-          BBL: (bblRank as any)?.result?.total || (Array.isArray(bblRank?.result) ? bblRank.result : []),
+          IPL:
+            (iplRank as any)?.result?.total ||
+            (Array.isArray(iplRank?.result) ? iplRank.result : []),
+          T20_WC:
+            (t20WcRank as any)?.result?.total ||
+            (Array.isArray(t20WcRank?.result) ? t20WcRank.result : []),
+          BBL:
+            (bblRank as any)?.result?.total ||
+            (Array.isArray(bblRank?.result) ? bblRank.result : []),
         });
       } else if (activeTab === 'series') {
         const res = await advancedCricketApi.getLeagues().catch(() => ({ result: [] }));
@@ -266,7 +280,11 @@ export function CricketScreen() {
       return (
         <ScrollView style={styles.contentScrollView}>
           {/* Sub-Tabs for Standings */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.subTabsContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.subTabsContainer}
+          >
             {[
               { id: 'IPL', label: 'IPL Table' },
               { id: 'T20_WC', label: 'T20 World Cup' },
@@ -303,20 +321,32 @@ export function CricketScreen() {
                 <Text style={[styles.thText, styles.thRight, { width: 36 }]}>PTS</Text>
               </View>
 
-              {(!standings[standingsTab] || standings[standingsTab].length === 0) ? (
+              {!standings[standingsTab] || standings[standingsTab].length === 0 ? (
                 <Text style={styles.emptyTableText}>Standings updating shortly...</Text>
               ) : (
                 standings[standingsTab].map((row, idx) => (
                   <View key={idx} style={styles.tableRow}>
-                    <Text style={[styles.tdRank, { width: 28 }]}>{row.standing_place || idx + 1}</Text>
+                    <Text style={[styles.tdRank, { width: 28 }]}>
+                      {row.standing_place || idx + 1}
+                    </Text>
                     <Text style={[styles.tdTeam, { flex: 1 }]} numberOfLines={1}>
                       {row.standing_team}
                     </Text>
-                    <Text style={[styles.tdText, styles.thCenter, { width: 28 }]}>{row.standing_MP || '0'}</Text>
-                    <Text style={[styles.tdWin, styles.thCenter, { width: 28 }]}>{row.standing_W || '0'}</Text>
-                    <Text style={[styles.tdLose, styles.thCenter, { width: 28 }]}>{row.standing_L || '0'}</Text>
-                    <Text style={[styles.tdNrr, styles.thCenter, { width: 44 }]}>{row.standing_NRR || '0.00'}</Text>
-                    <Text style={[styles.tdPts, styles.thRight, { width: 36 }]}>{row.standing_Pts || '0'}</Text>
+                    <Text style={[styles.tdText, styles.thCenter, { width: 28 }]}>
+                      {row.standing_MP || '0'}
+                    </Text>
+                    <Text style={[styles.tdWin, styles.thCenter, { width: 28 }]}>
+                      {row.standing_W || '0'}
+                    </Text>
+                    <Text style={[styles.tdLose, styles.thCenter, { width: 28 }]}>
+                      {row.standing_L || '0'}
+                    </Text>
+                    <Text style={[styles.tdNrr, styles.thCenter, { width: 44 }]}>
+                      {row.standing_NRR || '0.00'}
+                    </Text>
+                    <Text style={[styles.tdPts, styles.thRight, { width: 36 }]}>
+                      {row.standing_Pts || '0'}
+                    </Text>
                   </View>
                 ))
               )}
@@ -360,7 +390,11 @@ export function CricketScreen() {
             <Text style={styles.emptyTableText}>No series currently listed.</Text>
           ) : (
             seriesList
-              .filter((s) => !searchQuery || (s.league_name && s.league_name.toLowerCase().includes(searchQuery.toLowerCase())))
+              .filter(
+                (s) =>
+                  !searchQuery ||
+                  (s.league_name && s.league_name.toLowerCase().includes(searchQuery.toLowerCase()))
+              )
               .map((series) => (
                 <Pressable
                   key={series.league_key}
@@ -373,7 +407,9 @@ export function CricketScreen() {
                       <Text style={styles.seriesTitle} numberOfLines={1}>
                         {series.league_name}
                       </Text>
-                      <Text style={styles.seriesCountry}>{series.country_name || 'International'}</Text>
+                      <Text style={styles.seriesCountry}>
+                        {series.country_name || 'International'}
+                      </Text>
                     </View>
                   </View>
                   <Ionicons name="chevron-forward" size={16} color="#F59E0B" />
@@ -390,7 +426,11 @@ export function CricketScreen() {
           <Text style={styles.sectionHeaderTitle}>Trending Cricketers</Text>
           <View style={styles.directoryGrid}>
             {playersList
-              .filter((p) => !searchQuery || (p.player_name && p.player_name.toLowerCase().includes(searchQuery.toLowerCase())))
+              .filter(
+                (p) =>
+                  !searchQuery ||
+                  (p.player_name && p.player_name.toLowerCase().includes(searchQuery.toLowerCase()))
+              )
               .map((player) => (
                 <Pressable
                   key={player.player_key}
@@ -416,7 +456,11 @@ export function CricketScreen() {
 
           <Text style={[styles.sectionHeaderTitle, { marginTop: SPACING.md }]}>Cricket Teams</Text>
           {teamsList
-            .filter((t) => !searchQuery || (t.team_name && t.team_name.toLowerCase().includes(searchQuery.toLowerCase())))
+            .filter(
+              (t) =>
+                !searchQuery ||
+                (t.team_name && t.team_name.toLowerCase().includes(searchQuery.toLowerCase()))
+            )
             .map((team) => (
               <Pressable
                 key={team.team_key}
@@ -425,7 +469,11 @@ export function CricketScreen() {
               >
                 <View style={styles.seriesCardLeft}>
                   {team.team_logo ? (
-                    <Image source={{ uri: team.team_logo }} style={styles.teamListLogo} resizeMode="contain" />
+                    <Image
+                      source={{ uri: team.team_logo }}
+                      style={styles.teamListLogo}
+                      resizeMode="contain"
+                    />
                   ) : (
                     <View style={styles.teamFallbackLogo}>
                       <Text style={styles.teamFallbackText}>{team.team_name.charAt(0)}</Text>
@@ -568,31 +616,34 @@ export function CricketScreen() {
       )}
 
       {/* Date Strip for upcoming & results */}
-      {activeTab !== 'live' && activeTab !== 'standings' && activeTab !== 'series' && activeTab !== 'teams' && (
-        <View style={styles.dateStripContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.dateStrip}>
-              {dateStrip.map((item) => {
-                const isSelected = selectedDate === item.iso;
-                return (
-                  <Pressable
-                    key={item.iso}
-                    style={[styles.dateButton, isSelected && styles.dateButtonActive]}
-                    onPress={() => setSelectedDate(item.iso)}
-                  >
-                    <Text style={[styles.dayName, isSelected && styles.dayNameActive]}>
-                      {item.dayName}
-                    </Text>
-                    <Text style={[styles.dayNumber, isSelected && styles.dayNumberActive]}>
-                      {item.dayNumber}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </ScrollView>
-        </View>
-      )}
+      {activeTab !== 'live' &&
+        activeTab !== 'standings' &&
+        activeTab !== 'series' &&
+        activeTab !== 'teams' && (
+          <View style={styles.dateStripContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.dateStrip}>
+                {dateStrip.map((item) => {
+                  const isSelected = selectedDate === item.iso;
+                  return (
+                    <Pressable
+                      key={item.iso}
+                      style={[styles.dateButton, isSelected && styles.dateButtonActive]}
+                      onPress={() => setSelectedDate(item.iso)}
+                    >
+                      <Text style={[styles.dayName, isSelected && styles.dayNameActive]}>
+                        {item.dayName}
+                      </Text>
+                      <Text style={[styles.dayNumber, isSelected && styles.dayNumberActive]}>
+                        {item.dayNumber}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+        )}
 
       {/* Dynamic Screen Content */}
       <View style={styles.body}>{renderContent()}</View>

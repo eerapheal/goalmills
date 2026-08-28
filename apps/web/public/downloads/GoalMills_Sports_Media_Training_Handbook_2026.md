@@ -1,11 +1,13 @@
 # GOALMILLS
+
 ## Training Resources & Handbooks
+
 ### Complete Sports Media & Publishing Master Tutorial: Writing, Social Media, Canva Graphics, Video Production, SEO & Traffic Growth
 
 **Author:** Ekpenisi Erue Raphael  
 **Edition:** First Edition, 2026  
 **Website:** https://goalmills-web.vercel.app  
-**Contact:** support@goalmills.com | +2347084988228  
+**Contact:** support@goalmills.com | +2347084988228
 
 ---
 
@@ -38,18 +40,20 @@
 
 # 1. 30-DAY SPORTS MEDIA EMPLOYEE TRAINING CURRICULUM
 
-* **Program:** GoalMills Sports Media Academy
-* **Duration:** 30 working days
-* **Daily Stand-up:** 5:00 PM – 5:30 PM WAT (Google Meet)
-* **Training Model:** Learn → Create → Publish → Submit → Review → Improve
-* **Primary Objective:** Produce staff who can independently research, write, optimise, design, publish, distribute, and analyse professional sports content.
+- **Program:** GoalMills Sports Media Academy
+- **Duration:** 30 working days
+- **Daily Stand-up:** 5:00 PM – 5:30 PM WAT (Google Meet)
+- **Training Model:** Learn → Create → Publish → Submit → Review → Improve
+- **Primary Objective:** Produce staff who can independently research, write, optimise, design, publish, distribute, and analyse professional sports content.
 
 ### Staff Training Policy
+
 This is a production-based training program, not a reading program. Every working day, staff must:
 **Study → Create → Publish → Submit links → Attend review → Correct mistakes**
 No staff member receives credit simply for reading the lesson.
 
 ### Daily Minimum Requirements
+
 - Assigned lesson completed
 - Assigned research and fact-checking verified
 - Assigned content written and formatted
@@ -59,6 +63,7 @@ No staff member receives credit simply for reading the lesson.
 - Active attendance in the 5:00 PM stand-up
 
 ### Daily Stand-up Agenda (5:00 PM – 5:30 PM WAT)
+
 1. **5:00–5:05 PM:** Attendance roll-call.
 2. **5:05–5:15 PM:** Staff reports. Each employee answers:
    - What did I study?
@@ -69,22 +74,24 @@ No staff member receives credit simply for reading the lesson.
 4. **5:25–5:30 PM:** Tomorrow's assignments and priorities.
 
 ### Daily Evaluation Metric (100 Points Total)
-| Category | Points | Description |
-| :--- | :--- | :--- |
-| Research | 15 pts | Sourcing depth, primary verification, zero unverified claims |
-| Accuracy | 15 pts | Correct scores, names, dates, stats, club attributions |
-| Writing | 15 pts | Inverted pyramid, hook, structure, clarity, grammar |
-| SEO | 10 pts | Search intent, keyword integration, titles, meta, slug, internal links |
-| Social Media | 10 pts | Platform-specific formatting, hashtags, CTA, comments |
-| Graphic / Design | 10 pts | Canva brand alignment, typography hierarchy, safe margins |
-| Creativity | 10 pts | Unique editorial angles, engaging storytelling |
-| Publishing Discipline | 5 pts | Meeting deadlines, correct categories, tags |
-| Analytics / Learning | 5 pts | Performance awareness, CTR/engagement insights |
-| Reporting / Teamwork | 5 pts | Daily report submitted on time, stand-up participation |
+
+| Category              | Points | Description                                                            |
+| :-------------------- | :----- | :--------------------------------------------------------------------- |
+| Research              | 15 pts | Sourcing depth, primary verification, zero unverified claims           |
+| Accuracy              | 15 pts | Correct scores, names, dates, stats, club attributions                 |
+| Writing               | 15 pts | Inverted pyramid, hook, structure, clarity, grammar                    |
+| SEO                   | 10 pts | Search intent, keyword integration, titles, meta, slug, internal links |
+| Social Media          | 10 pts | Platform-specific formatting, hashtags, CTA, comments                  |
+| Graphic / Design      | 10 pts | Canva brand alignment, typography hierarchy, safe margins              |
+| Creativity            | 10 pts | Unique editorial angles, engaging storytelling                         |
+| Publishing Discipline | 5 pts  | Meeting deadlines, correct categories, tags                            |
+| Analytics / Learning  | 5 pts  | Performance awareness, CTR/engagement insights                         |
+| Reporting / Teamwork  | 5 pts  | Daily report submitted on time, stand-up participation                 |
 
 ### 4-Week Progression Roadmap
-* **Week 1 (Days 1–7): Sports Journalism Foundation**  
-  *Observe + Practice (100% Editorial Supervision)*
+
+- **Week 1 (Days 1–7): Sports Journalism Foundation**  
+  _Observe + Practice (100% Editorial Supervision)_
   - Day 1: Introduction to GoalMills & Sports Journalism
   - Day 2: Sports Research & Fact Checking
   - Day 3: Article Structure & Inverted Pyramid
@@ -92,8 +99,8 @@ No staff member receives credit simply for reading the lesson.
   - Day 5: Journalistic Standards, Attribution & Defamation
   - Day 6: Sports SEO & Keywords
   - Day 7: Week 1 Exam & Evaluation (800–1,000 word piece)
-* **Week 2 (Days 8–14): Content Strategy & Social Media**  
-  *High Supervision*
+- **Week 2 (Days 8–14): Content Strategy & Social Media**  
+  _High Supervision_
   - Day 8: Editorial Workflow from Lead to Publish
   - Day 9: Content Strategy & 7-Day Editorial Calendar
   - Day 10: Traffic Generation & Audience Loops
@@ -101,8 +108,8 @@ No staff member receives credit simply for reading the lesson.
   - Day 12: Community Management & Comment Moderation
   - Day 13: Social Content Planning
   - Day 14: Social Media Exam & Multi-Channel Package
-* **Week 3 (Days 15–21): Canva Visuals + Video Production**  
-  *Moderate Supervision*
+- **Week 3 (Days 15–21): Canva Visuals + Video Production**  
+  _Moderate Supervision_
   - Day 15: Canva Fundamentals & GoalMills Brand Kit
   - Day 16: Sports Graphic System & Reusable Templates
   - Day 17: Sports Infographics & Data Visualizations
@@ -110,8 +117,8 @@ No staff member receives credit simply for reading the lesson.
   - Day 19: Long-Form YouTube Sports Analysis
   - Day 20: Content Repurposing (1 Story → 15+ Assets)
   - Day 21: Breaking News Simulation Exercise
-* **Week 4 (Days 22–30): Professional Newsroom & Independence**  
-  *Light Supervision → Full Independent Operation*
+- **Week 4 (Days 22–30): Professional Newsroom & Independence**  
+  _Light Supervision → Full Independent Operation_
   - Day 22: Live Matchday Operations & Live Text
   - Day 23: Audience Development & Retention Funnels
   - Day 24: Analytics, CTR & Retention Analysis
@@ -123,10 +130,11 @@ No staff member receives credit simply for reading the lesson.
   - Day 30: Final Exam Portfolio & Certification
 
 ### Certification Tiers
-- **90–100%:** 🏆 *GoalMills Certified Sports Media Professional — Advanced* (Can operate newsroom independently)
-- **80–89%:** *GoalMills Certified Sports Media Professional* (Can operate with limited supervision)
-- **70–79%:** *GoalMills Certified Junior Sports Media Professional* (Routine assignments with review)
-- **Below 70%:** *Remedial Training & Extension Required*
+
+- **90–100%:** 🏆 _GoalMills Certified Sports Media Professional — Advanced_ (Can operate newsroom independently)
+- **80–89%:** _GoalMills Certified Sports Media Professional_ (Can operate with limited supervision)
+- **70–79%:** _GoalMills Certified Junior Sports Media Professional_ (Routine assignments with review)
+- **Below 70%:** _Remedial Training & Extension Required_
 
 ---
 
@@ -135,6 +143,7 @@ No staff member receives credit simply for reading the lesson.
 A successful sports blog is not simply a website where articles are posted—it is a **sports media business and content distribution system**.
 
 ### The Growth Flywheel
+
 ```
 SPORTS WORLD / EVENTS
        │
@@ -158,27 +167,31 @@ DIVERSIFIED MONETIZATION
 ```
 
 ### The 4 Core Assets You Build
+
 1. **Content Library:** Evergreen guides, player databases, historical records, and tactical reviews that build topical authority for search engines.
 2. **Engaged Audience:** Returning readers, followers, email subscribers, and active community members who trust your coverage.
 3. **Brand Reputation:** Recognized for SPEED + ACCURACY + DEEP ANALYSIS.
 4. **Owned Distribution:** Direct traffic, newsletter list, mobile push notifications, and WhatsApp broadcast channels.
 
 ### Content Mix Formula
-* **35% Breaking News & Transfers:** High immediate velocity and short-term traffic spikes.
-* **25% Evergreen SEO & Guides:** Long-term compounding organic search traffic.
-* **20% Match Coverage:** Matchday live blogs, previews, ratings, and tactical reports.
-* **10% Deep Tactical & Data Analysis:** Builds industry authority, backlinks, and brand respect.
-* **10% Community & Features:** Polls, debates, player spotlights, and fan interaction.
+
+- **35% Breaking News & Transfers:** High immediate velocity and short-term traffic spikes.
+- **25% Evergreen SEO & Guides:** Long-term compounding organic search traffic.
+- **20% Match Coverage:** Matchday live blogs, previews, ratings, and tactical reports.
+- **10% Deep Tactical & Data Analysis:** Builds industry authority, backlinks, and brand respect.
+- **10% Community & Features:** Polls, debates, player spotlights, and fan interaction.
 
 ---
 
 # PART 2: CHOOSING & DEFINING YOUR SPORTS NICHE
 
 ### The GoalMills Recommended Niche Model: Football-First Media Platform
-* **Primary Focus (70%):** Football (European Elite Leagues, UEFA Champions League, African Competitions, Super Eagles & Nigerian Players Abroad).
-* **Secondary Focus (30%):** Basketball (NBA), Cricket, Athletics, Combat Sports, Tennis.
+
+- **Primary Focus (70%):** Football (European Elite Leagues, UEFA Champions League, African Competitions, Super Eagles & Nigerian Players Abroad).
+- **Secondary Focus (30%):** Basketball (NBA), Cricket, Athletics, Combat Sports, Tennis.
 
 ### Audience Personas
+
 1. **"The Daily Fan" (Age 18–35):** Mobile-first, checks sports news multiple times daily, wants fast scores, transfer updates, and clean visuals.
 2. **"The Analyst":** Wants tactical diagrams, deep metrics (xG, field tilt, progressive passes), and tactical reasons behind results.
 3. **"The Local Supporter":** Dedicated focus on Super Eagles, NPFL, Nigerian players abroad (Osimhen, Lookman, Iwobi), and African continental tournaments.
@@ -189,6 +202,7 @@ DIVERSIFIED MONETIZATION
 # PART 3: WEBSITE CONTENT ARCHITECTURE & HUBS
 
 Organize your publication into an **Entity-First Structure**:
+
 ```
 SPORT (Football)
   └── COMPETITION (Premier League)
@@ -201,7 +215,8 @@ SPORT (Football)
 ```
 
 ### URL Best Practices
-* Clean, human-readable, permanent URLs with hyphens:
+
+- Clean, human-readable, permanent URLs with hyphens:
   - Hub: `/football/premier-league`
   - Team: `/football/premier-league/arsenal`
   - Match: `/matches/arsenal-vs-chelsea-2026`
@@ -212,6 +227,7 @@ SPORT (Football)
 # PART 4: NEWS DISCOVERY, RESEARCH & VERIFICATION
 
 ### The 5-Tier Sourcing Pyramid
+
 1. **Tier 1 (Official Sources - 100% Trust):** Club statements, league portals, federations, verified player quotes, press conferences.
 2. **Tier 2 (High Credibility):** Established specialist sports journalists (e.g. David Ornstein, Fabrizio Romano) and major news outlets (BBC, Sky, The Athletic).
 3. **Tier 3 (Specialist Media):** Secondary football publications and transfer aggregators.
@@ -219,7 +235,9 @@ SPORT (Football)
 5. **Tier 5 (Fan Accounts & Forums):** Unverified chatter; never publish without independent confirmation.
 
 ### The Two-Source Rule
+
 Major breaking transfer or disciplinary claims require either:
+
 - One official primary source, OR
 - Two independent, highly reputable secondary reports.
 
@@ -228,50 +246,55 @@ Major breaking transfer or disciplinary claims require either:
 # PART 5: HOW TO WRITE PROFESSIONAL SPORTS ARTICLES
 
 ### The Inverted Pyramid Structure
-* **Headline:** Tells what happened accurately (no misleading clickbait).
-* **Lead / Intro (3 Sentences):**
-  1. *What happened?*
-  2. *What was the key factor?*
-  3. *Why does it matter?*
-* **Body Paragraphs:** One main idea per paragraph (2–4 sentences).
-* **Evidence & Data:** Statistics that support the point (e.g., "Arsenal controlled 62% possession and registered 7 shots on target").
-* **Quotes:** Verified statements presented with clear attribution.
-* **Analysis:** Answers *“So what?”* and explains the tactical or tournament significance.
-* **What’s Next:** Upcoming fixtures, table impact, next assessment dates.
+
+- **Headline:** Tells what happened accurately (no misleading clickbait).
+- **Lead / Intro (3 Sentences):**
+  1. _What happened?_
+  2. _What was the key factor?_
+  3. _Why does it matter?_
+- **Body Paragraphs:** One main idea per paragraph (2–4 sentences).
+- **Evidence & Data:** Statistics that support the point (e.g., "Arsenal controlled 62% possession and registered 7 shots on target").
+- **Quotes:** Verified statements presented with clear attribution.
+- **Analysis:** Answers _“So what?”_ and explains the tactical or tournament significance.
+- **What’s Next:** Upcoming fixtures, table impact, next assessment dates.
 
 ---
 
 # PART 6: SOCIAL MEDIA POSTING & ENGAGEMENT
 
 ### Platform-Specific Roles
-* **X (Twitter):** Real-time wire, breaking news, live match reaction, tactical threads, live polls.
-* **Facebook:** Community debates, match summaries, video highlights, fan groups.
-* **Instagram:** Clean visuals, scoreline cards, 6-slide matchday carousels, aesthetic player stats.
-* **TikTok & Reels:** 30–60 second vertical videos with instant hooks, kinetic captions, and engaging sports storytelling.
-* **YouTube:** Deep tactical breakdowns, post-match analysis, and YouTube Shorts.
-* **WhatsApp Channel:** Direct alerts for breaking news, lineups, full-time scores, and morning briefs.
+
+- **X (Twitter):** Real-time wire, breaking news, live match reaction, tactical threads, live polls.
+- **Facebook:** Community debates, match summaries, video highlights, fan groups.
+- **Instagram:** Clean visuals, scoreline cards, 6-slide matchday carousels, aesthetic player stats.
+- **TikTok & Reels:** 30–60 second vertical videos with instant hooks, kinetic captions, and engaging sports storytelling.
+- **YouTube:** Deep tactical breakdowns, post-match analysis, and YouTube Shorts.
+- **WhatsApp Channel:** Direct alerts for breaking news, lineups, full-time scores, and morning briefs.
 
 ---
 
 # PART 7: CANVA SPORTS GRAPHIC DESIGN & BRAND SYSTEM
 
 ### GoalMills Brand Palette
-* **Primary Background:** Deep Navy (`#0B1220` or `#001F3F`)
-* **Secondary / Text:** Clean White (`#FFFFFF`) & Slate Gray (`#94A3B8`)
-* **Primary Accent:** GoalMills Green (`#10B981`)
-* **Alert / Breaking:** Crimson Red (`#EF4444`)
-* **Gold / Trophy:** Amber Gold (`#F59E0B` or `#FFD700`)
+
+- **Primary Background:** Deep Navy (`#0B1220` or `#001F3F`)
+- **Secondary / Text:** Clean White (`#FFFFFF`) & Slate Gray (`#94A3B8`)
+- **Primary Accent:** GoalMills Green (`#10B981`)
+- **Alert / Breaking:** Crimson Red (`#EF4444`)
+- **Gold / Trophy:** Amber Gold (`#F59E0B` or `#FFD700`)
 
 ### Typography Rules
-* **Headlines:** Clean, bold, condensed sans-serif (e.g., *Montserrat ExtraBold* or *Bebas Neue*).
-* **Body / Subtitles:** High-legibility sans-serif (*Inter* or *Montserrat Regular*).
-* **Hierarchy Rule:** Main message readable in 2–3 seconds at mobile thumbnail size.
+
+- **Headlines:** Clean, bold, condensed sans-serif (e.g., _Montserrat ExtraBold_ or _Bebas Neue_).
+- **Body / Subtitles:** High-legibility sans-serif (_Inter_ or _Montserrat Regular_).
+- **Hierarchy Rule:** Main message readable in 2–3 seconds at mobile thumbnail size.
 
 ---
 
 # PART 8, 11 & 12: SPORTS SEO & GOOGLE NEWS ENGINE
 
 ### SEO Checklist for Every Story
+
 1. **Search Intent:** Align with whether users want quick news, match results, tactical analysis, or background biography.
 2. **Metadata:** Unique title (under 60 chars), meta description (140–160 chars), semantic H1/H2 headings.
 3. **Structured Data:** Schema.org `NewsArticle` and `SportsEvent` with author, publisher, datePublished, dateModified.
@@ -283,31 +306,35 @@ Major breaking transfer or disciplinary claims require either:
 # PART 13: SPORTS MONETIZATION & BUSINESS MODEL
 
 ### Diversified Revenue Streams
-* **Programmatic Advertising:** Header bidding, Google Ad Manager, and clean banner placements.
-* **Direct Brand Sponsorships:** Match Centre partnerships, Transfer Hub sponsorships, Newsletter sponsors, and custom media packages.
-* **Affiliate Partnerships:** Official sportswear, ticket portals, gaming, and sports streaming.
-* **GoalMills Pro & Data API:** Ad-free premium analysis, advanced statistics, and B2B sports widgets.
+
+- **Programmatic Advertising:** Header bidding, Google Ad Manager, and clean banner placements.
+- **Direct Brand Sponsorships:** Match Centre partnerships, Transfer Hub sponsorships, Newsletter sponsors, and custom media packages.
+- **Affiliate Partnerships:** Official sportswear, ticket portals, gaming, and sports streaming.
+- **GoalMills Pro & Data API:** Ad-free premium analysis, advanced statistics, and B2B sports widgets.
 
 ---
 
 # PART 20: SPORTS VIDEO CONTENT CREATION
 
 ### 30-Second Video Script Formula
-* **0–3 Seconds (Hook):** Strong, curiosity-driven statement that establishes the topic.
-* **3–10 Seconds (What Happened):** The core verified news or result.
-* **10–20 Seconds (Key Details & Tactical Reason):** Statistical proof or key tactical adjustment.
-* **20–27 Seconds (Why It Matters):** The league, table, or tournament consequence.
-* **27–30 Seconds (Call to Action):** "Follow GoalMills for daily football analysis."
+
+- **0–3 Seconds (Hook):** Strong, curiosity-driven statement that establishes the topic.
+- **3–10 Seconds (What Happened):** The core verified news or result.
+- **10–20 Seconds (Key Details & Tactical Reason):** Statistical proof or key tactical adjustment.
+- **20–27 Seconds (Why It Matters):** The league, table, or tournament consequence.
+- **27–30 Seconds (Call to Action):** "Follow GoalMills for daily football analysis."
 
 ### Copyright Rules
-* Never pirate or re-upload broadcast TV footage.
-* Use original commentary, licensed stills, tactical animation boards, face-cam commentary, and official embedded players.
+
+- Never pirate or re-upload broadcast TV footage.
+- Use original commentary, licensed stills, tactical animation boards, face-cam commentary, and official embedded players.
 
 ---
 
 # STANDARD REUSABLE TEMPLATES & CHECKLISTS LIBRARY
 
 ### 1. Daily Staff Content Report Template
+
 ```text
 ==================================================
 GOALMILLS DAILY STAFF REPORT
@@ -341,14 +368,16 @@ WHAT I WILL IMPROVE TOMORROW:
 ```
 
 ### 2. Standard Match Report Template
-* **Headline:** `[Team A] [Score]–[Score] [Team B]: [Player/Event] Inspires Crucial Victory`
-* **Intro:** 3 sentences covering result, decisive player/moment, and table significance.
-* **First Half Analysis:** Tactical layout, early momentum, opening goals.
-* **Second Half & Key Adjustments:** Tactical shifts, substitutions, decisive moments.
-* **Numbers That Matter:** Key stats (possession, shots on target, xG, defensive duels).
-* **Player of the Match:** Standout performer with individual numbers.
-* **Manager Quotes:** Verified press conference reactions.
-* **What It Means & Next Fixture:** Table impact and upcoming match previews.
+
+- **Headline:** `[Team A] [Score]–[Score] [Team B]: [Player/Event] Inspires Crucial Victory`
+- **Intro:** 3 sentences covering result, decisive player/moment, and table significance.
+- **First Half Analysis:** Tactical layout, early momentum, opening goals.
+- **Second Half & Key Adjustments:** Tactical shifts, substitutions, decisive moments.
+- **Numbers That Matter:** Key stats (possession, shots on target, xG, defensive duels).
+- **Player of the Match:** Standout performer with individual numbers.
+- **Manager Quotes:** Verified press conference reactions.
+- **What It Means & Next Fixture:** Table impact and upcoming match previews.
 
 ---
-*GoalMills Sports Media Group © 2026. All rights reserved.*
+
+_GoalMills Sports Media Group © 2026. All rights reserved._

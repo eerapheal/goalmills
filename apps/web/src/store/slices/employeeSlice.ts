@@ -40,10 +40,7 @@ export const employeeSlice = createSlice({
     setEmployeeError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setLastCreatedCredentials: (
-      state,
-      action: PayloadAction<CredentialsModalData | null>
-    ) => {
+    setLastCreatedCredentials: (state, action: PayloadAction<CredentialsModalData | null>) => {
       state.lastCreatedCredentials = action.payload;
     },
     clearCreatedCredentials: (state) => {

@@ -1,6 +1,5 @@
 import { UserRole } from '@goalmills/types';
 
-
 // ---------------------------------------------------------------------------
 // Permission Actions — every gated action in the system
 // ---------------------------------------------------------------------------
@@ -64,12 +63,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, PermissionAction[]> = {
   user: ['articles:read'],
 
   // External freelancer — can draft and request approval only
-  contributor: [
-    'articles:read',
-    'articles:draft',
-    'articles:request_publish',
-    'articles:edit_own',
-  ],
+  contributor: ['articles:read', 'articles:draft', 'articles:request_publish', 'articles:edit_own'],
 
   // Full-time editorial staff — content creation, own reports, training, portal
   staff: [

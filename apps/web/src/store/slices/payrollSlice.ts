@@ -34,11 +34,7 @@ export const payrollSlice = createSlice({
   },
 });
 
-export const {
-  setPayrollRecords,
-  setPayrollLoading,
-  setActivePeriod,
-  setPayrollError,
-} = payrollSlice.actions;
+export const { setPayrollRecords, setPayrollLoading, setActivePeriod, setPayrollError } =
+  payrollSlice.actions;
 
 export default payrollSlice.reducer;

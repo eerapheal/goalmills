@@ -111,9 +111,7 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-sm font-bold text-slate-100 line-clamp-1 block">
-              {homeName}
-            </span>
+            <span className="text-sm font-bold text-slate-100 line-clamp-1 block">{homeName}</span>
             {match.event_home_final_result ? (
               <div className="flex items-baseline space-x-1.5 mt-0.5">
                 <span className="text-xs font-black text-amber-400 tabular-nums">
@@ -139,9 +137,7 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
             </span>
           ) : isLive ? (
             <div className="rounded bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-center">
-              <span className="text-[11px] font-black tracking-wider text-amber-400">
-                INNINGS
-              </span>
+              <span className="text-[11px] font-black tracking-wider text-amber-400">INNINGS</span>
             </div>
           ) : (
             <div className="rounded bg-black/30 px-2.5 py-1 text-center">
@@ -153,9 +149,7 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
         {/* Away Team */}
         <div className="flex flex-1 items-center justify-end space-x-3 text-right min-w-0">
           <div className="min-w-0 flex-1">
-            <span className="text-sm font-bold text-slate-100 line-clamp-1 block">
-              {awayName}
-            </span>
+            <span className="text-sm font-bold text-slate-100 line-clamp-1 block">{awayName}</span>
             {match.event_away_final_result ? (
               <div className="flex items-baseline justify-end space-x-1.5 mt-0.5">
                 {match.event_away_rr && (

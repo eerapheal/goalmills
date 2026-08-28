@@ -67,8 +67,8 @@ export default async function CricketHubPage() {
               Global Cricket Intelligence Network
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Real-time ball-by-ball commentary, franchise tournament scorecards, ICC world leaderboards,
-              player statistical career records, and tactical cricket analysis.
+              Real-time ball-by-ball commentary, franchise tournament scorecards, ICC world
+              leaderboards, player statistical career records, and tactical cricket analysis.
             </p>
 
             {/* Quick Competitions Ribbon */}
@@ -159,7 +159,10 @@ export default async function CricketHubPage() {
                 <FiTrendingUp className="text-amber-400" />
                 <span>ICC World Rankings</span>
               </h3>
-              <Link href="/cricket/rankings" className="text-xs font-bold text-amber-400 hover:underline">
+              <Link
+                href="/cricket/rankings"
+                className="text-xs font-bold text-amber-400 hover:underline"
+              >
                 View All &rarr;
               </Link>
             </div>

@@ -473,7 +473,8 @@ export default function CreateNewsForm() {
           </button>
           {!isDirectPublisher && (
             <p className="text-[11px] text-amber-400 text-center mt-2 font-medium">
-              ℹ️ Your role submits drafts for review. An Editor, Manager, or Super Admin will review and publish.
+              ℹ️ Your role submits drafts for review. An Editor, Manager, or Super Admin will review
+              and publish.
             </p>
           )}
         </div>

@@ -62,7 +62,6 @@ export default function EmployeesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-
   const fetchEmployees = async () => {
     try {
       setLoading(true);
@@ -138,7 +137,6 @@ export default function EmployeesPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };
-
 
   const filteredEmployees = employees.filter((emp) => {
     if (deptFilter !== 'all' && emp.department !== deptFilter) return false;
@@ -598,9 +596,7 @@ export default function EmployeesPage() {
                       required
                       placeholder="e.g. No 35 church street, Jos, Plateau State"
                       value={formData.address}
-                      onChange={(e) =>
-                        setFormData({ ...formData, address: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       className="w-full p-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-500 focus:outline-none"
                     />
                   </div>
@@ -722,8 +718,12 @@ export default function EmployeesPage() {
                     <FiKey size={20} />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-black text-white">Staff Login Account Created</h3>
-                    <p className="text-xs text-text-muted">Deliver these credentials to the staff member</p>
+                    <h3 className="text-base sm:text-lg font-black text-white">
+                      Staff Login Account Created
+                    </h3>
+                    <p className="text-xs text-text-muted">
+                      Deliver these credentials to the staff member
+                    </p>
                   </div>
                 </div>
                 <button
@@ -740,16 +740,26 @@ export default function EmployeesPage() {
                   <p className="text-sm font-bold text-white">{createdCredentials.fullName}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Login Email</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                    Login Email
+                  </span>
                   <p className="text-sm font-mono text-amber-300">{createdCredentials.email}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Temporary Password</span>
-                  <p className="text-sm font-mono font-bold text-emerald-400">{createdCredentials.tempPassword}</p>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                    Temporary Password
+                  </span>
+                  <p className="text-sm font-mono font-bold text-emerald-400">
+                    {createdCredentials.tempPassword}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Assigned Role</span>
-                  <p className="text-xs uppercase font-black text-slate-300">{createdCredentials.role}</p>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">
+                    Assigned Role
+                  </span>
+                  <p className="text-xs uppercase font-black text-slate-300">
+                    {createdCredentials.role}
+                  </p>
                 </div>
               </div>
 
@@ -777,4 +787,3 @@ export default function EmployeesPage() {
     </div>
   );
 }
-

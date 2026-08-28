@@ -144,7 +144,7 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           relatedTeam: relatedTeam.trim(),
           isBreaking,
           isFeatured,
-          status: isDirectPublisher ? status : (status === 'draft' ? 'draft' : 'pending_approval'),
+          status: isDirectPublisher ? status : status === 'draft' ? 'draft' : 'pending_approval',
         }),
       });
 
@@ -357,7 +357,9 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
 
           {/* Editorial Publication Status */}
           <div className="flex items-center gap-2 ml-auto">
-            <label className="text-xs font-bold uppercase text-slate-400">Publication Status:</label>
+            <label className="text-xs font-bold uppercase text-slate-400">
+              Publication Status:
+            </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as any)}

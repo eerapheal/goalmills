@@ -25,9 +25,7 @@ import {
 export default function AdminHandbookPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeSectionId, setActiveSectionId] = useState<string>(
-    GOALMILLS_HANDBOOK_SECTIONS[0].id
-  );
+  const [activeSectionId, setActiveSectionId] = useState<string>(GOALMILLS_HANDBOOK_SECTIONS[0].id);
   const [copiedTemplateId, setCopiedTemplateId] = useState<string | null>(null);
 
   const categories = [
@@ -44,15 +42,12 @@ export default function AdminHandbookPage() {
 
   const filteredSections = useMemo(() => {
     return GOALMILLS_HANDBOOK_SECTIONS.filter((section) => {
-      const matchesCat =
-        selectedCategory === 'All' || section.category === selectedCategory;
+      const matchesCat = selectedCategory === 'All' || section.category === selectedCategory;
       const matchesSearch =
         searchQuery === '' ||
         section.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         section.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        section.keyPoints.some((kp) =>
-          kp.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        section.keyPoints.some((kp) => kp.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesCat && matchesSearch;
     });
   }, [selectedCategory, searchQuery]);
@@ -106,8 +101,8 @@ export default function AdminHandbookPage() {
               <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed print:text-slate-700">
                 Complete 2026 Sports Media & Publishing Master Tutorial by{' '}
                 <strong className="text-white print:text-black">Ekpenisi Erue Raphael</strong>.
-                Standardized curriculum, newsroom verification models, Canva graphics system,
-                video workflows, SEO growth, and 100-point staff evaluation rubrics.
+                Standardized curriculum, newsroom verification models, Canva graphics system, video
+                workflows, SEO growth, and 100-point staff evaluation rubrics.
               </p>
             </div>
 
@@ -191,9 +186,7 @@ export default function AdminHandbookPage() {
               >
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-amber-400 font-bold">
-                    {typeof sec.partNumber === 'number'
-                      ? `Part ${sec.partNumber}`
-                      : sec.partNumber}
+                    {typeof sec.partNumber === 'number' ? `Part ${sec.partNumber}` : sec.partNumber}
                   </span>
                   <span className="text-[10px] text-slate-400 font-semibold uppercase">
                     {sec.category}
@@ -289,10 +282,7 @@ export default function AdminHandbookPage() {
                   <div className="flex items-center gap-2 print:hidden">
                     <button
                       onClick={() =>
-                        handleCopyTemplate(
-                          activeSection.id,
-                          activeSection.template!.content
-                        )
+                        handleCopyTemplate(activeSection.id, activeSection.template!.content)
                       }
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition-all"
                     >

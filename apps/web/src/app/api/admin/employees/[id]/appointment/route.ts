@@ -31,11 +31,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const isManagerOrAdmin = hasPermission(userRole, 'employees:read');
     const isSelf =
       (employee.userId && employee.userId.toString() === session.user.id) ||
-      (employee.email && session.user.email && employee.email.toLowerCase() === session.user.email.toLowerCase());
+      (employee.email &&
+        session.user.email &&
+        employee.email.toLowerCase() === session.user.email.toLowerCase());
 
     if (!isManagerOrAdmin && !isSelf) {
       return NextResponse.json(
-        { success: false, error: 'Forbidden: You cannot access another staff member\'s appointment letter' },
+        {
+          success: false,
+          error: "Forbidden: You cannot access another staff member's appointment letter",
+        },
         { status: 403 }
       );
     }
@@ -98,11 +103,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const isManagerOrAdmin = hasPermission(userRole, 'employees:manage');
     const isSelf =
       (employee.userId && employee.userId.toString() === session.user.id) ||
-      (employee.email && session.user.email && employee.email.toLowerCase() === session.user.email.toLowerCase());
+      (employee.email &&
+        session.user.email &&
+        employee.email.toLowerCase() === session.user.email.toLowerCase());
 
     if (!isManagerOrAdmin && !isSelf) {
       return NextResponse.json(
-        { success: false, error: 'Forbidden: You cannot sign an appointment letter for another employee' },
+        {
+          success: false,
+          error: 'Forbidden: You cannot sign an appointment letter for another employee',
+        },
         { status: 403 }
       );
     }
@@ -142,4 +152,3 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     );
   }
 }
-

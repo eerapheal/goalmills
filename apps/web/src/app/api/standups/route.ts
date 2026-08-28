@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
 
     const userRole = session.user.role as UserRole;
     if (!hasPermission(userRole, 'standup:attend')) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Insufficient permissions' }, { status: 403 });
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Insufficient permissions' },
+        { status: 403 }
+      );
     }
 
     await dbConnect();

@@ -49,7 +49,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid email or password');
         }
 
-
         return {
           id: user._id.toString(),
           email: user.email,
