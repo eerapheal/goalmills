@@ -20,6 +20,7 @@ import {
   FiChevronDown,
   FiBookOpen,
   FiKey,
+  FiMail,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
@@ -38,6 +39,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: 'News & Media',
     href: '/admin/dashboard',
     icon: FiFileText,
+    group: 'editorial',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Newsletter Hub',
+    href: '/admin/newsletter',
+    icon: FiMail,
     group: 'editorial',
     requiredPermission: 'articles:draft',
   },

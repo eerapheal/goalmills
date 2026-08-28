@@ -2713,3 +2713,69 @@ export interface PayrollRecord {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// ============================================================================
+// GOALMILLS ENTERPRISE NEWSLETTER & MAILING SYSTEM TYPES
+// ============================================================================
+
+export type NewsletterFrequency = 'daily' | 'weekly' | 'monthly' | 'all';
+export type NewsletterSubscriberStatus = 'active' | 'unsubscribed' | 'bounced';
+export type NewsletterCampaignStatus = 'draft' | 'scheduled' | 'processing' | 'sent' | 'failed';
+export type NewsletterAudience =
+  | 'daily_subscribers'
+  | 'weekly_subscribers'
+  | 'monthly_subscribers'
+  | 'all_subscribers';
+
+export interface NewsletterSubscriber {
+  _id?: string;
+  email: string;
+  frequency: NewsletterFrequency;
+  categories?: string[];
+  status: NewsletterSubscriberStatus;
+  unsubscribeToken: string;
+  source?: string;
+  lastEmailSentAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface NewsletterArticlePreview {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  image?: string;
+  category: string;
+  sport: string;
+  readTime: number;
+  isBreaking?: boolean;
+  isFeatured?: boolean;
+  views?: number;
+  author: string;
+  createdAt: string;
+}
+
+export interface NewsletterCampaign {
+  _id?: string;
+  title: string; // Subject line
+  previewText?: string;
+  editorialNote?: string;
+  frequencyTier: 'daily' | 'weekly' | 'monthly' | 'custom_broadcast';
+  targetAudience: NewsletterAudience;
+  articleIds: string[];
+  articles?: NewsletterArticlePreview[];
+  scheduledFor?: string;
+  sentAt?: string;
+  status: NewsletterCampaignStatus;
+  stats?: {
+    totalRecipients: number;
+    successCount: number;
+    failureCount: number;
+    openCount: number;
+  };
+  createdBy: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+

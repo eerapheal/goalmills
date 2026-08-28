@@ -10,13 +10,28 @@ export function SportsPulseNewsSection() {
     'all' | 'football' | 'cricket' | 'basketball' | 'tennis'
   >('all');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const [selectedTier, setSelectedTier] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && email.includes('@')) {
-      setSubscribed(true);
-      setTimeout(() => {
-        setEmail('');
-      }, 3000);
+    if (!email || !email.includes('@')) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, frequency: selectedTier, source: 'homepage_vip_hub' }),
+      });
+
+      if (res.ok) {
+        setSubscribed(true);
+      }
+    } catch (err) {
+      console.error('Subscription error:', err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
