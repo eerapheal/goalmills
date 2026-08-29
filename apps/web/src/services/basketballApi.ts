@@ -1,19 +1,8 @@
 /**
  * Complete API-Basketball (v1.5.2) Enterprise Service Client for Next.js Web
  * Implements ALL official endpoints and query parameters strictly according to API-Basketball documentation.
+ * Requests are securely proxied through the internal `/api/basketball` route to safeguard provider secrets.
  */
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASKETBALL_BASE_URL ||
-  process.env.API_BASKETBALL_BASE_URL ||
-  'https://v1.basketball.api-sports.io';
-
-const API_KEY =
-  process.env.API_BASKETBALL_KEY_WEB ||
-  process.env.NEXT_PUBLIC_API_BASKETBALL_KEY_WEB ||
-  process.env.NEXT_PUBLIC_API_FOOTBALL_KEY_WEB ||
-  process.env.API_FOOTBALL_KEY_WEB ||
-  '';
 
 export interface ApiBasketballResponse<T> {
   get: string;

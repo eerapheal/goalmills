@@ -8,12 +8,6 @@ try {
   // Ignore if setServers is not supported in the current runtime
 }
 
-const MONGODB_URL = process.env.MONGODB_URL;
-
-if (!MONGODB_URL) {
-  throw new Error('Please define the MONGODB_URL environment variable inside .env');
-}
-
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -30,6 +24,12 @@ if (!cached) {
 }
 
 async function dbConnect() {
+  const mongodbUrl = process.env.MONGODB_URL;
+
+  if (!mongodbUrl) {
+    throw new Error('Please define the MONGODB_URL environment variable inside .env');
+  }
+
   if (cached!.conn) {
     return cached!.conn;
   }
@@ -37,10 +37,12 @@ async function dbConnect() {
   if (!cached!.promise) {
     const opts = {
       bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
     };
 
-    cached!.promise = mongoose.connect(MONGODB_URL!, opts).then((mongoose) => {
-      return mongoose;
+    cached!.promise = mongoose.connect(mongodbUrl, opts).then((mongooseInstance) => {
+      return mongooseInstance;
     });
   }
   try {

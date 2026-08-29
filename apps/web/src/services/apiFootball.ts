@@ -1,15 +1,8 @@
 /**
  * Complete API-Football (v3.9.3) Enterprise Service Client for Next.js Web
  * Implements ALL official endpoints and query parameters strictly according to API-Football documentation.
+ * Requests are securely proxied through the internal `/api/football` route to safeguard provider secrets.
  */
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_FOOTBALL_BASE_URL ||
-  process.env.API_FOOTBALL_BASE_URL ||
-  'https://v3.football.api-sports.io';
-
-const API_KEY =
-  process.env.API_FOOTBALL_KEY_WEB || process.env.NEXT_PUBLIC_API_FOOTBALL_KEY_WEB || '';
 
 export interface ApiFootballResponse<T> {
   get: string;
