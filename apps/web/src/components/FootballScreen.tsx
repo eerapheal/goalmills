@@ -5,11 +5,23 @@ import { FootballMatchCard, UnifiedWebMatchEvent } from './FootballMatchCard';
 import {
   webApiFootballService,
   ApiFootballFixtureItem,
-  ApiFootballStandingItem,
 } from '../services/apiFootball';
 import { GoalmillsLoader } from './GoalmillsLoader';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
+
+export interface UnifiedWebStandingItem {
+  rank: number | string;
+  team_name: string;
+  team_logo?: string;
+  team_id?: number | string;
+  played: number | string;
+  win: number | string;
+  draw: number | string;
+  lose: number | string;
+  goalsDiff: number | string;
+  points: number | string;
+}
 
 export function FootballScreen() {
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
@@ -17,7 +29,7 @@ export function FootballScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [fixtures, setFixtures] = useState<UnifiedWebMatchEvent[]>([]);
-  const [standings, setStandings] = useState<ApiFootballStandingItem[]>([]);
+  const [standings, setStandings] = useState<UnifiedWebStandingItem[]>([]);
 
   // 7-day date slider
   const dateStrip = useMemo(() => {
@@ -106,6 +118,44 @@ export function FootballScreen() {
     return null;
   };
 
+  const adaptStanding = (item: any): UnifiedWebStandingItem | null => {
+    if (!item) return null;
+
+    // Format 1: API-Sports / API-Football (item.team, item.all, item.rank)
+    if (item.team && typeof item.team === 'object') {
+      return {
+        rank: item.rank || 1,
+        team_name: item.team?.name || 'Team',
+        team_logo: item.team?.logo || '',
+        team_id: item.team?.id,
+        played: item.all?.played ?? item.played ?? 0,
+        win: item.all?.win ?? item.win ?? 0,
+        draw: item.all?.draw ?? item.draw ?? 0,
+        lose: item.all?.lose ?? item.lose ?? 0,
+        goalsDiff: item.goalsDiff ?? 0,
+        points: item.points ?? 0,
+      };
+    }
+
+    // Format 2: AllSportsAPI (item.standing_team, item.standing_place, item.team_logo)
+    if (item.standing_team || item.standing_place !== undefined) {
+      return {
+        rank: item.standing_place || item.standing_position || 1,
+        team_name: item.standing_team || 'Team',
+        team_logo: item.team_logo || item.team_badge || '',
+        team_id: item.team_key || item.standing_team_id,
+        played: item.standing_P ?? item.standing_played ?? 0,
+        win: item.standing_W ?? item.standing_won ?? 0,
+        draw: item.standing_D ?? item.standing_draw ?? 0,
+        lose: item.standing_L ?? item.standing_lost ?? 0,
+        goalsDiff: item.standing_GD ?? item.standing_gd ?? 0,
+        points: item.standing_PTS ?? item.standing_pts ?? item.standing_points ?? 0,
+      };
+    }
+
+    return null;
+  };
+
   // On-demand fetch (NO auto-refresh intervals)
   const fetchMatches = useCallback(async () => {
     setLoading(true);
@@ -115,7 +165,29 @@ export function FootballScreen() {
           league: 39,
           season: new Date().getFullYear(),
         });
-        setStandings(res || []);
+
+        let rawList: any[] = [];
+        if (Array.isArray(res)) {
+          if (res.length > 0 && res[0]?.league?.standings) {
+            rawList = res[0].league.standings.flat();
+          } else {
+            rawList = res;
+          }
+        } else if (res && typeof res === 'object') {
+          if (Array.isArray((res as any).total)) {
+            rawList = (res as any).total;
+          } else if (Array.isArray((res as any).result?.total)) {
+            rawList = (res as any).result.total;
+          } else if (Array.isArray((res as any).result)) {
+            rawList = (res as any).result;
+          }
+        }
+
+        const adapted = rawList
+          .map(adaptStanding)
+          .filter((s): s is UnifiedWebStandingItem => s !== null);
+
+        setStandings(adapted);
       } else {
         let raw: ApiFootballFixtureItem[] = [];
         if (activeTab === 'live') {
@@ -242,10 +314,11 @@ export function FootballScreen() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${isActive
+              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+                isActive
                   ? 'border border-emerald-500/50 bg-[#162234] text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
                   : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
-                }`}
+              }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
@@ -254,39 +327,34 @@ export function FootballScreen() {
         })}
       </div>
 
-      {/* Date Strip (for upcoming & results) */}
-      {activeTab !== 'live' && activeTab !== 'standings' && (
-        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
+      {/* 7-Day Date Slider (Hidden in Standings & Live modes) */}
+      {activeTab !== 'standings' && activeTab !== 'live' && (
+        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
           {dateStrip.map((item) => {
             const isSelected = selectedDate === item.iso;
             return (
               <button
                 key={item.iso}
                 onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${isSelected
-                    ? 'border-emerald-500 bg-emerald-500 text-slate-950 font-bold'
-                    : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
-                  }`}
+                className={`flex min-w-[72px] flex-col items-center rounded-2xl p-2.5 transition-all ${
+                  isSelected
+                    ? 'border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 shadow-md shadow-emerald-950'
+                    : 'border border-white/5 bg-[#141C2B] text-slate-400 hover:bg-[#1E293B] hover:text-slate-200'
+                }`}
               >
-                <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
-                <span
-                  className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
-                >
-                  {item.dayNumber}
-                </span>
+                <span className="text-xs font-semibold">{item.dayName}</span>
+                <span className="text-lg font-black">{item.dayNumber}</span>
               </button>
             );
           })}
         </div>
       )}
 
-      {/* Content Area */}
+      {/* Content Feed */}
       {loading ? (
-        <GoalmillsLoader
-          size="md"
-          label="Football Hub"
-          sublabel="Syncing live scores & league standings..."
-        />
+        <div className="flex h-64 items-center justify-center">
+          <GoalmillsLoader size="lg" label="GoalMills Football" sublabel="Loading football updates..." />
+        </div>
       ) : activeTab === 'standings' ? (
         <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
           <h2 className="mb-4 text-lg font-bold text-white">League Table Standings</h2>
@@ -305,27 +373,42 @@ export function FootballScreen() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {standings.map((row) => (
-                  <tr key={row.rank} className="hover:bg-white/5">
-                    <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
-                    <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
-                      <img
-                        src={row.team.logo}
-                        alt={row.team.name}
-                        className="h-5 w-5 object-contain"
-                      />
-                      <span>{row.team.name}</span>
-                    </td>
-                    <td className="py-3 px-3 text-center">{row.all.played}</td>
-                    <td className="py-3 px-3 text-center">{row.all.win}</td>
-                    <td className="py-3 px-3 text-center">{row.all.draw}</td>
-                    <td className="py-3 px-3 text-center">{row.all.lose}</td>
-                    <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
-                    <td className="py-3 px-4 text-right font-black text-emerald-400">
-                      {row.points}
+                {standings.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-slate-500">
+                      No standings data available at this time.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  standings.map((row, index) => (
+                    <tr key={row.team_id || index} className="hover:bg-white/5">
+                      <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
+                      <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
+                        {row.team_logo ? (
+                          <img
+                            src={row.team_logo}
+                            alt={row.team_name}
+                            className="h-5 w-5 object-contain"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs">⚽</span>
+                        )}
+                        <span>{row.team_name}</span>
+                      </td>
+                      <td className="py-3 px-3 text-center">{row.played}</td>
+                      <td className="py-3 px-3 text-center">{row.win}</td>
+                      <td className="py-3 px-3 text-center">{row.draw}</td>
+                      <td className="py-3 px-3 text-center">{row.lose}</td>
+                      <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
+                      <td className="py-3 px-4 text-right font-black text-emerald-400">
+                        {row.points}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -359,14 +442,15 @@ export function FootballScreen() {
                 ) : (
                   <span className="text-blue-400">🏆</span>
                 )}
-                <h2 className="text-sm font-bold text-slate-200">{group.title}</h2>
-                <span className="text-xs text-slate-500">({group.matches.length})</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-300">
+                  {group.title}
+                </span>
               </div>
 
-              {/* Match Cards Grid */}
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+              {/* Match Cards */}
+              <div className="space-y-2">
                 {group.matches.map((match) => (
-                  <FootballMatchCard key={match.event_key} event={match} hideLeague />
+                  <FootballMatchCard key={match.event_key} event={match} />
                 ))}
               </div>
             </div>

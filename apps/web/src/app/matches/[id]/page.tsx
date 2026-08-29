@@ -425,30 +425,37 @@ export default function MatchDetailsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {standings.map((row) => {
+                  {standings.map((row, index) => {
                     const isCurrent =
-                      row.team.id === fixture?.teams.home.id ||
-                      row.team.id === fixture?.teams.away.id;
+                      (row.team?.id && row.team?.id === fixture?.teams?.home?.id) ||
+                      (row.team?.id && row.team?.id === fixture?.teams?.away?.id);
                     return (
                       <tr
-                        key={row.rank}
+                        key={row.team?.id || row.rank || index}
                         className={isCurrent ? 'bg-emerald-500/10' : 'hover:bg-white/5'}
                       >
-                        <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
+                        <td className="py-3 px-2 font-bold text-slate-400">{row.rank || index + 1}</td>
                         <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
-                          <img
-                            src={row.team.logo}
-                            alt={row.team.name}
-                            className="h-5 w-5 object-contain"
-                          />
+                          {row.team?.logo ? (
+                            <img
+                              src={row.team.logo}
+                              alt={row.team?.name || 'Team'}
+                              className="h-5 w-5 object-contain"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-xs">⚽</span>
+                          )}
                           <span className={isCurrent ? 'text-emerald-400 font-black' : ''}>
-                            {row.team.name}
+                            {row.team?.name || 'Team'}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-center">{row.all.played}</td>
-                        <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
+                        <td className="py-3 px-3 text-center">{row.all?.played ?? 0}</td>
+                        <td className="py-3 px-3 text-center font-medium">{row.goalsDiff ?? 0}</td>
                         <td className="py-3 px-4 text-right font-black text-emerald-400">
-                          {row.points}
+                          {row.points ?? 0}
                         </td>
                       </tr>
                     );
