@@ -34,3 +34,30 @@ CRON_SECRET=your_secure_cron_secret
 cd services/mailer
 go run ./cmd/server/main.go
 ```
+
+## Docker & Render.com Deployment
+
+### Method 1: Render CLI / Blueprint (Recommended)
+This repository includes a [render.yaml](../../render.yaml) blueprint configured for `services/mailer`.
+
+1. Install Render CLI:
+   ```bash
+   npm install -g @render/cli
+   ```
+2. Login with your API key:
+   ```bash
+   render login
+   ```
+3. Deploy the service:
+   ```bash
+   render blueprint launch
+   ```
+
+### Method 2: Render Web Service via Git
+1. Connect your repository in Render Dashboard.
+2. Choose **Web Service** -> **Docker**.
+3. Set:
+   - **Root Directory**: `services/mailer`
+   - **Dockerfile Path**: `./Dockerfile` (or root `dockerContext: ./services/mailer`)
+   - **Health Check Path**: `/health`
+4. Configure required SMTP and cron environment variables in Render settings.

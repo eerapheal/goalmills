@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: goalmills-mailer
+    runtime: docker
+    dockerfilePath: ./services/mailer/Dockerfile
+    dockerContext: ./services/mailer
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8085
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        value: newsletter@goalmills.com
+      - key: SMTP_FROM_NAME
+        value: "GoalMills Sports Media"
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
