@@ -1,18 +1,49 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FiLock, FiMail, FiEye, FiEyeOff } from 'react-icons/fi';
+import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const callbackUrl = searchParams.get('callbackUrl') || '';
+  const queryError = searchParams.get('error') || '';
+
+  // Display helpful messages if redirected from unauthorized route
+  useEffect(() => {
+    if (queryError === 'AccessDenied') {
+      setError('Access denied. Staff or admin privileges required.');
+    } else if (queryError === 'CredentialsSignin') {
+      setError('Invalid email or password.');
+    }
+  }, [queryError]);
+
+  // Automatic redirect if already authenticated
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      const role = session.user.role || 'user';
+      const isStaffOrAdmin = ['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(role);
+      
+      let destination = callbackUrl;
+      if (!destination || destination === '/signin' || destination === '/login') {
+        destination = isStaffOrAdmin ? '/admin/dashboard' : '/';
+      }
+      
+      router.replace(destination);
+    }
+  }, [status, session, callbackUrl, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,22 +52,41 @@ export default function SignInPage() {
 
     try {
       const res = await signIn('credentials', {
-        email,
+        email: email.trim().toLowerCase(),
         password,
         redirect: false,
       });
 
       if (res?.error) {
         setError('Invalid email or password');
-      } else {
-        router.push('/admin/dashboard');
+        setLoading(false);
+      } else if (res?.ok) {
+        // Success: determine target destination
+        let destination = callbackUrl;
+        if (!destination || destination === '/signin' || destination === '/login') {
+          destination = '/admin/dashboard';
+        }
+
+        // Full page redirect ensures NextAuth JWT cookies are loaded into subsequent requests
+        window.location.href = destination;
       }
     } catch (err: any) {
-      setError('An error occurred during sign in');
-    } finally {
+      setError('An error occurred during sign in. Please try again.');
       setLoading(false);
     }
   };
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <GoalmillsLoader
+          size="fullscreen"
+          label="GoalMills Account"
+          sublabel="Checking authentication status..."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 pt-20">
@@ -54,7 +104,7 @@ export default function SignInPage() {
         </div>
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-xl mb-4 text-xs sm:text-sm font-bold">
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl mb-4 text-xs sm:text-sm font-bold animate-shake">
             {error}
           </div>
         )}
@@ -119,7 +169,7 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black uppercase tracking-wider py-3.5 rounded-xl transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 mt-2"
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black uppercase tracking-wider py-3.5 rounded-xl transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 mt-2 cursor-pointer"
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -135,5 +185,23 @@ export default function SignInPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+          <GoalmillsLoader
+            size="fullscreen"
+            label="GoalMills Sign In"
+            sublabel="Loading security portal..."
+          />
+        </div>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }

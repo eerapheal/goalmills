@@ -39,9 +39,16 @@ MONGODB_URL="mongodb+srv://goalmills:G8jQXggyUTu5Dk45@goalmills.7oliki1.mongodb.
 
 # Firebase Cloud Messaging Server Key (from Firebase Console > Project Settings > Cloud Messaging)
 FIREBASE_SERVER_KEY="your_firebase_fcm_server_key_here"
+FCM_SERVER_KEY="your_firebase_fcm_server_key_here"
+
+# Firebase Admin Service Account Key (from Firebase Console > Project Settings > Service Accounts > Generate new private key)
+FIREBASE_SERVICE_ACCOUNT_KEY='{"type": "service_account", "project_id": "goalmills-39156", ...}'
+# Or individual credentials:
+FIREBASE_CLIENT_EMAIL="firebase-adminsdk-xxxxx@goalmills-39156.iam.gserviceaccount.com"
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 
 # Web Push VAPID Public Key (from Firebase Console > Cloud Messaging > Web Push certificates)
-
+NEXT_PUBLIC_FIREBASE_VAPID_KEY="your_vapid_public_key"
 
 # Optional: Admin API Key to protect /api/notifications/send endpoint
 ADMIN_NOTIFICATION_KEY="your_admin_secret_key"

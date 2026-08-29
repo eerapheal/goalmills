@@ -1,21 +1,27 @@
 'use client';
 
-import { SessionProvider } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 
-function AdminAuth({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/signin');
+      const callbackUrl = encodeURIComponent(pathname || '/admin/dashboard');
+      router.replace(`/signin?callbackUrl=${callbackUrl}`);
+    } else if (status === 'authenticated' && session?.user) {
+      const role = session.user.role;
+      if (role === 'user') {
+        // Standard non-staff readers redirect to home
+        router.replace('/?error=Unauthorized');
+      }
     }
-  }, [status, router]);
+  }, [status, session, pathname, router]);
 
   if (status === 'loading') {
     return (
@@ -29,17 +35,9 @@ function AdminAuth({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!session) {
+  if (!session?.user || session.user.role === 'user') {
     return null;
   }
 
   return <>{children}</>;
-}
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <SessionProvider>
-      <AdminAuth>{children}</AdminAuth>
-    </SessionProvider>
-  );
 }

@@ -104,7 +104,7 @@ export function Header() {
 
           {session?.user ? (
             <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-              {['super-admin', 'manager', 'editor'].includes(session.user.role as any) && (
+              {['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(session.user.role as any) && (
                 <Link
                   href="/admin/dashboard"
                   className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 transition-all text-xs flex items-center gap-1"
@@ -189,6 +189,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => setIsOpen(false)}
                 className={`text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-300 to-slate-500 hover:from-blue-400 hover:to-cyan-400 transition-all duration-300 transform ${
                   isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                 }`}
@@ -199,9 +200,10 @@ export function Header() {
 
             {session?.user ? (
               <>
-                {['super-admin', 'manager', 'editor'].includes(session.user.role as any) && (
+                {['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(session.user.role as any) && (
                   <Link
                     href="/admin/dashboard"
+                    onClick={() => setIsOpen(false)}
                     className={`text-2xl font-black text-amber-400 transition-all duration-300 ${
                       isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                     }`}
@@ -212,6 +214,7 @@ export function Header() {
 
                 <Link
                   href="/admin/portal"
+                  onClick={() => setIsOpen(false)}
                   className={`text-2xl font-bold text-cyan-400 transition-all duration-300 ${
                     isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                   }`}
@@ -220,6 +223,7 @@ export function Header() {
                 </Link>
                 <Link
                   href="/profile"
+                  onClick={() => setIsOpen(false)}
                   className={`text-2xl font-bold text-blue-400 transition-all duration-300 ${
                     isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                   }`}
@@ -230,6 +234,7 @@ export function Header() {
             ) : (
               <Link
                 href="/signin"
+                onClick={() => setIsOpen(false)}
                 className={`text-2xl font-bold text-white transition-all duration-300 ${
                   isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                 }`}

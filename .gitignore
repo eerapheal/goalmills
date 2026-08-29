@@ -25,12 +25,16 @@ apps/apps/
 *.pem
 .turbo
 
-# Environment Variables
+# Environment Variables & Secrets
 .env
 .env.*
 .env*.local
 !.env.example
 !.env.*.example
+secrete/
+*firebase-adminsdk*.json
+*service_account*.json
+*.key
 
 # Debug
 npm-debug.log*

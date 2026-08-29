@@ -78,16 +78,16 @@ export default withAuth(
       }
     }
 
-    // General admin protection — at minimum need staff role
+    // General admin protection — at minimum need contributor role
     if (path.startsWith('/admin') || path.startsWith('/api/admin')) {
-      if (!meetsMinRole(role, 'staff')) {
+      if (!meetsMinRole(role, 'contributor')) {
         if (path.startsWith('/api/')) {
           return NextResponse.json(
-            { message: 'Unauthorized: Admin access required' },
+            { message: 'Unauthorized: Staff or Admin access required' },
             { status: 401 }
           );
         }
-        return NextResponse.redirect(new URL('/', req.url));
+        return NextResponse.redirect(new URL('/signin?error=AccessDenied', req.url));
       }
     }
 
@@ -107,7 +107,10 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !token,
+      authorized: ({ token }) => !!token,
+    },
+    pages: {
+      signIn: '/signin',
     },
   }
 );
