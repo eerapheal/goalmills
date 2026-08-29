@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
 import { SportType } from '@goalmills/types';
 import { SportTabs } from '../../../components/SportTabs';
+import { SponsoredBannerCard } from '../../../components/SponsoredBannerCard';
 import { AdvancedFootballScreen } from '../../../screens/AdvancedFootballScreen';
 import { CricketScreen } from '../../../screens/CricketScreen';
 import BasketballScreen from '../../../screens/BasketballScreen';
@@ -48,6 +49,9 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Featured Mobile Sponsor Banner */}
+      <SponsoredBannerCard placement="homepage_hero" sport={selectedSport} />
+
       {/* Sport Category Tabs */}
       <SportTabs selectedSport={selectedSport} onSelectSport={setSelectedSport} />
 

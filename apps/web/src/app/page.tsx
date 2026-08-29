@@ -8,6 +8,7 @@ import { CricketScreen } from '../components/CricketScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
 import { SportsPulseNewsSection } from '../components/SportsPulseNewsSection';
 import { NewsletterSubscriptionSection } from '../components/NewsletterSubscriptionSection';
+import { SponsoredBannerCard } from '../components/SponsoredBannerCard';
 
 export default function HomePage() {
   const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -55,6 +56,11 @@ export default function HomePage() {
         <p className="text-sm text-gray-300 font-semibold animate-marquee inline-block">
           Your Ultimate Sports Platform brought to you by Ekpenisi Erue Raphael
         </p>
+      </div>
+
+      {/* Featured VIP Sponsor Hero Banner */}
+      <div className="max-w-6xl mx-auto w-full px-4 pt-4">
+        <SponsoredBannerCard placement="homepage_hero" sport={selectedSport as any} />
       </div>
 
       {/* Sport Category Tabs */}

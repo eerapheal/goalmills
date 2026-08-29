@@ -22,93 +22,111 @@ import {
   FiKey,
   FiMail,
   FiCompass,
+  FiTrash2,
+  FiSend,
+  FiSettings,
+  FiShield,
+  FiZap,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
-import { hasPermission, hasMinRole } from '@/lib/rbac';
+import { hasPermission } from '@/lib/rbac';
 
-interface NavItem {
+interface PrimaryTab {
+  id: string;
   label: string;
   href: string;
-  icon: typeof FiFileText;
-  group: string;
-  requiredPermission: PermissionAction;
+  icon: any;
+  requiredPermission?: PermissionAction;
+  subItems?: { label: string; href: string; icon?: any }[];
 }
 
-const ALL_NAV_ITEMS: NavItem[] = [
+const PRIMARY_TABS: PrimaryTab[] = [
   {
-    label: 'News & Media',
+    id: 'cms',
+    label: 'CMS',
     href: '/admin/dashboard',
     icon: FiFileText,
-    group: 'editorial',
     requiredPermission: 'articles:draft',
+    subItems: [
+      { label: 'News & Media', href: '/admin/dashboard', icon: FiFileText },
+      { label: 'Content Ecosystem', href: '/admin/ecosystem', icon: FiCompass },
+      { label: 'Categories', href: '/admin/categories', icon: FiLayers },
+      { label: 'Create Article', href: '/admin/news/new', icon: FiFileText },
+    ],
   },
   {
-    label: 'Content Ecosystem',
-    href: '/admin/ecosystem',
-    icon: FiCompass,
-    group: 'editorial',
-    requiredPermission: 'articles:draft',
-  },
-  {
-    label: 'Newsletter Hub',
-    href: '/admin/newsletter',
-    icon: FiMail,
-    group: 'editorial',
-    requiredPermission: 'articles:draft',
-  },
-  {
-    label: 'Handbook & SOPs',
-    href: '/admin/handbook',
-    icon: FiBookOpen,
-    group: 'ems',
-    requiredPermission: 'handbook:read',
-  },
-  {
-    label: 'Employees & Staff',
+    id: 'employee_management',
+    label: 'Employee Management',
     href: '/admin/employees',
     icon: FiUsers,
-    group: 'ems',
     requiredPermission: 'employees:read',
+    subItems: [
+      { label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers },
+      { label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare },
+      { label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar },
+      { label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen },
+      { label: 'Evaluations', href: '/admin/evaluations', icon: FiAward },
+      { label: 'Payroll', href: '/admin/payroll', icon: FiDollarSign },
+    ],
   },
   {
-    label: 'Daily Reports',
-    href: '/admin/reports',
-    icon: FiCheckSquare,
-    group: 'ems',
-    requiredPermission: 'reports:read_own',
-  },
-  {
-    label: '5 PM Stand-up',
-    href: '/admin/standup',
-    icon: FiCalendar,
-    group: 'ems',
-    requiredPermission: 'standup:attend',
-  },
-  {
-    label: 'Evaluations',
-    href: '/admin/evaluations',
-    icon: FiAward,
-    group: 'ems',
-    requiredPermission: 'evaluations:read',
-  },
-  {
-    label: 'Payroll & Allowances',
-    href: '/admin/payroll',
-    icon: FiDollarSign,
-    group: 'ems',
-    requiredPermission: 'payroll:read',
-  },
-  {
-    label: 'Staff Portal',
-    href: '/admin/portal',
+    id: 'user_management',
+    label: 'User Management',
+    href: '/admin/users',
     icon: FiUserCheck,
-    group: 'portal',
-    requiredPermission: 'articles:read',
+    requiredPermission: 'users:manage',
+    subItems: [
+      { label: 'User Directory', href: '/admin/users', icon: FiUserCheck },
+      { label: 'Staff Roles & Invitations', href: '/admin/users', icon: FiShield },
+    ],
+  },
+  {
+    id: 'sponsorship_management',
+    label: 'Sponsorship Management',
+    href: '/admin/sponsorships',
+    icon: FiDollarSign,
+    requiredPermission: 'articles:draft',
+    subItems: [
+      { label: 'Active Campaigns', href: '/admin/sponsorships', icon: FiDollarSign },
+      { label: 'Create Partnership', href: '/admin/sponsorships', icon: FiDollarSign },
+    ],
+  },
+  {
+    id: 'content_deletion',
+    label: 'Content Deletion',
+    href: '/admin/deletion',
+    icon: FiTrash2,
+    requiredPermission: 'articles:draft',
+    subItems: [
+      { label: 'Trash Bin', href: '/admin/deletion', icon: FiTrash2 },
+      { label: 'Deletion Audit Log', href: '/admin/deletion', icon: FiShield },
+    ],
+  },
+  {
+    id: 'publishing',
+    label: 'Publishing',
+    href: '/admin/publishing',
+    icon: FiSend,
+    requiredPermission: 'articles:draft',
+    subItems: [
+      { label: 'Drafts Queue', href: '/admin/publishing', icon: FiSend },
+      { label: 'Newsletter Hub', href: '/admin/newsletter', icon: FiMail },
+    ],
+  },
+  {
+    id: 'system_configuration',
+    label: 'System Configuration',
+    href: '/admin/system',
+    icon: FiSettings,
+    requiredPermission: 'articles:draft',
+    subItems: [
+      { label: 'System Diagnostics', href: '/admin/system', icon: FiSettings },
+      { label: 'Redis Cache Purge', href: '/admin/system', icon: FiZap },
+    ],
   },
 ];
 
-/** Human-readable role label */
 function getRoleBadge(role?: string): string {
   const labels: Record<string, string> = {
     'super-admin': 'Super Admin',
@@ -118,7 +136,7 @@ function getRoleBadge(role?: string): string {
     contributor: 'Contributor',
     user: 'Reader',
   };
-  return labels[role || ''] || role || 'admin';
+  return labels[role || ''] || role || 'Admin';
 }
 
 export default function AdminNavBar() {
@@ -126,29 +144,44 @@ export default function AdminNavBar() {
   const router = useRouter();
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const userRole = (session?.user?.role as UserRole) || undefined;
 
-  // Filter nav items based on user's permissions
-  const navItems = useMemo(
-    () => ALL_NAV_ITEMS.filter((item) => hasPermission(userRole, item.requiredPermission)),
-    [userRole]
-  );
+  const accessibleTabs = useMemo(() => {
+    return PRIMARY_TABS.filter((tab) => {
+      if (!tab.requiredPermission) return true;
+      return hasPermission(userRole, tab.requiredPermission);
+    });
+  }, [userRole]);
 
-  const currentNav =
-    navItems.find(
-      (item) =>
-        pathname === item.href ||
-        (item.href !== '/admin/dashboard' && pathname.startsWith(item.href))
-    ) || navItems[0];
-
-  const canManageUsers = hasPermission(userRole, 'users:manage');
-  const canManageCategories = hasPermission(userRole, 'categories:manage');
+  // Determine which primary tab matches the current path
+  const activeTabId = useMemo(() => {
+    if (pathname.startsWith('/admin/employees') || pathname.startsWith('/admin/reports') || pathname.startsWith('/admin/standup') || pathname.startsWith('/admin/handbook') || pathname.startsWith('/admin/evaluations') || pathname.startsWith('/admin/payroll')) {
+      return 'employee_management';
+    }
+    if (pathname.startsWith('/admin/users')) {
+      return 'user_management';
+    }
+    if (pathname.startsWith('/admin/sponsorships')) {
+      return 'sponsorship_management';
+    }
+    if (pathname.startsWith('/admin/deletion')) {
+      return 'content_deletion';
+    }
+    if (pathname.startsWith('/admin/publishing') || pathname.startsWith('/admin/newsletter')) {
+      return 'publishing';
+    }
+    if (pathname.startsWith('/admin/system')) {
+      return 'system_configuration';
+    }
+    return 'cms';
+  }, [pathname]);
 
   return (
     <header className="glass-card border-b border-white/10 rounded-2xl sm:rounded-3xl mb-5 sm:mb-6 shadow-2xl backdrop-blur-2xl bg-slate-950/85">
       <div className="p-3.5 sm:p-5">
-        {/* Top Row: Brand, User Info & Global Actions */}
+        {/* Top Row: Brand, User Info & Quick Actions */}
         <div className="flex items-center justify-between gap-3">
           {/* Brand Info */}
           <Link href="/admin/dashboard" className="flex items-center gap-2.5 sm:gap-3 group">
@@ -158,11 +191,11 @@ export default function AdminNavBar() {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-base sm:text-xl font-black text-white uppercase tracking-tight">
-                  GoalMills <span className="text-amber-400 text-xs sm:text-sm font-bold">EMS</span>
+                  GoalMills <span className="text-amber-400 text-xs sm:text-sm font-bold">Admin Hub</span>
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[150px] sm:max-w-[240px]">
-                {session?.user?.name || 'Managing Director'}{' '}
+                {session?.user?.name || 'Administrator'}{' '}
                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/10 text-amber-300 font-mono">
                   {getRoleBadge(session?.user?.role as string)}
                 </span>
@@ -170,7 +203,7 @@ export default function AdminNavBar() {
             </div>
           </Link>
 
-          {/* Desktop Right Global Actions */}
+          {/* Desktop Right Quick Actions */}
           <div className="hidden lg:flex items-center gap-2">
             <Link
               href="/admin/ecosystem"
@@ -179,24 +212,6 @@ export default function AdminNavBar() {
               <FiCompass size={13} />
               <span>Ecosystem</span>
             </Link>
-            {canManageUsers && (
-              <Link
-                href="/admin/users"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/20 transition-all text-xs"
-              >
-                <FiUsers size={13} />
-                <span>User Roles</span>
-              </Link>
-            )}
-            {canManageCategories && (
-              <Link
-                href="/admin/categories"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 font-bold border border-purple-500/20 transition-all text-xs"
-              >
-                <FiLayers size={13} />
-                <span>Categories</span>
-              </Link>
-            )}
             <Link
               href="/profile"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/20 transition-all text-xs"
@@ -221,7 +236,7 @@ export default function AdminNavBar() {
             </button>
           </div>
 
-          {/* Mobile Right Controls: Dropdown Jump + Drawer Button */}
+          {/* Mobile Right Controls */}
           <div className="flex items-center gap-2 lg:hidden">
             <Link
               href="/"
@@ -240,47 +255,47 @@ export default function AdminNavBar() {
           </div>
         </div>
 
-        {/* Mobile Module Quick Dropdown Selector — only shows permitted items */}
+        {/* Desktop Primary Tabs Navigation (7 Core Modules strictly ordered) */}
+        <nav className="hidden lg:flex items-center gap-1.5 mt-4 pt-3 border-t border-white/10 overflow-x-auto no-scrollbar">
+          {accessibleTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTabId === tab.id;
+
+            return (
+              <div key={tab.id} className="relative group">
+                <Link
+                  href={tab.href}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/20 scale-[1.02]'
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon size={15} />
+                  <span>{tab.label}</span>
+                </Link>
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Mobile Dropdown Quick Selector */}
         <div className="mt-3 block lg:hidden">
           <div className="relative">
             <select
-              value={currentNav?.href || '/admin/dashboard'}
+              value={pathname}
               onChange={(e) => router.push(e.target.value)}
               className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-500 pr-9 transition-colors shadow-inner"
             >
-              {navItems.filter((i) => i.group === 'editorial').length > 0 && (
-                <optgroup label="Editorial & Content Hub">
-                  {navItems
-                    .filter((i) => i.group === 'editorial')
-                    .map((item) => (
-                      <option key={item.href} value={item.href}>
-                        {item.label}
-                      </option>
-                    ))}
+              {accessibleTabs.map((tab) => (
+                <optgroup key={tab.id} label={tab.label}>
+                  {tab.subItems?.map((sub) => (
+                    <option key={sub.href} value={sub.href}>
+                      {sub.label}
+                    </option>
+                  ))}
                 </optgroup>
-              )}
-              {navItems.filter((i) => i.group === 'ems').length > 0 && (
-                <optgroup label="Employee Management & Training">
-                  {navItems
-                    .filter((i) => i.group === 'ems')
-                    .map((item) => (
-                      <option key={item.href} value={item.href}>
-                        {item.label}
-                      </option>
-                    ))}
-                </optgroup>
-              )}
-              {navItems.filter((i) => i.group === 'portal').length > 0 && (
-                <optgroup label="Self-Service Portal">
-                  {navItems
-                    .filter((i) => i.group === 'portal')
-                    .map((item) => (
-                      <option key={item.href} value={item.href}>
-                        {item.label}
-                      </option>
-                    ))}
-                </optgroup>
-              )}
+              ))}
             </select>
             <FiChevronDown
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
@@ -289,76 +304,33 @@ export default function AdminNavBar() {
           </div>
         </div>
 
-        {/* Desktop Navigation Pills — only shows permitted items */}
-        <div className="hidden lg:flex items-center gap-1.5 mt-4 pt-3 border-t border-white/10 overflow-x-auto no-scrollbar">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href ||
-              (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/20 scale-[1.02]'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <Icon size={15} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-
         {/* Mobile Accordion Drawer */}
         {mobileMenuOpen && (
-          <div className="mt-3 pt-3 border-t border-white/10 space-y-2 lg:hidden animate-fade-in">
-            <div className="grid grid-cols-2 gap-2">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
+          <div className="mt-3 pt-3 border-t border-white/10 space-y-3 lg:hidden animate-fade-in">
+            <div className="space-y-2">
+              {accessibleTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTabId === tab.id;
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all ${
-                      isActive
-                        ? 'bg-amber-500 text-slate-950 shadow-md'
-                        : 'bg-white/5 text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    <Icon size={15} />
-                    <span className="truncate">{item.label}</span>
-                  </Link>
+                  <div key={tab.id} className="space-y-1">
+                    <Link
+                      href={tab.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all ${
+                        isActive
+                          ? 'bg-amber-500 text-slate-950 shadow-md'
+                          : 'bg-white/5 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      <Icon size={15} />
+                      <span>{tab.label}</span>
+                    </Link>
+                  </div>
                 );
               })}
             </div>
 
             <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-              {canManageUsers && (
-                <Link
-                  href="/admin/users"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 rounded-xl bg-blue-500/10 text-blue-400 text-xs font-bold"
-                >
-                  Users
-                </Link>
-              )}
-              {canManageCategories && (
-                <Link
-                  href="/admin/categories"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 rounded-xl bg-purple-500/10 text-purple-400 text-xs font-bold"
-                >
-                  Categories
-                </Link>
-              )}
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
