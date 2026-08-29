@@ -4,6 +4,7 @@ import Category from '@/models/Category';
 import News from '@/models/News';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { hasPermission } from '@/lib/rbac';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+  if (!session || !hasPermission(session.user?.role, 'categories:manage')) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
@@ -74,7 +75,7 @@ export async function DELETE(
 ) {
   const { id } = await params;
   const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+  if (!session || !hasPermission(session.user?.role, 'categories:manage')) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 

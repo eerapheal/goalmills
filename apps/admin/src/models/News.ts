@@ -110,16 +110,6 @@ const NewsSchema = new mongoose.Schema(
     },
     articleType: {
       type: String,
-      enum: [
-        'news',
-        'transfer',
-        'tactical_analysis',
-        'player_analysis',
-        'match_report',
-        'feature',
-        'interview',
-        'prediction',
-      ],
       default: 'news',
       index: true,
     },

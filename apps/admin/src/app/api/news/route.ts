@@ -6,6 +6,8 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { cacheGet, cacheSet, cacheInvalidatePattern, getSeoCacheHeaders } from '@/lib/redisCache';
 import { broadcastNewNews } from '@/lib/socketBroadcaster';
 import { notifyOnNewNewsArticle } from '@/lib/pushService';
+import Category from '@/models/Category';
+import EcosystemEntity from '@/models/EcosystemEntity';
 import { hasPermission, canDirectPublish } from '@/lib/rbac';
 import { UserRole } from '@goalmills/types';
 
@@ -321,6 +323,106 @@ export async function POST(request: NextRequest) {
       readTime: Math.ceil((content || '').split(' ').length / 200) || 3,
       views: 0,
     });
+
+    // Auto-upsert custom Category into DB if not present
+    if (category && catSlug) {
+      await Category.findOneAndUpdate(
+        { slug: catSlug },
+        {
+          $setOnInsert: {
+            name: category.trim(),
+            slug: catSlug,
+            isFeatured: false,
+            order: 0,
+          },
+        },
+        { upsert: true, new: true }
+      ).catch((err: any) => console.warn('Auto category upsert note:', err.message));
+    }
+
+    // Auto-upsert custom Sport into EcosystemEntity DB if not present
+    if (sport && sportSlug) {
+      await EcosystemEntity.findOneAndUpdate(
+        { type: 'sport', slug: sportSlug.toLowerCase().trim() },
+        {
+          $setOnInsert: {
+            type: 'sport',
+            name: sport.trim(),
+            slug: sportSlug.toLowerCase().trim(),
+            isCustom: true,
+          },
+        },
+        { upsert: true, new: true }
+      ).catch((err: any) => console.warn('Auto sport upsert note:', err.message));
+    }
+
+    // Auto-upsert custom Competition into EcosystemEntity DB if not present
+    if (competition && competitionSlug) {
+      await EcosystemEntity.findOneAndUpdate(
+        { type: 'competition', slug: competitionSlug.toLowerCase().trim() },
+        {
+          $setOnInsert: {
+            type: 'competition',
+            name: competition.trim(),
+            slug: competitionSlug.toLowerCase().trim(),
+            sportSlug: (sportSlug || 'football').toLowerCase().trim(),
+            isCustom: true,
+          },
+        },
+        { upsert: true, new: true }
+      ).catch((err: any) => console.warn('Auto competition upsert note:', err.message));
+    }
+
+    // Auto-upsert custom Clubs into EcosystemEntity DB if not present
+    if (Array.isArray(teams) && teams.length > 0) {
+      for (const t of teams) {
+        if (t.name && t.slug) {
+          await EcosystemEntity.findOneAndUpdate(
+            { type: 'club', slug: t.slug.toLowerCase().trim() },
+            {
+              $setOnInsert: {
+                type: 'club',
+                name: t.name.trim(),
+                slug: t.slug.toLowerCase().trim(),
+                logo: t.logo,
+                sportSlug: (sportSlug || 'football').toLowerCase().trim(),
+                competitionSlug: competitionSlug ? competitionSlug.toLowerCase().trim() : undefined,
+                isCustom: true,
+              },
+            },
+            { upsert: true, new: true }
+          ).catch((err: any) => console.warn('Auto club upsert note:', err.message));
+        }
+      }
+    }
+
+    // Auto-upsert custom Players into EcosystemEntity DB if not present
+    if (Array.isArray(players) && players.length > 0) {
+      for (const p of players) {
+        if (p.name && p.slug) {
+          await EcosystemEntity.findOneAndUpdate(
+            { type: 'player', slug: p.slug.toLowerCase().trim() },
+            {
+              $setOnInsert: {
+                type: 'player',
+                name: p.name.trim(),
+                slug: p.slug.toLowerCase().trim(),
+                photo: p.photo,
+                sportSlug: (sportSlug || 'football').toLowerCase().trim(),
+                competitionSlug: competitionSlug ? competitionSlug.toLowerCase().trim() : undefined,
+                clubSlug: teams && teams[0]?.slug ? teams[0].slug.toLowerCase().trim() : undefined,
+                isCustom: true,
+              },
+            },
+            { upsert: true, new: true }
+          ).catch((err: any) => console.warn('Auto player upsert note:', err.message));
+        }
+      }
+    }
+
+    // Invalidate ecosystem and categories caches
+    await cacheInvalidatePattern('cache:ecosystem:*');
+    await cacheInvalidatePattern('cache:categories:*');
 
     // Only notify and broadcast if article is published directly
     if (articleStatus === 'published') {

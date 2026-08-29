@@ -3,6 +3,7 @@ import dbConnect from '@/lib/db';
 import Category from '@/models/Category';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { hasPermission } from '@/lib/rbac';
 
 export const dynamic = 'force-dynamic';
 
@@ -128,9 +129,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
+  if (!session || !hasPermission(session.user?.role, 'categories:manage')) {
     return NextResponse.json(
-      { message: 'Unauthorized: staff or Super Admin role required' },
+      { message: 'Unauthorized: staff, editor, manager, or Super Admin role required' },
       { status: 401 }
     );
   }

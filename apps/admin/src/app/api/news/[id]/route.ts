@@ -10,6 +10,8 @@ import {
   cacheInvalidatePattern,
   getSeoCacheHeaders,
 } from '@/lib/redisCache';
+import Category from '@/models/Category';
+import EcosystemEntity from '@/models/EcosystemEntity';
 import { canEditArticle, canDirectPublish, hasPermission } from '@/lib/rbac';
 import { UserRole } from '@goalmills/types';
 
@@ -93,9 +95,107 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       runValidators: true,
     });
 
+    // Auto-upsert custom Category into DB if not present
+    if (body.category && body.categorySlug) {
+      await Category.findOneAndUpdate(
+        { slug: body.categorySlug },
+        {
+          $setOnInsert: {
+            name: body.category.trim(),
+            slug: body.categorySlug,
+            isFeatured: false,
+            order: 0,
+          },
+        },
+        { upsert: true, new: true }
+      ).catch((err: any) => console.warn('Auto category upsert note:', err.message));
+    }
+
+    // Auto-upsert custom Sport into EcosystemEntity DB if not present
+    if (body.sport && body.sportSlug) {
+      await EcosystemEntity.findOneAndUpdate(
+        { type: 'sport', slug: body.sportSlug.toLowerCase().trim() },
+        {
+          $setOnInsert: {
+            type: 'sport',
+            name: body.sport.trim(),
+            slug: body.sportSlug.toLowerCase().trim(),
+            isCustom: true,
+          },
+        },
+        { upsert: true, new: true }
+      ).catch((err: any) => console.warn('Auto sport upsert note:', err.message));
+    }
+
+    // Auto-upsert custom Competition into EcosystemEntity DB if not present
+    if (body.competition && body.competitionSlug) {
+      await EcosystemEntity.findOneAndUpdate(
+        { type: 'competition', slug: body.competitionSlug.toLowerCase().trim() },
+        {
+          $setOnInsert: {
+            type: 'competition',
+            name: body.competition.trim(),
+            slug: body.competitionSlug.toLowerCase().trim(),
+            sportSlug: (body.sportSlug || 'football').toLowerCase().trim(),
+            isCustom: true,
+          },
+        },
+        { upsert: true, new: true }
+      ).catch((err: any) => console.warn('Auto competition upsert note:', err.message));
+    }
+
+    // Auto-upsert custom Clubs into EcosystemEntity DB if not present
+    if (Array.isArray(body.teams) && body.teams.length > 0) {
+      for (const t of body.teams) {
+        if (t.name && t.slug) {
+          await EcosystemEntity.findOneAndUpdate(
+            { type: 'club', slug: t.slug.toLowerCase().trim() },
+            {
+              $setOnInsert: {
+                type: 'club',
+                name: t.name.trim(),
+                slug: t.slug.toLowerCase().trim(),
+                logo: t.logo,
+                sportSlug: (body.sportSlug || 'football').toLowerCase().trim(),
+                competitionSlug: body.competitionSlug ? body.competitionSlug.toLowerCase().trim() : undefined,
+                isCustom: true,
+              },
+            },
+            { upsert: true, new: true }
+          ).catch((err: any) => console.warn('Auto club upsert note:', err.message));
+        }
+      }
+    }
+
+    // Auto-upsert custom Players into EcosystemEntity DB if not present
+    if (Array.isArray(body.players) && body.players.length > 0) {
+      for (const p of body.players) {
+        if (p.name && p.slug) {
+          await EcosystemEntity.findOneAndUpdate(
+            { type: 'player', slug: p.slug.toLowerCase().trim() },
+            {
+              $setOnInsert: {
+                type: 'player',
+                name: p.name.trim(),
+                slug: p.slug.toLowerCase().trim(),
+                photo: p.photo,
+                sportSlug: (body.sportSlug || 'football').toLowerCase().trim(),
+                competitionSlug: body.competitionSlug ? body.competitionSlug.toLowerCase().trim() : undefined,
+                clubSlug: body.teams && body.teams[0]?.slug ? body.teams[0].slug.toLowerCase().trim() : undefined,
+                isCustom: true,
+              },
+            },
+            { upsert: true, new: true }
+          ).catch((err: any) => console.warn('Auto player upsert note:', err.message));
+        }
+      }
+    }
+
     // Invalidate caches
     await cacheDel(`cache:news:item:${id}`);
     await cacheInvalidatePattern('cache:news:*');
+    await cacheInvalidatePattern('cache:ecosystem:*');
+    await cacheInvalidatePattern('cache:categories:*');
 
     return NextResponse.json(updatedNews);
   } catch (error) {
