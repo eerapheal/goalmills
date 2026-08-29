@@ -15,6 +15,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "ci": "turbo run lint test build",
     "web": "turbo run dev --filter=web",
+    "admin": "turbo run dev --filter=admin",
     "mobile": "turbo run dev --filter=mobiles",
     "mailer:docker": "docker compose -f services/mailer/docker-compose.yml up --build",
     "mailer:docker:down": "docker compose -f services/mailer/docker-compose.yml down",

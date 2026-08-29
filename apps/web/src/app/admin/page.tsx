@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
-export default function AdminRootPage() {
-  redirect('/admin/dashboard');
+export default function AdminPage() {
+  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
+  redirect(`${adminUrl}/dashboard`);
 }

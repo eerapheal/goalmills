@@ -105,12 +105,12 @@ export function Header() {
           {session?.user ? (
             <div className="flex items-center gap-3 pl-4 border-l border-white/10">
               {['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(session.user.role as any) && (
-                <Link
-                  href="/admin/dashboard"
+                <a
+                  href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'}
                   className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 transition-all text-xs flex items-center gap-1"
                 >
                   <span>⚡</span> Admin Hub
-                </Link>
+                </a>
               )}
 
               <Link href="/profile" className="flex items-center gap-3 group">
@@ -201,15 +201,15 @@ export function Header() {
             {session?.user ? (
               <>
                 {['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(session.user.role as any) && (
-                  <Link
-                    href="/admin/dashboard"
+                  <a
+                    href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'}
                     onClick={() => setIsOpen(false)}
                     className={`text-2xl font-black text-amber-400 transition-all duration-300 ${
                       isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                     }`}
                   >
                     ⚡ Admin & EMS Hub
-                  </Link>
+                  </a>
                 )}
 
                 <Link
