@@ -11,7 +11,7 @@ export interface ISponsorship {
   imageUrl?: string;
   tagline?: string;
   ctaText: string;
-  sportSlug: 'all' | 'football' | 'cricket' | 'basketball';
+  sportSlug: 'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey';
   badgeText: string;
   status: 'active' | 'paused' | 'expired' | 'draft' | 'trash';
   startDate: Date;
@@ -50,7 +50,7 @@ const SponsorshipSchema = new mongoose.Schema(
     ctaText: { type: String, default: 'Learn More' },
     sportSlug: {
       type: String,
-      enum: ['all', 'football', 'cricket', 'basketball'],
+      enum: ['all', 'football', 'cricket', 'basketball', 'tennis', 'baseball', 'hockey'],
       default: 'all',
       index: true,
     },

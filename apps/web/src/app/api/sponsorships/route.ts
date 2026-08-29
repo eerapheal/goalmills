@@ -24,9 +24,9 @@ export async function GET(request: NextRequest) {
     };
 
     if (placement !== 'all') {
-      filter.placement = placement;
-    }
-    if (sport !== 'all') {
+      // Include items specifically for the sport or placement
+      filter.$or = [{ placement: placement }, { sportSlug: sport }];
+    } else if (sport !== 'all') {
       filter.sportSlug = { $in: [sport, 'all'] };
     }
 
