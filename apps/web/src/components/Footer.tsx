@@ -38,11 +38,6 @@ export function Footer() {
                   Basketball (NBA)
                 </Link>
               </li>
-              <li>
-                <Link href="/tennis" className="hover:text-blue-400 transition-colors">
-                  Tennis
-                </Link>
-              </li>
             </ul>
           </div>
 

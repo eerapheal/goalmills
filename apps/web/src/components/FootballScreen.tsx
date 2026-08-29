@@ -50,10 +50,10 @@ export function FootballScreen() {
       const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(shortStatus);
       const scoreStr =
         item.goals &&
-        item.goals.home !== null &&
-        item.goals.home !== undefined &&
-        item.goals.away !== null &&
-        item.goals.away !== undefined
+          item.goals.home !== null &&
+          item.goals.home !== undefined &&
+          item.goals.away !== null &&
+          item.goals.away !== undefined
           ? `${item.goals.home} - ${item.goals.away}`
           : undefined;
 
@@ -242,11 +242,10 @@ export function FootballScreen() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
-                isActive
+              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${isActive
                   ? 'border border-emerald-500/50 bg-[#162234] text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
                   : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
-              }`}
+                }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
@@ -264,11 +263,10 @@ export function FootballScreen() {
               <button
                 key={item.iso}
                 onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
-                  isSelected
+                className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${isSelected
                     ? 'border-emerald-500 bg-emerald-500 text-slate-950 font-bold'
                     : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
-                }`}
+                  }`}
               >
                 <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
                 <span

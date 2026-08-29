@@ -61,7 +61,7 @@ export function SportsIntelligenceSection() {
     {
       value: '1,200+',
       label: 'Global Leagues',
-      subtext: 'Covering Football, Cricket, NBA & Tennis',
+      subtext: 'Covering Football, Cricket & Basketball',
       icon: (
         <svg
           className="w-5 h-5 text-blue-400"
@@ -274,11 +274,10 @@ export function SportsIntelligenceSection() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveFeatureTab(tab.id)}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
-                    activeFeatureTab === tab.id
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 ${activeFeatureTab === tab.id
                       ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-105'
                       : 'bg-slate-800/60 text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
+                    }`}
                 >
                   <span>{tab.title}</span>
                 </button>
@@ -401,33 +400,30 @@ export function SportsIntelligenceSection() {
             <div className="grid grid-cols-3 gap-2 mb-4">
               <button
                 onClick={() => handleVote('match-1', 'home')}
-                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${
-                  votedMatch === 'home'
+                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'home'
                     ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
-                }`}
+                  }`}
               >
                 <span>Madrid Win</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({homePct}%)</div>
               </button>
               <button
                 onClick={() => handleVote('match-1', 'draw')}
-                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${
-                  votedMatch === 'draw'
+                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'draw'
                     ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
-                }`}
+                  }`}
               >
                 <span>Draw</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({drawPct}%)</div>
               </button>
               <button
                 onClick={() => handleVote('match-1', 'away')}
-                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${
-                  votedMatch === 'away'
+                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'away'
                     ? 'bg-cyan-600 text-white border-cyan-400 shadow-md shadow-cyan-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
-                }`}
+                  }`}
               >
                 <span>City Win</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({awayPct}%)</div>

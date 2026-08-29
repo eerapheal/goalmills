@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES } from '@goalmills/ui';
 import { SportType } from '@goalmills/types';
 import { SportTabs } from '../../../components/SportTabs';
 import { AdvancedFootballScreen } from '../../../screens/AdvancedFootballScreen';
 import { CricketScreen } from '../../../screens/CricketScreen';
-import { TennisScreen } from '../../../screens/TennisScreen';
 import BasketballScreen from '../../../screens/BasketballScreen';
 
 export default function HomeScreen() {
@@ -19,17 +18,16 @@ export default function HomeScreen() {
       case 'cricket':
         return <CricketScreen />;
 
-      case 'tennis':
-        return <TennisScreen />;
-
       case 'basketball':
         return <BasketballScreen />;
 
+      case 'tennis':
       case 'baseball':
       case 'hockey':
         return (
           <View style={styles.comingSoonContainer}>
             <Text style={styles.comingSoonEmoji}>
+              {selectedSport === 'tennis' && '🎾'}
               {selectedSport === 'baseball' && '⚾'}
               {selectedSport === 'hockey' && '🏒'}
             </Text>
@@ -38,7 +36,7 @@ export default function HomeScreen() {
             </Text>
             <Text style={styles.comingSoonText}>Coming Soon!</Text>
             <Text style={styles.comingSoonSubtext}>
-              We're working hard to bring you the best {selectedSport} experience.
+              We're working hard to bring you real-time {selectedSport} scores, fixtures, and statistics.
             </Text>
           </View>
         );
@@ -63,26 +61,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundDark,
-  },
-  appHeader: {
-    paddingTop: SPACING.xl,
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.md,
-    backgroundColor: 'rgba(0, 31, 63, 0.9)',
-    borderBottomWidth: 3,
-    borderBottomColor: COLORS.secondary,
-  },
-  appTitle: {
-    fontSize: FONT_SIZES.xxl + 4,
-    fontWeight: '900',
-    color: COLORS.background,
-    marginBottom: SPACING.xs,
-    letterSpacing: 1,
-  },
-  appSubtitle: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textLight,
-    fontWeight: '600',
   },
   contentContainer: {
     flex: 1,

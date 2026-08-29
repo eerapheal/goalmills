@@ -11,15 +11,15 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://goalmills.com'),
   referrer: 'no-referrer',
-  title: 'GoalMills | Live Scores, Sports Stats & Betting Insights',
+  title: 'GoalMills | Live Scores, Sports Stats & Intelligence',
   description:
-    'Get real-time live scores, match stats, standings, and betting insights for Football, Cricket, NBA & Tennis. Fast, accurate sports data on web & mobile.',
+    'Get real-time live scores, match stats, standings, and sports intelligence for Football, Cricket, and Basketball. Fast, accurate sports data on web & mobile.',
   keywords: [
     'live scores',
     'football live scores',
     'cricket live score',
     'NBA live scores',
-    'tennis live scores',
+    'basketball live scores',
     'sports analytics',
     'sports betting odds',
     'match statistics',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'GoalMills | Live Sports Scores & Analytics Platform',
     description:
-      'Real-time scores, detailed match stats, standings, and betting insights for Football, Cricket, NBA & Tennis.',
+      'Real-time scores, detailed match stats, standings, and intelligence for Football, Cricket, and Basketball.',
     url: 'https://goalmills.com',
     siteName: 'GoalMills',
     images: [
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GoalMills | Live Scores & Sports Analytics',
     description:
-      'Live football, cricket, NBA & tennis scores with deep stats and betting insights.',
+      'Live football, cricket, and basketball scores with deep stats and insights.',
     images: ['/og-image.png'],
   },
 };

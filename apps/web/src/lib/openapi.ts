@@ -181,47 +181,7 @@ Enterprise multi-sport data delivery engine powering Football, Cricket, Tennis, 
       },
     },
 
-    '/api/tennis': {
-      get: {
-        tags: ['Tennis'],
-        summary: 'Get Tennis Tournaments & Matches',
-        description:
-          'Retrieve ATP, WTA, and Grand Slam live matches, fixtures, and official world rankings.',
-        parameters: [
-          {
-            name: 'type',
-            in: 'query',
-            description: 'Category (live, fixtures, results, rankings)',
-            schema: { type: 'string', default: 'live' },
-          },
-          {
-            name: 'date',
-            in: 'query',
-            description: 'Filter matches by date (YYYY-MM-DD)',
-            schema: { type: 'string', format: 'date' },
-          },
-        ],
-        responses: {
-          '200': {
-            description: 'Tennis data returned successfully',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    success: { type: 'boolean' },
-                    matches: {
-                      type: 'array',
-                      items: { $ref: '#/components/schemas/TennisMatch' },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+
 
     '/api/basketball': {
       get: {

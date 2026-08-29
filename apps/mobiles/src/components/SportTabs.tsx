@@ -1,4 +1,4 @@
-import { ScrollView, Pressable, Text, StyleSheet } from 'react-native';
+import { ScrollView, Pressable, Text, StyleSheet, View } from 'react-native';
 import { SportType } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 
@@ -7,13 +7,13 @@ interface SportTabsProps {
   onSelectSport: (sport: SportType) => void;
 }
 
-const sports: { type: SportType; name: string; emoji: string }[] = [
+const sports: { type: SportType; name: string; emoji: string; isComingSoon?: boolean }[] = [
   { type: 'football', name: 'Football', emoji: '⚽' },
   { type: 'cricket', name: 'Cricket', emoji: '🏏' },
-  { type: 'tennis', name: 'Tennis', emoji: '🎾' },
   { type: 'basketball', name: 'Basketball', emoji: '🏀' },
-  { type: 'baseball', name: 'Baseball', emoji: '⚾' },
-  { type: 'hockey', name: 'Hockey', emoji: '🏒' },
+  { type: 'tennis', name: 'Tennis', emoji: '🎾', isComingSoon: true },
+  { type: 'baseball', name: 'Baseball', emoji: '⚾', isComingSoon: true },
+  { type: 'hockey', name: 'Hockey', emoji: '🏒', isComingSoon: true },
 ];
 
 export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
@@ -24,22 +24,30 @@ export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
       contentContainerStyle={styles.container}
       style={styles.scrollView}
     >
-      {sports.map((sport) => (
-        <Pressable
-          key={sport.type}
-          style={({ pressed }) => [
-            styles.tab,
-            selectedSport === sport.type && styles.activeTab,
-            pressed && styles.pressedTab,
-          ]}
-          onPress={() => onSelectSport(sport.type)}
-        >
-          <Text style={styles.emoji}>{sport.emoji}</Text>
-          <Text style={[styles.tabText, selectedSport === sport.type && styles.activeTabText]}>
-            {sport.name}
-          </Text>
-        </Pressable>
-      ))}
+      {sports.map((sport) => {
+        const isSelected = selectedSport === sport.type;
+        return (
+          <Pressable
+            key={sport.type}
+            style={({ pressed }) => [
+              styles.tab,
+              isSelected && styles.activeTab,
+              pressed && styles.pressedTab,
+            ]}
+            onPress={() => onSelectSport(sport.type)}
+          >
+            <Text style={styles.emoji}>{sport.emoji}</Text>
+            <Text style={[styles.tabText, isSelected && styles.activeTabText]}>
+              {sport.name}
+            </Text>
+            {sport.isComingSoon && (
+              <View style={styles.soonBadge}>
+                <Text style={styles.soonBadgeText}>Soon</Text>
+              </View>
+            )}
+          </Pressable>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -84,5 +92,20 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: COLORS.background,
     fontWeight: '700',
+  },
+  soonBadge: {
+    marginLeft: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.4)',
+  },
+  soonBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FBBF24',
+    textTransform: 'uppercase',
   },
 });

@@ -4,6 +4,7 @@ import dbConnect from '@/lib/db';
 import News from '@/models/News';
 import { ContentHubLayout } from '@/components/ContentHubLayout';
 import { RelatedArticlesMatrix } from '@/components/RelatedArticlesMatrix';
+import { SportsIntelligenceSection } from '@/components/SportsIntelligenceSection';
 import { FiTrendingUp, FiActivity, FiLayers, FiCompass, FiTarget } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 
@@ -78,75 +79,80 @@ export default async function AnalysisHubPage() {
   ];
 
   return (
-    <ContentHubLayout
-      breadcrumbs={[{ name: 'Analysis Hub', url: '/analysis' }]}
-      header={
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-[#0d1c38] via-[#09152b] to-[#050b17] p-6 sm:p-10 shadow-2xl">
-          <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-black uppercase tracking-widest">
-              <FiCompass /> TACTICAL & DATA LAB
+    <>
+      <ContentHubLayout
+        breadcrumbs={[{ name: 'Analysis Hub', url: '/analysis' }]}
+        header={
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-[#0d1c38] via-[#09152b] to-[#050b17] p-6 sm:p-10 shadow-2xl">
+            <div className="max-w-3xl space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-black uppercase tracking-widest">
+                <FiCompass /> TACTICAL & DATA LAB
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                GoalMills Sports Intelligence & Analysis Hub
+              </h1>
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                Move beyond basic scores. Discover why teams win, how managers organize their press,
+                and what the advanced metrics reveal about Europe and Africa's top performers.
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-              GoalMills Sports Intelligence & Analysis Hub
-            </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Move beyond basic scores. Discover why teams win, how managers organize their press,
-              and what the advanced metrics reveal about Europe and Africa's top performers.
-            </p>
           </div>
-        </div>
-      }
-      sidebar={
-        <div className="space-y-6">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-5 space-y-4">
-            <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiCompass className="text-blue-400" />
-              <span>Intelligence Pillars</span>
-            </h3>
-            <div className="space-y-3">
-              {analysisCategories.map((cat) => (
-                <div
-                  key={cat.slug}
-                  className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-1"
-                >
-                  <div className="flex items-center gap-2.5">
-                    {cat.icon}
-                    <h4 className="text-xs font-bold text-white">{cat.title}</h4>
+        }
+        sidebar={
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-5 space-y-4">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <FiCompass className="text-blue-400" />
+                <span>Intelligence Pillars</span>
+              </h3>
+              <div className="space-y-3">
+                {analysisCategories.map((cat) => (
+                  <div
+                    key={cat.slug}
+                    className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-1"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {cat.icon}
+                      <h4 className="text-xs font-bold text-white">{cat.title}</h4>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">{cat.desc}</p>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{cat.desc}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      }
-    >
-      {/* Tactical Analysis Showcase */}
-      {tacticalArticles.length > 0 && (
-        <RelatedArticlesMatrix
-          title="Team Tactics & Match Breakdowns"
-          subtitle="Tactical setups, transition speeds, and pressing efficiency"
-          articles={tacticalArticles}
-        />
-      )}
+        }
+      >
+        {/* Tactical Analysis Showcase */}
+        {tacticalArticles.length > 0 && (
+          <RelatedArticlesMatrix
+            title="Team Tactics & Match Breakdowns"
+            subtitle="Tactical setups, transition speeds, and pressing efficiency"
+            articles={tacticalArticles}
+          />
+        )}
 
-      {/* Player Deep Dives */}
-      {playerAnalysisArticles.length > 0 && (
-        <RelatedArticlesMatrix
-          title="Player Profiles & Tactical Fits"
-          subtitle="How individual talent adapts to coach demands and team systems"
-          articles={playerAnalysisArticles}
-        />
-      )}
+        {/* Player Deep Dives */}
+        {playerAnalysisArticles.length > 0 && (
+          <RelatedArticlesMatrix
+            title="Player Profiles & Tactical Fits"
+            subtitle="How individual talent adapts to coach demands and team systems"
+            articles={playerAnalysisArticles}
+          />
+        )}
 
-      {/* Statistical Trends */}
-      {statsArticles.length > 0 && (
-        <RelatedArticlesMatrix
-          title="Data & Numbers That Tell the Story"
-          subtitle="xG, xA, progressive passes, and statistical milestones"
-          articles={statsArticles}
-        />
-      )}
-    </ContentHubLayout>
+        {/* Statistical Trends */}
+        {statsArticles.length > 0 && (
+          <RelatedArticlesMatrix
+            title="Data & Numbers That Tell the Story"
+            subtitle="xG, xA, progressive passes, and statistical milestones"
+            articles={statsArticles}
+          />
+        )}
+      </ContentHubLayout>
+
+      {/* Section 1: Sports Intelligence & Pro Analytics Suite */}
+      <SportsIntelligenceSection />
+    </>
   );
 }

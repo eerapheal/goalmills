@@ -5,9 +5,7 @@ import { SportType } from '@goalmills/types';
 import { SportTabs } from '../components/SportTabs';
 import { FootballScreen } from '../components/FootballScreen';
 import { CricketScreen } from '../components/CricketScreen';
-import { TennisScreen } from '../components/TennisScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
-import { SportsIntelligenceSection } from '../components/SportsIntelligenceSection';
 import { SportsPulseNewsSection } from '../components/SportsPulseNewsSection';
 import { NewsletterSubscriptionSection } from '../components/NewsletterSubscriptionSection';
 
@@ -22,24 +20,25 @@ export default function HomePage() {
       case 'cricket':
         return <CricketScreen />;
 
-      case 'tennis':
-        return <TennisScreen />;
-
       case 'basketball':
         return <BasketballScreen />;
 
+      case 'tennis':
       case 'baseball':
       case 'hockey':
         return (
-          <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="flex-1 flex flex-col items-center justify-center p-12 my-8">
             <span className="text-8xl mb-4">
+              {selectedSport === 'tennis' && '🎾'}
               {selectedSport === 'baseball' && '⚾'}
               {selectedSport === 'hockey' && '🏒'}
             </span>
-            <h2 className="text-2xl font-extrabold text-white mb-2 capitalize">{selectedSport}</h2>
-            <p className="text-xl font-bold text-[#ffd700] mb-4">Coming Soon!</p>
-            <p className="text-gray-400 text-center max-w-md">
-              We're working hard to bring you the best {selectedSport} experience.
+            <h2 className="text-3xl font-extrabold text-white mb-2 capitalize">{selectedSport}</h2>
+            <div className="inline-block px-4 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold text-sm tracking-wider uppercase mb-4">
+              Coming Soon
+            </div>
+            <p className="text-gray-400 text-center max-w-md text-base">
+              We're working hard to bring you real-time {selectedSport} scores, fixtures, and statistics.
             </p>
           </div>
         );
@@ -63,9 +62,6 @@ export default function HomePage() {
 
       {/* Sport Content */}
       <div className="flex-1 overflow-y-auto scrollbar-hide">{renderSportContent()}</div>
-
-      {/* Section 1: Sports Intelligence & Pro Analytics Suite */}
-      <SportsIntelligenceSection />
 
       {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
       <SportsPulseNewsSection />

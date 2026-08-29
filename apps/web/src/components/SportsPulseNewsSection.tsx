@@ -7,7 +7,7 @@ export function SportsPulseNewsSection() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [activeCategory, setActiveCategory] = useState<
-    'all' | 'football' | 'cricket' | 'basketball' | 'tennis'
+    'all' | 'football' | 'cricket' | 'basketball' | 'transfers'
   >('all');
 
   const [selectedTier, setSelectedTier] = useState<'daily' | 'weekly' | 'monthly'>('daily');
@@ -77,15 +77,15 @@ export function SportsPulseNewsSection() {
     },
     {
       id: 'art-4',
-      title: 'Grand Slam Surface Adjustments: Second-Serve Win Percentages & Rally Lengths',
+      title: 'European Transfer Window Intel: Contract Clauses & Imminent Moves',
       excerpt:
-        'How top-ranked players adjust their court positioning and topspin RPM between hardcourt and clay.',
-      category: 'tennis',
-      categoryName: 'Tennis',
+        'Behind-the-scenes breakdown of release clause deadlines and valuation models across top 5 leagues.',
+      category: 'transfers',
+      categoryName: 'Transfers',
       readTime: '4 min read',
       tagColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
       date: '6 hrs ago',
-      author: 'Court Vision',
+      author: 'Transfer Desk',
       isHot: false,
     },
   ];
@@ -122,7 +122,7 @@ export function SportsPulseNewsSection() {
 
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900/80 border border-slate-800 rounded-2xl">
-            {(['all', 'football', 'cricket', 'basketball', 'tennis'] as const).map((cat) => (
+            {(['all', 'football', 'cricket', 'basketball', 'transfers'] as const).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}

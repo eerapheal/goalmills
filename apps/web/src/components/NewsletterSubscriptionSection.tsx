@@ -20,7 +20,6 @@ const TOPICS: TopicOption[] = [
   { id: 'football', label: 'Football', icon: '⚽' },
   { id: 'basketball', label: 'Basketball (NBA)', icon: '🏀' },
   { id: 'cricket', label: 'Cricket', icon: '🏏' },
-  { id: 'tennis', label: 'Tennis', icon: '🎾' },
   { id: 'transfers', label: 'Transfers & Deals', icon: '🔄' },
   { id: 'tactics', label: 'Tactics & Analytics', icon: '📊' },
   { id: 'vip-alerts', label: 'Matchday Alerts', icon: '⚡' },

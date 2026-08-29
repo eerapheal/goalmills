@@ -45,7 +45,7 @@ export default function MatchDetailsPage() {
           webApiFootballService
             .getStandings({ league: fix.value.league.id, season: fix.value.league.season })
             .then((res) => setStandings(res))
-            .catch(() => {});
+            .catch(() => { });
         }
       }
 
@@ -131,11 +131,10 @@ export default function MatchDetailsPage() {
           {/* Score / Center */}
           <div className="flex flex-col items-center justify-center">
             <span
-              className={`mb-2 rounded-full px-3 py-0.5 text-xs font-bold ${
-                isLive
+              className={`mb-2 rounded-full px-3 py-0.5 text-xs font-bold ${isLive
                   ? 'border border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
                   : 'bg-white/10 text-slate-300'
-              }`}
+                }`}
             >
               {fixture?.fixture.status.short || 'VS'}
             </span>
@@ -181,11 +180,10 @@ export default function MatchDetailsPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 rounded-lg py-2.5 text-xs font-bold capitalize transition ${
-                isActive
+              className={`flex-1 rounded-lg py-2.5 text-xs font-bold capitalize transition ${isActive
                   ? 'bg-[#1E293B] text-emerald-400 shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -256,9 +254,8 @@ export default function MatchDetailsPage() {
                         {isGoal && <span>⚽</span>}
                         {isCard && (
                           <span
-                            className={`inline-block h-3.5 w-2.5 rounded-sm ${
-                              isYellow ? 'bg-amber-400' : 'bg-red-600'
-                            }`}
+                            className={`inline-block h-3.5 w-2.5 rounded-sm ${isYellow ? 'bg-amber-400' : 'bg-red-600'
+                              }`}
                           />
                         )}
                         {ev.type === 'subst' && <span>🔄</span>}
