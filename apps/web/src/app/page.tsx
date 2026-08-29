@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { SportType } from '@goalmills/types';
 import { SportTabs, ExtendedSportType } from '../components/SportTabs';
 import { GoalmillsLiveDashboard } from '../components/GoalmillsLiveDashboard';
+import { GoalmillsFootballDashboard } from '../components/GoalmillsFootballDashboard';
 import { FootballScreen } from '../components/FootballScreen';
 import { CricketScreen } from '../components/CricketScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
@@ -20,7 +21,7 @@ export default function HomePage() {
         return <GoalmillsLiveDashboard onSelectTab={(tab) => setSelectedSport(tab as ExtendedSportType)} />;
 
       case 'football':
-        return <FootballScreen />;
+        return <GoalmillsFootballDashboard />;
 
       case 'cricket':
         return <CricketScreen />;
