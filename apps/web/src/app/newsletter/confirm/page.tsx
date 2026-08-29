@@ -62,11 +62,14 @@ function ConfirmContent() {
             <FiCheckCircle size={22} />
           </div>
           <div>
-            <h1 className="text-2xl font-black uppercase tracking-tight">Subscription Confirmed!</h1>
+            <h1 className="text-2xl font-black uppercase tracking-tight">
+              Subscription Confirmed!
+            </h1>
             <p className="text-xs text-emerald-400 font-bold mt-1">Verified: {email}</p>
           </div>
           <p className="text-xs text-text-muted leading-relaxed">
-            Your email has been confirmed. You will now receive curated 10:00 AM matchday briefs, breaking news alerts, and editor picks.
+            Your email has been confirmed. You will now receive curated 10:00 AM matchday briefs,
+            breaking news alerts, and editor picks.
           </p>
 
           <div className="pt-2">
@@ -103,7 +106,9 @@ function ConfirmContent() {
 export default function ConfirmSubscriptionPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 pt-20">
-      <Suspense fallback={<div className="text-white text-sm font-bold">Loading confirmation...</div>}>
+      <Suspense
+        fallback={<div className="text-white text-sm font-bold">Loading confirmation...</div>}
+      >
         <ConfirmContent />
       </Suspense>
     </div>

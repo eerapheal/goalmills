@@ -2732,7 +2732,8 @@ export type SubscriberHealthStatus =
   | 'SUPPRESSED'
   | 'UNSUBSCRIBED';
 
-export type NewsletterSubscriberStatus = SubscriberHealthStatus | 'active' | 'unsubscribed' | 'bounced';
+export type NewsletterSubscriberStatus =
+  SubscriberHealthStatus | 'active' | 'unsubscribed' | 'bounced';
 
 export type SuppressionReason =
   | 'HARD_BOUNCE'
@@ -2767,7 +2768,8 @@ export type EmailEventType =
   | 'unsubscribed'
   | 'deferred';
 
-export type NewsletterCampaignStatus = 'draft' | 'scheduled' | 'processing' | 'sent' | 'failed' | 'paused';
+export type NewsletterCampaignStatus =
+  'draft' | 'scheduled' | 'processing' | 'sent' | 'failed' | 'paused';
 export type NewsletterAudience =
   | 'daily_subscribers'
   | 'weekly_subscribers'
@@ -2913,5 +2915,3 @@ export interface NewsletterCampaign {
   createdAt?: string;
   updatedAt?: string;
 }
-
-

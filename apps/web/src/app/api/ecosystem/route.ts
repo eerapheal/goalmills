@@ -4,12 +4,7 @@ import EcosystemEntity from '@/models/EcosystemEntity';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { COMPETITIONS_REGISTRY, CLUBS_REGISTRY, PLAYERS_REGISTRY } from '@/lib/entityService';
-import {
-  cacheGet,
-  cacheSet,
-  cacheDel,
-  cacheInvalidatePattern,
-} from '@/lib/redisCache';
+import { cacheGet, cacheSet, cacheDel, cacheInvalidatePattern } from '@/lib/redisCache';
 
 export const dynamic = 'force-dynamic';
 
@@ -214,10 +209,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!type || !name) {
-      return NextResponse.json(
-        { message: 'Entity type and name are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Entity type and name are required' }, { status: 400 });
     }
 
     const generatedSlug = (customSlug || name)

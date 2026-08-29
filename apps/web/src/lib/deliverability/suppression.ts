@@ -13,7 +13,11 @@ export async function isEmailSuppressed(email: string): Promise<boolean> {
   const normalized = email.trim().toLowerCase();
   const suppressed = await EmailSuppression.findOne({
     emailNormalized: normalized,
-    $or: [{ expiresAt: { $exists: false } }, { expiresAt: null }, { expiresAt: { $gt: new Date() } }],
+    $or: [
+      { expiresAt: { $exists: false } },
+      { expiresAt: null },
+      { expiresAt: { $gt: new Date() } },
+    ],
   });
 
   return !!suppressed;
@@ -29,7 +33,11 @@ export async function getSuppressedEmailSet(emails: string[]): Promise<Set<strin
   const normalizedList = emails.map((e) => e.trim().toLowerCase());
   const records = await EmailSuppression.find({
     emailNormalized: { $in: normalizedList },
-    $or: [{ expiresAt: { $exists: false } }, { expiresAt: null }, { expiresAt: { $gt: new Date() } }],
+    $or: [
+      { expiresAt: { $exists: false } },
+      { expiresAt: null },
+      { expiresAt: { $gt: new Date() } },
+    ],
   }).select('emailNormalized');
 
   return new Set(records.map((r) => r.emailNormalized));

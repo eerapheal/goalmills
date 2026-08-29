@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
       // Return success with generic message for privacy / security
       return NextResponse.json({
         success: true,
-        message: 'If an account exists with this email, password reset instructions have been generated.',
+        message:
+          'If an account exists with this email, password reset instructions have been generated.',
       });
     }
 

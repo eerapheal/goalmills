@@ -19,7 +19,8 @@ export default function AdminEcosystemPage() {
             </h1>
             <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
               Create, edit, and manage custom Sports, Competitions, Clubs, Players, and Categories.
-              Custom entities automatically populate all publishing selectors and auto-distribution hubs.
+              Custom entities automatically populate all publishing selectors and auto-distribution
+              hubs.
             </p>
           </div>
 

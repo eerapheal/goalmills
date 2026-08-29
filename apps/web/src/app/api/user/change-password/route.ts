@@ -10,7 +10,10 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ success: false, message: 'Unauthorized. Please sign in.' }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized. Please sign in.' },
+        { status: 401 }
+      );
     }
 
     const { currentPassword, newPassword, confirmPassword } = await request.json();

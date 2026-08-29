@@ -59,5 +59,4 @@ const EmailEventSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.EmailEvent ||
-  mongoose.model('EmailEvent', EmailEventSchema);
+export default mongoose.models.EmailEvent || mongoose.model('EmailEvent', EmailEventSchema);

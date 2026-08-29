@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
     const campaigns = await NewsletterCampaign.find(query)
       .populate({
         path: 'articleIds',
-        select: 'title slug excerpt image category sport readTime isBreaking isFeatured views author',
+        select:
+          'title slug excerpt image category sport readTime isBreaking isFeatured views author',
       })
       .sort({ createdAt: -1 })
       .limit(limit);

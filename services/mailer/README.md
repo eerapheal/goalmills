@@ -38,6 +38,7 @@ go run ./cmd/server/main.go
 ## Docker & Render.com Deployment
 
 ### Method 1: Render CLI / Blueprint (Recommended)
+
 This repository includes a [render.yaml](../../render.yaml) blueprint configured for `services/mailer`.
 
 1. Install Render CLI:
@@ -54,6 +55,7 @@ This repository includes a [render.yaml](../../render.yaml) blueprint configured
    ```
 
 ### Method 2: Render Web Service via Git
+
 1. Connect your repository in Render Dashboard.
 2. Choose **Web Service** -> **Docker**.
 3. Set:

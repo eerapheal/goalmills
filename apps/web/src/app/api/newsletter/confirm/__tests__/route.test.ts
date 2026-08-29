@@ -19,7 +19,8 @@ const { mockPendingSubscriber } = vi.hoisted(() => ({
 vi.mock('@/models/NewsletterSubscriber', () => ({
   default: {
     findOne: vi.fn().mockImplementation((query) => {
-      if (query.confirmationToken === 'valid-confirm-token-123') return Promise.resolve(mockPendingSubscriber);
+      if (query.confirmationToken === 'valid-confirm-token-123')
+        return Promise.resolve(mockPendingSubscriber);
       return Promise.resolve(null);
     }),
   },
@@ -42,7 +43,9 @@ describe('Double Opt-In Confirmation API (/api/newsletter/confirm)', () => {
   });
 
   it('should confirm valid token and transition to CONFIRMED state', async () => {
-    const req = new NextRequest('http://localhost:3000/api/newsletter/confirm?token=valid-confirm-token-123');
+    const req = new NextRequest(
+      'http://localhost:3000/api/newsletter/confirm?token=valid-confirm-token-123'
+    );
     const res = await GET(req);
     const json = await res.json();
 

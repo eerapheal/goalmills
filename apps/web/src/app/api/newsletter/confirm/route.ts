@@ -8,7 +8,10 @@ export async function GET(req: NextRequest) {
     const token = searchParams.get('token');
 
     if (!token) {
-      return NextResponse.json({ success: false, message: 'Missing confirmation token' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Missing confirmation token' },
+        { status: 400 }
+      );
     }
 
     await dbConnect();

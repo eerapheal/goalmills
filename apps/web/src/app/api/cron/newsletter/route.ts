@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
 
     // Validate cron secret if configured
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ success: false, message: 'Unauthorized cron request' }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized cron request' },
+        { status: 401 }
+      );
     }
 
     await dbConnect();

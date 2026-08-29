@@ -92,7 +92,10 @@ export function isSendable(
   // 3. Check Minimum Health Score (Must be >= 40)
   const healthScore = subscriber.emailHealthScore ?? calculateEmailHealthScore(subscriber);
   if (healthScore < 40) {
-    return { sendable: false, reason: `Email health score (${healthScore}) is below threshold (40)` };
+    return {
+      sendable: false,
+      reason: `Email health score (${healthScore}) is below threshold (40)`,
+    };
   }
 
   return { sendable: true };
@@ -181,7 +184,8 @@ export async function generatePreflightReport(
   const total = allSubscribers.length;
   const eligible = eligibleSubscribers.length;
 
-  const bounceRiskPercentage = total > 0 ? Number(((hardBouncedCount + (total - eligible) * 0.05) / total).toFixed(2)) : 0;
+  const bounceRiskPercentage =
+    total > 0 ? Number(((hardBouncedCount + (total - eligible) * 0.05) / total).toFixed(2)) : 0;
   const complaintRiskPercentage = total > 0 ? Number((lowEngagementCount * 0.002).toFixed(3)) : 0;
 
   let expectedRisk: DeliverabilityRisk = 'LOW';
@@ -189,18 +193,24 @@ export async function generatePreflightReport(
 
   if (lowEngagementCount > total * 0.3) {
     expectedRisk = 'MEDIUM';
-    recommendations.push('⚠ Over 30% of target audience has low engagement. Consider segmenting to active users.');
+    recommendations.push(
+      '⚠ Over 30% of target audience has low engagement. Consider segmenting to active users.'
+    );
   }
 
   if (bounceRiskPercentage > 1.5 || suppressedCount > total * 0.15) {
     expectedRisk = 'HIGH';
-    recommendations.push('⚠ Elevated bounce or suppression volume detected. Send campaign in throttled batches.');
+    recommendations.push(
+      '⚠ Elevated bounce or suppression volume detected. Send campaign in throttled batches.'
+    );
   }
 
   if (eligible === 0) {
     recommendations.push('No eligible recipients found after deliverability gating.');
   } else {
-    recommendations.push(`✓ Deliverability Gate: ${eligible} of ${total} recipients verified deliverable.`);
+    recommendations.push(
+      `✓ Deliverability Gate: ${eligible} of ${total} recipients verified deliverable.`
+    );
   }
 
   const report: CampaignPreflightReport = {

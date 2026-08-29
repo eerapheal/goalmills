@@ -6,12 +6,7 @@ import UploadVideoForm from '@/components/admin/UploadVideoForm';
 import NewsList from '@/components/admin/NewsList';
 import VideoList from '@/components/admin/VideoList';
 import AdminNavBar from '@/components/admin/AdminNavBar';
-import {
-  FiFileText,
-  FiVideo,
-  FiList,
-  FiChevronDown,
-} from 'react-icons/fi';
+import { FiFileText, FiVideo, FiList, FiChevronDown } from 'react-icons/fi';
 
 type CreationTab = 'news' | 'video' | 'manage';
 type ManageSubTab = 'news' | 'video';

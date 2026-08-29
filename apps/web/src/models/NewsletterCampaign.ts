@@ -22,12 +22,7 @@ const NewsletterCampaignSchema = new mongoose.Schema(
     },
     targetAudience: {
       type: String,
-      enum: [
-        'daily_subscribers',
-        'weekly_subscribers',
-        'monthly_subscribers',
-        'all_subscribers',
-      ],
+      enum: ['daily_subscribers', 'weekly_subscribers', 'monthly_subscribers', 'all_subscribers'],
       default: 'daily_subscribers',
       index: true,
     },

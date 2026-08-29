@@ -48,7 +48,9 @@ export default function SignInPage() {
           <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
             GoalMills Sign In
           </h2>
-          <p className="text-xs text-text-muted mt-1">Access your account, staff hub, and workspace</p>
+          <p className="text-xs text-text-muted mt-1">
+            Access your account, staff hub, and workspace
+          </p>
         </div>
 
         {error && (
@@ -71,7 +73,10 @@ export default function SignInPage() {
                 className="w-full bg-slate-900/80 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                 placeholder="you@goalmills.com"
               />
-              <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <FiMail
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
             </div>
           </div>
 
@@ -96,7 +101,10 @@ export default function SignInPage() {
                 className="w-full bg-slate-900/80 border border-white/15 rounded-xl pl-10 pr-11 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                 placeholder="••••••••"
               />
-              <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <FiLock
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}

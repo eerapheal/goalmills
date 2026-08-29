@@ -207,7 +207,8 @@ export function generateNewsletterHTML(params: {
   siteUrl: string;
   unsubscribeUrl: string;
 }): string {
-  const { title, previewText, editorialNote, frequency, articles, siteUrl, unsubscribeUrl } = params;
+  const { title, previewText, editorialNote, frequency, articles, siteUrl, unsubscribeUrl } =
+    params;
   const year = new Date().getFullYear();
   const dateFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -344,10 +345,13 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
       return [
         {
           _id: 'featured-1',
-          title: 'Champions League Tactical Masterclass: How Midfield Transitions Decided the Clash',
+          title:
+            'Champions League Tactical Masterclass: How Midfield Transitions Decided the Clash',
           slug: 'champions-league-tactical-masterclass',
-          excerpt: 'An in-depth tactical analysis on modern pressing schemes, midfield overloads, and decisive penalty box execution.',
-          image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80',
+          excerpt:
+            'An in-depth tactical analysis on modern pressing schemes, midfield overloads, and decisive penalty box execution.',
+          image:
+            'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80',
           category: 'Tactical Analysis',
           sport: 'Football',
           readTime: 4,
@@ -361,8 +365,10 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
           _id: 'featured-2',
           title: 'Transfer Radar: Top European Clubs Race for Emerging Wonderkid Playmaker',
           slug: 'transfer-radar-emerging-wonderkid',
-          excerpt: 'Exclusive scouting reports and insider transfer negotiations as top European giants submit priority inquiries.',
-          image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80',
+          excerpt:
+            'Exclusive scouting reports and insider transfer negotiations as top European giants submit priority inquiries.',
+          image:
+            'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80',
           category: 'Transfer Radar',
           sport: 'Football',
           readTime: 3,
@@ -383,8 +389,10 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
         _id: 'default-1',
         title: 'Champions League Tactical Masterclass: How Midfield Transitions Decided the Clash',
         slug: 'champions-league-tactical-masterclass',
-        excerpt: 'An in-depth tactical breakdown on modern pressing schemes and decisive match execution.',
-        image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80',
+        excerpt:
+          'An in-depth tactical breakdown on modern pressing schemes and decisive match execution.',
+        image:
+          'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80',
         category: 'Tactical Analysis',
         sport: 'Football',
         readTime: 4,
@@ -398,8 +406,10 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
         _id: 'default-2',
         title: 'Transfer Radar: Inside the High-Stakes Race for European Football Talent',
         slug: 'transfer-radar-european-talent',
-        excerpt: 'Exclusive scouting reports and insider negotiations shaping the upcoming transfer window.',
-        image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80',
+        excerpt:
+          'Exclusive scouting reports and insider negotiations shaping the upcoming transfer window.',
+        image:
+          'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80',
         category: 'Transfer Radar',
         sport: 'Football',
         readTime: 3,
@@ -452,15 +462,17 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
     : 'Daily';
 
   // Render the 2 Editor Pick Post Cards
-  const editorPicksHtml = editorPicks.slice(0, 2).map((art, idx) => {
-    const articleLink = `${siteUrl}/news/${art.slug || art._id}`;
-    const badgeLabel = art.isBreaking ? '⚡ Breaking News' : '⭐ Editor\'s Pick';
-    const badgeColor = art.isBreaking ? '#ef4444' : '#8b5cf6';
-    const imageTag = art.image
-      ? `<img src="${art.image}" alt="${art.title}" width="100%" style="width:100%;height:180px;object-fit:cover;display:block;border-top-left-radius:14px;border-top-right-radius:14px;background-color:#1e293b;" />`
-      : `<div style="height:120px;background:linear-gradient(135deg,#1e1b4b,#0f172a);display:flex;align-items:center;justify-content:center;border-top-left-radius:14px;border-top-right-radius:14px;text-align:center;padding:12px;"><span style="color:#f59e0b;font-size:24px;font-weight:900;">GOALMILLS POST #${idx + 1}</span></div>`;
+  const editorPicksHtml = editorPicks
+    .slice(0, 2)
+    .map((art, idx) => {
+      const articleLink = `${siteUrl}/news/${art.slug || art._id}`;
+      const badgeLabel = art.isBreaking ? '⚡ Breaking News' : "⭐ Editor's Pick";
+      const badgeColor = art.isBreaking ? '#ef4444' : '#8b5cf6';
+      const imageTag = art.image
+        ? `<img src="${art.image}" alt="${art.title}" width="100%" style="width:100%;height:180px;object-fit:cover;display:block;border-top-left-radius:14px;border-top-right-radius:14px;background-color:#1e293b;" />`
+        : `<div style="height:120px;background:linear-gradient(135deg,#1e1b4b,#0f172a);display:flex;align-items:center;justify-content:center;border-top-left-radius:14px;border-top-right-radius:14px;text-align:center;padding:12px;"><span style="color:#f59e0b;font-size:24px;font-weight:900;">GOALMILLS POST #${idx + 1}</span></div>`;
 
-    return `
+      return `
     <!-- Post Card ${idx + 1} -->
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:18px;background:#0d1527;border:1px solid rgba(245,158,11,0.22);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.35);">
       <tr>
@@ -518,7 +530,8 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
       </tr>
     </table>
     `;
-  }).join('');
+    })
+    .join('');
 
   const preheaderSnippet = requireDoubleOptIn
     ? `Please confirm your subscription to GoalMills Newsletters. Plus, explore 2 exclusive Editor's Pick posts today.`
@@ -538,9 +551,15 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
 
   const primaryActionUrl = requireDoubleOptIn ? confirmationUrl : siteUrl;
 
-  const categoriesBadge = categories && categories.length > 0
-    ? categories.map((c) => `<span style="display:inline-block;background:rgba(255,255,255,0.08);color:#cbd5e1;padding:2px 8px;border-radius:6px;font-size:11px;margin-right:4px;margin-bottom:4px;">${c}</span>`).join('')
-    : '<span style="color:#94a3b8;font-size:11px;">All Sports & Leagues</span>';
+  const categoriesBadge =
+    categories && categories.length > 0
+      ? categories
+          .map(
+            (c) =>
+              `<span style="display:inline-block;background:rgba(255,255,255,0.08);color:#cbd5e1;padding:2px 8px;border-radius:6px;font-size:11px;margin-right:4px;margin-bottom:4px;">${c}</span>`
+          )
+          .join('')
+      : '<span style="color:#94a3b8;font-size:11px;">All Sports & Leagues</span>';
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">

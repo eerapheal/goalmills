@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { isEmailSuppressed, suppressEmail, unsuppressEmail, getSuppressedEmailSet } from '../suppression';
+import {
+  isEmailSuppressed,
+  suppressEmail,
+  unsuppressEmail,
+  getSuppressedEmailSet,
+} from '../suppression';
 
 vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
@@ -25,7 +30,10 @@ vi.mock('@/models/EmailSuppression', () => ({
       };
     }),
     findOneAndUpdate: vi.fn().mockImplementation((filter, update) => {
-      mockSuppressed.set(filter.emailNormalized, { emailNormalized: filter.emailNormalized, ...update.$set });
+      mockSuppressed.set(filter.emailNormalized, {
+        emailNormalized: filter.emailNormalized,
+        ...update.$set,
+      });
       return Promise.resolve(true);
     }),
     deleteOne: vi.fn().mockImplementation((filter) => {

@@ -33,7 +33,9 @@ describe('Newsletter Unsubscribe API (/api/newsletter/unsubscribe)', () => {
   });
 
   it('should fetch subscriber details with valid token on GET', async () => {
-    const req = new NextRequest('http://localhost:3000/api/newsletter/unsubscribe?token=valid-unsub-token');
+    const req = new NextRequest(
+      'http://localhost:3000/api/newsletter/unsubscribe?token=valid-unsub-token'
+    );
     const res = await GET(req);
     const json = await res.json();
 

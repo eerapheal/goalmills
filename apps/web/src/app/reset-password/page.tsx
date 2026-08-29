@@ -115,7 +115,10 @@ function ResetPasswordForm() {
                   className="w-full bg-slate-900/80 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-white text-xs sm:text-sm font-mono focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                   placeholder="Paste reset token here"
                 />
-                <FiKey className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <FiKey
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={16}
+                />
               </div>
             </div>
           )}
@@ -134,7 +137,10 @@ function ResetPasswordForm() {
                 className="w-full bg-slate-900/80 border border-white/15 rounded-xl pl-10 pr-11 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                 placeholder="At least 6 characters"
               />
-              <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <FiLock
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -160,7 +166,10 @@ function ResetPasswordForm() {
                 className="w-full bg-slate-900/80 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                 placeholder="Re-enter new password"
               />
-              <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <FiLock
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
             </div>
           </div>
 
@@ -189,7 +198,9 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 pt-20">
-      <Suspense fallback={<div className="text-white text-sm font-bold">Loading reset form...</div>}>
+      <Suspense
+        fallback={<div className="text-white text-sm font-bold">Loading reset form...</div>}
+      >
         <ResetPasswordForm />
       </Suspense>
     </div>

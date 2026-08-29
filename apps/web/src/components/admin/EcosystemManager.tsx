@@ -141,7 +141,9 @@ export default function EcosystemManager() {
         const matchesCountry = item.country?.toLowerCase().includes(q);
         const matchesNat = item.nationality?.toLowerCase().includes(q);
         const matchesClub = item.clubName?.toLowerCase().includes(q);
-        return matchesName || matchesSlug || matchesShort || matchesCountry || matchesNat || matchesClub;
+        return (
+          matchesName || matchesSlug || matchesShort || matchesCountry || matchesNat || matchesClub
+        );
       }
       return true;
     });
@@ -150,7 +152,10 @@ export default function EcosystemManager() {
   const handleOpenCreate = (preselectedType?: 'sport' | 'competition' | 'club' | 'player') => {
     const targetType =
       preselectedType ||
-      (activeTab === 'sport' || activeTab === 'competition' || activeTab === 'club' || activeTab === 'player'
+      (activeTab === 'sport' ||
+      activeTab === 'competition' ||
+      activeTab === 'club' ||
+      activeTab === 'player'
         ? activeTab
         : 'competition');
 
@@ -294,7 +299,9 @@ export default function EcosystemManager() {
       const json = await res.json();
       if (res.ok && (json.success || json.data)) {
         toast.success(
-          editingItem ? 'Ecosystem entity updated!' : `Custom ${formData.type} created successfully!`
+          editingItem
+            ? 'Ecosystem entity updated!'
+            : `Custom ${formData.type} created successfully!`
         );
         setIsModalOpen(false);
         fetchEntities();
@@ -526,8 +533,8 @@ export default function EcosystemManager() {
               </div>
               <p className="text-white font-bold text-base">No ecosystem entities found</p>
               <p className="text-slate-400 text-xs max-w-md mx-auto">
-                No items match your filter criteria. Click &quot;Add Custom Entity&quot; to create a new custom
-                sport, competition, club, or player.
+                No items match your filter criteria. Click &quot;Add Custom Entity&quot; to create a
+                new custom sport, competition, club, or player.
               </p>
               <button
                 onClick={() => handleOpenCreate()}
@@ -587,9 +594,7 @@ export default function EcosystemManager() {
                               </span>
                             )}
                           </h4>
-                          <span className="text-[11px] text-slate-400 font-mono">
-                            /{item.slug}
-                          </span>
+                          <span className="text-[11px] text-slate-400 font-mono">/{item.slug}</span>
                         </div>
                       </div>
 
@@ -673,7 +678,9 @@ export default function EcosystemManager() {
               <div>
                 <h3 className="text-lg font-black text-white flex items-center gap-2">
                   <FiCompass className="text-blue-400" />
-                  {editingItem ? `Edit ${editingItem.name}` : `Add Custom ${formData.type.toUpperCase()}`}
+                  {editingItem
+                    ? `Edit ${editingItem.name}`
+                    : `Add Custom ${formData.type.toUpperCase()}`}
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
                   Custom entities will instantly appear in all publishing selectors across GoalMills
@@ -797,7 +804,9 @@ export default function EcosystemManager() {
                     <input
                       type="text"
                       value={formData.country}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, country: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, country: e.target.value }))
+                      }
                       placeholder="e.g. Africa / England / International"
                       className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500"
                     />
@@ -848,7 +857,8 @@ export default function EcosystemManager() {
                           ...prev,
                           competitionSlug: e.target.value,
                           competitionName:
-                            availableCompetitions.find((c) => c.slug === e.target.value)?.name || '',
+                            availableCompetitions.find((c) => c.slug === e.target.value)?.name ||
+                            '',
                         }))
                       }
                       className="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500"
@@ -989,7 +999,8 @@ export default function EcosystemManager() {
                   disabled={saving}
                   className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 flex items-center gap-2"
                 >
-                  <FiCheck /> {saving ? 'Saving...' : editingItem ? 'Update Entity' : 'Create Custom Entity'}
+                  <FiCheck />{' '}
+                  {saving ? 'Saving...' : editingItem ? 'Update Entity' : 'Create Custom Entity'}
                 </button>
               </div>
             </form>

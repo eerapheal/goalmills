@@ -196,7 +196,13 @@ export default function ProfilePage() {
                 <div className="flex flex-col items-center gap-3">
                   <div className="relative w-28 h-28 rounded-2xl overflow-hidden border-2 border-white/15 bg-slate-900 group shadow-lg">
                     {image ? (
-                      <Image src={image} alt="Profile" fill sizes="112px" className="object-cover" />
+                      <Image
+                        src={image}
+                        alt="Profile"
+                        fill
+                        sizes="112px"
+                        className="object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-3xl font-black text-slate-400 bg-slate-800">
                         {username?.charAt(0)?.toUpperCase() || 'GM'}
@@ -231,7 +237,10 @@ export default function ProfilePage() {
                       placeholder="Enter username"
                       required
                     />
-                    <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <FiUser
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={16}
+                    />
                   </div>
                 </div>
 
@@ -246,9 +255,14 @@ export default function ProfilePage() {
                       disabled
                       className="w-full bg-slate-950/50 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-slate-500 text-sm cursor-not-allowed"
                     />
-                    <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
+                    <FiMail
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600"
+                      size={16}
+                    />
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Managed by system administration</p>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Managed by system administration
+                  </p>
                 </div>
 
                 {message.text && (
@@ -300,7 +314,10 @@ export default function ProfilePage() {
                       className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-11 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                       placeholder="••••••••"
                     />
-                    <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <FiLock
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={16}
+                    />
                     <button
                       type="button"
                       onClick={() => setShowCurrent(!showCurrent)}
@@ -325,7 +342,10 @@ export default function ProfilePage() {
                       className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-11 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                       placeholder="At least 6 characters"
                     />
-                    <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <FiLock
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={16}
+                    />
                     <button
                       type="button"
                       onClick={() => setShowNew(!showNew)}
@@ -350,7 +370,10 @@ export default function ProfilePage() {
                       className="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-inner"
                       placeholder="Re-enter new password"
                     />
-                    <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <FiLock
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      size={16}
+                    />
                   </div>
                 </div>
 

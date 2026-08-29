@@ -5,7 +5,10 @@ import NewsletterSubscriber from '@/models/NewsletterSubscriber';
 import CampaignRecipient from '@/models/CampaignRecipient';
 import NewsletterCampaign from '@/models/NewsletterCampaign';
 import { suppressEmail } from '@/lib/deliverability/suppression';
-import { calculateEngagementScore, calculateEmailHealthScore } from '@/lib/deliverability/healthGate';
+import {
+  calculateEngagementScore,
+  calculateEmailHealthScore,
+} from '@/lib/deliverability/healthGate';
 import type { EmailEventType } from '@goalmills/types';
 
 export async function POST(req: NextRequest) {
@@ -24,7 +27,10 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!email || !eventType) {
-      return NextResponse.json({ success: false, message: 'email and eventType are required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'email and eventType are required' },
+        { status: 400 }
+      );
     }
 
     await dbConnect();
@@ -175,9 +181,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, message: `Event ${eventType} processed successfully` });
+    return NextResponse.json({
+      success: true,
+      message: `Event ${eventType} processed successfully`,
+    });
   } catch (err: any) {
     console.error('Webhook error:', err);
-    return NextResponse.json({ success: false, message: err.message || 'Webhook processing failed' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: err.message || 'Webhook processing failed' },
+      { status: 500 }
+    );
   }
 }

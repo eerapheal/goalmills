@@ -76,30 +76,24 @@ export function CricketScreen() {
           advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: [] })),
           advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: [] })),
           advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: [] })),
-          advancedCricketApi
-            .getRankings('test', 'teams', 'men')
-            .catch(() => ({
-              format: 'test' as const,
-              category: 'teams' as const,
-              gender: 'men' as const,
-              rankings: [],
-            })),
-          advancedCricketApi
-            .getRankings('odi', 'teams', 'men')
-            .catch(() => ({
-              format: 'odi' as const,
-              category: 'teams' as const,
-              gender: 'men' as const,
-              rankings: [],
-            })),
-          advancedCricketApi
-            .getRankings('t20', 'teams', 'men')
-            .catch(() => ({
-              format: 't20' as const,
-              category: 'teams' as const,
-              gender: 'men' as const,
-              rankings: [],
-            })),
+          advancedCricketApi.getRankings('test', 'teams', 'men').catch(() => ({
+            format: 'test' as const,
+            category: 'teams' as const,
+            gender: 'men' as const,
+            rankings: [],
+          })),
+          advancedCricketApi.getRankings('odi', 'teams', 'men').catch(() => ({
+            format: 'odi' as const,
+            category: 'teams' as const,
+            gender: 'men' as const,
+            rankings: [],
+          })),
+          advancedCricketApi.getRankings('t20', 'teams', 'men').catch(() => ({
+            format: 't20' as const,
+            category: 'teams' as const,
+            gender: 'men' as const,
+            rankings: [],
+          })),
         ]);
 
         setStandings({

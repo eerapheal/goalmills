@@ -10,7 +10,8 @@ const mockProcessedEvents = new Set<string>();
 vi.mock('@/models/EmailEvent', () => ({
   default: {
     findOne: vi.fn().mockImplementation((query) => {
-      if (mockProcessedEvents.has(query.eventId)) return Promise.resolve({ eventId: query.eventId });
+      if (mockProcessedEvents.has(query.eventId))
+        return Promise.resolve({ eventId: query.eventId });
       return Promise.resolve(null);
     }),
     create: vi.fn().mockImplementation((data) => {

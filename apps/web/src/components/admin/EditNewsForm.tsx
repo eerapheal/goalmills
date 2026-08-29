@@ -486,7 +486,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
     // 5. Resolve Final Article Type
     const finalArticleType =
       articleType === '__custom__'
-        ? (customArticleType.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_') as ArticleType) || 'news'
+        ? (customArticleType
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_') as ArticleType) || 'news'
         : articleType;
 
     try {
@@ -643,7 +646,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
                     onChange={(e) => {
                       setCustomSportName(e.target.value);
                       setCustomSportSlug(
-                        e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-')
+                        e.target.value
+                          .toLowerCase()
+                          .trim()
+                          .replace(/[^a-z0-9]+/g, '-')
                       );
                     }}
                     className="w-full bg-slate-900 border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-xs"
@@ -700,7 +706,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
                     onChange={(e) => {
                       setCustomCompetitionName(e.target.value);
                       setCustomCompetitionSlug(
-                        e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-')
+                        e.target.value
+                          .toLowerCase()
+                          .trim()
+                          .replace(/[^a-z0-9]+/g, '-')
                       );
                     }}
                     className="w-full bg-slate-900 border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-xs"
@@ -773,7 +782,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
                     onChange={(e) => {
                       setCustomClubName(e.target.value);
                       setCustomClubSlug(
-                        e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-')
+                        e.target.value
+                          .toLowerCase()
+                          .trim()
+                          .replace(/[^a-z0-9]+/g, '-')
                       );
                       if (!customClubShortName) setCustomClubShortName(e.target.value);
                     }}
@@ -832,7 +844,8 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
                 <option value="">None / General Squad</option>
                 {playersList.map((p) => (
                   <option key={p.slug} value={p.slug}>
-                    {p.name} {p.nationality ? `(${p.nationality})` : ''} {p.isCustom ? '(Custom)' : ''}
+                    {p.name} {p.nationality ? `(${p.nationality})` : ''}{' '}
+                    {p.isCustom ? '(Custom)' : ''}
                   </option>
                 ))}
                 <option value="__custom__">+ Custom Player / Athlete...</option>
@@ -847,7 +860,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
                     onChange={(e) => {
                       setCustomPlayerName(e.target.value);
                       setCustomPlayerSlug(
-                        e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-')
+                        e.target.value
+                          .toLowerCase()
+                          .trim()
+                          .replace(/[^a-z0-9]+/g, '-')
                       );
                     }}
                     className="w-full bg-slate-900 border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-xs"

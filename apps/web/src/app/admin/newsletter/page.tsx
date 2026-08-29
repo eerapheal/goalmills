@@ -63,7 +63,9 @@ export default function AdminNewsletterPage() {
   const [title, setTitle] = useState('');
   const [previewText, setPreviewText] = useState('');
   const [editorialNote, setEditorialNote] = useState('');
-  const [frequencyTier, setFrequencyTier] = useState<'daily' | 'weekly' | 'monthly' | 'custom_broadcast'>('custom_broadcast');
+  const [frequencyTier, setFrequencyTier] = useState<
+    'daily' | 'weekly' | 'monthly' | 'custom_broadcast'
+  >('custom_broadcast');
   const [targetAudience, setTargetAudience] = useState<NewsletterAudience>('all_subscribers');
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduledFor, setScheduledFor] = useState('');
@@ -203,7 +205,8 @@ export default function AdminNewsletterPage() {
         });
 
         const json = await res.json();
-        if (!res.ok || !json.success) throw new Error(json.message || 'Failed to schedule campaign');
+        if (!res.ok || !json.success)
+          throw new Error(json.message || 'Failed to schedule campaign');
 
         toast.success(json.message || 'Campaign scheduled successfully');
       } else {
@@ -225,7 +228,9 @@ export default function AdminNewsletterPage() {
         const json = await res.json();
         if (!res.ok || !json.success) throw new Error(json.message || 'Failed to send campaign');
 
-        toast.success(json.message || `Dispatched to ${json.eligibleCount} deliverable subscribers`);
+        toast.success(
+          json.message || `Dispatched to ${json.eligibleCount} deliverable subscribers`
+        );
       }
 
       setShowComposeModal(false);
@@ -293,12 +298,16 @@ export default function AdminNewsletterPage() {
   };
 
   const handleRemoveSuppression = async (email: string) => {
-    if (!confirm(`Are you sure you want to remove ${email} from the global suppression list?`)) return;
+    if (!confirm(`Are you sure you want to remove ${email} from the global suppression list?`))
+      return;
 
     try {
-      const res = await fetch(`/api/admin/newsletter/suppressions?email=${encodeURIComponent(email)}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(
+        `/api/admin/newsletter/suppressions?email=${encodeURIComponent(email)}`,
+        {
+          method: 'DELETE',
+        }
+      );
 
       const json = await res.json();
       if (res.ok && json.success) {
@@ -333,7 +342,8 @@ export default function AdminNewsletterPage() {
   });
 
   const filteredSuppressions = suppressions.filter((supp) => {
-    if (suppressionSearch && !supp.emailNormalized.includes(suppressionSearch.toLowerCase())) return false;
+    if (suppressionSearch && !supp.emailNormalized.includes(suppressionSearch.toLowerCase()))
+      return false;
     return true;
   });
 
@@ -354,7 +364,8 @@ export default function AdminNewsletterPage() {
               Newsletter & <span className="text-amber-400">Reputation Hub</span>
             </h1>
             <p className="text-xs text-text-muted mt-0.5">
-              Enterprise Go traffic shaping, domain rate limiting, double opt-in & global suppression
+              Enterprise Go traffic shaping, domain rate limiting, double opt-in & global
+              suppression
             </p>
           </div>
 
@@ -389,7 +400,8 @@ export default function AdminNewsletterPage() {
                 {reputationData?.reputationScore || 95}/100
               </h3>
               <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
-                <FiCheckCircle size={10} className="text-emerald-400" /> Tier: {reputationData?.reputationTier || 'EXCELLENT'}
+                <FiCheckCircle size={10} className="text-emerald-400" /> Tier:{' '}
+                {reputationData?.reputationTier || 'EXCELLENT'}
               </p>
             </div>
           </div>
@@ -497,7 +509,9 @@ export default function AdminNewsletterPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                   <FiZap className="text-amber-400" /> Fast-Action Automated Curated Dispatches
                 </span>
-                <span className="text-[11px] text-text-muted">Automated schedule: Daily 10:00 AM WAT</span>
+                <span className="text-[11px] text-text-muted">
+                  Automated schedule: Daily 10:00 AM WAT
+                </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -601,7 +615,9 @@ export default function AdminNewsletterPage() {
                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 text-slate-200">
                               {camp.frequencyTier}
                             </span>
-                            <p className="text-[11px] text-text-muted mt-1">{camp.targetAudience}</p>
+                            <p className="text-[11px] text-text-muted mt-1">
+                              {camp.targetAudience}
+                            </p>
                           </td>
 
                           <td className="p-4">
@@ -672,7 +688,10 @@ export default function AdminNewsletterPage() {
                     placeholder="Search email..."
                     className="bg-slate-900 border border-white/15 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
                   />
-                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={13} />
+                  <FiSearch
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                    size={13}
+                  />
                 </div>
 
                 <select
@@ -722,7 +741,9 @@ export default function AdminNewsletterPage() {
                       <td className="p-4">
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                            sub.status === 'ENGAGED' || sub.status === 'CONFIRMED' || sub.status === 'ACTIVE'
+                            sub.status === 'ENGAGED' ||
+                            sub.status === 'CONFIRMED' ||
+                            sub.status === 'ACTIVE'
                               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                               : sub.status === 'SOFT_BOUNCE' || sub.status === 'INACTIVE'
                                 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
@@ -734,7 +755,9 @@ export default function AdminNewsletterPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs">{sub.emailHealthScore ?? 85}/100</span>
+                          <span className="font-bold text-xs">
+                            {sub.emailHealthScore ?? 85}/100
+                          </span>
                         </div>
                       </td>
                       <td className="p-4">
@@ -748,7 +771,9 @@ export default function AdminNewsletterPage() {
                         </span>
                       </td>
                       <td className="p-4 text-xs text-slate-400">
-                        {sub.lastOpenedAt ? new Date(sub.lastOpenedAt).toLocaleDateString() : 'Never'}
+                        {sub.lastOpenedAt
+                          ? new Date(sub.lastOpenedAt).toLocaleDateString()
+                          : 'Never'}
                       </td>
                     </tr>
                   ))}
@@ -767,7 +792,8 @@ export default function AdminNewsletterPage() {
                   <FiAlertTriangle className="text-red-400" /> Global Email Suppression List
                 </h2>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Addresses permanently blocked from marketing delivery (Hard bounces, complaints, manual blocks)
+                  Addresses permanently blocked from marketing delivery (Hard bounces, complaints,
+                  manual blocks)
                 </p>
               </div>
 
@@ -780,7 +806,10 @@ export default function AdminNewsletterPage() {
                     placeholder="Search suppressed email..."
                     className="bg-slate-900 border border-white/15 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white"
                   />
-                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={13} />
+                  <FiSearch
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                    size={13}
+                  />
                 </div>
 
                 <button
@@ -846,7 +875,9 @@ export default function AdminNewsletterPage() {
                 <h3 className="text-2xl font-black text-white">
                   {reputationData?.rates?.bounceRate || 0.0}%
                 </h3>
-                <p className="text-[11px] text-emerald-400">Target: &lt; 2.0% (Google / Yahoo compliant)</p>
+                <p className="text-[11px] text-emerald-400">
+                  Target: &lt; 2.0% (Google / Yahoo compliant)
+                </p>
               </div>
 
               <div className="glass-card p-5 rounded-2xl border border-white/10 space-y-2">
@@ -856,7 +887,9 @@ export default function AdminNewsletterPage() {
                 <h3 className="text-2xl font-black text-white">
                   {reputationData?.rates?.complaintRate || 0.0}%
                 </h3>
-                <p className="text-[11px] text-emerald-400">Target: &lt; 0.1% (Strict industry threshold)</p>
+                <p className="text-[11px] text-emerald-400">
+                  Target: &lt; 0.1% (Strict industry threshold)
+                </p>
               </div>
 
               <div className="glass-card p-5 rounded-2xl border border-white/10 space-y-2">
@@ -873,7 +906,8 @@ export default function AdminNewsletterPage() {
             {/* DNS Security Card */}
             <div className="glass-card p-6 rounded-3xl border border-white/10 space-y-4">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <FiShield className="text-emerald-400" /> Domain Authentication (SPF, DKIM, DMARC, BIMI)
+                <FiShield className="text-emerald-400" /> Domain Authentication (SPF, DKIM, DMARC,
+                BIMI)
               </h3>
               <p className="text-xs text-text-muted">
                 Meets Google & Yahoo 2026 bulk sender requirements for inbox delivery
@@ -882,24 +916,31 @@ export default function AdminNewsletterPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-white">SPF (Sender Policy Framework)</span>
+                    <span className="font-bold text-xs text-white">
+                      SPF (Sender Policy Framework)
+                    </span>
                     <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
                       VALID
                     </span>
                   </div>
                   <p className="text-[11px] font-mono text-slate-400 truncate">
-                    {reputationData?.authentication?.spf?.record || 'v=spf1 include:_spf.google.com ~all'}
+                    {reputationData?.authentication?.spf?.record ||
+                      'v=spf1 include:_spf.google.com ~all'}
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-white">DKIM (DomainKeys Identified Mail)</span>
+                    <span className="font-bold text-xs text-white">
+                      DKIM (DomainKeys Identified Mail)
+                    </span>
                     <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
                       2048-BIT RSA
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400">Selector: gm2026._domainkey.goalmills.com</p>
+                  <p className="text-[11px] text-slate-400">
+                    Selector: gm2026._domainkey.goalmills.com
+                  </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
@@ -910,7 +951,8 @@ export default function AdminNewsletterPage() {
                     </span>
                   </div>
                   <p className="text-[11px] font-mono text-slate-400 truncate">
-                    {reputationData?.authentication?.dmarc?.policy || 'p=quarantine; rua=mailto:dmarc@goalmills.com'}
+                    {reputationData?.authentication?.dmarc?.policy ||
+                      'p=quarantine; rua=mailto:dmarc@goalmills.com'}
                   </p>
                 </div>
 
@@ -921,7 +963,9 @@ export default function AdminNewsletterPage() {
                       CONFIGURED
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400">GoalMills Brand Shield SVG configured</p>
+                  <p className="text-[11px] text-slate-400">
+                    GoalMills Brand Shield SVG configured
+                  </p>
                 </div>
               </div>
             </div>
@@ -941,7 +985,8 @@ export default function AdminNewsletterPage() {
                     <FiShield className="text-amber-400" /> Compose & Dispatch Newsletter
                   </h3>
                   <p className="text-xs text-text-muted mt-0.5">
-                    Pre-flight deliverability gate, immutable recipient snapshotting & domain traffic shaping
+                    Pre-flight deliverability gate, immutable recipient snapshotting & domain
+                    traffic shaping
                   </p>
                 </div>
                 <button
@@ -964,17 +1009,23 @@ export default function AdminNewsletterPage() {
                   <div className="flex items-center gap-2 font-bold">
                     <FiShield size={14} />
                     <span>
-                      Deliverability Gate: {preflightReport.eligibleCount} of {preflightReport.totalRecipients} Eligible ({preflightReport.suppressedCount} Suppressed)
+                      Deliverability Gate: {preflightReport.eligibleCount} of{' '}
+                      {preflightReport.totalRecipients} Eligible ({preflightReport.suppressedCount}{' '}
+                      Suppressed)
                     </span>
                   </div>
                   <span className="font-black uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-white/10">
-                    Risk: {preflightReport.expectedRisk} (Bounce Risk: {preflightReport.bounceRiskPercentage}%)
+                    Risk: {preflightReport.expectedRisk} (Bounce Risk:{' '}
+                    {preflightReport.bounceRiskPercentage}%)
                   </span>
                 </div>
               )}
 
               {/* Modal Body */}
-              <form onSubmit={handleSendOrSchedule} className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
+              <form
+                onSubmit={handleSendOrSchedule}
+                className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
@@ -1014,10 +1065,18 @@ export default function AdminNewsletterPage() {
                       onChange={(e) => setTargetAudience(e.target.value as NewsletterAudience)}
                       className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500"
                     >
-                      <option value="all_subscribers">All Active Subscribers ({stats.totalActive})</option>
-                      <option value="daily_subscribers">Daily Subscribers Only ({stats.daily})</option>
-                      <option value="weekly_subscribers">Weekly Subscribers Only ({stats.weekly})</option>
-                      <option value="monthly_subscribers">Monthly Subscribers Only ({stats.monthly})</option>
+                      <option value="all_subscribers">
+                        All Active Subscribers ({stats.totalActive})
+                      </option>
+                      <option value="daily_subscribers">
+                        Daily Subscribers Only ({stats.daily})
+                      </option>
+                      <option value="weekly_subscribers">
+                        Weekly Subscribers Only ({stats.weekly})
+                      </option>
+                      <option value="monthly_subscribers">
+                        Monthly Subscribers Only ({stats.monthly})
+                      </option>
                       <option value="engaged_only">Highly Engaged Subscribers Only</option>
                     </select>
                   </div>
@@ -1099,9 +1158,13 @@ export default function AdminNewsletterPage() {
                   {/* News list */}
                   <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-slate-950 rounded-2xl border border-white/10">
                     {loadingNews ? (
-                      <div className="p-4 text-center text-xs text-slate-400">Loading articles...</div>
+                      <div className="p-4 text-center text-xs text-slate-400">
+                        Loading articles...
+                      </div>
                     ) : availableNews.length === 0 ? (
-                      <div className="p-4 text-center text-xs text-slate-400">No published news found</div>
+                      <div className="p-4 text-center text-xs text-slate-400">
+                        No published news found
+                      </div>
                     ) : (
                       availableNews.map((news) => {
                         const isSelected = selectedArticles.some((a) => a._id === news._id);
@@ -1118,7 +1181,9 @@ export default function AdminNewsletterPage() {
                             <div className="flex items-center gap-2 truncate">
                               <span
                                 className={`w-4 h-4 rounded-md flex items-center justify-center text-[10px] ${
-                                  isSelected ? 'bg-amber-500 text-slate-950 font-black' : 'border border-white/20'
+                                  isSelected
+                                    ? 'bg-amber-500 text-slate-950 font-black'
+                                    : 'border border-white/20'
                                 }`}
                               >
                                 {isSelected && '✓'}
@@ -1148,7 +1213,8 @@ export default function AdminNewsletterPage() {
                         Schedule for Future Delivery
                       </p>
                       <p className="text-[11px] text-text-muted">
-                        Queue this campaign to be automatically fired at a specific time (e.g. 10:00 AM WAT)
+                        Queue this campaign to be automatically fired at a specific time (e.g. 10:00
+                        AM WAT)
                       </p>
                     </div>
                     <input

@@ -57,7 +57,8 @@ export async function GET(req: NextRequest) {
       success: true,
       data: {
         reputationScore,
-        reputationTier: reputationScore >= 85 ? 'EXCELLENT' : reputationScore >= 70 ? 'GOOD' : 'NEEDS_ATTENTION',
+        reputationTier:
+          reputationScore >= 85 ? 'EXCELLENT' : reputationScore >= 70 ? 'GOOD' : 'NEEDS_ATTENTION',
         rates: {
           bounceRate,
           complaintRate,

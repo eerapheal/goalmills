@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Temporary / disposable email addresses are not accepted. Please use a standard email provider.',
+          message:
+            'Temporary / disposable email addresses are not accepted. Please use a standard email provider.',
         },
         { status: 400 }
       );
@@ -51,7 +52,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: 'This email address is currently on our global suppression list (e.g. past bounce or unsubscribe request).',
+          message:
+            'This email address is currently on our global suppression list (e.g. past bounce or unsubscribe request).',
         },
         { status: 400 }
       );
@@ -61,8 +63,15 @@ export async function POST(req: NextRequest) {
 
     if (subscriber) {
       // Re-activate or update preferences
-      subscriber.status = subscriber.status === 'HARD_BOUNCE' || subscriber.status === 'COMPLAINT' ? 'CONFIRMED' : subscriber.status;
-      if (subscriber.status === 'UNSUBSCRIBED' || subscriber.status === 'INACTIVE' || subscriber.status === 'unsubscribed') {
+      subscriber.status =
+        subscriber.status === 'HARD_BOUNCE' || subscriber.status === 'COMPLAINT'
+          ? 'CONFIRMED'
+          : subscriber.status;
+      if (
+        subscriber.status === 'UNSUBSCRIBED' ||
+        subscriber.status === 'INACTIVE' ||
+        subscriber.status === 'unsubscribed'
+      ) {
         subscriber.status = 'CONFIRMED';
       }
       if (frequency) subscriber.frequency = frequency;
@@ -96,7 +105,8 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Your newsletter subscription preferences have been updated! A confirmation email with today\'s top editor picks has been sent.',
+        message:
+          "Your newsletter subscription preferences have been updated! A confirmation email with today's top editor picks has been sent.",
         data: subscriber,
       });
     }
@@ -147,7 +157,7 @@ export async function POST(req: NextRequest) {
         success: true,
         message: requireDoubleOptIn
           ? 'Please check your inbox to confirm your subscription.'
-          : 'Thank you for subscribing to GoalMills Newsletters! A confirmation email with 2 Editor\'s Picks has been sent to your inbox.',
+          : "Thank you for subscribing to GoalMills Newsletters! A confirmation email with 2 Editor's Picks has been sent to your inbox.",
         confirmationUrl: requireDoubleOptIn ? confirmationUrl : undefined,
         confirmationEmailSent: confirmationEmailResult?.success || false,
         data: subscriber,
@@ -162,4 +172,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

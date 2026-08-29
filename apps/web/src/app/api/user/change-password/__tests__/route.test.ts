@@ -18,7 +18,11 @@ vi.mock('@/lib/db', () => ({
 
 vi.mock('bcryptjs', () => ({
   default: {
-    compare: vi.fn().mockImplementation((pwd: string, hash: string) => Promise.resolve(pwd === 'correctPassword')),
+    compare: vi
+      .fn()
+      .mockImplementation((pwd: string, hash: string) =>
+        Promise.resolve(pwd === 'correctPassword')
+      ),
     hash: vi.fn().mockResolvedValue('new_hashed_password'),
   },
 }));

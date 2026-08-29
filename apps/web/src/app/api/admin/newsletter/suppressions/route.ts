@@ -50,7 +50,10 @@ export async function POST(req: NextRequest) {
 
     const { email, reason = 'MANUAL' } = await req.json();
     if (!email || !email.includes('@')) {
-      return NextResponse.json({ success: false, message: 'Valid email is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Valid email is required' },
+        { status: 400 }
+      );
     }
 
     await suppressEmail({
@@ -80,7 +83,10 @@ export async function DELETE(req: NextRequest) {
     const email = searchParams.get('email');
 
     if (!email) {
-      return NextResponse.json({ success: false, message: 'Email query parameter required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Email query parameter required' },
+        { status: 400 }
+      );
     }
 
     const unsuppressed = await unsuppressEmail(email);

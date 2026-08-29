@@ -71,9 +71,6 @@ export async function DELETE(
       message: 'User account and all associated staff records deleted completely from DB',
     });
   } catch (error: any) {
-    return NextResponse.json(
-      { message: error?.message || 'Error deleting user' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: error?.message || 'Error deleting user' }, { status: 500 });
   }
 }

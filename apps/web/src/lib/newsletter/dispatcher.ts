@@ -9,8 +9,15 @@ import {
   getEditorPickArticles,
   generateConfirmationEmailHTML,
 } from './curator';
-import { generatePreflightReport, createCampaignRecipientSnapshot } from '@/lib/deliverability/healthGate';
-import type { NewsletterAudience, NewsletterArticlePreview, CampaignPreflightReport } from '@goalmills/types';
+import {
+  generatePreflightReport,
+  createCampaignRecipientSnapshot,
+} from '@/lib/deliverability/healthGate';
+import type {
+  NewsletterAudience,
+  NewsletterArticlePreview,
+  CampaignPreflightReport,
+} from '@goalmills/types';
 
 export interface DispatchCampaignParams {
   campaignId?: string;
@@ -106,7 +113,9 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
   await createCampaignRecipientSnapshot(campaign._id.toString(), eligibleSubscribers);
 
   // Fetch created recipient records to get recipient IDs for telemetry tracking
-  const recipientRecords = await CampaignRecipient.find({ campaignId: campaign._id }).select('_id email');
+  const recipientRecords = await CampaignRecipient.find({ campaignId: campaign._id }).select(
+    '_id email'
+  );
   const recipientIdMap = new Map<string, string>();
   recipientRecords.forEach((r) => recipientIdMap.set(r.email.toLowerCase(), r._id.toString()));
 
@@ -217,7 +226,9 @@ export interface SendConfirmationResult {
  * Sends a welcome / confirmation email with two curated Editor's Pick posts
  * to newly subscribed fans or re-activated subscribers.
  */
-export async function sendConfirmationEmail(params: SendConfirmationParams): Promise<SendConfirmationResult> {
+export async function sendConfirmationEmail(
+  params: SendConfirmationParams
+): Promise<SendConfirmationResult> {
   const { subscriber, requireDoubleOptIn = false } = params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
   const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'http://localhost:8085';
@@ -295,7 +306,7 @@ export async function sendConfirmationEmail(params: SendConfirmationParams): Pro
   return {
     success: true,
     message: dispatchedViaGo
-      ? 'Confirmation email with 2 Editor\'s Picks queued via Go Mailer'
+      ? "Confirmation email with 2 Editor's Picks queued via Go Mailer"
       : 'Confirmation email generated and prepared successfully',
     editorPicks,
     dispatchedViaGo,

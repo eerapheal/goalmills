@@ -109,7 +109,8 @@ function UnsubscribeContent() {
         <FiAlertCircle className="mx-auto text-amber-400" size={40} />
         <h2 className="text-xl font-bold">Missing Token</h2>
         <p className="text-xs text-text-muted">
-          No unsubscribe token provided. Please click the unsubscribe link directly in your newsletter email.
+          No unsubscribe token provided. Please click the unsubscribe link directly in your
+          newsletter email.
         </p>
         <Link
           href="/"
@@ -138,7 +139,8 @@ function UnsubscribeContent() {
         </div>
         <h1 className="text-2xl font-black uppercase tracking-tight">Newsletter Preferences</h1>
         <p className="text-xs text-text-muted mt-1">
-          Managing subscription for <span className="text-amber-400 font-bold">{subscriberEmail}</span>
+          Managing subscription for{' '}
+          <span className="text-amber-400 font-bold">{subscriberEmail}</span>
         </p>
       </div>
 

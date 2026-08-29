@@ -12,7 +12,17 @@ vi.mock('@/lib/deliverability/suppression', () => ({
 vi.mock('@/lib/deliverability/validator', () => ({
   validateEmail: vi.fn().mockImplementation((email: string) => {
     if (!email || !email.includes('@')) {
-      return Promise.resolve({ isValid: false, isSendable: false, emailNormalized: '', domain: '', isDisposable: false, isRoleAccount: false, hasMxRecord: false, hasTypo: false, reason: 'Invalid syntax' });
+      return Promise.resolve({
+        isValid: false,
+        isSendable: false,
+        emailNormalized: '',
+        domain: '',
+        isDisposable: false,
+        isRoleAccount: false,
+        hasMxRecord: false,
+        hasTypo: false,
+        reason: 'Invalid syntax',
+      });
     }
     return Promise.resolve({
       isValid: true,
@@ -31,7 +41,10 @@ vi.mock('@/lib/newsletter/dispatcher', () => ({
   sendConfirmationEmail: vi.fn().mockResolvedValue({
     success: true,
     message: 'Confirmation email queued',
-    editorPicks: [{ _id: '1', title: 'Editor Pick 1' }, { _id: '2', title: 'Editor Pick 2' }],
+    editorPicks: [
+      { _id: '1', title: 'Editor Pick 1' },
+      { _id: '2', title: 'Editor Pick 2' },
+    ],
   }),
 }));
 
@@ -103,4 +116,3 @@ describe('Newsletter Subscribe API (/api/newsletter/subscribe)', () => {
     );
   });
 });
-
