@@ -177,6 +177,91 @@ func main() {
 		})
 	})
 
+	// Send Single Confirmation / Transactional Email (High Priority)
+	mux.HandleFunc("POST /api/send-confirmation", func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Email             string                `json:"email"`
+			Subject           string                `json:"subject"`
+			HTMLBody          string                `json:"htmlBody"`
+			UnsubscribeToken  string                `json:"unsubscribeToken"`
+			ConfirmationToken string                `json:"confirmationToken"`
+			Frequency         string                `json:"frequency"`
+			IsHighPriority    bool                  `json:"isHighPriority"`
+			EditorPicks       []curator.ArticleItem `json:"editorPicks"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, fmt.Sprintf("invalid payload: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		if req.Email == "" {
+			http.Error(w, "missing email", http.StatusBadRequest)
+			return
+		}
+
+		html := req.HTMLBody
+		if html == "" {
+			unsubURL := fmt.Sprintf("%s/newsletter/unsubscribe?token=%s", cfg.SiteURL, req.UnsubscribeToken)
+			confirmURL := fmt.Sprintf("%s/newsletter/confirm?token=%s", cfg.SiteURL, req.ConfirmationToken)
+			var err error
+			html, err = curator.RenderConfirmationHTML(curator.ConfirmationData{
+				SubscriberEmail: req.Email,
+				Frequency:       req.Frequency,
+				ConfirmationURL: confirmURL,
+				UnsubscribeURL:  unsubURL,
+				SiteURL:         cfg.SiteURL,
+				EditorPicks:     req.EditorPicks,
+			})
+			if err != nil {
+				http.Error(w, fmt.Sprintf("template render error: %v", err), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		subject := req.Subject
+		if subject == "" {
+			subject = "Welcome to GoalMills Sports Alerts! (+ 2 Curated Editor's Picks)"
+		}
+
+		task := queue.EmailTask{
+			ID:               fmt.Sprintf("confirm-%d-%s", time.Now().UnixNano(), req.Email),
+			To:               req.Email,
+			Subject:          subject,
+			HTMLBody:         html,
+			UnsubscribeToken: req.UnsubscribeToken,
+			CampaignID:       "confirmation_transactional",
+			RecipientID:      req.Email,
+			Priority:         queue.PriorityHigh,
+			Attempt:          1,
+			SendFunc: func(ctx context.Context, t queue.EmailTask) error {
+				return mailClient.SendRawEmail(ctx, t.To, t.Subject, t.HTMLBody, t.UnsubscribeToken)
+			},
+			OnSuccess: func(t queue.EmailTask) {
+				forwardEventToWebhook("delivered", t.To, t.CampaignID, t.RecipientID, nil)
+			},
+			OnFailure: func(t queue.EmailTask, analysis bounce.BounceAnalysis) {
+				eventType := "soft_bounce"
+				if analysis.Type == bounce.BounceTypeHard {
+					eventType = "hard_bounce"
+				}
+				forwardEventToWebhook(eventType, t.To, t.CampaignID, t.RecipientID, map[string]any{
+					"reason":      analysis.Reason,
+					"isPermanent": analysis.IsPermanent,
+				})
+			},
+		}
+
+		queued := pqManager.Submit(task)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": queued,
+			"message": "Confirmation email successfully queued with high priority",
+			"email":   req.Email,
+		})
+	})
+
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8085"

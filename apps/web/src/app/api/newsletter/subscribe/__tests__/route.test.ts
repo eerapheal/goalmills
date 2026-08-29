@@ -27,6 +27,14 @@ vi.mock('@/lib/deliverability/validator', () => ({
   }),
 }));
 
+vi.mock('@/lib/newsletter/dispatcher', () => ({
+  sendConfirmationEmail: vi.fn().mockResolvedValue({
+    success: true,
+    message: 'Confirmation email queued',
+    editorPicks: [{ _id: '1', title: 'Editor Pick 1' }, { _id: '2', title: 'Editor Pick 2' }],
+  }),
+}));
+
 const { mockSubscriber } = vi.hoisted(() => ({
   mockSubscriber: {
     _id: 'sub-1',
@@ -47,6 +55,7 @@ vi.mock('@/models/NewsletterSubscriber', () => ({
 }));
 
 import { POST } from '../route';
+import { sendConfirmationEmail } from '@/lib/newsletter/dispatcher';
 
 describe('Newsletter Subscribe API (/api/newsletter/subscribe)', () => {
   beforeEach(() => {
@@ -66,12 +75,13 @@ describe('Newsletter Subscribe API (/api/newsletter/subscribe)', () => {
     expect(json.success).toBe(false);
   });
 
-  it('should create new subscriber with selected frequency and deliverability scores', async () => {
+  it('should create new subscriber with selected frequency and dispatch confirmation email with 2 editor picks', async () => {
     const req = new NextRequest('http://localhost:3000/api/newsletter/subscribe', {
       method: 'POST',
       body: JSON.stringify({
         email: 'fan@goalmills.com',
         frequency: 'weekly',
+        categories: ['Premier League'],
       }),
     });
 
@@ -82,5 +92,15 @@ describe('Newsletter Subscribe API (/api/newsletter/subscribe)', () => {
     expect(json.success).toBe(true);
     expect(json.data.frequency).toBe('weekly');
     expect(json.data.unsubscribeToken).toBeDefined();
+    expect(json.confirmationEmailSent).toBe(true);
+    expect(sendConfirmationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriber: expect.objectContaining({
+          email: 'fan@goalmills.com',
+          frequency: 'weekly',
+        }),
+      })
+    );
   });
 });
+

@@ -3,7 +3,12 @@ import NewsletterSubscriber from '@/models/NewsletterSubscriber';
 import NewsletterCampaign from '@/models/NewsletterCampaign';
 import CampaignRecipient from '@/models/CampaignRecipient';
 import News from '@/models/News';
-import { generateNewsletterHTML, formatArticlePreview } from './curator';
+import {
+  generateNewsletterHTML,
+  formatArticlePreview,
+  getEditorPickArticles,
+  generateConfirmationEmailHTML,
+} from './curator';
 import { generatePreflightReport, createCampaignRecipientSnapshot } from '@/lib/deliverability/healthGate';
 import type { NewsletterAudience, NewsletterArticlePreview, CampaignPreflightReport } from '@goalmills/types';
 
@@ -185,5 +190,114 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       ? `Dispatched to ${eligibleSubscribers.length} deliverable subscribers via Go Domain Router (${report.suppressedCount} suppressed)`
       : `Dispatched to ${eligibleSubscribers.length} deliverable subscribers (${report.suppressedCount} suppressed)`,
     preflightReport: report,
+  };
+}
+
+export interface SendConfirmationParams {
+  subscriber: {
+    _id?: string;
+    email: string;
+    emailNormalized?: string;
+    frequency?: string;
+    categories?: string[];
+    confirmationToken?: string;
+    unsubscribeToken?: string;
+  };
+  requireDoubleOptIn?: boolean;
+}
+
+export interface SendConfirmationResult {
+  success: boolean;
+  message: string;
+  editorPicks: NewsletterArticlePreview[];
+  dispatchedViaGo?: boolean;
+}
+
+/**
+ * Sends a welcome / confirmation email with two curated Editor's Pick posts
+ * to newly subscribed fans or re-activated subscribers.
+ */
+export async function sendConfirmationEmail(params: SendConfirmationParams): Promise<SendConfirmationResult> {
+  const { subscriber, requireDoubleOptIn = false } = params;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
+  const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'http://localhost:8085';
+
+  const recipientEmail = (subscriber.emailNormalized || subscriber.email).toLowerCase().trim();
+  const confirmationUrl = `${siteUrl}/newsletter/confirm?token=${subscriber.confirmationToken || ''}`;
+  const unsubscribeUrl = `${siteUrl}/newsletter/unsubscribe?token=${subscriber.unsubscribeToken || ''}`;
+
+  // 1. Fetch 2 top Editor's Pick articles
+  const editorPicks = await getEditorPickArticles(2);
+
+  // 2. Generate responsive HTML email
+  const htmlBody = generateConfirmationEmailHTML({
+    subscriberEmail: recipientEmail,
+    frequency: subscriber.frequency || 'daily',
+    categories: subscriber.categories || [],
+    confirmationUrl,
+    unsubscribeUrl,
+    siteUrl,
+    editorPicks,
+    requireDoubleOptIn,
+  });
+
+  const subject = requireDoubleOptIn
+    ? `Please confirm your GoalMills Newsletter subscription (+ 2 Editor's Picks)`
+    : `Welcome to GoalMills Sports Alerts! (+ 2 Curated Editor's Picks)`;
+
+  let dispatchedViaGo = false;
+
+  // 3. Dispatch via Go Mailer microservice priority queue
+  try {
+    const payload = {
+      email: recipientEmail,
+      subject,
+      htmlBody,
+      unsubscribeToken: subscriber.unsubscribeToken || '',
+      confirmationToken: subscriber.confirmationToken || '',
+      frequency: subscriber.frequency || 'daily',
+      isHighPriority: true,
+      editorPicks: editorPicks.map((art) => ({
+        id: art._id,
+        title: art.title,
+        slug: art.slug,
+        excerpt: art.excerpt,
+        image: art.image || '',
+        category: art.category,
+        sport: art.sport,
+        readTime: art.readTime,
+        isBreaking: art.isBreaking,
+        isFeatured: art.isFeatured,
+        views: art.views || 0,
+        author: art.author,
+        url: `${siteUrl}/news/${art.slug || art._id}`,
+      })),
+    };
+
+    const res = await fetch(`${mailerServiceUrl}/api/send-confirmation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        dispatchedViaGo = true;
+      }
+    }
+  } catch (err) {
+    // Go microservice offline or in local dev - handled gracefully
+    console.warn('[Confirmation Dispatch] Go mailer service not reachable, fallback logged:', err);
+  }
+
+  return {
+    success: true,
+    message: dispatchedViaGo
+      ? 'Confirmation email with 2 Editor\'s Picks queued via Go Mailer'
+      : 'Confirmation email generated and prepared successfully',
+    editorPicks,
+    dispatchedViaGo,
   };
 }

@@ -9,6 +9,7 @@ import { TennisScreen } from '../components/TennisScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
 import { SportsIntelligenceSection } from '../components/SportsIntelligenceSection';
 import { SportsPulseNewsSection } from '../components/SportsPulseNewsSection';
+import { NewsletterSubscriptionSection } from '../components/NewsletterSubscriptionSection';
 
 export default function HomePage() {
   const [selectedSport, setSelectedSport] = useState<SportType>('football');
@@ -68,6 +69,9 @@ export default function HomePage() {
 
       {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
       <SportsPulseNewsSection />
+
+      {/* Section 3: GoalMills Sports Intelligence Newsletter Subscription */}
+      <NewsletterSubscriptionSection />
     </div>
   );
 }

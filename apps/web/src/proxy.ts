@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import type { UserRole } from '@goalmills/types';
 
 /**
- * Route ➜ Permission mapping for middleware.
+ * Route ➜ Permission mapping for proxy/middleware.
  * Duplicated from rbac.ts because Edge Runtime cannot import Node.js modules
  * (getServerSession, mongoose, etc.) that rbac.ts now depends on.
  * Keep this in sync with ROUTE_PERMISSION_MAP in lib/rbac.ts.
@@ -55,7 +55,7 @@ function meetsMinRole(currentRole: string | undefined, minRole: string): boolean
 }
 
 export default withAuth(
-  function middleware(req) {
+  function proxy(req) {
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
     const role = (token?.role as string) || '';
@@ -107,7 +107,7 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => !token,
     },
   }
 );

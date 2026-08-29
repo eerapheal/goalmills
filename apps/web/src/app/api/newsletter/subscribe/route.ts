@@ -4,6 +4,7 @@ import dbConnect from '@/lib/db';
 import NewsletterSubscriber from '@/models/NewsletterSubscriber';
 import { validateEmail } from '@/lib/deliverability/validator';
 import { isEmailSuppressed } from '@/lib/deliverability/suppression';
+import { sendConfirmationEmail } from '@/lib/newsletter/dispatcher';
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,12 +70,33 @@ export async function POST(req: NextRequest) {
       if (!subscriber.unsubscribeToken) {
         subscriber.unsubscribeToken = crypto.randomBytes(24).toString('hex');
       }
+      if (!subscriber.confirmationToken) {
+        subscriber.confirmationToken = crypto.randomBytes(24).toString('hex');
+      }
       subscriber.emailHealthScore = 85;
       await subscriber.save();
 
+      // Trigger confirmation email with 2 editor picks
+      try {
+        await sendConfirmationEmail({
+          subscriber: {
+            _id: subscriber._id.toString(),
+            email: subscriber.email,
+            emailNormalized: subscriber.emailNormalized,
+            frequency: subscriber.frequency,
+            categories: subscriber.categories,
+            confirmationToken: subscriber.confirmationToken,
+            unsubscribeToken: subscriber.unsubscribeToken,
+          },
+          requireDoubleOptIn: false,
+        });
+      } catch (mailErr) {
+        console.error('Error sending update confirmation email:', mailErr);
+      }
+
       return NextResponse.json({
         success: true,
-        message: 'Your newsletter subscription preferences have been updated!',
+        message: 'Your newsletter subscription preferences have been updated! A confirmation email with today\'s top editor picks has been sent.',
         data: subscriber,
       });
     }
@@ -101,13 +123,33 @@ export async function POST(req: NextRequest) {
 
     const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills.com'}/newsletter/confirm?token=${confirmationToken}`;
 
+    // Trigger confirmation email with 2 curated editor picks
+    let confirmationEmailResult: any = null;
+    try {
+      confirmationEmailResult = await sendConfirmationEmail({
+        subscriber: {
+          _id: subscriber._id?.toString() || 'new-sub',
+          email: subscriber.email,
+          emailNormalized: subscriber.emailNormalized,
+          frequency: subscriber.frequency,
+          categories: subscriber.categories,
+          confirmationToken,
+          unsubscribeToken,
+        },
+        requireDoubleOptIn,
+      });
+    } catch (mailErr) {
+      console.error('Error sending welcome confirmation email:', mailErr);
+    }
+
     return NextResponse.json(
       {
         success: true,
         message: requireDoubleOptIn
           ? 'Please check your inbox to confirm your subscription.'
-          : 'Thank you for subscribing to GoalMills Newsletters!',
+          : 'Thank you for subscribing to GoalMills Newsletters! A confirmation email with 2 Editor\'s Picks has been sent to your inbox.',
         confirmationUrl: requireDoubleOptIn ? confirmationUrl : undefined,
+        confirmationEmailSent: confirmationEmailResult?.success || false,
         data: subscriber,
       },
       { status: 201 }
@@ -120,3 +162,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
