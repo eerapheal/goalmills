@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -27,104 +27,271 @@ import {
   FiSettings,
   FiShield,
   FiZap,
+  FiPlusCircle,
+  FiActivity,
+  FiLayout,
+  FiExternalLink,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
 import { hasPermission } from '@/lib/rbac';
 
-interface PrimaryTab {
+export interface SubNavItem {
   id: string;
   label: string;
   href: string;
+  description: string;
   icon: any;
   requiredPermission?: PermissionAction;
-  subItems?: { label: string; href: string; icon?: any }[];
+  badge?: string;
+}
+
+export interface PrimaryTab {
+  id: string;
+  label: string;
+  shortLabel?: string;
+  href: string;
+  icon: any;
+  requiredPermission?: PermissionAction;
+  subItems: SubNavItem[];
 }
 
 const PRIMARY_TABS: PrimaryTab[] = [
   {
     id: 'cms',
-    label: 'CMS',
+    label: 'CMS & Editorial',
+    shortLabel: 'CMS',
     href: '/admin/dashboard',
     icon: FiFileText,
     requiredPermission: 'articles:draft',
     subItems: [
-      { label: 'News & Media', href: '/admin/dashboard', icon: FiFileText },
-      { label: 'Content Ecosystem', href: '/admin/ecosystem', icon: FiCompass },
-      { label: 'Categories', href: '/admin/categories', icon: FiLayers },
-      { label: 'Create Article', href: '/admin/news/new', icon: FiFileText },
+      {
+        id: 'news_media',
+        label: 'News & Media',
+        href: '/admin/dashboard',
+        description: 'Published articles, breaking feeds & newsroom wire',
+        icon: FiFileText,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'create_article',
+        label: 'Create Article',
+        href: '/admin/news/new',
+        description: 'Compose sports previews, match reports & analysis',
+        icon: FiPlusCircle,
+        requiredPermission: 'articles:draft',
+        badge: 'New',
+      },
+      {
+        id: 'ecosystem',
+        label: 'Content Ecosystem',
+        href: '/admin/ecosystem',
+        description: 'Competitions, clubs, sports & publisher tag network',
+        icon: FiCompass,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'categories',
+        label: 'Categories & Tags',
+        href: '/admin/categories',
+        description: 'Manage leagues, topics, filter badges & taxonomy',
+        icon: FiLayers,
+        requiredPermission: 'categories:manage',
+      },
+      {
+        id: 'publishing',
+        label: 'Publishing Queue',
+        href: '/admin/publishing',
+        description: 'Pending editorial reviews & scheduled release drafts',
+        icon: FiSend,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'newsletter',
+        label: 'Newsletter Hub',
+        href: '/admin/newsletter',
+        description: 'Send subscriber email campaigns & match roundups',
+        icon: FiMail,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   {
     id: 'employee_management',
-    label: 'Employee Management',
+    label: 'HR & Staff Operations',
+    shortLabel: 'HR & Staff',
     href: '/admin/employees',
     icon: FiUsers,
     requiredPermission: 'employees:read',
     subItems: [
-      { label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers },
-      { label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare },
-      { label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar },
-      { label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen },
-      { label: 'Evaluations', href: '/admin/evaluations', icon: FiAward },
-      { label: 'Payroll', href: '/admin/payroll', icon: FiDollarSign },
+      {
+        id: 'staff_portal',
+        label: 'Staff Portal / Workspace',
+        href: '/admin/portal',
+        description: 'Daily submissions, curriculum checklist & standup',
+        icon: FiLayout,
+        requiredPermission: 'articles:read',
+        badge: 'Hub',
+      },
+      {
+        id: 'employees_directory',
+        label: 'Employees & Staff',
+        href: '/admin/employees',
+        description: 'Directory, onboarding contracts & staff profiles',
+        icon: FiUsers,
+        requiredPermission: 'employees:read',
+      },
+      {
+        id: 'daily_reports',
+        label: 'Daily Reports',
+        href: '/admin/reports',
+        description: 'End-of-day deliverables, links & task tracking',
+        icon: FiCheckSquare,
+        requiredPermission: 'reports:read_own',
+      },
+      {
+        id: 'standup',
+        label: '5 PM Stand-up',
+        href: '/admin/standup',
+        description: 'Daily newsroom video syncs & attendance logs',
+        icon: FiCalendar,
+        requiredPermission: 'standup:attend',
+      },
+      {
+        id: 'handbook',
+        label: 'Handbook & SOPs',
+        href: '/admin/handbook',
+        description: 'Official sports journalism curriculum & PDF guide',
+        icon: FiBookOpen,
+        requiredPermission: 'handbook:read',
+      },
+      {
+        id: 'evaluations',
+        label: 'Evaluations & Scorecards',
+        href: '/admin/evaluations',
+        description: '30-Day trainee assessment, KPIs & transition reviews',
+        icon: FiAward,
+        requiredPermission: 'evaluations:read',
+        badge: 'KPIs',
+      },
+      {
+        id: 'payroll',
+        label: 'Payroll & Allowances',
+        href: '/admin/payroll',
+        description: 'Monthly stipends, salary slips & disbursement logs',
+        icon: FiDollarSign,
+        requiredPermission: 'payroll:read',
+      },
     ],
   },
   {
     id: 'user_management',
     label: 'User Management',
+    shortLabel: 'Users',
     href: '/admin/users',
     icon: FiUserCheck,
     requiredPermission: 'users:manage',
     subItems: [
-      { label: 'User Directory', href: '/admin/users', icon: FiUserCheck },
-      { label: 'Staff Roles & Invitations', href: '/admin/users', icon: FiShield },
+      {
+        id: 'user_directory',
+        label: 'User Directory',
+        href: '/admin/users',
+        description: 'Registered accounts, profile roles & reader subscriptions',
+        icon: FiUserCheck,
+        requiredPermission: 'users:manage',
+      },
+      {
+        id: 'staff_roles',
+        label: 'Staff Roles & Invitations',
+        href: '/admin/users',
+        description: 'Role-based access permissions & security levels',
+        icon: FiShield,
+        requiredPermission: 'users:manage',
+      },
     ],
   },
   {
     id: 'sponsorship_management',
-    label: 'Sponsorship Management',
+    label: 'Sponsorships',
+    shortLabel: 'Ads',
     href: '/admin/sponsorships',
     icon: FiDollarSign,
     requiredPermission: 'articles:draft',
     subItems: [
-      { label: 'Active Campaigns', href: '/admin/sponsorships', icon: FiDollarSign },
-      { label: 'Create Partnership', href: '/admin/sponsorships', icon: FiDollarSign },
+      {
+        id: 'active_sponsorships',
+        label: 'Active Campaigns',
+        href: '/admin/sponsorships',
+        description: 'Manage brand partnerships, banners & ad placements',
+        icon: FiDollarSign,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   {
     id: 'content_deletion',
-    label: 'Content Deletion',
+    label: 'Trash & Deletions',
+    shortLabel: 'Trash',
     href: '/admin/deletion',
     icon: FiTrash2,
     requiredPermission: 'articles:draft',
     subItems: [
-      { label: 'Trash Bin', href: '/admin/deletion', icon: FiTrash2 },
-      { label: 'Deletion Audit Log', href: '/admin/deletion', icon: FiShield },
-    ],
-  },
-  {
-    id: 'publishing',
-    label: 'Publishing',
-    href: '/admin/publishing',
-    icon: FiSend,
-    requiredPermission: 'articles:draft',
-    subItems: [
-      { label: 'Drafts Queue', href: '/admin/publishing', icon: FiSend },
-      { label: 'Newsletter Hub', href: '/admin/newsletter', icon: FiMail },
+      {
+        id: 'trash_bin',
+        label: 'Trash Bin',
+        href: '/admin/deletion',
+        description: 'Soft-deleted news articles & restoration center',
+        icon: FiTrash2,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'deletion_audit',
+        label: 'Deletion Audit Log',
+        href: '/admin/deletion',
+        description: 'Compliance history & permanent purge records',
+        icon: FiShield,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   {
     id: 'system_configuration',
-    label: 'System Configuration',
+    label: 'System & Diagnostics',
+    shortLabel: 'System',
     href: '/admin/system',
     icon: FiSettings,
     requiredPermission: 'articles:draft',
     subItems: [
-      { label: 'System Diagnostics', href: '/admin/system', icon: FiSettings },
-      { label: 'Redis Cache Purge', href: '/admin/system', icon: FiZap },
+      {
+        id: 'diagnostics',
+        label: 'System Diagnostics',
+        href: '/admin/system',
+        description: 'API health checks, database connections & server stats',
+        icon: FiActivity,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'redis_cache',
+        label: 'Redis Cache Purge',
+        href: '/admin/system',
+        description: 'Flush cached pages, categories & edge keys',
+        icon: FiZap,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
+];
+
+// Quick jump desktop shortcut chips for high frequency operations
+const QUICK_SHORTCUTS = [
+  { label: 'Portal', href: '/admin/portal', icon: FiLayout, color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20' },
+  { label: 'Evaluation', href: '/admin/evaluations', icon: FiAward, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
+  { label: 'Handbook', href: '/admin/handbook', icon: FiBookOpen, color: 'text-amber-300 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
+  { label: 'Payroll', href: '/admin/payroll', icon: FiDollarSign, color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20' },
+  { label: 'Reports', href: '/admin/reports', icon: FiCheckSquare, color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20' },
+  { label: 'Stand-up', href: '/admin/standup', icon: FiCalendar, color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20' },
+  { label: 'Ecosystem', href: '/admin/ecosystem', icon: FiCompass, color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20' },
+  { label: 'Categories', href: '/admin/categories', icon: FiLayers, color: 'text-rose-400 border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20' },
 ];
 
 function getRoleBadge(role?: string): string {
@@ -139,53 +306,118 @@ function getRoleBadge(role?: string): string {
   return labels[role || ''] || role || 'Admin';
 }
 
+function isPathActive(currentPath: string, targetHref: string): boolean {
+  if (!currentPath || !targetHref) return false;
+  if (currentPath === targetHref) return true;
+
+  const normalize = (p: string) => {
+    let s = p.replace(/^\/admin/, '');
+    if (s === '') s = '/';
+    return s;
+  };
+
+  const normCurrent = normalize(currentPath);
+  const normTarget = normalize(targetHref);
+
+  if (normCurrent === normTarget) return true;
+  if (normTarget !== '/' && normTarget !== '/dashboard' && normCurrent.startsWith(normTarget + '/')) {
+    return true;
+  }
+  return false;
+}
+
 export default function AdminNavBar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>(null);
+  const navContainerRef = useRef<HTMLDivElement>(null);
 
   const userRole = (session?.user?.role as UserRole) || undefined;
 
+  // Filter primary tabs and their sub-items by role permission
   const accessibleTabs = useMemo(() => {
-    return PRIMARY_TABS.filter((tab) => {
+    return PRIMARY_TABS.map((tab) => {
+      const filteredSubItems = tab.subItems.filter((sub) => {
+        if (!sub.requiredPermission) return true;
+        return hasPermission(userRole, sub.requiredPermission);
+      });
+
+      return {
+        ...tab,
+        subItems: filteredSubItems,
+      };
+    }).filter((tab) => {
+      if (tab.subItems.length > 0) return true;
       if (!tab.requiredPermission) return true;
       return hasPermission(userRole, tab.requiredPermission);
     });
   }, [userRole]);
 
-  // Determine which primary tab matches the current path
+  // Flatten all accessible sub-items for mobile quick dropdown
+  const allSubItems = useMemo(() => {
+    const items: { group: string; label: string; href: string }[] = [];
+    accessibleTabs.forEach((tab) => {
+      tab.subItems.forEach((sub) => {
+        items.push({
+          group: tab.label,
+          label: sub.label,
+          href: sub.href,
+        });
+      });
+    });
+    return items;
+  }, [accessibleTabs]);
+
+  // Determine current active dropdown value for mobile select
+  const currentSelectValue = useMemo(() => {
+    const match = allSubItems.find((item) => isPathActive(pathname, item.href));
+    return match ? match.href : pathname;
+  }, [pathname, allSubItems]);
+
+  // Determine active primary tab
   const activeTabId = useMemo(() => {
-    if (pathname.startsWith('/admin/employees') || pathname.startsWith('/admin/reports') || pathname.startsWith('/admin/standup') || pathname.startsWith('/admin/handbook') || pathname.startsWith('/admin/evaluations') || pathname.startsWith('/admin/payroll')) {
-      return 'employee_management';
-    }
-    if (pathname.startsWith('/admin/users')) {
-      return 'user_management';
-    }
-    if (pathname.startsWith('/admin/sponsorships')) {
-      return 'sponsorship_management';
-    }
-    if (pathname.startsWith('/admin/deletion')) {
-      return 'content_deletion';
-    }
-    if (pathname.startsWith('/admin/publishing') || pathname.startsWith('/admin/newsletter')) {
-      return 'publishing';
-    }
-    if (pathname.startsWith('/admin/system')) {
-      return 'system_configuration';
+    for (const tab of accessibleTabs) {
+      if (isPathActive(pathname, tab.href)) return tab.id;
+      for (const sub of tab.subItems) {
+        if (isPathActive(pathname, sub.href)) return tab.id;
+      }
     }
     return 'cms';
+  }, [pathname, accessibleTabs]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (navContainerRef.current && !navContainerRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile menus on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setOpenDropdown(null);
   }, [pathname]);
 
   return (
-    <header className="glass-card border-b border-white/10 rounded-2xl sm:rounded-3xl mb-5 sm:mb-6 shadow-2xl backdrop-blur-2xl bg-slate-950/85">
-      <div className="p-3.5 sm:p-5">
-        {/* Top Row: Brand, User Info & Quick Actions */}
+    <header
+      ref={navContainerRef}
+      className="glass-card border border-white/10 rounded-2xl sm:rounded-3xl mb-5 sm:mb-6 shadow-2xl backdrop-blur-2xl bg-slate-950/90 relative z-50"
+    >
+      <div className="p-3.5 sm:p-5 space-y-3.5">
+        {/* ========================================================================= */}
+        {/* TOP ROW: Brand, Identity, Role Badge & Desktop Shortcuts */}
+        {/* ========================================================================= */}
         <div className="flex items-center justify-between gap-3">
           {/* Brand Info */}
           <Link href="/admin/dashboard" className="flex items-center gap-2.5 sm:gap-3 group">
-            <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
+            <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-black text-sm sm:text-lg shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
               GM
             </span>
             <div>
@@ -194,9 +426,9 @@ export default function AdminNavBar() {
                   GoalMills <span className="text-amber-400 text-xs sm:text-sm font-bold">Admin Hub</span>
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[150px] sm:max-w-[240px]">
-                {session?.user?.name || 'Administrator'}{' '}
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/10 text-amber-300 font-mono">
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate max-w-[170px] sm:max-w-[260px] flex items-center gap-1.5">
+                <span>{session?.user?.name || 'Administrator'}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-500/20 font-mono font-bold">
                   {getRoleBadge(session?.user?.role as string)}
                 </span>
               </p>
@@ -204,28 +436,25 @@ export default function AdminNavBar() {
           </Link>
 
           {/* Desktop Right Quick Actions */}
-          <div className="hidden lg:flex items-center gap-2">
-            <Link
-              href="/admin/ecosystem"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-all text-xs"
-            >
-              <FiCompass size={13} />
-              <span>Ecosystem</span>
-            </Link>
+          <div className="hidden xl:flex items-center gap-2">
             <Link
               href="/profile"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/20 transition-all text-xs"
-              title="Profile & Password Settings"
+              title="Profile & Password Security"
             >
               <FiKey size={13} />
               <span>Password</span>
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-all text-xs"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-all text-xs border border-white/10"
+              title="Open Live Public GoalMills Site"
             >
               <FiHome size={13} />
               <span>Live Site</span>
+              <FiExternalLink size={11} className="text-slate-400" />
             </Link>
             <button
               onClick={() => signOut({ callbackUrl: '/signin' })}
@@ -240,57 +469,211 @@ export default function AdminNavBar() {
           <div className="flex items-center gap-2 lg:hidden">
             <Link
               href="/"
-              className="p-2 rounded-xl bg-white/5 text-slate-300 hover:text-white text-xs font-bold"
-              title="View Site"
+              target="_blank"
+              rel="noreferrer"
+              className="p-2.5 rounded-xl bg-white/5 text-slate-300 hover:text-white text-xs font-bold border border-white/10"
+              title="View Public Site"
             >
               <FiHome size={16} />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl bg-white/10 text-white hover:bg-white/15 transition-all"
+              className="p-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition-all flex items-center gap-1.5 text-xs font-bold"
               aria-label="Toggle Admin Navigation"
             >
               {mobileMenuOpen ? <FiX size={18} /> : <FiMenu size={18} />}
+              <span className="text-xs font-black uppercase">Menu</span>
             </button>
           </div>
         </div>
 
-        {/* Desktop Primary Tabs Navigation (7 Core Modules strictly ordered) */}
-        <nav className="hidden lg:flex items-center gap-1.5 mt-4 pt-3 border-t border-white/10 overflow-x-auto no-scrollbar">
-          {accessibleTabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTabId === tab.id;
-
-            return (
-              <div key={tab.id} className="relative group">
+        {/* ========================================================================= */}
+        {/* DESKTOP QUICK ACCESS SHORTCUT BAR */}
+        {/* ========================================================================= */}
+        <div className="hidden lg:flex items-center justify-between gap-2 pt-2 border-t border-white/10">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
+              <span>⚡</span> Quick Links:
+            </span>
+            {QUICK_SHORTCUTS.map((item) => {
+              const Icon = item.icon;
+              const isActive = isPathActive(pathname, item.href);
+              return (
                 <Link
-                  href={tab.href}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 ${
+                  key={item.href}
+                  href={item.href}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/20 scale-[1.02]'
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                      ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20 scale-[1.03]'
+                      : item.color
                   }`}
                 >
-                  <Icon size={15} />
-                  <span>{tab.label}</span>
+                  <Icon size={12} />
+                  <span>{item.label}</span>
                 </Link>
+              );
+            })}
+          </div>
+
+          <div className="hidden lg:flex xl:hidden items-center gap-2">
+            <Link
+              href="/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 text-white text-xs font-bold"
+            >
+              <FiHome size={12} />
+              <span>Live Site</span>
+            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: '/signin' })}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold"
+            >
+              <FiLogOut size={12} />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* DESKTOP PRIMARY MODULE TABS WITH RICH INTERACTIVE DROPDOWNS */}
+        {/* ========================================================================= */}
+        <nav className="hidden lg:flex items-center gap-1.5 pt-2 border-t border-white/5 overflow-visible relative">
+          {accessibleTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isTabActive = activeTabId === tab.id;
+            const isDropdownOpen = openDropdown === tab.id;
+
+            return (
+              <div
+                key={tab.id}
+                className="relative"
+                onMouseEnter={() => setOpenDropdown(tab.id)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                {/* Module Trigger Button / Link */}
+                <div className="flex items-center">
+                  <Link
+                    href={tab.href}
+                    onClick={() => setOpenDropdown(null)}
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-200 ${
+                      isTabActive
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 scale-[1.02]'
+                        : isDropdownOpen
+                          ? 'bg-white/10 text-white'
+                          : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon size={14} />
+                    <span>{tab.label}</span>
+                    {tab.subItems.length > 0 && (
+                      <FiChevronDown
+                        size={12}
+                        className={`transition-transform duration-200 ${
+                          isDropdownOpen ? 'rotate-180 text-white' : 'text-slate-400'
+                        }`}
+                      />
+                    )}
+                  </Link>
+                </div>
+
+                {/* Rich Hover / Click Popover Dropdown Card */}
+                {isDropdownOpen && tab.subItems.length > 0 && (
+                  <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 rounded-2xl bg-slate-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl p-2 z-50 animate-fade-in space-y-1">
+                    <div className="px-3 py-1.5 border-b border-white/10 flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                        {tab.label} Modules
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {tab.subItems.length} items
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 max-h-[360px] overflow-y-auto custom-scrollbar">
+                      {tab.subItems.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = isPathActive(pathname, sub.href);
+
+                        return (
+                          <Link
+                            key={sub.id + sub.href}
+                            href={sub.href}
+                            onClick={() => setOpenDropdown(null)}
+                            className={`group flex items-start gap-3 p-2.5 rounded-xl transition-all ${
+                              isSubActive
+                                ? 'bg-amber-500/15 border border-amber-500/40 text-amber-300'
+                                : 'hover:bg-white/10 text-slate-200 border border-transparent'
+                            }`}
+                          >
+                            <div
+                              className={`p-2 rounded-lg mt-0.5 transition-colors ${
+                                isSubActive
+                                  ? 'bg-amber-500 text-slate-950'
+                                  : 'bg-white/5 text-slate-300 group-hover:bg-amber-500/20 group-hover:text-amber-400'
+                              }`}
+                            >
+                              <SubIcon size={14} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-1">
+                                <span
+                                  className={`text-xs font-bold truncate ${
+                                    isSubActive ? 'text-amber-300' : 'text-white'
+                                  }`}
+                                >
+                                  {sub.label}
+                                </span>
+                                {sub.badge && (
+                                  <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 uppercase font-mono">
+                                    {sub.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5 line-clamp-1">
+                                {sub.description}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
         </nav>
 
-        {/* Mobile Dropdown Quick Selector */}
-        <div className="mt-3 block lg:hidden">
+        {/* ========================================================================= */}
+        {/* MOBILE PROMINENT QUICK SELECTOR DROPDOWN (All-in-one Jump Dropdown) */}
+        {/* ========================================================================= */}
+        <div className="block lg:hidden pt-2 border-t border-white/10">
+          <div className="flex items-center justify-between mb-1.5">
+            <label
+              htmlFor="mobile-admin-dropdown"
+              className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5"
+            >
+              <span>⚡</span>
+              <span>Quick Module Navigator</span>
+            </label>
+            <span className="text-[10px] text-slate-400 font-bold uppercase">
+              1-Tap Switch
+            </span>
+          </div>
+
           <div className="relative">
             <select
-              value={pathname}
-              onChange={(e) => router.push(e.target.value)}
-              className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-500 pr-9 transition-colors shadow-inner"
+              id="mobile-admin-dropdown"
+              value={currentSelectValue}
+              onChange={(e) => {
+                router.push(e.target.value);
+              }}
+              className="w-full appearance-none px-4 py-3 rounded-2xl bg-slate-900/95 border-2 border-amber-500/30 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-400 pr-10 shadow-xl transition-all"
             >
               {accessibleTabs.map((tab) => (
-                <optgroup key={tab.id} label={tab.label}>
-                  {tab.subItems?.map((sub) => (
-                    <option key={sub.href} value={sub.href}>
+                <optgroup key={tab.id} label={`📂 ${tab.label}`}>
+                  {tab.subItems.map((sub) => (
+                    <option key={sub.id + sub.href} value={sub.href}>
                       {sub.label}
                     </option>
                   ))}
@@ -298,49 +681,139 @@ export default function AdminNavBar() {
               ))}
             </select>
             <FiChevronDown
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-              size={16}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none"
+              size={18}
             />
           </div>
         </div>
 
-        {/* Mobile Accordion Drawer */}
+        {/* ========================================================================= */}
+        {/* MOBILE ACCORDION DRAWER WITH FULL CATEGORIZED EXPANDABLE MENUS */}
+        {/* ========================================================================= */}
         {mobileMenuOpen && (
-          <div className="mt-3 pt-3 border-t border-white/10 space-y-3 lg:hidden animate-fade-in">
-            <div className="space-y-2">
-              {accessibleTabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTabId === tab.id;
-                return (
-                  <div key={tab.id} className="space-y-1">
+          <div className="pt-3 border-t border-white/10 space-y-4 lg:hidden animate-fade-in">
+            {/* Quick Action Badges on Mobile Drawer */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                Featured Tools:
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {QUICK_SHORTCUTS.slice(0, 6).map((item) => {
+                  const Icon = item.icon;
+                  const isActive = isPathActive(pathname, item.href);
+                  return (
                     <Link
-                      href={tab.href}
+                      key={item.href}
+                      href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all ${
+                      className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold border transition-all ${
                         isActive
-                          ? 'bg-amber-500 text-slate-950 shadow-md'
-                          : 'bg-white/5 text-slate-300 hover:text-white'
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
+                          : item.color
                       }`}
                     >
-                      <Icon size={15} />
-                      <span>{tab.label}</span>
+                      <Icon size={14} />
+                      <span>{item.label}</span>
                     </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Categorized Dropdown Accordions */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                All Admin Modules:
+              </span>
+
+              {accessibleTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isTabActive = activeTabId === tab.id;
+                const isExpanded =
+                  mobileExpandedSection === tab.id || (mobileExpandedSection === null && isTabActive);
+
+                return (
+                  <div
+                    key={tab.id}
+                    className="rounded-2xl border border-white/10 bg-slate-900/60 overflow-hidden"
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMobileExpandedSection(isExpanded ? '__none__' : tab.id)
+                      }
+                      className={`w-full flex items-center justify-between p-3 text-xs font-black uppercase transition-colors ${
+                        isTabActive
+                          ? 'bg-amber-500/10 text-amber-300'
+                          : 'text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon size={15} className="text-amber-400" />
+                        <span>{tab.label}</span>
+                      </div>
+                      <FiChevronDown
+                        size={14}
+                        className={`transition-transform duration-200 ${
+                          isExpanded ? 'rotate-180 text-amber-400' : 'text-slate-400'
+                        }`}
+                      />
+                    </button>
+
+                    {isExpanded && (
+                      <div className="p-2 space-y-1 border-t border-white/5 bg-slate-950/40">
+                        {tab.subItems.map((sub) => {
+                          const SubIcon = sub.icon;
+                          const isSubActive = isPathActive(pathname, sub.href);
+
+                          return (
+                            <Link
+                              key={sub.id + sub.href}
+                              href={sub.href}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className={`flex items-center justify-between p-2.5 rounded-xl text-xs transition-all ${
+                                isSubActive
+                                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                                  : 'bg-white/5 text-slate-200 hover:bg-white/10 font-bold'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <SubIcon size={14} />
+                                <span>{sub.label}</span>
+                              </div>
+                              {sub.badge && (
+                                <span
+                                  className={`text-[9px] font-black px-1.5 py-0.2 rounded uppercase ${
+                                    isSubActive
+                                      ? 'bg-slate-950 text-amber-400'
+                                      : 'bg-amber-500/20 text-amber-400'
+                                  }`}
+                                >
+                                  {sub.badge}
+                                </span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
 
-            <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+            {/* Bottom Actions */}
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-amber-500/10 text-amber-300 text-xs font-bold"
+                className="flex-1 text-center py-2.5 rounded-xl bg-amber-500/10 text-amber-300 text-xs font-bold border border-amber-500/20"
               >
-                Password
+                Password Security
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/signin' })}
-                className="flex-1 text-center py-2 rounded-xl bg-red-500/10 text-red-400 text-xs font-bold"
+                className="flex-1 text-center py-2.5 rounded-xl bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/20"
               >
                 Sign Out
               </button>
