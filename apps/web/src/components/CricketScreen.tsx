@@ -242,34 +242,43 @@ export function CricketScreen() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* Header Bar */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-            Cricket LiveScore
-          </h1>
-          <p className="text-sm text-slate-400">
-            Real-time ball-by-ball fixtures, tournament tables, series summaries, and ICC rankings
-          </p>
+    <div className="w-full space-y-5">
+      {/* Smart Control Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+            <span className="text-lg">🏏</span>
+          </div>
+          <div>
+            <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+              <span>Cricket LiveScore</span>
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold">
+                Ball-by-Ball
+              </span>
+            </h2>
+            <p className="text-xs text-slate-400">
+              Live overs, tournament tables, series summaries, and ICC world rankings
+            </p>
+          </div>
         </div>
 
         {/* Search & Refresh */}
-        <div className="flex items-center space-x-3">
-          <div className="relative flex-1 sm:w-64">
+        <div className="flex items-center gap-2.5">
+          <div className="relative flex-1 sm:w-60">
             <input
               type="text"
-              placeholder="Search teams, series or venues..."
+              placeholder="Search teams, series..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-[#141C2B] px-4 py-2.5 pl-9 text-sm text-white placeholder-slate-500 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded-xl border border-blue-500/20 bg-[#070E1A] px-3.5 py-2 pl-9 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
             />
-            <span className="absolute left-3 top-3 text-xs text-slate-400">🔍</span>
+            <span className="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
           </div>
 
           <button
             onClick={fetchCricketData}
-            className="flex items-center space-x-2 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs hover:from-amber-400 hover:to-orange-400 transition-all shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-50"
             title="Refresh on demand"
           >
             <span>🔄</span>
@@ -279,17 +288,17 @@ export function CricketScreen() {
       </div>
 
       {/* Main Tabs */}
-      <div className="mb-4 flex space-x-2 overflow-x-auto border-b border-white/10 pb-2">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 flex-shrink-0 ${
                 isActive
-                  ? 'border border-amber-500/50 bg-[#1A2333] text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
-                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-lg shadow-blue-600/30 scale-[1.02]'
+                  : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
               }`}
             >
               <span>{tab.icon}</span>
@@ -301,17 +310,17 @@ export function CricketScreen() {
 
       {/* Format Filter Pills for Matches */}
       {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
-        <div className="mb-4 flex space-x-2 overflow-x-auto pb-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {formatFilters.map((fmt) => {
             const isFmtActive = formatFilter === fmt.id;
             return (
               <button
                 key={fmt.id}
                 onClick={() => setFormatFilter(fmt.id)}
-                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
                   isFmtActive
-                    ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
-                    : 'bg-[#141C2B] text-slate-400 border border-white/10 hover:border-white/20 hover:text-white'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                    : 'bg-[#0B172B]/70 text-slate-400 border border-blue-500/15 hover:border-blue-400/30 hover:text-white'
                 }`}
               >
                 {fmt.label}
@@ -326,25 +335,21 @@ export function CricketScreen() {
         activeTab !== 'standings' &&
         activeTab !== 'series' &&
         activeTab !== 'teams' && (
-          <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             {dateStrip.map((item) => {
               const isSelected = selectedDate === item.iso;
               return (
                 <button
                   key={item.iso}
                   onClick={() => setSelectedDate(item.iso)}
-                  className={`flex min-w-[72px] flex-col items-center justify-center rounded-xl border p-2.5 transition ${
+                  className={`flex min-w-[72px] sm:min-w-[80px] flex-col items-center rounded-2xl p-2.5 transition-all duration-200 border ${
                     isSelected
-                      ? 'border-amber-500 bg-amber-500 text-slate-950 font-bold'
-                      : 'border-white/10 bg-[#141C2B] text-slate-400 hover:border-white/20 hover:text-white'
+                      ? 'border-amber-400 bg-gradient-to-b from-amber-500/20 to-orange-500/10 text-amber-300 shadow-lg shadow-amber-500/20 scale-[1.03]'
+                      : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-400 hover:border-blue-400/30 hover:text-white'
                   }`}
                 >
-                  <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
-                  <span
-                    className={`text-base font-black ${isSelected ? 'text-slate-950' : 'text-white'}`}
-                  >
-                    {item.dayNumber}
-                  </span>
+                  <span className="text-[10px] font-bold uppercase">{item.dayName}</span>
+                  <span className="text-base sm:text-lg font-black">{item.dayNumber}</span>
                 </button>
               );
             })}
@@ -353,11 +358,13 @@ export function CricketScreen() {
 
       {/* Content Area */}
       {loading ? (
-        <GoalmillsLoader
-          size="md"
-          label="Cricket Desk"
-          sublabel="Fetching live overs, wickets & tournament tables..."
-        />
+        <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
+          <GoalmillsLoader
+            size="md"
+            label="Cricket Desk"
+            sublabel="Fetching live overs, wickets & tournament tables..."
+          />
+        </div>
       ) : activeTab === 'standings' ? (
         /* Standings & Rankings Hub */
         <div className="space-y-6">
@@ -376,10 +383,10 @@ export function CricketScreen() {
                 <button
                   key={sub.id}
                   onClick={() => setStandingsTab(sub.id as any)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
                     isSubActive
-                      ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
-                      : 'bg-[#141C2B] text-slate-400 border border-white/10 hover:border-white/20 hover:text-white'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                      : 'bg-[#0B172B]/70 text-slate-300 border border-blue-500/15 hover:border-blue-400/30 hover:text-white'
                   }`}
                 >
                   {sub.label}
@@ -390,12 +397,12 @@ export function CricketScreen() {
 
           {/* Standings Table View */}
           {standingsTab === 'IPL' || standingsTab === 'T20_WC' || standingsTab === 'BBL' ? (
-            <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
-              <h2 className="mb-4 text-lg font-bold text-white flex items-center gap-2">
-                <span>🏆</span>
+            <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+              <h2 className="mb-4 text-base font-black text-white flex items-center gap-2 uppercase tracking-tight">
+                <span className="text-amber-400">🏆</span>
                 <span>
                   {standingsTab === 'IPL'
-                    ? 'Indian Premier League (IPL) Standings'
+                    ? 'Indian Premier League (IPL) Points Table'
                     : standingsTab === 'T20_WC'
                       ? 'ICC T20 World Cup Standings'
                       : 'Big Bash League (BBL) Standings'}
@@ -403,48 +410,48 @@ export function CricketScreen() {
               </h2>
 
               {!standings[standingsTab] || standings[standingsTab].length === 0 ? (
-                <p className="text-sm text-slate-400 py-4 text-center">
-                  Standings for this tournament are currently updating.
+                <p className="text-sm text-slate-400 py-6 text-center">
+                  Standings for this tournament are currently syncing...
                 </p>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm text-slate-300">
-                    <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                  <table className="w-full text-left text-xs sm:text-sm text-slate-300">
+                    <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
                       <tr>
-                        <th className="py-3 px-2">#</th>
-                        <th className="py-3 px-4">Team</th>
-                        <th className="py-3 px-3 text-center">P</th>
-                        <th className="py-3 px-3 text-center">W</th>
-                        <th className="py-3 px-3 text-center">L</th>
-                        <th className="py-3 px-3 text-center">NR</th>
-                        <th className="py-3 px-3 text-center">NRR</th>
-                        <th className="py-3 px-4 text-right">PTS</th>
+                        <th className="py-3 px-2 text-center w-8">#</th>
+                        <th className="py-3 px-3">Team</th>
+                        <th className="py-3 px-2 text-center">P</th>
+                        <th className="py-3 px-2 text-center">W</th>
+                        <th className="py-3 px-2 text-center">L</th>
+                        <th className="py-3 px-2 text-center">NR</th>
+                        <th className="py-3 px-2 text-center font-mono">NRR</th>
+                        <th className="py-3 px-3 text-right font-black text-amber-400">PTS</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-white/5 font-medium">
                       {standings[standingsTab].map((row, idx) => (
-                        <tr key={idx} className="hover:bg-white/5">
-                          <td className="py-3 px-2 font-bold text-slate-400">
+                        <tr key={idx} className="hover:bg-blue-600/10 transition-colors">
+                          <td className="py-2.5 px-2 text-center font-bold text-slate-400">
                             {row.standing_place || idx + 1}
                           </td>
-                          <td className="py-3 px-4 font-bold text-white flex items-center gap-2">
+                          <td className="py-2.5 px-3 font-bold text-white flex items-center gap-2">
                             <span className="text-amber-400">🛡️</span>
                             <span>{row.standing_team}</span>
                           </td>
-                          <td className="py-3 px-3 text-center">{row.standing_MP || 0}</td>
-                          <td className="py-3 px-3 text-center text-emerald-400 font-bold">
+                          <td className="py-2.5 px-2 text-center text-slate-300">{row.standing_MP || 0}</td>
+                          <td className="py-2.5 px-2 text-center text-emerald-400 font-bold">
                             {row.standing_W || 0}
                           </td>
-                          <td className="py-3 px-3 text-center text-red-400 font-bold">
+                          <td className="py-2.5 px-2 text-center text-red-400 font-bold">
                             {row.standing_L || 0}
                           </td>
-                          <td className="py-3 px-3 text-center text-slate-400">
+                          <td className="py-2.5 px-2 text-center text-slate-400">
                             {row.standing_NR || 0}
                           </td>
-                          <td className="py-3 px-3 text-center font-mono text-xs">
+                          <td className="py-2.5 px-2 text-center font-mono text-xs text-slate-300">
                             {row.standing_NRR || '0.00'}
                           </td>
-                          <td className="py-3 px-4 text-right font-black text-amber-400 text-base">
+                          <td className="py-2.5 px-3 text-right font-black text-amber-400 text-sm">
                             {row.standing_Pts || 0}
                           </td>
                         </tr>
@@ -456,9 +463,9 @@ export function CricketScreen() {
             </div>
           ) : (
             /* ICC Team Rankings Table */
-            <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
-              <h2 className="mb-4 text-lg font-bold text-white flex items-center gap-2">
-                <span>🌍</span>
+            <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+              <h2 className="mb-4 text-base font-black text-white flex items-center gap-2 uppercase tracking-tight">
+                <span className="text-amber-400">🌍</span>
                 <span>
                   {standingsTab === 'ICC_TEST'
                     ? 'Official ICC Men’s Test Team Rankings'
@@ -473,35 +480,35 @@ export function CricketScreen() {
                 const data = targetObj?.data || [];
                 if (data.length === 0) {
                   return (
-                    <p className="text-sm text-slate-400 py-4 text-center">
-                      ICC Rankings are loading...
+                    <p className="text-sm text-slate-400 py-6 text-center">
+                      ICC Rankings telemetry is loading...
                     </p>
                   );
                 }
                 return (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-slate-300">
-                      <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+                    <table className="w-full text-left text-xs sm:text-sm text-slate-300">
+                      <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
                         <tr>
-                          <th className="py-3 px-2">Rank</th>
-                          <th className="py-3 px-4">Country / Team</th>
+                          <th className="py-3 px-2 text-center w-12">Rank</th>
+                          <th className="py-3 px-3">Country / Team</th>
                           <th className="py-3 px-3 text-center">Rating Points</th>
-                          <th className="py-3 px-4 text-right">ICC Rating</th>
+                          <th className="py-3 px-3 text-right">ICC Rating</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5">
+                      <tbody className="divide-y divide-white/5 font-medium">
                         {data.map((item: any, idx: number) => (
-                          <tr key={idx} className="hover:bg-white/5">
-                            <td className="py-3 px-2 font-bold text-slate-400">
+                          <tr key={idx} className="hover:bg-blue-600/10 transition-colors">
+                            <td className="py-2.5 px-2 text-center font-bold text-slate-400">
                               {item.rank || idx + 1}
                             </td>
-                            <td className="py-3 px-4 font-bold text-white">
+                            <td className="py-2.5 px-3 font-bold text-white">
                               {item.country || item.team_name}
                             </td>
-                            <td className="py-3 px-3 text-center text-slate-300 font-medium">
+                            <td className="py-2.5 px-3 text-center text-slate-300">
                               {item.points ? item.points.toLocaleString() : '-'}
                             </td>
-                            <td className="py-3 px-4 text-right font-black text-amber-400">
+                            <td className="py-2.5 px-3 text-right font-black text-amber-400">
                               {item.rating || '-'}
                             </td>
                           </tr>
@@ -517,14 +524,14 @@ export function CricketScreen() {
       ) : activeTab === 'series' ? (
         /* Series / Tournament Directory */
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-white">Tournaments & International Tours</h2>
+          <h2 className="text-base font-black text-white uppercase tracking-tight">Tournaments & International Tours</h2>
           {seriesList.length === 0 ? (
-            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
+            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-8 text-center backdrop-blur-md">
               <span className="text-4xl">🏏</span>
               <h3 className="mt-3 text-base font-bold text-white">No Series Found</h3>
               <button
                 onClick={fetchCricketData}
-                className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-amber-400 hover:bg-slate-700"
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-all shadow-md"
               >
                 Refresh
               </button>
@@ -542,16 +549,16 @@ export function CricketScreen() {
                   <Link
                     key={series.league_key}
                     href={`/cricket/series/${series.league_key}`}
-                    className="group rounded-2xl border border-white/10 bg-[#141C2B] p-5 hover:border-amber-500/40 hover:bg-[#162234] transition-all flex flex-col justify-between"
+                    className="group rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 p-5 hover:border-amber-400/40 hover:bg-[#0E203C] transition-all flex flex-col justify-between shadow-lg"
                   >
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-amber-400 text-lg">🏏</span>
-                        <span className="text-[10px] font-black uppercase text-amber-400/90 tracking-wider">
+                        <span className="text-[10px] font-black uppercase text-amber-300 tracking-wider">
                           Tournament
                         </span>
                       </div>
-                      <h3 className="text-sm font-black text-white group-hover:text-amber-400 transition-colors line-clamp-2">
+                      <h3 className="text-sm font-black text-white group-hover:text-amber-300 transition-colors line-clamp-2">
                         {series.league_name}
                       </h3>
                       {series.country_name && (
@@ -571,7 +578,7 @@ export function CricketScreen() {
         /* Teams & Players Directory */
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-bold text-white mb-3">Trending Cricketers & Profiles</h2>
+            <h2 className="text-base font-black text-white uppercase tracking-tight mb-3">Trending Cricketers & Profiles</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {playersList
                 .filter(
@@ -584,9 +591,9 @@ export function CricketScreen() {
                   <Link
                     key={player.player_key}
                     href={`/cricket/players/${player.player_key}`}
-                    className="group rounded-2xl border border-white/10 bg-[#141C2B] p-4 hover:border-amber-500/40 hover:bg-[#162234] transition-all flex items-center space-x-3.5"
+                    className="group rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 p-4 hover:border-amber-400/40 hover:bg-[#0E203C] transition-all flex items-center space-x-3.5 shadow-lg"
                   >
-                    <div className="h-12 w-12 rounded-xl bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
                       {player.player_image ? (
                         <img
                           src={player.player_image}
@@ -600,13 +607,13 @@ export function CricketScreen() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                      <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
                         {player.player_name}
                       </h3>
                       <p className="text-xs text-slate-400 truncate">
                         {player.player_role || player.player_type || 'Cricket Star'}
                       </p>
-                      <p className="text-[10px] text-amber-400/90 font-medium truncate mt-0.5">
+                      <p className="text-[10px] text-amber-300 font-medium truncate mt-0.5">
                         {player.player_country || player.team_name}
                       </p>
                     </div>
@@ -616,7 +623,7 @@ export function CricketScreen() {
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-white mb-3">Cricket Teams & Clubs</h2>
+            <h2 className="text-base font-black text-white uppercase tracking-tight mb-3">Cricket Teams & Clubs</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {teamsList
                 .filter(
@@ -628,9 +635,9 @@ export function CricketScreen() {
                   <Link
                     key={team.team_key}
                     href={`/cricket/teams/${team.team_key}`}
-                    className="group rounded-2xl border border-white/10 bg-[#141C2B] p-4 hover:border-amber-500/40 hover:bg-[#162234] transition-all flex items-center space-x-3.5"
+                    className="group rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 p-4 hover:border-amber-400/40 hover:bg-[#0E203C] transition-all flex items-center space-x-3.5 shadow-lg"
                   >
-                    <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 p-1 flex items-center justify-center shrink-0">
+                    <div className="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 p-1 flex items-center justify-center shrink-0">
                       {team.team_logo ? (
                         <img
                           src={team.team_logo}
@@ -644,7 +651,7 @@ export function CricketScreen() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate">
+                      <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
                         {team.team_name}
                       </h3>
                       <p className="text-xs text-slate-400 truncate">
@@ -658,19 +665,19 @@ export function CricketScreen() {
         </div>
       ) : leagueGroups.length === 0 ? (
         /* Empty State */
-        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-8 text-center backdrop-blur-md">
           <span className="text-4xl">🏏</span>
           <h3 className="mt-3 text-base font-bold text-white">
-            {activeTab === 'live' ? 'No Live Cricket Matches Ongoing' : 'No Matches Found'}
+            {activeTab === 'live' ? 'No Live Cricket Matches In-Play' : 'No Matches Found'}
           </h3>
           <p className="mt-1 text-xs text-slate-400 max-w-sm">
             {activeTab === 'live'
-              ? 'Check upcoming fixtures or select another date from the calendar.'
-              : 'Try selecting a different format filter or search query.'}
+              ? 'Check upcoming fixtures or pick another date from the calendar.'
+              : 'Try selecting a different format filter or clearing search query.'}
           </p>
           <button
             onClick={fetchCricketData}
-            className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-amber-400 hover:bg-slate-700"
+            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-all shadow-md"
           >
             Refresh Feed
           </button>
@@ -679,16 +686,25 @@ export function CricketScreen() {
         /* Grouped Matches List */
         <div className="space-y-6">
           {leagueGroups.map((group) => (
-            <div key={group.title} className="space-y-3">
+            <div
+              key={group.title}
+              className="space-y-3 rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-4 shadow-xl backdrop-blur-md"
+            >
               {/* League Header */}
-              <div className="flex items-center space-x-2">
-                <span className="text-amber-400">🏏</span>
-                <h2 className="text-sm font-bold text-slate-200">{group.title}</h2>
-                <span className="text-xs text-slate-500">({group.matches.length})</span>
+              <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                <div className="flex items-center space-x-2">
+                  <span className="text-amber-400">🏏</span>
+                  <h2 className="text-xs font-black uppercase tracking-wider text-white">
+                    {group.title}
+                  </h2>
+                </div>
+                <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                  {group.matches.length} {group.matches.length === 1 ? 'Match' : 'Matches'}
+                </span>
               </div>
 
               {/* Match Cards Grid */}
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {group.matches.map((match) => (
                   <CricketMatchCard key={match.event_key} match={match} hideLeague />
                 ))}
