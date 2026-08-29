@@ -55,9 +55,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#001f3f', // match stack header background
+    backgroundColor: '#091529',
     borderBottomWidth: 1,
-    borderBottomColor: '#54789dff',
+    borderBottomColor: 'rgba(245, 158, 11, 0.25)',
   },
   brandContainer: {
     flexDirection: 'row',
@@ -67,9 +67,11 @@ const styles = StyleSheet.create({
   logoWrapper: {
     width: 38,
     height: 38,
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#fff',
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
     marginRight: 12,
   },
   logo: {
@@ -84,10 +86,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   titleGradient: {
-    color: '#4f9bff',
+    color: '#38bdf8',
   },
   titlePlain: {
-    color: '#fff',
+    color: '#F59E0B',
   },
   rightActions: {
     flexDirection: 'row',
@@ -98,10 +100,10 @@ const styles = StyleSheet.create({
   actionButton: {
     width: 38,
     height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(79, 155, 255, 0.12)',
+    borderRadius: 12,
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(79, 155, 255, 0.25)',
+    borderColor: 'rgba(245, 158, 11, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },

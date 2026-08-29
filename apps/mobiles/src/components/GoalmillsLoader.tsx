@@ -12,7 +12,7 @@ interface GoalmillsLoaderProps {
 export function GoalmillsLoader({
   size = 'md',
   label = 'GoalMills Live',
-  sublabel = 'Syncing real-time sports intelligence...',
+  sublabel = 'Loading real-time scores and sports updates...',
   style,
 }: GoalmillsLoaderProps) {
   const spinValue = useRef(new Animated.Value(0)).current;

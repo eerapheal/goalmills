@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     marginRight: SPACING.sm,
   },
   activeTab: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.secondary,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderColor: '#F59E0B',
   },
   pressedTab: {
     opacity: 0.7,
@@ -87,11 +87,11 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: FONT_SIZES.sm,
     fontWeight: '600',
-    color: COLORS.textLight,
+    color: '#94A3B8',
   },
   activeTabText: {
-    color: COLORS.background,
-    fontWeight: '700',
+    color: '#FBBF24',
+    fontWeight: '800',
   },
   soonBadge: {
     marginLeft: 6,

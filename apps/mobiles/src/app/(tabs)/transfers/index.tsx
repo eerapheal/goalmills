@@ -148,7 +148,7 @@ export default function TransfersScreen() {
       {/* Transfer News Feed */}
       {transferNews.length > 0 && (
         <View style={styles.newsSection}>
-          <Text style={styles.sectionTitle}>Transfer Intel & Fit Analysis</Text>
+          <Text style={styles.sectionTitle}>Transfer News & Scouting Reports</Text>
           {transferNews.map((news) => (
             <TouchableOpacity
               key={news._id}
