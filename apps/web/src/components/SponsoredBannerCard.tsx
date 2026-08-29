@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { FiExternalLink, FiAward, FiTag } from 'react-icons/fi';
+import { SportType } from '@goalmills/types';
 
 interface SponsoredBannerProps {
   placement?: 'homepage_hero' | 'sports_pulse' | 'match_details' | 'newsletter_footer';
-  sport?: 'all' | 'football' | 'cricket' | 'basketball';
+  sport?: SportType | 'all';
   className?: string;
 }
 

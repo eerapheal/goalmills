@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { SportType } from '@goalmills/types';
-import { SportTabs } from '../components/SportTabs';
+import { SportTabs, ExtendedSportType } from '../components/SportTabs';
+import { GoalmillsLiveDashboard } from '../components/GoalmillsLiveDashboard';
 import { FootballScreen } from '../components/FootballScreen';
 import { CricketScreen } from '../components/CricketScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
@@ -11,10 +12,13 @@ import { NewsletterSubscriptionSection } from '../components/NewsletterSubscript
 import { SponsoredBannerCard } from '../components/SponsoredBannerCard';
 
 export default function HomePage() {
-  const [selectedSport, setSelectedSport] = useState<SportType>('football');
+  const [selectedSport, setSelectedSport] = useState<ExtendedSportType>('live');
 
   const renderSportContent = () => {
     switch (selectedSport) {
+      case 'live':
+        return <GoalmillsLiveDashboard onSelectTab={(tab) => setSelectedSport(tab as ExtendedSportType)} />;
+
       case 'football':
         return <FootballScreen />;
 
@@ -39,35 +43,38 @@ export default function HomePage() {
               Coming Soon
             </div>
             <p className="text-gray-400 text-center max-w-md text-base">
-              We're working hard to bring you real-time {selectedSport} scores, fixtures, and statistics.
+              We&apos;re working hard to bring you real-time {selectedSport} scores, fixtures, and statistics.
             </p>
           </div>
         );
 
       default:
-        return null;
+        return <GoalmillsLiveDashboard onSelectTab={(tab) => setSelectedSport(tab as ExtendedSportType)} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0e27] pt-[90px] flex flex-col">
-      {/* App Header */}
-      <div className="px-4 pt-2 pb-4 bg-[#001f3f]/90 border-b-4 border-[#ffd700] overflow-hidden whitespace-nowrap">
-        <p className="text-sm text-gray-300 font-semibold animate-marquee inline-block">
-          Your Ultimate Sports Platform brought to you by Ekpenisi Erue Raphael
+    <div className="min-h-screen bg-[#080E18] pt-[86px] flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+      {/* Platform Title Marquee */}
+      <div className="px-4 py-2 bg-[#0A1422] border-b border-emerald-500/20 overflow-hidden whitespace-nowrap">
+        <p className="text-xs text-slate-300 font-medium animate-marquee inline-block">
+          ⚡ GoalMills Sports Intelligence Platform • Real-time livescores, high-precision analytics, video recaps, and deep sports coverage • Engineered by Ekpenisi Erue Raphael
         </p>
       </div>
 
       {/* Featured VIP Sponsor Hero Banner */}
-      <div className="max-w-6xl mx-auto w-full px-4 pt-4">
-        <SponsoredBannerCard placement="homepage_hero" sport={selectedSport as any} />
+      <div className="max-w-[1400px] mx-auto w-full px-4 sm:px-6 pt-4">
+        <SponsoredBannerCard
+          placement="homepage_hero"
+          sport={selectedSport === 'live' ? 'all' : selectedSport}
+        />
       </div>
 
       {/* Sport Category Tabs */}
       <SportTabs selectedSport={selectedSport} onSelectSport={setSelectedSport} />
 
-      {/* Sport Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide">{renderSportContent()}</div>
+      {/* Sport Content / Live Dashboard */}
+      <div className="flex-1">{renderSportContent()}</div>
 
       {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
       <SportsPulseNewsSection />
