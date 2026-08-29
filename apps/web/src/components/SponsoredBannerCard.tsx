@@ -94,7 +94,7 @@ export function SponsoredBannerCard({
     >
       {/* Background Accent Glow */}
       <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-      <div className="absolute -left-8 -bottom-8 h-28 w-28 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
+      <div className="absolute -left-8 -bottom-8 h-28 w-28 rounded-full bg-orange-500/10 blur-2xl pointer-events-none" />
 
       <div className="relative z-10 flex items-center justify-between gap-2.5 sm:gap-4">
         {/* Sponsor Identity & Copy */}

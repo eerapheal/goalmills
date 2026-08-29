@@ -41,10 +41,10 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-6 py-3">
       <div className="max-w-[1400px] mx-auto">
-        <nav className="rounded-2xl border border-emerald-400/40 bg-[#0C1726]/95 backdrop-blur-xl px-4 sm:px-6 py-3 shadow-[0_0_25px_rgba(16,185,129,0.15)] flex items-center justify-between">
+        <nav className="rounded-2xl border border-amber-400/40 bg-[#0C1726]/95 backdrop-blur-xl px-4 sm:px-6 py-3 shadow-[0_0_25px_rgba(245,158,11,0.15)] flex items-center justify-between">
           {/* Brand Logo & Subtitle */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[2px] shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition duration-300">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 p-[2px] shadow-lg shadow-amber-500/20 group-hover:scale-105 transition duration-300">
               <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center overflow-hidden">
                 <Image
                   src="/icon.png"
@@ -58,12 +58,12 @@ export function Header() {
 
             <div>
               <h1 className="text-xl font-black italic tracking-tight text-white flex items-center">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
                   GOAL
                 </span>
                 <span className="text-white ml-0.5">MILLS</span>
               </h1>
-              <p className="text-[10px] font-semibold text-emerald-400 tracking-wider uppercase">
+              <p className="text-[10px] font-semibold text-amber-400 tracking-wider uppercase">
                 Sports Intelligence Platform
               </p>
             </div>
@@ -83,13 +83,13 @@ export function Header() {
                   href={item.href}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 relative ${
                     isActive
-                      ? 'text-emerald-400 bg-emerald-500/10 shadow-[0_0_12px_rgba(16,185,129,0.2)] border border-emerald-500/30'
+                      ? 'text-amber-400 bg-amber-500/10 shadow-[0_0_12px_rgba(245,158,11,0.2)] border border-amber-500/30'
                       : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {item.name}
                   {isActive && (
-                    <span className="absolute -bottom-1 left-3 right-3 h-[2px] bg-emerald-400 rounded-full shadow-[0_0_8px_#34d399]" />
+                    <span className="absolute -bottom-1 left-3 right-3 h-[2px] bg-amber-400 rounded-full shadow-[0_0_8px_#fbbf24]" />
                   )}
                 </Link>
               );
@@ -100,9 +100,9 @@ export function Header() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/news"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition hover:border-emerald-500/30"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition hover:border-amber-500/30"
             >
-              <FiSearch className="w-3.5 h-3.5 text-emerald-400" />
+              <FiSearch className="w-3.5 h-3.5 text-amber-400" />
               <span>Search</span>
             </Link>
 
@@ -110,9 +110,9 @@ export function Header() {
 
             <Link
               href="/docs"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition hover:border-emerald-500/30"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition hover:border-amber-500/30"
             >
-              <FiActivity className="w-3.5 h-3.5 text-cyan-400" />
+              <FiActivity className="w-3.5 h-3.5 text-orange-400" />
               <span>Docs</span>
             </Link>
           </div>
@@ -132,12 +132,12 @@ export function Header() {
 
         {/* Mobile Navigation Drawer */}
         {isOpen && (
-          <div className="lg:hidden mt-2 p-4 rounded-2xl bg-[#0C1726]/95 border border-emerald-400/30 shadow-2xl backdrop-blur-xl space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden mt-2 p-4 rounded-2xl bg-[#0C1726]/95 border border-amber-400/30 shadow-2xl backdrop-blur-xl space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block px-4 py-2.5 rounded-xl text-sm font-bold text-slate-200 hover:bg-emerald-500/10 hover:text-emerald-400 transition"
+                className="block px-4 py-2.5 rounded-xl text-sm font-bold text-slate-200 hover:bg-amber-500/10 hover:text-amber-400 transition"
               >
                 {item.name}
               </Link>
