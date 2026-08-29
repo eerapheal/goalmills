@@ -22,6 +22,8 @@ import {
   FiSliders,
   FiRefreshCw,
   FiStar,
+  FiArrowRight,
+  FiZap,
 } from 'react-icons/fi';
 import { GoalmillsLoader } from '../GoalmillsLoader';
 import { FaFire } from 'react-icons/fa6';
@@ -92,7 +94,6 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
   }, [activeTab, selectedCategory, searchQuery, selectedTeam, favoriteTeams]);
 
   useEffect(() => {
-    // Skip initial mount if default params
     if (
       activeTab !== 'all' ||
       selectedCategory !== 'All' ||
@@ -126,14 +127,31 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
 
   return (
     <div className="space-y-8">
+      {/* ─── LIVE NEWS FLASH TICKER ─── */}
+      <div className="rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2.5 overflow-hidden shadow-lg flex items-center gap-3">
+        <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          GLOBAL WIRE
+        </span>
+        <div className="overflow-hidden whitespace-nowrap w-full">
+          <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
+            ⚡ Breaking Transfer Flashes • Matchday Tactical Breakdowns • Premier League, Champions League, NBA & Cricket Intel • Real-Time Sports Coverage
+          </p>
+        </div>
+      </div>
+
       {/* Header & Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-blue-500/20 pb-6">
         <div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Sports <span className="text-blue-500">Pulse</span> & News
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight flex items-center gap-3">
+            <span>Sports</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">
+              Pulse
+            </span>
+            <span>& News</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Breaking updates, tactical deep dives, transfers and team stories
+          <p className="text-xs sm:text-sm text-slate-300 mt-1">
+            Breaking updates, tactical deep dives, transfers and team stories across world sports
           </p>
         </div>
 
@@ -145,7 +163,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
             placeholder="Search teams, players, topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full bg-[#070E1A] border border-blue-500/25 rounded-2xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
           />
           {searchQuery && (
             <button
@@ -160,7 +178,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
 
       {/* 9+ Professional Filter Tabs */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {NEWS_FILTER_TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -172,10 +190,10 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                     setSelectedTeam(favoriteTeams[0]);
                   }
                 }}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-300 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-105'
-                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-lg shadow-blue-600/30 scale-[1.02]'
+                    : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
                 }`}
               >
                 <span>{tab.label}</span>
@@ -186,18 +204,18 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
 
         {/* Favorite Teams Selector Bar (Visible when on 'favorites' tab) */}
         {activeTab === 'favorites' && (
-          <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl bg-blue-950/30 border border-blue-500/20 animate-in fade-in">
-            <span className="text-xs font-bold text-blue-400 flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-2 p-3.5 rounded-2xl bg-[#09162C]/90 border border-blue-500/25 animate-in fade-in shadow-xl">
+            <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
               <FiStar /> My Teams:
             </span>
             {favoriteTeams.map((t) => (
               <button
                 key={t}
                 onClick={() => setSelectedTeam(t)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
                   selectedTeam === t
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md font-black'
+                    : 'bg-[#0E1F38] text-slate-300 hover:text-white border border-white/5'
                 }`}
               >
                 {t}
@@ -205,7 +223,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
             ))}
             <button
               onClick={() => setIsTeamModalOpen(true)}
-              className="flex items-center gap-1 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-1 px-3 py-1 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-xs font-bold text-blue-300 border border-blue-500/30 transition-colors"
             >
               <FiPlus size={12} />
               <span>Customize Teams</span>
@@ -214,13 +232,13 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
         )}
 
         {/* Dynamic Category Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => setSelectedCategory('All')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               selectedCategory === 'All'
-                ? 'bg-white/20 text-white'
-                : 'bg-white/[0.03] text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                : 'bg-[#0B172B]/70 text-slate-300 hover:text-white border border-blue-500/15'
             }`}
           >
             All Categories
@@ -231,10 +249,10 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
               <button
                 key={cat._id}
                 onClick={() => setSelectedCategory(cat.name)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap border transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition-all ${
                   isSel
-                    ? 'border-blue-500 bg-blue-500/10 text-blue-400'
-                    : 'border-white/5 bg-white/[0.03] text-slate-400 hover:text-white hover:border-white/10'
+                    ? 'border-amber-400 bg-amber-500/15 text-amber-300 shadow-md'
+                    : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-300 hover:text-white hover:border-blue-400/30'
                 }`}
               >
                 <span
@@ -250,10 +268,10 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
 
       {/* Customize Favorite Teams Modal */}
       {isTeamModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-md rounded-3xl border border-blue-500/30 bg-[#0B172B] p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
                 <FiStar className="text-amber-400" />
                 <span>Select Your Favorite Teams</span>
               </h3>
@@ -264,11 +282,11 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                 <FiX size={18} />
               </button>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-300">
               Pick the clubs and franchises you follow to get a personalized news stream:
             </p>
 
-            <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
+            <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
               {POPULAR_TEAMS.map((t) => {
                 const isSelected = favoriteTeams.includes(t);
                 return (
@@ -277,24 +295,24 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                     onClick={() => handleToggleFavoriteTeam(t)}
                     className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-500/20 text-blue-300'
-                        : 'border-white/5 bg-white/5 text-slate-300 hover:bg-white/10'
+                        ? 'border-amber-400 bg-amber-500/20 text-amber-300'
+                        : 'border-blue-500/15 bg-[#070E1A] text-slate-300 hover:bg-white/5'
                     }`}
                   >
                     <span>{t}</span>
-                    {isSelected && <FiCheck size={14} className="text-blue-400" />}
+                    {isSelected && <FiCheck size={14} className="text-amber-400" />}
                   </button>
                 );
               })}
             </div>
 
-            <div className="pt-2 border-t border-white/10 flex justify-end">
+            <div className="pt-3 border-t border-white/10 flex justify-end">
               <button
                 onClick={() => {
                   setIsTeamModalOpen(false);
                   fetchFilteredNews();
                 }}
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-orange-400 transition-all"
               >
                 Save Preferences
               </button>
@@ -305,7 +323,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
 
       {/* Loading State */}
       {loading ? (
-        <div className="py-16">
+        <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
           <GoalmillsLoader
             size="md"
             label="News Pulse"
@@ -313,9 +331,9 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
           />
         </div>
       ) : news.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] py-16 text-center text-slate-400 space-y-3">
-          <p className="text-lg font-bold text-white">No News Stories Found</p>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+        <div className="rounded-3xl border border-blue-500/20 bg-[#0A1424]/80 py-16 text-center text-slate-400 space-y-3 backdrop-blur-md shadow-xl">
+          <p className="text-lg font-black text-white">No News Stories Found</p>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto">
             Try choosing another filter tab or resetting your search terms.
           </p>
           <button
@@ -324,7 +342,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
               setSelectedCategory('All');
               setSearchQuery('');
             }}
-            className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-500"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/30 transition-all"
           >
             Reset All Filters
           </button>
@@ -335,7 +353,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
           {featuredArticle && activeTab === 'all' && selectedCategory === 'All' && !searchQuery && (
             <Link
               href={`/news/${featuredArticle._id}`}
-              className="group relative block rounded-3xl border border-white/10 bg-[#0E1522] overflow-hidden shadow-2xl transition-all hover:border-blue-500/50 hover:shadow-blue-900/20"
+              className="group relative block rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#08142A] via-[#0B1E3E] to-[#060D18] overflow-hidden shadow-2xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-blue-900/30"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12">
                 <div className="relative aspect-[16/9] lg:aspect-auto lg:col-span-7 h-64 sm:h-80 lg:h-[420px] overflow-hidden">
@@ -348,29 +366,29 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E1522] via-transparent to-transparent lg:hidden" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#08142A] via-transparent to-transparent lg:hidden" />
                 </div>
 
                 <div className="p-6 sm:p-8 lg:p-10 lg:col-span-5 flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       {featuredArticle.isBreaking ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-red-600 text-white shadow-md shadow-red-600/30 animate-pulse">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-600 text-white shadow-md shadow-rose-600/30 animate-pulse">
                           <FaFire /> Breaking
                         </span>
                       ) : (
-                        <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-blue-600 text-white shadow-md shadow-blue-600/30">
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm">
                           {featuredArticle.category || 'Featured'}
                         </span>
                       )}
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-300 font-medium">
                         ⏱️ {featuredArticle.readTime || 3} min read
                       </span>
                     </div>
 
-                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white group-hover:text-blue-400 transition-colors leading-tight">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white group-hover:text-amber-300 transition-colors leading-tight">
                       {featuredArticle.title}
                     </h2>
 
@@ -380,7 +398,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                   </div>
 
                   <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                    <span className="font-semibold text-white">
+                    <span className="font-bold text-white">
                       By {featuredArticle.author || 'GoalMills Desk'}
                     </span>
                     <span>
@@ -407,7 +425,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
               <Link
                 key={item._id.toString()}
                 href={`/news/${item._id}`}
-                className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0E1522]/80 hover:bg-[#131C2E] overflow-hidden transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/10"
+                className="group flex flex-col justify-between rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 hover:bg-[#0E203C] overflow-hidden transition-all duration-300 hover:border-amber-400/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/20"
               >
                 <div>
                   {/* Image */}
@@ -421,11 +439,11 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                     />
                     <div className="absolute top-3 left-3 flex items-center gap-1.5">
                       {item.isBreaking && (
-                        <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-wider">
+                        <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[9px] font-black uppercase tracking-wider shadow-md">
                           Breaking
                         </span>
                       )}
-                      <span className="px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur-md text-blue-400 text-[10px] font-bold uppercase tracking-wider border border-white/10">
+                      <span className="px-2.5 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-500/30">
                         {item.category || 'News'}
                       </span>
                     </div>
@@ -442,16 +460,16 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                             })
                           : ''}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <FiClock size={11} /> {item.readTime || 3} min
+                      <span className="flex items-center gap-1 text-slate-300">
+                        <FiClock size={11} className="text-amber-400" /> {item.readTime || 3} min
                       </span>
                     </div>
 
-                    <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                    <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 transition-colors line-clamp-2 leading-snug">
                       {item.title}
                     </h3>
 
-                    <p className="text-slate-400 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                    <p className="text-slate-300 text-xs sm:text-sm line-clamp-2 leading-relaxed">
                       {item.excerpt}
                     </p>
                   </div>
@@ -459,12 +477,12 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
 
                 {/* Card Footer */}
                 <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-                  <span className="truncate max-w-[140px] font-semibold text-slate-300">
+                  <span className="truncate max-w-[140px] font-semibold text-slate-200">
                     {item.author || 'GoalMills Staff'}
                   </span>
                   {typeof item.views === 'number' && (
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <FiEye size={12} /> {item.views.toLocaleString()}
+                    <span className="flex items-center gap-1 text-slate-400 font-mono">
+                      <FiEye size={12} className="text-blue-400" /> {item.views.toLocaleString()}
                     </span>
                   )}
                 </div>

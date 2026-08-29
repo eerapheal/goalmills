@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { FiTrendingUp, FiPlay, FiMail, FiArrowRight, FiClock, FiCheck } from 'react-icons/fi';
+import { FaFire } from 'react-icons/fa6';
 
 export function SportsPulseNewsSection() {
   const [email, setEmail] = useState('');
@@ -51,7 +53,7 @@ export function SportsPulseNewsSection() {
     },
     {
       id: 'art-2',
-      title: 'IPL 2025 Powerplay Analytics: Why Death-Over Strike Rates are Soaring Past 210',
+      title: 'IPL 2026 Powerplay Analytics: Why Death-Over Strike Rates are Soaring Past 210',
       excerpt:
         'An analytical deep dive into modern T20 boundary percentages and bowler release angle variations.',
       category: 'cricket',
@@ -96,40 +98,40 @@ export function SportsPulseNewsSection() {
       : trendingArticles.filter((art) => art.category === activeCategory);
 
   return (
-    <section className="relative bg-[#070b1e] py-16 md:py-24 border-t border-slate-800/80 text-white overflow-hidden">
+    <section className="relative bg-[#070E1A] py-16 md:py-24 border-t border-blue-500/20 text-white overflow-hidden">
       {/* Ambient Background Gradient Accent */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-700/5 rounded-full blur-[160px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 rounded-full blur-[160px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header with Title & Filter Pills */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider mb-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider mb-3 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               Editorial & Video Spotlight
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               The Sports{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">
                 Pulse & Headlines
               </span>
             </h2>
-            <p className="mt-2 text-sm md:text-base text-slate-400 max-w-xl">
+            <p className="mt-2 text-sm md:text-base text-slate-300 max-w-xl">
               Curated matchday analysis, statistical deep dives, and instant video recaps from
               around the sporting world.
             </p>
           </div>
 
           {/* Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900/80 border border-slate-800 rounded-2xl">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#091529] border border-blue-500/20 rounded-2xl shadow-xl">
             {(['all', 'football', 'cricket', 'basketball', 'transfers'] as const).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+                className={`px-4 py-2 rounded-xl text-xs font-black capitalize transition-all ${
                   activeCategory === cat
-                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 scale-[1.02]'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {cat === 'all' ? 'All Pulse' : cat}
@@ -146,17 +148,17 @@ export function SportsPulseNewsSection() {
               <Link
                 href="/news"
                 key={article.id}
-                className="group block bg-slate-900/50 hover:bg-slate-900/90 border border-slate-800/80 hover:border-orange-500/40 rounded-2xl p-5 md:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/5 relative overflow-hidden"
+                className="group block bg-[#0B172B]/80 hover:bg-[#0E203C] border border-blue-500/15 hover:border-amber-400/40 rounded-3xl p-5 md:p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/20 relative overflow-hidden"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md border ${article.tagColor}`}
+                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border ${article.tagColor}`}
                     >
                       {article.categoryName}
                     </span>
                     {article.isHot && (
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
                         <span>🔥</span> Trending
                       </span>
                     )}
@@ -168,31 +170,19 @@ export function SportsPulseNewsSection() {
                   </span>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-orange-400 transition-colors leading-snug mb-2">
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 transition-colors leading-snug mb-2">
                   {article.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed line-clamp-2">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed line-clamp-2">
                   {article.excerpt}
                 </p>
 
-                <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-medium">By {article.author}</span>
-                  <span className="text-orange-400 group-hover:text-orange-300 font-bold inline-flex items-center gap-1">
-                    Read Analysis
-                    <svg
-                      className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.5}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-semibold">By {article.author}</span>
+                  <span className="text-amber-400 group-hover:text-amber-300 font-bold inline-flex items-center gap-1">
+                    <span>Read Analysis</span>
+                    <FiArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
                   </span>
                 </div>
               </Link>
@@ -201,17 +191,10 @@ export function SportsPulseNewsSection() {
             <div className="pt-2 text-center">
               <Link
                 href="/news"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm font-bold text-slate-200 hover:text-white hover:border-orange-500/50 transition-all hover:bg-slate-800"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-sm font-black text-white shadow-lg shadow-blue-600/30 transition-all active:scale-95"
               >
                 <span>Browse All Sports News & Features</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
-                </svg>
+                <FiArrowRight size={15} />
               </Link>
             </div>
           </div>
@@ -221,31 +204,29 @@ export function SportsPulseNewsSection() {
             {/* Highlights Spotlight Card */}
             <Link
               href="/highlights"
-              className="group block relative bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/60 border border-slate-800 hover:border-blue-500/50 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl overflow-hidden"
+              className="group block relative bg-gradient-to-br from-[#0B172B] via-[#0E203C] to-[#070E1A] border border-blue-500/25 hover:border-amber-400/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl shadow-xl overflow-hidden"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
                   <span className="text-xs font-black uppercase tracking-wider text-white">
                     Video Highlights
                   </span>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-blue-600/30 text-blue-300 border border-blue-500/30">
+                <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                   Ultra HD
                 </span>
               </div>
 
               {/* Simulated Video Player Banner */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 mb-4 flex items-center justify-center group-hover:border-blue-500/40 transition-colors">
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-blue-500/20 mb-4 flex items-center justify-center group-hover:border-amber-400/40 transition-colors shadow-inner">
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-                <div className="w-14 h-14 rounded-full bg-blue-600 group-hover:bg-blue-500 text-white flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-all duration-300 z-10">
-                  <svg className="w-6 h-6 fill-current translate-x-0.5" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 group-hover:from-amber-400 group-hover:to-orange-400 text-slate-950 flex items-center justify-center shadow-xl shadow-amber-500/30 transform group-hover:scale-110 transition-all duration-300 z-10 font-bold">
+                  <FiPlay size={22} className="ml-1" />
                 </div>
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-semibold text-slate-300 z-10">
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-white z-10">
                   <span>Top Goals & Decisive Plays of the Week</span>
-                  <span className="bg-black/70 px-2 py-0.5 rounded text-[10px] font-mono">
+                  <span className="bg-black/80 px-2 py-0.5 rounded-md text-[10px] font-mono text-amber-300 border border-white/10">
                     08:42
                   </span>
                 </div>
@@ -258,17 +239,10 @@ export function SportsPulseNewsSection() {
             </Link>
 
             {/* GoalMills VIP Alert Hub & Newsletter */}
-            <div className="bg-gradient-to-br from-slate-900/90 via-blue-950/40 to-slate-900/90 backdrop-blur-xl border border-blue-500/20 rounded-3xl p-6 sm:p-7 shadow-2xl relative">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
+            <div className="bg-[#0B172B]/90 backdrop-blur-xl border border-blue-500/25 rounded-3xl p-6 sm:p-7 shadow-2xl relative">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 rounded-2xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                  <FiMail size={18} />
                 </div>
                 <div>
                   <h3 className="text-base font-black text-white">GoalMills Matchday VIP</h3>
@@ -284,20 +258,8 @@ export function SportsPulseNewsSection() {
               </p>
 
               {subscribed ? (
-                <div className="bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded-xl p-3.5 text-xs font-bold flex items-center gap-2 animate-fade-in">
-                  <svg
-                    className="w-5 h-5 text-emerald-400 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                <div className="bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2 animate-fade-in">
+                  <FiCheck className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                   <span>You&apos;re in! Check your inbox on matchdays for VIP alerts.</span>
                 </div>
               ) : (
@@ -309,14 +271,15 @@ export function SportsPulseNewsSection() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email for free alerts..."
-                      className="w-full bg-slate-950/80 border border-slate-700/80 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition-all"
+                      className="w-full bg-[#070E1A] border border-blue-500/20 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 rounded-2xl px-4 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition-all shadow-inner"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-500/40 transition-all duration-300"
+                    disabled={submitting}
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-black uppercase tracking-wider py-3 rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-300 active:scale-95 disabled:opacity-50"
                   >
-                    Get Matchday VIP Alerts (Free)
+                    {submitting ? 'Subscribing...' : 'Get Matchday VIP Alerts (Free)'}
                   </button>
                   <p className="text-[10px] text-slate-400 text-center">
                     Zero spam. Unsubscribe anytime with 1 click.

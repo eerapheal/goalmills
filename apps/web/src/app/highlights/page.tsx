@@ -37,12 +37,12 @@ export default async function HighlightsPage() {
   }));
 
   return (
-    <main className="min-h-screen bg-[#0B0F17] text-white selection:bg-blue-500/30">
+    <main className="min-h-screen bg-[#070E1A] text-white selection:bg-amber-500 selection:text-slate-950 pt-[100px] sm:pt-[105px] pb-20 relative overflow-hidden">
       {/* Dynamic Ambient Background Glows */}
-      <div className="fixed top-0 left-1/4 h-[500px] w-[500px] bg-blue-600/5 blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed bottom-0 right-1/4 h-[600px] w-[600px] bg-red-600/5 blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed top-0 left-1/4 h-[500px] w-[500px] bg-blue-600/10 blur-[150px] pointer-events-none -z-10" />
+      <div className="fixed bottom-0 right-1/4 h-[600px] w-[600px] bg-amber-500/5 blur-[160px] pointer-events-none -z-10" />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <HighlightsFeedClient initialHighlights={formattedHighlights} />
       </div>
     </main>
