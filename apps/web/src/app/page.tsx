@@ -54,16 +54,18 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080E18] pt-[86px] flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#080E18] pt-[80px] sm:pt-[86px] flex flex-col selection:bg-emerald-500 selection:text-slate-950">
       {/* Platform Title Marquee */}
-      <div className="px-4 py-2 bg-[#0A1422] border-b border-emerald-500/20 overflow-hidden whitespace-nowrap">
-        <p className="text-xs text-slate-300 font-medium animate-marquee inline-block">
-          ⚡ GoalMills Sports Intelligence Platform • Real-time livescores, high-precision analytics, video recaps, and deep sports coverage • Engineered by Ekpenisi Erue Raphael
-        </p>
+      <div className="w-full max-w-full px-3 py-1.5 bg-[#0A1422] border-b border-emerald-500/20 overflow-hidden whitespace-nowrap">
+        <div className="w-full overflow-hidden">
+          <p className="text-xs text-slate-300 font-medium animate-marquee inline-block">
+            ⚡ GoalMills Sports Intelligence Platform • Real-time livescores, high-precision analytics, video recaps, and deep sports coverage • Engineered by Ekpenisi Erue Raphael
+          </p>
+        </div>
       </div>
 
       {/* Featured VIP Sponsor Hero Banner */}
-      <div className="max-w-[1400px] mx-auto w-full px-4 sm:px-6 pt-4">
+      <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-3">
         <SponsoredBannerCard
           placement="homepage_hero"
           sport={selectedSport === 'live' ? 'all' : selectedSport}

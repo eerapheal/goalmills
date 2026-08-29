@@ -141,38 +141,38 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
       )}
 
       {/* Match Body */}
-      <div className="flex items-center justify-between">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         {/* Home Team */}
-        <div className="flex flex-1 items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
           {event.home_team_logo ? (
             <img
               src={event.home_team_logo}
               alt={event.event_home_team}
-              className="h-9 w-9 object-contain"
+              className="h-7 w-7 sm:h-9 sm:w-9 object-contain flex-shrink-0"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
           ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-xs text-slate-400">
+            <div className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/5 text-xs text-slate-400 flex-shrink-0">
               🛡️
             </div>
           )}
-          <span className="text-sm font-bold text-slate-100 line-clamp-1">
+          <span className="text-xs sm:text-sm font-bold text-slate-100 truncate">
             {event.event_home_team}
           </span>
         </div>
 
         {/* Center Score */}
-        <div className="mx-4 flex flex-col items-center justify-center min-w-[70px]">
+        <div className="flex flex-col items-center justify-center min-w-[56px] sm:min-w-[70px] flex-shrink-0">
           {isUpcoming ? (
-            <span className="rounded border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold text-slate-300">
+            <span className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-semibold text-slate-300">
               {formattedKickoff}
             </span>
           ) : (
-            <div className="rounded bg-black/30 px-3 py-1 text-center">
+            <div className="rounded-lg bg-black/40 border border-white/5 px-2.5 py-0.5 sm:px-3 sm:py-1 text-center shadow-inner">
               <span
-                className={`text-lg font-black tracking-wider ${
+                className={`text-base sm:text-lg font-black tracking-wider ${
                   isLive ? 'text-emerald-400' : 'text-slate-100'
                 }`}
               >
@@ -183,21 +183,21 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
         </div>
 
         {/* Away Team */}
-        <div className="flex flex-1 items-center justify-end space-x-3 text-right">
-          <span className="text-sm font-bold text-slate-100 line-clamp-1">
+        <div className="flex items-center justify-end space-x-2 sm:space-x-3 text-right min-w-0">
+          <span className="text-xs sm:text-sm font-bold text-slate-100 truncate">
             {event.event_away_team}
           </span>
           {event.away_team_logo ? (
             <img
               src={event.away_team_logo}
               alt={event.event_away_team}
-              className="h-9 w-9 object-contain"
+              className="h-7 w-7 sm:h-9 sm:w-9 object-contain flex-shrink-0"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
           ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-xs text-slate-400">
+            <div className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-white/5 text-xs text-slate-400 flex-shrink-0">
               🛡️
             </div>
           )}
