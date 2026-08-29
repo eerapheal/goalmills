@@ -7,6 +7,7 @@ import {
   ApiFootballFixtureItem,
 } from '../services/apiFootball';
 import { GoalmillsLoader } from './GoalmillsLoader';
+import { FiRefreshCw, FiSearch, FiCalendar, FiAward, FiActivity, FiZap } from 'react-icons/fi';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -62,10 +63,10 @@ export function FootballScreen() {
       const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(shortStatus);
       const scoreStr =
         item.goals &&
-          item.goals.home !== null &&
-          item.goals.home !== undefined &&
-          item.goals.away !== null &&
-          item.goals.away !== undefined
+        item.goals.home !== null &&
+        item.goals.home !== undefined &&
+        item.goals.away !== null &&
+        item.goals.away !== undefined
           ? `${item.goals.home} - ${item.goals.away}`
           : undefined;
 
@@ -121,7 +122,6 @@ export function FootballScreen() {
   const adaptStanding = (item: any): UnifiedWebStandingItem | null => {
     if (!item) return null;
 
-    // Format 1: API-Sports / API-Football (item.team, item.all, item.rank)
     if (item.team && typeof item.team === 'object') {
       return {
         rank: item.rank || 1,
@@ -137,7 +137,6 @@ export function FootballScreen() {
       };
     }
 
-    // Format 2: AllSportsAPI (item.standing_team, item.standing_place, item.team_logo)
     if (item.standing_team || item.standing_place !== undefined) {
       return {
         rank: item.standing_place || item.standing_position || 1,
@@ -156,7 +155,6 @@ export function FootballScreen() {
     return null;
   };
 
-  // On-demand fetch (NO auto-refresh intervals)
   const fetchMatches = useCallback(async () => {
     setLoading(true);
     try {
@@ -262,66 +260,86 @@ export function FootballScreen() {
     return Object.values(groups);
   }, [filteredFixtures]);
 
-  const tabs: { id: FootballTab; label: string; icon: string }[] = [
-    { id: 'live', label: 'Live Matches', icon: '🔴' },
-    { id: 'upcoming', label: 'Upcoming', icon: '📅' },
+  const tabs: { id: FootballTab; label: string; icon: string; badge?: string }[] = [
+    { id: 'live', label: 'Live Matches', icon: '⚡', badge: 'Live' },
+    { id: 'upcoming', label: 'Fixtures', icon: '📅' },
     { id: 'results', label: 'Results', icon: '✅' },
     { id: 'standings', label: 'Standings', icon: '🏆' },
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* Header Bar */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-            Football LiveScore
-          </h1>
-          <p className="text-sm text-slate-400">
-            Real-time fixtures, live match events, lineups, and league tables
-          </p>
+    <div className="w-full space-y-5">
+      {/* Smart Control Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+            <FiActivity className="w-5 h-5 text-amber-300" />
+          </div>
+          <div>
+            <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+              <span>Football LiveScore</span>
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold">
+                Smart Engine
+              </span>
+            </h2>
+            <p className="text-xs text-slate-400">
+              Live match events, real-time scorelines, and league tables
+            </p>
+          </div>
         </div>
 
-        {/* Search & Refresh */}
-        <div className="flex items-center space-x-3">
-          <div className="relative flex-1 sm:w-64">
+        {/* Search & Refresh Controls */}
+        <div className="flex items-center gap-2.5">
+          <div className="relative flex-1 sm:w-60">
             <input
               type="text"
-              placeholder="Search teams or leagues..."
+              placeholder="Search team or league..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-[#141C2B] px-4 py-2.5 pl-9 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-blue-500/20 bg-[#070E1A] px-3.5 py-2 pl-9 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
             />
-            <span className="absolute left-3 top-3 text-xs text-slate-400">🔍</span>
+            <FiSearch className="absolute left-3 top-2.5 text-xs text-slate-400" />
           </div>
 
           <button
             onClick={fetchMatches}
-            className="flex items-center space-x-2 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs hover:from-amber-400 hover:to-orange-400 transition-all shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-50"
             title="Refresh on demand"
           >
-            <span>🔄</span>
+            <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="mb-6 flex space-x-2 overflow-x-auto border-b border-white/10 pb-2">
+      {/* Primary Module Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 flex-shrink-0 ${
                 isActive
-                  ? 'border border-emerald-500/50 bg-[#162234] text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-lg shadow-blue-600/30 scale-[1.02]'
+                  : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
               }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
+              {tab.badge && (
+                <span
+                  className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono ${
+                    isActive
+                      ? 'bg-amber-400 text-slate-950 font-black'
+                      : 'bg-amber-500/20 text-amber-300'
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              )}
             </button>
           );
         })}
@@ -329,21 +347,21 @@ export function FootballScreen() {
 
       {/* 7-Day Date Slider (Hidden in Standings & Live modes) */}
       {activeTab !== 'standings' && activeTab !== 'live' && (
-        <div className="mb-6 flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {dateStrip.map((item) => {
             const isSelected = selectedDate === item.iso;
             return (
               <button
                 key={item.iso}
                 onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[72px] flex-col items-center rounded-2xl p-2.5 transition-all ${
+                className={`flex min-w-[72px] sm:min-w-[80px] flex-col items-center rounded-2xl p-2.5 transition-all duration-200 border ${
                   isSelected
-                    ? 'border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 shadow-md shadow-emerald-950'
-                    : 'border border-white/5 bg-[#141C2B] text-slate-400 hover:bg-[#1E293B] hover:text-slate-200'
+                    ? 'border-amber-400 bg-gradient-to-b from-amber-500/20 to-orange-500/10 text-amber-300 shadow-lg shadow-amber-500/20 scale-[1.03]'
+                    : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-400 hover:border-blue-400/30 hover:text-white'
                 }`}
               >
-                <span className="text-xs font-semibold">{item.dayName}</span>
-                <span className="text-lg font-black">{item.dayNumber}</span>
+                <span className="text-[10px] font-bold uppercase">{item.dayName}</span>
+                <span className="text-base sm:text-lg font-black">{item.dayNumber}</span>
               </button>
             );
           })}
@@ -352,105 +370,156 @@ export function FootballScreen() {
 
       {/* Content Feed */}
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <GoalmillsLoader size="lg" label="GoalMills Football" sublabel="Loading football updates..." />
+        <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
+          <GoalmillsLoader size="lg" label="GoalMills Football" sublabel="Syncing live match telemetry..." />
         </div>
       ) : activeTab === 'standings' ? (
-        <div className="rounded-2xl border border-white/10 bg-[#141C2B] p-6 shadow-xl">
-          <h2 className="mb-4 text-lg font-bold text-white">League Table Standings</h2>
+        <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+          <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+            <div>
+              <h3 className="text-base font-black text-white flex items-center gap-2 uppercase">
+                <FiAward className="text-amber-400" />
+                <span>Premier League Table & Form</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Official standings, goal differentials, and European qualification spots
+              </p>
+            </div>
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono">
+              2025/26 Season
+            </span>
+          </div>
+
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="border-b border-white/10 text-xs uppercase text-slate-400">
+            <table className="w-full text-left text-xs sm:text-sm text-slate-300">
+              <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
                 <tr>
-                  <th className="py-3 px-2">#</th>
-                  <th className="py-3 px-4">Club</th>
-                  <th className="py-3 px-3 text-center">PL</th>
-                  <th className="py-3 px-3 text-center">W</th>
-                  <th className="py-3 px-3 text-center">D</th>
-                  <th className="py-3 px-3 text-center">L</th>
-                  <th className="py-3 px-3 text-center">GD</th>
-                  <th className="py-3 px-4 text-right">PTS</th>
+                  <th className="py-3 px-2 text-center w-8">#</th>
+                  <th className="py-3 px-3">Club</th>
+                  <th className="py-3 px-2 text-center">PL</th>
+                  <th className="py-3 px-2 text-center">W</th>
+                  <th className="py-3 px-2 text-center">D</th>
+                  <th className="py-3 px-2 text-center">L</th>
+                  <th className="py-3 px-2 text-center font-semibold">GD</th>
+                  <th className="py-3 px-3 text-right font-black text-amber-400">PTS</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-white/5 font-medium">
                 {standings.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-slate-500">
-                      No standings data available at this time.
+                    <td colSpan={8} className="py-12 text-center text-slate-400 text-xs">
+                      No standings telemetry available at this time.
                     </td>
                   </tr>
                 ) : (
-                  standings.map((row, index) => (
-                    <tr key={row.team_id || index} className="hover:bg-white/5">
-                      <td className="py-3 px-2 font-bold text-slate-400">{row.rank}</td>
-                      <td className="flex items-center space-x-3 py-3 px-4 font-bold text-white">
-                        {row.team_logo ? (
-                          <img
-                            src={row.team_logo}
-                            alt={row.team_name}
-                            className="h-5 w-5 object-contain"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLElement).style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          <span className="text-xs">⚽</span>
-                        )}
-                        <span>{row.team_name}</span>
-                      </td>
-                      <td className="py-3 px-3 text-center">{row.played}</td>
-                      <td className="py-3 px-3 text-center">{row.win}</td>
-                      <td className="py-3 px-3 text-center">{row.draw}</td>
-                      <td className="py-3 px-3 text-center">{row.lose}</td>
-                      <td className="py-3 px-3 text-center font-medium">{row.goalsDiff}</td>
-                      <td className="py-3 px-4 text-right font-black text-emerald-400">
-                        {row.points}
-                      </td>
-                    </tr>
-                  ))
+                  standings.map((row, index) => {
+                    const rankNum = Number(row.rank);
+                    const isUCL = rankNum <= 4;
+                    const isUEL = rankNum === 5 || rankNum === 6;
+                    const isRelegation = rankNum >= 18;
+
+                    return (
+                      <tr
+                        key={row.team_id || index}
+                        className="hover:bg-blue-600/10 transition-colors group"
+                      >
+                        <td className="py-2.5 px-2 text-center">
+                          <span
+                            className={`inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-black ${
+                              isUCL
+                                ? 'bg-blue-600/30 text-blue-300 border border-blue-400/40'
+                                : isUEL
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  : isRelegation
+                                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                    : 'text-slate-400'
+                            }`}
+                          >
+                            {row.rank}
+                          </span>
+                        </td>
+                        <td className="flex items-center space-x-2.5 py-2.5 px-3 font-bold text-white group-hover:text-blue-300 transition-colors">
+                          {row.team_logo ? (
+                            <img
+                              src={row.team_logo}
+                              alt={row.team_name}
+                              className="h-5 w-5 object-contain"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-xs text-blue-400">⚽</span>
+                          )}
+                          <span className="truncate">{row.team_name}</span>
+                        </td>
+                        <td className="py-2.5 px-2 text-center text-slate-300">{row.played}</td>
+                        <td className="py-2.5 px-2 text-center text-slate-300">{row.win}</td>
+                        <td className="py-2.5 px-2 text-center text-slate-300">{row.draw}</td>
+                        <td className="py-2.5 px-2 text-center text-slate-300">{row.lose}</td>
+                        <td className="py-2.5 px-2 text-center font-bold text-slate-200">
+                          {row.goalsDiff}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-black text-amber-400 text-sm">
+                          {row.points}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
           </div>
         </div>
       ) : leagueGroups.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#141C2B] p-8 text-center">
-          <span className="text-4xl">⚽</span>
-          <h3 className="mt-3 text-base font-bold text-white">
-            {activeTab === 'live' ? 'No Live Matches Ongoing' : 'No Matches Found'}
+        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-8 text-center backdrop-blur-md">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl mb-3 shadow-inner">
+            ⚽
+          </div>
+          <h3 className="text-base font-black text-white">
+            {activeTab === 'live' ? 'No Live Matches In-Play' : 'No Fixtures Found'}
           </h3>
           <p className="mt-1 text-xs text-slate-400 max-w-sm">
             {activeTab === 'live'
-              ? 'Check upcoming games or select another date from the calendar.'
-              : 'Try searching for a different team or league.'}
+              ? 'Check upcoming games in the Fixtures tab or pick another date from the calendar.'
+              : 'Try selecting a different date or clearing your search filter.'}
           </p>
           <button
             onClick={fetchMatches}
-            className="mt-4 rounded-xl border border-white/10 bg-[#1E293B] px-4 py-2 text-xs font-bold text-emerald-400 hover:bg-slate-700"
+            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-all shadow-md"
           >
-            Refresh Feed
+            <FiRefreshCw className="w-3.5 h-3.5" />
+            <span>Reload Match Feed</span>
           </button>
         </div>
       ) : (
         <div className="space-y-6">
           {leagueGroups.map((group) => (
-            <div key={group.title} className="space-y-3">
+            <div
+              key={group.title}
+              className="space-y-3 rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-4 shadow-xl backdrop-blur-md"
+            >
               {/* League Header */}
-              <div className="flex items-center space-x-2">
-                {group.logo ? (
-                  <img src={group.logo} alt={group.title} className="h-5 w-5 object-contain" />
-                ) : (
-                  <span className="text-blue-400">🏆</span>
-                )}
-                <span className="text-xs font-black uppercase tracking-wider text-slate-300">
-                  {group.title}
+              <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                <div className="flex items-center space-x-2.5">
+                  {group.logo ? (
+                    <img src={group.logo} alt={group.title} className="h-5 w-5 object-contain" />
+                  ) : (
+                    <span className="text-amber-400 text-sm">🏆</span>
+                  )}
+                  <span className="text-xs font-black uppercase tracking-wider text-white">
+                    {group.title}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                  {group.matches.length} {group.matches.length === 1 ? 'Match' : 'Matches'}
                 </span>
               </div>
 
               {/* Match Cards */}
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {group.matches.map((match) => (
-                  <FootballMatchCard key={match.event_key} event={match} />
+                  <FootballMatchCard key={match.event_key} event={match} hideLeague={true} />
                 ))}
               </div>
             </div>
