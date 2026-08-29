@@ -32,7 +32,7 @@ func LoadConfigFromEnv() Config {
 	}
 	fromEmail := os.Getenv("SMTP_FROM_EMAIL")
 	if fromEmail == "" {
-		fromEmail = "newsletter@goalmills.com"
+		fromEmail = "hayeswaya@gmail.com"
 	}
 	fromName := os.Getenv("SMTP_FROM_NAME")
 	if fromName == "" {

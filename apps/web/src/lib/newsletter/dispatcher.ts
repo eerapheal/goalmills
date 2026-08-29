@@ -50,7 +50,7 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
   await dbConnect();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
-  const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'http://localhost:8085';
+  const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'https://goalmills.onrender.com';
 
   // 1. Resolve Articles
   let articles: NewsletterArticlePreview[] = params.articles || [];
@@ -231,7 +231,7 @@ export async function sendConfirmationEmail(
 ): Promise<SendConfirmationResult> {
   const { subscriber, requireDoubleOptIn = false } = params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
-  const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'http://localhost:8085';
+  const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'https://goalmills.onrender.com';
 
   const recipientEmail = (subscriber.emailNormalized || subscriber.email).toLowerCase().trim();
   const confirmationUrl = `${siteUrl}/newsletter/confirm?token=${subscriber.confirmationToken || ''}`;
