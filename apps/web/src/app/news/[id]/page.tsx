@@ -116,7 +116,8 @@ export async function generateMetadata({
     imageUrl = `https://res.cloudinary.com/demo/image/upload/w_1200,h_630,c_fill,g_auto/sample.jpg`;
   }
 
-  const url = `https://goalmills-web.vercel.app/news/${id}`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
+  const url = `${baseUrl}/news/${id}`;
 
   return {
     title,
@@ -126,6 +127,9 @@ export async function generateMetadata({
     }, GoalMills`,
     authors: [{ name: news.author as string }],
     publisher: 'GoalMills',
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
       type: 'article',
       title,

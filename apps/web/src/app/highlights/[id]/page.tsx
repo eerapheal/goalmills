@@ -34,13 +34,17 @@ export async function generateMetadata({
     video.video_description ||
     `Watch ${video.video_title} match replay and video highlights in HD on GoalMills.`;
   const thumbnailUrl = getHighlightThumbnail(video.video_url, video.video_thumbnail);
-  const url = `https://goalmills-web.vercel.app/highlights/${id}`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
+  const url = `${baseUrl}/highlights/${id}`;
 
   return {
     title,
     description,
     keywords: `${video.category || 'football'}, ${video.league || 'sports'}, ${video.video_title}, match highlights, sports replay, GoalMills`,
     publisher: 'GoalMills',
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
       type: 'video.other',
       title,

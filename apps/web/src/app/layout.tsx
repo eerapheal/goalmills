@@ -55,8 +55,38 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://goalmills.com/#organization',
+        name: 'GoalMills Sports Intelligence',
+        url: 'https://goalmills.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://goalmills.com/og-image.png',
+        },
+        sameAs: ['https://twitter.com/goalmills'],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://goalmills.com/#website',
+        url: 'https://goalmills.com',
+        name: 'GoalMills',
+        publisher: { '@id': 'https://goalmills.com/#organization' },
+      },
+    ],
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${inter.className} antialiased bg-slate-950 text-slate-200`}
         suppressHydrationWarning
