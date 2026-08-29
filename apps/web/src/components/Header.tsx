@@ -44,7 +44,7 @@ export function Header() {
         <nav className="rounded-2xl border border-amber-400/40 bg-[#0C1726]/95 backdrop-blur-xl px-4 sm:px-6 py-3 shadow-[0_0_25px_rgba(245,158,11,0.15)] flex items-center justify-between">
           {/* Brand Logo & Subtitle */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 p-[2px] shadow-lg shadow-amber-500/20 group-hover:scale-105 transition duration-300">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-blue-400 p-[2px] shadow-lg shadow-amber-500/20 group-hover:scale-105 transition duration-300">
               <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center overflow-hidden">
                 <Image
                   src="/icon.png"
@@ -58,7 +58,7 @@ export function Header() {
 
             <div>
               <h1 className="text-xl font-black italic tracking-tight text-white flex items-center">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-orange-400">
                   GOAL
                 </span>
                 <span className="text-white ml-0.5">MILLS</span>
