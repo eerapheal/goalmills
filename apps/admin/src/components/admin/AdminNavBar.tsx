@@ -191,24 +191,7 @@ const PRIMARY_TABS: PrimaryTab[] = [
     href: '/admin/users',
     icon: FiUserCheck,
     requiredPermission: 'users:manage',
-    subItems: [
-      {
-        id: 'user_directory',
-        label: 'User Directory',
-        href: '/admin/users',
-        description: 'Registered accounts, profile roles & reader subscriptions',
-        icon: FiUserCheck,
-        requiredPermission: 'users:manage',
-      },
-      {
-        id: 'staff_roles',
-        label: 'Staff Roles & Invitations',
-        href: '/admin/users',
-        description: 'Role-based access permissions & security levels',
-        icon: FiShield,
-        requiredPermission: 'users:manage',
-      },
-    ],
+    subItems: [],
   },
   {
     id: 'sponsorship_management',
@@ -217,16 +200,7 @@ const PRIMARY_TABS: PrimaryTab[] = [
     href: '/admin/sponsorships',
     icon: FiDollarSign,
     requiredPermission: 'articles:draft',
-    subItems: [
-      {
-        id: 'active_sponsorships',
-        label: 'Active Campaigns',
-        href: '/admin/sponsorships',
-        description: 'Manage brand partnerships, banners & ad placements',
-        icon: FiDollarSign,
-        requiredPermission: 'articles:draft',
-      },
-    ],
+    subItems: [],
   },
   {
     id: 'content_deletion',
@@ -235,24 +209,7 @@ const PRIMARY_TABS: PrimaryTab[] = [
     href: '/admin/deletion',
     icon: FiTrash2,
     requiredPermission: 'articles:draft',
-    subItems: [
-      {
-        id: 'trash_bin',
-        label: 'Trash Bin',
-        href: '/admin/deletion',
-        description: 'Soft-deleted news articles & restoration center',
-        icon: FiTrash2,
-        requiredPermission: 'articles:draft',
-      },
-      {
-        id: 'deletion_audit',
-        label: 'Deletion Audit Log',
-        href: '/admin/deletion',
-        description: 'Compliance history & permanent purge records',
-        icon: FiShield,
-        requiredPermission: 'articles:draft',
-      },
-    ],
+    subItems: [],
   },
   {
     id: 'system_configuration',
@@ -261,30 +218,14 @@ const PRIMARY_TABS: PrimaryTab[] = [
     href: '/admin/system',
     icon: FiSettings,
     requiredPermission: 'articles:draft',
-    subItems: [
-      {
-        id: 'diagnostics',
-        label: 'System Diagnostics',
-        href: '/admin/system',
-        description: 'API health checks, database connections & server stats',
-        icon: FiActivity,
-        requiredPermission: 'articles:draft',
-      },
-      {
-        id: 'redis_cache',
-        label: 'Redis Cache Purge',
-        href: '/admin/system',
-        description: 'Flush cached pages, categories & edge keys',
-        icon: FiZap,
-        requiredPermission: 'articles:draft',
-      },
-    ],
+    subItems: [],
   },
 ];
 
 // Quick jump desktop shortcut chips for high frequency operations
 const QUICK_SHORTCUTS = [
   { label: 'Portal', href: '/admin/portal', icon: FiLayout, color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20' },
+  { label: 'Create Article', href: '/admin/news/new', icon: FiPlusCircle, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Evaluation', href: '/admin/evaluations', icon: FiAward, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Handbook', href: '/admin/handbook', icon: FiBookOpen, color: 'text-amber-300 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Payroll', href: '/admin/payroll', icon: FiDollarSign, color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20' },
@@ -356,17 +297,25 @@ export default function AdminNavBar() {
     });
   }, [userRole]);
 
-  // Flatten all accessible sub-items for mobile quick dropdown
+  // Flatten all accessible items for mobile quick dropdown
   const allSubItems = useMemo(() => {
     const items: { group: string; label: string; href: string }[] = [];
     accessibleTabs.forEach((tab) => {
-      tab.subItems.forEach((sub) => {
+      if (tab.subItems.length > 1) {
+        tab.subItems.forEach((sub) => {
+          items.push({
+            group: tab.label,
+            label: sub.label,
+            href: sub.href,
+          });
+        });
+      } else {
         items.push({
           group: tab.label,
-          label: sub.label,
-          href: sub.href,
+          label: tab.label,
+          href: tab.href,
         });
-      });
+      }
     });
     return items;
   }, [accessibleTabs]);
@@ -536,14 +485,34 @@ export default function AdminNavBar() {
         </div>
 
         {/* ========================================================================= */}
-        {/* DESKTOP PRIMARY MODULE TABS WITH RICH INTERACTIVE DROPDOWNS */}
+        {/* DESKTOP PRIMARY MODULE TABS (Interactive Dropdowns only for multi-item tabs) */}
         {/* ========================================================================= */}
         <nav className="hidden lg:flex items-center gap-1.5 pt-2 border-t border-white/5 overflow-visible relative">
           {accessibleTabs.map((tab) => {
             const Icon = tab.icon;
             const isTabActive = activeTabId === tab.id;
-            const isDropdownOpen = openDropdown === tab.id;
+            const hasDropdown = tab.subItems.length > 1;
+            const isDropdownOpen = hasDropdown && openDropdown === tab.id;
 
+            // Direct link for single-page modules (User Management, Sponsorships, Deletion, System)
+            if (!hasDropdown) {
+              return (
+                <Link
+                  key={tab.id}
+                  href={tab.href}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-200 ${
+                    isTabActive
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 scale-[1.02]'
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon size={14} />
+                  <span>{tab.label}</span>
+                </Link>
+              );
+            }
+
+            // Interactive Popover Dropdown for multi-item modules (CMS & Editorial, HR & Staff)
             return (
               <div
                 key={tab.id}
@@ -551,34 +520,28 @@ export default function AdminNavBar() {
                 onMouseEnter={() => setOpenDropdown(tab.id)}
                 onMouseLeave={() => setOpenDropdown(null)}
               >
-                {/* Module Trigger Button / Link */}
-                <div className="flex items-center">
-                  <Link
-                    href={tab.href}
-                    onClick={() => setOpenDropdown(null)}
-                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-200 ${
-                      isTabActive
-                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 scale-[1.02]'
-                        : isDropdownOpen
-                          ? 'bg-white/10 text-white'
-                          : 'text-slate-300 hover:text-white hover:bg-white/5'
+                <Link
+                  href={tab.href}
+                  onClick={() => setOpenDropdown(null)}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-200 ${
+                    isTabActive
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 scale-[1.02]'
+                      : isDropdownOpen
+                        ? 'bg-white/10 text-white'
+                        : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon size={14} />
+                  <span>{tab.label}</span>
+                  <FiChevronDown
+                    size={12}
+                    className={`transition-transform duration-200 ${
+                      isDropdownOpen ? 'rotate-180 text-white' : 'text-slate-400'
                     }`}
-                  >
-                    <Icon size={14} />
-                    <span>{tab.label}</span>
-                    {tab.subItems.length > 0 && (
-                      <FiChevronDown
-                        size={12}
-                        className={`transition-transform duration-200 ${
-                          isDropdownOpen ? 'rotate-180 text-white' : 'text-slate-400'
-                        }`}
-                      />
-                    )}
-                  </Link>
-                </div>
+                  />
+                </Link>
 
-                {/* Rich Hover / Click Popover Dropdown Card */}
-                {isDropdownOpen && tab.subItems.length > 0 && (
+                {isDropdownOpen && (
                   <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 rounded-2xl bg-slate-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl p-2 z-50 animate-fade-in space-y-1">
                     <div className="px-3 py-1.5 border-b border-white/10 flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
@@ -670,15 +633,24 @@ export default function AdminNavBar() {
               }}
               className="w-full appearance-none px-4 py-3 rounded-2xl bg-slate-900/95 border-2 border-amber-500/30 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-400 pr-10 shadow-xl transition-all"
             >
-              {accessibleTabs.map((tab) => (
-                <optgroup key={tab.id} label={`📂 ${tab.label}`}>
-                  {tab.subItems.map((sub) => (
-                    <option key={sub.id + sub.href} value={sub.href}>
-                      {sub.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
+              {accessibleTabs.map((tab) => {
+                if (tab.subItems.length > 1) {
+                  return (
+                    <optgroup key={tab.id} label={`📂 ${tab.label}`}>
+                      {tab.subItems.map((sub) => (
+                        <option key={sub.id + sub.href} value={sub.href}>
+                          {sub.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                }
+                return (
+                  <option key={tab.id} value={tab.href}>
+                    📌 {tab.label}
+                  </option>
+                );
+              })}
             </select>
             <FiChevronDown
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-amber-400 pointer-events-none"
@@ -688,7 +660,7 @@ export default function AdminNavBar() {
         </div>
 
         {/* ========================================================================= */}
-        {/* MOBILE ACCORDION DRAWER WITH FULL CATEGORIZED EXPANDABLE MENUS */}
+        {/* MOBILE ACCORDION DRAWER WITH FULL CATEGORIZED MENUS */}
         {/* ========================================================================= */}
         {mobileMenuOpen && (
           <div className="pt-3 border-t border-white/10 space-y-4 lg:hidden animate-fade-in">
@@ -720,7 +692,7 @@ export default function AdminNavBar() {
               </div>
             </div>
 
-            {/* Categorized Dropdown Accordions */}
+            {/* Categorized Navigation: Single Link or Accordion */}
             <div className="space-y-2 pt-2 border-t border-white/10">
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
                 All Admin Modules:
@@ -729,6 +701,26 @@ export default function AdminNavBar() {
               {accessibleTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isTabActive = activeTabId === tab.id;
+                const hasDropdown = tab.subItems.length > 1;
+
+                if (!hasDropdown) {
+                  return (
+                    <Link
+                      key={tab.id}
+                      href={tab.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-2.5 p-3 rounded-2xl border text-xs font-black uppercase transition-all ${
+                        isTabActive
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
+                          : 'bg-slate-900/60 border-white/10 text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      <Icon size={15} className={isTabActive ? 'text-slate-950' : 'text-amber-400'} />
+                      <span>{tab.label}</span>
+                    </Link>
+                  );
+                }
+
                 const isExpanded =
                   mobileExpandedSection === tab.id || (mobileExpandedSection === null && isTabActive);
 

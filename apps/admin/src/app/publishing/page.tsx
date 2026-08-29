@@ -167,7 +167,7 @@ export default function PublishingDashboardPage() {
                     </p>
                   </div>
                   <Link
-                    href={`/admin/news/edit/${item._id}`}
+                    href={`/admin/news/${item._id}/edit`}
                     className="px-3.5 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 text-xs font-bold transition"
                   >
                     Review & Publish
