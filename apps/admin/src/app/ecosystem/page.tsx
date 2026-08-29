@@ -6,8 +6,7 @@ import { FiArrowLeft, FiCompass, FiFileText } from 'react-icons/fi';
 
 export default function AdminEcosystemPage() {
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 pt-[90px]">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6">
         {/* Header Bar */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center glass-card p-6 rounded-3xl border border-white/10 gap-4">
           <div>
@@ -42,7 +41,6 @@ export default function AdminEcosystemPage() {
 
         {/* Ecosystem Manager Tabbed Engine */}
         <EcosystemManager />
-      </div>
     </div>
   );
 }

@@ -6,8 +6,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 
 export default function AdminCategoriesPage() {
   return (
-    <div className="min-h-screen bg-background p-6 pt-[90px]">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-center glass-card p-6 rounded-2xl gap-4">
           <div>
             <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
@@ -41,7 +40,6 @@ export default function AdminCategoriesPage() {
         </div>
 
         <CategoryManager />
-      </div>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import AdminShell from '../AdminShell';
 import {
   FiTrash2,
   FiRotateCcw,
@@ -89,8 +88,7 @@ export default function ContentDeletionPage() {
   };
 
   return (
-    <AdminShell>
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6">
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-6">
           <div>
@@ -220,6 +218,5 @@ export default function ContentDeletionPage() {
           </div>
         )}
       </div>
-    </AdminShell>
   );
 }
