@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cacheGet, cacheSet, singleFlight } from '@/lib/redisCache';
 
-// ─── In-Memory Cache ──────────────────────────────────────────────────────────
-interface CacheEntry {
-  timestamp: number;
-  data: any;
-  ttl: number;
-}
-
-const CACHE_STORE = new Map<string, CacheEntry>();
 let rateLimitBackoffUntil = 0;
+let consecutiveFailures = 0;
+let circuitBreakerOpenUntil = 0;
 
 // Rate-limit spacer: minimum 250ms between outbound fetches to prevent 429 bursts
 let lastFetchTime = 0;
@@ -1194,105 +1189,151 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const cacheKey = apiUrl.toString();
+    const cacheKey = `gm:sport:cricket:${apiUrl.toString()}`;
     const ttlSeconds = getTtlForEndpoint(endpointParam);
     const now = Date.now();
 
-    // Check in-memory cache
-    const cached = CACHE_STORE.get(cacheKey);
-    if (cached && now - cached.timestamp < cached.ttl * 1000) {
-      return NextResponse.json(cached.data, {
+    // 1. Check Redis / Multi-Tier Cache
+    const cached = await cacheGet<any>(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached, {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Cache-Control': `public, s-maxage=${ttlSeconds}, stale-while-revalidate=${ttlSeconds * 2}`,
           'X-Cache': 'HIT',
+          'X-Data-Freshness': 'FRESH',
         },
       });
     }
 
-    // Rate-limited backoff check
-    if (now < rateLimitBackoffUntil) {
+    // 2. Check Circuit Breaker & Rate Limit Throttling
+    const isCircuitOpen = now < circuitBreakerOpenUntil;
+    const isRateLimited = now < rateLimitBackoffUntil;
+
+    if (isCircuitOpen || isRateLimited) {
       if (cached) {
-        return NextResponse.json(cached.data, {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'X-Cache': 'STALE_THROTTLED',
-          },
-        });
-      }
-      return NextResponse.json(
-        { success: 1, result: [], message: 'Rate-limited backoff active' },
-        { status: 200, headers: { 'Access-Control-Allow-Origin': '*' } }
-      );
-    }
-
-    console.log('Proxying cricket request to:', apiUrl.toString());
-
-    let response: Response | null = null;
-    try {
-      response = await rateLimitedFetch(apiUrl.toString(), {
-        method: 'GET',
-        headers,
-        next: { revalidate: ttlSeconds },
-      });
-    } catch (fetchErr) {
-      console.warn('Cricket API fetch error:', fetchErr);
-    }
-
-    if (!response || !response.ok || response.status === 204) {
-      const status = response ? response.status : 502;
-      if (status === 404 || status === 204) {
-        console.info(
-          `[Info] Feed unavailable for ${endpointParam} (status ${status}), returning client fallback.`
-        );
-      } else {
-        console.warn(
-          `Cricket API status ${status} for ${endpointParam}, triggering client fallbacks.`
+        return NextResponse.json(
+          { ...cached, isStale: true },
+          {
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type',
+              'Cache-Control': `public, s-maxage=15, stale-while-revalidate=30`,
+              'X-Cache': 'STALE_CIRCUIT_DEGRADED',
+              'X-Data-Freshness': 'STALE',
+            },
+          }
         );
       }
-      if (status === 429) rateLimitBackoffUntil = Date.now() + 15_000;
-
-      if (cached) {
-        return NextResponse.json(cached.data, {
-          headers: { 'Access-Control-Allow-Origin': '*', 'X-Cache': 'STALE_ERROR_FALLBACK' },
-        });
-      }
-
       return NextResponse.json(
-        { success: 1, result: [], message: `Live feed fallback (status ${status})` },
-        { status: 200, headers: { 'Access-Control-Allow-Origin': '*' } }
-      );
-    }
-
-    const text = await response.text();
-    let data: any = {};
-    if (text && text.trim()) {
-      try {
-        data = JSON.parse(text);
-      } catch (err) {
-        console.warn('Cricket proxy JSON parse warning:', err);
-        data = {};
-      }
-    }
-
-    // ─── TRANSFORM: Convert Cricbuzz nested format → app-compatible flat format
-    const standardized = isRapidApi
-      ? transformCricbuzzResponse(endpointParam, data, searchParams)
-      : {
+        {
           success: 1,
-          result: Array.isArray(data) ? data : (data.result ?? data),
-          ...(!Array.isArray(data) ? data : {}),
-        };
+          result: [],
+          isStale: true,
+          message: isCircuitOpen
+            ? 'Cricket provider circuit breaker active, serving fallback'
+            : 'Rate-limited backoff active, serving fallback',
+          lastUpdatedAt: new Date().toISOString(),
+        },
+        { status: 200, headers: { 'Access-Control-Allow-Origin': '*', 'X-Data-Freshness': 'DEGRADED' } }
+      );
+    }
 
-    // Store in memory cache
-    CACHE_STORE.set(cacheKey, {
-      timestamp: Date.now(),
-      data: standardized,
-      ttl: ttlSeconds,
+    // 3. Single-Flight Coalesced Upstream Fetch
+    const standardized = await singleFlight(cacheKey, async () => {
+      console.log('Proxying cricket request to:', apiUrl.toString());
+
+      let response: Response | null = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (attempts < maxAttempts) {
+        try {
+          attempts++;
+          response = await rateLimitedFetch(apiUrl.toString(), {
+            method: 'GET',
+            headers,
+            next: { revalidate: ttlSeconds },
+          });
+
+          if (response && response.ok && response.status !== 204) {
+            consecutiveFailures = 0;
+            break;
+          }
+
+          if (response && response.status >= 500 && attempts < maxAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
+            continue;
+          }
+
+          break;
+        } catch (fetchErr) {
+          if (attempts >= maxAttempts) {
+            console.warn('Cricket API fetch error after retries:', fetchErr);
+            break;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
+        }
+      }
+
+      if (!response || !response.ok || response.status === 204) {
+        const status = response ? response.status : 502;
+        consecutiveFailures++;
+        if (consecutiveFailures >= 5) {
+          circuitBreakerOpenUntil = Date.now() + 30_000;
+          console.warn('⚡ Cricket Provider Circuit Breaker TRIPPED for 30s');
+        }
+
+        if (status === 429) rateLimitBackoffUntil = Date.now() + 15_000;
+
+        return {
+          success: 1,
+          result: [],
+          isStale: true,
+          lastUpdatedAt: new Date().toISOString(),
+          message: `Live feed fallback (status ${status})`,
+        };
+      }
+
+      let text = '';
+      if (typeof response.text === 'function') {
+        text = await response.text();
+      } else if (typeof response.json === 'function') {
+        const j = await response.json();
+        text = typeof j === 'string' ? j : JSON.stringify(j);
+      }
+
+      let data: any = {};
+      if (text && text.trim()) {
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          console.warn('Cricket proxy JSON parse warning:', err);
+          data = {};
+        }
+      }
+
+      // ─── TRANSFORM: Convert Cricbuzz nested format → app-compatible flat format
+      const transformed = isRapidApi
+        ? transformCricbuzzResponse(endpointParam, data, searchParams)
+        : {
+            success: 1,
+            result: Array.isArray(data) ? data : (data.result ?? data),
+            ...(!Array.isArray(data) ? data : {}),
+          };
+
+      const resultPayload = {
+        ...transformed,
+        lastUpdatedAt: new Date().toISOString(),
+        isStale: false,
+      };
+
+      // Store in Redis/Memory Cache
+      await cacheSet(cacheKey, resultPayload, ttlSeconds);
+      return resultPayload;
     });
 
     return NextResponse.json(standardized, {
@@ -1302,6 +1343,7 @@ export async function GET(request: NextRequest) {
         'Access-Control-Allow-Headers': 'Content-Type',
         'Cache-Control': `public, s-maxage=${ttlSeconds}, stale-while-revalidate=${ttlSeconds * 2}`,
         'X-Cache': 'MISS',
+        'X-Data-Freshness': 'LIVE',
       },
     });
   } catch (error) {
