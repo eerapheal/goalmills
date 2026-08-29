@@ -1,8 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Category from '@/models/Category';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +111,6 @@ export async function GET() {
   try {
     let categories = await Category.find({}).sort({ order: 1, createdAt: 1 }).lean();
 
-    // Auto-seed default categories if collection is empty
     if (!categories || categories.length === 0) {
       await Category.insertMany(DEFAULT_CATEGORIES);
       categories = await Category.find({}).sort({ order: 1, createdAt: 1 }).lean();
@@ -123,59 +120,5 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json({ message: 'Error fetching categories' }, { status: 500 });
-  }
-}
-
-export async function POST(request: NextRequest) {
-  const session = (await getServerSession(authOptions)) as any;
-  if (!session || (session.user.role !== 'staff' && session.user.role !== 'super-admin')) {
-    return NextResponse.json(
-      { message: 'Unauthorized: staff or Super Admin role required' },
-      { status: 401 }
-    );
-  }
-
-  await dbConnect();
-  try {
-    const { name, slug, description, color, icon, isFeatured, order } = await request.json();
-
-    if (!name || !name.trim()) {
-      return NextResponse.json({ message: 'Category name is required' }, { status: 400 });
-    }
-
-    const cleanSlug = (slug || name)
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-
-    // Check duplicate
-    const existing = await Category.findOne({
-      $or: [{ name: name.trim() }, { slug: cleanSlug }],
-    });
-    if (existing) {
-      return NextResponse.json(
-        { message: 'Category with this name or slug already exists' },
-        { status: 400 }
-      );
-    }
-
-    const category = await Category.create({
-      name: name.trim(),
-      slug: cleanSlug,
-      description: description || '',
-      color: color || '#3B82F6',
-      icon: icon || 'newspaper',
-      isFeatured: Boolean(isFeatured),
-      order: typeof order === 'number' ? order : 0,
-    });
-
-    return NextResponse.json(category, { status: 201 });
-  } catch (error: any) {
-    console.error('Error creating category:', error);
-    return NextResponse.json(
-      { message: error.message || 'Error creating category' },
-      { status: 400 }
-    );
   }
 }

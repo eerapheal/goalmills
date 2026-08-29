@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { NotificationBell } from './NotificationBell';
 
 export function Header() {
@@ -12,7 +11,6 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession();
 
   useEffect(() => {
     setMounted(true);
@@ -101,52 +99,6 @@ export function Header() {
 
           {/* Web Push Notification Bell */}
           <NotificationBell />
-
-          {session?.user ? (
-            <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-              {['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(session.user.role as any) && (
-                <a
-                  href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'}
-                  className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30 transition-all text-xs flex items-center gap-1"
-                >
-                  <span>⚡</span> Admin Hub
-                </a>
-              )}
-
-              <Link href="/profile" className="flex items-center gap-3 group">
-                <div className="text-right hidden lg:block">
-                  <p className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">
-                    {session.user.name}
-                  </p>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-                    {session.user.role || 'User'}
-                  </p>
-                </div>
-                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-slate-700 group-hover:border-blue-500 transition-colors">
-                  {session.user.image ? (
-                    <Image
-                      src={session.user.image}
-                      alt={session.user.name || 'Profile'}
-                      fill
-                      sizes="40px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold">
-                      {session.user.name?.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-              </Link>
-            </div>
-          ) : (
-            <Link
-              href="/signin"
-              className="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all text-sm font-bold ml-2"
-            >
-              Sign In
-            </Link>
-          )}
         </div>
 
         {/* Mobile Right Controls: Notification Bell & Menu Toggle */}
@@ -197,51 +149,6 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
-
-            {session?.user ? (
-              <>
-                {['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(session.user.role as any) && (
-                  <a
-                    href={process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'}
-                    onClick={() => setIsOpen(false)}
-                    className={`text-2xl font-black text-amber-400 transition-all duration-300 ${
-                      isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                    }`}
-                  >
-                    ⚡ Admin & EMS Hub
-                  </a>
-                )}
-
-                <Link
-                  href="/admin/portal"
-                  onClick={() => setIsOpen(false)}
-                  className={`text-2xl font-bold text-cyan-400 transition-all duration-300 ${
-                    isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                  }`}
-                >
-                  Staff Portal
-                </Link>
-                <Link
-                  href="/profile"
-                  onClick={() => setIsOpen(false)}
-                  className={`text-2xl font-bold text-blue-400 transition-all duration-300 ${
-                    isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                  }`}
-                >
-                  Profile ({session.user.name})
-                </Link>
-              </>
-            ) : (
-              <Link
-                href="/signin"
-                onClick={() => setIsOpen(false)}
-                className={`text-2xl font-bold text-white transition-all duration-300 ${
-                  isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                }`}
-              >
-                Sign In
-              </Link>
-            )}
           </div>
         </div>
       </nav>

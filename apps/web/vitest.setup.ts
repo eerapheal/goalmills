@@ -18,18 +18,6 @@ vi.mock('next/navigation', () => {
   };
 });
 
-// Mock Next-Auth
-vi.mock('next-auth/react', () => {
-  return {
-    useSession: vi.fn(() => ({
-      data: null,
-      status: 'unauthenticated',
-    })),
-    signIn: vi.fn(),
-    signOut: vi.fn(),
-    SessionProvider: ({ children }: { children: React.ReactNode }) => children,
-  };
-});
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

@@ -8,13 +8,12 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    fileParallelism: false,
+    maxConcurrency: 1,
+  },
+  resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-    },
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', '.next/', 'vitest.config.ts', 'vitest.setup.ts'],
     },
   },
 });

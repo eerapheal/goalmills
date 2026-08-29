@@ -679,7 +679,7 @@ Enterprise multi-sport data delivery engine powering Football, Cricket, Tennis, 
       SessionAuth: {
         type: 'apiKey',
         in: 'cookie',
-        name: 'next-auth.session-token',
+        name: 'session-token',
       },
     },
     schemas: {

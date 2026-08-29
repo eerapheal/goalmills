@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { FiArrowLeft, FiLogOut, FiKey, FiTrash2 } from 'react-icons/fi';
 import { User, UserRole } from '@goalmills/types';
-import { useToast } from '../../../components/Toast';
+import { useToast } from '@/components/Toast';
 
 export default function UserManagementPage() {
   const toast = useToast();

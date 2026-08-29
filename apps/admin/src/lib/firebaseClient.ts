@@ -41,10 +41,20 @@ export async function requestAndRegisterWebPush(
       return { success: false, error: 'Notification permission was denied or dismissed.' };
     }
 
-    // Register service worker
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-      scope: '/',
-    });
+    // Register service worker with Firebase config parameters
+    const queryParams = new URLSearchParams({
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
+    }).toString();
+
+    const registration = await navigator.serviceWorker.register(
+      `/firebase-messaging-sw.js?${queryParams}`,
+      {
+        scope: '/',
+      }
+    );
 
     await navigator.serviceWorker.ready;
 
