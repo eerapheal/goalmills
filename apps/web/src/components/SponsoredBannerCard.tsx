@@ -86,71 +86,89 @@ export function SponsoredBannerCard({
     setCurrentIndex((prev) => (prev + 1) % sponsorships.length);
   };
 
+  const bgImage = currentSponsor.imageUrl || null;
+  const logoImage = currentSponsor.sponsorLogo || currentSponsor.imageUrl || null;
+
   return (
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className={`group relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-r from-[#141C2B] via-[#1E293B] to-[#121A28] p-2.5 sm:p-3.5 shadow-lg transition-all duration-300 ${className}`}
+      className={`group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-[#091529] p-3 sm:p-4 shadow-xl transition-all duration-300 ${className}`}
     >
-      {/* Background Accent Glow */}
-      <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-      <div className="absolute -left-8 -bottom-8 h-28 w-28 rounded-full bg-orange-500/10 blur-2xl pointer-events-none" />
+      {/* ─── FULL BANNER BACKGROUND IMAGE ─── */}
+      {bgImage && (
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img
+            src={bgImage}
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700 opacity-30 sm:opacity-40"
+          />
+          {/* Multi-stage High-Contrast Gradient Dark Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#070E1A]/95 via-[#091529]/85 to-[#070E1A]/70 backdrop-blur-[2px]" />
+        </div>
+      )}
 
+      {/* Background Ambient Radial Accents */}
+      <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-500/15 blur-2xl pointer-events-none z-0" />
+      <div className="absolute -left-8 -bottom-8 h-28 w-28 rounded-full bg-blue-600/15 blur-2xl pointer-events-none z-0" />
+
+      {/* ─── CONTENT ROW ─── */}
       <div className="relative z-10 flex items-center justify-between gap-2.5 sm:gap-4">
         {/* Sponsor Identity & Copy */}
         <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
-          {currentSponsor.imageUrl ? (
+          {logoImage ? (
             <img
-              src={currentSponsor.imageUrl}
+              src={logoImage}
               alt={currentSponsor.sponsorName}
-              className="h-9 w-9 sm:h-11 sm:w-11 rounded-lg object-cover border border-amber-500/30 shadow-md flex-shrink-0"
+              className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-cover border border-amber-500/40 shadow-lg flex-shrink-0 bg-slate-950/80"
             />
           ) : (
-            <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-700/30 border border-amber-500/30 flex items-center justify-center text-amber-400 font-black text-xs flex-shrink-0">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-700/30 border border-amber-500/40 flex items-center justify-center text-amber-400 font-black text-sm flex-shrink-0 shadow-lg">
               <FiAward className="w-5 h-5" />
             </div>
           )}
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider text-amber-300 leading-none">
+              <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider text-amber-300 leading-none shadow-sm">
                 {currentSponsor.badgeText || 'SPONSORED'}
               </span>
-              <span className="text-[11px] sm:text-xs font-semibold text-slate-400 truncate">
+              <span className="text-[11px] sm:text-xs font-bold text-slate-300 truncate">
                 {currentSponsor.sponsorName}
               </span>
               {sponsorships.length > 1 && (
-                <span className="text-[9px] font-bold text-slate-400 bg-slate-800/90 px-1.5 py-0.5 rounded border border-white/5 leading-none">
+                <span className="text-[9px] font-bold text-amber-300 bg-slate-900/90 px-1.5 py-0.5 rounded border border-amber-500/20 leading-none font-mono">
                   {currentIndex + 1}/{sponsorships.length}
                 </span>
               )}
             </div>
-            <h4 className="text-xs sm:text-sm font-bold text-white mt-0.5 truncate">
+            <h4 className="text-xs sm:text-sm font-black text-white mt-1 truncate drop-shadow-sm">
               {currentSponsor.title}
             </h4>
             {currentSponsor.tagline && (
-              <p className="text-[10px] sm:text-[11px] text-slate-300 line-clamp-1">
+              <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium line-clamp-1 mt-0.5 drop-shadow-sm">
                 {currentSponsor.tagline}
               </p>
             )}
           </div>
         </div>
 
-        {/* CTA Action Button with optional subtle arrow controls on desktop */}
+        {/* CTA Action Button with optional arrow controls on desktop */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {sponsorships.length > 1 && (
-            <div className="hidden sm:flex items-center gap-0.5 bg-black/40 border border-white/10 rounded-lg p-0.5">
+            <div className="hidden sm:flex items-center gap-0.5 bg-slate-950/80 border border-white/15 rounded-xl p-0.5 shadow-md">
               <button
                 onClick={handlePrev}
                 aria-label="Previous Sponsor"
-                className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
+                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition"
               >
                 <FiChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Next Sponsor"
-                className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition"
+                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition"
               >
                 <FiChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -162,33 +180,33 @@ export function SponsoredBannerCard({
             target="_blank"
             rel="noopener noreferrer sponsored"
             onClick={handleClick}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-[11px] sm:text-xs shadow-md shadow-amber-950/40 transition transform active:scale-95 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-950/50 transition transform active:scale-95 whitespace-nowrap"
           >
             <span>{currentSponsor.ctaText || 'Claim Offer'}</span>
-            <FiExternalLink className="w-3 h-3" />
+            <FiExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>
 
       {/* Campaign Pagination Dots & Info */}
       {sponsorships.length > 1 && (
-        <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between gap-2">
+        <div className="relative z-10 mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1">
             {sponsorships.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={`Go to sponsor ${idx + 1}`}
-                className={`h-1 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 ${
                   idx === currentIndex
-                    ? 'w-4 bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]'
-                    : 'w-1 bg-slate-600 hover:bg-slate-400'
+                    ? 'w-5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'
+                    : 'w-1.5 bg-slate-600 hover:bg-slate-400'
                 }`}
               />
             ))}
           </div>
-          <span className="text-[9px] text-slate-400 font-medium tracking-wide truncate">
-            GoalMills Commercial Partner Network
+          <span className="text-[9px] text-slate-400 font-semibold tracking-wide truncate uppercase">
+            Official Partner
           </span>
         </div>
       )}
@@ -197,4 +215,3 @@ export function SponsoredBannerCard({
 }
 
 export default SponsoredBannerCard;
-

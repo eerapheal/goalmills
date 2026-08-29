@@ -24,6 +24,7 @@ export function SponsoredBannerCard({
       tagline: 'Get instant live scores, statistics & tactical match debriefs',
       ctaText: 'Explore VIP',
       targetUrl: 'https://goalmills.com',
+      imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
     });
   }, [placement, sport]);
 
@@ -45,6 +46,19 @@ export function SponsoredBannerCard({
       onPress={handlePress}
       style={styles.cardContainer}
     >
+      {/* Background Banner Image */}
+      {sponsorship.imageUrl && (
+        <View style={styles.bgImageContainer}>
+          <Image
+            source={{ uri: sponsorship.imageUrl }}
+            style={styles.bgImage}
+            resizeMode="cover"
+          />
+          {/* Dark High-Contrast Gradient/Overlay */}
+          <View style={styles.bgOverlay} />
+        </View>
+      )}
+
       <View style={styles.contentRow}>
         <View style={styles.badgeRow}>
           <View style={styles.badge}>
@@ -73,17 +87,41 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
     marginBottom: SPACING.xs,
     padding: SPACING.md,
-    backgroundColor: '#141C2B',
+    backgroundColor: '#091529',
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderColor: 'rgba(245, 158, 11, 0.35)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  bgImageContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
+  },
+  bgImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.35,
+  },
+  bgOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(7, 14, 26, 0.75)',
   },
   contentRow: {
     flex: 1,
     marginRight: SPACING.sm,
+    zIndex: 1,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -92,7 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   badge: {
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+    backgroundColor: 'rgba(245, 158, 11, 0.25)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -125,6 +163,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
+    zIndex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   ctaText: {
     color: '#0A0E27',
