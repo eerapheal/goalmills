@@ -6,13 +6,13 @@ import HighlightsFeedClient from '@/components/highlights/HighlightsFeedClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Sports Video Highlights & Match Replays | GoalMills',
+  title: 'Sports Video Highlights, All Goals & Match Replays in HD | GoalMills',
   description:
-    'Watch the latest football, basketball, and cricket match highlights, top goals, buzzer beaters, and tactical breakdowns in HD on GoalMills.',
+    'Watch the latest football match highlights, Premier League and Champions League goals, NBA buzzer beaters, and cricket wickets in HD on GoalMills.',
   openGraph: {
-    title: 'Sports Video Highlights & Match Replays | GoalMills',
+    title: 'Sports Video Highlights, All Goals & Match Replays in HD | GoalMills',
     description:
-      'Watch the latest football, basketball, and cricket match highlights, top goals, and HD replays.',
+      'Watch official football match highlights, top goals, and HD replays across world sports.',
     siteName: 'GoalMills',
     type: 'website',
   },

@@ -11,9 +11,9 @@ import { BlogPost } from '@goalmills/types';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Cricket World Hub: Live Scores, IPL, ICC World Cup & Rankings | GoalMills',
+  title: 'Live Cricket Scores, IPL 2026, ICC World Cup, Fixtures & ICC Rankings | GoalMills',
   description:
-    'Complete cricket intelligence network: IPL, ICC World Cup, BBL, Test match commentary, T20 franchise leagues, team standings, player profiles, and tactical analysis.',
+    'Real-time live cricket scores, ball-by-ball commentary, IPL 2026 points table, ICC Men’s World Cup fixtures, Test match updates, and official team rankings.',
 };
 
 const CRICKET_MAJOR_TOURNAMENTS = [
@@ -67,7 +67,7 @@ export default async function CricketHubPage() {
             </span>
             <div className="overflow-hidden whitespace-nowrap w-full">
               <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                🏏 IPL 2026 Auction & Squad Intel • ICC World Test Championship Standings • India vs Australia Border-Gavaskar Trophy • BBL Finals & Ball-by-Ball LiveScore
+                🏏 IPL 2026 Auction & Squad News • ICC World Test Championship Standings • India vs Australia Border-Gavaskar Trophy • BBL Finals & Ball-by-Ball LiveScores
               </p>
             </div>
           </div>
@@ -82,17 +82,17 @@ export default async function CricketHubPage() {
               {/* Level 1 Sport Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
                 <span className="text-amber-400">🏏</span>
-                <span>MULTI-SPORT CRICKET INTELLIGENCE DESK</span>
+                <span>LIVE CRICKET SCORES & MATCH REPORTS</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Global Cricket <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Hub</span>
+                Global Cricket <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Scores & News</span>
               </h1>
 
               {/* Subtitle description */}
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time ball-by-ball commentary, franchise tournament scorecards, ICC world rankings, team points tables, player statistical career records, and tactical cricket analysis.
+                Real-time ball-by-ball commentary, franchise tournament scorecards, official ICC team rankings, points tables, player career stats, and match previews.
               </p>
 
               {/* Quick Intelligence KPI Cards */}
@@ -110,8 +110,8 @@ export default async function CricketHubPage() {
                   <span className="text-lg sm:text-xl font-black text-emerald-400">Official</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Franchise Data</span>
-                  <span className="text-lg sm:text-xl font-black text-sky-400">Global Leagues</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">T20 Leagues</span>
+                  <span className="text-lg sm:text-xl font-black text-sky-400">Global Updates</span>
                 </div>
               </div>
 
@@ -232,10 +232,10 @@ export default async function CricketHubPage() {
           <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-b from-[#0E1E38] to-[#081224] p-5 space-y-3 shadow-xl">
             <div className="flex items-center gap-2 text-amber-400 font-black text-xs uppercase tracking-wider">
               <FiMail className="w-4 h-4" />
-              <span>Cricket Wire VIP</span>
+              <span>Cricket Daily Brief</span>
             </div>
             <h4 className="text-sm font-black text-white">
-              Get Daily Morning Match Briefs & Ball-by-Ball Flashes
+              Get Daily Match Previews & Toss Flashes
             </h4>
             <p className="text-xs text-slate-300">
               Tournament predictions and player analytics delivered before toss.
@@ -260,8 +260,8 @@ export default async function CricketHubPage() {
       {featuredArticles.length > 0 && (
         <div className="pt-6 border-t border-white/10">
           <RelatedArticlesMatrix
-            title="Top Cricket Intelligence & Analysis"
-            subtitle="Curated match reports, tournament forecasts, and tactical breakdowns"
+            title="Top Cricket News & Match Reports"
+            subtitle="Curated match reports, tournament forecasts, and player interviews"
             articles={featuredArticles}
           />
         </div>

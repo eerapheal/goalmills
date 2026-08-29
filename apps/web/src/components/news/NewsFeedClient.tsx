@@ -135,7 +135,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
         </span>
         <div className="overflow-hidden whitespace-nowrap w-full">
           <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-            ⚡ Breaking Transfer Flashes • Matchday Tactical Breakdowns • Premier League, Champions League, NBA & Cricket Intel • Real-Time Sports Coverage
+            ⚡ Breaking Transfer Rumours & Deals • Matchday Previews & Lineups • Premier League, Champions League, NBA & Cricket Updates • Real-Time Sports Coverage
           </p>
         </div>
       </div>

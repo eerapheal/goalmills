@@ -91,9 +91,9 @@ export function GoalmillsFootballDashboard() {
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
                   <h3 className="text-sm font-black tracking-wider text-white uppercase flex items-center gap-2">
-                    <span>LIVE MATCH TELEMETRY</span>
+                    <span>LIVE MATCHES & SCORES</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono">
-                      Real-Time
+                      In-Play
                     </span>
                   </h3>
                 </div>
@@ -308,7 +308,7 @@ export function GoalmillsFootballDashboard() {
               <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                 <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                   <FiTrendingUp className="text-amber-400" />
-                  <span>Transfer Desk Flashes</span>
+                  <span>Transfer News & Rumours</span>
                 </h3>
                 <Link href="/transfers" className="text-xs font-bold text-amber-400 hover:underline">
                   View All →

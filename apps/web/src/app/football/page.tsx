@@ -22,9 +22,9 @@ import { BlogPost } from '@goalmills/types';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Football World Hub: Competitions, Clubs, Live Matches & Intelligence | GoalMills',
+  title: 'Live Football Scores, Premier League Fixtures, Transfers & Tables | GoalMills',
   description:
-    'Complete football intelligence network: Premier League, Champions League, La Liga, Serie A, African Football, live scores, confirmed transfers, and tactical breakdowns.',
+    'Real-time live football scores, Premier League, Champions League, La Liga, Serie A fixtures, confirmed transfer news, match predictions, and league standings.',
 };
 
 export default async function FootballHubPage() {
@@ -82,11 +82,11 @@ export default async function FootballHubPage() {
           <div className="w-full rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2 overflow-hidden shadow-lg flex items-center gap-3">
             <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              LIVE WIRE
+              FOOTBALL WIRE
             </span>
             <div className="overflow-hidden whitespace-nowrap w-full">
               <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                ⚽ UEFA Champions League Knockouts • Premier League Title Race • Real Madrid & Barcelona El Clásico Intel • CAF AFCON Qualifiers • Real-Time LiveScores & Video Analysis
+                ⚽ UEFA Champions League Knockouts • Premier League Title Race & Fixtures • Real Madrid & Barcelona El Clásico Updates • Transfer Rumours & Confirmed Deals • Real-Time LiveScores
               </p>
             </div>
           </div>
@@ -100,17 +100,17 @@ export default async function FootballHubPage() {
               {/* Level 1 Sport Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
                 <span className="text-amber-400">⚽</span>
-                <span>LEVEL 1 SPORT INTELLIGENCE NETWORK</span>
+                <span>WORLD FOOTBALL SCORES, FIXTURES & NEWS HUB</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Global Football <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Hub</span>
+                Global Football <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Scores & News</span>
               </h1>
 
               {/* Subtitle description */}
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time live scores, European and African championships, deep tactical frameworks, confirmed transfer desk intelligence, and comprehensive club ecosystem networks.
+                Real-time live scores, European and African league fixtures, match previews, confirmed transfer news, lineups, and team standings.
               </p>
 
               {/* Quick Intelligence KPI Cards */}
@@ -120,16 +120,16 @@ export default async function FootballHubPage() {
                   <span className="text-lg sm:text-xl font-black text-white">30+ Leagues</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Match Telemetry</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Live Match Stats</span>
                   <span className="text-lg sm:text-xl font-black text-amber-400">Real-Time</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Transfer Intel</span>
-                  <span className="text-lg sm:text-xl font-black text-emerald-400">Verified</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Transfer News</span>
+                  <span className="text-lg sm:text-xl font-black text-emerald-400">Confirmed</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Tactical Matrix</span>
-                  <span className="text-lg sm:text-xl font-black text-sky-400">Masterclass</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Match Previews</span>
+                  <span className="text-lg sm:text-xl font-black text-sky-400">Lineups</span>
                 </div>
               </div>
 
@@ -176,7 +176,7 @@ export default async function FootballHubPage() {
                 <span>Major Competitions</span>
               </h3>
               <span className="text-[10px] text-amber-400 uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                Tier 1
+                Top Leagues
               </span>
             </div>
             <div className="space-y-2">
@@ -220,7 +220,7 @@ export default async function FootballHubPage() {
                 <span>Featured Club Hubs</span>
               </h3>
               <span className="text-[10px] text-blue-300 uppercase font-bold font-mono">
-                Level 3
+                Teams
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -255,7 +255,7 @@ export default async function FootballHubPage() {
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <FiTrendingUp className="text-amber-400" />
-                <span>Transfer Desk</span>
+                <span>Transfer News & Rumours</span>
               </h3>
               <Link
                 href="/transfers"
@@ -275,10 +275,10 @@ export default async function FootballHubPage() {
           <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-b from-[#0E1E38] to-[#081224] p-5 space-y-3 shadow-xl">
             <div className="flex items-center gap-2 text-amber-400 font-black text-xs uppercase tracking-wider">
               <FiMail className="w-4 h-4" />
-              <span>Football Wire VIP</span>
+              <span>Football Daily Brief</span>
             </div>
             <h4 className="text-sm font-black text-white">
-              Get Daily Morning Match Briefs & Transfer Flashes
+              Get Daily Morning Match Previews & Transfer Flashes
             </h4>
             <p className="text-xs text-slate-300">
               Delivered directly to your inbox before kickoff. Free forever.
@@ -299,12 +299,12 @@ export default async function FootballHubPage() {
         <FootballScreen />
       </section>
 
-      {/* Featured Intelligence Grid */}
+      {/* Featured Articles Grid */}
       {featuredArticles.length > 0 && (
         <div className="pt-6 border-t border-white/10">
           <RelatedArticlesMatrix
-            title="Top Football Intelligence & Reports"
-            subtitle="Curated breaking stories, tactical columns, and exclusive reports"
+            title="Latest Football News & Match Reports"
+            subtitle="Curated breaking stories, tactical columns, and post-match analysis"
             articles={featuredArticles}
           />
         </div>
@@ -314,8 +314,8 @@ export default async function FootballHubPage() {
       {tacticalArticles.length > 0 && (
         <div className="pt-6 border-t border-white/10">
           <RelatedArticlesMatrix
-            title="Tactical Breakdowns & Team Philosophy"
-            subtitle="Masterclass match analysis, pressing frameworks, and player roles"
+            title="Tactical Analysis & Match Previews"
+            subtitle="In-depth match previews, pressing systems, and predicted lineups"
             articles={tacticalArticles}
           />
         </div>

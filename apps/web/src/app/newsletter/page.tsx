@@ -52,7 +52,7 @@ const NEWSLETTER_CHANNELS: TopicOption[] = [
   {
     id: 'cricket',
     name: 'The 22 Yards Report',
-    desc: 'IPL squad intel, ICC World Cup analysis & ball-by-ball telemetry.',
+    desc: 'IPL squad news, ICC World Cup updates & ball-by-ball live scores.',
     icon: '🏏',
     subscribers: '22.3K subs',
   },
@@ -61,7 +61,7 @@ const NEWSLETTER_CHANNELS: TopicOption[] = [
 const FREQUENCIES = [
   {
     id: 'daily',
-    title: 'Daily Morning Intel',
+    title: 'Daily Morning Brief',
     timing: 'Delivered at 07:00 GMT',
     desc: 'Lineup alerts, injury reports & yesterday box scores.',
     badge: 'Most Popular',
@@ -159,11 +159,11 @@ export default function NewsletterPage() {
         <div className="rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2.5 overflow-hidden shadow-lg flex items-center gap-3">
           <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            VIP DISPATCH
+            DAILY SPORTS BRIEF
           </span>
           <div className="overflow-hidden whitespace-nowrap w-full">
             <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-              📬 Delivered to 45,000+ Analysts, Scouts & Fans Daily • Zero Spam • 1-Click Unsubscribe • Real-Time Lineup & Tactical Intelligence
+              📬 Delivered to 45,000+ Fans & Writers Daily • Zero Spam • 1-Click Unsubscribe • Real-Time Lineups, Previews & Transfer News
             </p>
           </div>
         </div>
@@ -173,18 +173,18 @@ export default function NewsletterPage() {
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
               <FiMail className="text-amber-400" />
-              <span>THE GOALMILLS INTELLIGENCE DISPATCH</span>
+              <span>THE GOALMILLS DAILY SPORTS BRIEF</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-              Smarter Sports Intel,{' '}
+              Match Previews & Transfers,{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">
                 Direct to Your Inbox
               </span>
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-              Receive tactical breakdowns, verified transfer scoops, and confirmed matchday lineups
+              Receive tactical breakdowns, verified transfer news, and confirmed matchday lineups
               before kickoff. Choose your sports channels and frequency below.
             </p>
 
@@ -214,10 +214,10 @@ export default function NewsletterPage() {
               <div>
                 <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight flex items-center gap-2">
                   <span className="text-amber-400">1.</span>
-                  <span>Select Your Intelligence Channels</span>
+                  <span>Select Your Sports Channels</span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">
-                  Customize the specific sports streams you want in your daily briefing:
+                  Customize the specific sports updates you want in your daily briefing:
                 </p>
               </div>
 

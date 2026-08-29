@@ -60,7 +60,7 @@ export default function HomePage() {
       <div className="w-full max-w-full px-3 py-1.5 bg-[#0A1422] border-b border-amber-500/20 overflow-hidden whitespace-nowrap">
         <div className="w-full overflow-hidden">
           <p className="text-xs text-slate-300 font-medium animate-marquee inline-block">
-            ⚡ GoalMills Sports Intelligence Platform • Real-time livescores, high-precision analytics, video recaps, and deep sports coverage • Engineered by Ekpenisi Erue Raphael
+            ⚡ GoalMills Live Scores & Sports News • Real-time match scores, football transfer rumours, league standings, video replays, and match predictions • Built for sports fans
           </p>
         </div>
       </div>

@@ -11,9 +11,9 @@ import { BlogPost } from '@goalmills/types';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Basketball World Hub: Live Scores, NBA, EuroLeague & Standings | GoalMills',
+  title: 'NBA Live Scores, Basketball Standings, EuroLeague & Box Scores | GoalMills',
   description:
-    'Complete basketball intelligence network: NBA, EuroLeague, Basketball Africa League (BAL), NCAA, live scores, conference standings, player stats, and tactical analysis.',
+    'Real-time NBA live scores, conference standings, EuroLeague results, Basketball Africa League (BAL) fixtures, player box scores, and game previews.',
 };
 
 const BASKETBALL_MAJOR_LEAGUES = [
@@ -63,11 +63,11 @@ export default async function BasketballHubPage() {
           <div className="w-full rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2 overflow-hidden shadow-lg flex items-center gap-3">
             <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              COURT WIRE
+              HOOPS WIRE
             </span>
             <div className="overflow-hidden whitespace-nowrap w-full">
               <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                🏀 NBA Playoff Race & Conference Standings • EuroLeague Final Four Road • Basketball Africa League (BAL) Live • Real-Time Quarters & Player Stats
+                🏀 NBA Playoff Race & Conference Standings • EuroLeague Final Four Road • Basketball Africa League (BAL) Live • Real-Time Quarter Scores & Box Scores
               </p>
             </div>
           </div>
@@ -82,17 +82,17 @@ export default async function BasketballHubPage() {
               {/* Level 1 Sport Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
                 <span className="text-amber-400">🏀</span>
-                <span>MULTI-SPORT BASKETBALL INTELLIGENCE DESK</span>
+                <span>NBA SCORES, BASKETBALL STANDINGS & NEWS</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Global Basketball <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Hub</span>
+                Global Basketball <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Scores & News</span>
               </h1>
 
               {/* Subtitle description */}
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time quarter-by-quarter scorelines, NBA conference standings, EuroLeague fixtures, Basketball Africa League telemetry, player performance analytics, and tactical breakdowns.
+                Real-time quarter-by-quarter scorelines, NBA conference standings, EuroLeague fixtures, Basketball Africa League results, player stats, and match previews.
               </p>
 
               {/* Quick Intelligence KPI Cards */}
@@ -102,16 +102,16 @@ export default async function BasketballHubPage() {
                   <span className="text-lg sm:text-xl font-black text-white">NBA & Euro</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Quarter Telemetry</span>
-                  <span className="text-lg sm:text-xl font-black text-amber-400">Live Clocks</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Live Quarters</span>
+                  <span className="text-lg sm:text-xl font-black text-amber-400">Real-Time</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Standings</span>
                   <span className="text-lg sm:text-xl font-black text-emerald-400">Official</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Franchise Data</span>
-                  <span className="text-lg sm:text-xl font-black text-sky-400">Global Clubs</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Club Updates</span>
+                  <span className="text-lg sm:text-xl font-black text-sky-400">Global Info</span>
                 </div>
               </div>
 
@@ -216,13 +216,13 @@ export default async function BasketballHubPage() {
           <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-b from-[#0E1E38] to-[#081224] p-5 space-y-3 shadow-xl">
             <div className="flex items-center gap-2 text-amber-400 font-black text-xs uppercase tracking-wider">
               <FiMail className="w-4 h-4" />
-              <span>Basketball Wire VIP</span>
+              <span>Hoops Daily Brief</span>
             </div>
             <h4 className="text-sm font-black text-white">
               Get Daily Morning NBA Box Scores & Highlights
             </h4>
             <p className="text-xs text-slate-300">
-              Complete game recaps and playoff race analytics delivered before morning tipoff.
+              Complete game recaps and playoff race updates delivered before morning tipoff.
             </p>
             <Link
               href="/newsletter"
@@ -240,12 +240,12 @@ export default async function BasketballHubPage() {
         <BasketballScreen />
       </section>
 
-      {/* Featured Intelligence Grid */}
+      {/* Featured Articles Grid */}
       {featuredArticles.length > 0 && (
         <div className="pt-6 border-t border-white/10">
           <RelatedArticlesMatrix
-            title="Top Basketball Intelligence & Analysis"
-            subtitle="Curated match reports, tournament forecasts, and tactical breakdowns"
+            title="Top Basketball News & Game Reports"
+            subtitle="Curated match reports, tournament forecasts, and player interviews"
             articles={featuredArticles}
           />
         </div>

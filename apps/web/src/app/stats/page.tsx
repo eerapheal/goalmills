@@ -12,9 +12,9 @@ import { FootballStanding, FootballTopscorer } from '@goalmills/types';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Statistics Engine: Top Scorers, Assists, Clean Sheets & Tables | GoalMills',
+  title: 'Football League Tables, Standings, Top Scorers & Golden Boot Stats | GoalMills',
   description:
-    'Comprehensive sports statistics product area. Multi-league standings, top goalscorers, playmakers, and statistical metrics across world football.',
+    'Real-time football league tables, Premier League, Champions League, La Liga standings, Golden Boot top scorers, clean sheets, and club form records.',
 };
 
 export default async function StatsHubPage() {
@@ -42,18 +42,18 @@ export default async function StatsHubPage() {
 
   return (
     <ContentHubLayout
-      breadcrumbs={[{ name: 'Statistics Engine', url: '/stats' }]}
+      breadcrumbs={[{ name: 'Tables & Stats', url: '/stats' }]}
       header={
         <div className="space-y-4">
           {/* Live Stats Pulse Marquee */}
           <div className="w-full rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2.5 overflow-hidden shadow-lg flex items-center gap-3">
             <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              STATISTICS WIRE
+              TABLES & STATS WIRE
             </span>
             <div className="overflow-hidden whitespace-nowrap w-full">
               <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                📊 Golden Boot Race • Premier League & Champions League Standings • Expected Goals (xG) Delta • Clean Sheet Leaders • Real-Time Sports Record Center
+                📊 Premier League & Champions League Standings • Golden Boot Top Scorers • Expected Goals (xG) • Golden Glove Clean Sheets • Real-Time Sports Record Center
               </p>
             </div>
           </div>
@@ -68,17 +68,17 @@ export default async function StatsHubPage() {
               {/* Level 1 Stats Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
                 <FiBarChart2 className="text-amber-400" />
-                <span>CENTRALIZED SPORTS METRICS & TELEMETRY</span>
+                <span>LEAGUE TABLES, STANDINGS & STATS</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Statistics & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Record Center</span>
+                Standings & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Top Scorers Center</span>
               </h1>
 
               {/* Subtitle description */}
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time league tables, top goalscorers, playmakers, clean sheets, expected goals (xG), and head-to-head records powered by our centralized sports engine.
+                Real-time league tables, top goalscorers, playmakers, clean sheets, expected goals (xG), and 5-match team form records across major world competitions.
               </p>
 
               {/* Quick Intelligence KPI Cards */}
@@ -93,10 +93,10 @@ export default async function StatsHubPage() {
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Expected Goals</span>
-                  <span className="text-lg sm:text-xl font-black text-emerald-400">xG Analytics</span>
+                  <span className="text-lg sm:text-xl font-black text-emerald-400">xG Stats</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Form Records</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Form Guide</span>
                   <span className="text-lg sm:text-xl font-black text-sky-400">5-Match Form</span>
                 </div>
               </div>
@@ -140,10 +140,10 @@ export default async function StatsHubPage() {
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <FiGlobe className="text-amber-400" />
-                <span>Competition Stats Hubs</span>
+                <span>Competition Tables</span>
               </h3>
               <span className="text-[10px] text-amber-400 font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                Tables
+                Standings
               </span>
             </div>
             <div className="space-y-2">
@@ -178,7 +178,7 @@ export default async function StatsHubPage() {
             <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <FiShield className="text-blue-400" />
-                <span>Golden Glove Leaders</span>
+                <span>Golden Glove Clean Sheets</span>
               </h3>
               <span className="text-[10px] font-mono text-blue-300 font-bold">25/26</span>
             </div>
@@ -235,7 +235,7 @@ export default async function StatsHubPage() {
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-base shadow-md shadow-blue-600/30">
                 <FiActivity />
               </span>
-              <span>Premier League Standings & Form</span>
+              <span>Premier League Standings & Form Guide</span>
             </h2>
             <span className="text-[10px] font-mono text-blue-300 font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
               Matchday 28

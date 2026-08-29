@@ -8,9 +8,9 @@ import { BlogPost, Category as ICategory } from '@goalmills/types';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Sports News, Transfers & Pulse | GoalMills',
+  title: 'Breaking Sports News, Football Transfer Rumours & Match Reports | GoalMills',
   description:
-    'Stay ahead with breaking sports news, transfer intel, tactical analysis, and live updates across world football, NBA, cricket, and more.',
+    'Stay updated with breaking sports news, football transfer rumours, confirmed deals, match previews, lineups, and post-match reports across world football, NBA, cricket, and more.',
 };
 
 export default async function NewsPage() {

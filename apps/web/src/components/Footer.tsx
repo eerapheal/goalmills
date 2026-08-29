@@ -56,10 +56,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#newsletter-section"
+                  href="/newsletter"
                   className="hover:text-blue-400 transition-colors flex items-center gap-1.5 text-amber-300 font-semibold"
                 >
-                  <span>Newsletter Intel</span>
+                  <span>VIP Newsletter</span>
                   <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 border border-amber-500/30">
                     Free
                   </span>

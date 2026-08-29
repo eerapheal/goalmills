@@ -12,28 +12,36 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://goalmills.com'),
   referrer: 'no-referrer',
-  title: 'GoalMills | Live Scores, Sports Stats & Intelligence',
+  title: {
+    default: 'GoalMills | Live Football Scores, Cricket, NBA Stats & Sports News',
+    template: '%s | GoalMills',
+  },
   description:
-    'Get real-time live scores, match stats, standings, and sports intelligence for Football, Cricket, and Basketball. Fast, accurate sports data on web & mobile.',
+    'Real-time live scores, match fixtures, football transfer rumours, league standings, NBA box scores, cricket updates, and video highlights across world sports.',
   keywords: [
     'live scores',
     'football live scores',
     'cricket live score',
     'NBA live scores',
-    'basketball live scores',
-    'sports analytics',
-    'sports betting odds',
-    'match statistics',
-    'sports predictions',
-    'Next.js sports app',
+    'premier league table',
+    'football transfer news',
+    'transfer rumours today',
+    'champions league fixtures',
+    'match predictions',
+    'football stats',
+    'nba standings',
+    'ipl live score',
+    'sports news blog',
+    'match highlights video',
+    'lineups and team news',
   ],
   alternates: {
     canonical: 'https://goalmills.com',
   },
   openGraph: {
-    title: 'GoalMills | Live Sports Scores & Analytics Platform',
+    title: 'GoalMills | Live Football Scores, Cricket, NBA & Sports News',
     description:
-      'Real-time scores, detailed match stats, standings, and intelligence for Football, Cricket, and Basketball.',
+      'Real-time scores, match fixtures, football transfer rumours, league standings, NBA box scores, and sports news.',
     url: 'https://goalmills.com',
     siteName: 'GoalMills',
     images: [
@@ -48,9 +56,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GoalMills | Live Scores & Sports Analytics',
+    title: 'GoalMills | Live Football Scores, Cricket, NBA & Sports News',
     description:
-      'Live football, cricket, and basketball scores with deep stats and insights.',
+      'Live football scores, match fixtures, transfer news, league tables, and video highlights.',
     images: ['/og-image.png'],
   },
 };
@@ -60,13 +68,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'Organization',
+        '@type': 'SportsOrganization',
         '@id': 'https://goalmills.com/#organization',
-        name: 'GoalMills Sports Intelligence',
+        name: 'GoalMills Sports News & Live Scores',
         url: 'https://goalmills.com',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://goalmills.com/og-image.png',
+          url: 'https://goalmills.com/icon.png',
         },
         sameAs: ['https://twitter.com/goalmills'],
       },
@@ -75,7 +83,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         '@id': 'https://goalmills.com/#website',
         url: 'https://goalmills.com',
         name: 'GoalMills',
+        description: 'Live scores, football fixtures, transfer news, and league standings',
         publisher: { '@id': 'https://goalmills.com/#organization' },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://goalmills.com/news?search={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
       },
     ],
   };

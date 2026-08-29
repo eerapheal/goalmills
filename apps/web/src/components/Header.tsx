@@ -64,7 +64,7 @@ export function Header() {
                 <span className="text-white ml-0.5">MILLS</span>
               </h1>
               <p className="text-[10px] font-semibold text-amber-400 tracking-wider uppercase">
-                Sports Intelligence Platform
+                Live Scores & Sports News
               </p>
             </div>
           </Link>
@@ -172,7 +172,7 @@ export function Header() {
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:text-white"
               >
                 <FiSearch className="text-amber-400" />
-                <span>Search Intelligence</span>
+                <span>Search News & Matches</span>
               </Link>
               <Link
                 href="/docs"
