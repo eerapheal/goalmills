@@ -19,6 +19,12 @@ export default function AdminCategoriesPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
+              href="/admin/ecosystem"
+              className="flex items-center px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 font-bold transition-colors text-sm border border-blue-500/30"
+            >
+              Full Ecosystem Hub
+            </Link>
+            <Link
               href="/admin/news"
               className="flex items-center px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold transition-colors text-sm"
             >

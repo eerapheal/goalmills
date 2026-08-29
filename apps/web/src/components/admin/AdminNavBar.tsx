@@ -21,6 +21,7 @@ import {
   FiBookOpen,
   FiKey,
   FiMail,
+  FiCompass,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
@@ -39,6 +40,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: 'News & Media',
     href: '/admin/dashboard',
     icon: FiFileText,
+    group: 'editorial',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Content Ecosystem',
+    href: '/admin/ecosystem',
+    icon: FiCompass,
     group: 'editorial',
     requiredPermission: 'articles:draft',
   },
@@ -164,10 +172,17 @@ export default function AdminNavBar() {
 
           {/* Desktop Right Global Actions */}
           <div className="hidden lg:flex items-center gap-2">
+            <Link
+              href="/admin/ecosystem"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-all text-xs"
+            >
+              <FiCompass size={13} />
+              <span>Ecosystem</span>
+            </Link>
             {canManageUsers && (
               <Link
                 href="/admin/users"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold border border-blue-500/20 transition-all text-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/20 transition-all text-xs"
               >
                 <FiUsers size={13} />
                 <span>User Roles</span>
