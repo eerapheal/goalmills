@@ -128,7 +128,7 @@ export function SportsPulseNewsSection() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
                   activeCategory === cat
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
@@ -146,7 +146,7 @@ export function SportsPulseNewsSection() {
               <Link
                 href="/news"
                 key={article.id}
-                className="group block bg-slate-900/50 hover:bg-slate-900/90 border border-slate-800/80 hover:border-blue-500/40 rounded-2xl p-5 md:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 relative overflow-hidden"
+                className="group block bg-slate-900/50 hover:bg-slate-900/90 border border-slate-800/80 hover:border-orange-500/40 rounded-2xl p-5 md:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/5 relative overflow-hidden"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                   <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export function SportsPulseNewsSection() {
                   </span>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-blue-400 transition-colors leading-snug mb-2">
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-orange-400 transition-colors leading-snug mb-2">
                   {article.title}
                 </h3>
 
@@ -178,7 +178,7 @@ export function SportsPulseNewsSection() {
 
                 <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs">
                   <span className="text-slate-400 font-medium">By {article.author}</span>
-                  <span className="text-blue-400 group-hover:text-blue-300 font-bold inline-flex items-center gap-1">
+                  <span className="text-orange-400 group-hover:text-orange-300 font-bold inline-flex items-center gap-1">
                     Read Analysis
                     <svg
                       className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform"
@@ -201,7 +201,7 @@ export function SportsPulseNewsSection() {
             <div className="pt-2 text-center">
               <Link
                 href="/news"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm font-bold text-slate-200 hover:text-white hover:border-blue-500 transition-all hover:bg-slate-800"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm font-bold text-slate-200 hover:text-white hover:border-orange-500/50 transition-all hover:bg-slate-800"
               >
                 <span>Browse All Sports News & Features</span>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -31,6 +31,7 @@ export function Header() {
     { name: 'Cricket', href: '/cricket' },
     { name: 'Transfers', href: '/transfers' },
     { name: 'Analysis', href: '/analysis' },
+    { name: 'Sports Pulse', href: '/sports-pulse' },
     { name: 'Stats', href: '/stats' },
     { name: 'News', href: '/news' },
     { name: 'Highlights', href: '/highlights' },
