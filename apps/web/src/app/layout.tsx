@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '../components/Header';
+import { MobileBottomNav } from '../components/MobileBottomNav';
 import { ToastProvider } from '../components/Toast';
 import { Footer } from '../components/Footer';
 import RealtimeListener from '../components/RealtimeListener';
@@ -94,7 +95,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <RealtimeListener />
           <Header />
-          <main>{children}</main>
+          <main className="pb-16 lg:pb-0">{children}</main>
+          <MobileBottomNav />
           <Footer />
         </ToastProvider>
       </body>

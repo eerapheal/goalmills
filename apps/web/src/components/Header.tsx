@@ -132,16 +132,57 @@ export function Header() {
 
         {/* Mobile Navigation Drawer */}
         {isOpen && (
-          <div className="lg:hidden mt-2 p-4 rounded-2xl bg-[#0C1726]/95 border border-amber-400/30 shadow-2xl backdrop-blur-xl space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-            {navItems.map((item) => (
+          <div className="lg:hidden mt-2 p-4 rounded-3xl bg-[#091529]/98 border border-amber-400/30 shadow-2xl backdrop-blur-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Quick Links Grid */}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { name: 'Live Scores', href: '/', icon: '🔴' },
+                { name: 'Football Hub', href: '/football', icon: '⚽' },
+                { name: 'Cricket Desk', href: '/cricket', icon: '🏏' },
+                { name: 'Basketball Hub', href: '/basketball', icon: '🏀' },
+                { name: 'News & Pulse', href: '/news', icon: '📰' },
+                { name: 'Video Highlights', href: '/highlights', icon: '🎥' },
+                { name: 'Tables & Stats', href: '/stats', icon: '🏆' },
+                { name: 'VIP Newsletter', href: '/newsletter', icon: '📬' },
+              ].map((item) => {
+                const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md'
+                        : 'bg-[#0E1F38] text-slate-200 hover:text-white hover:bg-blue-600/20 border border-blue-500/15'
+                    }`}
+                  >
+                    <span>{item.icon}</span>
+                    <span className="truncate">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
               <Link
-                key={item.name}
-                href={item.href}
-                className="block px-4 py-2.5 rounded-xl text-sm font-bold text-slate-200 hover:bg-amber-500/10 hover:text-amber-400 transition"
+                href="/news"
+                onClick={() => setIsOpen(false)}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:text-white"
               >
-                {item.name}
+                <FiSearch className="text-amber-400" />
+                <span>Search Intelligence</span>
               </Link>
-            ))}
+              <Link
+                href="/docs"
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5"
+              >
+                <FiActivity className="text-orange-400" />
+                <span>Docs</span>
+              </Link>
+            </div>
           </div>
         )}
       </div>
