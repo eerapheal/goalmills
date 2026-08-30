@@ -3898,6 +3898,110 @@ export interface WarehouseDiagnosticsStats {
   }>;
 }
 
+// ==========================================
+// PHASE 9: AUTOMATED CONTENT DISTRIBUTION & SYNDICATION
+// ==========================================
+
+export type DistributionChannelType =
+  | 'x_twitter'
+  | 'telegram'
+  | 'whatsapp'
+  | 'facebook'
+  | 'rss_feed'
+  | 'apple_news'
+  | 'google_news'
+  | string;
+
+export type DistributionTriggerEvent =
+  | 'article_publish'
+  | 'match_recap'
+  | 'breaking_news'
+  | 'score_alert'
+  | 'manual_broadcast';
+
+export interface DistributionRule {
+  _id?: string;
+  ruleId: string;
+  tenantSlug: string;
+  name: string;
+  sport: string;
+  competitionSlug?: string;
+  triggerEvent: DistributionTriggerEvent;
+  targetChannels: DistributionChannelType[];
+  requiresApproval: boolean;
+  template?: {
+    titlePrefix?: string;
+    includeHashtags?: boolean;
+    customHashtags?: string[];
+    includeScores?: boolean;
+  };
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SyndicationJob {
+  _id?: string;
+  jobId: string;
+  ruleId?: string;
+  tenantSlug: string;
+  sport: string;
+  channel: DistributionChannelType;
+  triggerEvent: DistributionTriggerEvent;
+  sourceEntityId: string;
+  content: {
+    headline: string;
+    body: string;
+    mediaUrls?: string[];
+    linkUrl?: string;
+    hashtags?: string[];
+  };
+  status: 'queued' | 'pending_approval' | 'dispatched' | 'failed' | 'cancelled';
+  attempts: number;
+  dispatchedAt?: string;
+  errorMessage?: string;
+  approvedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ChannelConnection {
+  _id?: string;
+  channel: DistributionChannelType;
+  tenantSlug: string;
+  displayName: string;
+  isEnabled: boolean;
+  credentials: {
+    apiKey?: string;
+    apiSecret?: string;
+    botToken?: string;
+    chatId?: string;
+    webhookUrl?: string;
+  };
+  stats: {
+    totalDispatched: number;
+    totalFailed: number;
+    lastDispatchedAt?: string;
+  };
+  status: 'connected' | 'unconfigured' | 'error';
+}
+
+export interface DistributionHubStats {
+  totalDispatched24h: number;
+  pendingApprovalCount: number;
+  activeRulesCount: number;
+  connectedChannelsCount: number;
+  channelBreakdown: {
+    x_twitter: number;
+    telegram: number;
+    whatsapp: number;
+    rss_feed: number;
+    apple_news: number;
+    google_news: number;
+  };
+}
+
+
 
 
 

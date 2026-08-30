@@ -439,6 +439,29 @@ export const goalmillsApi = {
       return false;
     }
   },
+
+  // ==========================================
+  // PHASE 9: SYNDICATED WIRE & BREAKING FEED
+  // ==========================================
+
+  getSyndicatedFeed: async (sport?: string): Promise<any[]> => {
+    try {
+      const url = new URL(`${BASE_URL}/news`);
+      url.searchParams.set('limit', '20');
+      if (sport && sport !== 'all') url.searchParams.set('sport', sport);
+
+      const res = await fetch(url.toString(), {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.news || data.result || [];
+    } catch (error) {
+      console.warn('Error fetching mobile syndicated feed:', error);
+      return [];
+    }
+  },
 };
 
 export default goalmillsApi;
+
