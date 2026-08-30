@@ -9,7 +9,7 @@ export interface UnifiedWebMatchEvent {
   event_date?: string;
   event_time?: string;
   event_status?: string;
-  event_live?: string;
+  event_live?: string | number;
   event_home_team: string;
   home_team_key?: string | number;
   home_team_logo?: string;
@@ -35,6 +35,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
 
   const isLive =
     event.event_live === '1' ||
+    event.event_live === 1 ||
     event.event_status === '1H' ||
     event.event_status === '2H' ||
     event.event_status === 'HT' ||

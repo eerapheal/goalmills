@@ -123,30 +123,40 @@ export function GoalmillsLiveDashboard({
           }
         }
 
+        let matches: any[] = [];
         if (footRes && footRes.ok) {
           const fData = await footRes.json();
-          const matches = fData?.result || fData?.matches || (Array.isArray(fData) ? fData : []);
-          if (Array.isArray(matches) && matches.length > 0 && isMounted) {
-            const mapped = matches.slice(0, 2).map((m: any, idx: number) => {
-              const home = m.event_home_team || m.homeTeam || 'Home';
-              const away = m.event_away_team || m.awayTeam || 'Away';
-              const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
-              return {
-                id: m.event_key || `lf-${idx}`,
-                league: m.league_name || 'Premier League',
-                homeTeam: home,
-                homeCode: home.substring(0, 3).toUpperCase(),
-                homeScorer: m.event_scorer || '',
-                awayTeam: away,
-                awayCode: away.substring(0, 3).toUpperCase(),
-                awayScorer: '',
-                score,
-                time: m.event_status ? `(${m.event_status}')` : 'LIVE',
-                possession: 52,
-              };
-            });
-            setLiveFootballMatches(mapped);
+          matches = fData?.result || fData?.response || (Array.isArray(fData) ? fData : []);
+        }
+
+        if (matches.length === 0) {
+          const fixRes = await fetch('/api/football?met=Fixtures').catch(() => null);
+          if (fixRes && fixRes.ok) {
+            const fd = await fixRes.json();
+            matches = fd?.result || fd?.response || (Array.isArray(fd) ? fd : []);
           }
+        }
+
+        if (Array.isArray(matches) && matches.length > 0 && isMounted) {
+          const mapped = matches.slice(0, 2).map((m: any, idx: number) => {
+            const home = m.event_home_team || m.homeTeam || 'Home';
+            const away = m.event_away_team || m.awayTeam || 'Away';
+            const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+            return {
+              id: m.event_key || `lf-${idx}`,
+              league: m.league_name || 'Premier League',
+              homeTeam: home,
+              homeCode: home.substring(0, 3).toUpperCase(),
+              homeScorer: m.event_scorer || '',
+              awayTeam: away,
+              awayCode: away.substring(0, 3).toUpperCase(),
+              awayScorer: '',
+              score,
+              time: m.event_status ? `(${m.event_status}')` : 'LIVE',
+              possession: 52,
+            };
+          });
+          setLiveFootballMatches(mapped);
         }
 
         if (cricRes && cricRes.ok) {

@@ -37,10 +37,107 @@ function getApiBaseUrl(): string {
 }
 
 const API_KEY =
+  process.env.ALLSPORTS_API_KEY ||
   process.env.FOOTBALL_API_KEY ||
   process.env.NEXT_PUBLIC_FOOTBALL_API_KEY ||
-  process.env.ALLSPORTS_API_KEY ||
-  '';
+  '95c9b0311d4bfef71b062bb07cf0186dd20a77ac34160b0c2d1a0c24f3c4a008';
+
+/**
+ * Map generic/API-Football parameter and method names to AllSportsAPI's exact format
+ */
+function normalizeMethodAndParams(method: string, searchParams: URLSearchParams): { normalizedMethod: string; params: Record<string, string> } {
+  const m = (method || '').toLowerCase().trim();
+  const params: Record<string, string> = {};
+
+  // Copy existing params
+  searchParams.forEach((value, key) => {
+    if (key !== 'met' && key !== 'APIkey' && value) {
+      params[key] = value;
+    }
+  });
+
+  let normalizedMethod = 'Livescore';
+
+  if (m === 'livescore' || m === 'live' || (m === 'fixtures' && searchParams.get('live'))) {
+    normalizedMethod = 'Livescore';
+    delete params.live;
+  } else if (m === 'fixtures' || m === 'fixture') {
+    normalizedMethod = 'Fixtures';
+    // If date is passed (YYYY-MM-DD), set from and to
+    if (params.date) {
+      params.from = params.date;
+      params.to = params.date;
+      delete params.date;
+    } else if (!params.from && !params.to) {
+      const today = new Date().toISOString().split('T')[0];
+      params.from = today;
+      params.to = today;
+    }
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (params.team) {
+      params.teamId = params.team;
+      delete params.team;
+    }
+    if (params.id) {
+      params.matchId = params.id;
+      delete params.id;
+    }
+  } else if (m === 'standings' || m === 'standing') {
+    normalizedMethod = 'Standings';
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (!params.leagueId) {
+      params.leagueId = '152'; // Default to Premier League (152) if unspecified
+    }
+  } else if (m === 'leagues' || m === 'league') {
+    normalizedMethod = 'Leagues';
+    if (params.country) {
+      params.countryId = params.country;
+      delete params.country;
+    }
+  } else if (m === 'topscorers' || m === 'topscorer') {
+    normalizedMethod = 'Topscorers';
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (!params.leagueId) {
+      params.leagueId = '152';
+    }
+  } else if (m === 'teams' || m === 'team') {
+    normalizedMethod = 'Teams';
+    if (params.team) {
+      params.teamId = params.team;
+      delete params.team;
+    }
+  } else if (m === 'players' || m === 'player') {
+    normalizedMethod = 'Players';
+    if (params.player) {
+      params.playerId = params.player;
+      delete params.player;
+    }
+  } else if (m === 'h2h') {
+    normalizedMethod = 'H2H';
+  } else if (m === 'odds') {
+    normalizedMethod = 'Odds';
+  } else if (m === 'comments') {
+    normalizedMethod = 'Comments';
+  } else if (m === 'videos' || m === 'video') {
+    normalizedMethod = 'Videos';
+  } else if (m === 'countries' || m === 'country') {
+    normalizedMethod = 'Countries';
+  } else {
+    // Preserve casing if already formatted
+    normalizedMethod = method.charAt(0).toUpperCase() + method.slice(1);
+  }
+
+  return { normalizedMethod, params };
+}
 
 /**
  * Determine dynamic TTL in seconds based on the requested method
@@ -72,29 +169,31 @@ function getTtlForMethod(method: string): number {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const method = searchParams.get('met');
+    const rawMethod = searchParams.get('met');
 
-    if (!method) {
+    if (!rawMethod) {
       return NextResponse.json({ error: 'Method parameter (met) is required' }, { status: 400 });
     }
 
+    const { normalizedMethod, params } = normalizeMethodAndParams(rawMethod, searchParams);
+
     const baseUrlStr = getApiBaseUrl();
     const apiUrl = new URL(baseUrlStr);
-    apiUrl.searchParams.append('met', method);
+    apiUrl.searchParams.set('met', normalizedMethod);
 
     if (API_KEY) {
-      apiUrl.searchParams.append('APIkey', API_KEY);
+      apiUrl.searchParams.set('APIkey', API_KEY);
     }
 
-    // Forward all other search params
-    searchParams.forEach((value, key) => {
-      if (key !== 'met' && value) {
-        apiUrl.searchParams.append(key, value);
+    // Append normalized parameters
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        apiUrl.searchParams.set(key, value);
       }
     });
 
     const cacheKey = `gm:sport:football:${apiUrl.toString()}`;
-    const ttlSeconds = getTtlForMethod(method);
+    const ttlSeconds = getTtlForMethod(normalizedMethod);
     const now = Date.now();
 
     // 1. Check Redis / Multi-tier Cache
@@ -181,7 +280,7 @@ export async function GET(request: NextRequest) {
 
           if (response.status >= 500 && attempts < maxAttempts) {
             console.warn(
-              `Football API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`
+              `Football API retry ${attempts}/${maxAttempts} for ${normalizedMethod} due to ${response.status}`
             );
             await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
             continue;
@@ -199,7 +298,7 @@ export async function GET(request: NextRequest) {
 
       if (!response || !response.ok) {
         const status = response ? response.status : 502;
-        console.warn(`Football API status ${status} for ${method}, returning graceful fallback.`);
+        console.warn(`Football API status ${status} for ${normalizedMethod}, returning graceful fallback.`);
 
         consecutiveFailures++;
         if (consecutiveFailures >= 5) {
@@ -214,6 +313,7 @@ export async function GET(request: NextRequest) {
         return {
           success: 1,
           result: [],
+          response: [],
           isStale: true,
           lastUpdatedAt: new Date().toISOString(),
           message: `Football live feed fallback (status ${status})`,
@@ -234,9 +334,12 @@ export async function GET(request: NextRequest) {
           ? data
           : (data.result ?? data.response ?? data);
 
+      const listResult = Array.isArray(sanitizedResult) ? sanitizedResult : [];
+
       const resultPayload = {
         success: 1,
-        result: Array.isArray(sanitizedResult) ? sanitizedResult : [],
+        result: listResult,
+        response: listResult,
         ...(!Array.isArray(data) ? data : {}),
         ...(hasUpstreamError ? { message: 'Upstream notice, using fallback data' } : {}),
         lastUpdatedAt: new Date().toISOString(),
@@ -247,8 +350,8 @@ export async function GET(request: NextRequest) {
       await cacheSet(cacheKey, resultPayload, ttlSeconds);
 
       // If live score update, broadcast to connected clients
-      if (method.toLowerCase().includes('live') && Array.isArray(resultPayload.result)) {
-        resultPayload.result.forEach((match: any) => {
+      if (normalizedMethod.toLowerCase().includes('live') && Array.isArray(listResult)) {
+        listResult.forEach((match: any) => {
           if (match.event_key || match.id) {
             broadcastLiveScore('football', String(match.event_key || match.id), {
               homeScore: match.event_final_result?.split('-')?.[0]?.trim() || match.event_home_team_score,

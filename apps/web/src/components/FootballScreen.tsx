@@ -217,13 +217,22 @@ export function FootballScreen() {
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter((f) => f.event_live === '1');
+      list = list.filter(
+        (f) =>
+          f &&
+          (f.event_live === '1' ||
+            f.event_live === 1 ||
+            (Boolean(f.event_status) &&
+              !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
+                f.event_status as string
+              )))
+      );
     } else if (activeTab === 'upcoming') {
       list = list.filter(
-        (f) => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished'
+        (f) => f && (f.event_status === 'Not Started' || f.event_status === 'NS' || f.event_status === 'TBA' || (f.event_live !== '1' && f.event_live !== 1 && f.event_status !== 'FT' && f.event_status !== 'Finished' && !f.event_final_result))
       );
     } else if (activeTab === 'results') {
-      list = list.filter((f) => f.event_status === 'FT' || f.event_status === 'Finished');
+      list = list.filter((f) => f && (f.event_status === 'FT' || f.event_status === 'Finished' || f.event_status === 'AET' || f.event_status === 'AP' || Boolean(f.event_final_result && f.event_final_result !== '-')));
     }
 
     if (searchQuery.trim()) {

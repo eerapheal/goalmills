@@ -92,57 +92,54 @@ export function AdvancedFootballScreen() {
     };
   };
 
-  // Load data on demand (NO auto-refresh intervals)
+  // Load data on demand
   const fetchMatches = useCallback(async () => {
     setLoading(true);
     try {
-      let raw: ApiFootballFixtureItem[] = [];
+      if (activeTab === 'live') {
+        const fallback = await advancedFootballApi.getLivescore();
+        if (
+          fallback &&
+          fallback.success &&
+          Array.isArray(fallback.result) &&
+          fallback.result.length > 0
+        ) {
+          setFixtures(fallback.result as any);
+          return;
+        }
+      } else {
+        const fallback = await advancedFootballApi.getFixtures({
+          from: selectedDate,
+          to: selectedDate,
+        });
+        if (
+          fallback &&
+          fallback.success &&
+          Array.isArray(fallback.result) &&
+          fallback.result.length > 0
+        ) {
+          setFixtures(fallback.result as any);
+          return;
+        }
+      }
+
+      // Secondary check via apiFootballService
       try {
+        let raw: ApiFootballFixtureItem[] = [];
         if (activeTab === 'live') {
           raw = await apiFootballService.getLiveFixtures();
         } else {
           raw = await apiFootballService.getFixturesByDate(selectedDate);
         }
+        if (Array.isArray(raw) && raw.length > 0) {
+          setFixtures(raw.map(adaptFixture));
+          return;
+        }
       } catch {
-        raw = [];
+        // Handled safely
       }
 
-      if (Array.isArray(raw) && raw.length > 0) {
-        setFixtures(raw.map(adaptFixture));
-      } else {
-        // Fallback to advancedFootballApi (AllSportsAPI / GoalMills backend)
-        try {
-          if (activeTab === 'live') {
-            const fallback = await advancedFootballApi.getLivescore();
-            if (
-              fallback &&
-              fallback.success &&
-              Array.isArray(fallback.result) &&
-              fallback.result.length > 0
-            ) {
-              setFixtures(fallback.result as any);
-              return;
-            }
-          } else {
-            const fallback = await advancedFootballApi.getFixtures({
-              from: selectedDate,
-              to: selectedDate,
-            });
-            if (
-              fallback &&
-              fallback.success &&
-              Array.isArray(fallback.result) &&
-              fallback.result.length > 0
-            ) {
-              setFixtures(fallback.result as any);
-              return;
-            }
-          }
-        } catch {
-          // Fallback handled safely
-        }
-        setFixtures([]);
-      }
+      setFixtures([]);
     } catch {
       setFixtures([]);
     } finally {
@@ -166,18 +163,38 @@ export function AdvancedFootballScreen() {
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter((f) => f && f.event_live === '1');
+      list = list.filter(
+        (f) =>
+          f &&
+          (f.event_live === '1' ||
+            f.event_live === 1 ||
+            (Boolean(f.event_status) &&
+              !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
+                f.event_status as string
+              )))
+      );
     } else if (activeTab === 'upcoming') {
       list = list.filter(
         (f) =>
           f &&
-          f.event_live !== '1' &&
-          f.event_status !== 'FT' &&
-          f.event_status !== 'Finished'
+          (f.event_status === 'Not Started' ||
+            f.event_status === 'NS' ||
+            f.event_status === 'TBA' ||
+            (f.event_live !== '1' &&
+              f.event_live !== 1 &&
+              f.event_status !== 'FT' &&
+              f.event_status !== 'Finished' &&
+              !f.event_final_result))
       );
     } else if (activeTab === 'results') {
       list = list.filter(
-        (f) => f && (f.event_status === 'FT' || f.event_status === 'Finished')
+        (f) =>
+          f &&
+          (f.event_status === 'FT' ||
+            f.event_status === 'Finished' ||
+            f.event_status === 'AET' ||
+            f.event_status === 'AP' ||
+            Boolean(f.event_final_result && f.event_final_result !== '-'))
       );
     }
 

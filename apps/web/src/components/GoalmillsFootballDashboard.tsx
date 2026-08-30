@@ -134,15 +134,26 @@ export function GoalmillsFootballDashboard() {
           }
         }
 
+        let matches: any[] = [];
         if (matchRes && matchRes.ok) {
           const mData = await matchRes.json();
-          const matches = mData?.result || mData?.matches || (Array.isArray(mData) ? mData : []);
-          if (Array.isArray(matches) && matches.length > 0 && isMounted) {
-            const mappedMatches = matches.slice(0, 2).map((m: any, idx: number) => {
-              const home = m.event_home_team || m.homeTeam || 'Team A';
-              const away = m.event_away_team || m.awayTeam || 'Team B';
-              const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
-              const isLive = m.event_live === '1' || m.event_status === 'LIVE' || !isNaN(Number(m.event_status));
+          matches = mData?.result || mData?.response || (Array.isArray(mData) ? mData : []);
+        }
+
+        if (matches.length === 0) {
+          const fixRes = await fetch('/api/football?met=Fixtures').catch(() => null);
+          if (fixRes && fixRes.ok) {
+            const fData = await fixRes.json();
+            matches = fData?.result || fData?.response || (Array.isArray(fData) ? fData : []);
+          }
+        }
+
+        if (Array.isArray(matches) && matches.length > 0 && isMounted) {
+          const mappedMatches = matches.slice(0, 2).map((m: any, idx: number) => {
+            const home = m.event_home_team || m.homeTeam || 'Team A';
+            const away = m.event_away_team || m.awayTeam || 'Team B';
+            const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+            const isLive = m.event_live === '1' || m.event_status === 'LIVE' || !isNaN(Number(m.event_status));
 
               return {
                 id: m.event_key || `live-m-${idx}`,
@@ -180,7 +191,6 @@ export function GoalmillsFootballDashboard() {
               probability: `Win Probability: ${topHome.substring(0, 4)} 45% • Draw 25% • ${topAway.substring(0, 3)} 30%`,
             });
           }
-        }
 
         if (transferRes && transferRes.ok) {
           const tData = await transferRes.json();
