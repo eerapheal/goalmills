@@ -263,9 +263,9 @@ export function AdvancedFootballScreen() {
             >
               <Ionicons
                 name={tab.icon}
-                size={16}
-                color={isActive ? '#10B981' : '#94A3B8'}
-                style={{ marginRight: 6 }}
+                size={13}
+                color={isActive ? '#60A5FA' : '#94A3B8'}
+                style={{ marginRight: 4 }}
               />
               <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{tab.label}</Text>
             </Pressable>
@@ -412,18 +412,18 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    paddingHorizontal: SPACING.md,
+    paddingHorizontal: SPACING.sm,
     marginBottom: SPACING.xs,
-    gap: 6,
+    gap: 4,
   },
   tabItem: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 5,
     backgroundColor: '#141C2B',
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.sm,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     borderColor: '#3B82F6',
   },
   tabLabel: {
-    fontSize: FONT_SIZES.xs,
+    fontSize: 10,
     color: '#94A3B8',
     fontWeight: '600',
   },
@@ -441,16 +441,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   dateStripContainer: {
-    paddingVertical: SPACING.xs,
+    paddingVertical: 3,
   },
   dateStripContent: {
-    paddingHorizontal: SPACING.md,
-    gap: 8,
+    paddingHorizontal: SPACING.sm,
+    gap: 4,
   },
   dateCard: {
-    width: 60,
-    paddingVertical: 8,
-    borderRadius: BORDER_RADIUS.md,
+    width: 36,
+    paddingVertical: 3,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: '#141C2B',
     alignItems: 'center',
     justifyContent: 'center',
@@ -462,22 +462,22 @@ const styles = StyleSheet.create({
     borderColor: '#3B82F6',
   },
   dateDayName: {
-    fontSize: 11,
+    fontSize: 8,
     color: '#94A3B8',
     fontWeight: '500',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   selectedDateText: {
-    color: '#0B0F17',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   dateDayNumber: {
-    fontSize: 16,
+    fontSize: 11,
     color: '#F8FAFC',
     fontWeight: '700',
   },
   selectedDateNumber: {
-    color: '#0B0F17',
+    color: '#FFFFFF',
   },
   listContent: {
     paddingHorizontal: SPACING.md,

@@ -189,9 +189,9 @@ export default function BasketballScreen() {
             >
               <Ionicons
                 name={t.icon}
-                size={14}
-                color={isActive ? '#F97316' : '#64748B'}
-                style={{ marginRight: 4 }}
+                size={12}
+                color={isActive ? '#60A5FA' : '#64748B'}
+                style={{ marginRight: 3 }}
               />
               <Text style={[styles.tabButtonText, isActive && styles.activeTabButtonText]}>
                 {t.label}
@@ -378,17 +378,17 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    paddingHorizontal: SPACING.md,
-    marginBottom: SPACING.sm,
-    gap: 8,
+    paddingHorizontal: SPACING.sm,
+    marginBottom: 4,
+    gap: 4,
   },
   tabButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    borderRadius: BORDER_RADIUS.md,
+    paddingVertical: 4,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: '#141C2B',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     borderColor: '#3B82F6',
   },
   tabButtonText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
     color: '#94A3B8',
   },
@@ -406,14 +406,14 @@ const styles = StyleSheet.create({
     color: '#60A5FA',
   },
   dateSlider: {
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.sm,
-    gap: 8,
+    paddingHorizontal: SPACING.sm,
+    paddingBottom: 4,
+    gap: 4,
   },
   dateCard: {
-    width: 58,
-    paddingVertical: 6,
-    borderRadius: BORDER_RADIUS.md,
+    width: 36,
+    paddingVertical: 3,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: '#141C2B',
     alignItems: 'center',
     justifyContent: 'center',
@@ -425,19 +425,19 @@ const styles = StyleSheet.create({
     borderColor: '#3B82F6',
   },
   dateDayText: {
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: '600',
     color: '#94A3B8',
     textTransform: 'uppercase',
   },
   dateNumberText: {
-    fontSize: 15,
+    fontSize: 11,
     fontWeight: '800',
     color: '#F8FAFC',
-    marginTop: 2,
+    marginTop: 1,
   },
   activeDateText: {
-    color: '#0B0F17',
+    color: '#FFFFFF',
   },
   listContainer: {
     paddingHorizontal: SPACING.md,
