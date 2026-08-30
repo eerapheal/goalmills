@@ -1,3 +1,4 @@
+"use cleint"
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { BasketballMatchCard } from './BasketballMatchCard';
