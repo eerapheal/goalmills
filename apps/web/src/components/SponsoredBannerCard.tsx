@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FiExternalLink, FiAward, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiExternalLink, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { SportType } from '@goalmills/types';
 
 export interface SponsoredBannerProps {
@@ -18,7 +18,7 @@ const DEFAULT_FALLBACKS = [
     _id: 'default-hero-1',
     sponsorName: '1xBet Global',
     title: '300% Welcome Bonus on Live Football & NBA',
-    tagline: 'Instant payouts, xG live metrics, and VIP matchday tournament multipliers.',
+    tagline: 'Instant payouts, xG live metrics, and VIP tournament multipliers.',
     ctaText: 'Claim 300% Bonus',
     targetUrl: 'https://1xbet.com',
     badgeText: 'VIP PARTNER',
@@ -79,12 +79,10 @@ export function SponsoredBannerCard({
         const res = await fetch(`/api/sponsorships?${queryParams.toString()}`);
         const data = await res.json();
         if (data.success && Array.isArray(data.sponsorships) && data.sponsorships.length > 0 && isMounted) {
-          // Rotate start index by campaignOffset if provided
           const offsetIndex = campaignOffset % data.sponsorships.length;
           setSponsorships(data.sponsorships);
           setCurrentIndex(offsetIndex);
         } else if (isMounted) {
-          // Fallback to designated demo card
           const fallback = DEFAULT_FALLBACKS[campaignOffset % DEFAULT_FALLBACKS.length];
           setSponsorships([fallback]);
           setCurrentIndex(0);
@@ -145,82 +143,113 @@ export function SponsoredBannerCard({
   };
 
   const bgImage = currentSponsor.imageUrl || null;
-  const logoImage = currentSponsor.sponsorLogo || currentSponsor.imageUrl || null;
 
   return (
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className={`group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-[#091529] p-4 sm:p-5 shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-amber-500/10 flex flex-col justify-between h-full ${className}`}
+      className={`group relative overflow-hidden rounded-xl border border-amber-500/35 bg-[#091529] p-3 sm:p-3.5 shadow-lg transition-all duration-300 hover:border-amber-400/60 hover:shadow-amber-500/15 flex flex-col justify-between h-full ${className}`}
     >
-      {/* ─── FULL BANNER BACKGROUND IMAGE WITH HIGH-CONTRAST OVERLAY ─── */}
+      {/* ─── VIBRANT HIGH-VISIBILITY BACKGROUND IMAGE WITH SOFT GRADIENT ─── */}
       {bgImage && (
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <img
             src={bgImage}
             alt=""
             aria-hidden="true"
-            className="h-full w-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700 opacity-25 sm:opacity-35"
+            className="h-full w-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-700 opacity-65 sm:opacity-75 group-hover:opacity-85"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#070E1A]/95 via-[#091529]/90 to-[#070E1A]/95 backdrop-blur-[1px]" />
+          {/* Balanced High-Contrast Gradient: Clear sports visuals with protected text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#070E1A]/85 via-[#091529]/65 to-[#070E1A]/85 backdrop-blur-[0.5px]" />
         </div>
       )}
 
       {/* Background Ambient Radial Accents */}
-      <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-500/15 blur-2xl pointer-events-none z-0" />
-      <div className="absolute -left-8 -bottom-8 h-28 w-28 rounded-full bg-blue-600/15 blur-2xl pointer-events-none z-0" />
+      <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-amber-500/20 blur-xl pointer-events-none z-0" />
+      <div className="absolute -left-6 -bottom-6 h-20 w-20 rounded-full bg-blue-600/20 blur-xl pointer-events-none z-0" />
 
-      {/* ─── TOP CONTENT SECTION (FLEX-COL) ─── */}
-      <div className="relative z-10 flex flex-col">
+      {/* ─── TOP CONTENT SECTION (COMPACT FLEX-COL) ─── */}
+      <div className="relative z-10 flex flex-col min-w-0">
+        {/* Badge & Sponsor Header Row */}
+        <div className="flex items-center justify-between gap-1.5 mb-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+            <span className="px-1.5 py-0.5 rounded bg-amber-500/30 border border-amber-400/50 text-[8.5px] font-black uppercase tracking-wider text-amber-300 leading-none shadow-sm drop-shadow">
+              {accentBadge || currentSponsor.badgeText || 'SPONSORED'}
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-200 truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              {currentSponsor.sponsorName}
+            </span>
+          </div>
+
+          {/* Carousel Arrows if multiple sponsors */}
+          {sponsorships.length > 1 && (
+            <div className="flex items-center gap-0.5 bg-slate-950/85 border border-white/20 rounded-lg p-0.5 shadow flex-shrink-0">
+              <button
+                onClick={handlePrev}
+                aria-label="Previous Sponsor"
+                className="w-6 h-6 rounded hover:bg-white/15 text-slate-200 hover:text-white transition flex items-center justify-center"
+              >
+                <FiChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={handleNext}
+                aria-label="Next Sponsor"
+                className="w-6 h-6 rounded hover:bg-white/15 text-slate-200 hover:text-white transition flex items-center justify-center"
+              >
+                <FiChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Headline & Description Body */}
-        <div className="mt-1">
-          <h3 className="text-sm sm:text-base font-black text-white leading-snug drop-shadow-sm line-clamp-2">
+        <div>
+          <h3 className="text-xs sm:text-[13px] font-black text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] line-clamp-1">
             {currentSponsor.title}
           </h3>
           {currentSponsor.tagline && (
-            <p className="text-xs text-slate-300 font-medium line-clamp-2 mt-1.5 leading-relaxed drop-shadow-sm">
+            <p className="text-[10.5px] sm:text-[11px] text-slate-200 font-medium line-clamp-1 mt-0.5 leading-snug drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {currentSponsor.tagline}
             </p>
           )}
         </div>
       </div>
 
-      {/* ─── BOTTOM SECTION: FULL-WIDTH CTA BELOW CONTENT ─── */}
-      <div className="relative z-10 mt-4 pt-3 border-t border-white/10 flex flex-col gap-2">
+      {/* ─── BOTTOM SECTION: COMPACT FULL-WIDTH CTA ─── */}
+      <div className="relative z-10 mt-2.5 pt-2 border-t border-white/15 flex flex-col gap-1.5">
         <a
           href={currentSponsor.targetUrl}
           target="_blank"
           rel="noopener noreferrer sponsored"
           onClick={handleClick}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-950/40 transition transform active:scale-98 text-center"
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 sm:py-2 px-3 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-[11px] uppercase tracking-wider shadow-md shadow-amber-950/40 transition transform active:scale-98 text-center"
         >
           <span>{currentSponsor.ctaText || 'Claim Offer'}</span>
-          <FiExternalLink className="w-3.5 h-3.5" />
+          <FiExternalLink className="w-3 h-3" />
         </a>
 
         {/* Indicator dots with accessible touch targets */}
         {sponsorships.length > 1 && (
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between pt-0.5">
             <div className="flex items-center">
               {sponsorships.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
                   aria-label={`Go to sponsor ${idx + 1}`}
-                  className="min-w-[32px] min-h-[32px] p-2 -m-1 flex items-center justify-center focus:outline-none"
+                  className="min-w-[28px] min-h-[20px] p-1 flex items-center justify-center focus:outline-none"
                 >
                   <span
                     className={`h-1.5 rounded-full transition-all duration-300 block ${
                       idx === currentIndex
-                        ? 'w-5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'
-                        : 'w-1.5 bg-slate-500 hover:bg-slate-300'
+                        ? 'w-4 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'
+                        : 'w-1.5 bg-slate-400 hover:bg-slate-200'
                     }`}
                   />
                 </button>
               ))}
             </div>
-            <span className="text-[9px] text-slate-300 font-semibold tracking-wide uppercase">
+            <span className="text-[8.5px] text-slate-300 font-semibold tracking-wide uppercase drop-shadow">
               Official Partner
             </span>
           </div>

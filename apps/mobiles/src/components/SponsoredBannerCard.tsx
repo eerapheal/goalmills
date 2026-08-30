@@ -35,7 +35,7 @@ export function SponsoredBannerCard({
 
   const handlePress = () => {
     if (sponsorship.targetUrl) {
-      Linking.openURL(sponsorship.targetUrl).catch((err) =>
+      Linking.openURL(sponsorship.targetUrl).catch((err: any) =>
         console.error('Failed to open sponsor URL:', err)
       );
     }
@@ -92,11 +92,11 @@ export function SponsoredBannerCard({
 const styles = StyleSheet.create({
   cardContainer: {
     marginHorizontal: SPACING.md,
-    marginTop: SPACING.sm,
+    marginTop: SPACING.xs,
     marginBottom: SPACING.xs,
-    padding: SPACING.md,
+    padding: SPACING.sm,
     backgroundColor: '#091529',
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.md,
     borderWidth: 1,
     borderColor: 'rgba(245, 158, 11, 0.35)',
     flexDirection: 'column',
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   bgImage: {
     width: '100%',
     height: '100%',
-    opacity: 0.3,
+    opacity: 0.65,
   },
   bgOverlay: {
     position: 'absolute',
@@ -122,54 +122,54 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(7, 14, 26, 0.85)',
+    backgroundColor: 'rgba(7, 14, 26, 0.68)',
   },
   contentCol: {
     zIndex: 1,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs,
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
+    gap: 5,
+    marginBottom: 2,
   },
   badge: {
-    backgroundColor: 'rgba(245, 158, 11, 0.25)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    backgroundColor: 'rgba(245, 158, 11, 0.3)',
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.4)',
+    borderColor: 'rgba(245, 158, 11, 0.45)',
   },
   badgeText: {
     color: '#FBBF24',
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: '900',
   },
   sponsorName: {
-    color: '#94A3B8',
-    fontSize: 11,
+    color: '#E2E8F0',
+    fontSize: 10.5,
     fontWeight: '700',
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: '900',
-    marginTop: 2,
-    lineHeight: 18,
+    marginTop: 1,
+    lineHeight: 16,
   },
   tagline: {
-    color: '#CBD5E1',
-    fontSize: 11,
-    marginTop: 4,
-    lineHeight: 15,
+    color: '#E2E8F0',
+    fontSize: 10.5,
+    marginTop: 2,
+    lineHeight: 14,
   },
   ctaButton: {
     backgroundColor: '#F59E0B',
-    paddingVertical: 9,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     zIndex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -179,17 +179,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 4,
+    elevation: 3,
   },
   ctaText: {
     color: '#0A0E27',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   ctaIcon: {
-    marginLeft: 6,
+    marginLeft: 5,
   },
 });
 
