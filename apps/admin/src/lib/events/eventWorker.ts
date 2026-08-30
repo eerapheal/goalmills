@@ -80,14 +80,30 @@ export class SportsEventWorker {
           await this.handleMatchdayMoment(envelope);
           break;
 
+        case 'match_finished':
+        case 'match_fulltime_recap_ready':
+          await this.handleMatchFinalization(envelope);
+          break;
+
+        case 'article_published':
+          await this.handleArticlePublished(envelope);
+          break;
+
         case 'article_read':
         case 'video_play':
+        case 'reader_engagement':
           await this.handleContentTelemetry(envelope);
           break;
 
         case 'sponsorship_impression':
         case 'sponsorship_click':
           await this.handleSponsorshipTelemetry(envelope);
+          break;
+
+        case 'payment_succeeded':
+        case 'subscription_created':
+        case 'subscription_updated':
+          await this.handleBillingEvent(envelope);
           break;
 
         default:
@@ -107,6 +123,26 @@ export class SportsEventWorker {
       const matchMomentKey = `match:moment:${envelope.payload.matchId}`;
       await cacheSet(matchMomentKey, envelope, 3600);
     }
+  }
+
+  private async handleMatchFinalization(envelope: StreamEventEnvelope) {
+    if (envelope.payload.matchId) {
+      const finalKey = `match:final:${envelope.payload.matchId}`;
+      await cacheSet(finalKey, envelope, 86400);
+    }
+  }
+
+  private async handleArticlePublished(envelope: StreamEventEnvelope) {
+    if (envelope.payload.articleId) {
+      const pubKey = `stream:article_pub:${envelope.payload.articleId}`;
+      await cacheSet(pubKey, envelope, 86400);
+    }
+  }
+
+  private async handleBillingEvent(envelope: StreamEventEnvelope) {
+    const tenantSlug = envelope.tenantSlug || 'goalmills';
+    const billingCacheKey = `stream:billing:latest:${tenantSlug}`;
+    await cacheSet(billingCacheKey, envelope, 86400);
   }
 
   private async handleContentTelemetry(envelope: StreamEventEnvelope) {

@@ -83,7 +83,7 @@ export class SportsEventWorker {
 
       eventsProcessedTotal++;
 
-      // 3. Sports Event Routing
+      // 3. Sports Event Routing & System Propagation Backbone
       switch (envelope.eventType) {
         case 'match_goal':
         case 'match_card':
@@ -94,14 +94,30 @@ export class SportsEventWorker {
           await this.handleMatchdayMoment(envelope);
           break;
 
+        case 'match_finished':
+        case 'match_fulltime_recap_ready':
+          await this.handleMatchFinalization(envelope);
+          break;
+
+        case 'article_published':
+          await this.handleArticlePublished(envelope);
+          break;
+
         case 'article_read':
         case 'video_play':
+        case 'reader_engagement':
           await this.handleContentTelemetry(envelope);
           break;
 
         case 'sponsorship_impression':
         case 'sponsorship_click':
           await this.handleSponsorshipTelemetry(envelope);
+          break;
+
+        case 'payment_succeeded':
+        case 'subscription_created':
+        case 'subscription_updated':
+          await this.handleBillingEvent(envelope);
           break;
 
         default:
@@ -139,6 +155,27 @@ export class SportsEventWorker {
       const current = (await cacheGet<number>(key)) || 0;
       await cacheSet(key, current + 1, 86400);
     }
+  }
+
+  private async handleMatchFinalization(envelope: StreamEventEnvelope) {
+    if (envelope.payload.matchId) {
+      // Invalidate live match cache and trigger distribution recap
+      const finalKey = `match:final:${envelope.payload.matchId}`;
+      await cacheSet(finalKey, envelope, 86400);
+    }
+  }
+
+  private async handleArticlePublished(envelope: StreamEventEnvelope) {
+    if (envelope.payload.articleId) {
+      const pubKey = `stream:article_pub:${envelope.payload.articleId}`;
+      await cacheSet(pubKey, envelope, 86400);
+    }
+  }
+
+  private async handleBillingEvent(envelope: StreamEventEnvelope) {
+    const tenantSlug = envelope.tenantSlug || 'goalmills';
+    const billingCacheKey = `stream:billing:latest:${tenantSlug}`;
+    await cacheSet(billingCacheKey, envelope, 86400);
   }
 
   /**

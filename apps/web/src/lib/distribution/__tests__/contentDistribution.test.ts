@@ -118,8 +118,8 @@ vi.mock('../../../models/ChannelConfig', () => ({
   },
 }));
 
-vi.mock('../../../models/News', () => ({
-  News: {
+vi.mock('../../../models/News', () => {
+  const newsMock = {
     find: vi.fn(() => ({
       sort: vi.fn(() => ({
         limit: vi.fn(() => ({
@@ -127,8 +127,12 @@ vi.mock('../../../models/News', () => ({
         })),
       })),
     })),
-  },
-}));
+  };
+  return {
+    default: newsMock,
+    News: newsMock,
+  };
+});
 
 describe('Phase 9: Automated Content Distribution & Multi-Channel Syndication Engine', () => {
   let distributionService: ContentDistributionService;

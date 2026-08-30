@@ -17,16 +17,20 @@ vi.mock('../../../lib/db', () => ({
   connectDB: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock('../../../models/Sponsorship', () => ({
-  Sponsorship: {
+vi.mock('../../../models/Sponsorship', () => {
+  const sponsorMock = {
     findById: vi.fn(() => ({
       lean: vi.fn().mockResolvedValue(mockSponsor),
     })),
     find: vi.fn(() => ({
       lean: vi.fn().mockResolvedValue([mockSponsor]),
     })),
-  },
-}));
+  };
+  return {
+    default: sponsorMock,
+    Sponsorship: sponsorMock,
+  };
+});
 
 vi.mock('../../../models/AdvertiserReport', () => ({
   AdvertiserReportModel: {
