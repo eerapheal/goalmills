@@ -231,7 +231,7 @@ export function AdvancedFootballScreen() {
       {/* Header Search & Refresh */}
       <View style={styles.headerBar}>
         <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={18} color="#94A3B8" />
+          <Ionicons name="search-outline" size={14} color="#94A3B8" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search teams or leagues..."
@@ -241,13 +241,13 @@ export function AdvancedFootballScreen() {
           />
           {searchQuery ? (
             <Pressable onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color="#94A3B8" />
+              <Ionicons name="close-circle" size={14} color="#94A3B8" />
             </Pressable>
           ) : null}
         </View>
 
         <Pressable style={styles.refreshButton} onPress={onRefresh}>
-          <Ionicons name="refresh" size={20} color="#F8FAFC" />
+          <Ionicons name="refresh" size={14} color="#F8FAFC" />
         </Pressable>
       </View>
 
@@ -379,31 +379,32 @@ const styles = StyleSheet.create({
   headerBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    gap: SPACING.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    gap: 4,
   },
   searchContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#141C2B',
-    borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: SPACING.sm,
-    height: 42,
+    borderRadius: BORDER_RADIUS.sm,
+    paddingHorizontal: 8,
+    height: 28,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   searchInput: {
     flex: 1,
     color: '#F8FAFC',
-    fontSize: FONT_SIZES.sm,
-    marginLeft: 6,
+    fontSize: 11,
+    marginLeft: 4,
+    paddingVertical: 0,
   },
   refreshButton: {
-    width: 42,
-    height: 42,
-    borderRadius: BORDER_RADIUS.md,
+    width: 28,
+    height: 28,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: '#1E293B',
     alignItems: 'center',
     justifyContent: 'center',
@@ -496,58 +497,59 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   sectionTitle: {
-    fontSize: 13,
-    color: '#F8FAFC',
-    fontWeight: '700',
+    fontSize: 11,
+    color: '#60A5FA',
+    fontWeight: '800',
     marginRight: 6,
+    textTransform: 'uppercase',
   },
   sectionCount: {
-    fontSize: 12,
-    color: '#64748B',
+    fontSize: 10,
+    color: '#94A3B8',
   },
   centerContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: SPACING.xl,
+    padding: SPACING.md,
   },
   loadingText: {
     color: '#94A3B8',
-    fontSize: FONT_SIZES.sm,
-    marginTop: SPACING.sm,
+    fontSize: 11,
+    marginTop: SPACING.xs,
   },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: SPACING.xl,
-    marginTop: 40,
+    padding: SPACING.lg,
+    marginTop: 20,
   },
   emptyTitle: {
     color: '#F8FAFC',
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    marginTop: SPACING.sm,
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: SPACING.xs,
   },
   emptySubtitle: {
     color: '#64748B',
-    fontSize: FONT_SIZES.xs,
+    fontSize: 10,
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 2,
     maxWidth: 240,
   },
   emptyButton: {
-    marginTop: SPACING.md,
-    backgroundColor: '#1E293B',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: BORDER_RADIUS.md,
+    marginTop: SPACING.sm,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: BORDER_RADIUS.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: '#3B82F6',
   },
   emptyButtonText: {
-    color: '#10B981',
-    fontWeight: '600',
-    fontSize: FONT_SIZES.xs,
+    color: '#60A5FA',
+    fontWeight: '700',
+    fontSize: 10,
   },
 });

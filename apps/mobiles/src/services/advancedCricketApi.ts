@@ -18,6 +18,7 @@ import {
   CricketPlayer,
   CricketIccRankingsResponse,
   CricketNewsItem,
+  CricketVenueInfo,
   CricketLeaguesParams,
   CricketFixturesParams,
   CricketLivescoreParams,
@@ -142,14 +143,50 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
     return matchId ? `/mcenter/v1/${matchId}` : '/matches/v1/live';
   }
 
-  if (ep === 'livescore' || ep === 'live') return '/matches/v1/live';
-  if (ep === 'fixtures' || ep === 'upcoming') return '/matches/v1/upcoming';
-  if (ep === 'recent') return '/matches/v1/recent';
+  // Matches live / upcoming / recent / list
+  if (ep === 'matches/live' || ep === 'livescore' || ep === 'live') return '/matches/v1/live';
+  if (ep === 'matches/upcoming' || ep === 'fixtures' || ep === 'upcoming') return '/matches/v1/upcoming';
+  if (ep === 'matches/recent' || ep === 'recent' || ep === 'matches/list') return '/matches/v1/recent';
 
-  if (ep === 'leagues' || ep === 'series' || ep === 'series/v1/international')
-    return '/series/v1/international';
-  if (ep === 'standings' || ep === 'points-table') {
+  // Schedules
+  if (ep === 'schedules/list' || ep === 'schedules') {
+    const sType = params.type || 'international';
+    return `/schedules/v1/${sType}`;
+  }
+
+  // Series
+  if (ep === 'series/list' || ep === 'leagues' || ep === 'series' || ep === 'series/v1/international') {
+    const sType = params.type || 'international';
+    return `/series/v1/${sType}`;
+  }
+  if (ep === 'series/list-archives' || ep === 'series/archives') {
+    const year = params.year || '2026';
+    return `/series/v1/archives/${year}`;
+  }
+  if (ep === 'series/get-matches' || ep === 'series/matches') {
+    return seriesId ? `/series/v1/${seriesId}` : '/matches/v1/recent';
+  }
+  if (ep === 'series/get-news' || ep === 'series/news') {
+    return seriesId ? `/news/v1/series/${seriesId}` : '/news/v1/index';
+  }
+  if (ep === 'series/get-squads' || ep === 'series/squads') {
+    return seriesId ? `/series/v1/${seriesId}/squads` : '/series/v1/international';
+  }
+  if (ep === 'series/get-players' || ep === 'series/players') {
+    const squadId = params.squadId || '1';
+    return seriesId ? `/series/v1/${seriesId}/squads/${squadId}` : '/stats/v1/player/trending';
+  }
+  if (ep === 'series/get-venues' || ep === 'series/venues') {
+    return seriesId ? `/series/v1/${seriesId}/venues` : '/series/v1/international';
+  }
+  if (ep === 'series/get-points-table' || ep === 'standings' || ep === 'points-table') {
     return seriesId ? `/series/v1/${seriesId}/points-table` : '/series/v1/international';
+  }
+  if (ep === 'series/get-stats-filters') {
+    return seriesId ? `/stats/v1/series/${seriesId}/filters` : '/stats/v1/player/trending';
+  }
+  if (ep === 'series/get-stats') {
+    return seriesId ? `/stats/v1/series/${seriesId}` : '/stats/v1/player/trending';
   }
 
   // Team sub-routes
@@ -165,15 +202,35 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   if (ep === 'teams/get-news' || ep === 'teams/news') {
     return teamId ? `/news/v1/team/${teamId}` : '/news/v1/index';
   }
-  if (ep === 'teams/get-stats' || ep === 'teams/get-stats-filters' || ep === 'teams/stats') {
+  if (ep === 'teams/get-stats-filters') {
+    return teamId ? `/stats/v1/team/${teamId}/filters` : '/teams/v1/international';
+  }
+  if (ep === 'teams/get-stats' || ep === 'teams/stats') {
     return teamId ? `/stats/v1/team/${teamId}` : '/teams/v1/international';
   }
-
   if (ep === 'teams' || ep === 'teams/list' || ep.startsWith('teams/')) {
     const teamType = params.type || 'international';
     return `/teams/v1/${teamType}`;
   }
 
+  // Venue sub-routes
+  if (ep === 'venues/get-info' || ep === 'venue/info') {
+    const venueId = params.venueId || params.id || '1';
+    return `/venues/v1/${venueId}`;
+  }
+  if (ep === 'venues/get-stats' || ep === 'venue/stats') {
+    const venueId = params.venueId || params.id || '1';
+    return `/venues/v1/${venueId}/stats`;
+  }
+  if (ep === 'venues/get-matches' || ep === 'venue/matches') {
+    const venueId = params.venueId || params.id || '1';
+    return `/venues/v1/${venueId}/matches`;
+  }
+
+  // Players
+  if (ep === 'players/search' || ep === 'player/search') {
+    return '/stats/v1/player/search';
+  }
   if (
     ep === 'players' ||
     ep === 'players/list-trending' ||
@@ -184,7 +241,6 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
     if (playerId) return `/stats/v1/player/${playerId}`;
     return '/stats/v1/player/trending';
   }
-
   if (ep === 'players/get-info' || ep === 'player/info') {
     return playerId ? `/stats/v1/player/${playerId}` : '/stats/v1/player/trending';
   }
@@ -197,9 +253,28 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   if (ep === 'players/get-bowling' || ep === 'player/bowling') {
     return playerId ? `/stats/v1/player/${playerId}/bowling` : '/stats/v1/player/trending';
   }
-  if (ep === 'players/get-news' || ep === 'player/news' || ep === 'news') {
-    return '/news/v1/index';
+  if (ep === 'players/get-news' || ep === 'player/news') {
+    return playerId ? `/news/v1/player/${playerId}` : '/news/v1/index';
   }
+
+  // News
+  if (ep === 'news/list' || ep === 'news') return '/news/v1/index';
+  if (ep === 'news/detail') return `/news/v1/detail/${params.newsId || params.id || '1'}`;
+  if (ep === 'news/get-categories' || ep === 'news/categories') return '/news/v1/categories';
+  if (ep === 'news/list-by-category' || ep === 'news/category') return `/news/v1/cat/${params.categoryId || '1'}`;
+  if (ep === 'news/get-topics' || ep === 'news/topics') return '/news/v1/topics';
+  if (ep === 'news/list-by-topic' || ep === 'news/topic') return `/news/v1/topic/${params.topicId || '1'}`;
+
+  // Photos
+  if (ep === 'photos/list' || ep === 'photos') return '/photos/v1/index';
+  if (ep === 'photos/get-gallery' || ep === 'photos/gallery') return `/photos/v1/detail/${params.galleryId || params.id || '1'}`;
+  if (ep === 'get-image' || ep === 'photos/image') return `/img/v1/i1/c${params.imageId || '776162'}/i.jpg`;
+
+  // Stats & Rankings
+  if (ep === 'stats/get-icc-rankings' || ep === 'rankings') return `/stats/v1/rankings/${params.category || 'teams'}`;
+  if (ep === 'stats/get-icc-standings') return `/stats/v1/icc-standings/${params.matchType || 'test'}`;
+  if (ep === 'stats/get-record-filters') return '/stats/v1/records/filters';
+  if (ep === 'stats/get-records') return '/stats/v1/records';
 
   return method.includes('/') ? `/${method.replace(/^\//, '')}` : `/matches/v1/${method}`;
 }
@@ -1210,9 +1285,9 @@ export const advancedCricketApi = {
     }
   },
 
-  getNews: async (): Promise<CricketNewsItem[]> => {
+  getNews: async (category?: string): Promise<CricketNewsItem[]> => {
     try {
-      const res = await fetchFromAPI<any>('news');
+      const res = await fetchFromAPI<any>('news', category ? { category } : {});
       const list = res.storyList || res.result || res.news || (Array.isArray(res) ? res : []);
       if (Array.isArray(list) && list.length > 0) {
         return list.map((item: any, idx: number) => ({
@@ -1344,9 +1419,10 @@ export const advancedCricketApi = {
    */
   getMatchCommentary: async (
     matchId: string | number,
-    isHighlights: boolean = false
+    isHighlightsOrInnings?: boolean | number | string
   ): Promise<Record<string, any[]>> => {
     try {
+      const isHighlights = isHighlightsOrInnings === true || isHighlightsOrInnings === 'highlights';
       const endpoint = isHighlights ? 'matches/get-hcomm' : 'matches/get-commentaries';
       const res = await fetchFromAPI<any>(endpoint, { matchId: String(matchId) });
       return res?.result || res || {};
@@ -1886,6 +1962,342 @@ export const advancedCricketApi = {
         values: [
           ['Lead Batter', '12', '12', '584', '53.09', '142.4'],
           ['All-Rounder', '12', '10', '320', '40.00', '165.2'],
+        ],
+      };
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MATCHES ENDPOINTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  getLiveMatches: async (params: any = {}): Promise<CricketLivescoreResponse> => {
+    return advancedCricketApi.getLivescore(params);
+  },
+
+  getUpcomingMatches: async (params: any = {}): Promise<CricketFixturesResponse> => {
+    return advancedCricketApi.getFixtures({
+      from: advancedCricketApi.getFormattedDate(0),
+      to: advancedCricketApi.getFormattedDate(14),
+      ...params,
+    });
+  },
+
+  getRecentMatches: async (params: any = {}): Promise<CricketFixturesResponse> => {
+    return advancedCricketApi.getFixtures({
+      from: advancedCricketApi.getFormattedDate(-14),
+      to: advancedCricketApi.getFormattedDate(0),
+      ...params,
+    });
+  },
+
+  getMatchesList: async (params: any = {}): Promise<CricketFixturesResponse> => {
+    return advancedCricketApi.getFixtures(params);
+  },
+
+  getMatchInfo: async (matchId: string | number): Promise<any> => {
+    return fetchFromAPI<any>('matches/get-info', { matchId: String(matchId) });
+  },
+
+  getMatchScorecardV2: async (matchId: string | number): Promise<any> => {
+    return advancedCricketApi.getMatchScorecard(matchId);
+  },
+
+  getMatchCommentaryV2: async (
+    matchId: string | number,
+    isHighlightsOrInnings?: boolean | number | string
+  ): Promise<any> => {
+    return advancedCricketApi.getMatchCommentary(matchId, isHighlightsOrInnings);
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SCHEDULES ENDPOINTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  getSchedulesList: async (type: string = 'international'): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('schedules/list', { type });
+      return res.matchScheduleMap || res.result || res;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // VENUE ENDPOINTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  getVenueInfo: async (venueId: string | number): Promise<CricketVenueInfo | null> => {
+    const VENUES_DB: Record<string, CricketVenueInfo> = {
+      '1': {
+        id: '1',
+        ground: 'Melbourne Cricket Ground (MCG)',
+        city: 'Melbourne',
+        country: 'Australia',
+        capacity: '100,024',
+        floodlights: true,
+        known_as: 'The G',
+        ends: 'Members End, Great Southern Stand End',
+        home_to: 'Australia, Victoria, Melbourne Stars',
+        profile:
+          'One of the most iconic sporting amphitheatres in the world, host to the first Test match in 1877.',
+      },
+      '2': {
+        id: '2',
+        ground: "Lord's Cricket Ground",
+        city: 'London',
+        country: 'United Kingdom',
+        capacity: '31,100',
+        floodlights: true,
+        known_as: 'The Home of Cricket',
+        ends: 'Pavilion End, Nursery End',
+        home_to: 'England, Middlesex',
+        profile:
+          'The historic headquarters of world cricket, revered for the Long Room and the Lord’s Honours Boards.',
+      },
+      '3': {
+        id: '3',
+        ground: 'Narendra Modi Stadium',
+        city: 'Ahmedabad',
+        country: 'India',
+        capacity: '132,000',
+        floodlights: true,
+        known_as: 'Motera Stadium',
+        ends: 'Adani Pavilion End, GMDC End',
+        home_to: 'India, Gujarat Titans',
+        profile:
+          'The largest cricket stadium in the world by capacity, featuring modern LED ring lighting and world-class pitches.',
+      },
+      '4': {
+        id: '4',
+        ground: 'Eden Gardens',
+        city: 'Kolkata',
+        country: 'India',
+        capacity: '68,000',
+        floodlights: true,
+        known_as: "Cricket's Colosseum",
+        ends: 'High Court End, Club House End',
+        home_to: 'India, Kolkata Knight Riders, Bengal',
+        profile:
+          'Famed for its electrifying roar and legendary atmosphere in international and IPL fixtures.',
+      },
+    };
+
+    try {
+      const res = await fetchFromAPI<any>('venues/get-info', { venueId: String(venueId) });
+      if (res && res.ground) {
+        return {
+          id: String(res.id || venueId),
+          ground: res.ground,
+          city: res.city || 'International',
+          country: res.country || 'Global',
+          capacity: res.capacity,
+          floodlights: res.floodlights ?? true,
+          known_as: res.knownAs,
+          ends: res.ends,
+          home_to: res.homeTo,
+          profile: res.profile,
+        };
+      }
+    } catch (e) {
+      console.warn('Error in getVenueInfo (mobile):', e);
+    }
+    return VENUES_DB[String(venueId)] || VENUES_DB['1'];
+  },
+
+  getVenueStats: async (venueId: string | number, params: any = {}): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('venues/get-stats', { venueId: String(venueId), ...params });
+      return res.venueStats || res.result || res;
+    } catch (e) {
+      return {
+        totalMatches: 24,
+        avgFirstInnings: '312',
+        avgSecondInnings: '280',
+        highestTotal: '652/7',
+        lowestTotal: '112',
+      };
+    }
+  },
+
+  getVenueMatches: async (venueId: string | number): Promise<CricketEvent[]> => {
+    try {
+      const res = await fetchFromAPI<any>('venues/get-matches', { venueId: String(venueId) });
+      const matches = res.matches || res.result || (Array.isArray(res) ? res : []);
+      if (Array.isArray(matches) && matches.length > 0) return matches;
+    } catch (e) {
+      console.warn('Error in getVenueMatches (mobile):', e);
+    }
+    const fixtures = await advancedCricketApi.getFixtures({
+      from: advancedCricketApi.getFormattedDate(-15),
+      to: advancedCricketApi.getFormattedDate(15),
+    });
+    return fixtures.result || [];
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PLAYER SEARCH & EXTENDED ENDPOINTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  searchPlayers: async (query: string): Promise<CricketPlayer[]> => {
+    try {
+      const res = await fetchFromAPI<any>('players/search', { q: query, plrN: query });
+      const players = res.player || res.players || res.result || [];
+      if (Array.isArray(players) && players.length > 0) return players;
+    } catch (e) {
+      console.warn('Error in searchPlayers (mobile):', e);
+    }
+    return CRICKET_PLAYERS_DATABASE.filter(p =>
+      p.player_name.toLowerCase().includes(query.toLowerCase()) ||
+      p.player_country?.toLowerCase().includes(query.toLowerCase())
+    );
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // NEWS ENDPOINTS (DETAILED / CATEGORIES / TOPICS)
+  // ─────────────────────────────────────────────────────────────────────────────
+  getNewsList: async (category?: string): Promise<CricketNewsItem[]> => {
+    return advancedCricketApi.getNews(category);
+  },
+
+  getNewsDetail: async (newsId: string | number): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('news/detail', { newsId: String(newsId), id: String(newsId) });
+      return res.story || res.news || res;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  getNewsCategories: async (): Promise<any[]> => {
+    try {
+      const res = await fetchFromAPI<any>('news/get-categories', {});
+      return res.storyType || res.categories || res.result || [
+        { id: 1, name: 'Match Reports' },
+        { id: 2, name: 'Interviews' },
+        { id: 3, name: 'Features' },
+        { id: 4, name: 'Live Blogs' },
+      ];
+    } catch (e) {
+      return [
+        { id: 1, name: 'Match Reports' },
+        { id: 2, name: 'Interviews' },
+        { id: 3, name: 'Features' },
+        { id: 4, name: 'Live Blogs' },
+      ];
+    }
+  },
+
+  getNewsByCategory: async (categoryId: string | number): Promise<CricketNewsItem[]> => {
+    try {
+      const res = await fetchFromAPI<any>('news/list-by-category', { categoryId: String(categoryId), catId: String(categoryId) });
+      return res.storyList || res.news || res.result || [];
+    } catch (e) {
+      return advancedCricketApi.getNews();
+    }
+  },
+
+  getNewsTopics: async (): Promise<any[]> => {
+    try {
+      const res = await fetchFromAPI<any>('news/get-topics', {});
+      return res.topics || res.result || [
+        { id: 1, name: 'IPL 2026' },
+        { id: 2, name: 'ICC T20 World Cup' },
+        { id: 3, name: 'World Test Championship' },
+      ];
+    } catch (e) {
+      return [
+        { id: 1, name: 'IPL 2026' },
+        { id: 2, name: 'ICC T20 World Cup' },
+        { id: 3, name: 'World Test Championship' },
+      ];
+    }
+  },
+
+  getNewsByTopic: async (topicId: string | number): Promise<CricketNewsItem[]> => {
+    try {
+      const res = await fetchFromAPI<any>('news/list-by-topic', { topicId: String(topicId) });
+      return res.storyList || res.news || res.result || [];
+    } catch (e) {
+      return advancedCricketApi.getNews();
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // PHOTOS ENDPOINTS
+  // ─────────────────────────────────────────────────────────────────────────────
+  getPhotosList: async (params: any = {}): Promise<any[]> => {
+    try {
+      const res = await fetchFromAPI<any>('photos/list', params);
+      return res.photoGallery || res.galleries || res.result || [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  getPhotoGallery: async (galleryId: string | number): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('photos/get-gallery', { galleryId: String(galleryId), id: String(galleryId) });
+      return res.gallery || res.photos || res;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  getImageUrl: (imageId: string | number): string => {
+    return `https://static.cricbuzz.com/a/img/v1/i1/c${imageId}/i.jpg`;
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // STATS & ICC RANKINGS / STANDINGS / RECORDS
+  // ─────────────────────────────────────────────────────────────────────────────
+  getIccRankings: async (
+    format: string = 'test',
+    category: string = 'teams',
+    gender: string = 'men'
+  ): Promise<CricketIccRankingsResponse> => {
+    return advancedCricketApi.getRankings(format as any, category as any, gender as any);
+  },
+
+  getIccStandings: async (matchType: string = 'test'): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('stats/get-icc-standings', { matchType });
+      return res.standings || res.result || [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  getRecordFilters: async (): Promise<any[]> => {
+    try {
+      const res = await fetchFromAPI<any>('stats/get-record-filters', {});
+      return res.filters || res.types || res.result || [
+        'Most Runs',
+        'Highest Individual Score',
+        'Most Wickets',
+        'Best Bowling Figures',
+        'Most Centuries',
+        'Most Sixes',
+      ];
+    } catch (e) {
+      return [
+        'Most Runs',
+        'Highest Individual Score',
+        'Most Wickets',
+        'Best Bowling Figures',
+        'Most Centuries',
+        'Most Sixes',
+      ];
+    }
+  },
+
+  getRecords: async (params: any = {}): Promise<any> => {
+    try {
+      const res = await fetchFromAPI<any>('stats/get-records', params);
+      return res.values || res.records || res.result || res;
+    } catch (e) {
+      return {
+        headers: ['Rank', 'Player', 'Span', 'Matches', 'Innings', 'Total'],
+        values: [
+          ['1', 'Sachin Tendulkar', '1989-2013', '200', '329', '15,921'],
+          ['2', 'Ricky Ponting', '1995-2012', '168', '287', '13,378'],
+          ['3', 'Jacques Kallis', '1995-2013', '166', '280', '13,289'],
         ],
       };
     }

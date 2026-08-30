@@ -192,14 +192,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   heading: {
-    fontSize: 22,
+    fontSize: 15,
     fontWeight: '800',
     color: '#F8FAFC',
   },
   subheading: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#94A3B8',
-    marginTop: 2,
+    marginTop: 1,
   },
   refreshBtn: {
     width: 38,

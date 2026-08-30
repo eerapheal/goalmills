@@ -155,9 +155,9 @@ export default function TransfersScreen() {
               style={styles.newsItem}
               onPress={() => router.push(`/(tabs)/news/${news._id}` as any)}
             >
-              {news.image ? <Image source={{ uri: news.image }} style={styles.newsImage} /> : null}
+              {news.image ? <Image source={{ uri: news.image }} style={styles.newsThumb} /> : null}
               <View style={styles.newsContent}>
-                <Text style={styles.newsCategory}>{news.category || 'Transfer News'}</Text>
+                <Text style={styles.newsTag}>{news.category || 'Transfer News'}</Text>
                 <Text style={styles.newsTitle} numberOfLines={2}>
                   {news.title}
                 </Text>
@@ -259,101 +259,109 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     letterSpacing: 0.5,
   },
   feeText: {
-    color: '#fbbf24',
-    fontSize: 12,
+    color: '#60A5FA',
+    fontSize: 10,
     fontWeight: '900',
   },
   clubsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   clubBlock: {
     flex: 1,
     alignItems: 'center',
   },
   clubLogo: {
-    width: 38,
-    height: 38,
+    width: 28,
+    height: 28,
     resizeMode: 'contain',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   clubName: {
     color: '#cbd5e1',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
   },
   transferIconWrap: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: 'rgba(59, 130, 246, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   playerRow: {
-    marginTop: 10,
-    paddingTop: 10,
+    marginTop: 6,
+    paddingTop: 6,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
   playerName: {
     color: '#fff',
-    fontSize: 15,
-    fontWeight: '800',
-    marginBottom: 2,
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 1,
   },
   descText: {
     color: '#94a3b8',
-    fontSize: 11,
-    lineHeight: 16,
+    fontSize: 10,
+    lineHeight: 14,
   },
   newsSection: {
-    paddingHorizontal: 16,
-    paddingBottom: 40,
+    paddingHorizontal: 12,
+    paddingBottom: 32,
   },
   sectionTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '900',
-    marginBottom: 12,
+    color: '#60A5FA',
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
   },
   newsItem: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 16,
-    padding: 10,
-    marginBottom: 10,
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 6,
+    gap: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
-    alignItems: 'center',
-    gap: 12,
+    borderColor: 'rgba(255, 255, 255, 0.04)',
   },
-  newsImage: {
-    width: 80,
-    height: 60,
-    borderRadius: 10,
+  newsThumb: {
+    width: 52,
+    height: 52,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   newsContent: {
     flex: 1,
+    justifyContent: 'center',
   },
-  newsCategory: {
-    color: '#3b82f6',
-    fontSize: 10,
+  newsTag: {
+    color: '#60a5fa',
+    fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   newsTitle: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '700',
-    lineHeight: 17,
+    lineHeight: 15,
+  },
+  newsDate: {
+    color: 'rgba(255, 255, 255, 0.4)',
+    fontSize: 9,
+    marginTop: 2,
   },
 });
