@@ -3477,3 +3477,106 @@ export interface NewsletterCampaign {
   updatedAt?: string;
 }
 
+// ============================================================================
+// PHASE 6: SEARCH INFRASTRUCTURE TYPES
+// ============================================================================
+
+export type SearchEntityType =
+  | 'article'
+  | 'video'
+  | 'match'
+  | 'team'
+  | 'player'
+  | 'competition'
+  | 'newsletter';
+
+export interface SearchResultItem {
+  id: string;
+  entityType: SearchEntityType;
+  title: string;
+  snippet: string;
+  slug?: string;
+  url?: string;
+  image?: string;
+  sport?: string;
+  competition?: string;
+  team?: string;
+  category?: string;
+  author?: string;
+  publishedAt?: string;
+  score: number;
+  highlight?: {
+    field: string;
+    matchedText: string;
+  };
+  metadata?: Record<string, any>;
+}
+
+export interface SearchFilterOptions {
+  query: string;
+  sport?: string;
+  competition?: string;
+  team?: string;
+  category?: string;
+  dateRange?: 'today' | 'week' | 'month' | 'year' | 'all';
+  entityTypes?: SearchEntityType[];
+  sortBy?: 'relevance' | 'newest' | 'popular';
+  page?: number;
+  limit?: number;
+  tenantSlug?: string;
+}
+
+export interface SearchFacetCounts {
+  sports: { [sport: string]: number };
+  entityTypes: { [type: string]: number };
+  competitions: { [competition: string]: number };
+}
+
+export interface SearchResponse {
+  success: boolean;
+  query: string;
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  results: SearchResultItem[];
+  facets: SearchFacetCounts;
+  executionTimeMs: number;
+  fromCache?: boolean;
+}
+
+export interface SearchSuggestionItem {
+  id: string;
+  title: string;
+  type: SearchEntityType;
+  subtitle?: string;
+  slug?: string;
+  sport?: string;
+  image?: string;
+}
+
+export interface SearchSuggestionsResponse {
+  success: boolean;
+  query: string;
+  suggestions: SearchSuggestionItem[];
+  fromCache?: boolean;
+}
+
+export interface SearchDiagnosticsStats {
+  status: 'healthy' | 'degraded' | 'indexing';
+  totalIndexedDocuments: {
+    articles: number;
+    videos: number;
+    newsletters: number;
+    teams: number;
+    competitions: number;
+    players: number;
+  };
+  totalIndexCount: number;
+  lastIndexSync: string;
+  avgQueryLatencyMs: number;
+  cacheHitRatio: number;
+  failedIndexQueueCount: number;
+}
+
+

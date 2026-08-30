@@ -32,6 +32,7 @@ import {
   FiLayout,
   FiExternalLink,
   FiSliders,
+  FiSearch,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
@@ -132,6 +133,15 @@ const PRIMARY_TABS: PrimaryTab[] = [
         icon: FiSliders,
         requiredPermission: 'articles:draft',
         badge: 'AI',
+      },
+      {
+        id: 'search_diagnostics',
+        label: 'Search Diagnostics',
+        href: '/admin/search',
+        description: 'Full-text index health, document counts & re-indexing sandbox',
+        icon: FiSearch,
+        requiredPermission: 'articles:draft',
+        badge: 'Index',
       },
     ],
   },

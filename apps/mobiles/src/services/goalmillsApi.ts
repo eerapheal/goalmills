@@ -319,6 +319,50 @@ export const goalmillsApi = {
       });
     } catch {}
   },
+
+  search: async (options: {
+    query: string;
+    sport?: string;
+    type?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<any> => {
+    try {
+      const url = new URL(`${BASE_URL}/search`);
+      url.searchParams.set('q', options.query);
+      if (options.sport && options.sport !== 'all') url.searchParams.set('sport', options.sport);
+      if (options.type && options.type !== 'all') url.searchParams.set('type', options.type);
+      if (options.page) url.searchParams.set('page', String(options.page));
+      if (options.limit) url.searchParams.set('limit', String(options.limit));
+
+      const response = await fetch(url.toString(), {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!response.ok) return { success: false, results: [], total: 0 };
+      return await response.json();
+    } catch (error) {
+      console.warn('Error executing mobile search:', error);
+      return { success: false, results: [], total: 0 };
+    }
+  },
+
+  searchSuggest: async (query: string): Promise<any[]> => {
+    try {
+      if (!query || query.trim().length < 2) return [];
+      const response = await fetch(
+        `${BASE_URL}/search/suggest?q=${encodeURIComponent(query.trim())}`,
+        {
+          headers: { 'x-tenant-slug': currentTenantSlug },
+        }
+      );
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.suggestions || [];
+    } catch (error) {
+      console.warn('Error fetching search suggestions:', error);
+      return [];
+    }
+  },
 };
 
 export default goalmillsApi;
