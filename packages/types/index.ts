@@ -49,13 +49,51 @@ export interface TenantContext {
   isDefaultTenant: boolean;
 }
 
+export type SponsorshipPlacement =
+  | 'homepage_hero'
+  | 'sports_pulse'
+  | 'match_details'
+  | 'newsletter_footer'
+  | 'global_sidebar'
+  | 'article_inline'
+  | 'breaking_ticker'
+  | 'video_preroll'
+  | 'mobile_interstitial'
+  | string;
+
+export type SponsorshipType =
+  | 'banner'
+  | 'match_card'
+  | 'article_header'
+  | 'affiliate_link'
+  | 'newsletter_sponsor'
+  | 'video_sponsor';
+
+export interface SponsorshipTargeting {
+  sports?: string[];
+  competitions?: string[];
+  teams?: string[];
+  devices?: ('all' | 'desktop' | 'mobile' | 'tablet')[];
+  countries?: string[];
+}
+
+export interface SponsorshipBudgetControls {
+  dailyBudget?: number;
+  totalBudget?: number;
+  maxImpressions?: number;
+  maxClicks?: number;
+  cpmRate?: number;
+  cpcRate?: number;
+  pacing?: 'even' | 'asap';
+}
+
 export interface Sponsorship {
   _id?: string;
   title: string;
   sponsorName: string;
   sponsorLogo?: string;
-  type?: 'banner' | 'match_card' | 'article_header' | 'affiliate_link' | 'newsletter_sponsor';
-  placement?: 'homepage_hero' | 'sports_pulse' | 'match_details' | 'newsletter_footer' | 'global_sidebar' | string;
+  type?: SponsorshipType;
+  placement?: SponsorshipPlacement;
   targetUrl: string;
   imageUrl?: string;
   tagline?: string;
@@ -67,8 +105,12 @@ export interface Sponsorship {
   endDate?: string | Date;
   impressions?: number;
   clicks?: number;
+  ctr?: number;
+  spent?: number;
   priority?: number;
   budget?: number;
+  targeting?: SponsorshipTargeting;
+  budgetControls?: SponsorshipBudgetControls;
   tenantId?: string;
   tenantSlug?: string;
   createdAt?: string;

@@ -4,6 +4,7 @@ import Sponsorship from '@/models/Sponsorship';
 import { requirePermission } from '@/lib/serverAuth';
 import { isValidObjectId, sanitizeObject } from '@/lib/security';
 import { logAdminAction } from '@/lib/auditLog';
+import { resolveTenantContext } from '@/lib/tenantContext';
 
 export async function GET(
   request: NextRequest,
@@ -45,8 +46,18 @@ export async function PUT(
     }
 
     await dbConnect();
+    const tenantContext = await resolveTenantContext(request, session);
     const rawBody = await request.json();
     const body = sanitizeObject(rawBody);
+
+    const existing = await Sponsorship.findById(id);
+    if (!existing) {
+      return NextResponse.json({ error: 'Sponsorship not found' }, { status: 404 });
+    }
+
+    if (!tenantContext.isSuperAdmin && existing.tenantId && existing.tenantId !== tenantContext.tenantId) {
+      return NextResponse.json({ error: 'Forbidden: Cannot edit campaign of another organization' }, { status: 403 });
+    }
 
     const updated = await Sponsorship.findByIdAndUpdate(
       id,
@@ -57,6 +68,8 @@ export async function PUT(
           ...(body.endDate ? { endDate: new Date(body.endDate) } : {}),
           ...(body.priority !== undefined ? { priority: Number(body.priority) } : {}),
           ...(body.budget !== undefined ? { budget: Number(body.budget) } : {}),
+          ...(body.targeting !== undefined ? { targeting: body.targeting } : {}),
+          ...(body.budgetControls !== undefined ? { budgetControls: body.budgetControls } : {}),
         },
       },
       { new: true, runValidators: true }
@@ -97,14 +110,22 @@ export async function DELETE(
     }
 
     await dbConnect();
+    const tenantContext = await resolveTenantContext(request, session);
+    const existing = await Sponsorship.findById(id);
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Sponsorship not found' }, { status: 404 });
+    }
+
+    if (!tenantContext.isSuperAdmin && existing.tenantId && existing.tenantId !== tenantContext.tenantId) {
+      return NextResponse.json({ error: 'Forbidden: Cannot delete campaign of another organization' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const permanent = searchParams.get('permanent') === 'true';
 
     if (permanent) {
-      const deleted = await Sponsorship.findByIdAndDelete(id);
-      if (!deleted) {
-        return NextResponse.json({ error: 'Sponsorship not found' }, { status: 404 });
-      }
+      await Sponsorship.findByIdAndDelete(id);
 
       logAdminAction({
         actorId: session.user.id,
@@ -130,10 +151,6 @@ export async function DELETE(
         },
         { new: true }
       );
-
-      if (!softDeleted) {
-        return NextResponse.json({ error: 'Sponsorship not found' }, { status: 404 });
-      }
 
       logAdminAction({
         actorId: session.user.id,

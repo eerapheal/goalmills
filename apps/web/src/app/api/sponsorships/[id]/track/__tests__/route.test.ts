@@ -9,8 +9,14 @@ vi.mock('@/lib/db', () => ({
 
 vi.mock('@/models/Sponsorship', () => ({
   default: {
-    findOneAndUpdate: vi.fn(),
+    findOne: vi.fn(),
+    findByIdAndUpdate: vi.fn(),
   },
+}));
+
+vi.mock('@/lib/redisCache', () => ({
+  cacheGet: vi.fn().mockResolvedValue(null),
+  cacheSet: vi.fn().mockResolvedValue(true),
 }));
 
 describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
@@ -45,12 +51,23 @@ describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
     expect(json.error).toBe('Invalid event type');
   });
 
-  it('should successfully track click on active campaign', async () => {
+  it('should successfully track click on active campaign and compute CTR', async () => {
     const validId = '507f1f77bcf86cd799439011';
-    (Sponsorship.findOneAndUpdate as any).mockResolvedValue({
+    (Sponsorship.findOne as any).mockResolvedValue({
       _id: validId,
       title: 'Partner Offer',
-      clicks: 1,
+      status: 'active',
+      impressions: 100,
+      clicks: 5,
+      budgetControls: { cpcRate: 0.5 },
+      spent: 2.5,
+    });
+    (Sponsorship.findByIdAndUpdate as any).mockResolvedValue({
+      _id: validId,
+      impressions: 100,
+      clicks: 6,
+      ctr: 6.0,
+      status: 'active',
     });
 
     const req = new NextRequest(`http://localhost:3000/api/sponsorships/${validId}/track?type=click`, {
@@ -64,5 +81,38 @@ describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
     expect(res.status).toBe(200);
     expect(json.success).toBe(true);
     expect(json.tracked).toBe('click');
+    expect(json.campaignStatus).toBe('active');
+  });
+
+  it('should auto-pause campaign when budget is reached', async () => {
+    const validId = '507f1f77bcf86cd799439011';
+    (Sponsorship.findOne as any).mockResolvedValue({
+      _id: validId,
+      title: 'Capped Campaign',
+      status: 'active',
+      impressions: 999,
+      clicks: 10,
+      budget: 50,
+      budgetControls: { maxImpressions: 1000 },
+      spent: 10,
+    });
+    (Sponsorship.findByIdAndUpdate as any).mockResolvedValue({
+      _id: validId,
+      impressions: 1000,
+      clicks: 10,
+      status: 'paused',
+    });
+
+    const req = new NextRequest(`http://localhost:3000/api/sponsorships/${validId}/track?type=impression`, {
+      method: 'POST',
+    });
+    const params = Promise.resolve({ id: validId });
+
+    const res = await POST(req, { params });
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.campaignStatus).toBe('paused');
   });
 });

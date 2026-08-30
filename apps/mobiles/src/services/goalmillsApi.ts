@@ -210,15 +210,26 @@ export const goalmillsApi = {
       });
       if (!response.ok) return [];
       const data = await response.json();
-      if (Array.isArray(data)) {
-        await mobileCache.set(cacheKey, data, 120);
-        return data;
+      const list = Array.isArray(data) ? data : data.sponsorships || [];
+      if (Array.isArray(list) && list.length > 0) {
+        await mobileCache.set(cacheKey, list, 120);
+        return list;
       }
-      return [];
+      return list;
     } catch (error) {
       console.warn('Error fetching sponsorships:', error);
       return [];
     }
+  },
+
+  trackSponsorshipEvent: async (id: string, type: 'impression' | 'click' = 'impression'): Promise<void> => {
+    if (!id || id.startsWith('default_')) return;
+    try {
+      await fetch(`${BASE_URL}/sponsorships/${id}/track?type=${type}`, {
+        method: 'POST',
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+    } catch {}
   },
 
   incrementNewsView: async (id: string): Promise<void> => {

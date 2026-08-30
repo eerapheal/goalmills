@@ -4,6 +4,7 @@ import Sponsorship from '@/models/Sponsorship';
 import { requirePermission } from '@/lib/serverAuth';
 import { sanitizeObject } from '@/lib/security';
 import { logAdminAction } from '@/lib/auditLog';
+import { resolveTenantContext, buildTenantFilter, DEFAULT_TENANT_ID, DEFAULT_TENANT_SLUG } from '@/lib/tenantContext';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,31 +12,45 @@ export async function GET(request: NextRequest) {
     if (error) return error;
 
     await dbConnect();
+    const tenantContext = await resolveTenantContext(request, session);
     const { searchParams } = new URL(request.url);
+
     const status = searchParams.get('status');
     const placement = searchParams.get('placement');
     const sportSlug = searchParams.get('sportSlug');
+    const tenantFilterParam = searchParams.get('tenantId');
     const includeDeleted = searchParams.get('includeDeleted') === 'true';
 
-    const filter: Record<string, any> = {};
-    if (!includeDeleted) {
-      filter.isDeleted = { $ne: true };
-    }
-    if (status && status !== 'all') {
-      filter.status = status;
-    }
-    if (placement && placement !== 'all') {
-      filter.placement = placement;
-    }
-    if (sportSlug && sportSlug !== 'all') {
-      filter.sportSlug = sportSlug;
+    let baseFilter: Record<string, any> = {};
+
+    if (tenantContext.isSuperAdmin && tenantFilterParam && tenantFilterParam !== 'all') {
+      baseFilter.tenantId = tenantFilterParam;
+    } else if (!tenantContext.isSuperAdmin) {
+      baseFilter = buildTenantFilter(tenantContext);
     }
 
-    const sponsorships = await Sponsorship.find(filter)
+    if (!includeDeleted) {
+      baseFilter.isDeleted = { $ne: true };
+    }
+    if (status && status !== 'all') {
+      baseFilter.status = status;
+    }
+    if (placement && placement !== 'all') {
+      baseFilter.placement = placement;
+    }
+    if (sportSlug && sportSlug !== 'all') {
+      baseFilter.sportSlug = sportSlug;
+    }
+
+    const sponsorships = await Sponsorship.find(baseFilter)
       .sort({ priority: -1, createdAt: -1 })
       .lean();
 
-    return NextResponse.json({ success: true, sponsorships });
+    return NextResponse.json({
+      success: true,
+      tenantSlug: tenantContext.tenantSlug,
+      sponsorships,
+    });
   } catch (error: any) {
     console.error('[Admin Sponsorships GET] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch sponsorships' }, { status: 500 });
@@ -48,6 +63,7 @@ export async function POST(request: NextRequest) {
     if (error) return error;
 
     await dbConnect();
+    const tenantContext = await resolveTenantContext(request, session);
     const rawBody = await request.json();
     const body = sanitizeObject(rawBody);
 
@@ -57,6 +73,11 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const assignedTenantId =
+      tenantContext.isSuperAdmin && body.tenantId ? body.tenantId : tenantContext.tenantId || DEFAULT_TENANT_ID;
+    const assignedTenantSlug =
+      tenantContext.isSuperAdmin && body.tenantSlug ? body.tenantSlug : tenantContext.tenantSlug || DEFAULT_TENANT_SLUG;
 
     const newSponsorship = await Sponsorship.create({
       title: body.title,
@@ -75,6 +96,14 @@ export async function POST(request: NextRequest) {
       endDate: body.endDate ? new Date(body.endDate) : undefined,
       priority: Number(body.priority) || 1,
       budget: body.budget ? Number(body.budget) : undefined,
+      targeting: body.targeting || {},
+      budgetControls: body.budgetControls || {},
+      tenantId: assignedTenantId,
+      tenantSlug: assignedTenantSlug,
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+      spent: 0,
       isDeleted: false,
     });
 
@@ -85,7 +114,11 @@ export async function POST(request: NextRequest) {
       resource: 'Sponsorship',
       resourceId: String(newSponsorship._id),
       status: 'SUCCESS',
-      metadata: { title: newSponsorship.title, sponsor: newSponsorship.sponsorName },
+      metadata: {
+        title: newSponsorship.title,
+        sponsor: newSponsorship.sponsorName,
+        tenantId: assignedTenantId,
+      },
     });
 
     return NextResponse.json({ success: true, sponsorship: newSponsorship }, { status: 201 });

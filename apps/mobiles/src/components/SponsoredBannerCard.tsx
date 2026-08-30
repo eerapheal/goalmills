@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
+import { goalmillsApi } from '../services/goalmillsApi';
 
 interface SponsoredBannerProps {
   placement?: string;
@@ -9,24 +10,44 @@ interface SponsoredBannerProps {
   category?: string;
 }
 
+const DEFAULT_SPONSOR = {
+  _id: 'default_mobile_sponsor',
+  title: 'GoalMills VIP Match & Fantasy Hub',
+  sponsorName: 'GoalMills Official',
+  badgeText: 'VIP SPONSOR',
+  tagline: 'Instant live scores, detailed statistics & tactical match debriefs with verified xG metrics',
+  ctaText: 'Claim VIP Match Pass',
+  targetUrl: 'https://goalmills.com',
+  imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+};
+
 export function SponsoredBannerCard({
   placement = 'homepage_hero',
   sport = 'all',
   category = 'vip',
 }: SponsoredBannerProps) {
-  const [sponsorship, setSponsorship] = useState<any | null>(null);
+  const [sponsorship, setSponsorship] = useState<any | null>(DEFAULT_SPONSOR);
 
   useEffect(() => {
-    setSponsorship({
-      _id: 'default_mobile_sponsor',
-      title: 'GoalMills VIP Match & Fantasy Hub',
-      sponsorName: 'GoalMills Official',
-      badgeText: 'VIP SPONSOR',
-      tagline: 'Instant live scores, detailed statistics & tactical match debriefs with verified xG metrics',
-      ctaText: 'Claim VIP Match Pass',
-      targetUrl: 'https://goalmills.com',
-      imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
-    });
+    let isMounted = true;
+    async function loadSponsorship() {
+      try {
+        const items = await goalmillsApi.getSponsorships(placement, sport);
+        if (isMounted && items && items.length > 0) {
+          const selected = items[0];
+          setSponsorship(selected);
+          if (selected._id) {
+            goalmillsApi.trackSponsorshipEvent(selected._id, 'impression');
+          }
+        }
+      } catch {
+        if (isMounted) setSponsorship(DEFAULT_SPONSOR);
+      }
+    }
+    loadSponsorship();
+    return () => {
+      isMounted = false;
+    };
   }, [placement, sport, category]);
 
   if (!sponsorship) {
@@ -34,6 +55,9 @@ export function SponsoredBannerCard({
   }
 
   const handlePress = () => {
+    if (sponsorship._id) {
+      goalmillsApi.trackSponsorshipEvent(sponsorship._id, 'click');
+    }
     if (sponsorship.targetUrl) {
       Linking.openURL(sponsorship.targetUrl).catch((err: any) =>
         console.error('Failed to open sponsor URL:', err)

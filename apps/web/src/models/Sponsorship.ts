@@ -1,25 +1,58 @@
 import mongoose from 'mongoose';
 
+export interface ISponsorshipTargeting {
+  sports?: string[];
+  competitions?: string[];
+  teams?: string[];
+  devices?: ('all' | 'desktop' | 'mobile' | 'tablet')[];
+  countries?: string[];
+}
+
+export interface ISponsorshipBudgetControls {
+  dailyBudget?: number;
+  totalBudget?: number;
+  maxImpressions?: number;
+  maxClicks?: number;
+  cpmRate?: number;
+  cpcRate?: number;
+  pacing?: 'even' | 'asap';
+}
+
 export interface ISponsorship {
   _id?: string;
   title: string;
   sponsorName: string;
   sponsorLogo?: string;
-  type: 'banner' | 'match_card' | 'article_header' | 'affiliate_link' | 'newsletter_sponsor';
-  placement: 'homepage_hero' | 'sports_pulse' | 'match_details' | 'newsletter_footer' | 'global_sidebar';
+  type: 'banner' | 'match_card' | 'article_header' | 'affiliate_link' | 'newsletter_sponsor' | 'video_sponsor';
+  placement:
+    | 'homepage_hero'
+    | 'sports_pulse'
+    | 'match_details'
+    | 'newsletter_footer'
+    | 'global_sidebar'
+    | 'article_inline'
+    | 'breaking_ticker'
+    | 'video_preroll'
+    | 'mobile_interstitial';
   targetUrl: string;
   imageUrl?: string;
   tagline?: string;
   ctaText: string;
-  sportSlug: 'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey';
+  sportSlug: 'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string;
   badgeText: string;
   status: 'active' | 'paused' | 'expired' | 'draft' | 'trash';
   startDate: Date;
   endDate?: Date;
   impressions: number;
   clicks: number;
+  ctr?: number;
+  spent?: number;
   priority: number;
   budget?: number;
+  targeting?: ISponsorshipTargeting;
+  budgetControls?: ISponsorshipBudgetControls;
+  tenantId?: string;
+  tenantSlug?: string;
   isDeleted: boolean;
   deletedAt?: Date;
   deletedBy?: string;
@@ -34,13 +67,23 @@ const SponsorshipSchema = new mongoose.Schema(
     sponsorLogo: { type: String, required: false },
     type: {
       type: String,
-      enum: ['banner', 'match_card', 'article_header', 'affiliate_link', 'newsletter_sponsor'],
+      enum: ['banner', 'match_card', 'article_header', 'affiliate_link', 'newsletter_sponsor', 'video_sponsor'],
       default: 'banner',
       index: true,
     },
     placement: {
       type: String,
-      enum: ['homepage_hero', 'sports_pulse', 'match_details', 'newsletter_footer', 'global_sidebar'],
+      enum: [
+        'homepage_hero',
+        'sports_pulse',
+        'match_details',
+        'newsletter_footer',
+        'global_sidebar',
+        'article_inline',
+        'breaking_ticker',
+        'video_preroll',
+        'mobile_interstitial',
+      ],
       default: 'homepage_hero',
       index: true,
     },
@@ -50,7 +93,6 @@ const SponsorshipSchema = new mongoose.Schema(
     ctaText: { type: String, default: 'Learn More' },
     sportSlug: {
       type: String,
-      enum: ['all', 'football', 'cricket', 'basketball', 'tennis', 'baseball', 'hockey'],
       default: 'all',
       index: true,
     },
@@ -65,13 +107,36 @@ const SponsorshipSchema = new mongoose.Schema(
     endDate: { type: Date, required: false },
     impressions: { type: Number, default: 0 },
     clicks: { type: Number, default: 0 },
+    ctr: { type: Number, default: 0 },
+    spent: { type: Number, default: 0 },
     priority: { type: Number, default: 1 },
     budget: { type: Number, required: false },
+    targeting: {
+      sports: [{ type: String }],
+      competitions: [{ type: String }],
+      teams: [{ type: String }],
+      devices: [{ type: String }],
+      countries: [{ type: String }],
+    },
+    budgetControls: {
+      dailyBudget: { type: Number },
+      totalBudget: { type: Number },
+      maxImpressions: { type: Number },
+      maxClicks: { type: Number },
+      cpmRate: { type: Number },
+      cpcRate: { type: Number },
+      pacing: { type: String, enum: ['even', 'asap'], default: 'asap' },
+    },
+    tenantId: { type: String, default: 'default', index: true },
+    tenantSlug: { type: String, default: 'goalmills', index: true },
     isDeleted: { type: Boolean, default: false, index: true },
     deletedAt: { type: Date, required: false },
     deletedBy: { type: String, required: false },
   },
   { timestamps: true }
 );
+
+SponsorshipSchema.index({ tenantId: 1, status: 1, placement: 1, priority: -1 });
+SponsorshipSchema.index({ status: 1, isDeleted: 1, priority: -1 });
 
 export default mongoose.models.Sponsorship || mongoose.model('Sponsorship', SponsorshipSchema);
