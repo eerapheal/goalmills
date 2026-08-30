@@ -7,3 +7,6 @@ export { SportTabs } from './SportTabs';
 export { RecommendedFeed } from './RecommendedFeed';
 export { HeadToHeadView } from './HeadToHeadView';
 export { FanPassBanner } from './FanPassBanner';
+export { LiveNewsFlashTicker } from './LiveNewsFlashTicker';
+export { PulseNewsTicker } from './PulseNewsTicker';
+export { NewsCard } from './NewsCard';

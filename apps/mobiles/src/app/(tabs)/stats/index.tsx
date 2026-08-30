@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
 import { MobileEntityService, COMPETITIONS_REGISTRY } from '../../../utils/entityRegistry';
 import { FootballStanding, FootballTopscorer } from '@goalmills/types';
+import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 
 export default function StatsScreen() {
   const router = useRouter();
@@ -63,6 +64,9 @@ export default function StatsScreen() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
+      {/* ── Live Flash Ticker ── */}
+      <LiveNewsFlashTicker badgeText="TABLES WIRE" />
+
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.badge}>

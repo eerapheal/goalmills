@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost } from '@goalmills/types';
+import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 
 export default function AnalysisScreen() {
   const router = useRouter();
@@ -47,6 +48,9 @@ export default function AnalysisScreen() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
+      {/* ── Live Flash Ticker ── */}
+      <LiveNewsFlashTicker badgeText="TACTICAL WIRE" />
+
       {/* Header Banner */}
       <View style={styles.header}>
         <View style={styles.badge}>

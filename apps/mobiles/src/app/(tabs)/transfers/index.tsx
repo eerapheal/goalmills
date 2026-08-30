@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MobileEntityService } from '../../../utils/entityRegistry';
 import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost, TransferItem } from '@goalmills/types';
+import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 
 export default function TransfersScreen() {
   const router = useRouter();
@@ -64,6 +65,9 @@ export default function TransfersScreen() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
+      {/* ── Live Flash Ticker ── */}
+      <LiveNewsFlashTicker badgeText="TRANSFER WIRE" />
+
       {/* Header Banner */}
       <View style={styles.header}>
         <View style={styles.badge}>

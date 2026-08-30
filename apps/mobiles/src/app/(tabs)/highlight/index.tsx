@@ -17,6 +17,7 @@ import { goalmillsApi } from '../../../services/goalmillsApi';
 import { mapInternalVideoToHighlight } from '../../../utils/footballAdapters';
 import { VideoHighlight } from '@goalmills/types';
 import { VideoCard } from '../../../components/VideoCard';
+import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 
 const CATEGORIES = ['All', 'Football', 'Basketball', 'Cricket', 'Top Goals', 'Tactical'];
 
@@ -88,6 +89,9 @@ export default function HighlightScreen() {
 
   return (
     <View style={styles.container}>
+      {/* ── Live Flash Ticker ── */}
+      <LiveNewsFlashTicker badgeText="VIDEO PULSE" />
+
       {/* Header & Search */}
       <View style={styles.headerContainer}>
         <View style={styles.titleRow}>

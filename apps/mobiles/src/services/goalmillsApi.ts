@@ -132,6 +132,37 @@ export const goalmillsApi = {
     }
   },
 
+  /**
+   * Fetch 8 randomly selected posts for the Live Flash Ticker.
+   * Calls GET /api/news/flash and returns posts with { _id, title, slug }.
+   * Results are cached for 45 s so each screen refresh gets fresh random items.
+   */
+  getFlashNews: async (sport?: string): Promise<{ _id: string; title: string; slug?: string }[]> => {
+    const cacheKey = `mobile:flash:${currentTenantSlug}:${sport || 'all'}`;
+    const cached = await mobileCache.get<{ _id: string; title: string; slug?: string }[]>(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const url = new URL(`${BASE_URL}/news/flash`);
+      if (sport) url.searchParams.set('sport', sport);
+
+      const response = await fetch(url.toString(), {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!response.ok) return [];
+
+      const data = await response.json();
+      const items = Array.isArray(data) ? data : data?.posts || [];
+      if (items.length > 0) {
+        await mobileCache.set(cacheKey, items, 45); // 45 s TTL – matches server cache
+      }
+      return items;
+    } catch (error) {
+      console.warn('Error fetching flash news:', error);
+      return [];
+    }
+  },
+
   getCategories: async (): Promise<Category[]> => {
     const cacheKey = `mobile:categories:${currentTenantSlug}`;
     const cached = await mobileCache.get<Category[]>(cacheKey);

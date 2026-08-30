@@ -17,11 +17,13 @@ import { goalmillsApi } from '../../../services/goalmillsApi';
 import { BlogPost, Category } from '@goalmills/types';
 import { NewsCard } from '../../../components/NewsCard';
 import { GoalmillsLoader } from '../../../components/GoalmillsLoader';
+import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 import {
   MOBILE_FILTER_TABS,
   MOBILE_POPULAR_TEAMS,
   newsHistoryUtil,
 } from '../../../utils/newsHistory';
+import { slugify } from '../../../utils/slugUtils';
 
 export default function NewsScreen() {
   const router = useRouter();
@@ -83,12 +85,16 @@ export default function NewsScreen() {
     loadData();
   };
 
-  const handlePress = (id: string) => {
-    router.push(`/news/${id}`);
+  const handlePress = (item: BlogPost | string) => {
+    const target = typeof item === 'string' ? item : (item.slug || slugify(item.title) || item._id);
+    router.push(`/news/${target}`);
   };
 
   return (
     <View style={styles.container}>
+      {/* ── Live Flash Ticker ── */}
+      <LiveNewsFlashTicker badgeText="SPORTS WIRE" />
+
       {/* Header & Search */}
       <View style={styles.headerContainer}>
         <View style={styles.titleRow}>
@@ -210,7 +216,7 @@ export default function NewsScreen() {
         <FlatList
           data={news}
           keyExtractor={(item) => item._id || Math.random().toString()}
-          renderItem={({ item }) => <NewsCard item={item} onPress={() => handlePress(item._id)} />}
+          renderItem={({ item }) => <NewsCard item={item} onPress={() => handlePress(item)} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshControl={

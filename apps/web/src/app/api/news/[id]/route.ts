@@ -5,11 +5,12 @@ import { cacheGet, cacheSet, getSeoCacheHeaders } from '@/lib/redisCache';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return NextResponse.json({ message: 'Invalid News ID' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ message: 'Invalid identifier' }, { status: 400 });
   }
 
-  const cacheKey = `cache:news:item:${id}`;
+  const decodedId = decodeURIComponent(id).trim();
+  const cacheKey = `cache:news:item:${decodedId}`;
   const cached = await cacheGet(cacheKey);
   if (cached) {
     return NextResponse.json(cached, {
@@ -22,7 +23,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   await dbConnect();
   try {
-    const news = await News.findById(id).lean();
+    const isObjectId = decodedId.match(/^[0-9a-fA-F]{24}$/);
+    const query = isObjectId
+      ? { $or: [{ _id: decodedId }, { slug: decodedId }] }
+      : { slug: decodedId };
+
+    const news = await News.findOne(query).lean();
     if (!news) return NextResponse.json({ message: 'News not found' }, { status: 404 });
 
     await cacheSet(cacheKey, news, 300);
