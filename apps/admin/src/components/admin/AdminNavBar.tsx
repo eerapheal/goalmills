@@ -33,6 +33,7 @@ import {
   FiExternalLink,
   FiSliders,
   FiSearch,
+  FiDatabase,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
@@ -151,6 +152,15 @@ const PRIMARY_TABS: PrimaryTab[] = [
         icon: FiZap,
         requiredPermission: 'articles:draft',
         badge: 'Stream',
+      },
+      {
+        id: 'sports_warehouse',
+        label: 'Sports Warehouse',
+        href: '/admin/warehouse',
+        description: 'Historical match scorecards, H2H analytics & provenance audit',
+        icon: FiDatabase,
+        requiredPermission: 'articles:draft',
+        badge: 'Data',
       },
     ],
   },
@@ -271,6 +281,7 @@ const PRIMARY_TABS: PrimaryTab[] = [
 
 // Quick jump desktop shortcut chips for high frequency operations
 const QUICK_SHORTCUTS = [
+  { label: 'Warehouse Hub', href: '/admin/warehouse', icon: FiDatabase, color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20' },
   { label: 'Stream & DLQ', href: '/admin/events', icon: FiZap, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Search Index', href: '/admin/search', icon: FiSearch, color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20' },
   { label: 'Recommendations', href: '/admin/recommendations', icon: FiSliders, color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20' },

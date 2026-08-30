@@ -24,9 +24,10 @@ import { VideoCard } from '../components/VideoCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
 import { RecommendedFeed } from '../components/RecommendedFeed';
+import { HeadToHeadView } from '../components/HeadToHeadView';
 import { mobileAnalytics } from '../utils/analytics';
 
-type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
+type FootballTab = 'live' | 'upcoming' | 'results' | 'h2h' | 'standings' | 'news' | 'videos';
 
 export function FootballScreen() {
   const router = useRouter();
@@ -129,6 +130,7 @@ export function FootballScreen() {
     { id: 'live', label: 'Live', count: liveFixtures.length },
     { id: 'upcoming', label: 'Upcoming', count: upcomingFixtures.length },
     { id: 'results', label: 'Results', count: finishedFixtures.length },
+    { id: 'h2h', label: 'H2H Intelligence' },
     { id: 'standings', label: 'Standings' },
     { id: 'news', label: 'News', count: blogPosts.length },
     { id: 'videos', label: 'Videos', count: videos.length },
@@ -182,9 +184,19 @@ export function FootballScreen() {
         return (
           <View style={styles.content}>
             <Text style={styles.sectionTitle}>✅ Recent Results</Text>
+            <HeadToHeadView sport="football" teamA="arsenal" teamB="chelsea" />
             {finishedFixtures.map((fixture, index) => (
               <FixtureCard key={`result-${fixture.fixture.id}-${index}`} fixture={fixture} />
             ))}
+          </View>
+        );
+
+      case 'h2h':
+        return (
+          <View style={styles.content}>
+            <Text style={styles.sectionTitle}>⚔️ Head-to-Head Derby Records</Text>
+            <HeadToHeadView sport="football" teamA="arsenal" teamB="chelsea" />
+            <HeadToHeadView sport="football" teamA="manchester-united" teamB="liverpool" />
           </View>
         );
 
@@ -195,6 +207,7 @@ export function FootballScreen() {
             <StandingsTable standings={standings} />
           </View>
         );
+
 
       case 'news':
         return (

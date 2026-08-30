@@ -5,3 +5,4 @@ export { BlogCard } from './BlogCard';
 export { VideoCard } from './VideoCard';
 export { SportTabs } from './SportTabs';
 export { RecommendedFeed } from './RecommendedFeed';
+export { HeadToHeadView } from './HeadToHeadView';

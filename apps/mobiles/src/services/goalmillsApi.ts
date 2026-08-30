@@ -363,6 +363,82 @@ export const goalmillsApi = {
       return [];
     }
   },
+
+  // ==========================================
+  // PHASE 8: SPORTS DATA WAREHOUSE & TELEMETRY
+  // ==========================================
+
+  getHeadToHead: async (sport = 'football', teamA = 'arsenal', teamB = 'chelsea'): Promise<any> => {
+    const cacheKey = `mobile:warehouse:h2h:${sport}:${teamA}:${teamB}`;
+    const cached = await mobileCache.get<any>(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/warehouse/h2h?sport=${encodeURIComponent(sport)}&teamA=${encodeURIComponent(teamA)}&teamB=${encodeURIComponent(teamB)}`,
+        {
+          headers: { 'x-tenant-slug': currentTenantSlug },
+        }
+      );
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (data.success && data.h2h) {
+        await mobileCache.set(cacheKey, data.h2h, 300); // 5 min TTL
+        return data.h2h;
+      }
+      return null;
+    } catch (error) {
+      console.warn('Error fetching mobile Head-to-Head data:', error);
+      return null;
+    }
+  },
+
+  getTeamTrends: async (sport = 'football', teamSlug: string): Promise<any> => {
+    const cacheKey = `mobile:warehouse:trends:${sport}:${teamSlug}`;
+    const cached = await mobileCache.get<any>(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/warehouse/teams/${encodeURIComponent(teamSlug)}/trends?sport=${encodeURIComponent(sport)}`,
+        {
+          headers: { 'x-tenant-slug': currentTenantSlug },
+        }
+      );
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (data.success && data.trends) {
+        await mobileCache.set(cacheKey, data.trends, 300);
+        return data.trends;
+      }
+      return null;
+    } catch (error) {
+      console.warn('Error fetching mobile team trends:', error);
+      return null;
+    }
+  },
+
+  trackSportsTelemetry: async (eventType: string, payload: any): Promise<boolean> => {
+    try {
+      await fetch(`${BASE_URL}/events/track`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-tenant-slug': currentTenantSlug,
+        },
+        body: JSON.stringify({
+          eventType,
+          payload: {
+            ...payload,
+            device: 'mobile',
+          },
+        }),
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  },
 };
 
 export default goalmillsApi;

@@ -3701,5 +3701,203 @@ export interface LiveMatchStreamEvent {
   timestamp: string;
 }
 
+// ==========================================
+// PHASE 8: SPORTS DATA WAREHOUSE & HISTORICAL INTELLIGENCE
+// ==========================================
+
+export interface DataProvenance {
+  provider: 'allsportsapi' | 'cricbuzz' | 'rapidapi' | 'manual_editorial' | string;
+  providerId: string;
+  ingestedAt: string;
+  normalizationVersion: string;
+  confidenceScore: number;
+}
+
+export interface HistoricalMatchScore {
+  home: number;
+  away: number;
+  formatted: string;
+  halftime?: { home: number; away: number };
+  extraTime?: { home: number; away: number };
+  penalties?: { home: number; away: number };
+  cricketInnings?: {
+    teamA?: { runs: number; wickets: number; overs: number };
+    teamB?: { runs: number; wickets: number; overs: number };
+  };
+  basketballQuarters?: {
+    home: number[];
+    away: number[];
+  };
+}
+
+export interface HistoricalMatchEvent {
+  minute: number | string;
+  type: 'goal' | 'card' | 'red_card' | 'yellow_card' | 'wicket' | 'boundary' | 'point' | 'substitution' | 'var' | string;
+  teamSlug?: string;
+  player: string;
+  assist?: string;
+  detail?: string;
+}
+
+export interface HistoricalMatchRecord {
+  _id?: string;
+  matchId: string;
+  sport: 'football' | 'cricket' | 'basketball' | 'tennis' | string;
+  competition: {
+    id: string;
+    name: string;
+    slug: string;
+    country?: string;
+    season: string;
+  };
+  date: string;
+  status: 'finished' | 'aet' | 'penalties' | 'awarded' | 'abandoned' | 'postponed' | string;
+  homeTeam: {
+    id: string;
+    name: string;
+    shortName?: string;
+    slug: string;
+    logo?: string;
+  };
+  awayTeam: {
+    id: string;
+    name: string;
+    shortName?: string;
+    slug: string;
+    logo?: string;
+  };
+  finalScore: HistoricalMatchScore;
+  events?: HistoricalMatchEvent[];
+  lineups?: {
+    homeStartingXI?: string[];
+    awayStartingXI?: string[];
+    homeFormation?: string;
+    awayFormation?: string;
+  };
+  venue?: string;
+  referee?: string;
+  provenance: DataProvenance;
+  tenantSlug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface HistoricalStandingsRow {
+  rank: number;
+  teamId: string;
+  teamName: string;
+  teamSlug: string;
+  teamLogo?: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDiff: number;
+  points: number;
+  form: string[];
+}
+
+export interface HistoricalStandingsRecord {
+  _id?: string;
+  sport: string;
+  competitionId: string;
+  competitionName: string;
+  competitionSlug: string;
+  season: string;
+  table: HistoricalStandingsRow[];
+  lastUpdated: string;
+  provenance: DataProvenance;
+}
+
+export interface HistoricalTeamRecord {
+  _id?: string;
+  teamId: string;
+  name: string;
+  shortName?: string;
+  slug: string;
+  sport: string;
+  logo?: string;
+  country?: string;
+  founded?: number;
+  stadium?: string;
+  manager?: string;
+  stats: {
+    matchesPlayed: number;
+    wins: number;
+    draws: number;
+    losses: number;
+    goalsScored: number;
+    goalsConceded: number;
+    cleanSheets: number;
+    winRate: number;
+    recentForm: string[];
+  };
+  lastUpdated?: string;
+}
+
+export interface HeadToHeadSummary {
+  sport: string;
+  teamA: {
+    name: string;
+    slug: string;
+    logo?: string;
+  };
+  teamB: {
+    name: string;
+    slug: string;
+    logo?: string;
+  };
+  totalMatches: number;
+  teamAWins: number;
+  teamBWins: number;
+  draws: number;
+  teamAGoals: number;
+  teamBGoals: number;
+  avgGoalsPerMatch: number;
+  mostCommonScoreline: string;
+  cleanSheetsTeamA: number;
+  cleanSheetsTeamB: number;
+  recentMatches: HistoricalMatchRecord[];
+}
+
+export interface TeamTrendAnalytics {
+  teamSlug: string;
+  teamName: string;
+  sport: string;
+  recentForm: string[];
+  averageGoalsScored: number;
+  averageGoalsConceded: number;
+  cleanSheetPercentage: number;
+  over25MatchPercentage: number;
+  goalTimingBreakdown: {
+    early0to30m: number;
+    mid31to60m: number;
+    late61to90m: number;
+  };
+}
+
+export interface WarehouseDiagnosticsStats {
+  status: 'healthy' | 'syncing' | 'degraded';
+  totalHistoricalMatches: {
+    football: number;
+    cricket: number;
+    basketball: number;
+    tennis: number;
+  };
+  totalTeams: number;
+  totalCompetitions: number;
+  totalStandingsSnapshots: number;
+  lastWarehouseSync: string;
+  providerSyncHealth: Array<{
+    provider: string;
+    status: 'online' | 'degraded';
+    confidenceAvg: number;
+    lastSync: string;
+  }>;
+}
+
+
 
 
