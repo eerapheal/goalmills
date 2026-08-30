@@ -312,3 +312,91 @@ export async function sendConfirmationEmail(
     dispatchedViaGo,
   };
 }
+
+export interface SendNewsletterBroadcastParams {
+  campaignId?: string;
+  subject: string;
+  previewText?: string;
+  editorialNote?: string;
+  frequency?: string;
+  isHighPriority?: boolean;
+  articleIds?: string[];
+  recipients: {
+    email: string;
+    unsubscribeToken?: string;
+    recipientId?: string;
+  }[];
+}
+
+/**
+ * Sends a custom newsletter broadcast or test preview dispatch to specific recipients.
+ */
+export async function sendNewsletterBroadcast(params: SendNewsletterBroadcastParams) {
+  await dbConnect();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
+  const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'https://goalmills.onrender.com';
+
+  let articles: NewsletterArticlePreview[] = [];
+  if (params.articleIds && params.articleIds.length > 0) {
+    const docs = await News.find({ _id: { $in: params.articleIds } });
+    articles = docs.map(formatArticlePreview);
+  }
+
+  let dispatchedViaGo = false;
+  try {
+    const goPayload = {
+      campaignId: params.campaignId || `preview_${Date.now()}`,
+      subject: params.subject,
+      previewText: params.previewText || '',
+      editorialNote: params.editorialNote || '',
+      frequency: params.frequency || 'Daily',
+      isHighPriority: !!params.isHighPriority,
+      articles: articles.map((a) => ({
+        id: a._id,
+        title: a.title,
+        slug: a.slug,
+        excerpt: a.excerpt,
+        image: a.image || '',
+        category: a.category,
+        sport: a.sport,
+        readTime: a.readTime,
+        isBreaking: a.isBreaking,
+        isFeatured: a.isFeatured,
+        views: a.views || 0,
+        author: a.author,
+        url: `${siteUrl}/news/${a.slug || a._id}`,
+      })),
+      recipients: params.recipients.map((r) => ({
+        email: r.email,
+        unsubscribeToken: r.unsubscribeToken || '',
+        recipientId: r.recipientId || '',
+      })),
+    };
+
+    const res = await fetch(`${mailerServiceUrl}/api/dispatch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(goPayload),
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        dispatchedViaGo = true;
+      }
+    }
+  } catch (err) {
+    // Go mailer service fallback
+  }
+
+  return {
+    success: true,
+    message: dispatchedViaGo
+      ? `Dispatched test preview to ${params.recipients.length} recipient(s) via Go Mailer`
+      : `Test preview prepared for ${params.recipients.length} recipient(s)`,
+    dispatchedViaGo,
+    recipientCount: params.recipients.length,
+  };
+}
+
