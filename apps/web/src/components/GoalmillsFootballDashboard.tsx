@@ -31,14 +31,96 @@ export function GoalmillsFootballDashboard() {
     { id: 'football-5', tag: 'AFCON', title: 'CAF confirms host venues and official tournament schedule for 2025/26', time: '3h ago' },
   ]);
 
+  const [liveMatches, setLiveMatches] = useState<any[]>([
+    {
+      id: 'm-1',
+      league: 'Premier League • Matchday 28',
+      status: '78\'',
+      isLive: true,
+      homeTeam: 'Man United',
+      homeCode: 'MU',
+      homeGoalScorer: 'B. Fernandes (60\')',
+      awayTeam: 'Arsenal',
+      awayCode: 'ARS',
+      awayGoalScorer: 'B. Saka (76\')',
+      score: '2 - 1',
+      homePossession: 54,
+      awayPossession: 46,
+      homeXg: '1.82',
+      awayXg: '1.45',
+    },
+    {
+      id: 'm-2',
+      league: 'La Liga • El Clásico',
+      status: 'HT',
+      isLive: true,
+      homeTeam: 'Real Madrid',
+      homeCode: 'RMA',
+      homeGoalScorer: 'Vinicius Jr (32\')',
+      awayTeam: 'Barcelona',
+      awayCode: 'FCB',
+      awayGoalScorer: 'Lamine Yamal (18\')',
+      score: '1 - 1',
+      homePossession: 49,
+      awayPossession: 51,
+      homeXg: '1.10',
+      awayXg: '1.30',
+    },
+  ]);
+
+  const [marqueeMatch, setMarqueeMatch] = useState<{
+    league: string;
+    stage: string;
+    homeTeam: string;
+    homeCode: string;
+    awayTeam: string;
+    awayCode: string;
+    kickoff: string;
+    venue: string;
+    probability: string;
+  }>({
+    league: 'UEFA Champions League',
+    stage: 'UCL Semi-Final',
+    homeTeam: 'Man City',
+    homeCode: 'MCFC',
+    awayTeam: 'Real Madrid',
+    awayCode: 'RMA',
+    kickoff: '20:00 GMT',
+    venue: 'Tomorrow • Etihad',
+    probability: 'Win Probability: City 44% • Draw 28% • Madrid 28%',
+  });
+
+  const [transfers, setTransfers] = useState<any[]>([
+    {
+      id: 't-1',
+      player: 'Victor Osimhen',
+      summary: 'Napoli → Galatasaray (Permanent €75M)',
+      tag: 'DONE DEAL',
+      tagColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    },
+    {
+      id: 't-2',
+      player: 'Viktor Gyökeres',
+      summary: 'Sporting CP → Arsenal (Talks Ongoing)',
+      tag: 'HOT RUMOR',
+      tagColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    },
+  ]);
+
   useEffect(() => {
-    async function loadFootballPulseNews() {
+    let isMounted = true;
+    async function loadDashboardData() {
       try {
-        const res = await fetch('/api/news?sport=football&limit=8');
-        if (res.ok) {
-          const data = await res.json();
+        const [newsRes, matchRes, transferRes] = await Promise.all([
+          fetch('/api/news?sport=football&limit=8').catch(() => null),
+          fetch('/api/football?met=Livescore').catch(() => null),
+          fetch('/api/news?category=transfers&limit=3').catch(() => null),
+        ]);
+
+        if (newsRes && newsRes.ok) {
+          const data = await newsRes.json();
           const items = Array.isArray(data) ? data : data?.news || data?.data;
-          if (items && items.length > 0) {
+          if (items && items.length > 0 && isMounted) {
             const formatted = items.map((item: any) => ({
               id: item._id || item.id,
               _id: item._id || item.id,
@@ -49,11 +131,79 @@ export function GoalmillsFootballDashboard() {
             setPulseNews(formatted);
           }
         }
+
+        if (matchRes && matchRes.ok) {
+          const mData = await matchRes.json();
+          const matches = mData?.result || mData?.matches || (Array.isArray(mData) ? mData : []);
+          if (Array.isArray(matches) && matches.length > 0 && isMounted) {
+            const mappedMatches = matches.slice(0, 2).map((m: any, idx: number) => {
+              const home = m.event_home_team || m.homeTeam || 'Team A';
+              const away = m.event_away_team || m.awayTeam || 'Team B';
+              const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+              const isLive = m.event_live === '1' || m.event_status === 'LIVE' || !isNaN(Number(m.event_status));
+
+              return {
+                id: m.event_key || `live-m-${idx}`,
+                league: m.league_name || 'Premier League',
+                status: m.event_status ? `${m.event_status}'` : 'LIVE',
+                isLive,
+                homeTeam: home,
+                homeCode: home.substring(0, 3).toUpperCase(),
+                homeGoalScorer: m.event_scorer || '',
+                awayTeam: away,
+                awayCode: away.substring(0, 3).toUpperCase(),
+                awayGoalScorer: '',
+                score,
+                homePossession: 52,
+                awayPossession: 48,
+                homeXg: '1.45',
+                awayXg: '1.20',
+              };
+            });
+            setLiveMatches(mappedMatches);
+
+            // Update marquee match
+            const topM = matches[0];
+            const topHome = topM.event_home_team || 'Man City';
+            const topAway = topM.event_away_team || 'Real Madrid';
+            setMarqueeMatch({
+              league: topM.league_name || 'UEFA Champions League',
+              stage: topM.league_round || 'Matchday Fixture',
+              homeTeam: topHome,
+              homeCode: topHome.substring(0, 4).toUpperCase(),
+              awayTeam: topAway,
+              awayCode: topAway.substring(0, 3).toUpperCase(),
+              kickoff: topM.event_time || '20:00 GMT',
+              venue: topM.event_stadium || 'Official Stadium',
+              probability: `Win Probability: ${topHome.substring(0, 4)} 45% • Draw 25% • ${topAway.substring(0, 3)} 30%`,
+            });
+          }
+        }
+
+        if (transferRes && transferRes.ok) {
+          const tData = await transferRes.json();
+          const tItems = Array.isArray(tData) ? tData : tData?.news || tData?.data;
+          if (Array.isArray(tItems) && tItems.length > 0 && isMounted) {
+            const mappedTransfers = tItems.slice(0, 2).map((item: any, idx: number) => ({
+              id: item._id || item.id || `tr-${idx}`,
+              player: item.title.split(/signs|joins|talks|deal/i)[0]?.trim() || item.title,
+              summary: item.summary || item.excerpt || item.title,
+              tag: idx === 0 ? 'DONE DEAL' : 'HOT RUMOR',
+              tagColor: idx === 0
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                : 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+            }));
+            setTransfers(mappedTransfers);
+          }
+        }
       } catch (err) {
-        console.warn('Failed to fetch football pulse news:', err);
+        console.warn('Failed to fetch football dashboard live data:', err);
       }
     }
-    loadFootballPulseNews();
+    loadDashboardData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -140,111 +290,70 @@ export function GoalmillsFootballDashboard() {
               </div>
 
               <div className="space-y-3.5">
-                {/* Match 1: Man United vs Arsenal */}
-                <div className="rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3.5 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
-                    <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                      <span className="text-amber-400">🏆</span> Premier League • Matchday 28
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      LIVE
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-                    {/* Home Team */}
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-900/40 border border-red-500/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
-                        MU
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs sm:text-sm text-white truncate">Man United</div>
-                        <div className="text-[10px] text-slate-400 truncate">B. Fernandes (60&apos;)</div>
-                      </div>
+                {liveMatches.map((m) => (
+                  <div
+                    key={m.id}
+                    className="rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3.5 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md"
+                  >
+                    <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
+                      <span className="font-bold text-slate-200 flex items-center gap-1.5 truncate pr-2">
+                        <span className="text-amber-400">🏆</span> {m.league}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse flex-shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        {m.status || 'LIVE'}
+                      </span>
                     </div>
 
-                    {/* Score Badge */}
-                    <div className="flex flex-col items-center justify-center px-3 sm:px-4 py-1.5 rounded-xl bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[64px] sm:min-w-[76px] text-center shadow-inner">
-                      <span className="text-base sm:text-lg font-black text-amber-400 tracking-tight leading-none">2 - 1</span>
-                      <span className="text-[10px] font-bold text-amber-300 mt-0.5">78&apos;</span>
-                    </div>
-
-                    {/* Away Team */}
-                    <div className="flex items-center justify-end gap-2.5 sm:gap-3 min-w-0 text-right">
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs sm:text-sm text-white truncate">Arsenal</div>
-                        <div className="text-[10px] text-slate-400 truncate">B. Saka (76&apos;)</div>
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
+                      {/* Home Team */}
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
+                          {m.homeCode}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold text-xs sm:text-sm text-white truncate">{m.homeTeam}</div>
+                          {m.homeGoalScorer && (
+                            <div className="text-[10px] text-slate-400 truncate">{m.homeGoalScorer}</div>
+                          )}
+                        </div>
                       </div>
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-600/30 border border-red-400/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
-                        ARS
+
+                      {/* Score Badge */}
+                      <div className="flex flex-col items-center justify-center px-3 sm:px-4 py-1.5 rounded-xl bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[64px] sm:min-w-[76px] text-center shadow-inner">
+                        <span className="text-base sm:text-lg font-black text-amber-400 tracking-tight leading-none">
+                          {m.score}
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-300 mt-0.5">{m.status}</span>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Possession & xG Progress Bar */}
-                  <div className="mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
-                    <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
-                      <span>Possession 54% • xG 1.82</span>
-                      <span>46% • xG 1.45</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex">
-                      <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full" style={{ width: '54%' }} />
-                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: '46%' }} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Match 2: Real Madrid vs Barcelona */}
-                <div className="rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3.5 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
-                    <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                      <span className="text-amber-400">🇪🇸</span> La Liga • El Clásico
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      LIVE
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
-                        RMA
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs sm:text-sm text-white truncate">Real Madrid</div>
-                        <div className="text-[10px] text-slate-400 truncate">Vinicius Jr (32&apos;)</div>
+                      {/* Away Team */}
+                      <div className="flex items-center justify-end gap-2.5 sm:gap-3 min-w-0 text-right">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold text-xs sm:text-sm text-white truncate">{m.awayTeam}</div>
+                          {m.awayGoalScorer && (
+                            <div className="text-[10px] text-slate-400 truncate">{m.awayGoalScorer}</div>
+                          )}
+                        </div>
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-900/40 border border-red-400/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
+                          {m.awayCode}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center justify-center px-3 sm:px-4 py-1.5 rounded-xl bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[64px] sm:min-w-[76px] text-center shadow-inner">
-                      <span className="text-base sm:text-lg font-black text-amber-400 tracking-tight leading-none">1 - 1</span>
-                      <span className="text-[10px] font-bold text-amber-300 mt-0.5">HT</span>
-                    </div>
-
-                    <div className="flex items-center justify-end gap-2.5 sm:gap-3 min-w-0 text-right">
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs sm:text-sm text-white truncate">Barcelona</div>
-                        <div className="text-[10px] text-slate-400 truncate">Lamine Yamal (18&apos;)</div>
+                    {/* Possession & xG Progress Bar */}
+                    <div className="mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
+                      <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
+                        <span>Possession {m.homePossession}% • xG {m.homeXg}</span>
+                        <span>{m.awayPossession}% • xG {m.awayXg}</span>
                       </div>
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-900/40 border border-blue-400/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
-                        FCB
+                      <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex">
+                        <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full" style={{ width: `${m.homePossession}%` }} />
+                        <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: `${m.awayPossession}%` }} />
                       </div>
                     </div>
                   </div>
-
-                  <div className="mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
-                    <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
-                      <span>Possession 49% • Shots on Target: 4</span>
-                      <span>51% • Shots on Target: 5</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex">
-                      <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full" style={{ width: '49%' }} />
-                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: '51%' }} />
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -302,7 +411,7 @@ export function GoalmillsFootballDashboard() {
                   <FiAward /> MATCH OF THE WEEK
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  UCL Semi-Final
+                  {marqueeMatch.stage}
                 </span>
               </div>
 
@@ -310,28 +419,28 @@ export function GoalmillsFootballDashboard() {
                 <div className="flex items-center justify-around">
                   <div className="flex flex-col items-center gap-1">
                     <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg">
-                      <span className="text-xs font-black text-blue-400">MCFC</span>
+                      <span className="text-xs font-black text-blue-400">{marqueeMatch.homeCode}</span>
                     </div>
-                    <span className="text-xs font-bold text-white">Man City</span>
+                    <span className="text-xs font-bold text-white truncate max-w-[90px]">{marqueeMatch.homeTeam}</span>
                   </div>
 
                   <div className="flex flex-col items-center">
                     <span className="text-xs font-black text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-xl">
-                      20:00 GMT
+                      {marqueeMatch.kickoff}
                     </span>
-                    <span className="text-[10px] text-slate-400 mt-1 font-semibold">Tomorrow • Etihad</span>
+                    <span className="text-[10px] text-slate-400 mt-1 font-semibold">{marqueeMatch.venue}</span>
                   </div>
 
                   <div className="flex flex-col items-center gap-1">
                     <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg">
-                      <span className="text-xs font-black text-amber-400">RMA</span>
+                      <span className="text-xs font-black text-amber-400">{marqueeMatch.awayCode}</span>
                     </div>
-                    <span className="text-xs font-bold text-white">Real Madrid</span>
+                    <span className="text-xs font-bold text-white truncate max-w-[90px]">{marqueeMatch.awayTeam}</span>
                   </div>
                 </div>
 
                 <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
-                  <span className="font-semibold">Win Probability: City 44% • Draw 28% • Madrid 28%</span>
+                  <span className="font-semibold">{marqueeMatch.probability}</span>
                 </div>
               </div>
             </div>
@@ -349,25 +458,20 @@ export function GoalmillsFootballDashboard() {
               </div>
 
               <div className="space-y-2.5">
-                <div className="p-3 rounded-xl bg-[#0E1F38] border border-blue-500/15 flex items-center justify-between gap-3">
-                  <div>
-                    <h4 className="text-xs font-bold text-white">Victor Osimhen</h4>
-                    <p className="text-[10px] text-slate-400">Napoli &rarr; Galatasaray (Permanent €75M)</p>
+                {transfers.map((t) => (
+                  <div
+                    key={t.id}
+                    className="p-3 rounded-xl bg-[#0E1F38] border border-blue-500/15 flex items-center justify-between gap-3"
+                  >
+                    <div>
+                      <h4 className="text-xs font-bold text-white">{t.player}</h4>
+                      <p className="text-[10px] text-slate-400">{t.summary}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${t.tagColor}`}>
+                      {t.tag}
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black">
-                    DONE DEAL
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-[#0E1F38] border border-blue-500/15 flex items-center justify-between gap-3">
-                  <div>
-                    <h4 className="text-xs font-bold text-white">Viktor Gyökeres</h4>
-                    <p className="text-[10px] text-slate-400">Sporting CP &rarr; Arsenal (Talks Ongoing)</p>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black">
-                    HOT RUMOR
-                  </span>
-                </div>
+                ))}
               </div>
             </div>
 

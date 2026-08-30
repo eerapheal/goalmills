@@ -71,50 +71,81 @@ export function SportsPulseNewsSection() {
   ];
 
   const [articles, setArticles] = useState(fallbackArticles);
+  const [spotlightVideo, setSpotlightVideo] = useState<{
+    id?: string;
+    title: string;
+    duration: string;
+    thumbnail?: string;
+    sport?: string;
+  }>({
+    title: 'Top Goals & Decisive Plays of the Week',
+    duration: '08:42',
+    sport: 'FOOTBALL',
+  });
 
   React.useEffect(() => {
     let isMounted = true;
-    async function fetchLivePulseNews() {
+    async function fetchLivePulseContent() {
       try {
-        const res = await fetch('/api/news?limit=10');
-        if (!res.ok) return;
-        const data = await res.json();
-        const newsItems = Array.isArray(data) ? data : data.news || [];
-        if (Array.isArray(newsItems) && newsItems.length > 0 && isMounted) {
-          const mapped = newsItems.map((item: any, idx: number) => {
-            const cat = (item.sport || item.category || 'football').toLowerCase();
-            const tagColor =
-              cat === 'cricket'
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-                : cat === 'basketball'
-                  ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
-                  : cat === 'transfers'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                    : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+        const [newsRes, videoRes] = await Promise.all([
+          fetch('/api/news?limit=10').catch(() => null),
+          fetch('/api/videos?limit=1').catch(() => null),
+        ]);
 
-            return {
-              id: item._id || `live-art-${idx}`,
-              title: item.title,
-              excerpt: item.summary || item.excerpt || item.title,
-              category: cat,
-              categoryName: cat.charAt(0).toUpperCase() + cat.slice(1),
-              readTime: `${item.readTime || 4} min read`,
-              tagColor,
-              date: item.publishedAt
-                ? new Date(item.publishedAt).toLocaleDateString()
-                : 'Latest',
-              author: item.author || 'GoalMills Sports Desk',
-              isHot: idx === 0 || !!item.isBreaking,
-            };
-          });
-          setArticles(mapped);
+        if (newsRes && newsRes.ok) {
+          const data = await newsRes.json();
+          const newsItems = Array.isArray(data) ? data : data.news || [];
+          if (Array.isArray(newsItems) && newsItems.length > 0 && isMounted) {
+            const mapped = newsItems.map((item: any, idx: number) => {
+              const cat = (item.sport || item.category || 'football').toLowerCase();
+              const tagColor =
+                cat === 'cricket'
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                  : cat === 'basketball'
+                    ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+                    : cat === 'transfers'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                      : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+
+              return {
+                id: item._id || `live-art-${idx}`,
+                title: item.title,
+                excerpt: item.summary || item.excerpt || item.title,
+                category: cat,
+                categoryName: cat.charAt(0).toUpperCase() + cat.slice(1),
+                readTime: `${item.readTime || 4} min read`,
+                tagColor,
+                date: item.publishedAt
+                  ? new Date(item.publishedAt).toLocaleDateString()
+                  : 'Latest',
+                author: item.author || 'GoalMills Sports Desk',
+                isHot: idx === 0 || !!item.isBreaking,
+              };
+            });
+            setArticles(mapped);
+          }
+        }
+
+        if (videoRes && videoRes.ok) {
+          const vData = await videoRes.json();
+          const vItems = Array.isArray(vData) ? vData : vData.videos || vData.result || [];
+          if (Array.isArray(vItems) && vItems.length > 0 && isMounted) {
+            const v = vItems[0];
+            setSpotlightVideo({
+              id: v._id || v.id,
+              title: v.title || 'Top Goals & Matchday Highlights',
+              duration: v.duration || '05:30',
+              thumbnail: v.thumbnailUrl || v.thumbnail,
+              sport: (v.sport || 'FOOTBALL').toUpperCase(),
+            });
+          }
         }
       } catch {
         // Retain fallback data gracefully
       }
     }
 
-    fetchLivePulseNews();
+    fetchLivePulseContent();
     return () => {
       isMounted = false;
     };
@@ -264,20 +295,27 @@ export function SportsPulseNewsSection() {
                   </span>
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  Ultra HD
+                  {spotlightVideo.sport || 'Ultra HD'}
                 </span>
               </div>
 
-              {/* Simulated Video Player Banner */}
+              {/* Video Player Banner */}
               <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-blue-500/20 mb-4 flex items-center justify-center group-hover:border-amber-400/40 transition-colors shadow-inner">
+                {spotlightVideo.thumbnail ? (
+                  <img
+                    src={spotlightVideo.thumbnail}
+                    alt={spotlightVideo.title}
+                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-75 transition-opacity"
+                  />
+                ) : null}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                 <div className="w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 group-hover:from-amber-400 group-hover:to-orange-400 text-slate-950 flex items-center justify-center shadow-xl shadow-amber-500/30 transform group-hover:scale-110 transition-all duration-300 z-10 font-bold">
                   <FiPlay size={22} className="ml-1" />
                 </div>
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-white z-10">
-                  <span>Top Goals & Decisive Plays of the Week</span>
-                  <span className="bg-black/80 px-2 py-0.5 rounded-md text-[10px] font-mono text-amber-300 border border-white/10">
-                    08:42
+                  <span className="truncate pr-2">{spotlightVideo.title}</span>
+                  <span className="bg-black/80 px-2 py-0.5 rounded-md text-[10px] font-mono text-amber-300 border border-white/10 flex-shrink-0">
+                    {spotlightVideo.duration}
                   </span>
                 </div>
               </div>
