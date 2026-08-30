@@ -23,6 +23,7 @@ vi.mock('@/models/News', () => {
   return {
     default: {
       find: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnThis(),
         sort: vi.fn().mockReturnThis(),
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
