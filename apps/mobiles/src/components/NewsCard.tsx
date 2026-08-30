@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { BlogPost } from '@goalmills/types';
 import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
+import { mobileAnalytics } from '../utils/analytics';
 
 interface NewsCardProps {
   item: BlogPost;
@@ -10,10 +11,21 @@ interface NewsCardProps {
 }
 
 export const NewsCard = ({ item, onPress }: NewsCardProps) => {
+  const handlePress = () => {
+    if (item._id) {
+      mobileAnalytics.trackArticleEngagement(item._id, item.title, 20000, 100, {
+        sportSlug: item.sportSlug || item.sport,
+        categorySlug: item.categorySlug || item.category,
+        authorSlug: item.authorSlug || item.author,
+      });
+    }
+    onPress();
+  };
+
   return (
     <Pressable
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
-      onPress={onPress}
+      onPress={handlePress}
     >
       <View style={styles.imageContainer}>
         <Image

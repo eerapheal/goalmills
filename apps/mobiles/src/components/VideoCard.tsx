@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { VideoHighlight } from '@goalmills/types';
 import { COLORS, SPACING, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
+import { mobileAnalytics } from '../utils/analytics';
 
 interface VideoCardProps {
   item: VideoHighlight;
@@ -11,6 +12,13 @@ interface VideoCardProps {
 
 export const VideoCard = ({ item, onPress }: VideoCardProps) => {
   if (!item) return null;
+
+  const handlePress = () => {
+    if (item.id) {
+      mobileAnalytics.trackVideoPlay(item.id, item.title, 'football');
+    }
+    onPress();
+  };
 
   const formatViews = (views: number): string => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
@@ -24,7 +32,7 @@ export const VideoCard = ({ item, onPress }: VideoCardProps) => {
   return (
     <Pressable
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}
-      onPress={onPress}
+      onPress={handlePress}
     >
       <View style={styles.thumbnailContainer}>
         <Image

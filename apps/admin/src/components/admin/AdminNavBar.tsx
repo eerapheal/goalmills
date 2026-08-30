@@ -114,7 +114,25 @@ const PRIMARY_TABS: PrimaryTab[] = [
         icon: FiMail,
         requiredPermission: 'articles:draft',
       },
+      {
+        id: 'analytics',
+        label: 'Audience Analytics',
+        href: '/admin/analytics',
+        description: 'Telemetry, read duration & content performance KPIs',
+        icon: FiActivity,
+        requiredPermission: 'articles:draft',
+        badge: 'Pulse',
+      },
     ],
+  },
+  {
+    id: 'audience_analytics',
+    label: 'Analytics',
+    shortLabel: 'Analytics',
+    href: '/admin/analytics',
+    icon: FiActivity,
+    requiredPermission: 'articles:draft',
+    subItems: [],
   },
   {
     id: 'employee_management',
@@ -224,6 +242,7 @@ const PRIMARY_TABS: PrimaryTab[] = [
 
 // Quick jump desktop shortcut chips for high frequency operations
 const QUICK_SHORTCUTS = [
+  { label: 'Analytics', href: '/admin/analytics', icon: FiActivity, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Portal', href: '/admin/portal', icon: FiLayout, color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20' },
   { label: 'Create Article', href: '/admin/news/new', icon: FiPlusCircle, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Evaluation', href: '/admin/evaluations', icon: FiAward, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },

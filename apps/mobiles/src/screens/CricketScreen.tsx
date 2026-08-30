@@ -24,6 +24,7 @@ import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
+import { mobileAnalytics } from '../utils/analytics';
 
 type CricketTab = 'live' | 'upcoming' | 'results' | 'standings' | 'series' | 'teams';
 type FormatFilter = 'all' | 'international' | 'franchise' | 'domestic' | 'women';
@@ -152,8 +153,9 @@ export function CricketScreen() {
   }, [activeTab, selectedDate]);
 
   useEffect(() => {
+    mobileAnalytics.trackScreenView('cricket_hub', { sportSlug: 'cricket', activeTab });
     loadCricketData();
-  }, [loadCricketData]);
+  }, [loadCricketData, activeTab]);
 
   const onRefresh = () => {
     setRefreshing(true);

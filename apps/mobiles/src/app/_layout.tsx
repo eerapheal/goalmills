@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import Header from '../components/Header';
 import { notificationService } from '../services/notificationService';
 import { ToastProvider } from '../components/Toast';
+import { mobileAnalytics } from '../utils/analytics';
 
 export default function RootLayout() {
   const router = useRouter();
@@ -12,6 +13,9 @@ export default function RootLayout() {
   const responseListener = useRef<any>(null);
 
   useEffect(() => {
+    // Track App Launch / Screen View
+    mobileAnalytics.trackScreenView('mobile_app_launch');
+
     // Automatically attempt background registration with default topics (mocked safely in Expo Go Android)
     notificationService.registerForPushNotificationsAsync().catch(() => {});
 
@@ -24,6 +28,14 @@ export default function RootLayout() {
     responseListener.current = notificationService.addResponseListener((response) => {
       const data = response?.notification?.request?.content?.data;
       const targetId = data?.id || data?.newsId || data?.videoId;
+
+      mobileAnalytics.track({
+        eventType: 'notification_click',
+        entityId: targetId || 'push_notification',
+        metadata: {
+          title: response?.notification?.request?.content?.title || 'Push Alert',
+        },
+      });
 
       if (data?.type === 'video' || data?.videoId) {
         if (targetId) {

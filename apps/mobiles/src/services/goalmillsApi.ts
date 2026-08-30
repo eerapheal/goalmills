@@ -292,6 +292,33 @@ export const goalmillsApi = {
       return false;
     }
   },
+
+  trackAnalyticsEvent: async (
+    eventType: string,
+    entityType: string,
+    entityId: string,
+    metadata?: Record<string, any>
+  ): Promise<void> => {
+    try {
+      await fetch(`${BASE_URL}/analytics/track`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-tenant-slug': currentTenantSlug,
+        },
+        body: JSON.stringify({
+          eventType,
+          entityType,
+          entityId,
+          metadata: {
+            ...metadata,
+            device: 'mobile',
+          },
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch {}
+  },
 };
 
 export default goalmillsApi;

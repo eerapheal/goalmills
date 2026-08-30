@@ -23,6 +23,7 @@ import { NewsCard } from '../components/NewsCard';
 import { VideoCard } from '../components/VideoCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
+import { mobileAnalytics } from '../utils/analytics';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
 
@@ -114,6 +115,7 @@ export function FootballScreen() {
   };
 
   useEffect(() => {
+    mobileAnalytics.trackScreenView('football_hub', { sportSlug: 'football' });
     loadData();
   }, []);
 

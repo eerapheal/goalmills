@@ -18,6 +18,7 @@ import { basketballApiService, ApiBasketballGameItem } from '../services/basketb
 import { BasketballMatchCard } from '../components/BasketballMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
+import { mobileAnalytics } from '../utils/analytics';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -81,8 +82,9 @@ export default function BasketballScreen() {
   }, [activeTab, selectedDate]);
 
   useEffect(() => {
+    mobileAnalytics.trackScreenView('basketball_hub', { sportSlug: 'basketball', activeTab });
     loadBasketballData();
-  }, [loadBasketballData]);
+  }, [loadBasketballData, activeTab]);
 
   const onRefresh = () => {
     setRefreshing(true);

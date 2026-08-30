@@ -49,6 +49,161 @@ export interface TenantContext {
   isDefaultTenant: boolean;
 }
 
+// ---------------------------------------------------------------------------
+// Phase 4: Audience Analytics & Content Performance Types
+// ---------------------------------------------------------------------------
+export type AnalyticsEventType =
+  | 'page_view'
+  | 'article_read'
+  | 'scroll_depth'
+  | 'video_play'
+  | 'share'
+  | 'search'
+  | 'sponsorship_click'
+  | 'newsletter_click';
+
+export type AnalyticsEntityType =
+  | 'article'
+  | 'category'
+  | 'video'
+  | 'newsletter'
+  | 'sponsorship'
+  | 'page'
+  | 'search';
+
+export interface AnalyticsEventMetadata {
+  sportSlug?: string;
+  categorySlug?: string;
+  authorId?: string;
+  authorSlug?: string;
+  teamSlug?: string;
+  competitionSlug?: string;
+  scrollPercentage?: number; // 25, 50, 75, 100
+  durationMs?: number;
+  readTimeMs?: number;
+  referrer?: string;
+  device?: 'desktop' | 'mobile' | 'tablet';
+  country?: string;
+  searchQuery?: string;
+  url?: string;
+  title?: string;
+}
+
+export interface AnalyticsEvent {
+  _id?: string;
+  tenantId?: string;
+  tenantSlug: string;
+  eventType: AnalyticsEventType;
+  entityType?: AnalyticsEntityType;
+  entityId?: string;
+  sessionHash: string;
+  metadata?: AnalyticsEventMetadata;
+  timestamp: string | Date;
+  createdAt?: string | Date;
+}
+
+export interface ScrollMilestones {
+  p25: number;
+  p50: number;
+  p75: number;
+  p100: number;
+}
+
+export interface ContentMetricSummary {
+  _id?: string;
+  tenantId?: string;
+  tenantSlug: string;
+  articleId: string;
+  articleSlug?: string;
+  articleTitle?: string;
+  categorySlug?: string;
+  sportSlug?: string;
+  authorId?: string;
+  authorSlug?: string;
+  date: string; // YYYY-MM-DD
+  pageViews: number;
+  uniqueReaders: number;
+  totalReadDurationMs: number;
+  avgReadDurationMs: number;
+  scrollMilestones: ScrollMilestones;
+  shares: number;
+  videoPlays: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface SportAffinityItem {
+  sportSlug: string;
+  views: number;
+  totalDurationMs: number;
+  shareCount: number;
+  percentage: number;
+}
+
+export interface DeviceDistributionItem {
+  device: 'desktop' | 'mobile' | 'tablet';
+  count: number;
+  percentage: number;
+}
+
+export interface ReferralSourceItem {
+  source: string;
+  count: number;
+  percentage: number;
+}
+
+export interface TopArticleMetric {
+  articleId: string;
+  slug: string;
+  title: string;
+  sport: string;
+  category: string;
+  author: string;
+  views: number;
+  uniqueReaders: number;
+  avgReadDurationSec: number;
+  scrollCompletionRate: number; // percentage reaching 75%+
+  shares: number;
+}
+
+export interface AnalyticsOverviewKPIs {
+  totalPageViews: number;
+  uniqueVisitors: number;
+  avgReadDurationSec: number;
+  scrollCompletionRate: number;
+  bounceRate: number;
+  totalShares: number;
+  activeReadersRealtime: number;
+  timeseries: {
+    date: string;
+    views: number;
+    readers: number;
+    shares: number;
+  }[];
+  topSports: SportAffinityItem[];
+  deviceDistribution: DeviceDistributionItem[];
+  topReferrers: ReferralSourceItem[];
+  topArticles: TopArticleMetric[];
+}
+
+export interface RealtimeAnalyticsSummary {
+  activeReaders5m: number;
+  activeReaders30m: number;
+  topActiveArticles: {
+    articleId: string;
+    title: string;
+    slug: string;
+    activeCount: number;
+  }[];
+  recentEvents: {
+    eventType: AnalyticsEventType;
+    title?: string;
+    timestamp: string;
+    device?: string;
+  }[];
+}
+
+
 export type SponsorshipPlacement =
   | 'homepage_hero'
   | 'sports_pulse'
