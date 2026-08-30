@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Fixture, Standing, BlogPost, VideoHighlight } from '@goalmills/types';
 import { advancedFootballApi } from '../services/advancedFootballApi';
+import { goalmillsApi } from '../services/goalmillsApi';
 import {
   mapEventToFixture,
   mapStandingToStanding,
@@ -52,28 +53,30 @@ export function FootballScreen() {
       const prevWeek = new Date(today);
       prevWeek.setDate(today.getDate() - 7);
 
-      const [liveRes, upcomingRes, finishedRes, standingsRes, videoRes] = await Promise.all([
-        advancedFootballApi.getLivescore(),
-        advancedFootballApi.getFixtures({
-          from: today.toISOString().split('T')[0],
-          to: nextWeek.toISOString().split('T')[0],
-        }), // Logic inside API handles filtering or returning mock list
-        advancedFootballApi.getFixtures({
-          from: prevWeek.toISOString().split('T')[0],
-          to: today.toISOString().split('T')[0],
-        }),
-        advancedFootballApi.getStandings(152), // Premier League (152 in new system)
-        advancedFootballApi.getVideos(),
-      ]);
+      const [liveRes, upcomingRes, finishedRes, standingsRes, videoRes, newsRes, dynamicVideos] =
+        await Promise.all([
+          advancedFootballApi.getLivescore(),
+          advancedFootballApi.getFixtures({
+            from: today.toISOString().split('T')[0],
+            to: nextWeek.toISOString().split('T')[0],
+          }),
+          advancedFootballApi.getFixtures({
+            from: prevWeek.toISOString().split('T')[0],
+            to: today.toISOString().split('T')[0],
+          }),
+          advancedFootballApi.getStandings(152),
+          advancedFootballApi.getVideos(),
+          goalmillsApi.getNews({ sport: 'football', limit: 15 }).catch(() => []),
+          goalmillsApi.getVideos().catch(() => []),
+        ]);
 
       // Process Live
       if (liveRes.success) {
         setLiveFixtures(liveRes.result.map(mapEventToFixture));
       }
 
-      // Process Upcoming (Filter NS if needed)
+      // Process Upcoming
       if (upcomingRes.success) {
-        // Mock API returns mixed statuses, filter for NS
         const upcoming = upcomingRes.result
           .filter((e) => e.event_status === 'Not Started' || e.event_status === 'NS')
           .slice(0, 15)
@@ -81,7 +84,7 @@ export function FootballScreen() {
         setUpcomingFixtures(upcoming);
       }
 
-      // Process Finished (Filter FT)
+      // Process Finished
       if (finishedRes.success) {
         const finished = finishedRes.result
           .filter(
@@ -101,13 +104,19 @@ export function FootballScreen() {
         setStandings(standingsRes.result.total.map(mapStandingToStanding));
       }
 
-      // Process Videos
-      if (videoRes.success) {
+      // Process Videos (Dynamic API with videoRes fallback)
+      if (Array.isArray(dynamicVideos) && dynamicVideos.length > 0) {
+        setVideos(dynamicVideos);
+      } else if (videoRes.success) {
         setVideos(videoRes.result.map(mapVideoToHighlight));
       }
 
-      // News - advanced api doesn't have it yet
-      setBlogPosts([]);
+      // Dynamic News from API
+      if (Array.isArray(newsRes) && newsRes.length > 0) {
+        setBlogPosts(newsRes);
+      } else {
+        setBlogPosts([]);
+      }
     } catch (error) {
       console.error('Error loading football data:', error);
     } finally {

@@ -5,6 +5,24 @@ import Link from 'next/link';
 
 export function SportsIntelligenceSection() {
   const [votedMatch, setVotedMatch] = useState<string | null>(null);
+  const [pulseMatch, setPulseMatch] = useState<{
+    id: string;
+    league: string;
+    kickoff: string;
+    homeTeam: string;
+    awayTeam: string;
+    homeCode: string;
+    awayCode: string;
+  }>({
+    id: 'match-1',
+    league: 'UEFA Champions League',
+    kickoff: 'Today 20:00 GMT',
+    homeTeam: 'Real Madrid',
+    awayTeam: 'Man City',
+    homeCode: 'RMA',
+    awayCode: 'MCI',
+  });
+
   const [voteCounts, setVoteCounts] = useState<{
     [key: string]: { home: number; draw: number; away: number };
   }>({
@@ -13,6 +31,43 @@ export function SportsIntelligenceSection() {
   const [activeFeatureTab, setActiveFeatureTab] = useState<'analytics' | 'alerts' | 'h2h' | 'odds'>(
     'analytics'
   );
+
+  React.useEffect(() => {
+    let isMounted = true;
+    async function fetchMarqueeMatch() {
+      try {
+        const res = await fetch('/api/football?met=Livescore');
+        if (!res.ok) return;
+        const data = await res.json();
+        const matches = data?.result || data?.matches || (Array.isArray(data) ? data : []);
+        if (Array.isArray(matches) && matches.length > 0 && isMounted) {
+          const m = matches[0];
+          const home = m.event_home_team || m.homeTeam || 'Arsenal';
+          const away = m.event_away_team || m.awayTeam || 'Chelsea';
+          const league = m.league_name || m.league || 'Premier League';
+          const kickoff = m.event_status ? `Live • ${m.event_status}'` : (m.event_time || 'Today 20:00 GMT');
+          const id = String(m.event_key || m.id || 'match-1');
+
+          setPulseMatch({
+            id,
+            league,
+            kickoff,
+            homeTeam: home,
+            awayTeam: away,
+            homeCode: home.substring(0, 3).toUpperCase(),
+            awayCode: away.substring(0, 3).toUpperCase(),
+          });
+        }
+      } catch {
+        // Retain fallback data gracefully
+      }
+    }
+
+    fetchMarqueeMatch();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleVote = (matchId: string, choice: 'home' | 'draw' | 'away') => {
     if (votedMatch) return;
@@ -29,7 +84,7 @@ export function SportsIntelligenceSection() {
     });
   };
 
-  const currentVotes = voteCounts['match-1'];
+  const currentVotes = voteCounts[pulseMatch.id] || voteCounts['match-1'] || { home: 54, draw: 18, away: 28 };
   const totalVotes = currentVotes.home + currentVotes.draw + currentVotes.away;
   const homePct = Math.round((currentVotes.home / totalVotes) * 100);
   const drawPct = Math.round((currentVotes.draw / totalVotes) * 100);
@@ -370,24 +425,24 @@ export function SportsIntelligenceSection() {
 
             <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 mb-5">
               <div className="text-[11px] text-slate-400 font-semibold mb-2 flex items-center justify-between">
-                <span>UEFA Champions League</span>
-                <span className="text-amber-400 font-bold">Today 20:00 GMT</span>
+                <span>{pulseMatch.league}</span>
+                <span className="text-amber-400 font-bold">{pulseMatch.kickoff}</span>
               </div>
               <div className="flex items-center justify-between gap-3 text-center py-2">
                 <div className="flex-1">
                   <div className="w-10 h-10 mx-auto rounded-full bg-blue-900/60 border border-blue-700/50 flex items-center justify-center font-bold text-white text-sm mb-1.5 shadow-md">
-                    RMA
+                    {pulseMatch.homeCode}
                   </div>
-                  <p className="text-xs font-bold text-white">Real Madrid</p>
+                  <p className="text-xs font-bold text-white truncate px-1">{pulseMatch.homeTeam}</p>
                 </div>
                 <div className="px-2">
                   <span className="text-sm font-black text-slate-500">VS</span>
                 </div>
                 <div className="flex-1">
                   <div className="w-10 h-10 mx-auto rounded-full bg-red-900/60 border border-red-700/50 flex items-center justify-center font-bold text-white text-sm mb-1.5 shadow-md">
-                    MCI
+                    {pulseMatch.awayCode}
                   </div>
-                  <p className="text-xs font-bold text-white">Man City</p>
+                  <p className="text-xs font-bold text-white truncate px-1">{pulseMatch.awayTeam}</p>
                 </div>
               </div>
             </div>
@@ -399,17 +454,17 @@ export function SportsIntelligenceSection() {
             {/* Interactive Voting Buttons */}
             <div className="grid grid-cols-3 gap-2 mb-4">
               <button
-                onClick={() => handleVote('match-1', 'home')}
+                onClick={() => handleVote(pulseMatch.id, 'home')}
                 className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'home'
                     ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
                   }`}
               >
-                <span>Madrid Win</span>
+                <span>{pulseMatch.homeCode} Win</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({homePct}%)</div>
               </button>
               <button
-                onClick={() => handleVote('match-1', 'draw')}
+                onClick={() => handleVote(pulseMatch.id, 'draw')}
                 className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'draw'
                     ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
@@ -419,13 +474,13 @@ export function SportsIntelligenceSection() {
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({drawPct}%)</div>
               </button>
               <button
-                onClick={() => handleVote('match-1', 'away')}
+                onClick={() => handleVote(pulseMatch.id, 'away')}
                 className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'away'
                     ? 'bg-cyan-600 text-white border-cyan-400 shadow-md shadow-cyan-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
                   }`}
               >
-                <span>City Win</span>
+                <span>{pulseMatch.awayCode} Win</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({awayPct}%)</div>
               </button>
             </div>

@@ -479,14 +479,44 @@ export const goalmillsApi = {
     }
   },
 
-  getAvailablePlans: async (): Promise<any[]> => {
+  // ==========================================
+  // UNIFIED SPORTS LIVE API PROXIES
+  // ==========================================
+
+  getFootballLivescore: async (): Promise<any[]> => {
     try {
-      const res = await fetch(`${BASE_URL}/billing/subscription`, {
+      const res = await fetch(`${BASE_URL}/football?met=Livescore`, {
         headers: { 'x-tenant-slug': currentTenantSlug },
       });
       if (!res.ok) return [];
       const data = await res.json();
-      return data.plans || [];
+      return data?.result || data?.matches || (Array.isArray(data) ? data : []);
+    } catch {
+      return [];
+    }
+  },
+
+  getCricketLivescore: async (): Promise<any[]> => {
+    try {
+      const res = await fetch(`${BASE_URL}/cricket?met=Livescore`, {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data?.result || (Array.isArray(data) ? data : []);
+    } catch {
+      return [];
+    }
+  },
+
+  getBasketballLivescore: async (): Promise<any[]> => {
+    try {
+      const res = await fetch(`${BASE_URL}/basketball?live=all`, {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data?.response || (Array.isArray(data) ? data : []);
     } catch {
       return [];
     }

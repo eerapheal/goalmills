@@ -15,29 +15,7 @@ export function SportsPulseNewsSection() {
   const [selectedTier, setSelectedTier] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !email.includes('@')) return;
-
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/newsletter/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, frequency: selectedTier, source: 'homepage_vip_hub' }),
-      });
-
-      if (res.ok) {
-        setSubscribed(true);
-      }
-    } catch (err) {
-      console.error('Subscription error:', err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const trendingArticles = [
+  const fallbackArticles = [
     {
       id: 'art-1',
       title: 'Champions League Quarterfinal Tactical Breakdown: High-Press vs Deep Block',
@@ -92,10 +70,82 @@ export function SportsPulseNewsSection() {
     },
   ];
 
+  const [articles, setArticles] = useState(fallbackArticles);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    async function fetchLivePulseNews() {
+      try {
+        const res = await fetch('/api/news?limit=10');
+        if (!res.ok) return;
+        const data = await res.json();
+        const newsItems = Array.isArray(data) ? data : data.news || [];
+        if (Array.isArray(newsItems) && newsItems.length > 0 && isMounted) {
+          const mapped = newsItems.map((item: any, idx: number) => {
+            const cat = (item.sport || item.category || 'football').toLowerCase();
+            const tagColor =
+              cat === 'cricket'
+                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                : cat === 'basketball'
+                  ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+                  : cat === 'transfers'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                    : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+
+            return {
+              id: item._id || `live-art-${idx}`,
+              title: item.title,
+              excerpt: item.summary || item.excerpt || item.title,
+              category: cat,
+              categoryName: cat.charAt(0).toUpperCase() + cat.slice(1),
+              readTime: `${item.readTime || 4} min read`,
+              tagColor,
+              date: item.publishedAt
+                ? new Date(item.publishedAt).toLocaleDateString()
+                : 'Latest',
+              author: item.author || 'GoalMills Sports Desk',
+              isHot: idx === 0 || !!item.isBreaking,
+            };
+          });
+          setArticles(mapped);
+        }
+      } catch {
+        // Retain fallback data gracefully
+      }
+    }
+
+    fetchLivePulseNews();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, frequency: selectedTier, source: 'homepage_vip_hub' }),
+      });
+
+      if (res.ok) {
+        setSubscribed(true);
+      }
+    } catch (err) {
+      console.error('Subscription error:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const filteredArticles =
     activeCategory === 'all'
-      ? trendingArticles
-      : trendingArticles.filter((art) => art.category === activeCategory);
+      ? articles
+      : articles.filter((art) => art.category === activeCategory);
 
   return (
     <section className="relative bg-[#070E1A] py-16 md:py-24 border-t border-blue-500/20 text-white overflow-hidden">
