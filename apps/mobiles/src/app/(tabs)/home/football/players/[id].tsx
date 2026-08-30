@@ -61,13 +61,21 @@ export default function PlayerDetailPage() {
     { label: 'Rating', value: player.player_rating || 'N/A', icon: '⭐' },
   ];
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.background} />
+          <Pressable onPress={handleBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#F8FAFC" />
           </Pressable>
         </View>
         {player.player_image && (
@@ -260,48 +268,48 @@ const styles = StyleSheet.create({
   infoItem: {
     width: '47%',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.sm,
+    padding: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   infoLabel: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textLight,
-    marginBottom: SPACING.xs,
+    fontSize: 10,
+    color: '#94A3B8',
+    marginBottom: 2,
   },
   infoValue: {
-    fontSize: FONT_SIZES.md,
+    fontSize: 12,
     fontWeight: '700',
-    color: COLORS.background,
+    color: '#F8FAFC',
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: SPACING.md,
+    gap: 6,
   },
   statCard: {
-    width: '30%',
+    width: '31%',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.sm,
+    padding: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   statIcon: {
-    fontSize: 32,
-    marginBottom: SPACING.xs,
-  },
-  statValue: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: '800',
-    color: COLORS.secondary,
+    fontSize: 18,
     marginBottom: 2,
   },
+  statValue: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#60A5FA',
+    marginBottom: 1,
+  },
   statLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
+    fontSize: 9,
+    color: '#94A3B8',
     textAlign: 'center',
   },
   advancedStats: {

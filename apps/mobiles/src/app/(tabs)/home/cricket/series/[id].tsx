@@ -92,6 +92,14 @@ export default function CricketSeriesDetailsScreen() {
     { id: 'news', label: 'News', icon: 'newspaper-outline' },
   ];
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -100,7 +108,7 @@ export default function CricketSeriesDetailsScreen() {
           headerStyle: { backgroundColor: '#0a0e27' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
+            <TouchableOpacity onPress={handleBack} style={{ marginLeft: 0 }}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
           ),
@@ -392,30 +400,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#0a0e27',
   },
   tabScroll: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    gap: 4,
   },
   tabButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
   tabButtonActive: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
   },
   tabText: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   tabTextActive: {
-    color: '#fff',
+    color: '#60A5FA',
   },
   tableCard: {
     backgroundColor: 'rgba(255,255,255,0.03)',

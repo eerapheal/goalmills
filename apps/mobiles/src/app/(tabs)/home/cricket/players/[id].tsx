@@ -66,6 +66,14 @@ export default function CricketPlayerDetailsScreen() {
   const currentStats =
     player.career_stats?.[activeFormat] || player.career_stats?.odi || player.career_stats?.test;
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -74,7 +82,7 @@ export default function CricketPlayerDetailsScreen() {
           headerStyle: { backgroundColor: '#0a0e27' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
+            <TouchableOpacity onPress={handleBack} style={{ marginLeft: 0 }}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
           ),
@@ -470,28 +478,30 @@ const styles = StyleSheet.create({
   formatTabs: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: BORDER_RADIUS.lg,
-    padding: 4,
-    gap: 4,
-    marginBottom: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    padding: 2,
+    gap: 2,
+    marginBottom: SPACING.xs,
   },
   formatTabBtn: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 4,
     alignItems: 'center',
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.sm,
   },
   formatTabBtnActive: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
   },
   formatTabText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   formatTabTextActive: {
-    color: '#fff',
+    color: '#60A5FA',
   },
   sectionCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',

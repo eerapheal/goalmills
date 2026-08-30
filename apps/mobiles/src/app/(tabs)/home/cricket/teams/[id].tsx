@@ -125,6 +125,14 @@ export default function CricketTeamDetailsScreen() {
 
   const currentMatches = activeTab === 'schedule' ? schedules : results;
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -133,7 +141,7 @@ export default function CricketTeamDetailsScreen() {
           headerStyle: { backgroundColor: '#0a0e27' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
+            <TouchableOpacity onPress={handleBack} style={{ marginLeft: 0 }}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
           ),
@@ -365,29 +373,31 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderRadius: 16,
-    padding: 4,
-    marginBottom: 20,
+    borderRadius: 8,
+    padding: 2,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   tabItem: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 4,
     alignItems: 'center',
-    borderRadius: 12,
+    borderRadius: 6,
   },
   tabItemActive: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
   },
   tabLabel: {
-    fontSize: 11,
-    fontWeight: '900',
+    fontSize: 10,
+    fontWeight: '800',
     color: 'rgba(255, 255, 255, 0.6)',
     textTransform: 'uppercase',
   },
   tabLabelActive: {
-    color: '#000',
+    color: '#60A5FA',
   },
   sectionContainer: {
     marginBottom: 20,

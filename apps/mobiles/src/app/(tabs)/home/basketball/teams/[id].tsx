@@ -9,6 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { basketballApi } from '../../../../../services/basketballApi';
 import { BasketballEvent, BasketballTeam } from '@goalmills/types';
 import { BasketballMatchCard } from '../../../../../components/BasketballMatchCard';
@@ -98,12 +99,20 @@ export default function BasketballTeamDetailsPage() {
   const losses = totalMatches - wins;
   const winPercentage = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) : '0.0';
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backBtnText}>←</Text>
+        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+          <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -297,28 +306,31 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    gap: 8,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+    gap: 4,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderRadius: 6,
     backgroundColor: '#1a1f3a',
     alignItems: 'center',
   },
   activeTab: {
-    backgroundColor: '#f59e0b',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
   },
   tabText: {
     color: '#8b92b0',
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '600',
   },
   activeTabText: {
-    color: '#fff',
+    color: '#60A5FA',
+    fontWeight: '800',
   },
   matchesContainer: {
     paddingHorizontal: 16,

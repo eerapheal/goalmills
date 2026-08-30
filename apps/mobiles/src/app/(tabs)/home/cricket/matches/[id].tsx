@@ -600,6 +600,14 @@ export default function CricketMatchDetailsScreen() {
     { id: 'info', label: 'Info', icon: '📝' },
   ];
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -608,7 +616,7 @@ export default function CricketMatchDetailsScreen() {
           headerStyle: { backgroundColor: '#0a0e27' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
+            <TouchableOpacity onPress={handleBack} style={{ marginLeft: 0 }}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
           ),
@@ -922,36 +930,36 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   tabsContainer: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   tabsContent: {
-    gap: 6,
+    gap: 4,
   },
   tabBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 8,
     backgroundColor: 'rgba(255,255,255,0.04)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
   tabBtnActive: {
-    backgroundColor: COLORS.secondary,
-    borderColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderColor: '#3B82F6',
   },
   tabBtnText: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   tabBtnTextActive: {
-    color: '#fff',
+    color: '#60A5FA',
   },
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 12,
+    padding: 10,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },

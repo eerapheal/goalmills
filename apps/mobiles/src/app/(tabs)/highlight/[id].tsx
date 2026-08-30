@@ -138,11 +138,19 @@ export default function HighlightDetail() {
     );
   }
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/highlight');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Top Navbar */}
       <View style={styles.navBar}>
-        <Pressable style={styles.navActionBtn} onPress={() => router.back()} hitSlop={10}>
+        <Pressable style={styles.navActionBtn} onPress={handleBack} hitSlop={10}>
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>

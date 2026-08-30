@@ -167,13 +167,21 @@ export default function TeamDetailPage() {
     </View>
   );
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.background} />
+          <Pressable onPress={handleBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#F8FAFC" />
           </Pressable>
           {team.team_logo && <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />}
           <Text style={styles.teamName}>{team.team_name}</Text>
@@ -413,27 +421,27 @@ const styles = StyleSheet.create({
   tabsContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   tab: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     alignItems: 'center',
-    borderBottomWidth: 3,
+    borderBottomWidth: 2,
     borderBottomColor: 'transparent',
-    minWidth: 100,
+    minWidth: 70,
   },
   activeTab: {
-    borderBottomColor: COLORS.secondary,
+    borderBottomColor: '#3B82F6',
   },
   tabText: {
-    fontSize: FONT_SIZES.md,
+    fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textLight,
+    color: '#94A3B8',
   },
   activeTabText: {
-    color: COLORS.secondary,
-    fontWeight: '700',
+    color: '#60A5FA',
+    fontWeight: '800',
   },
   content: {
     flex: 1,

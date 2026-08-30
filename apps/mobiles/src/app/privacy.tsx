@@ -19,19 +19,27 @@ export default function PrivacyScreen() {
     Linking.openURL(url).catch((err) => console.error('Error opening URL:', err));
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Top Bar / Header */}
       <View style={styles.topBar}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={handleBack}
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.topBarTitle}>Data Safety &amp; Privacy</Text>
+        <Text style={styles.topBarTitle}>Data Safety & Privacy</Text>
         <View style={{ width: 40 }} />
       </View>
 

@@ -96,11 +96,19 @@ export default function BasketballMatchDetailsPage() {
     game?.status.short || ''
   );
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Navigation Bar */}
       <View style={styles.navBar}>
-        <Pressable style={styles.navBackBtn} onPress={() => router.back()}>
+        <Pressable style={styles.navBackBtn} onPress={handleBack}>
           <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
         </Pressable>
         <Text style={styles.navTitle} numberOfLines={1}>
@@ -545,26 +553,30 @@ const styles = StyleSheet.create({
   tabSegments: {
     flexDirection: 'row',
     backgroundColor: '#141C2B',
-    margin: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    padding: 3,
+    marginHorizontal: SPACING.sm,
+    marginVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.sm,
+    padding: 2,
   },
   segmentBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 4,
     alignItems: 'center',
     borderRadius: BORDER_RADIUS.sm,
   },
   activeSegmentBtn: {
-    backgroundColor: '#1E293B',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
   },
   segmentBtnText: {
     fontSize: 10,
     color: '#94A3B8',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   activeSegmentBtnText: {
-    color: '#F97316',
+    color: '#60A5FA',
+    fontWeight: '800',
   },
   tabSection: {
     paddingHorizontal: SPACING.md,

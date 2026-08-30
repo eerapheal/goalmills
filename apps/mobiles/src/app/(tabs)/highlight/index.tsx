@@ -231,28 +231,28 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   categoriesSlider: {
-    paddingBottom: 12,
-    gap: 8,
+    paddingBottom: 6,
+    gap: 4,
   },
   categoryChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: '#141C2B',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   activeCategoryChip: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
     borderColor: '#3B82F6',
   },
   categoryText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
     color: '#94A3B8',
   },
   activeCategoryText: {
-    color: '#FFFFFF',
+    color: '#60A5FA',
     fontWeight: '700',
   },
   listContent: {

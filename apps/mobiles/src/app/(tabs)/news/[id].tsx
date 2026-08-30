@@ -241,10 +241,21 @@ export default function NewsDetail() {
     },
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/news');
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      {/* Dynamic 4-Level Breadcrumb Bar on Mobile */}
+      {/* Dynamic 4-Level Breadcrumb Bar on Mobile with Back Button */}
       <View style={styles.breadcrumbsBar}>
+        <TouchableOpacity onPress={handleBack} style={{ marginRight: 6 }}>
+          <Ionicons name="arrow-back" size={18} color="#F8FAFC" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push('/(tabs)/home' as any)}>
           <Text style={styles.breadcrumbLink}>Home</Text>
         </TouchableOpacity>

@@ -92,24 +92,32 @@ export default function NotificationsScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Top Bar */}
       <View style={styles.topBar}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={handleBack}
           accessibilityLabel="Go back"
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.topBarTitle}>Alerts &amp; Notifications</Text>
+        <Text style={styles.topBarTitle}>Alerts & Notifications</Text>
         <TouchableOpacity
           style={styles.refreshButton}
           onPress={loadData}
           accessibilityLabel="Refresh notifications"
         >
-          <Ionicons name="refresh" size={20} color="#4f9bff" />
+          <Ionicons name="refresh" size={20} color="#3B82F6" />
         </TouchableOpacity>
       </View>
 

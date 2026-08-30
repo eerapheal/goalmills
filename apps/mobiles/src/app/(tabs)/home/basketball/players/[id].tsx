@@ -9,6 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { basketballApi } from '../../../../../services/basketballApi';
 import { BasketballPlayer, BasketballEvent } from '@goalmills/types';
 import { BasketballMatchCard } from '../../../../../components/BasketballMatchCard';
@@ -81,12 +82,20 @@ export default function BasketballPlayerDetailsPage() {
     );
   }
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backBtnText}>←</Text>
+        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+          <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -251,27 +260,27 @@ const styles = StyleSheet.create({
     borderColor: '#2a3150',
   },
   playerImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 16,
-    borderWidth: 3,
-    borderColor: '#f59e0b',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: '#3B82F6',
   },
   playerImagePlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: '#2a3150',
-    marginBottom: 16,
+    marginBottom: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#f59e0b',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
   },
   playerInitials: {
-    color: '#f59e0b',
-    fontSize: 36,
+    color: '#60A5FA',
+    fontSize: 32,
     fontWeight: '700',
   },
   playerName: {

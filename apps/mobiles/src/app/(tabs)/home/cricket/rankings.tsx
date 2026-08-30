@@ -45,6 +45,14 @@ export default function CricketRankingsScreen() {
     loadRankings();
   }, [activeFormat, activeCategory, activeGender]);
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/home');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -53,7 +61,7 @@ export default function CricketRankingsScreen() {
           headerStyle: { backgroundColor: '#0a0e27' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
+            <TouchableOpacity onPress={handleBack} style={{ marginLeft: 0 }}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
           ),
@@ -199,42 +207,44 @@ const styles = StyleSheet.create({
   },
   genderBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 4,
     alignItems: 'center',
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.sm,
   },
   genderBtnActive: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
   },
   genderText: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   genderTextActive: {
-    color: '#fff',
+    color: '#60A5FA',
   },
   formatTabs: {
     flexDirection: 'row',
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: BORDER_RADIUS.lg,
-    padding: 4,
-    gap: 4,
-    marginBottom: SPACING.sm,
+    borderRadius: BORDER_RADIUS.md,
+    padding: 2,
+    gap: 2,
+    marginBottom: SPACING.xs,
   },
   formatBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 4,
     alignItems: 'center',
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.sm,
   },
   formatBtnActive: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#3B82F6',
   },
   formatText: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
@@ -243,30 +253,30 @@ const styles = StyleSheet.create({
   },
   categoryRow: {
     flexDirection: 'row',
-    gap: 6,
-    marginBottom: SPACING.md,
+    gap: 4,
+    marginBottom: SPACING.sm,
   },
   categoryChip: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: BORDER_RADIUS.md,
+    paddingVertical: 4,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: 'rgba(255,255,255,0.04)',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
   categoryChipActive: {
-    backgroundColor: COLORS.secondary,
-    borderColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderColor: '#3B82F6',
   },
   categoryText: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   categoryTextActive: {
-    color: '#fff',
+    color: '#60A5FA',
   },
   tableCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
