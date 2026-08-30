@@ -190,9 +190,11 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
       </div>
 
       {/* Match Result / Status Footer */}
-      {match.event_status && match.event_status !== 'Finished' && match.event_status !== 'FT' && (
+      {(match.event_status_info || (match.event_status && match.event_status !== 'Finished' && match.event_status !== 'FT')) && (
         <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-300">
-          <span className="font-semibold text-blue-300 truncate">{match.event_status}</span>
+          <span className="font-semibold text-blue-300 truncate">
+            {match.event_status_info || match.event_status}
+          </span>
           {match.event_toss && (
             <span className="text-[10px] text-slate-400 truncate max-w-[200px]">
               🪙 {match.event_toss}

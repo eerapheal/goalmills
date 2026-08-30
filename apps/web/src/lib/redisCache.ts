@@ -92,6 +92,7 @@ const UPSTASH_REST_TOKEN =
   'gQAAAAAAAs2oAAIgcDJkOWY0MzJjMGE5Zjc0YjVmOTcwMWM3MzdjNTk2YWY4YQ';
 
 async function upstashRestPost(command: string, ...args: any[]): Promise<any> {
+  if (process.env.NODE_ENV === 'test' || process.env.VITEST) return null;
   if (!UPSTASH_REST_URL || !UPSTASH_REST_TOKEN) return null;
   try {
     const cleanUrl = UPSTASH_REST_URL.replace(/\/$/, '');
@@ -322,7 +323,9 @@ export async function getCacheDiagnostics(): Promise<{
   redisConnected: boolean;
   upstashRestActive: boolean;
   latencyMs: number;
+  memoryEntries: number;
   memoryEntriesCount: number;
+  inFlightRequests: number;
   metrics: CacheMetrics;
   hitRatioPercent: number;
 }> {
@@ -368,8 +371,81 @@ export async function getCacheDiagnostics(): Promise<{
     redisConnected: isRedisConnected,
     upstashRestActive,
     latencyMs: livePingMs,
+    memoryEntries: memoryCache.size,
     memoryEntriesCount: memoryCache.size,
+    inFlightRequests: inFlightRequests.size,
     metrics: { ...metrics },
     hitRatioPercent,
   };
 }
+
+export const cacheDel = cacheDelete;
+
+/**
+ * Invalidate cached keys matching a wildcard pattern (e.g., 'gm:sport:football:*')
+ */
+export async function cacheInvalidatePattern(pattern: string): Promise<void> {
+  // 1. In-memory pattern matching
+  if (pattern === '*' || pattern === '') {
+    memoryCache.clear();
+  } else {
+    const regexPattern = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
+    for (const key of memoryCache.keys()) {
+      if (regexPattern.test(key)) {
+        memoryCache.delete(key);
+      }
+    }
+  }
+
+  // 2. Redis cluster invalidation
+  if (redisClient && isRedisConnected) {
+    try {
+      if (pattern === '*' || pattern === '') {
+        await redisClient.flushall();
+      } else {
+        const keys = await redisClient.keys(pattern);
+        if (keys.length > 0) {
+          await redisClient.del(...keys);
+        }
+      }
+    } catch {
+      metrics.errors++;
+    }
+  }
+
+  // 3. Upstash REST invalidation
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      if (pattern === '*' || pattern === '') {
+        await upstashRestPost('FLUSHALL');
+      } else {
+        const keys = await upstashRestPost('KEYS', pattern);
+        if (Array.isArray(keys) && keys.length > 0) {
+          await upstashRestPost('DEL', ...keys);
+        }
+      }
+    } catch {
+      metrics.errors++;
+    }
+  }
+}
+
+/**
+ * Alias for getCacheDiagnostics
+ */
+export const getRedisHealth = getCacheDiagnostics;
+
+/**
+ * SEO & CDN edge caching headers helper
+ */
+export function getSeoCacheHeaders(
+  sMaxAgeSeconds = 60,
+  staleWhileRevalidateSeconds = 300
+): Record<string, string> {
+  return {
+    'Cache-Control': `public, s-maxage=${sMaxAgeSeconds}, stale-while-revalidate=${staleWhileRevalidateSeconds}`,
+    'CDN-Cache-Control': `public, s-maxage=${sMaxAgeSeconds}`,
+    'Vercel-CDN-Cache-Control': `public, s-maxage=${sMaxAgeSeconds}`,
+  };
+}
+

@@ -28,7 +28,7 @@ const TOPICS: TopicOption[] = [
 const FREQUENCIES: FrequencyOption[] = [
   {
     id: 'daily',
-    label: 'Daily Morning Brief',
+    label: 'Daily Morning Intel',
     sublabel: '10:00 AM WAT • Key lineups & match previews',
     badge: 'Popular',
   },

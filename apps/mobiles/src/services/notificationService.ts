@@ -1,6 +1,15 @@
 import { Platform } from 'react-native';
-import * as Device from 'expo-device';
-import Constants from 'expo-constants';
+
+// Safe dynamic imports for optional Expo native device helpers
+let Device: any = null;
+try {
+  Device = require('expo-device');
+} catch {}
+
+let Constants: any = null;
+try {
+  Constants = require('expo-constants')?.default || require('expo-constants') || {};
+} catch {}
 
 const BASE_URL = 'https://goalmills-web.vercel.app/api';
 
