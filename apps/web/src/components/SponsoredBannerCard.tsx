@@ -172,58 +172,6 @@ export function SponsoredBannerCard({
 
       {/* ─── TOP CONTENT SECTION (FLEX-COL) ─── */}
       <div className="relative z-10 flex flex-col">
-        {/* Header Row: Sponsor Logo, Badges & Pagination */}
-        <div className="flex items-center justify-between gap-2.5 mb-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {logoImage ? (
-              <img
-                src={logoImage}
-                alt={currentSponsor.sponsorName}
-                className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl object-cover border border-amber-500/40 shadow-lg flex-shrink-0 bg-slate-950/80"
-              />
-            ) : (
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-700/30 border border-amber-500/40 flex items-center justify-center text-amber-400 font-black text-sm flex-shrink-0 shadow-lg">
-                <FiAward className="w-5 h-5" />
-              </div>
-            )}
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-[9px] font-black uppercase tracking-wider text-amber-300 leading-none shadow-sm">
-                  {accentBadge || currentSponsor.badgeText || 'SPONSORED'}
-                </span>
-                {sponsorships.length > 1 && (
-                  <span className="text-[9px] font-bold text-amber-300 bg-slate-900/90 px-1.5 py-0.5 rounded border border-amber-500/20 leading-none font-mono">
-                    {currentIndex + 1}/{sponsorships.length}
-                  </span>
-                )}
-              </div>
-              <span className="text-[11px] sm:text-xs font-bold text-slate-300 truncate block mt-0.5">
-                {currentSponsor.sponsorName}
-              </span>
-            </div>
-          </div>
-
-          {/* Carousel Arrows if multiple sponsors */}
-          {sponsorships.length > 1 && (
-            <div className="flex items-center gap-0.5 bg-slate-950/80 border border-white/15 rounded-xl p-0.5 shadow-md flex-shrink-0">
-              <button
-                onClick={handlePrev}
-                aria-label="Previous Sponsor"
-                className="min-w-[32px] min-h-[32px] p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition flex items-center justify-center"
-              >
-                <FiChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleNext}
-                aria-label="Next Sponsor"
-                className="min-w-[32px] min-h-[32px] p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition flex items-center justify-center"
-              >
-                <FiChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-        </div>
 
         {/* Headline & Description Body */}
         <div className="mt-1">
