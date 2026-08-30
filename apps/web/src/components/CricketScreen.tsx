@@ -22,6 +22,52 @@ export function CricketScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [tickerIndex, setTickerIndex] = useState(0);
+  const [pulseNews, setPulseNews] = useState<
+    { id?: string; _id?: string; tag: string; title: string; time: string }[]
+  >([
+    { id: 'cricket-1', tag: 'IPL 2026', title: 'Powerplay Analytics: Boundary percentages soar past 210 strike rate', time: '15m ago' },
+    { id: 'cricket-2', tag: 'ICC RANKINGS', title: 'India retain #1 spot in ICC T20 World Championship rankings', time: '40m ago' },
+    { id: 'cricket-3', tag: 'T20 CUP', title: 'Australia announce 15-man squad with surprise pace bowling inclusions', time: '1h ago' },
+    { id: 'cricket-4', tag: 'BBL', title: 'Perth Scorchers vs Sydney Sixers: Tactical pitch report and keys to victory', time: '3h ago' },
+    { id: 'cricket-5', tag: 'WOMEN', title: 'WPL playoffs set: High drama expected in knockout semifinals', time: '5h ago' },
+  ]);
+
+  useEffect(() => {
+    async function loadCricketPulseNews() {
+      try {
+        const res = await fetch('/api/news?sport=cricket&limit=8');
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data?.news || data?.data;
+          if (items && items.length > 0) {
+            const formatted = items.map((item: any) => ({
+              id: item._id || item.id,
+              _id: item._id || item.id,
+              tag: (item.competition || item.category || item.tags?.[0] || 'CRICKET').toUpperCase(),
+              title: item.title,
+              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
+            }));
+            setPulseNews(formatted);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch cricket pulse news:', err);
+      }
+    }
+    loadCricketPulseNews();
+  }, []);
+
+  useEffect(() => {
+    if (pulseNews.length === 0) return;
+    const timer = setInterval(() => {
+      setTickerIndex((prev) => (prev + 1) % pulseNews.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [pulseNews.length]);
+
+  const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
+  const pulseLink = currentPulse?.id || currentPulse?._id ? `/news/${currentPulse.id || currentPulse._id}` : '/news';
 
   const [liveMatches, setLiveMatches] = useState<CricketEvent[]>([]);
   const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
@@ -242,43 +288,76 @@ export function CricketScreen() {
   ];
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-3.5">
+      {/* ─── TOP CRICKET PULSE WIRE TICKER ─── */}
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            CRICKET PULSE
+          </span>
+          <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold uppercase text-[9px]">
+              {currentPulse?.tag || 'IPL'}
+            </span>
+            <Link
+              href={pulseLink}
+              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
+            >
+              {currentPulse?.title}
+            </Link>
+            <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
+              • {currentPulse?.time}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            {activeTab === 'live' ? '📅 Upcoming Fixtures' : '⚡ Live Cricket'}
+          </button>
+        </div>
+      </div>
+
       {/* Smart Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
-            <span className="text-lg">🏏</span>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30">
+            <span className="text-sm">🏏</span>
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+            <h2 className="text-xs sm:text-sm font-black text-white uppercase tracking-tight flex items-center gap-1.5">
               <span>Cricket LiveScore</span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono font-bold">
                 Ball-by-Ball
               </span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-[10px] text-slate-400">
               Live overs, tournament tables, series summaries, and ICC world rankings
             </p>
           </div>
         </div>
 
         {/* Search & Refresh */}
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex-1 sm:w-60">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-52">
             <input
               type="text"
               placeholder="Search teams, series..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-blue-500/20 bg-[#070E1A] px-3.5 py-2 pl-9 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
+              className="w-full rounded-lg border border-blue-500/20 bg-[#070E1A] px-2.5 py-1 pl-7 text-[11px] text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all shadow-inner h-7"
             />
-            <span className="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
+            <span className="absolute left-2.5 top-1.5 text-[10px] text-slate-400">🔍</span>
           </div>
 
           <button
             onClick={fetchCricketData}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs hover:from-amber-400 hover:to-orange-400 transition-all shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black text-[11px] hover:from-blue-400 hover:to-indigo-500 transition-all shadow-sm active:scale-95 disabled:opacity-50 h-7"
             title="Refresh on demand"
           >
             <span>🔄</span>
@@ -288,16 +367,16 @@ export function CricketScreen() {
       </div>
 
       {/* Main Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 flex-shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all duration-150 flex-shrink-0 ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-lg shadow-blue-600/30 scale-[1.02]'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-md shadow-blue-600/30'
                   : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
               }`}
             >
@@ -310,16 +389,16 @@ export function CricketScreen() {
 
       {/* Format Filter Pills for Matches */}
       {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
           {formatFilters.map((fmt) => {
             const isFmtActive = formatFilter === fmt.id;
             return (
               <button
                 key={fmt.id}
                 onClick={() => setFormatFilter(fmt.id)}
-                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
                   isFmtActive
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                    ? 'bg-blue-600 text-white font-black shadow-sm'
                     : 'bg-[#0B172B]/70 text-slate-400 border border-blue-500/15 hover:border-blue-400/30 hover:text-white'
                 }`}
               >
@@ -335,21 +414,21 @@ export function CricketScreen() {
         activeTab !== 'standings' &&
         activeTab !== 'series' &&
         activeTab !== 'teams' && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
             {dateStrip.map((item) => {
               const isSelected = selectedDate === item.iso;
               return (
                 <button
                   key={item.iso}
                   onClick={() => setSelectedDate(item.iso)}
-                  className={`flex min-w-[72px] sm:min-w-[80px] flex-col items-center rounded-2xl p-2.5 transition-all duration-200 border ${
+                  className={`flex min-w-[56px] sm:min-w-[64px] flex-col items-center rounded-lg p-1.5 transition-all duration-150 border ${
                     isSelected
-                      ? 'border-amber-400 bg-gradient-to-b from-amber-500/20 to-orange-500/10 text-amber-300 shadow-lg shadow-amber-500/20 scale-[1.03]'
+                      ? 'border-blue-400 bg-blue-600/25 text-blue-300 shadow-md scale-[1.02]'
                       : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-400 hover:border-blue-400/30 hover:text-white'
                   }`}
                 >
-                  <span className="text-[10px] font-bold uppercase">{item.dayName}</span>
-                  <span className="text-base sm:text-lg font-black">{item.dayNumber}</span>
+                  <span className="text-[9px] font-bold uppercase">{item.dayName}</span>
+                  <span className="text-xs sm:text-sm font-black">{item.dayNumber}</span>
                 </button>
               );
             })}

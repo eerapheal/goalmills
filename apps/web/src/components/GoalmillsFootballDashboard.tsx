@@ -21,40 +21,73 @@ import { FootballScreen } from './FootballScreen';
 export function GoalmillsFootballDashboard() {
   const [activeSubTab, setActiveSubTab] = useState<'hub' | 'livescores'>('hub');
   const [tickerIndex, setTickerIndex] = useState(0);
-
-  const breakingFootballNews = [
-    { tag: 'TRANSFER', title: 'Victor Osimhen signs landmark deal with €75M release clause', time: '10m ago' },
-    { tag: 'UCL', title: 'Champions League Quarterfinal Draw announced: Blockbuster ties set', time: '25m ago' },
-    { tag: 'EPL', title: 'Arsenal narrow gap at top of table after dramatic North London Derby', time: '1h ago' },
-    { tag: 'EL CLÁSICO', title: 'Real Madrid vs Barcelona: Tactical team news and predicted lineups', time: '2h ago' },
-    { tag: 'AFCON', title: 'CAF confirms host venues and official tournament schedule for 2025/26', time: '3h ago' },
-  ];
+  const [pulseNews, setPulseNews] = useState<
+    { id?: string; _id?: string; tag: string; title: string; time: string }[]
+  >([
+    { id: 'football-1', tag: 'TRANSFER', title: 'Victor Osimhen signs landmark deal with €75M release clause', time: '10m ago' },
+    { id: 'football-2', tag: 'UCL', title: 'Champions League Quarterfinal Draw announced: Blockbuster ties set', time: '25m ago' },
+    { id: 'football-3', tag: 'EPL', title: 'Arsenal narrow gap at top of table after dramatic North London Derby', time: '1h ago' },
+    { id: 'football-4', tag: 'EL CLÁSICO', title: 'Real Madrid vs Barcelona: Tactical team news and predicted lineups', time: '2h ago' },
+    { id: 'football-5', tag: 'AFCON', title: 'CAF confirms host venues and official tournament schedule for 2025/26', time: '3h ago' },
+  ]);
 
   useEffect(() => {
+    async function loadFootballPulseNews() {
+      try {
+        const res = await fetch('/api/news?sport=football&limit=8');
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data?.news || data?.data;
+          if (items && items.length > 0) {
+            const formatted = items.map((item: any) => ({
+              id: item._id || item.id,
+              _id: item._id || item.id,
+              tag: (item.competition || item.category || item.tags?.[0] || 'FOOTBALL').toUpperCase(),
+              title: item.title,
+              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
+            }));
+            setPulseNews(formatted);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch football pulse news:', err);
+      }
+    }
+    loadFootballPulseNews();
+  }, []);
+
+  useEffect(() => {
+    if (pulseNews.length === 0) return;
     const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % breakingFootballNews.length);
+      setTickerIndex((prev) => (prev + 1) % pulseNews.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [breakingFootballNews.length]);
+  }, [pulseNews.length]);
+
+  const currentItem = pulseNews[tickerIndex] || pulseNews[0];
+  const newsLink = currentItem?.id || currentItem?._id ? `/news/${currentItem.id || currentItem._id}` : '/news';
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-6 space-y-6">
+    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP FOOTBALL BREAKING WIRE TICKER ─── */}
-      <div className="rounded-2xl bg-[#0B172B]/90 border border-blue-500/25 p-3.5 flex items-center justify-between gap-4 backdrop-blur-md shadow-xl">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <span className="flex-shrink-0 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
             FOOTBALL PULSE
           </span>
           <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
-            <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold uppercase text-[9px]">
-              {breakingFootballNews[tickerIndex].tag}
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold uppercase text-[9px]">
+              {currentItem?.tag || 'EPL'}
             </span>
-            <span className="text-white font-bold truncate">
-              {breakingFootballNews[tickerIndex].title}
-            </span>
+            <Link
+              href={newsLink}
+              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
+            >
+              {currentItem?.title}
+            </Link>
             <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-              • {breakingFootballNews[tickerIndex].time}
+              • {currentItem?.time}
             </span>
           </div>
         </div>
@@ -62,9 +95,9 @@ export function GoalmillsFootballDashboard() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setActiveSubTab(activeSubTab === 'hub' ? 'livescores' : 'hub')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border ${
               activeSubTab === 'livescores'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 border-amber-400 shadow-md'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-sm'
                 : 'bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30'
             }`}
           >
@@ -74,35 +107,35 @@ export function GoalmillsFootballDashboard() {
       </div>
 
       {activeSubTab === 'livescores' ? (
-        <div className="rounded-3xl border border-blue-500/20 bg-[#091529]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+        <div className="rounded-2xl border border-blue-500/20 bg-[#091529]/90 p-3 sm:p-4 shadow-xl backdrop-blur-md">
           <FootballScreen />
         </div>
       ) : (
         /* ─── PRIMARY FOOTBALL INTELLIGENCE GRID ─── */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* ─── LEFT COLUMN (col-span-7): MATCH TELEMETRY & TACTICAL RADAR ─── */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4">
             {/* 1. LIVE FOOTBALL MATCHES IN-PLAY */}
-            <div className="rounded-2xl bg-[#09162C]/90 border border-blue-500/25 p-4 sm:p-5 shadow-xl backdrop-blur-md relative overflow-hidden">
+            <div className="rounded-xl bg-[#09162C]/90 border border-blue-500/25 p-3 sm:p-4 shadow-lg backdrop-blur-md relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-32 bg-blue-600/10 blur-3xl -z-10" />
-              <div className="absolute bottom-0 left-1/3 w-64 h-32 bg-amber-500/5 blur-3xl -z-10" />
+              <div className="absolute bottom-0 left-1/3 w-64 h-32 bg-blue-500/5 blur-3xl -z-10" />
 
-              <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
-                  <h3 className="text-sm font-black tracking-wider text-white uppercase flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <h3 className="text-xs font-black tracking-wider text-white uppercase flex items-center gap-2">
                     <span>LIVE MATCHES & SCORES</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono">
                       In-Play
                     </span>
                   </h3>
                 </div>
                 <Link
                   href="/football"
-                  className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  className="text-[11px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
                 >
                   <span>All Leagues</span>
-                  <FiArrowRight size={12} />
+                  <FiArrowRight size={11} />
                 </Link>
               </div>
 

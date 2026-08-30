@@ -23,37 +23,100 @@ export function GoalmillsLiveDashboard({
 }) {
   const [activeTab, setActiveTab] = useState('LIVE SCORES');
   const [tickerIndex, setTickerIndex] = useState(0);
-
-  const breakingNews = [
-    { tag: 'TRANSFER', title: 'Mbappe to Real Madrid Confirmed!', sport: 'football' },
-    { tag: 'TRANSFER', title: 'Victor Osimhen signs new deal with release clause', sport: 'football' },
-    { tag: 'F1', title: 'Max Verstappen Clinches Thrilling Monaco GP Victory', sport: 'f1' },
-    { tag: 'NBA', title: 'Lakers rally in 4th quarter against Celtics in historic thriller', sport: 'basketball' },
-    { tag: 'CRICKET', title: 'India set 343 target in ICC Champions Trophy clash', sport: 'cricket' },
-  ];
+  const [pulseNews, setPulseNews] = useState<
+    { id?: string; _id?: string; tag: string; title: string; time: string }[]
+  >([
+    { id: 'live-1', tag: 'TRANSFER', title: 'Mbappe to Real Madrid: Behind the scenes of landmark contract signing', time: '10m ago' },
+    { id: 'live-2', tag: 'EPL', title: 'Arsenal narrow gap at top of table after dramatic North London Derby', time: '25m ago' },
+    { id: 'live-3', tag: 'NBA', title: 'Lakers rally in 4th quarter against Celtics in historic thriller', time: '1h ago' },
+    { id: 'live-4', tag: 'CRICKET', title: 'India set 343 target in ICC Champions Trophy clash', time: '2h ago' },
+    { id: 'live-5', tag: 'F1', title: 'Max Verstappen Clinches Thrilling Monaco GP Victory with precision pit strategy', time: '3h ago' },
+  ]);
 
   useEffect(() => {
+    async function loadLivePulseNews() {
+      try {
+        const res = await fetch('/api/news?limit=8');
+        if (res.ok) {
+          const data = await res.json();
+          const items = Array.isArray(data) ? data : data?.news || data?.data;
+          if (items && items.length > 0) {
+            const formatted = items.map((item: any) => ({
+              id: item._id || item.id,
+              _id: item._id || item.id,
+              tag: (item.competition || item.sport || item.category || 'LIVE').toUpperCase(),
+              title: item.title,
+              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
+            }));
+            setPulseNews(formatted);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch live pulse news:', err);
+      }
+    }
+    loadLivePulseNews();
+  }, []);
+
+  useEffect(() => {
+    if (pulseNews.length === 0) return;
     const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % breakingNews.length);
-    }, 6000);
+      setTickerIndex((prev) => (prev + 1) % pulseNews.length);
+    }, 5000);
     return () => clearInterval(timer);
-  }, [breakingNews.length]);
+  }, [pulseNews.length]);
+
+  const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
+  const pulseLink = currentPulse?.id || currentPulse?._id ? `/news/${currentPulse.id || currentPulse._id}` : '/news';
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-6 space-y-6">
-      {/* ─── ROW 1: PRIMARY SPORTS INTELLIGENCE GRID ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* ─── LEFT COLUMN (col-span-6): FOOTBALL & BASKETBALL ─── */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* 1. LIVE FOOTBALL SCORES CARD */}
-          <div className="rounded-2xl bg-[#0E1A29]/90 border border-amber-500/20 p-4 sm:p-5 shadow-xl shadow-amber-950/20 backdrop-blur-md relative overflow-hidden">
-            {/* Ambient subtle glow */}
-            <div className="absolute top-0 right-0 w-64 h-32 bg-amber-500/5 blur-3xl -z-10" />
+    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
+      {/* ─── TOP LIVE PULSE WIRE TICKER ─── */}
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            LIVE PULSE
+          </span>
+          <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold uppercase text-[9px]">
+              {currentPulse?.tag || 'BREAKING'}
+            </span>
+            <Link
+              href={pulseLink}
+              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
+            >
+              {currentPulse?.title}
+            </Link>
+            <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
+              • {currentPulse?.time}
+            </span>
+          </div>
+        </div>
 
-            <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => onSelectTab?.('football')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            ⚡ Football Hub
+          </button>
+        </div>
+      </div>
+
+      {/* ─── ROW 1: PRIMARY SPORTS INTELLIGENCE GRID ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* ─── LEFT COLUMN (col-span-6): FOOTBALL & BASKETBALL ─── */}
+        <div className="lg:col-span-6 space-y-4">
+          {/* 1. LIVE FOOTBALL SCORES CARD */}
+          <div className="rounded-xl bg-[#0E1A29]/90 border border-blue-500/20 p-3 sm:p-4 shadow-lg backdrop-blur-md relative overflow-hidden">
+            {/* Ambient subtle glow */}
+            <div className="absolute top-0 right-0 w-64 h-32 bg-blue-600/5 blur-3xl -z-10" />
+
+            <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <h3 className="text-xs font-black tracking-wider text-slate-200 uppercase">
                   LIVE FOOTBALL SCORES
                 </h3>
               </div>
@@ -497,11 +560,11 @@ export function GoalmillsLiveDashboard({
       </div>
 
       {/* ─── ROW 2: BREAKING SPORTS NEWS TICKER / CARDS ─── */}
-      <div className="rounded-2xl bg-[#0E1A29]/90 border border-amber-500/20 p-3 sm:p-4 shadow-xl shadow-amber-950/20 backdrop-blur-md overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+      <div className="rounded-xl bg-[#0E1A29]/90 border border-blue-500/20 p-2.5 sm:p-3 shadow-lg backdrop-blur-md overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[11px] sm:text-xs font-black tracking-wider uppercase flex items-center gap-1.5 whitespace-nowrap">
-              <FaFire className="w-3 h-3 text-orange-400" />
+            <span className="px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] sm:text-[11px] font-black tracking-wider uppercase flex items-center gap-1.5 whitespace-nowrap">
+              <FaFire className="w-3 h-3 text-blue-400" />
               BREAKING INTEL
             </span>
           </div>
@@ -509,30 +572,33 @@ export function GoalmillsLiveDashboard({
           {/* Ticker Item with glowing badges */}
           <div className="flex-1 min-w-0 w-full flex items-center justify-between overflow-hidden gap-2">
             <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-              <span className="px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 text-[9px] sm:text-[10px] font-black tracking-wider uppercase flex-shrink-0">
-                {breakingNews[tickerIndex].tag}
+              <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black tracking-wider uppercase flex-shrink-0">
+                {currentPulse?.tag || 'BREAKING'}
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-slate-200 truncate">
-                {breakingNews[tickerIndex].title}
-              </span>
+              <Link
+                href={pulseLink}
+                className="text-xs font-bold text-slate-200 truncate hover:text-blue-400 hover:underline transition-colors flex-1"
+              >
+                {currentPulse?.title}
+              </Link>
             </div>
 
             <div className="flex items-center gap-1 flex-shrink-0 pl-1">
               <button
                 onClick={() =>
-                  setTickerIndex((prev) => (prev - 1 + breakingNews.length) % breakingNews.length)
+                  setTickerIndex((prev) => (prev - 1 + pulseNews.length) % pulseNews.length)
                 }
                 className="p-1 rounded bg-slate-800 text-slate-300 hover:text-white transition"
                 aria-label="Previous"
               >
-                <FiChevronLeft className="w-3.5 h-3.5" />
+                <FiChevronLeft className="w-3 h-3" />
               </button>
               <button
-                onClick={() => setTickerIndex((prev) => (prev + 1) % breakingNews.length)}
+                onClick={() => setTickerIndex((prev) => (prev + 1) % pulseNews.length)}
                 className="p-1 rounded bg-slate-800 text-slate-300 hover:text-white transition"
                 aria-label="Next"
               >
-                <FiChevronRight className="w-3.5 h-3.5" />
+                <FiChevronRight className="w-3 h-3" />
               </button>
             </div>
           </div>

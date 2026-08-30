@@ -6,9 +6,6 @@ const nextConfig = {
     // Typecheck is strictly enforced in dedicated `pnpm typecheck` suite
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {

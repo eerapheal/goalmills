@@ -1,7 +1,6 @@
 'use client';
 
 import { SportType } from '@goalmills/types';
-import { FiRadio } from 'react-icons/fi';
 
 export type ExtendedSportType = SportType | 'live';
 
@@ -22,8 +21,8 @@ const sports: { type: ExtendedSportType; name: string; emoji: string; isComingSo
 
 export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
   return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2 overflow-x-auto scrollbar-hide">
-      <div className="flex items-center gap-2.5 py-1">
+    <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-1.5 overflow-x-auto scrollbar-hide">
+      <div className="flex items-center gap-1.5 py-0.5">
         {sports.map((sport) => {
           const isSelected = selectedSport === sport.type;
           return (
@@ -31,19 +30,19 @@ export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
               key={sport.type}
               onClick={() => onSelectSport(sport.type)}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-200 whitespace-nowrap
+                flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all duration-150 whitespace-nowrap
                 ${
                   isSelected
-                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.25)] scale-[1.02]'
-                    : 'bg-[#121E2E]/80 border-white/10 text-slate-300 hover:text-white hover:border-amber-500/30 hover:bg-[#16263A]'
+                    ? 'bg-blue-600/20 text-blue-400 border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.25)]'
+                    : 'bg-[#121E2E]/80 border-white/10 text-slate-300 hover:text-white hover:border-blue-500/30 hover:bg-[#16263A]'
                 }
                 active:scale-95
               `}
             >
-              <span>{sport.emoji}</span>
+              <span className="text-xs">{sport.emoji}</span>
               <span>{sport.name}</span>
               {sport.isComingSoon && (
-                <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                <span className="text-[8px] uppercase font-black px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
                   Soon
                 </span>
               )}
@@ -54,3 +53,4 @@ export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
     </div>
   );
 }
+

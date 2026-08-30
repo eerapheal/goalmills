@@ -79,9 +79,6 @@ export default function HomePage() {
       {/* Sport Content / Live Dashboard */}
       <div className="flex-1">{renderSportContent()}</div>
 
-      {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
-      <SportsPulseNewsSection />
-
       {/* Section 3: GoalMills Sports Intelligence Newsletter Subscription */}
       <NewsletterSubscriptionSection />
     </div>

@@ -4,6 +4,7 @@ import News from '@/models/News';
 import Category from '@/models/Category';
 import NewsFeedClient from '@/components/news/NewsFeedClient';
 import { BlogPost, Category as ICategory } from '@goalmills/types';
+import { SportsPulseNewsSection } from '@/components/SportsPulseNewsSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +37,9 @@ export default async function NewsPage() {
       <div className="fixed top-0 left-1/4 h-[500px] w-[500px] bg-blue-600/10 blur-[150px] pointer-events-none -z-10" />
       <div className="fixed bottom-0 right-1/4 h-[600px] w-[600px] bg-amber-500/5 blur-[160px] pointer-events-none -z-10" />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto">     
+      {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
+      <SportsPulseNewsSection />
         <Suspense
           fallback={<div className="py-24 text-center text-slate-400 font-bold">Loading sports pulse...</div>}
         >

@@ -268,62 +268,62 @@ export function FootballScreen() {
   ];
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-3.5">
       {/* Smart Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
-            <FiActivity className="w-5 h-5 text-amber-300" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30">
+            <FiActivity className="w-4 h-4 text-blue-300" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+            <h2 className="text-xs sm:text-sm font-black text-white uppercase tracking-tight flex items-center gap-1.5">
               <span>Football LiveScore</span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold">
+              <span className="px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono font-bold">
                 Smart Engine
               </span>
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-[10px] text-slate-400">
               Live match events, real-time scorelines, and league tables
             </p>
           </div>
         </div>
 
         {/* Search & Refresh Controls */}
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex-1 sm:w-60">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-52">
             <input
               type="text"
               placeholder="Search team or league..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-blue-500/20 bg-[#070E1A] px-3.5 py-2 pl-9 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
+              className="w-full rounded-lg border border-blue-500/20 bg-[#070E1A] px-2.5 py-1 pl-7 text-[11px] text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all shadow-inner h-7"
             />
-            <FiSearch className="absolute left-3 top-2.5 text-xs text-slate-400" />
+            <FiSearch className="absolute left-2.5 top-2 text-[10px] text-slate-400" />
           </div>
 
           <button
             onClick={fetchMatches}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs hover:from-amber-400 hover:to-orange-400 transition-all shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black text-[11px] hover:from-blue-400 hover:to-indigo-500 transition-all shadow-sm active:scale-95 disabled:opacity-50 h-7"
             title="Refresh on demand"
           >
-            <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <FiRefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
         </div>
       </div>
 
       {/* Primary Module Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 flex-shrink-0 ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all duration-150 flex-shrink-0 ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-lg shadow-blue-600/30 scale-[1.02]'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-md shadow-blue-600/30'
                   : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
               }`}
             >
@@ -331,10 +331,10 @@ export function FootballScreen() {
               <span>{tab.label}</span>
               {tab.badge && (
                 <span
-                  className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono ${
+                  className={`text-[8px] px-1.5 py-0.2 rounded-full font-mono ${
                     isActive
-                      ? 'bg-amber-400 text-slate-950 font-black'
-                      : 'bg-amber-500/20 text-amber-300'
+                      ? 'bg-blue-400 text-slate-950 font-black'
+                      : 'bg-blue-500/20 text-blue-300'
                   }`}
                 >
                   {tab.badge}
@@ -347,21 +347,21 @@ export function FootballScreen() {
 
       {/* 7-Day Date Slider (Hidden in Standings & Live modes) */}
       {activeTab !== 'standings' && activeTab !== 'live' && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
           {dateStrip.map((item) => {
             const isSelected = selectedDate === item.iso;
             return (
               <button
                 key={item.iso}
                 onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[72px] sm:min-w-[80px] flex-col items-center rounded-2xl p-2.5 transition-all duration-200 border ${
+                className={`flex min-w-[56px] sm:min-w-[64px] flex-col items-center rounded-lg p-1.5 transition-all duration-150 border ${
                   isSelected
-                    ? 'border-amber-400 bg-gradient-to-b from-amber-500/20 to-orange-500/10 text-amber-300 shadow-lg shadow-amber-500/20 scale-[1.03]'
+                    ? 'border-blue-400 bg-blue-600/25 text-blue-300 shadow-md scale-[1.02]'
                     : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-400 hover:border-blue-400/30 hover:text-white'
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase">{item.dayName}</span>
-                <span className="text-base sm:text-lg font-black">{item.dayNumber}</span>
+                <span className="text-[9px] font-bold uppercase">{item.dayName}</span>
+                <span className="text-xs sm:text-sm font-black">{item.dayNumber}</span>
               </button>
             );
           })}
