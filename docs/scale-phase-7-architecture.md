@@ -1,117 +1,78 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 7 ARCHITECTURE
-## Distributed Real-Time Event & Stream Ingestion Pipeline
+## Distributed Real-Time Event & Stream Ingestion Pipeline (Multi-Platform)
 
 ```text
-                                 ┌────────────────────────┐
-                                 │   GoalMills Ingestion  │
-                                 │      Event Producers   │
-                                 └───────────┬────────────┘
-                                             │
-               ┌─────────────────────────────┼─────────────────────────────┐
-               ▼                             ▼                             ▼
-     ┌───────────────────┐         ┌───────────────────┐         ┌───────────────────┐
-     │ Analytics Ingest  │         │ Sponsorship Track │         │ Live Sports Feed  │
-     │ /api/analytics    │         │ /api/sponsorships │         │ /api/matches/live │
-     └─────────┬─────────┘         └─────────┬─────────┘         └─────────┬─────────┘
-               │                             │                             │
-               └─────────────────────────────┼─────────────────────────────┘
-                                             │  (Non-blocking XADD)
-                                             ▼
-                               ┌───────────────────────────┐
-                               │  Redis Streams Broker     │
-                               │  stream:events:{tenant}   │
-                               └─────────────┬─────────────┘
-                                             │
-               ┌─────────────────────────────┴─────────────────────────────┐
-               ▼                                                           ▼
-     ┌───────────────────┐                                       ┌───────────────────┐
-     │  Consumer Group A │                                       │  Consumer Group B │
-     │  (Analytics & DLQ)│                                       │ (Live Match Alert)│
-     └─────────┬─────────┘                                       └─────────┬─────────┘
-               │                                                           │
-        ┌──────┴──────┐                                             ┌──────┴──────┐
-        ▼             ▼                                             ▼             ▼
-   [Idempotency] [DB Rollup]                                   [Push Notify] [SSE Broadcast]
-        │             │                                             │             │
-        ▼             ▼                                             ▼             ▼
-  MongoDB Metric  MongoDB DLQ                                   Mobile App     Web Client
+  ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+  │    Web Client   │      │  Mobile Client  │      │ Live Sports Feed│
+  │   (apps/web)    │      │ (apps/mobiles)  │      │   & Mailer API  │
+  └────────┬────────┘      └────────┬────────┘      └────────┬────────┘
+           │                        │                        │
+           │ (HTTPS / POST)         │ (Offline Buffer/Flush) │ (Worker Sync)
+           ▼                        ▼                        ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │                 Event Producer Layer (Non-Blocking)               │
+  │                  POST /api/events/track (Fast Path)               │
+  └─────────────────────────────────┬─────────────────────────────────┘
+                                    │
+                                    ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │                Redis Streams Broker (Partitioned)                 │
+  │              `stream:sports:events:{tenantSlug}`                  │
+  └──────────────────┬─────────────────────────────┬──────────────────┘
+                     │                             │
+                     ▼                             ▼
+  ┌───────────────────────────────────┐   ┌───────────────────────────┐
+  │ Real-Time Live Match Moment Fanout│   │ Micro-Batch Stream Worker │
+  │ GET /api/events/live-stream (SSE) │   │ (Idempotent Rollups & DLQ)│
+  └──────────┬────────────────────────┘   └─────────────┬─────────────┘
+             │                                          │
+    ┌────────┴────────┐                       ┌─────────┴─────────┐
+    ▼                 ▼                       ▼                   ▼
+┌───────┐         ┌────────┐              ┌───────┐           ┌───────┐
+│ Web   │         │ Mobile │              │MongoDB│           │Phase 8│
+│ Client│         │ Client │              │Metrics│           │Warehse│
+└───────┘         └────────┘              └───────┘           └───────┘
 ```
 
 ---
 
-### 1. High-Throughput Stream Ingestion Topology
+### 1. Ingestion Isolation & Throughput SLA
 
-1. **Non-Blocking Ingestion**: Client requests dispatch events to Redis Streams in `< 2ms` with immediate `202 Accepted` response.
-2. **Partitioning Key**: Events are stream-partitioned by `tenantSlug` (`stream:events:{tenant}`) to prevent multi-tenant noisy-neighbor starvation.
-3. **Consumer Groups**: Scalable worker pools consume via `XREADGROUP GROUP goalmills-workers worker-{id} COUNT 100 BLOCK 2000`.
+1. **Sub-10ms Fast Path**:
+   - `POST /api/events/track` parses the payload, validates tenant context, and calls `SportsEventProducer.produceEvent()`.
+   - The producer executes `XADD stream:sports:events:{tenantSlug} * ...` in Redis and immediately returns `202 Accepted`.
+   - Primary MongoDB transactional operations (article saves, user auth) remain completely insulated from high-volume telemetry spikes.
 
----
-
-### 2. Idempotency & Exactly-Once Semantics
-
-- Every event carries an `idempotencyKey` computed as `SHA-256(tenantId + eventType + entityId + sessionHash + roundedTimestampWindow)`.
-- Before processing, workers execute atomic check-and-set:
-  ```typescript
-  const acquired = await redis.set(`idemp:${event.idempotencyKey}`, '1', 'EX', 86400, 'NX');
-  if (!acquired) {
-    // Duplicate detected — acknowledge and skip
-    await redis.xack(streamKey, groupName, event.id);
-    return;
-  }
-  ```
+2. **Multi-Platform Support**:
+   - **Web**: Batched browser telemetry via `navigator.sendBeacon` and `fetch('/api/events/track')`.
+   - **Mobile (`apps/mobiles`)**: `goalmillsApi.trackSportsTelemetry()` buffers events locally and flushes to the stream endpoint.
+   - **Sports Feed Workers**: Emit match event moments (goals, red cards, wickets, overtime periods) to the stream.
 
 ---
 
-### 3. Fault Tolerance & Dead-Letter Queue (DLQ) Strategy
+### 2. Stream Worker & Micro-Batching
 
-```text
-[Incoming Event] ──> [Worker Processing] ──> Success ──> [XACK & Commit]
-                             │
-                        Transient Error
-                             │
-                             ▼
-                 [Retry Counter < 3 (Backoff)]
-                    │                     │
-               Retry Passes          Max Retries Exceeded
-                    │                     │
-                    ▼                     ▼
-             [XACK & Commit]      [Route to DLQ Stream]
-                                          │
-                                          ▼
-                                 [MongoDB DLQ Store]
-                                          │
-                                          ▼
-                                 [Admin Replay Portal]
-```
-
-- **Exponential Backoff**: Retries are scheduled at `1s`, `5s`, `25s` with random jitter.
-- **DLQ Store**: Persistent MongoDB collection `dead_letter_events` storing full diagnostic context and payload for auditing and re-play.
+1. **Redis Consumer Groups (`XREADGROUP`)**:
+   - Multiple worker instances read concurrently from the tenant stream partition with automated message acknowledgment (`XACK`).
+2. **Atomic Idempotency Guard**:
+   - Each event envelope contains a unique `idempotencyKey`.
+   - Before processing, the worker verifies `SETNX stream:idempotency:{key}` with a 24-hour TTL. Duplicate events are silently acknowledged and skipped.
+3. **Micro-Batch Time-Series Aggregations**:
+   - Worker accumulates pageviews, read completions, ad clicks, and video play progress in-memory or Redis hashes, then flushes consolidated metric increments (`$inc`) into MongoDB `ContentMetricSummary` and `Sponsorship` models in batch transactions every 15 seconds.
 
 ---
 
-### 4. Micro-Batch Aggregation Model
+### 3. Fault Tolerance & Dead-Letter Queue (DLQ)
 
-Rather than executing individual atomic increments against MongoDB on every single pageview or impression, workers maintain in-memory counters and flush batched `$inc` operations in 10-second micro-batches:
-
-```typescript
-// Batched bulkWrite for high-volume telemetry
-await ContentMetricSummary.bulkWrite(
-  Object.entries(aggregatedViews).map(([articleId, count]) => ({
-    updateOne: {
-      filter: { articleId, date: todayDateString },
-      update: { $inc: { views: count } },
-      upsert: true,
-    },
-  }))
-);
-```
+1. **Exponential Retry & Backoff**:
+   - Failed events undergo up to 3 automatic retry attempts with exponential jitter (`500ms`, `1500ms`, `4500ms`).
+2. **DLQ Persistence**:
+   - If retries are exhausted, the event is saved to the `dead_letter_events` MongoDB collection with error diagnostic stacks.
+3. **Admin Studio Management (`/admin/events`)**:
+   - Operators can inspect dead-letter payloads, filter by error type, and trigger bulk re-drive into the active stream (`POST /api/admin/events/dlq/replay`).
 
 ---
 
-### 5. Admin Control Plane (`/admin/events`)
+### 4. Integration with Sports Warehouse (Phase 8)
 
-The Phase 7 Admin Event Studio provides complete visibility into:
-1. **Real-time Throughput**: Live chart of events processed per second.
-2. **Lag Telemetry**: Number of unread events across each consumer group.
-3. **DLQ Dashboard**: Search, view, and replay failed events.
-4. **Partition Rebalancing**: Dynamic worker reallocation across tenant streams.
+When a match event of type `'fulltime'` or match completion is ingested through the event pipeline, the worker notifies the **Phase 8 Sports Warehouse**, triggering durable analytical persistence into `HistoricalMatch` without adding latency to live user-facing scoring feeds.

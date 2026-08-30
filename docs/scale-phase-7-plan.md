@@ -1,68 +1,92 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 7 PLAN
-## Distributed Real-Time Event & Stream Ingestion Pipeline
+## Distributed Real-Time Event & Stream Ingestion Pipeline (All Platforms)
 
 ### 1. Executive Summary
-Phase 7 elevates GoalMills' backend data infrastructure to an enterprise-grade, decoupled **Distributed Real-Time Event & Stream Ingestion Pipeline**. It isolates high-velocity telemetry (ad impressions, click attribution, reader scroll depth, live match telemetry, and recommendation feedback) from primary MongoDB transactional paths by buffering events through high-throughput Redis Streams / message queues, processing them asynchronously with resilient consumer workers, enforcing strict idempotency, and providing a Dead-Letter Queue (DLQ) management hub in the Admin portal.
+Phase 7 establishes the **GoalMills Distributed Real-Time Event & Stream Ingestion Pipeline** across **all platforms** (`apps/web`, `apps/admin`, `apps/mobiles`, `services/mailer`, `@goalmills/types`). It decouples high-velocity sports telemetry, reader engagement, ad impressions, click tracking, and live match moments from transactional databases by buffering events into high-throughput Redis Streams (`XADD`/`XREADGROUP`), executing resilient idempotent micro-batch workers, and routing failures to a self-healing Dead-Letter Queue (DLQ) with Admin Studio replay controls.
 
 ---
 
-### 2. Architecture & Scope
+### 2. Multi-Platform Architecture Topology
 
 ```text
-┌────────────────────────────────────────────────────────────────────────┐
-│             GOALMILLS PHASE 7: DISTRIBUTED EVENT PIPELINE              │
-├────────────────────────────────────────────────────────────────────────┤
-│ 1. ULTRA-FAST INGESTION: Asynchronous non-blocking buffer producers    │
-│ 2. STREAM BROKER: Redis Streams (XADD/XREADGROUP) partitioned buffer   │
-│ 3. IDEMPOTENT WORKERS: Atomic deduplication & distributed processing   │
-│ 4. RESILIENCE & DLQ: Exponential retry, backoff & dead-letter console  │
-│ 5. MICRO-BATCH AGGREGATION: Pre-aggregated time-series rollups         │
-│ 6. ADMIN PIPELINE CONTROL: Live throughput, consumer lag & DLQ replay  │
-│ 7. CROSS-PLATFORM DISPATCH: Real-time live match push & alert fanout   │
-└────────────────────────────────────────────────────────────────────────┘
+  ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+  │    Web Client   │      │  Mobile Client  │      │ Live Sports Feed│
+  │   (apps/web)    │      │ (apps/mobiles)  │      │   & Mailer API  │
+  └────────┬────────┘      └────────┬────────┘      └────────┬────────┘
+           │                        │                        │
+           │ (HTTPS / POST)         │ (Offline Buffer/Flush) │ (Worker Sync)
+           ▼                        ▼                        ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │                 Event Producer Layer (Non-Blocking)               │
+  │                  POST /api/events/track (Fast Path)               │
+  └─────────────────────────────────┬─────────────────────────────────┘
+                                    │
+                                    ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │                Redis Streams Broker (Partitioned)                 │
+  │              `stream:sports:events:{tenantSlug}`                  │
+  └──────────────────┬─────────────────────────────┬──────────────────┘
+                     │                             │
+                     ▼                             ▼
+  ┌───────────────────────────────────┐   ┌───────────────────────────┐
+  │ Real-Time Live Match Moment Fanout│   │ Micro-Batch Stream Worker │
+  │ GET /api/events/live-stream (SSE) │   │ (Idempotent Rollups & DLQ)│
+  └──────────┬────────────────────────┘   └─────────────┬─────────────┘
+             │                                          │
+    ┌────────┴────────┐                       ┌─────────┴─────────┐
+    ▼                 ▼                       ▼                   ▼
+┌───────┐         ┌────────┐              ┌───────┐           ┌───────┐
+│ Web   │         │ Mobile │              │MongoDB│           │Phase 8│
+│ Client│         │ Client │              │Metrics│           │Warehse│
+└───────┘         └────────┘              └───────┘           └───────┘
 ```
 
 ---
 
-### 3. Key Milestones & Deliverables
+### 3. Key Milestones & Platform Scope
 
-#### Milestone 1: Shared Event Stream Types & Interfaces (`@goalmills/types`)
-- **`StreamEventEnvelope`**: Generic event wrapper with `eventId`, `tenantId`, `eventType`, `timestamp`, `producer`, `idempotencyKey`, `payload`, `retryCount`, `traceId`.
-- **`StreamConsumerGroup`**: Consumer group state, acknowledged offsets, lag metrics, and worker node heartbeat.
-- **`DeadLetterEvent`**: Failed event record with `originalEvent`, `errorReason`, `stackTrace`, `failedAt`, `attempts`, `status` (`'pending' | 'resolved' | 'discarded' | 'replayed'`).
-- **`PipelineThroughputStats`**: Real-time throughput metrics (events/sec, latency p95/p99, error rate, queue backlog).
+#### Milestone 1: Shared Event Stream Contracts (`@goalmills/types`)
+- **`SportsEventType`**:
+  - Sports telemetry: `'live_match_moment'`, `'goal'`, `'wicket'`, `'quarter_end'`, `'var_decision'`.
+  - Monetization: `'ad_impression'`, `'ad_click'`, `'sponsor_engagement'`.
+  - Engagement: `'article_read'`, `'scroll_depth_50'`, `'scroll_depth_100'`, `'video_play_milestone'`, `'search_query'`.
+- **`StreamEventEnvelope<T>`**: Standardized envelope with `eventId`, `tenantSlug`, `platform` (`'web' | 'mobile_ios' | 'mobile_android' | 'admin'`), `timestamp`, `idempotencyKey`, `payload`, `retryCount`.
+- **`DeadLetterEventRecord`**: Error logging, payload serialization, failure reason, and resolution state.
+- **`PipelineThroughputStats`**: Real-time throughput metrics (events/sec, latency, consumer lag, DLQ size).
 
-#### Milestone 2: Asynchronous Event Producer Layer (`apps/web`, `apps/admin`)
-- Non-blocking `EventProducer` service writing directly to Redis Streams (`XADD`) with batching and memory-efficient fallback.
-- Migration of `/api/analytics/track`, `/api/sponsorships/[id]/track`, and `/api/recommendations/feedback` to produce stream events rather than performing immediate heavy DB aggregations.
+#### Milestone 2: Web Application Integration (`apps/web`)
+- Fast non-blocking ingestion endpoint `POST /api/events/track` returning `202 Accepted` within `< 10ms`.
+- Server-Sent Events (SSE) live match telemetry broker `GET /api/events/live-stream`.
+- Integration into ad impression tracking, news article read trackers, and video milestone events.
 
-#### Milestone 3: Distributed Stream Worker Engine (`services/event-worker` & Node runtime)
-- Scalable worker pool using Redis Consumer Groups (`XREADGROUP`, `XACK`).
-- Atomic idempotency verification using Redis SETNX / TTL keys to eliminate duplicate processing.
-- Micro-batch aggregation worker rolling up metrics into MongoDB `ContentMetricSummary` and `Sponsorship` impression counters every 10–30 seconds.
+#### Milestone 3: Mobile Application Full Parity (`apps/mobiles`)
+- **Mobile Telemetry Emitter (`goalmillsApi.trackSportsTelemetry`)**:
+  - Dispatches user engagement, sponsor viewability, and search query telemetry.
+- **Offline Mobile Batch Buffer & Auto-Flush**:
+  - Queues telemetry offline when connectivity is lost and automatically flushes batches upon reconnection.
+- **Live Match Moment Listener**:
+  - Connects to SSE / stream endpoints to trigger live ticker notifications, goal alerts, and real-time score refresh.
 
-#### Milestone 4: Dead-Letter Queue (DLQ) & Self-Healing Fault Tolerance
-- Automatic retry engine with jittered exponential backoff for transient database or network failures.
-- Unrecoverable events routed to `dlq:events` stream and MongoDB `DeadLetterEvent` collection.
-- Automated alert triggers on DLQ size thresholds.
+#### Milestone 4: Stream Ingestion & Micro-Batch Workers (`apps/web`, `apps/admin`)
+- Redis Consumer Group worker pool with `XREADGROUP` and `XACK`.
+- Atomic idempotency check (`SETNX stream:idempotency:{key}`) preventing duplicate metric processing.
+- Micro-batch aggregation accumulating metrics and rolling up to MongoDB `ContentMetricSummary` every 15 seconds.
+- Hand-off hook emitting finished fixtures into the **Phase 8 Sports Data Warehouse**.
 
-#### Milestone 5: Admin Event Pipeline & DLQ Studio (`apps/admin`)
-- Dedicated `/admin/events` management console:
-  - **Live Stream Wire**: Real-time events/sec throughput graphs and active consumers.
-  - **Consumer Group Health**: Lag monitoring, pending entries list (`XPENDING`), and partition balance.
-  - **DLQ Inspector & Re-Drive**: Inspect payload failures, single or bulk event retry, and purge controls.
-  - **Pipeline Health Diagnostics**: End-to-end latency benchmarks and worker node health checks.
-- Admin APIs:
-  - `GET /api/admin/events/stats`: Real-time stream metrics and consumer lag.
-  - `GET /api/admin/events/dlq`: Paginated list of failed dead-letter events.
-  - `POST /api/admin/events/dlq/replay`: Re-inject failed events back into the active stream.
-  - `DELETE /api/admin/events/dlq`: Purge discarded dead-letter entries.
+#### Milestone 5: Self-Healing Dead-Letter Queue (DLQ) & Resilience
+- Transient failure retry engine with exponential backoff and jitter (3 attempts).
+- Unrecoverable events saved to MongoDB `dead_letter_events` collection.
+- Admin bulk/single replay APIs (`POST /api/admin/events/dlq/replay`).
 
-#### Milestone 6: Live Sports Fanout & Real-Time Event Dispatcher
-- Real-time match telemetry stream (goals, cards, wickets, score updates) broadcasting via SSE/WebSocket gateways.
-- High-efficiency fanout to mobile push notifications and live web dashboards.
+#### Milestone 6: Admin Stream & DLQ Management Studio (`apps/admin`)
+- Dedicated `/admin/events` console:
+  - **Live Stream Wire**: Real-time throughput graphs (events/sec) and latency monitors.
+  - **Consumer Group Health**: Lag monitoring and acknowledged offsets.
+  - **DLQ Management Console**: Payload inspector, replay engine, and discard actions.
+  - **Sports Telemetry Simulation**: Trigger mock goal, wicket, and ad impression events.
+- Integrated into `AdminNavBar.tsx` under CMS & Editorial and Quick Shortcuts.
 
-#### Milestone 7: Verification, Load Testing & Architectural Documentation
-- High-concurrency synthetic load testing (> 5,000 events/sec burst ingestion).
-- Automated unit and integration test suites for producers, consumer groups, idempotency, and DLQ re-drive.
-- Architectural document `docs/scale-phase-7-architecture.md` and report `docs/scale-phase-7-report.md`.
+#### Milestone 7: Automated Verification & Documentation
+- Comprehensive Vitest unit tests for event production, worker processing, DLQ handling, and idempotency.
+- Clean compilation across all monorepo workspaces.
+- Documentation in `docs/scale-phase-7-plan.md`, `docs/scale-phase-7-architecture.md`, and `docs/scale-phase-7-report.md`.
