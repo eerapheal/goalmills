@@ -2,9 +2,9 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import GoalmillsLoader from '@/components/GoalmillsLoader';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 import { FiMail, FiCheck, FiBell, FiCalendar, FiShield, FiAlertCircle, FiArrowRight } from 'react-icons/fi';
 import Link from 'next/link';
 
