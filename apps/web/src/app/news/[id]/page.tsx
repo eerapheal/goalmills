@@ -8,6 +8,7 @@ import { ShareButtons } from '@/components/ShareButtons';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import ArticleTrackerAndActions from '@/components/news/ArticleTrackerAndActions';
 import RecentlyViewedSection from '@/components/news/RecentlyViewedSection';
+import { SmartRelatedContent } from '@/components/SmartRelatedContent';
 import { generateArticleSchema } from '@/lib/seo/schemaGenerator';
 import { EntityBreadcrumbItem } from '@goalmills/types';
 import { Metadata } from 'next';
@@ -544,6 +545,14 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                 </div>
               </section>
             )}
+
+            <SmartRelatedContent
+              currentId={id}
+              sportSlug={news.sport}
+              categorySlug={news.category}
+              teamSlug={news.team}
+              title="Recommended Tactical & Related Intel"
+            />
 
             <RecentlyViewedSection currentId={id} />
           </article>

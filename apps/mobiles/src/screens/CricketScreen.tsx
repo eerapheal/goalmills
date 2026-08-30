@@ -24,6 +24,7 @@ import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
+import { RecommendedFeed } from '../components/RecommendedFeed';
 import { mobileAnalytics } from '../utils/analytics';
 
 type CricketTab = 'live' | 'upcoming' | 'results' | 'standings' | 'series' | 'teams';
@@ -542,6 +543,7 @@ export function CricketScreen() {
           </Pressable>
         )}
         contentContainerStyle={styles.listContent}
+        ListFooterComponent={<RecommendedFeed sportSlug="cricket" title="Recommended Cricket Intel" />}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
         }

@@ -203,6 +203,103 @@ export interface RealtimeAnalyticsSummary {
   }[];
 }
 
+// ---------------------------------------------------------------------------
+// Phase 5: Recommendation Engine Types
+// ---------------------------------------------------------------------------
+export type RecommendationType =
+  | 'article'
+  | 'match'
+  | 'team'
+  | 'league'
+  | 'sport'
+  | 'video'
+  | 'newsletter'
+  | 'multi';
+
+export type RecommendationContext =
+  | 'homepage'
+  | 'article_detail'
+  | 'match_detail'
+  | 'sports_hub'
+  | 'mobile_feed'
+  | 'newsletter';
+
+export type RecommendationAlgorithmType =
+  | 'content_similarity'
+  | 'trending'
+  | 'collaborative_signal'
+  | 'personalized_affinity';
+
+export interface RecommendationCandidate {
+  id: string;
+  type: 'article' | 'match' | 'video' | 'newsletter' | 'topic';
+  title: string;
+  slug: string;
+  url: string;
+  image?: string;
+  sportSlug?: string;
+  categorySlug?: string;
+  teamSlug?: string;
+  competitionSlug?: string;
+  score: number;
+  reasonBadge: string;
+  algorithm: RecommendationAlgorithmType;
+  metadata?: Record<string, any>;
+  publishedAt?: string;
+}
+
+export interface RecommendationAlgorithmWeights {
+  sportMatchWeight: number; // default: 30
+  competitionMatchWeight: number; // default: 25
+  teamOverlapWeight: number; // default: 35
+  categoryMatchWeight: number; // default: 15
+  recencyDecayHours: number; // default: 48 (half-life)
+  trendingPopularityWeight: number; // default: 20
+  personalizationAffinityWeight: number; // default: 25
+  diversityPenalty: number; // default: 10
+}
+
+export interface RecommendationConfig {
+  _id?: string;
+  tenantId?: string;
+  tenantSlug: string;
+  weights: RecommendationAlgorithmWeights;
+  enabledContexts: RecommendationContext[];
+  excludedCategorySlugs?: string[];
+  maxCandidatesPerSport?: number;
+  updatedAt?: string | Date;
+}
+
+export interface RecommendationFeedbackPayload {
+  recommendationId?: string;
+  candidateId: string;
+  candidateType: string;
+  context: RecommendationContext;
+  action: 'impression' | 'click' | 'dismiss';
+  tenantSlug?: string;
+  sessionHash?: string;
+  timestamp?: string;
+}
+
+export interface RecommendationMetricStats {
+  totalImpressions: number;
+  totalClicks: number;
+  overallCTR: number;
+  contextBreakdown: {
+    context: RecommendationContext;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+  }[];
+  algorithmBreakdown: {
+    algorithm: RecommendationAlgorithmType;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+  }[];
+}
+
+
 
 export type SponsorshipPlacement =
   | 'homepage_hero'

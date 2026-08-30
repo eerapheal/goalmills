@@ -31,6 +31,7 @@ import {
   FiActivity,
   FiLayout,
   FiExternalLink,
+  FiSliders,
 } from 'react-icons/fi';
 import type { UserRole } from '@goalmills/types';
 import type { PermissionAction } from '@/lib/rbac';
@@ -122,6 +123,15 @@ const PRIMARY_TABS: PrimaryTab[] = [
         icon: FiActivity,
         requiredPermission: 'articles:draft',
         badge: 'Pulse',
+      },
+      {
+        id: 'recommendations',
+        label: 'Recommendation Studio',
+        href: '/admin/recommendations',
+        description: 'Configure algorithm weights, decay factors & candidate testing',
+        icon: FiSliders,
+        requiredPermission: 'articles:draft',
+        badge: 'AI',
       },
     ],
   },
@@ -242,6 +252,7 @@ const PRIMARY_TABS: PrimaryTab[] = [
 
 // Quick jump desktop shortcut chips for high frequency operations
 const QUICK_SHORTCUTS = [
+  { label: 'Recommendations', href: '/admin/recommendations', icon: FiSliders, color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20' },
   { label: 'Analytics', href: '/admin/analytics', icon: FiActivity, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Portal', href: '/admin/portal', icon: FiLayout, color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20' },
   { label: 'Create Article', href: '/admin/news/new', icon: FiPlusCircle, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },

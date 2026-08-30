@@ -4,3 +4,4 @@ export { StandingsTable } from './StandingsTable';
 export { BlogCard } from './BlogCard';
 export { VideoCard } from './VideoCard';
 export { SportTabs } from './SportTabs';
+export { RecommendedFeed } from './RecommendedFeed';

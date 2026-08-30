@@ -23,6 +23,7 @@ import { NewsCard } from '../components/NewsCard';
 import { VideoCard } from '../components/VideoCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
+import { RecommendedFeed } from '../components/RecommendedFeed';
 import { mobileAnalytics } from '../utils/analytics';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
@@ -309,6 +310,7 @@ export function FootballScreen() {
         }
       >
         {renderContent()}
+        <RecommendedFeed sportSlug="football" title="Recommended Football Intel" />
       </ScrollView>
     </View>
   );

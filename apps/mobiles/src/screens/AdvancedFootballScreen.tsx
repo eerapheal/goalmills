@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballMatchCard, UnifiedMatchEvent } from '../components/FootballMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
+import { RecommendedFeed } from '../components/RecommendedFeed';
 import { apiFootballService, ApiFootballFixtureItem } from '../services/apiFootball';
 import { advancedFootballApi } from '../services/advancedFootballApi';
 
@@ -374,6 +375,7 @@ export function AdvancedFootballScreen() {
             </Pressable>
           )}
           renderItem={({ item }) => <FootballMatchCard event={item} />}
+          ListFooterComponent={<RecommendedFeed sportSlug="football" title="Recommended Football Intel" />}
         />
       )}
     </View>

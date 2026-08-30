@@ -18,6 +18,7 @@ import { basketballApiService, ApiBasketballGameItem } from '../services/basketb
 import { BasketballMatchCard } from '../components/BasketballMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
+import { RecommendedFeed } from '../components/RecommendedFeed';
 import { mobileAnalytics } from '../utils/analytics';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
@@ -340,6 +341,7 @@ export default function BasketballScreen() {
             </Pressable>
           )}
           renderItem={({ item }) => <BasketballMatchCard match={item} hideLeague />}
+          ListFooterComponent={<RecommendedFeed sportSlug="basketball" title="Recommended Basketball Intel" />}
         />
       )}
     </View>
