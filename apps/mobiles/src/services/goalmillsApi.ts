@@ -249,4 +249,49 @@ export const goalmillsApi = {
       });
     } catch {}
   },
+
+  getNewsletterPreferences: async (tokenOrEmail: string): Promise<any | null> => {
+    try {
+      const isEmail = tokenOrEmail.includes('@');
+      const param = isEmail ? `email=${encodeURIComponent(tokenOrEmail)}` : `token=${encodeURIComponent(tokenOrEmail)}`;
+      const response = await fetch(`${BASE_URL}/newsletter/preferences?${param}`, {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      return data.subscriber || null;
+    } catch (error) {
+      console.warn('Error fetching newsletter preferences:', error);
+      return null;
+    }
+  },
+
+  updateNewsletterPreferences: async (payload: {
+    token?: string;
+    email?: string;
+    preferences: {
+      sports: string[];
+      frequency: string;
+      breakingAlerts: boolean;
+      transfersOnly: boolean;
+      isPaused: boolean;
+    };
+  }): Promise<boolean> => {
+    try {
+      const response = await fetch(`${BASE_URL}/newsletter/preferences`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-tenant-slug': currentTenantSlug,
+        },
+        body: JSON.stringify(payload),
+      });
+      return response.ok;
+    } catch (error) {
+      console.warn('Error updating newsletter preferences:', error);
+      return false;
+    }
+  },
 };
+
+export default goalmillsApi;

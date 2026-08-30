@@ -96,6 +96,25 @@ const NewsletterSubscriberSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    listIds: [{ type: String, index: true }],
+    tags: [{ type: String, index: true }],
+    preferences: {
+      sports: [{ type: String }],
+      frequency: { type: String, default: 'daily' },
+      breakingAlerts: { type: Boolean, default: true },
+      transfersOnly: { type: Boolean, default: false },
+      isPaused: { type: Boolean, default: false },
+      pausedUntil: { type: Date },
+    },
+    tenantId: {
+      type: String,
+      index: true,
+    },
+    tenantSlug: {
+      type: String,
+      default: 'goalmills',
+      index: true,
+    },
     source: {
       type: String,
       default: 'website',

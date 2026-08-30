@@ -2899,6 +2899,95 @@ export type NewsletterAudience =
   | 'engaged_only'
   | 'reengagement_targets';
 
+export interface NewsletterPreferences {
+  sports: ('football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string)[];
+  frequency: NewsletterFrequency;
+  breakingAlerts: boolean;
+  transfersOnly: boolean;
+  isPaused: boolean;
+  pausedUntil?: string;
+}
+
+export interface NewsletterList {
+  _id?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  isDefault: boolean;
+  subscriberCount: number;
+  tenantId?: string;
+  tenantSlug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface NewsletterSegmentRule {
+  field: 'sport' | 'frequency' | 'engagementScore' | 'activity' | 'tags' | 'category';
+  operator: 'in' | 'equals' | 'gte' | 'lte' | 'contains';
+  value: any;
+}
+
+export interface NewsletterSegment {
+  _id?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  rules: NewsletterSegmentRule[];
+  matchType: 'all' | 'any';
+  estimatedSubscribers: number;
+  tenantId?: string;
+  tenantSlug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface NewsletterTemplate {
+  _id?: string;
+  name: string;
+  slug: string;
+  description?: string;
+  category: 'daily_digest' | 'breaking_news' | 'weekend_preview' | 'tactical_debrief' | 'transfer_radar' | 'custom';
+  subjectFormat: string;
+  headerTitle: string;
+  headerSubtitle: string;
+  bannerImageUrl?: string;
+  accentColor: string;
+  sections: {
+    id: string;
+    title: string;
+    type: 'top_stories' | 'tactical_focus' | 'transfer_radar' | 'stats_leaderboard' | 'sponsor_slot' | 'editor_notes';
+    itemLimit: number;
+  }[];
+  footerText?: string;
+  isDefault?: boolean;
+  tenantId?: string;
+  tenantSlug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type SendJobStatus = 'pending' | 'running' | 'paused' | 'completed' | 'failed' | 'cancelled';
+
+export interface NewsletterSendJob {
+  _id?: string;
+  campaignId: string;
+  tenantId?: string;
+  tenantSlug?: string;
+  status: SendJobStatus;
+  totalRecipients: number;
+  processedRecipients: number;
+  successCount: number;
+  failedCount: number;
+  batchSize: number;
+  currentBatchIndex: number;
+  startedAt?: string;
+  pausedAt?: string;
+  completedAt?: string;
+  lastError?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface NewsletterSubscriber {
   _id?: string;
   email: string;
@@ -2906,6 +2995,9 @@ export interface NewsletterSubscriber {
   status: SubscriberHealthStatus;
   frequency: NewsletterFrequency;
   categories?: string[];
+  listIds?: string[];
+  tags?: string[];
+  preferences?: NewsletterPreferences;
   emailHealthScore: number; // 0 - 100
   engagementScore: number; // 0 - 100
   reputationRiskScore: number; // 0 - 100
@@ -2919,6 +3011,8 @@ export interface NewsletterSubscriber {
   hardBounceCount: number;
   complaintCount: number;
   source?: string;
+  tenantId?: string;
+  tenantSlug?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -2929,6 +3023,8 @@ export interface EmailSuppression {
   reason: SuppressionReason;
   source: string;
   campaignId?: string;
+  tenantId?: string;
+  tenantSlug?: string;
   metadata?: Record<string, any>;
   expiresAt?: string;
   createdAt?: string;
@@ -2960,6 +3056,8 @@ export interface EmailEvent {
   provider: string;
   campaignId?: string;
   recipientId?: string;
+  tenantId?: string;
+  tenantSlug?: string;
   metadata?: Record<string, any>;
   timestamp: string;
   createdAt?: string;
@@ -3016,6 +3114,10 @@ export interface NewsletterCampaign {
   editorialNote?: string;
   frequencyTier: 'daily' | 'weekly' | 'monthly' | 'custom_broadcast';
   targetAudience: NewsletterAudience;
+  listId?: string;
+  segmentId?: string;
+  templateId?: string;
+  sendJobId?: string;
   articleIds: string[];
   articles?: NewsletterArticlePreview[];
   scheduledFor?: string;
@@ -3031,7 +3133,10 @@ export interface NewsletterCampaign {
     softBounceCount?: number;
     hardBounceCount?: number;
     complaintCount?: number;
+    unsubscribeCount?: number;
   };
+  tenantId?: string;
+  tenantSlug?: string;
   createdBy: string;
   createdAt?: string;
   updatedAt?: string;

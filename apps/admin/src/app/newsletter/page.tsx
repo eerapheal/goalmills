@@ -34,7 +34,14 @@ import {
   FiAlertTriangle,
 } from 'react-icons/fi';
 
-type ActiveViewTab = 'overview' | 'campaigns' | 'subscribers' | 'suppressions' | 'reputation';
+type ActiveViewTab =
+  | 'overview'
+  | 'campaigns'
+  | 'subscribers'
+  | 'lists_segments'
+  | 'templates'
+  | 'suppressions'
+  | 'reputation';
 
 export default function AdminNewsletterPage() {
   const toast = useToast();
@@ -47,6 +54,9 @@ export default function AdminNewsletterPage() {
   const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
   const [suppressions, setSuppressions] = useState<EmailSuppression[]>([]);
   const [reputationData, setReputationData] = useState<any>(null);
+  const [lists, setLists] = useState<any[]>([]);
+  const [segments, setSegments] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalActive: 0,
     daily: 0,
@@ -54,6 +64,16 @@ export default function AdminNewsletterPage() {
     monthly: 0,
     unsubscribed: 0,
   });
+
+  // Test Send Modal State
+  const [showTestSendModal, setShowTestSendModal] = useState(false);
+  const [testEmailInput, setTestEmailInput] = useState('editor@goalmills.com');
+  const [sendingTest, setSendingTest] = useState(false);
+
+  // Create List / Segment Modal State
+  const [showCreateListModal, setShowCreateListModal] = useState(false);
+  const [newListName, setNewListName] = useState('');
+  const [newListDesc, setNewListDesc] = useState('');
 
   // Compose Modal State
   const [showComposeModal, setShowComposeModal] = useState(false);
@@ -94,17 +114,23 @@ export default function AdminNewsletterPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [campRes, subRes, suppRes, repRes] = await Promise.all([
+      const [campRes, subRes, suppRes, repRes, listRes, segRes, tmplRes] = await Promise.all([
         fetch('/api/admin/newsletter/campaigns'),
         fetch('/api/admin/newsletter/subscribers'),
         fetch('/api/admin/newsletter/suppressions'),
         fetch('/api/admin/newsletter/reputation'),
+        fetch('/api/admin/newsletter/lists'),
+        fetch('/api/admin/newsletter/segments'),
+        fetch('/api/admin/newsletter/templates'),
       ]);
 
       const campJson = await campRes.json();
       const subJson = await subRes.json();
       const suppJson = await suppRes.json();
       const repJson = await repRes.json();
+      const listJson = await listRes.json().catch(() => ({ lists: [] }));
+      const segJson = await segRes.json().catch(() => ({ segments: [] }));
+      const tmplJson = await tmplRes.json().catch(() => ({ templates: [] }));
 
       if (campJson.success) setCampaigns(campJson.data);
       if (subJson.success) {
@@ -113,10 +139,62 @@ export default function AdminNewsletterPage() {
       }
       if (suppJson.success) setSuppressions(suppJson.data);
       if (repJson.success) setReputationData(repJson.data);
+      if (listJson.lists) setLists(listJson.lists);
+      if (segJson.segments) setSegments(segJson.segments);
+      if (tmplJson.templates) setTemplates(tmplJson.templates);
     } catch (err) {
       console.error('Error loading newsletter data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTestSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSendingTest(true);
+      const res = await fetch('/api/admin/newsletter/test-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          testEmails: [testEmailInput],
+          title: 'GoalMills Sports Intel Preview',
+          previewText: 'Live test preview from Admin Console',
+          editorialNote: 'Internal deliverability verification test.',
+          frequencyTier: 'daily',
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message || 'Failed to dispatch test email');
+      toast.success(json.message || 'Test email dispatched successfully');
+      setShowTestSendModal(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Error sending test email');
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
+  const handleCreateList = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/admin/newsletter/lists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newListName,
+          description: newListDesc,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message || 'Failed to create list');
+      toast.success('Subscriber list created');
+      setShowCreateListModal(false);
+      setNewListName('');
+      setNewListDesc('');
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.message || 'Error creating list');
     }
   };
 
@@ -368,6 +446,14 @@ export default function AdminNewsletterPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
+              onClick={() => setShowTestSendModal(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold text-xs uppercase tracking-wider transition-all"
+            >
+              <FiSend size={14} />
+              <span>Test Send Preview</span>
+            </button>
+            <button
+              type="button"
               onClick={() => {
                 resetComposer();
                 setShowComposeModal(true);
@@ -471,6 +557,28 @@ export default function AdminNewsletterPage() {
             }`}
           >
             Health & Roster ({stats.totalActive})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('lists_segments')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+              activeTab === 'lists_segments'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            Lists & Segments ({lists.length + segments.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('templates')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+              activeTab === 'templates'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            Templates ({templates.length})
           </button>
           <button
             type="button"
@@ -968,6 +1076,198 @@ export default function AdminNewsletterPage() {
           </div>
         )}
 
+        {/* Tab: Lists & Segments */}
+        {activeTab === 'lists_segments' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header / Actions */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black uppercase tracking-tight text-white flex items-center gap-2">
+                  <FiLayers className="text-amber-400" /> Subscriber Lists & Dynamic Segments
+                </h2>
+                <p className="text-xs text-text-muted">
+                  Partition your audience by sports interests, activity recency, and delivery tiers.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateListModal(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all"
+              >
+                <FiPlus size={14} />
+                <span>Create List</span>
+              </button>
+            </div>
+
+            {/* Lists Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lists.length > 0 ? (
+                lists.map((list) => (
+                  <div
+                    key={list._id}
+                    className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col justify-between hover:border-amber-500/30 transition-all"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                          {list.name}
+                        </span>
+                        {list.isDefault && (
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                        {list.description || 'General subscriber list'}
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                      <span>Subscribers: <strong className="text-white">{list.subscriberCount || 0}</strong></span>
+                      <span className="text-[10px] font-mono text-slate-500">/{list.slug}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full glass-card p-8 rounded-2xl border border-white/10 text-center space-y-2">
+                  <FiLayers size={28} className="mx-auto text-amber-400 opacity-60" />
+                  <h3 className="text-sm font-bold text-white">Default GoalMills List Active</h3>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    All new subscribers are automatically indexed into the primary GoalMills master list. Create custom lists to partition specialized broadcasts.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Dynamic Segments Section */}
+            <div className="glass-card p-5 rounded-3xl border border-white/10 space-y-4">
+              <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
+                <FiFilter className="text-purple-400" /> Automated Audience Segments
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-white/10 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-white">⚽ Football Insiders</span>
+                    <span className="text-[10px] text-emerald-400 font-mono">Dynamic</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">Subscribers interested in Premier League, UCL & European Football</p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-white/10 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-white">🏏 Cricket Pulse</span>
+                    <span className="text-[10px] text-emerald-400 font-mono">Dynamic</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">Subscribers targeted for IPL, Test Matches & ICC Tournaments</p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-white/10 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-white">⚡ Breaking Alert VIPs</span>
+                    <span className="text-[10px] text-emerald-400 font-mono">Dynamic</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">Subscribers with breaking alert opt-ins & high engagement scores</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Templates */}
+        {activeTab === 'templates' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base sm:text-lg font-black uppercase tracking-tight text-white flex items-center gap-2">
+                  <FiStar className="text-amber-400" /> Newsletter Structured Templates
+                </h2>
+                <p className="text-xs text-text-muted">
+                  Pre-configured responsive layout engines with multi-sport styling and sponsor slot containers.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                {
+                  id: 'daily_digest',
+                  name: 'Daily Sports Intel Digest',
+                  category: 'daily_digest',
+                  desc: 'Curated 10:00 AM daily briefing with top headlines, stats, and sponsor banner.',
+                  badge: 'Standard',
+                  accent: '#F59E0B',
+                },
+                {
+                  id: 'breaking_news',
+                  name: 'Breaking News Flash Alert',
+                  category: 'breaking_news',
+                  desc: 'Single-story urgent alert format for high-priority transfers and breaking updates.',
+                  badge: 'Urgent',
+                  accent: '#EF4444',
+                },
+                {
+                  id: 'weekend_preview',
+                  name: 'Weekend Matchday Preview',
+                  category: 'weekend_preview',
+                  desc: 'Derby previews, key matchups, and tactical battle breakdowns.',
+                  badge: 'Weekend',
+                  accent: '#3B82F6',
+                },
+                {
+                  id: 'tactical_debrief',
+                  name: 'Tactical Debrief & Analysis',
+                  category: 'tactical_debrief',
+                  desc: 'In-depth tactical breakdowns, heatmaps, and manager decisions.',
+                  badge: 'Deep Dive',
+                  accent: '#8B5CF6',
+                },
+                {
+                  id: 'transfer_radar',
+                  name: 'Transfer Radar Special',
+                  category: 'transfer_radar',
+                  desc: 'Done deals, verified rumours, and contract renewal roundups.',
+                  badge: 'Transfer',
+                  accent: '#10B981',
+                },
+              ].map((tmpl) => (
+                <div
+                  key={tmpl.id}
+                  className="glass-card p-5 rounded-2xl border border-white/10 flex flex-col justify-between hover:border-amber-500/30 transition-all space-y-4"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-white">
+                        {tmpl.name}
+                      </span>
+                      <span
+                        className="text-[9px] font-black uppercase px-2 py-0.5 rounded"
+                        style={{ backgroundColor: `${tmpl.accent}20`, color: tmpl.accent }}
+                      >
+                        {tmpl.badge}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                      {tmpl.desc}
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                    <span className="text-[10px] text-slate-400 font-mono">Category: {tmpl.category}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTitle(`GoalMills ${tmpl.name} • ${new Date().toLocaleDateString()}`);
+                        setComposerMode('auto_curate');
+                        setShowComposeModal(true);
+                      }}
+                      className="text-xs font-bold text-amber-400 hover:text-amber-300"
+                    >
+                      Use Template →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ------------------------------------------------------------- */}
         {/* COMPOSE & PRE-FLIGHT DELIVERABILITY GATE MODAL */}
         {/* ------------------------------------------------------------- */}
@@ -1328,6 +1628,131 @@ export default function AdminNewsletterPage() {
                     className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider"
                   >
                     Block Email
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* TEST SEND MODAL */}
+        {/* ------------------------------------------------------------- */}
+        {showTestSendModal && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-white/15 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <FiSend className="text-purple-400" /> Dispatch Test Preview
+                </h3>
+                <button
+                  onClick={() => setShowTestSendModal(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <FiX size={18} />
+                </button>
+              </div>
+
+              <p className="text-xs text-slate-400">
+                Sends a live HTML test preview rendered through the Go Mailer priority queue to the specified test mailbox.
+              </p>
+
+              <form onSubmit={handleTestSend} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Recipient Test Email *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={testEmailInput}
+                    onChange={(e) => setTestEmailInput(e.target.value)}
+                    placeholder="editor@goalmills.com"
+                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowTestSendModal(false)}
+                    className="px-4 py-2 rounded-xl bg-white/5 text-slate-300 text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={sendingTest}
+                    className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    <FiSend size={12} />
+                    <span>{sendingTest ? 'Dispatching...' : 'Send Live Test'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* CREATE LIST MODAL */}
+        {/* ------------------------------------------------------------- */}
+        {showCreateListModal && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-white/15 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <FiLayers className="text-amber-400" /> Create Subscriber List
+                </h3>
+                <button
+                  onClick={() => setShowCreateListModal(false)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <FiX size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateList} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    List Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newListName}
+                    onChange={(e) => setNewListName(e.target.value)}
+                    placeholder="e.g. VIP Transfer Insiders"
+                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newListDesc}
+                    onChange={(e) => setNewListDesc(e.target.value)}
+                    placeholder="List purpose and audience scope"
+                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateListModal(false)}
+                    className="px-4 py-2 rounded-xl bg-white/5 text-slate-300 text-xs font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all"
+                  >
+                    Create List
                   </button>
                 </div>
               </form>

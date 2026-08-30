@@ -22,8 +22,23 @@ const NewsletterCampaignSchema = new mongoose.Schema(
     },
     targetAudience: {
       type: String,
-      enum: ['daily_subscribers', 'weekly_subscribers', 'monthly_subscribers', 'all_subscribers'],
       default: 'daily_subscribers',
+      index: true,
+    },
+    listId: {
+      type: String,
+      index: true,
+    },
+    segmentId: {
+      type: String,
+      index: true,
+    },
+    templateId: {
+      type: String,
+      index: true,
+    },
+    sendJobId: {
+      type: String,
       index: true,
     },
     articleIds: [
@@ -42,7 +57,7 @@ const NewsletterCampaignSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['draft', 'scheduled', 'processing', 'sent', 'failed'],
+      enum: ['draft', 'scheduled', 'processing', 'sent', 'failed', 'paused'],
       default: 'draft',
       index: true,
     },
@@ -51,6 +66,20 @@ const NewsletterCampaignSchema = new mongoose.Schema(
       successCount: { type: Number, default: 0 },
       failureCount: { type: Number, default: 0 },
       openCount: { type: Number, default: 0 },
+      clickCount: { type: Number, default: 0 },
+      softBounceCount: { type: Number, default: 0 },
+      hardBounceCount: { type: Number, default: 0 },
+      complaintCount: { type: Number, default: 0 },
+      unsubscribeCount: { type: Number, default: 0 },
+    },
+    tenantId: {
+      type: String,
+      index: true,
+    },
+    tenantSlug: {
+      type: String,
+      default: 'goalmills',
+      index: true,
     },
     createdBy: {
       type: String,
@@ -59,6 +88,8 @@ const NewsletterCampaignSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+NewsletterCampaignSchema.index({ tenantSlug: 1, status: 1, createdAt: -1 });
 
 export default mongoose.models.NewsletterCampaign ||
   mongoose.model('NewsletterCampaign', NewsletterCampaignSchema);
