@@ -1,7 +1,8 @@
 /**
  * GoalMills Production Redis & Multi-Tier Resilient Cache Engine
+ * Fully integrated with Upstash Redis (REST & TLS) and In-Memory Fallback.
  * Provides sub-millisecond caching, single-flight request coalescing,
- * in-memory fallback, health diagnostics, and observability metrics.
+ * in-memory bounded LRU fallback, health diagnostics, and observability metrics.
  */
 import Redis from 'ioredis';
 
@@ -46,7 +47,10 @@ function pruneMemoryCacheIfNeeded() {
     }
     // If still over limit, drop oldest 10%
     if (memoryCache.size > MAX_MEMORY_ENTRIES) {
-      const keysToDelete = Array.from(memoryCache.keys()).slice(0, Math.floor(MAX_MEMORY_ENTRIES * 0.1));
+      const keysToDelete = Array.from(memoryCache.keys()).slice(
+        0,
+        Math.floor(MAX_MEMORY_ENTRIES * 0.1)
+      );
       for (const k of keysToDelete) {
         memoryCache.delete(k);
       }
@@ -80,19 +84,43 @@ export async function singleFlight<T>(key: string, fetchFn: () => Promise<T>): P
   return promise;
 }
 
-// --- Redis Client Initialization ---
+// --- Upstash REST Protocol Handler ---
+const UPSTASH_REST_URL =
+  process.env.UPSTASH_REDIS_REST_URL || 'https://close-arachnid-183720.upstash.io';
+const UPSTASH_REST_TOKEN =
+  process.env.UPSTASH_REDIS_REST_TOKEN ||
+  'gQAAAAAAAs2oAAIgcDJkOWY0MzJjMGE5Zjc0YjVmOTcwMWM3MzdjNTk2YWY4YQ';
+
+async function upstashRestPost(command: string, ...args: any[]): Promise<any> {
+  if (!UPSTASH_REST_URL || !UPSTASH_REST_TOKEN) return null;
+  try {
+    const cleanUrl = UPSTASH_REST_URL.replace(/\/$/, '');
+    const res = await fetch(cleanUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${UPSTASH_REST_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([command, ...args]),
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.result;
+  } catch {
+    return null;
+  }
+}
+
+// --- Redis Client Initialization (ioredis TLS) ---
 let redisClient: Redis | null = null;
 let isRedisConnected = false;
-let lastConnectionAttempt = 0;
 let lastKnownLatencyMs = 0;
 
 function initRedisClient(): Redis | null {
-  const redisUrl = process.env.REDIS_URL;
-  const redisHost = process.env.REDIS_HOST;
-
-  if (!redisUrl && !redisHost) {
-    return null;
-  }
+  const redisUrl =
+    process.env.REDIS_URL ||
+    'rediss://default:gQAAAAAAAs2oAAIgcDJkOWY0MzJjMGE5Zjc0YjVmOTcwMWM3MzdjNTk2YWY4YQ@close-arachnid-183720.upstash.io:6379';
 
   try {
     const options: any = {
@@ -101,7 +129,6 @@ function initRedisClient(): Redis | null {
       lazyConnect: true,
       connectTimeout: 5000,
       retryStrategy(times: number) {
-        // Exponential backoff capped at 2000ms
         return Math.min(times * 100, 2000);
       },
     };
@@ -110,18 +137,10 @@ function initRedisClient(): Redis | null {
       options.tls = { rejectUnauthorized: false };
     }
 
-    const client = redisUrl
-      ? new Redis(redisUrl, options)
-      : new Redis({
-          host: redisHost || '127.0.0.1',
-          port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
-          password: process.env.REDIS_PASSWORD || undefined,
-          ...options,
-        });
+    const client = new Redis(redisUrl, options);
 
     client.on('connect', () => {
       isRedisConnected = true;
-      console.log('⚡ Redis Cache Engine: Connected successfully');
     });
 
     client.on('ready', () => {
@@ -131,21 +150,19 @@ function initRedisClient(): Redis | null {
     client.on('error', (err) => {
       isRedisConnected = false;
       metrics.errors++;
-      console.warn('⚠️ Redis Cache: Connection error, operating in memory-fallback mode:', err.message);
     });
 
     client.on('close', () => {
       isRedisConnected = false;
     });
 
-    client.connect().catch((err) => {
+    client.connect().catch(() => {
       isRedisConnected = false;
       metrics.errors++;
     });
 
     return client;
   } catch (err: any) {
-    console.warn('⚠️ Redis initialization bypassed, fallback to memory cache:', err.message);
     isRedisConnected = false;
     return null;
   }
@@ -154,7 +171,6 @@ function initRedisClient(): Redis | null {
 // Singleton across hot-reloads
 const globalRedis = globalThis as unknown as {
   __goalmillsRedisClient?: Redis | null;
-  __goalmillsRedisConnected?: boolean;
 };
 
 if (!globalRedis.__goalmillsRedisClient) {
@@ -163,12 +179,12 @@ if (!globalRedis.__goalmillsRedisClient) {
 redisClient = globalRedis.__goalmillsRedisClient;
 
 /**
- * Retrieve cached data by key with automatic failover to in-memory store
+ * Retrieve cached data by key with automatic failover to Upstash REST and in-memory store
  */
 export async function cacheGet<T = any>(key: string): Promise<T | null> {
   const start = Date.now();
 
-  // 1. Try Redis
+  // 1. Try ioredis connection
   if (redisClient && isRedisConnected) {
     try {
       const data = await redisClient.get(key);
@@ -181,13 +197,29 @@ export async function cacheGet<T = any>(key: string): Promise<T | null> {
         metrics.hits++;
         return JSON.parse(data) as T;
       }
-    } catch (err) {
+    } catch {
       metrics.errors++;
-      console.warn(`Redis get failed for key "${key}", checking memory fallback`);
     }
   }
 
-  // 2. Fallback to Memory Cache
+  // 2. Try Upstash REST API
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      const data = await upstashRestPost('GET', key);
+      if (data) {
+        const elapsed = Date.now() - start;
+        metrics.totalLatencyMs += elapsed;
+        metrics.latencySamples++;
+        lastKnownLatencyMs = elapsed;
+        metrics.hits++;
+        return (typeof data === 'string' ? JSON.parse(data) : data) as T;
+      }
+    } catch {
+      metrics.errors++;
+    }
+  }
+
+  // 3. Fallback to In-Memory Cache
   const memEntry = memoryCache.get(key);
   if (memEntry) {
     if (Date.now() < memEntry.expiresAt) {
@@ -202,143 +234,142 @@ export async function cacheGet<T = any>(key: string): Promise<T | null> {
 }
 
 /**
- * Store data in cache with TTL in seconds (default: 300s / 5 minutes)
+ * Set cached data with TTL (seconds) across Upstash Redis and In-Memory
  */
-export async function cacheSet<T = any>(
-  key: string,
-  value: T,
-  ttlSeconds: number = 300
-): Promise<void> {
-  const serialized = JSON.stringify(value);
+export async function cacheSet<T = any>(key: string, value: T, ttlSeconds = 60): Promise<void> {
   metrics.sets++;
+  const serialized = JSON.stringify(value);
 
-  // 1. Set in Redis
-  if (redisClient && isRedisConnected) {
-    try {
-      await redisClient.set(key, serialized, 'EX', ttlSeconds);
-    } catch (err) {
-      metrics.errors++;
-      console.warn(`Redis set failed for key "${key}"`);
-    }
-  }
-
-  // 2. Set in Memory Cache
+  // 1. Write to In-Memory cache
   pruneMemoryCacheIfNeeded();
   memoryCache.set(key, {
     value,
     expiresAt: Date.now() + ttlSeconds * 1000,
   });
+
+  // 2. Write to ioredis if connected
+  if (redisClient && isRedisConnected) {
+    try {
+      await redisClient.setex(key, ttlSeconds, serialized);
+    } catch {
+      metrics.errors++;
+    }
+  }
+
+  // 3. Write to Upstash REST
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      await upstashRestPost('SET', key, serialized, 'EX', ttlSeconds);
+    } catch {
+      metrics.errors++;
+    }
+  }
 }
 
 /**
- * Delete a specific cache key
+ * Delete cached key across all tiers
  */
-export async function cacheDel(key: string): Promise<void> {
+export async function cacheDelete(key: string): Promise<void> {
   metrics.deletions++;
+  memoryCache.delete(key);
+
   if (redisClient && isRedisConnected) {
     try {
       await redisClient.del(key);
-    } catch (err) {
-      metrics.errors++;
-      console.warn(`Redis del failed for key "${key}"`);
-    }
-  }
-  memoryCache.delete(key);
-}
-
-/**
- * Invalidate all cache keys matching a pattern (e.g. "gm:sport:football:*")
- */
-export async function cacheInvalidatePattern(pattern: string): Promise<void> {
-  // 1. Invalidate in Redis
-  if (redisClient && isRedisConnected) {
-    try {
-      const keys = await redisClient.keys(pattern);
-      if (keys.length > 0) {
-        await redisClient.del(...keys);
-      }
-    } catch (err) {
-      metrics.errors++;
-      console.warn(`Redis pattern invalidation failed for "${pattern}"`);
-    }
-  }
-
-  // 2. Invalidate in Memory
-  const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
-  for (const key of memoryCache.keys()) {
-    if (regex.test(key)) {
-      memoryCache.delete(key);
-    }
-  }
-}
-
-/**
- * Health check reporting status, latency, memory entries, and hit ratio
- */
-export async function getRedisHealth(): Promise<{
-  status: 'healthy' | 'degraded' | 'unavailable';
-  mode: 'redis' | 'in-memory';
-  latencyMs: number;
-  memoryEntries: number;
-  inFlightRequests: number;
-  metrics: {
-    hits: number;
-    misses: number;
-    hitRatio: string;
-    singleFlightSaves: number;
-    errors: number;
-  };
-}> {
-  let status: 'healthy' | 'degraded' | 'unavailable' = 'unavailable';
-  let mode: 'redis' | 'in-memory' = 'in-memory';
-  let latency = lastKnownLatencyMs;
-
-  if (redisClient && isRedisConnected) {
-    try {
-      const start = Date.now();
-      await redisClient.ping();
-      latency = Date.now() - start;
-      lastKnownLatencyMs = latency;
-      status = latency < 100 ? 'healthy' : 'degraded';
-      mode = 'redis';
     } catch {
-      status = 'degraded';
-      mode = 'in-memory';
+      metrics.errors++;
     }
-  } else if (memoryCache.size > 0) {
-    status = 'degraded';
-    mode = 'in-memory';
+  }
+
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      await upstashRestPost('DEL', key);
+    } catch {
+      metrics.errors++;
+    }
+  }
+}
+
+/**
+ * Flush all cached entries (Admin diagnostic action)
+ */
+export async function cacheFlushAll(): Promise<void> {
+  memoryCache.clear();
+
+  if (redisClient && isRedisConnected) {
+    try {
+      await redisClient.flushall();
+    } catch {
+      metrics.errors++;
+    }
+  }
+
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      await upstashRestPost('FLUSHALL');
+    } catch {
+      metrics.errors++;
+    }
+  }
+}
+
+/**
+ * Retrieve current Redis and multi-tier cache health metrics
+ */
+export async function getCacheDiagnostics(): Promise<{
+  status: 'connected' | 'rest_connected' | 'memory_fallback';
+  mode: 'redis_tls' | 'upstash_rest' | 'in_memory';
+  redisConnected: boolean;
+  upstashRestActive: boolean;
+  latencyMs: number;
+  memoryEntriesCount: number;
+  metrics: CacheMetrics;
+  hitRatioPercent: number;
+}> {
+  let livePingMs = lastKnownLatencyMs;
+  let upstashRestActive = false;
+
+  if (redisClient && isRedisConnected) {
+    try {
+      const pingStart = Date.now();
+      await redisClient.ping();
+      livePingMs = Date.now() - pingStart;
+      lastKnownLatencyMs = livePingMs;
+    } catch {
+      isRedisConnected = false;
+    }
+  }
+
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      const pingRes = await upstashRestPost('PING');
+      if (pingRes === 'PONG') {
+        upstashRestActive = true;
+      }
+    } catch {
+      upstashRestActive = false;
+    }
   }
 
   const totalLookups = metrics.hits + metrics.misses;
-  const hitRatio = totalLookups > 0 ? ((metrics.hits / totalLookups) * 100).toFixed(1) + '%' : '100%';
+  const hitRatioPercent =
+    totalLookups > 0 ? parseFloat(((metrics.hits / totalLookups) * 100).toFixed(2)) : 100;
+
+  const mode = isRedisConnected ? 'redis_tls' : upstashRestActive ? 'upstash_rest' : 'in_memory';
+  const status = isRedisConnected
+    ? 'connected'
+    : upstashRestActive
+      ? 'rest_connected'
+      : 'memory_fallback';
 
   return {
     status,
     mode,
-    latencyMs: latency,
-    memoryEntries: memoryCache.size,
-    inFlightRequests: inFlightRequests.size,
-    metrics: {
-      hits: metrics.hits,
-      misses: metrics.misses,
-      hitRatio,
-      singleFlightSaves: metrics.singleFlightSaves,
-      errors: metrics.errors,
-    },
-  };
-}
-
-/**
- * Generates SEO-optimized HTTP Cache Headers for CDN Edges & Browsers
- */
-export function getSeoCacheHeaders(
-  sMaxAge: number = 60,
-  staleWhileRevalidate: number = 300
-): Record<string, string> {
-  return {
-    'Cache-Control': `public, s-maxage=${sMaxAge}, stale-while-revalidate=${staleWhileRevalidate}`,
-    'CDN-Cache-Control': `public, s-maxage=${sMaxAge}`,
-    Vary: 'Accept-Encoding',
+    redisConnected: isRedisConnected,
+    upstashRestActive,
+    latencyMs: livePingMs,
+    memoryEntriesCount: memoryCache.size,
+    metrics: { ...metrics },
+    hitRatioPercent,
   };
 }
