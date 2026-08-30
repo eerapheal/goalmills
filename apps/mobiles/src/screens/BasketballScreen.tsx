@@ -157,7 +157,7 @@ export default function BasketballScreen() {
       {/* Search Header */}
       <View style={styles.header}>
         <View style={styles.searchBox}>
-          <Ionicons name="search-outline" size={18} color="#64748B" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={16} color="#64748B" style={styles.searchIcon} />
           <TextInput
             placeholder="Search teams or leagues..."
             placeholderTextColor="#64748B"
@@ -167,13 +167,13 @@ export default function BasketballScreen() {
           />
           {searchQuery.length > 0 && (
             <Pressable onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color="#64748B" />
+              <Ionicons name="close-circle" size={16} color="#64748B" />
             </Pressable>
           )}
         </View>
 
         <Pressable style={styles.refreshBtn} onPress={onRefresh}>
-          <Ionicons name="refresh-outline" size={20} color="#F8FAFC" />
+          <Ionicons name="refresh-outline" size={16} color="#60A5FA" />
         </Pressable>
       </View>
 
@@ -343,33 +343,34 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    gap: SPACING.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 3,
+    gap: 4,
   },
   searchBox: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#141C2B',
-    borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: 10,
-    height: 40,
+    borderRadius: BORDER_RADIUS.sm,
+    paddingHorizontal: 8,
+    height: 32,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   searchIcon: {
-    marginRight: 6,
+    marginRight: 4,
   },
   searchInput: {
     flex: 1,
     color: '#F8FAFC',
-    fontSize: 13,
+    fontSize: 11,
+    paddingVertical: 0,
   },
   refreshBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: BORDER_RADIUS.md,
+    width: 32,
+    height: 32,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: '#1E293B',
     alignItems: 'center',
     justifyContent: 'center',

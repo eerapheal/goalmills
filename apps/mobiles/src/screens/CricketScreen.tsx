@@ -566,7 +566,7 @@ export function CricketScreen() {
           )}
         </View>
         <Pressable style={styles.reloadBtn} onPress={onRefresh}>
-          <Ionicons name="refresh" size={18} color="#F59E0B" />
+          <Ionicons name="refresh" size={16} color="#60A5FA" />
         </Pressable>
       </View>
 
@@ -669,36 +669,36 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.xs,
-    gap: 8,
+    paddingHorizontal: SPACING.sm,
+    paddingTop: 3,
+    paddingBottom: 2,
+    gap: 4,
   },
   searchBar: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#141C2B',
-    borderRadius: BORDER_RADIUS.lg,
-    paddingHorizontal: 12,
-    height: 40,
+    borderRadius: BORDER_RADIUS.sm,
+    paddingHorizontal: 8,
+    height: 32,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   searchIcon: {
-    marginRight: 6,
+    marginRight: 4,
   },
   searchInput: {
     flex: 1,
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
     paddingVertical: 0,
   },
   reloadBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: BORDER_RADIUS.lg,
+    width: 32,
+    height: 32,
+    borderRadius: BORDER_RADIUS.sm,
     backgroundColor: '#141C2B',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
