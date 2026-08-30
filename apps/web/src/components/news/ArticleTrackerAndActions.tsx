@@ -9,6 +9,7 @@ interface ArticleTrackerAndActionsProps {
   article: {
     _id: string;
     title: string;
+    slug?: string;
     excerpt?: string;
     image?: string;
     category?: string;

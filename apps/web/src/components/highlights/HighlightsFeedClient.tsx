@@ -18,6 +18,7 @@ import {
 import { FaFire } from 'react-icons/fa6';
 
 import { getHighlightThumbnail, HIGHLIGHT_CATEGORIES } from '@/lib/videoUtils';
+import { LiveNewsFlashTicker } from '../LiveNewsFlashTicker';
 
 export interface HighlightItem {
   _id: string;
@@ -58,19 +59,17 @@ export default function HighlightsFeedClient({ initialHighlights }: HighlightsFe
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      list = list.filter((h) => {
-        const titleMatch = h.video_title?.toLowerCase().includes(q);
-        const leagueMatch = h.league?.toLowerCase().includes(q);
-        const descMatch = h.video_description?.toLowerCase().includes(q);
-        const catMatch = h.category?.toLowerCase().includes(q);
-        return titleMatch || leagueMatch || descMatch || catMatch;
-      });
+      list = list.filter(
+        (h) =>
+          h.video_title?.toLowerCase().includes(q) ||
+          h.category?.toLowerCase().includes(q) ||
+          h.league?.toLowerCase().includes(q)
+      );
     }
 
     return list;
   }, [highlights, selectedCategory, searchQuery]);
 
-  // Featured Spotlight (either explicitly featured or the first item)
   const spotlightItem = useMemo(() => {
     return highlights.find((h) => h.isFeatured) || highlights[0];
   }, [highlights]);
@@ -81,18 +80,8 @@ export default function HighlightsFeedClient({ initialHighlights }: HighlightsFe
 
   return (
     <div className="space-y-8">
-      {/* ─── LIVE VIDEO PULSE TICKER ─── */}
-      <div className="rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2.5 overflow-hidden shadow-lg flex items-center gap-3">
-        <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          HIGHLIGHTS DESK
-        </span>
-        <div className="overflow-hidden whitespace-nowrap w-full">
-          <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-            🎥 Ultra HD Match Replays • Decisive Premier League & Champions League Goals • NBA Clutch Shots • Cricket Wickets & Sixes Breakdown
-          </p>
-        </div>
-      </div>
+      {/* ─── LIVE FLASH TICKER ─── */}
+      <LiveNewsFlashTicker badgeText="VIDEO PULSE" />
 
       {/* Header & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-blue-500/20 pb-6">

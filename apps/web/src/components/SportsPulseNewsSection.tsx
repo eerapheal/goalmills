@@ -215,7 +215,7 @@ export function SportsPulseNewsSection() {
   const videoLink = spotlightVideo.id ? `/highlights/${spotlightVideo.id}` : '/highlights';
 
   return (
-    <section className="relative bg-[#070E1A] py-16 md:py-24 border-t border-blue-500/20 text-white overflow-hidden">
+    <section className="relative bg-[#070E1A] text-white overflow-hidden">
       {/* Ambient Background Gradient Accent */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 rounded-full blur-[160px] pointer-events-none -z-10" />
 
@@ -223,10 +223,6 @@ export function SportsPulseNewsSection() {
         {/* Header with Title & Dynamic Filter Pills */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider mb-3 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              Editorial & Video Spotlight
-            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               The Sports{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">

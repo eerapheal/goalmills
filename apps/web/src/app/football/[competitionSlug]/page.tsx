@@ -14,6 +14,7 @@ import { FootballTopScorers } from '@/components/FootballTopScorers';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { FiCalendar, FiUsers, FiAward, FiShield, FiTrendingUp } from 'react-icons/fi';
 import { BlogPost, FootballStanding, FootballTopscorer } from '@goalmills/types';
+import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,7 +59,7 @@ export default async function CompetitionHubPage({
           { tags: { $in: [comp.name, comp.slug] } },
         ],
       })
-        .sort({ isBreaking: -1, createdAt: -1 })
+        .sort({ isBreaking: -1, views: -1, createdAt: -1 })
         .limit(6)
         .lean(),
       News.find({
@@ -109,18 +110,21 @@ export default async function CompetitionHubPage({
         { name: comp.name, url: `/football/${comp.slug}` },
       ]}
       header={
-        <EntityHeader
-          type="competition"
-          title={comp.name}
-          subtitle={comp.description}
-          image={comp.logo}
-          parentEntity={{ name: 'Football Hub', url: '/football' }}
-          badges={[
-            { label: 'Season', value: comp.season, icon: <FiCalendar /> },
-            { label: 'Country / Region', value: comp.country, icon: <FiAward /> },
-            { label: 'Registered Clubs', value: clubs.length || 20, icon: <FiUsers /> },
-          ]}
-        />
+        <div className="space-y-4">
+          <LiveNewsFlashTicker sport="football" badgeText={`${comp.name.toUpperCase()} WIRE`} />
+          <EntityHeader
+            type="competition"
+            title={comp.name}
+            subtitle={comp.description}
+            image={comp.logo}
+            parentEntity={{ name: 'Football Hub', url: '/football' }}
+            badges={[
+              { label: 'Season', value: comp.season, icon: <FiCalendar /> },
+              { label: 'Country / Region', value: comp.country, icon: <FiAward /> },
+              { label: 'Registered Clubs', value: clubs.length || 20, icon: <FiUsers /> },
+            ]}
+          />
+        </div>
       }
       sidebar={
         <div className="space-y-6">

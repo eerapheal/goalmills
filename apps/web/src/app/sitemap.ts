@@ -3,6 +3,8 @@ import dbConnect from '@/lib/db';
 import News from '@/models/News';
 import Video from '@/models/Video';
 
+import { slugify } from '@/lib/slugUtils';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
 
@@ -29,17 +31,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       status: 'published',
       isDeleted: { $ne: true },
     })
-      .select('_id updatedAt')
+      .select('_id title slug updatedAt')
       .sort({ updatedAt: -1 })
       .limit(1000)
       .lean();
 
-    const newsRoutes: MetadataRoute.Sitemap = newsArticles.map((article: any) => ({
-      url: `${baseUrl}/news/${article._id}`,
-      lastModified: article.updatedAt ? new Date(article.updatedAt) : new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    }));
+    const newsRoutes: MetadataRoute.Sitemap = newsArticles.map((article: any) => {
+      const slug = article.slug || (article.title ? slugify(article.title) : '') || article._id.toString();
+      return {
+        url: `${baseUrl}/news/${slug}`,
+        lastModified: article.updatedAt ? new Date(article.updatedAt) : new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      };
+    });
 
     // Fetch published video highlights
     const videos = await Video.find({

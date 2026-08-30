@@ -18,6 +18,7 @@ import {
   FiMail,
 } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
+import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,96 +77,7 @@ export default async function FootballHubPage() {
   return (
     <ContentHubLayout
       breadcrumbs={[{ name: 'Football Hub', url: '/football' }]}
-      header={
-        <div className="space-y-4">
-          {/* Live Football Ticker Marquee */}
-          <div className="w-full rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2 overflow-hidden shadow-lg flex items-center gap-3">
-            <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              FOOTBALL WIRE
-            </span>
-            <div className="overflow-hidden whitespace-nowrap w-full">
-              <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                ⚽ UEFA Champions League Knockouts • Premier League Title Race & Fixtures • Real Madrid & Barcelona El Clásico Updates • Transfer Rumours & Confirmed Deals • Real-Time LiveScores
-              </p>
-            </div>
-          </div>
-
-          {/* Hero Banner Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#08142A] via-[#0B1E3E] to-[#060D18] p-6 sm:p-10 shadow-2xl shadow-blue-950/50">
-            <div className="absolute top-0 right-0 w-96 h-64 bg-blue-600/15 blur-3xl pointer-events-none -z-0" />
-            <div className="absolute bottom-0 left-1/3 w-80 h-48 bg-amber-500/10 blur-3xl pointer-events-none -z-0" />
-
-            <div className="relative z-10 max-w-4xl space-y-4">
-              {/* Level 1 Sport Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
-                <span className="text-amber-400">⚽</span>
-                <span>WORLD FOOTBALL SCORES, FIXTURES & NEWS HUB</span>
-              </div>
-
-              {/* Main Headline */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Global Football <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Scores & News</span>
-              </h1>
-
-              {/* Subtitle description */}
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time live scores, European and African league fixtures, match previews, confirmed transfer news, lineups, and team standings.
-              </p>
-
-              {/* Quick Intelligence KPI Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Competitions</span>
-                  <span className="text-lg sm:text-xl font-black text-white">30+ Leagues</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Live Match Stats</span>
-                  <span className="text-lg sm:text-xl font-black text-amber-400">Real-Time</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Transfer News</span>
-                  <span className="text-lg sm:text-xl font-black text-emerald-400">Confirmed</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Match Previews</span>
-                  <span className="text-lg sm:text-xl font-black text-sky-400">Lineups</span>
-                </div>
-              </div>
-
-              {/* Quick Competitions Ribbon */}
-              <div className="pt-3 border-t border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <FiAward className="text-amber-400 text-xs" />
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Popular Leagues & Cups:
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {competitions.map((comp) => (
-                    <Link
-                      key={comp.slug}
-                      href={`/football/${comp.slug}`}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#091529]/80 hover:bg-blue-600/30 border border-blue-500/20 hover:border-amber-400/40 text-xs font-bold text-slate-200 hover:text-white transition-all shadow-md group"
-                    >
-                      {comp.logo && (
-                        <Image
-                          src={comp.logo}
-                          alt={comp.name}
-                          width={18}
-                          height={18}
-                          className="object-contain"
-                        />
-                      )}
-                      <span className="group-hover:text-amber-300 transition-colors">{comp.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
+      header={<LiveNewsFlashTicker sport="football" badgeText="FOOTBALL WIRE" />}
       sidebar={
         <div className="space-y-6">
           {/* Major Competitions Quick Navigator */}
@@ -303,7 +215,7 @@ export default async function FootballHubPage() {
       {featuredArticles.length > 0 && (
         <div className="pt-6 border-t border-white/10">
           <RelatedArticlesMatrix
-            title="Latest Football News & Match Reports"
+            title="Football Reports"
             subtitle="Curated breaking stories, tactical columns, and post-match analysis"
             articles={featuredArticles}
           />
@@ -312,7 +224,7 @@ export default async function FootballHubPage() {
 
       {/* Tactical Analysis Section */}
       {tacticalArticles.length > 0 && (
-        <div className="pt-6 border-t border-white/10">
+        <div className="pt-6 border-t border-white/10 text-md">
           <RelatedArticlesMatrix
             title="Tactical Analysis & Match Previews"
             subtitle="In-depth match previews, pressing systems, and predicted lineups"

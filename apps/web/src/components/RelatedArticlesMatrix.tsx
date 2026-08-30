@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FiClock, FiArrowRight, FiZap } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
+import { getNewsUrl } from '@/lib/slugUtils';
 
 interface RelatedArticlesMatrixProps {
   title?: string;
@@ -42,7 +43,7 @@ export function RelatedArticlesMatrix({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {articles.map((item) => {
           const articleId = item._id;
-          const articleUrl = item.slug ? `/news/${item.slug}` : `/news/${articleId}`;
+          const articleUrl = getNewsUrl(item);
 
           return (
             <Link

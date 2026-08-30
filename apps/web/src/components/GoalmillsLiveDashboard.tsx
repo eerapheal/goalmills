@@ -15,6 +15,7 @@ import {
   FiZap,
 } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 export function GoalmillsLiveDashboard({
   onSelectTab,
@@ -113,6 +114,7 @@ export function GoalmillsLiveDashboard({
             const formatted = items.map((item: any) => ({
               id: item._id || item.id,
               _id: item._id || item.id,
+              slug: item.slug || slugify(item.title) || item._id,
               tag: (item.competition || item.sport || item.category || 'LIVE').toUpperCase(),
               title: item.title,
               time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
@@ -220,7 +222,7 @@ export function GoalmillsLiveDashboard({
   }, [pulseNews.length]);
 
   const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
-  const pulseLink = currentPulse?.id || currentPulse?._id ? `/news/${currentPulse.id || currentPulse._id}` : '/news';
+  const pulseLink = getNewsUrl(currentPulse);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">

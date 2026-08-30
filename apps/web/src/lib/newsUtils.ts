@@ -1,6 +1,7 @@
 export interface RecentlyViewedItem {
   _id: string;
   title: string;
+  slug?: string;
   excerpt?: string;
   image?: string;
   category?: string;
@@ -44,6 +45,7 @@ export const NEWS_FILTER_TABS = [
 export function trackArticleView(article: {
   _id: string;
   title: string;
+  slug?: string;
   excerpt?: string;
   image?: string;
   category?: string;
@@ -60,6 +62,7 @@ export function trackArticleView(article: {
     list.unshift({
       _id: article._id,
       title: article.title,
+      slug: article.slug,
       excerpt: article.excerpt,
       image: article.image,
       category: article.category,

@@ -249,4 +249,29 @@ mark.article-highlight,
   color: #60a5fa !important;
 }
 
+/* ------------------------------------------------------------- */
+/* Live Flash Ticker Continuous Animation & Masking               */
+/* ------------------------------------------------------------- */
+@keyframes marquee-continuous-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
 
+.animate-marquee-continuous {
+  display: inline-flex;
+  width: max-content;
+  animation: marquee-continuous-scroll 40s linear infinite;
+}
+
+.animate-marquee-continuous:hover {
+  animation-play-state: paused;
+}
+
+.mask-gradient {
+  mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+}

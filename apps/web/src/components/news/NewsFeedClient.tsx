@@ -27,6 +27,8 @@ import {
 } from 'react-icons/fi';
 import { GoalmillsLoader } from '../GoalmillsLoader';
 import { FaFire } from 'react-icons/fa6';
+import { LiveNewsFlashTicker } from './LiveNewsFlashTicker';
+import { getNewsUrl } from '@/lib/slugUtils';
 
 interface NewsFeedClientProps {
   initialNews: BlogPost[];
@@ -128,17 +130,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
   return (
     <div className="space-y-8">
       {/* ─── LIVE NEWS FLASH TICKER ─── */}
-      <div className="rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2.5 overflow-hidden shadow-lg flex items-center gap-3">
-        <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          GLOBAL WIRE
-        </span>
-        <div className="overflow-hidden whitespace-nowrap w-full">
-          <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-            ⚡ Breaking Transfer Rumours & Deals • Matchday Previews & Lineups • Premier League, Champions League, NBA & Cricket Updates • Real-Time Sports Coverage
-          </p>
-        </div>
-      </div>
+      <LiveNewsFlashTicker badgeText="GLOBAL WIRE" />
 
       {/* Header & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-blue-500/20 pb-6">
@@ -160,10 +152,10 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
           <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search teams, players, topics..."
+            placeholder="Search all sports news..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#070E1A] border border-blue-500/25 rounded-2xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
+            className="w-full bg-[#0B172B] border border-blue-500/30 rounded-2xl pl-10 pr-10 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all shadow-inner"
           />
           {searchQuery && (
             <button
@@ -176,8 +168,9 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
         </div>
       </div>
 
-      {/* 9+ Professional Filter Tabs */}
-      <div className="space-y-3">
+      {/* Dynamic Controls Bar */}
+      <div className="space-y-4">
+        {/* Main Filter Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {NEWS_FILTER_TABS.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -248,18 +241,14 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
             return (
               <button
                 key={cat._id}
-                onClick={() => setSelectedCategory(cat.name)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition-all ${
+                onClick={() => setSelectedCategory(isSel ? 'All' : cat.slug || cat.name)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   isSel
-                    ? 'border-amber-400 bg-amber-500/15 text-amber-300 shadow-md'
-                    : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-300 hover:text-white hover:border-blue-400/30'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md font-black border border-blue-400'
+                    : 'bg-[#0B172B]/70 text-slate-300 hover:text-white border border-blue-500/15'
                 }`}
               >
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: cat.color || '#3B82F6' }}
-                />
-                <span>{cat.name}</span>
+                {cat.name}
               </button>
             );
           })}
@@ -352,7 +341,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
           {/* Spotlight Hero Article (on default views) */}
           {featuredArticle && activeTab === 'all' && selectedCategory === 'All' && !searchQuery && (
             <Link
-              href={`/news/${featuredArticle._id}`}
+              href={getNewsUrl(featuredArticle)}
               className="group relative block rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#08142A] via-[#0B1E3E] to-[#060D18] overflow-hidden shadow-2xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-blue-900/30"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12">
@@ -424,7 +413,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
             ).map((item) => (
               <Link
                 key={item._id.toString()}
-                href={`/news/${item._id}`}
+                href={getNewsUrl(item)}
                 className="group flex flex-col justify-between rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 hover:bg-[#0E203C] overflow-hidden transition-all duration-300 hover:border-amber-400/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/20"
               >
                 <div>

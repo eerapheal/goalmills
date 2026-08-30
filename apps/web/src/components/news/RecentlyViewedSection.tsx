@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getRecentlyViewedArticles, RecentlyViewedItem } from '@/lib/newsUtils';
+import { getNewsUrl } from '@/lib/slugUtils';
 
 export default function RecentlyViewedSection({ currentId }: { currentId?: string }) {
   const [items, setItems] = useState<RecentlyViewedItem[]>([]);
@@ -31,7 +32,7 @@ export default function RecentlyViewedSection({ currentId }: { currentId?: strin
         {items.map((item) => (
           <Link
             key={item._id}
-            href={`/news/${item._id}`}
+            href={getNewsUrl(item)}
             className="group flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-blue-500/40 transition-all"
           >
             {item.image ? (

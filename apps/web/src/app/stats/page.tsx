@@ -8,6 +8,7 @@ import { FootballTopScorers } from '@/components/FootballTopScorers';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { FiActivity, FiAward, FiBarChart2, FiGlobe, FiShield, FiTrendingUp, FiArrowRight } from 'react-icons/fi';
 import { FootballStanding, FootballTopscorer } from '@goalmills/types';
+import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,17 +47,7 @@ export default async function StatsHubPage() {
       header={
         <div className="space-y-4">
           {/* Live Stats Pulse Marquee */}
-          <div className="w-full rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2.5 overflow-hidden shadow-lg flex items-center gap-3">
-            <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              TABLES & STATS WIRE
-            </span>
-            <div className="overflow-hidden whitespace-nowrap w-full">
-              <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                📊 Premier League & Champions League Standings • Golden Boot Top Scorers • Expected Goals (xG) • Golden Glove Clean Sheets • Real-Time Sports Record Center
-              </p>
-            </div>
-          </div>
+          <LiveNewsFlashTicker badgeText="TABLES & STATS WIRE" />
 
           {/* Hero Banner Card */}
           <div className="relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#08142A] via-[#0B1E3E] to-[#060D18] p-6 sm:p-10 shadow-2xl shadow-blue-950/50">

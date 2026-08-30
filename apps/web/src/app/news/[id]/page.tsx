@@ -93,6 +93,8 @@ function splitContentAtMidpoint(content: string): { firstHalf: string; secondHal
   return { firstHalf: content, secondHalf: '' };
 }
 
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
+
 export async function generateMetadata({
   params,
 }: {
@@ -101,13 +103,27 @@ export async function generateMetadata({
   const { id } = await params;
   await dbConnect();
 
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return { title: 'News Not Found | GoalMills' };
+  const decoded = decodeURIComponent(id);
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
+  const query = isObjectId ? { $or: [{ _id: decoded }, { slug: decoded }] } : { slug: decoded };
+
+  let news: any = await News.findOne(query)
+    .select('title slug excerpt image author createdAt category tags competition')
+    .lean();
+
+  if (!news && !isObjectId) {
+    const slugClean = decoded.replace(/-/g, ' ');
+    news = await News.findOne({
+      $or: [
+        { slug: decoded },
+        { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+        { title: { $regex: new RegExp(slugClean, 'i') } },
+      ],
+    })
+      .select('title slug excerpt image author createdAt category tags competition')
+      .lean();
   }
 
-  const news = await News.findById(id)
-    .select('title excerpt image author createdAt category tags competition')
-    .lean();
   if (!news) return { title: 'News Not Found | GoalMills' };
 
   const title = `${news.title} | GoalMills`;
@@ -118,7 +134,8 @@ export async function generateMetadata({
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
-  const url = `${baseUrl}/news/${id}`;
+  const canonicalSlug = news.slug || (news.title ? slugify(news.title) : '') || news._id.toString();
+  const url = `${baseUrl}/news/${canonicalSlug}`;
 
   return {
     title,
@@ -158,17 +175,30 @@ export async function generateMetadata({
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    notFound();
-  }
-
   await dbConnect();
-  const news: any = await News.findById(id).lean();
+
+  const decoded = decodeURIComponent(id);
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
+  const query = isObjectId ? { $or: [{ _id: decoded }, { slug: decoded }] } : { slug: decoded };
+
+  let news: any = await News.findOne(query).lean();
+
+  if (!news && !isObjectId) {
+    const slugClean = decoded.replace(/-/g, ' ');
+    news = await News.findOne({
+      $or: [
+        { slug: decoded },
+        { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+        { title: { $regex: new RegExp(slugClean, 'i') } },
+      ],
+    }).lean();
+  }
 
   if (!news) {
     notFound();
   }
+
+  const currentDocId = news._id.toString();
 
   const categoryDoc: any = await Category.findOne({
     $or: [{ name: news.category }, { slug: news.categorySlug }],
@@ -179,7 +209,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
   const playerSlugs = Array.isArray(news.players) ? news.players.map((p: any) => p.slug) : [];
 
   let inContentRelated: any[] = await News.find({
-    _id: { $ne: id },
+    _id: { $ne: currentDocId },
     $or: [
       { 'players.slug': { $in: playerSlugs } },
       { 'teams.slug': { $in: teamSlugs } },
@@ -194,7 +224,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     .lean();
 
   if (inContentRelated.length < 3) {
-    const existingIds = [id, ...inContentRelated.map((n: any) => n._id.toString())];
+    const existingIds = [currentDocId, ...inContentRelated.map((n: any) => n._id.toString())];
     const backfill = await News.find({
       _id: { $nin: existingIds },
     })
@@ -204,7 +234,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     inContentRelated = [...inContentRelated, ...backfill];
   }
 
-  const excludedIds = [id, ...inContentRelated.map((n: any) => n._id.toString())];
+  const excludedIds = [currentDocId, ...inContentRelated.map((n: any) => n._id.toString())];
   const moreStories = await News.find({
     _id: { $nin: excludedIds },
   })
@@ -212,7 +242,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     .limit(4)
     .lean();
 
-  const trendingStories = await News.find({ _id: { $ne: id } })
+  const trendingStories = await News.find({ _id: { $ne: currentDocId } })
     .sort({ views: -1, isBreaking: -1, createdAt: -1 })
     .limit(4)
     .lean();
@@ -252,7 +282,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
   breadcrumbItems.push({
     name: news.title,
-    url: `/news/${id}`,
+    url: getNewsUrl(news),
   });
 
   const articleJsonLd = generateArticleSchema({
@@ -266,6 +296,10 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     authorUrl: news.authorSlug ? `/authors/${news.authorSlug}` : undefined,
   });
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
+  const canonicalSlug = news.slug || (news.title ? slugify(news.title) : '') || currentDocId;
+  const articleUrl = `${baseUrl}/news/${canonicalSlug}`;
+
   return (
     <main className="min-h-screen bg-[#070B12] text-white selection:bg-blue-500/30 overflow-x-hidden pt-24 pb-20">
       {/* Schema.org JSON-LD */}
@@ -278,6 +312,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
         article={{
           _id: news._id.toString(),
           title: news.title,
+          slug: news.slug || slugify(news.title),
           excerpt: news.excerpt,
           image: news.image,
           category: news.category,
@@ -349,120 +384,128 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                 }
                 className="group flex items-center gap-3"
               >
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white shadow-lg flex-shrink-0"
-                  style={{ backgroundColor: accentColor }}
-                >
-                  {news.author ? news.author.charAt(0).toUpperCase() : 'G'}
+                <div className="relative h-10 w-10 overflow-hidden rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-sm font-bold text-amber-400">
+                  {news.authorPhoto ? (
+                    <Image
+                      src={news.authorPhoto}
+                      alt={news.author || 'Author'}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span>{(news.author || 'G')[0]}</span>
+                  )}
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors flex items-center gap-1.5">
-                    <span>{news.author || 'GoalMills Staff'}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold">
-                      Author
-                    </span>
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                    <span>{formattedDate}</span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <FiClock size={12} /> {news.readTime || 3} min read
-                    </span>
-                    {typeof news.views === 'number' && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 text-slate-400">
-                          <FiEye size={12} /> {news.views.toLocaleString()} reads
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  <h4 className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">
+                    {news.author || 'GoalMills Staff'}
+                  </h4>
+                  <p className="text-[10px] text-slate-400 capitalize">
+                    {news.authorRole || 'Editorial Columnist'}
+                  </p>
                 </div>
               </Link>
 
-              <div className="hidden sm:block">
-                <ShareButtons
-                  url={`https://goalmills-web.vercel.app/news/${id}`}
-                  title={news.title}
-                />
+              <div className="flex items-center gap-4 text-xs text-slate-400">
+                <span className="flex items-center gap-1">
+                  <FiClock className="text-blue-400" />
+                  <span>{formattedDate}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <FiEye className="text-emerald-400" />
+                  <span>{(news.views || 0) + 1} reads</span>
+                </span>
               </div>
             </div>
 
             {/* Featured Cover Image */}
             {news.image && (
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0E1522] shadow-2xl aspect-[16/9] sm:aspect-[21/9] max-h-[240px] sm:max-h-[460px] w-full max-w-full">
+              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">
                 <Image
                   src={news.image}
                   alt={news.title}
                   fill
                   priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
+                  sizes="(max-width: 1024px) 100vw, 800px"
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                {news.source && (
+                  <div className="absolute bottom-3 right-3 rounded-lg bg-black/60 backdrop-blur-md px-2.5 py-1 text-[10px] text-slate-300 border border-white/10">
+                    Source: {news.source}
+                  </div>
+                )}
               </div>
             )}
 
             {/* Lead Excerpt */}
             {news.excerpt && (
-              <div className="rounded-xl border-l-4 border-blue-500 bg-blue-500/5 p-4 sm:p-5 text-base sm:text-lg font-medium italic text-slate-200 leading-relaxed break-words">
+              <p className="text-base sm:text-lg font-medium text-slate-200 leading-relaxed border-l-4 border-blue-500 pl-4 py-1 italic bg-blue-500/[0.03] rounded-r-xl">
                 {news.excerpt}
-              </div>
+              </p>
             )}
+
+            {/* Mid-Article Share Bar */}
+            <div className="py-2 border-y border-white/10 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Share Article
+              </span>
+              <ShareButtons url={articleUrl} title={news.title} />
+            </div>
 
             {/* Main Article Body */}
             {news.content && (
               <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 sm:p-8 space-y-4 max-w-full overflow-hidden">
                 <div
-                  className="prose prose-invert max-w-full text-slate-100 leading-relaxed text-sm sm:text-base break-words [word-break:break-word]"
-                  dangerouslySetInnerHTML={{ __html: firstHalf || news.content }}
+                  className="prose prose-invert prose-lg max-w-none text-slate-300 leading-relaxed space-y-4
+                    prose-headings:text-white prose-headings:font-black prose-headings:tracking-tight
+                    prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:text-blue-300
+                    prose-h3:text-lg sm:prose-h3:text-xl prose-h3:text-amber-300
+                    prose-p:text-slate-300 prose-p:text-sm sm:prose-p:text-base prose-p:leading-relaxed
+                    prose-strong:text-white prose-strong:font-bold
+                    prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-300
+                    prose-blockquote:border-l-amber-500 prose-blockquote:bg-amber-500/[0.05] prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:text-slate-200
+                    prose-img:rounded-2xl prose-img:border prose-img:border-white/10"
+                  dangerouslySetInnerHTML={{ __html: firstHalf }}
                 />
 
                 {/* In-Article "You May Also Like" */}
                 {inContentRelated.length > 0 && (
-                  <div className="my-5 sm:my-8 rounded-2xl border border-blue-500/20 bg-gradient-to-b from-[#0c162d]/90 via-[#0a1122]/90 to-[#070c18]/95 p-3 sm:p-5 shadow-2xl backdrop-blur-md">
-                    <div className="flex items-center justify-between gap-2 pb-2.5 sm:pb-3.5 mb-3 sm:mb-4 border-b border-white/10">
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg sm:rounded-xl bg-blue-600/30 text-blue-400 text-xs sm:text-sm shadow-inner">
-                          ⚡
-                        </span>
-                        <div>
-                          <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-white">
-                            Related Sports Intelligence
-                          </h3>
-                          <p className="text-[10px] sm:text-[11px] text-slate-400">
-                            Contextual stories linked to this match & entity
-                          </p>
-                        </div>
-                      </div>
+                  <div className="my-8 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-950/40 via-slate-950/60 to-purple-950/30 p-4 sm:p-5 backdrop-blur-md">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/20 text-blue-400 text-xs">
+                        ★
+                      </span>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-blue-300">
+                        Key Tactical & Related Intel
+                      </h4>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
-                      {inContentRelated.map((item: any) => (
+                    <div className="space-y-2.5">
+                      {inContentRelated.map((rel: any) => (
                         <Link
-                          key={item._id.toString()}
-                          href={`/news/${item._id}`}
-                          className="group flex flex-col justify-between rounded-xl border border-white/10 bg-slate-900/80 hover:bg-slate-800/90 p-2 sm:p-3 transition-all duration-300 hover:border-blue-500/50"
+                          key={rel._id.toString()}
+                          href={getNewsUrl(rel)}
+                          className="group flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] hover:bg-blue-500/10 border border-white/5 hover:border-blue-500/30 transition-all"
                         >
-                          <div>
-                            {item.image && (
-                              <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-slate-950 mb-2">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {rel.image && (
+                              <div className="relative h-10 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-slate-900">
                                 <Image
-                                  src={item.image}
-                                  alt={item.title}
+                                  src={rel.image}
+                                  alt={rel.title}
                                   fill
-                                  sizes="250px"
-                                  className="object-cover group-hover:scale-105 transition-transform"
+                                  sizes="56px"
+                                  className="object-cover"
                                 />
                               </div>
                             )}
-                            <span className="text-[9px] font-black uppercase text-blue-400 block mb-1">
-                              {item.category || item.competition || 'News'}
+                            <span className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors line-clamp-1">
+                              {rel.title}
                             </span>
-                            <h4 className="text-xs font-bold text-white line-clamp-2 group-hover:text-blue-400 transition-colors">
-                              {item.title}
-                            </h4>
                           </div>
+                          <FiArrowRight
+                            size={14}
+                            className="text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all flex-shrink-0 ml-2"
+                          />
                         </Link>
                       ))}
                     </div>
@@ -471,7 +514,15 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
                 {secondHalf && (
                   <div
-                    className="prose prose-invert max-w-full text-slate-100 leading-relaxed text-sm sm:text-base break-words [word-break:break-word]"
+                    className="prose prose-invert prose-lg max-w-none text-slate-300 leading-relaxed space-y-4
+                      prose-headings:text-white prose-headings:font-black prose-headings:tracking-tight
+                      prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:text-blue-300
+                      prose-h3:text-lg sm:prose-h3:text-xl prose-h3:text-amber-300
+                      prose-p:text-slate-300 prose-p:text-sm sm:prose-p:text-base prose-p:leading-relaxed
+                      prose-strong:text-white prose-strong:font-bold
+                      prose-a:text-blue-400 prose-a:underline hover:prose-a:text-blue-300
+                      prose-blockquote:border-l-amber-500 prose-blockquote:bg-amber-500/[0.05] prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-xl prose-blockquote:text-slate-200
+                      prose-img:rounded-2xl prose-img:border prose-img:border-white/10"
                     dangerouslySetInnerHTML={{ __html: secondHalf }}
                   />
                 )}
@@ -480,12 +531,13 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
             {/* Related Tags */}
             {Array.isArray(news.tags) && news.tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-white/10">
+              <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-slate-400 font-bold mr-1">Tags:</span>
                 {news.tags.map((tag: string) => (
                   <Link
                     key={tag}
                     href={`/news?search=${encodeURIComponent(tag)}`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white/[0.04] hover:bg-blue-500/15 border border-white/10 hover:border-blue-500/30 text-xs font-semibold text-slate-300 hover:text-white transition-all"
                   >
                     <FiTag size={12} className="text-slate-400" />
                     <span>{tag}</span>
@@ -513,7 +565,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                   {moreStories.map((item: any) => (
                     <Link
                       key={item._id.toString()}
-                      href={`/news/${item._id}`}
+                      href={getNewsUrl(item)}
                       className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] p-4 transition-all hover:border-blue-500/40"
                     >
                       {item.image && (
@@ -547,14 +599,14 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
             )}
 
             <SmartRelatedContent
-              currentId={id}
+              currentId={currentDocId}
               sportSlug={news.sport}
               categorySlug={news.category}
               teamSlug={news.team}
               title="Recommended Tactical & Related Intel"
             />
 
-            <RecentlyViewedSection currentId={id} />
+            <RecentlyViewedSection currentId={currentDocId} />
           </article>
 
           {/* Sidebar */}
@@ -576,7 +628,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                   {trendingStories.map((item: any, idx: number) => (
                     <Link
                       key={item._id.toString()}
-                      href={`/news/${item._id}`}
+                      href={getNewsUrl(item)}
                       className="group flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors"
                     >
                       <span className="text-lg font-black text-slate-600 group-hover:text-blue-400 transition-colors w-5">

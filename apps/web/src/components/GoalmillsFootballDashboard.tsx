@@ -17,6 +17,7 @@ import {
   FiCheckCircle,
 } from 'react-icons/fi';
 import { FootballScreen } from './FootballScreen';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 export function GoalmillsFootballDashboard() {
   const [activeSubTab, setActiveSubTab] = useState<'hub' | 'livescores'>('hub');
@@ -124,6 +125,7 @@ export function GoalmillsFootballDashboard() {
             const formatted = items.map((item: any) => ({
               id: item._id || item.id,
               _id: item._id || item.id,
+              slug: item.slug || slugify(item.title) || item._id,
               tag: (item.competition || item.category || item.tags?.[0] || 'FOOTBALL').toUpperCase(),
               title: item.title,
               time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
@@ -215,7 +217,7 @@ export function GoalmillsFootballDashboard() {
   }, [pulseNews.length]);
 
   const currentItem = pulseNews[tickerIndex] || pulseNews[0];
-  const newsLink = currentItem?.id || currentItem?._id ? `/news/${currentItem.id || currentItem._id}` : '/news';
+  const newsLink = getNewsUrl(currentItem);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">

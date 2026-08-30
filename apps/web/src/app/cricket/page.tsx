@@ -8,6 +8,8 @@ import { CricketScreen } from '@/components/CricketScreen';
 import { FiAward, FiUsers, FiTrendingUp, FiArrowRight, FiActivity, FiMail } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 
+import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
+
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -59,18 +61,8 @@ export default async function CricketHubPage() {
       breadcrumbs={[{ name: 'Cricket Hub', url: '/cricket' }]}
       header={
         <div className="space-y-4">
-          {/* Live Cricket Ticker Marquee */}
-          <div className="w-full rounded-2xl bg-[#09162C] border border-blue-500/25 px-4 py-2 overflow-hidden shadow-lg flex items-center gap-3">
-            <span className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              CRICKET WIRE
-            </span>
-            <div className="overflow-hidden whitespace-nowrap w-full">
-              <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-                🏏 IPL 2026 Auction & Squad News • ICC World Test Championship Standings • India vs Australia Border-Gavaskar Trophy • BBL Finals & Ball-by-Ball LiveScores
-              </p>
-            </div>
-          </div>
+          {/* Live Cricket Dynamic Flash Ticker */}
+          <LiveNewsFlashTicker sport="cricket" badgeText="CRICKET WIRE" />
 
           {/* Hero Banner Card */}
           <div className="relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#08142A] via-[#0B1E3E] to-[#060D18] p-6 sm:p-10 shadow-2xl shadow-blue-950/50">

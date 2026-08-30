@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FiCompass, FiTrendingUp, FiPlay, FiArrowRight } from 'react-icons/fi';
 import type { RecommendationCandidate, RecommendationContext } from '@goalmills/types';
+import { getNewsUrl } from '@/lib/slugUtils';
 
 interface SmartRelatedContentProps {
   currentId?: string;
@@ -114,7 +115,7 @@ export function SmartRelatedContent({
         {candidates.map((item) => (
           <Link
             key={item.id}
-            href={item.url || (item.slug ? `/news/${item.slug}` : '#')}
+            href={item.url || getNewsUrl({ id: item.id, slug: item.slug, title: item.title })}
             onClick={() => handleCandidateClick(item)}
             className="glass-card group rounded-2xl border border-white/10 p-4 bg-slate-950/60 hover:bg-slate-900/90 transition-all duration-300 flex flex-col justify-between hover:border-amber-400/40 hover:-translate-y-1 shadow-lg"
           >

@@ -12,6 +12,8 @@ import { SportsPulseNewsSection } from '../components/SportsPulseNewsSection';
 import { NewsletterSubscriptionSection } from '../components/NewsletterSubscriptionSection';
 import { SponsoredBannersGrid } from '../components/SponsoredBannersGrid';
 
+import { LiveNewsFlashTicker } from '../components/LiveNewsFlashTicker';
+
 export default function HomePage() {
   const [selectedSport, setSelectedSport] = useState<ExtendedSportType>('live');
 
@@ -56,13 +58,20 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#080E18] pt-[80px] sm:pt-[86px] flex flex-col selection:bg-amber-500 selection:text-slate-950">
-      {/* Platform Title Marquee */}
-      <div className="w-full max-w-full px-3 py-1.5 bg-[#0A1422] border-b border-amber-500/20 overflow-hidden whitespace-nowrap">
-        <div className="w-full overflow-hidden">
-          <p className="text-xs text-slate-300 font-medium animate-marquee inline-block">
-            ⚡ GoalMills Live Scores & Sports News • Real-time match scores, football transfer rumours, league standings, video replays, and match predictions • Built for sports fans
-          </p>
-        </div>
+      {/* Dynamic Live News Flash Ticker */}
+      <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-2">
+        <LiveNewsFlashTicker
+          sport={selectedSport === 'live' ? undefined : selectedSport}
+          badgeText={
+            selectedSport === 'football'
+              ? 'FOOTBALL WIRE'
+              : selectedSport === 'cricket'
+                ? 'CRICKET WIRE'
+                : selectedSport === 'basketball'
+                  ? 'HOOPS WIRE'
+                  : 'LIVE WIRE'
+          }
+        />
       </div>
 
       {/* Featured VIP Sponsor Hero Banner Grid (3 Desktop, 2 Tablet, 1 Mobile) */}
