@@ -10,7 +10,7 @@ import { CricketScreen } from '../components/CricketScreen';
 import { BasketballScreen } from '../components/BasketballScreen';
 import { SportsPulseNewsSection } from '../components/SportsPulseNewsSection';
 import { NewsletterSubscriptionSection } from '../components/NewsletterSubscriptionSection';
-import { SponsoredBannerCard } from '../components/SponsoredBannerCard';
+import { SponsoredBannersGrid } from '../components/SponsoredBannersGrid';
 
 export default function HomePage() {
   const [selectedSport, setSelectedSport] = useState<ExtendedSportType>('live');
@@ -65,10 +65,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Featured VIP Sponsor Hero Banner */}
+      {/* Featured VIP Sponsor Hero Banner Grid (3 Desktop, 2 Tablet, 1 Mobile) */}
       <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-3">
-        <SponsoredBannerCard
-          placement="homepage_hero"
+        <SponsoredBannersGrid
           sport={selectedSport === 'live' ? 'all' : selectedSport}
         />
       </div>
