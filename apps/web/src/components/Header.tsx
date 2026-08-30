@@ -10,15 +10,13 @@ import { FiSearch, FiMenu, FiX, FiActivity } from 'react-icons/fi';
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    setMounted(true);
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -36,10 +34,8 @@ export function Header() {
     { name: 'Tables', href: '/stats' },
   ];
 
-  if (!mounted) return null;
-
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-6 py-2">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-6 py-2 ${scrolled ? 'bg-slate-950/80 backdrop-blur-md shadow-md' : ''}`}>
       <div className="max-w-[1400px] mx-auto">
         <nav className="rounded-xl border border-blue-500/30 bg-[#0C1726]/95 backdrop-blur-xl px-3 sm:px-4 py-2 shadow-lg flex items-center justify-between">
           {/* Brand Logo & Subtitle */}

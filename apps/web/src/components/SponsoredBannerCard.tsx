@@ -63,7 +63,8 @@ export function SponsoredBannerCard({
   className = '',
   accentBadge,
 }: SponsoredBannerProps) {
-  const [sponsorships, setSponsorships] = useState<any[]>([]);
+  const fallbackSponsor = DEFAULT_FALLBACKS[campaignOffset % DEFAULT_FALLBACKS.length];
+  const [sponsorships, setSponsorships] = useState<any[]>([fallbackSponsor]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -83,14 +84,12 @@ export function SponsoredBannerCard({
           setSponsorships(data.sponsorships);
           setCurrentIndex(offsetIndex);
         } else if (isMounted) {
-          const fallback = DEFAULT_FALLBACKS[campaignOffset % DEFAULT_FALLBACKS.length];
-          setSponsorships([fallback]);
+          setSponsorships([fallbackSponsor]);
           setCurrentIndex(0);
         }
       } catch {
         if (isMounted) {
-          const fallback = DEFAULT_FALLBACKS[campaignOffset % DEFAULT_FALLBACKS.length];
-          setSponsorships([fallback]);
+          setSponsorships([fallbackSponsor]);
           setCurrentIndex(0);
         }
       }
@@ -100,9 +99,9 @@ export function SponsoredBannerCard({
     return () => {
       isMounted = false;
     };
-  }, [placement, sport, category, campaignOffset]);
+  }, [placement, sport, category, campaignOffset, fallbackSponsor]);
 
-  const currentSponsor = sponsorships[currentIndex] || DEFAULT_FALLBACKS[campaignOffset % DEFAULT_FALLBACKS.length];
+  const currentSponsor = sponsorships[currentIndex] || fallbackSponsor;
 
   // Track impressions per active campaign
   useEffect(() => {
@@ -148,7 +147,7 @@ export function SponsoredBannerCard({
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className={`group relative overflow-hidden rounded-xl border border-amber-500/35 bg-[#091529] p-3 sm:p-3.5 shadow-lg transition-all duration-300 hover:border-amber-400/60 hover:shadow-amber-500/15 flex flex-col justify-between h-full ${className}`}
+      className={`group relative overflow-hidden rounded-xl border border-amber-500/35 bg-[#091529] p-3 sm:p-3.5 shadow-lg transition-all duration-300 hover:border-amber-400/60 hover:shadow-amber-500/15 flex flex-col justify-between h-full min-h-[148px] sm:min-h-[152px] ${className}`}
     >
       {/* ─── VIBRANT HIGH-VISIBILITY BACKGROUND IMAGE WITH SOFT GRADIENT ─── */}
       {bgImage && (
@@ -157,6 +156,7 @@ export function SponsoredBannerCard({
             src={bgImage}
             alt=""
             aria-hidden="true"
+            loading="eager"
             className="h-full w-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-700 opacity-65 sm:opacity-75 group-hover:opacity-85"
           />
           {/* Balanced High-Contrast Gradient: Clear sports visuals with protected text readability */}
@@ -170,8 +170,8 @@ export function SponsoredBannerCard({
 
       {/* ─── TOP CONTENT SECTION (COMPACT FLEX-COL) ─── */}
       <div className="relative z-10 flex flex-col min-w-0">
-        {/* Badge & Sponsor Header Row */}
-        <div className="flex items-center justify-between gap-1.5 mb-1.5">
+        {/* Badge & Sponsor Header Row (Locked height to prevent layout shift) */}
+        <div className="flex items-center justify-between gap-1.5 mb-1.5 min-h-[26px]">
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">
             <span className="px-1.5 py-0.5 rounded bg-amber-500/30 border border-amber-400/50 text-[8.5px] font-black uppercase tracking-wider text-amber-300 leading-none shadow-sm drop-shadow">
               {accentBadge || currentSponsor.badgeText || 'SPONSORED'}
@@ -181,25 +181,27 @@ export function SponsoredBannerCard({
             </span>
           </div>
 
-          {/* Carousel Arrows if multiple sponsors */}
-          {sponsorships.length > 1 && (
-            <div className="flex items-center gap-0.5 bg-slate-950/85 border border-white/20 rounded-lg p-0.5 shadow flex-shrink-0">
-              <button
-                onClick={handlePrev}
-                aria-label="Previous Sponsor"
-                className="w-6 h-6 rounded hover:bg-white/15 text-slate-200 hover:text-white transition flex items-center justify-center"
-              >
-                <FiChevronLeft className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={handleNext}
-                aria-label="Next Sponsor"
-                className="w-6 h-6 rounded hover:bg-white/15 text-slate-200 hover:text-white transition flex items-center justify-center"
-              >
-                <FiChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
+          {/* Carousel Arrows (Zero-shift container) */}
+          <div className="flex items-center justify-end flex-shrink-0 min-h-[24px]">
+            {sponsorships.length > 1 && (
+              <div className="flex items-center gap-0.5 bg-slate-950/85 border border-white/20 rounded-lg p-0.5 shadow flex-shrink-0">
+                <button
+                  onClick={handlePrev}
+                  aria-label="Previous Sponsor"
+                  className="w-6 h-6 rounded hover:bg-white/15 text-slate-200 hover:text-white transition flex items-center justify-center"
+                >
+                  <FiChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  aria-label="Next Sponsor"
+                  className="w-6 h-6 rounded hover:bg-white/15 text-slate-200 hover:text-white transition flex items-center justify-center"
+                >
+                  <FiChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Headline & Description Body */}
@@ -228,16 +230,16 @@ export function SponsoredBannerCard({
           <FiExternalLink className="w-3 h-3" />
         </a>
 
-        {/* Indicator dots with accessible touch targets */}
-        {sponsorships.length > 1 && (
-          <div className="flex items-center justify-between pt-0.5">
-            <div className="flex items-center">
-              {sponsorships.map((_, idx) => (
+        {/* Indicator dots / partner banner (Fixed height container to eliminate CLS) */}
+        <div className="flex items-center justify-between min-h-[20px] pt-0.5">
+          <div className="flex items-center min-h-[20px]">
+            {sponsorships.length > 1 ? (
+              sponsorships.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
                   aria-label={`Go to sponsor ${idx + 1}`}
-                  className="min-w-[28px] min-h-[20px] p-1 flex items-center justify-center focus:outline-none"
+                  className="min-w-[24px] min-h-[20px] p-0.5 flex items-center justify-center focus:outline-none"
                 >
                   <span
                     className={`h-1.5 rounded-full transition-all duration-300 block ${
@@ -247,13 +249,15 @@ export function SponsoredBannerCard({
                     }`}
                   />
                 </button>
-              ))}
-            </div>
-            <span className="text-[8.5px] text-slate-300 font-semibold tracking-wide uppercase drop-shadow">
-              Official Partner
-            </span>
+              ))
+            ) : (
+              <span className="w-2 h-1 rounded-full bg-amber-400/80 inline-block ml-0.5" />
+            )}
           </div>
-        )}
+          <span className="text-[8.5px] text-slate-300 font-semibold tracking-wide uppercase drop-shadow">
+            Official Partner
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { ToastProvider } from '../components/Toast';
 import { Footer } from '../components/Footer';
 import RealtimeListener from '../components/RealtimeListener';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://goalmills.com'),

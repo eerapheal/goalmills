@@ -66,7 +66,7 @@ export default function HomePage() {
       </div>
 
       {/* Featured VIP Sponsor Hero Banner Grid (3 Desktop, 2 Tablet, 1 Mobile) */}
-      <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-2.5 min-h-[140px]">
+      <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-2.5 min-h-[148px] sm:min-h-[152px]">
         <SponsoredBannersGrid
           sport={selectedSport === 'live' ? 'all' : selectedSport}
         />
