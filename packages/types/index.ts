@@ -1,11 +1,62 @@
 export type UserRole = 'user' | 'contributor' | 'staff' | 'editor' | 'manager' | 'super-admin';
 
+// ---------------------------------------------------------------------------
+// Multi-Tenant Architecture Types
+// ---------------------------------------------------------------------------
+export type TenantStatus = 'active' | 'suspended' | 'trial' | 'cancelled';
+export type TenantPlan = 'free' | 'creator' | 'publisher' | 'enterprise';
+
+export interface TenantSettings {
+  brandName?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  primaryColor?: string;
+  accentColor?: string;
+  defaultSport?: string;
+  supportedSports?: string[];
+  contactEmail?: string;
+}
+
+export interface TenantFeatureFlag {
+  newsletter: boolean;
+  videoHighlights: boolean;
+  advancedAds: boolean;
+  customDomain: boolean;
+  apiAccess: boolean;
+  customThemes: boolean;
+  sportsPredictions: boolean;
+}
+
+export interface Tenant {
+  _id: string;
+  name: string;
+  slug: string;
+  status: TenantStatus;
+  plan: TenantPlan;
+  customDomain?: string;
+  settings?: TenantSettings;
+  features?: TenantFeatureFlag;
+  ownerId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TenantContext {
+  tenantId: string;
+  tenantSlug: string;
+  tenant?: Tenant | null;
+  isSuperAdmin: boolean;
+  isDefaultTenant: boolean;
+}
+
 export interface AuthorProfile {
   id?: string;
   name: string;
   slug: string;
   email?: string;
   role: UserRole;
+  tenantId?: string;
+  tenantSlug?: string;
   image?: string;
   bio?: string;
   specialization?: string[];
@@ -22,6 +73,8 @@ export interface User {
   username: string;
   email: string;
   role: UserRole;
+  tenantId?: string;
+  tenantSlug?: string;
   image?: string;
   bio?: string;
   specialization?: string[];
