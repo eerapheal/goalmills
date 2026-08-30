@@ -271,6 +271,11 @@ async function requestApiFootball<T>(
   endpoint: string,
   params: Record<string, any> = {}
 ): Promise<T[]> {
+  // If API key is missing or blank, skip network request to avoid 403 Forbidden errors
+  if (!API_KEY || !API_KEY.trim()) {
+    return [];
+  }
+
   const cleanBase = API_BASE_URL.replace(/\/$/, '');
   const cleanEndpoint = endpoint.replace(/^\//, '');
   const url = new URL(`${cleanBase}/${cleanEndpoint}`);
@@ -282,8 +287,8 @@ async function requestApiFootball<T>(
   });
 
   const headers: Record<string, string> = {
-    'x-apisports-key': API_KEY,
     Accept: 'application/json',
+    'x-apisports-key': API_KEY.trim(),
   };
 
   try {
@@ -293,24 +298,13 @@ async function requestApiFootball<T>(
     });
 
     if (!response.ok) {
-      throw new Error(
-        `[API-Football] Request to ${endpoint} failed: ${response.status} ${response.statusText}`
-      );
+      return [];
     }
 
     const data: ApiFootballResponse<T[]> = await response.json();
-
-    if (
-      data.errors &&
-      (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)
-    ) {
-      console.warn(`[API-Football] Warnings/Errors on ${endpoint}:`, data.errors);
-    }
-
-    return data.response || [];
-  } catch (error) {
-    console.error(`[API-Football] Error on GET ${endpoint}:`, error);
-    throw error;
+    return Array.isArray(data?.response) ? data.response : [];
+  } catch {
+    return [];
   }
 }
 

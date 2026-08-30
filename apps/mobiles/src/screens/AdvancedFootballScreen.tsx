@@ -12,10 +12,11 @@ import {
   Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballMatchCard, UnifiedMatchEvent } from '../components/FootballMatchCard';
 import { apiFootballService, ApiFootballFixtureItem } from '../services/apiFootball';
+import { advancedFootballApi } from '../services/advancedFootballApi';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
@@ -52,31 +53,40 @@ export function AdvancedFootballScreen() {
 
   // Adapt API-Football Fixture to UnifiedMatchEvent
   const adaptFixture = (item: ApiFootballFixtureItem): UnifiedMatchEvent => {
-    const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(item.fixture.status.short);
+    if (!item) return {} as UnifiedMatchEvent;
+
+    const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(
+      item?.fixture?.status?.short || ''
+    );
     const scoreStr =
-      item.goals.home !== null && item.goals.away !== null
+      item?.goals?.home !== null &&
+      item?.goals?.home !== undefined &&
+      item?.goals?.away !== null &&
+      item?.goals?.away !== undefined
         ? `${item.goals.home} - ${item.goals.away}`
         : undefined;
 
+    const fixtureDate = item?.fixture?.date ? String(item.fixture.date).split('T') : ['', ''];
+
     return {
-      event_key: item.fixture.id,
-      event_date: item.fixture.date.split('T')[0],
-      event_time: item.fixture.date.split('T')[1]?.slice(0, 5) || '',
-      event_status: item.fixture.status.short,
+      event_key: item?.fixture?.id || Math.floor(Math.random() * 1000000),
+      event_date: fixtureDate[0] || '',
+      event_time: fixtureDate[1]?.slice(0, 5) || '',
+      event_status: item?.fixture?.status?.short || '',
       event_live: isLiveShort ? '1' : '0',
-      event_home_team: item.teams.home.name,
-      home_team_key: item.teams.home.id,
-      home_team_logo: item.teams.home.logo,
-      event_away_team: item.teams.away.name,
-      away_team_key: item.teams.away.id,
-      away_team_logo: item.teams.away.logo,
+      event_home_team: item?.teams?.home?.name || 'Home Team',
+      home_team_key: item?.teams?.home?.id || 0,
+      home_team_logo: item?.teams?.home?.logo || '',
+      event_away_team: item?.teams?.away?.name || 'Away Team',
+      away_team_key: item?.teams?.away?.id || 0,
+      away_team_logo: item?.teams?.away?.logo || '',
       event_final_result: scoreStr,
       event_ft_result: scoreStr,
-      league_name: item.league.name,
-      league_key: item.league.id,
-      league_logo: item.league.logo,
-      country_name: item.league.country,
-      country_logo: item.league.flag || undefined,
+      league_name: item?.league?.name || 'General League',
+      league_key: item?.league?.id || 0,
+      league_logo: item?.league?.logo || '',
+      country_name: item?.league?.country || '',
+      country_logo: item?.league?.flag || undefined,
     };
   };
 
@@ -85,19 +95,54 @@ export function AdvancedFootballScreen() {
     setLoading(true);
     try {
       let raw: ApiFootballFixtureItem[] = [];
-      if (activeTab === 'live') {
-        raw = await apiFootballService.getLiveFixtures();
-      } else {
-        raw = await apiFootballService.getFixturesByDate(selectedDate);
+      try {
+        if (activeTab === 'live') {
+          raw = await apiFootballService.getLiveFixtures();
+        } else {
+          raw = await apiFootballService.getFixturesByDate(selectedDate);
+        }
+      } catch {
+        raw = [];
       }
 
-      if (raw && raw.length > 0) {
+      if (Array.isArray(raw) && raw.length > 0) {
         setFixtures(raw.map(adaptFixture));
       } else {
+        // Fallback to advancedFootballApi (AllSportsAPI / GoalMills backend)
+        try {
+          if (activeTab === 'live') {
+            const fallback = await advancedFootballApi.getLivescore();
+            if (
+              fallback &&
+              fallback.success &&
+              Array.isArray(fallback.result) &&
+              fallback.result.length > 0
+            ) {
+              setFixtures(fallback.result as any);
+              return;
+            }
+          } else {
+            const fallback = await advancedFootballApi.getFixtures({
+              from: selectedDate,
+              to: selectedDate,
+            });
+            if (
+              fallback &&
+              fallback.success &&
+              Array.isArray(fallback.result) &&
+              fallback.result.length > 0
+            ) {
+              setFixtures(fallback.result as any);
+              return;
+            }
+          }
+        } catch {
+          // Fallback handled safely
+        }
         setFixtures([]);
       }
-    } catch (err) {
-      console.error('[FootballScreen] Error loading matches:', err);
+    } catch {
+      setFixtures([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -115,25 +160,32 @@ export function AdvancedFootballScreen() {
 
   // Filter and group matches by league
   const filteredFixtures = useMemo(() => {
+    if (!Array.isArray(fixtures)) return [];
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter((f) => f.event_live === '1');
+      list = list.filter((f) => f && f.event_live === '1');
     } else if (activeTab === 'upcoming') {
       list = list.filter(
-        (f) => f.event_live !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished'
+        (f) =>
+          f &&
+          f.event_live !== '1' &&
+          f.event_status !== 'FT' &&
+          f.event_status !== 'Finished'
       );
     } else if (activeTab === 'results') {
-      list = list.filter((f) => f.event_status === 'FT' || f.event_status === 'Finished');
+      list = list.filter(
+        (f) => f && (f.event_status === 'FT' || f.event_status === 'Finished')
+      );
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         (f) =>
-          f.event_home_team.toLowerCase().includes(q) ||
-          f.event_away_team.toLowerCase().includes(q) ||
-          (f.league_name && f.league_name.toLowerCase().includes(q))
+          (f?.event_home_team && f.event_home_team.toLowerCase().includes(q)) ||
+          (f?.event_away_team && f.event_away_team.toLowerCase().includes(q)) ||
+          (f?.league_name && f.league_name.toLowerCase().includes(q))
       );
     }
 

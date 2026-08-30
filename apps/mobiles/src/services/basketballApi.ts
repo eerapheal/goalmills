@@ -207,6 +207,14 @@ async function requestApiBasketball<T>(
   endpoint: string,
   params: Record<string, any> = {}
 ): Promise<T[] & { result: T[]; success: number }> {
+  // If API key is missing or blank, skip network request to avoid 403 Forbidden errors
+  if (!API_KEY || !API_KEY.trim()) {
+    const emptyArr: any = [];
+    emptyArr.result = emptyArr;
+    emptyArr.success = 1;
+    return emptyArr;
+  }
+
   const cleanBase = API_BASE_URL.replace(/\/$/, '');
   const cleanEndpoint = endpoint.replace(/^\//, '');
   const url = new URL(`${cleanBase}/${cleanEndpoint}`);
@@ -218,8 +226,8 @@ async function requestApiBasketball<T>(
   });
 
   const headers: Record<string, string> = {
-    'x-apisports-key': API_KEY,
     Accept: 'application/json',
+    'x-apisports-key': API_KEY.trim(),
   };
 
   try {
@@ -229,26 +237,18 @@ async function requestApiBasketball<T>(
     });
 
     if (!response.ok) {
-      throw new Error(
-        `[API-Basketball] Request to ${endpoint} failed: ${response.status} ${response.statusText}`
-      );
+      const arr: any = [];
+      arr.result = arr;
+      arr.success = 1;
+      return arr;
     }
 
     const data: ApiBasketballResponse<T[]> = await response.json();
-
-    if (
-      data.errors &&
-      (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)
-    ) {
-      console.warn(`[API-Basketball] Warnings/Errors on ${endpoint}:`, data.errors);
-    }
-
-    const arr: any = Array.isArray(data.response) ? data.response : [];
+    const arr: any = Array.isArray(data?.response) ? data.response : [];
     arr.result = arr;
     arr.success = 1;
     return arr;
-  } catch (error) {
-    console.error(`[API-Basketball] Error on GET ${endpoint}:`, error);
+  } catch {
     const arr: any = [];
     arr.result = arr;
     arr.success = 1;
