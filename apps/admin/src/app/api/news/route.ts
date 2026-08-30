@@ -10,10 +10,13 @@ import Category from '@/models/Category';
 import EcosystemEntity from '@/models/EcosystemEntity';
 import { hasPermission, canDirectPublish } from '@/lib/rbac';
 import { UserRole } from '@goalmills/types';
+import { resolveTenantContext, buildTenantFilter } from '@/lib/tenantContext';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const session = (await getServerSession(authOptions)) as any;
+  const tenantContext = await resolveTenantContext(request, session);
   const { searchParams } = new URL(request.url);
   const isAdminRequest = searchParams.get('admin') === 'true';
   const filterType = searchParams.get('filter'); // 'trending', 'breaking', 'transfers', 'analysis', 'popular', 'featured', 'team', etc.
@@ -32,7 +35,7 @@ export async function GET(request: NextRequest) {
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
 
   // Check Redis/Memory cache for public queries
-  const cacheKey = `cache:news:list:${filterType || 'all'}:${categoryParam || 'all'}:${sportParam || 'all'}:${competitionParam || 'all'}:${team || ''}:${player || ''}:${articleType || ''}:${authorParam || ''}:${search || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
+  const cacheKey = `cache:news:list:${tenantContext.tenantSlug}:${filterType || 'all'}:${categoryParam || 'all'}:${sportParam || 'all'}:${competitionParam || 'all'}:${team || ''}:${player || ''}:${articleType || ''}:${authorParam || ''}:${search || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
 
   if (!isAdminRequest) {
     const cached = await cacheGet(cacheKey);
@@ -46,11 +49,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const session = (await getServerSession(authOptions)) as any;
-
   await dbConnect();
   try {
-    const query: any = {};
+    const tenantFilter = buildTenantFilter(tenantContext);
+    const query: any = { ...tenantFilter };
 
     // If it's an admin request, enforce role-based filtering
     if (isAdminRequest) {
@@ -237,6 +239,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const tenantContext = await resolveTenantContext(request, session);
+
   await dbConnect();
   try {
     const body = await request.json();
@@ -261,6 +265,7 @@ export async function POST(request: NextRequest) {
       isBreaking,
       isFeatured,
       status: requestedStatus,
+      tenantId: customTenantId,
     } = body;
 
     const userRole = session.user.role as UserRole;
@@ -295,7 +300,13 @@ export async function POST(request: NextRequest) {
       .trim()
       .replace(/[^a-z0-9]+/g, '-');
 
+    const effectiveTenantId =
+      tenantContext.isSuperAdmin && customTenantId
+        ? customTenantId
+        : tenantContext.tenantId;
+
     const news = await News.create({
+      tenantId: effectiveTenantId,
       title,
       excerpt,
       content,

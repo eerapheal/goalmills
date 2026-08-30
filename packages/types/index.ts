@@ -49,6 +49,32 @@ export interface TenantContext {
   isDefaultTenant: boolean;
 }
 
+export interface Sponsorship {
+  _id?: string;
+  title: string;
+  sponsorName: string;
+  sponsorLogo?: string;
+  type?: 'banner' | 'match_card' | 'article_header' | 'affiliate_link' | 'newsletter_sponsor';
+  placement?: 'homepage_hero' | 'sports_pulse' | 'match_details' | 'newsletter_footer' | 'global_sidebar' | string;
+  targetUrl: string;
+  imageUrl?: string;
+  tagline?: string;
+  ctaText?: string;
+  sportSlug?: 'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string;
+  badgeText?: string;
+  status?: 'active' | 'paused' | 'expired' | 'draft' | 'trash';
+  startDate?: string | Date;
+  endDate?: string | Date;
+  impressions?: number;
+  clicks?: number;
+  priority?: number;
+  budget?: number;
+  tenantId?: string;
+  tenantSlug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthorProfile {
   id?: string;
   name: string;

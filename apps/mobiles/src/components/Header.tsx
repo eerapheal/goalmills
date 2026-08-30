@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { goalmillsApi, TenantConfig } from '../services/goalmillsApi';
 
 export function Header() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [tenantConfig, setTenantConfig] = useState<TenantConfig | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    goalmillsApi.getTenantConfig().then((cfg) => {
+      if (mounted && cfg) setTenantConfig(cfg);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const topPadding = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 28) + 4;
+  const brandName = tenantConfig?.settings?.brandName || 'GoalMills';
+  const primaryColor = tenantConfig?.settings?.primaryColor || '#3B82F6';
+  const accentColor = tenantConfig?.settings?.accentColor || '#6366F1';
 
   return (
     <View style={[styles.outerContainer, { paddingTop: topPadding }]}>
@@ -19,12 +34,12 @@ export function Header() {
           style={styles.brandContainer}
           onPress={() => router.push('/(tabs)/home')}
           activeOpacity={0.85}
-          accessibilityLabel="GoalMills Home"
+          accessibilityLabel={`${brandName} Home`}
           accessibilityRole="button"
         >
           {/* Logo Frame with Gradient Border */}
           <LinearGradient
-            colors={['#3B82F6', '#6366F1']}
+            colors={[primaryColor, accentColor]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.logoGradientBorder}
@@ -41,8 +56,14 @@ export function Header() {
           {/* Brand Typography & Subtitle */}
           <View style={styles.brandTextContainer}>
             <View style={styles.brandTitleRow}>
-              <Text style={styles.brandGoal}>GOAL</Text>
-              <Text style={styles.brandMills}>MILLS</Text>
+              {brandName.toLowerCase() === 'goalmills' ? (
+                <>
+                  <Text style={styles.brandGoal}>GOAL</Text>
+                  <Text style={styles.brandMills}>MILLS</Text>
+                </>
+              ) : (
+                <Text style={[styles.brandMills, { color: primaryColor }]}>{brandName}</Text>
+              )}
             </View>
             <Text style={styles.brandSubtitle}>Live Scores & Sports News</Text>
           </View>

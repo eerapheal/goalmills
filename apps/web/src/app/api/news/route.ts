@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import News from '@/models/News';
 import { cacheGet, cacheSet, getSeoCacheHeaders } from '@/lib/redisCache';
+import { resolveTenantContext, buildTenantFilter } from '@/lib/tenantContext';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const tenantContext = await resolveTenantContext(request);
+  const tenantSlug = tenantContext.tenantSlug;
   const { searchParams } = new URL(request.url);
   const filterType = searchParams.get('filter');
   const categoryParam = searchParams.get('category');
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
   const limitParam = parseInt(searchParams.get('limit') || '0', 10);
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
 
-  const cacheKey = `cache:news:list:${filterType || 'all'}:${categoryParam || 'all'}:${sportParam || 'all'}:${competitionParam || 'all'}:${team || ''}:${player || ''}:${articleType || ''}:${authorParam || ''}:${search || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
+  const cacheKey = `cache:news:list:${tenantSlug}:${filterType || 'all'}:${categoryParam || 'all'}:${sportParam || 'all'}:${competitionParam || 'all'}:${team || ''}:${player || ''}:${articleType || ''}:${authorParam || ''}:${search || ''}:${ids || ''}:${exclude || ''}:${sortParam || 'latest'}:${limitParam}:${pageParam}`;
 
   const cached = await cacheGet(cacheKey);
   if (cached) {
@@ -36,8 +39,10 @@ export async function GET(request: NextRequest) {
 
   await dbConnect();
   try {
+    const tenantFilter = buildTenantFilter(tenantContext);
     const query: any = {
-      $or: [{ status: 'published' }, { status: { $exists: false } }],
+      ...tenantFilter,
+      $and: [{ $or: [{ status: 'published' }, { status: { $exists: false } }] }],
     };
 
     if (exclude) {
