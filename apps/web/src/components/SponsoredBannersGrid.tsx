@@ -14,14 +14,14 @@ export function SponsoredBannersGrid({
   className = '',
 }: SponsoredBannersGridProps) {
   return (
-    <div className={`w-full max-w-[1360px] mx-auto ${className}`}>
+    <div className={`w-full ${className}`}>
       {/* 
         Responsive Layout Rules:
         - Desktop (lg & up): 3 columns (3 banners rendered)
         - Tablet (md to lg): 2 columns (2 banners visible, 3rd hidden)
         - Mobile (base): 1 column (1 banner visible, 2nd & 3rd hidden)
       */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5">
         {/* Banner 1: Always visible on Mobile, Tablet & Desktop (Filter Logic: Homepage Hero & VIP Offers) */}
         <div className="w-full flex">
           <SponsoredBannerCard

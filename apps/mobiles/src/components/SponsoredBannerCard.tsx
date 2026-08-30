@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
-import { goalmillsApi } from '../services/goalmillsApi';
 
 interface SponsoredBannerProps {
   placement?: string;
@@ -10,44 +9,24 @@ interface SponsoredBannerProps {
   category?: string;
 }
 
-const DEFAULT_SPONSOR = {
-  _id: 'default_mobile_sponsor',
-  title: 'GoalMills VIP Match & Fantasy Hub',
-  sponsorName: 'GoalMills Official',
-  badgeText: 'VIP SPONSOR',
-  tagline: 'Instant live scores, detailed statistics & tactical match debriefs with verified xG metrics',
-  ctaText: 'Claim VIP Match Pass',
-  targetUrl: 'https://goalmills.com',
-  imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
-};
-
 export function SponsoredBannerCard({
   placement = 'homepage_hero',
   sport = 'all',
   category = 'vip',
 }: SponsoredBannerProps) {
-  const [sponsorship, setSponsorship] = useState<any | null>(DEFAULT_SPONSOR);
+  const [sponsorship, setSponsorship] = useState<any | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-    async function loadSponsorship() {
-      try {
-        const items = await goalmillsApi.getSponsorships(placement, sport);
-        if (isMounted && items && items.length > 0) {
-          const selected = items[0];
-          setSponsorship(selected);
-          if (selected._id) {
-            goalmillsApi.trackSponsorshipEvent(selected._id, 'impression');
-          }
-        }
-      } catch {
-        if (isMounted) setSponsorship(DEFAULT_SPONSOR);
-      }
-    }
-    loadSponsorship();
-    return () => {
-      isMounted = false;
-    };
+    setSponsorship({
+      _id: 'default_mobile_sponsor',
+      title: 'GoalMills VIP Match & Fantasy Hub',
+      sponsorName: 'GoalMills Official',
+      badgeText: 'VIP SPONSOR',
+      tagline: 'Instant live scores, detailed statistics & tactical match debriefs with verified xG metrics',
+      ctaText: 'Claim VIP Match Pass',
+      targetUrl: 'https://goalmills.com',
+      imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+    });
   }, [placement, sport, category]);
 
   if (!sponsorship) {
@@ -55,11 +34,8 @@ export function SponsoredBannerCard({
   }
 
   const handlePress = () => {
-    if (sponsorship._id) {
-      goalmillsApi.trackSponsorshipEvent(sponsorship._id, 'click');
-    }
     if (sponsorship.targetUrl) {
-      Linking.openURL(sponsorship.targetUrl).catch((err: any) =>
+      Linking.openURL(sponsorship.targetUrl).catch((err) =>
         console.error('Failed to open sponsor URL:', err)
       );
     }
@@ -116,11 +92,11 @@ export function SponsoredBannerCard({
 const styles = StyleSheet.create({
   cardContainer: {
     marginHorizontal: SPACING.md,
-    marginTop: SPACING.xs,
+    marginTop: SPACING.sm,
     marginBottom: SPACING.xs,
-    padding: SPACING.sm,
+    padding: SPACING.md,
     backgroundColor: '#091529',
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
     borderColor: 'rgba(245, 158, 11, 0.35)',
     flexDirection: 'column',
@@ -138,7 +114,7 @@ const styles = StyleSheet.create({
   bgImage: {
     width: '100%',
     height: '100%',
-    opacity: 0.65,
+    opacity: 0.3,
   },
   bgOverlay: {
     position: 'absolute',
@@ -146,54 +122,54 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(7, 14, 26, 0.68)',
+    backgroundColor: 'rgba(7, 14, 26, 0.85)',
   },
   contentCol: {
     zIndex: 1,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.sm,
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    marginBottom: 2,
+    gap: 6,
+    marginBottom: 4,
   },
   badge: {
-    backgroundColor: 'rgba(245, 158, 11, 0.3)',
-    paddingHorizontal: 5,
-    paddingVertical: 1.5,
+    backgroundColor: 'rgba(245, 158, 11, 0.25)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.45)',
+    borderColor: 'rgba(245, 158, 11, 0.4)',
   },
   badgeText: {
     color: '#FBBF24',
-    fontSize: 8.5,
+    fontSize: 9,
     fontWeight: '900',
   },
   sponsorName: {
-    color: '#E2E8F0',
-    fontSize: 10.5,
+    color: '#94A3B8',
+    fontSize: 11,
     fontWeight: '700',
   },
   title: {
     color: '#FFFFFF',
-    fontSize: 12.5,
+    fontSize: 14,
     fontWeight: '900',
-    marginTop: 1,
-    lineHeight: 16,
+    marginTop: 2,
+    lineHeight: 18,
   },
   tagline: {
-    color: '#E2E8F0',
-    fontSize: 10.5,
-    marginTop: 2,
-    lineHeight: 14,
+    color: '#CBD5E1',
+    fontSize: 11,
+    marginTop: 4,
+    lineHeight: 15,
   },
   ctaButton: {
     backgroundColor: '#F59E0B',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     zIndex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -203,17 +179,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 3,
+    elevation: 4,
   },
   ctaText: {
     color: '#0A0E27',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   ctaIcon: {
-    marginLeft: 5,
+    marginLeft: 6,
   },
 });
 

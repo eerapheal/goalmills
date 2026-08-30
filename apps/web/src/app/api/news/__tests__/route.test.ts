@@ -20,15 +20,22 @@ vi.mock('@/lib/db', () => ({
 }));
 
 vi.mock('@/models/News', () => {
+  const queryChain: any = {
+    select: vi.fn().mockReturnThis(),
+    sort: vi.fn().mockReturnThis(),
+    skip: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    lean: vi.fn().mockResolvedValue(mockArticles),
+  };
   return {
     default: {
-      find: vi.fn().mockReturnValue({
+      find: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
         sort: vi.fn().mockReturnThis(),
         skip: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
         lean: vi.fn().mockResolvedValue(mockArticles),
-      }),
+      })),
       countDocuments: vi.fn().mockResolvedValue(1),
     },
   };
