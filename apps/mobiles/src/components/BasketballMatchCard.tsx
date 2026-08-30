@@ -52,7 +52,16 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
       {/* League Header */}
       {!hideLeague && (
         <View style={styles.header}>
-          <View style={styles.leagueInfo}>
+          <Pressable
+            style={styles.leagueInfo}
+            onPress={(e) => {
+              e.stopPropagation();
+              const leagueId = match?.league?.id || match?.league?.name;
+              if (leagueId) {
+                router.push(`/home/basketball/leagues/${String(leagueId)}` as any);
+              }
+            }}
+          >
             {match?.league?.logo ? (
               <Image
                 source={{ uri: match.league.logo }}
@@ -65,7 +74,7 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
             <Text style={styles.leagueName} numberOfLines={1}>
               {match?.league?.name || 'Competition'}
             </Text>
-          </View>
+          </Pressable>
 
           {/* Status Badge */}
           <View style={[styles.statusBadge, isLive && styles.liveStatusBadge]}>
@@ -81,20 +90,31 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
       <View style={styles.matchContent}>
         {/* Home Team */}
         <View style={styles.teamRow}>
-          {match?.teams?.home?.logo ? (
-            <Image
-              source={{ uri: match.teams.home.logo }}
-              style={styles.teamLogo}
-              resizeMode="contain"
-            />
-          ) : (
-            <View style={styles.fallbackLogo}>
-              <Ionicons name="shield-outline" size={14} color="#94A3B8" />
-            </View>
-          )}
-          <Text style={styles.teamName} numberOfLines={1}>
-            {match?.teams?.home?.name || 'Home Team'}
-          </Text>
+          <Pressable
+            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+            onPress={(e) => {
+              e.stopPropagation();
+              const teamId = match?.teams?.home?.id || match?.teams?.home?.name;
+              if (teamId) {
+                router.push(`/home/basketball/teams/${String(teamId)}` as any);
+              }
+            }}
+          >
+            {match?.teams?.home?.logo ? (
+              <Image
+                source={{ uri: match.teams.home.logo }}
+                style={styles.teamLogo}
+                resizeMode="contain"
+              />
+            ) : (
+              <View style={styles.fallbackLogo}>
+                <Ionicons name="shield-outline" size={14} color="#94A3B8" />
+              </View>
+            )}
+            <Text style={styles.teamName} numberOfLines={1}>
+              {match?.teams?.home?.name || 'Home Team'}
+            </Text>
+          </Pressable>
           <Text
             style={[
               styles.teamScore,
@@ -110,20 +130,31 @@ export const BasketballMatchCard: React.FC<BasketballMatchCardProps> = ({
 
         {/* Away Team */}
         <View style={[styles.teamRow, { marginTop: 6 }]}>
-          {match?.teams?.away?.logo ? (
-            <Image
-              source={{ uri: match.teams.away.logo }}
-              style={styles.teamLogo}
-              resizeMode="contain"
-            />
-          ) : (
-            <View style={styles.fallbackLogo}>
-              <Ionicons name="shield-outline" size={14} color="#94A3B8" />
-            </View>
-          )}
-          <Text style={styles.teamName} numberOfLines={1}>
-            {match?.teams?.away?.name || 'Away Team'}
-          </Text>
+          <Pressable
+            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+            onPress={(e) => {
+              e.stopPropagation();
+              const teamId = match?.teams?.away?.id || match?.teams?.away?.name;
+              if (teamId) {
+                router.push(`/home/basketball/teams/${String(teamId)}` as any);
+              }
+            }}
+          >
+            {match?.teams?.away?.logo ? (
+              <Image
+                source={{ uri: match.teams.away.logo }}
+                style={styles.teamLogo}
+                resizeMode="contain"
+              />
+            ) : (
+              <View style={styles.fallbackLogo}>
+                <Ionicons name="shield-outline" size={14} color="#94A3B8" />
+              </View>
+            )}
+            <Text style={styles.teamName} numberOfLines={1}>
+              {match?.teams?.away?.name || 'Away Team'}
+            </Text>
+          </Pressable>
           <Text
             style={[
               styles.teamScore,

@@ -43,9 +43,12 @@ export const THEME = {
 
 // Global shorthand COLORS (defaults to modern dark sports palette)
 export const COLORS = {
-  // Brand & Accents
-  primary: '#0B0F17',
-  secondary: '#0074D9',
+  // Brand & Accents (Unified with Web #3B82F6 Electric Blue)
+  primary: '#3B82F6',
+  primaryDark: '#1D4ED8',
+  primaryLight: '#60A5FA',
+  primaryGlow: 'rgba(59, 130, 246, 0.25)',
+  secondary: '#F59E0B',
   accent: '#00E599',
   brandBlue: '#3B82F6',
   brandEmerald: '#10B981',

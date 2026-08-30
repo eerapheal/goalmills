@@ -62,7 +62,16 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
       {/* League & Series Header */}
       {!hideLeague && (
         <View style={styles.header}>
-          <View style={styles.leagueInfo}>
+          <Pressable
+            style={styles.leagueInfo}
+            onPress={(e) => {
+              e.stopPropagation();
+              const seriesId = (match as any).league_key || (match as any).series_id || match.league_name;
+              if (seriesId) {
+                router.push(`/home/cricket/series/${String(seriesId)}` as any);
+              }
+            }}
+          >
             <Text style={styles.sportEmoji}>🏏</Text>
             {match.event_type && (
               <View style={styles.formatBadge}>
@@ -72,7 +81,7 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
             <Text style={styles.leagueName} numberOfLines={1}>
               {match.league_name || 'Tournament'}
             </Text>
-          </View>
+          </Pressable>
 
           {/* Status Badge */}
           <View style={[styles.statusBadge, isLive && styles.liveStatusBadge]}>
@@ -88,21 +97,32 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
       <View style={styles.matchContent}>
         {/* Home Team */}
         <View style={styles.teamRow}>
-          {match.event_home_team_logo && !homeImgError ? (
-            <Image
-              source={{ uri: match.event_home_team_logo }}
-              style={styles.teamLogo}
-              resizeMode="contain"
-              onError={() => setHomeImgError(true)}
-            />
-          ) : (
-            <View style={styles.fallbackLogo}>
-              <Text style={styles.fallbackText}>{homeName.charAt(0)}</Text>
-            </View>
-          )}
-          <Text style={styles.teamName} numberOfLines={1}>
-            {homeName}
-          </Text>
+          <Pressable
+            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+            onPress={(e) => {
+              e.stopPropagation();
+              const teamKey = (match as any).home_team_key || (match as any).event_home_team_key || match.event_home_team;
+              if (teamKey) {
+                router.push(`/home/cricket/teams/${encodeURIComponent(String(teamKey))}` as any);
+              }
+            }}
+          >
+            {match.event_home_team_logo && !homeImgError ? (
+              <Image
+                source={{ uri: match.event_home_team_logo }}
+                style={styles.teamLogo}
+                resizeMode="contain"
+                onError={() => setHomeImgError(true)}
+              />
+            ) : (
+              <View style={styles.fallbackLogo}>
+                <Text style={styles.fallbackText}>{homeName.charAt(0)}</Text>
+              </View>
+            )}
+            <Text style={styles.teamName} numberOfLines={1}>
+              {homeName}
+            </Text>
+          </Pressable>
           <View style={styles.scoreContainer}>
             {match.event_home_final_result ? (
               <Text style={[styles.teamScore, isLive && styles.liveScoreText]}>
@@ -117,21 +137,32 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
 
         {/* Away Team */}
         <View style={[styles.teamRow, { marginTop: 8 }]}>
-          {match.event_away_team_logo && !awayImgError ? (
-            <Image
-              source={{ uri: match.event_away_team_logo }}
-              style={styles.teamLogo}
-              resizeMode="contain"
-              onError={() => setAwayImgError(true)}
-            />
-          ) : (
-            <View style={styles.fallbackLogo}>
-              <Text style={styles.fallbackText}>{awayName.charAt(0)}</Text>
-            </View>
-          )}
-          <Text style={styles.teamName} numberOfLines={1}>
-            {awayName}
-          </Text>
+          <Pressable
+            style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+            onPress={(e) => {
+              e.stopPropagation();
+              const teamKey = (match as any).away_team_key || (match as any).event_away_team_key || match.event_away_team;
+              if (teamKey) {
+                router.push(`/home/cricket/teams/${encodeURIComponent(String(teamKey))}` as any);
+              }
+            }}
+          >
+            {match.event_away_team_logo && !awayImgError ? (
+              <Image
+                source={{ uri: match.event_away_team_logo }}
+                style={styles.teamLogo}
+                resizeMode="contain"
+                onError={() => setAwayImgError(true)}
+              />
+            ) : (
+              <View style={styles.fallbackLogo}>
+                <Text style={styles.fallbackText}>{awayName.charAt(0)}</Text>
+              </View>
+            )}
+            <Text style={styles.teamName} numberOfLines={1}>
+              {awayName}
+            </Text>
+          </Pressable>
           <View style={styles.scoreContainer}>
             {match.event_away_final_result ? (
               <Text style={[styles.teamScore, isLive && styles.liveScoreText]}>

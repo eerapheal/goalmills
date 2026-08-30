@@ -230,13 +230,14 @@ export function CricketScreen() {
 
   // Group by league for SectionList
   const sections = useMemo(() => {
-    const map = new Map<string, { title: string; data: CricketEvent[] }>();
+    const map = new Map<string, { title: string; league_key?: string | number; data: CricketEvent[] }>();
 
     currentMatchesList.forEach((match) => {
       const key = match.league_name || 'Cricket Fixtures';
       if (!map.has(key)) {
         map.set(key, {
           title: key,
+          league_key: match.league_key || (match as any).series_id || key,
           data: [],
         });
       }
@@ -517,16 +518,25 @@ export function CricketScreen() {
         sections={sections}
         keyExtractor={(item) => String(item.event_key)}
         renderItem={({ item }) => <CricketMatchCard match={item} hideLeague />}
-        renderSectionHeader={({ section: { title, data } }) => (
-          <View style={styles.sectionHeader}>
+        renderSectionHeader={({ section }: any) => (
+          <Pressable
+            style={styles.sectionHeader}
+            onPress={() => {
+              const seriesId = section.league_key || section.title;
+              if (seriesId) {
+                router.push(`/home/cricket/series/${String(seriesId)}` as any);
+              }
+            }}
+          >
             <View style={styles.sectionHeaderLeft}>
               <Text style={styles.sectionEmoji}>🏏</Text>
               <Text style={styles.sectionTitle} numberOfLines={1}>
-                {title}
+                {section.title}
               </Text>
             </View>
-            <Text style={styles.sectionCount}>({data.length})</Text>
-          </View>
+            <Text style={styles.sectionCount}>({section.data.length})</Text>
+            <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 6 }} />
+          </Pressable>
         )}
         contentContainerStyle={styles.listContent}
         refreshControl={
@@ -715,9 +725,9 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.md,
   },
   tabButtonActive: {
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.35)',
+    borderColor: '#3B82F6',
   },
   tabLabel: {
     fontSize: 12,
@@ -725,7 +735,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
   tabLabelActive: {
-    color: '#F59E0B',
+    color: '#60A5FA',
     fontWeight: '800',
   },
   countBadge: {
@@ -736,7 +746,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   countBadgeActive: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#3B82F6',
   },
   countText: {
     fontSize: 10,

@@ -98,7 +98,15 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
     >
       {/* League Header */}
       <View style={styles.leagueHeader}>
-        <View style={styles.leagueLeft}>
+        <Pressable
+          style={styles.leagueLeft}
+          onPress={(e) => {
+            e.stopPropagation();
+            if (event.league_key) {
+              router.push(`/home/football/leagues/${String(event.league_key)}` as any);
+            }
+          }}
+        >
           {event.league_logo ? (
             <Image
               source={{ uri: event.league_logo }}
@@ -116,7 +124,7 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
           <Text style={styles.leagueTitle} numberOfLines={1}>
             {event.league_name || 'Football'}
           </Text>
-        </View>
+        </Pressable>
 
         {isLive ? (
           <View style={styles.livePill}>

@@ -156,7 +156,14 @@ export default function MatchDetailsScreen() {
       >
         {/* Score Banner */}
         <View style={styles.scoreBanner}>
-          <View style={styles.leagueBannerInfo}>
+          <Pressable
+            style={styles.leagueBannerInfo}
+            onPress={() => {
+              if (fixture?.league?.id) {
+                router.push(`/home/football/leagues/${String(fixture.league.id)}` as any);
+              }
+            }}
+          >
             {fixture?.league?.logo && (
               <Image
                 source={{ uri: fixture.league.logo }}
@@ -167,11 +174,19 @@ export default function MatchDetailsScreen() {
             <Text style={styles.bannerLeagueText}>
               {fixture?.league?.name} • {fixture?.league?.round || 'Matchday'}
             </Text>
-          </View>
+            <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 4 }} />
+          </Pressable>
 
           <View style={styles.bannerTeamsRow}>
             {/* Home Team */}
-            <View style={styles.bannerTeam}>
+            <Pressable
+              style={styles.bannerTeam}
+              onPress={() => {
+                if (fixture?.teams?.home?.id) {
+                  router.push(`/home/football/teams/${String(fixture.teams.home.id)}` as any);
+                }
+              }}
+            >
               {fixture?.teams?.home?.logo ? (
                 <Image
                   source={{ uri: fixture.teams.home.logo }}
@@ -186,7 +201,7 @@ export default function MatchDetailsScreen() {
               <Text style={styles.bannerTeamName} numberOfLines={2}>
                 {fixture?.teams?.home?.name || 'Home Team'}
               </Text>
-            </View>
+            </Pressable>
 
             {/* Score & Status */}
             <View style={styles.bannerScoreBox}>
@@ -213,7 +228,14 @@ export default function MatchDetailsScreen() {
             </View>
 
             {/* Away Team */}
-            <View style={styles.bannerTeam}>
+            <Pressable
+              style={styles.bannerTeam}
+              onPress={() => {
+                if (fixture?.teams?.away?.id) {
+                  router.push(`/home/football/teams/${String(fixture.teams.away.id)}` as any);
+                }
+              }}
+            >
               {fixture?.teams?.away?.logo ? (
                 <Image
                   source={{ uri: fixture.teams.away.logo }}
@@ -228,7 +250,7 @@ export default function MatchDetailsScreen() {
               <Text style={styles.bannerTeamName} numberOfLines={2}>
                 {fixture?.teams?.away?.name || 'Away Team'}
               </Text>
-            </View>
+            </Pressable>
           </View>
         </View>
 
@@ -322,7 +344,17 @@ export default function MatchDetailsScreen() {
                           {ev?.type === 'subst' && (
                             <Ionicons name="swap-horizontal" size={16} color="#3B82F6" />
                           )}
-                          <Text style={styles.eventPlayerName}>{ev?.player?.name || 'Player'}</Text>
+                          <Pressable
+                            onPress={() => {
+                              if (ev?.player?.id) {
+                                router.push(`/home/football/players/${String(ev.player.id)}` as any);
+                              }
+                            }}
+                          >
+                            <Text style={[styles.eventPlayerName, { color: '#60A5FA' }]}>
+                              {ev?.player?.name || 'Player'}
+                            </Text>
+                          </Pressable>
                         </View>
                         {ev?.assist?.name ? (
                           <Text style={styles.eventAssistText}>Assist: {ev.assist.name}</Text>
@@ -360,7 +392,15 @@ export default function MatchDetailsScreen() {
                     </Text>
                     <View style={styles.pitchGrid}>
                       {(lineups[0]?.startXI || []).slice(0, 11).map((p: any, idx: number) => (
-                        <View key={idx} style={styles.pitchPlayerNode}>
+                        <Pressable
+                          key={idx}
+                          style={styles.pitchPlayerNode}
+                          onPress={() => {
+                            if (p?.player?.id) {
+                              router.push(`/home/football/players/${String(p.player.id)}` as any);
+                            }
+                          }}
+                        >
                           <View style={[styles.pitchJersey, { backgroundColor: '#3B82F6' }]}>
                             <Text style={styles.pitchJerseyNum}>
                               {p?.player?.number ?? idx + 1}
@@ -369,7 +409,7 @@ export default function MatchDetailsScreen() {
                           <Text style={styles.pitchPlayerName} numberOfLines={1}>
                             {(p?.player?.name || 'Player').split(' ').pop()}
                           </Text>
-                        </View>
+                        </Pressable>
                       ))}
                     </View>
                   </View>
@@ -382,7 +422,15 @@ export default function MatchDetailsScreen() {
                       </Text>
                       <View style={styles.pitchGrid}>
                         {(lineups[1]?.startXI || []).slice(0, 11).map((p: any, idx: number) => (
-                          <View key={idx} style={styles.pitchPlayerNode}>
+                          <Pressable
+                            key={idx}
+                            style={styles.pitchPlayerNode}
+                            onPress={() => {
+                              if (p?.player?.id) {
+                                router.push(`/home/football/players/${String(p.player.id)}` as any);
+                              }
+                            }}
+                          >
                             <View style={[styles.pitchJersey, { backgroundColor: '#EF4444' }]}>
                               <Text style={styles.pitchJerseyNum}>
                                 {p?.player?.number ?? idx + 1}
@@ -391,7 +439,7 @@ export default function MatchDetailsScreen() {
                             <Text style={styles.pitchPlayerName} numberOfLines={1}>
                               {(p?.player?.name || 'Player').split(' ').pop()}
                             </Text>
-                          </View>
+                          </Pressable>
                         ))}
                       </View>
                     </View>
@@ -405,10 +453,19 @@ export default function MatchDetailsScreen() {
                     <View style={{ flex: 1, marginRight: 8 }}>
                       <Text style={styles.benchTeamHeader}>{lineups[0]?.team?.name || 'Home'}</Text>
                       {(lineups[0]?.substitutes || []).map((s: any, idx: number) => (
-                        <Text key={idx} style={styles.benchPlayerText}>
-                          {s?.player?.number ?? '-'}. {s?.player?.name || 'Player'} (
-                          {s?.player?.pos || 'SUB'})
-                        </Text>
+                        <Pressable
+                          key={idx}
+                          onPress={() => {
+                            if (s?.player?.id) {
+                              router.push(`/home/football/players/${String(s.player.id)}` as any);
+                            }
+                          }}
+                        >
+                          <Text style={[styles.benchPlayerText, { color: '#93C5FD' }]}>
+                            {s?.player?.number ?? '-'}. {s?.player?.name || 'Player'} (
+                            {s?.player?.pos || 'SUB'})
+                          </Text>
+                        </Pressable>
                       ))}
                     </View>
                     {lineups[1] && (
@@ -417,10 +474,19 @@ export default function MatchDetailsScreen() {
                           {lineups[1]?.team?.name || 'Away'}
                         </Text>
                         {(lineups[1]?.substitutes || []).map((s: any, idx: number) => (
-                          <Text key={idx} style={styles.benchPlayerText}>
-                            {s?.player?.number ?? '-'}. {s?.player?.name || 'Player'} (
-                            {s?.player?.pos || 'SUB'})
-                          </Text>
+                          <Pressable
+                            key={idx}
+                            onPress={() => {
+                              if (s?.player?.id) {
+                                router.push(`/home/football/players/${String(s.player.id)}` as any);
+                              }
+                            }}
+                          >
+                            <Text style={[styles.benchPlayerText, { color: '#93C5FD' }]}>
+                              {s?.player?.number ?? '-'}. {s?.player?.name || 'Player'} (
+                              {s?.player?.pos || 'SUB'})
+                            </Text>
+                          </Pressable>
                         ))}
                       </View>
                     )}

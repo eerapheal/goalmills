@@ -11,6 +11,7 @@ import {
   TextInput,
   Image,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { basketballApiService, ApiBasketballGameItem } from '../services/basketballApi';
@@ -20,6 +21,7 @@ import { GoalmillsLoader } from '../components/GoalmillsLoader';
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export default function BasketballScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<BasketballTab>('live');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -138,6 +140,7 @@ export default function BasketballScreen() {
     return Array.from(map.values()).map((entry) => ({
       title: entry?.league?.name || 'Competition',
       logo: entry?.league?.logo,
+      league_id: entry?.league?.id,
       data: entry?.data || [],
     }));
   }, [filteredGames]);
@@ -252,7 +255,15 @@ export default function BasketballScreen() {
               <Text style={styles.emptyText}>No standings data currently available.</Text>
             ) : (
               standings.map((stRow, idx) => (
-                <View key={idx} style={styles.tableRow}>
+                <Pressable
+                  key={idx}
+                  style={styles.tableRow}
+                  onPress={() => {
+                    if (stRow.team?.id) {
+                      router.push(`/home/basketball/teams/${String(stRow.team.id)}` as any);
+                    }
+                  }}
+                >
                   <Text style={styles.tableRank}>{stRow.position || idx + 1}</Text>
                   {stRow.team?.logo && (
                     <Image
@@ -266,7 +277,8 @@ export default function BasketballScreen() {
                   </Text>
                   <Text style={styles.tableStat}>{stRow.games?.win?.total ?? 0}W</Text>
                   <Text style={styles.tableStat}>{stRow.games?.lose?.total ?? 0}L</Text>
-                </View>
+                  <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 6 }} />
+                </Pressable>
               ))
             )}
           </View>
@@ -296,17 +308,25 @@ export default function BasketballScreen() {
               colors={['#F97316']}
             />
           }
-          renderSectionHeader={({ section: { title, logo } }) => (
-            <View style={styles.sectionHeader}>
-              {logo ? (
-                <Image source={{ uri: logo }} style={styles.sectionLogo} resizeMode="contain" />
+          renderSectionHeader={({ section }: any) => (
+            <Pressable
+              style={styles.sectionHeader}
+              onPress={() => {
+                if (section.league_id) {
+                  router.push(`/home/basketball/leagues/${String(section.league_id)}` as any);
+                }
+              }}
+            >
+              {section.logo ? (
+                <Image source={{ uri: section.logo }} style={styles.sectionLogo} resizeMode="contain" />
               ) : (
-                <Ionicons name="basketball-outline" size={16} color="#F97316" />
+                <Ionicons name="basketball-outline" size={16} color="#3B82F6" />
               )}
               <Text style={styles.sectionTitle} numberOfLines={1}>
-                {title}
+                {section.title}
               </Text>
-            </View>
+              <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 'auto' }} />
+            </Pressable>
           )}
           renderItem={({ item }) => <BasketballMatchCard match={item} hideLeague />}
         />
@@ -374,8 +394,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   activeTabButton: {
-    backgroundColor: '#1E293B',
-    borderColor: 'rgba(249, 115, 22, 0.4)',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderColor: '#3B82F6',
   },
   tabButtonText: {
     fontSize: 12,
@@ -383,7 +403,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
   activeTabButtonText: {
-    color: '#F97316',
+    color: '#60A5FA',
   },
   dateSlider: {
     paddingHorizontal: SPACING.md,
@@ -401,8 +421,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   activeDateCard: {
-    backgroundColor: '#F97316',
-    borderColor: '#F97316',
+    backgroundColor: '#3B82F6',
+    borderColor: '#3B82F6',
   },
   dateDayText: {
     fontSize: 10,

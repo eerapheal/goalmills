@@ -194,8 +194,14 @@ export function AdvancedFootballScreen() {
 
   // Group by league for SectionList
   const sections = useMemo(() => {
-    const groups: { [key: string]: { title: string; logo?: string; data: UnifiedMatchEvent[] } } =
-      {};
+    const groups: {
+      [key: string]: {
+        title: string;
+        logo?: string;
+        league_key?: string | number;
+        data: UnifiedMatchEvent[];
+      };
+    } = {};
 
     filteredFixtures.forEach((item) => {
       const leagueTitle = item.league_name || 'Other Matches';
@@ -203,6 +209,7 @@ export function AdvancedFootballScreen() {
         groups[leagueTitle] = {
           title: leagueTitle,
           logo: item.league_logo,
+          league_key: item.league_key,
           data: [],
         };
       }
@@ -329,8 +336,15 @@ export function AdvancedFootballScreen() {
               colors={['#10B981']}
             />
           }
-          renderSectionHeader={({ section }) => (
-            <View style={styles.sectionHeader}>
+          renderSectionHeader={({ section }: any) => (
+            <Pressable
+              style={styles.sectionHeader}
+              onPress={() => {
+                if (section.league_key) {
+                  router.push(`/home/football/leagues/${String(section.league_key)}` as any);
+                }
+              }}
+            >
               {section.logo ? (
                 <Image
                   source={{ uri: section.logo }}
@@ -347,7 +361,8 @@ export function AdvancedFootballScreen() {
               )}
               <Text style={styles.sectionTitle}>{section.title}</Text>
               <Text style={styles.sectionCount}>({section.data.length})</Text>
-            </View>
+              <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 'auto' }} />
+            </Pressable>
           )}
           renderItem={({ item }) => <FootballMatchCard event={item} />}
         />
@@ -413,8 +428,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   activeTabItem: {
-    backgroundColor: '#162234',
-    borderColor: 'rgba(16, 185, 129, 0.5)',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderColor: '#3B82F6',
   },
   tabLabel: {
     fontSize: FONT_SIZES.xs,
@@ -422,7 +437,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activeTabLabel: {
-    color: '#F8FAFC',
+    color: '#60A5FA',
     fontWeight: '700',
   },
   dateStripContainer: {
@@ -443,8 +458,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   selectedDateCard: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
+    backgroundColor: '#3B82F6',
+    borderColor: '#3B82F6',
   },
   dateDayName: {
     fontSize: 11,

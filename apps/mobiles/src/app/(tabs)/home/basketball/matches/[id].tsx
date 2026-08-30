@@ -124,8 +124,15 @@ export default function BasketballMatchDetailsPage() {
       >
         {/* Score Banner */}
         <View style={styles.scoreBanner}>
-          <View style={styles.leagueBannerInfo}>
-            {game?.league.logo && (
+          <Pressable
+            style={styles.leagueBannerInfo}
+            onPress={() => {
+              if (game?.league?.id) {
+                router.push(`/home/basketball/leagues/${String(game.league.id)}` as any);
+              }
+            }}
+          >
+            {game?.league?.logo && (
               <Image
                 source={{ uri: game.league.logo }}
                 style={styles.bannerLeagueLogo}
@@ -133,14 +140,22 @@ export default function BasketballMatchDetailsPage() {
               />
             )}
             <Text style={styles.bannerLeagueText}>
-              {game?.league.name} • {game?.country.name}
+              {game?.league?.name} • {game?.country?.name}
             </Text>
-          </View>
+            <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 4 }} />
+          </Pressable>
 
           <View style={styles.bannerTeamsRow}>
             {/* Home Team */}
-            <View style={styles.bannerTeam}>
-              {game?.teams.home.logo ? (
+            <Pressable
+              style={styles.bannerTeam}
+              onPress={() => {
+                if (game?.teams?.home?.id) {
+                  router.push(`/home/basketball/teams/${String(game.teams.home.id)}` as any);
+                }
+              }}
+            >
+              {game?.teams?.home?.logo ? (
                 <Image
                   source={{ uri: game.teams.home.logo }}
                   style={styles.bannerTeamLogo}
@@ -148,24 +163,24 @@ export default function BasketballMatchDetailsPage() {
                 />
               ) : (
                 <View style={styles.fallbackLogo}>
-                  <Ionicons name="basketball-outline" size={28} color="#F97316" />
+                  <Ionicons name="basketball-outline" size={28} color="#3B82F6" />
                 </View>
               )}
               <Text style={styles.bannerTeamName} numberOfLines={2}>
-                {game?.teams.home.name || 'Home'}
+                {game?.teams?.home?.name || 'Home'}
               </Text>
-            </View>
+            </Pressable>
 
             {/* Score & Status */}
             <View style={styles.bannerScoreBox}>
               <View style={[styles.statusBadge, isLive && styles.liveStatusBadge]}>
                 {isLive && <View style={styles.livePulse} />}
                 <Text style={[styles.statusBadgeText, isLive && styles.liveStatusBadgeText]}>
-                  {game?.status.short || 'VS'}
+                  {game?.status?.short || 'VS'}
                 </Text>
               </View>
               <Text style={styles.bannerScoreNumbers}>
-                {game?.scores.home.total ?? '-'}:{game?.scores.away.total ?? '-'}
+                {game?.scores?.home?.total ?? '-'}:{game?.scores?.away?.total ?? '-'}
               </Text>
               {game?.time && (
                 <Text style={styles.bannerTimeText}>
@@ -175,8 +190,15 @@ export default function BasketballMatchDetailsPage() {
             </View>
 
             {/* Away Team */}
-            <View style={styles.bannerTeam}>
-              {game?.teams.away.logo ? (
+            <Pressable
+              style={styles.bannerTeam}
+              onPress={() => {
+                if (game?.teams?.away?.id) {
+                  router.push(`/home/basketball/teams/${String(game.teams.away.id)}` as any);
+                }
+              }}
+            >
+              {game?.teams?.away?.logo ? (
                 <Image
                   source={{ uri: game.teams.away.logo }}
                   style={styles.bannerTeamLogo}
@@ -184,13 +206,13 @@ export default function BasketballMatchDetailsPage() {
                 />
               ) : (
                 <View style={styles.fallbackLogo}>
-                  <Ionicons name="basketball-outline" size={28} color="#F97316" />
+                  <Ionicons name="basketball-outline" size={28} color="#3B82F6" />
                 </View>
               )}
               <Text style={styles.bannerTeamName} numberOfLines={2}>
-                {game?.teams.away.name || 'Away'}
+                {game?.teams?.away?.name || 'Away'}
               </Text>
-            </View>
+            </Pressable>
           </View>
         </View>
 

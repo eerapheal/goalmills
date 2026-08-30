@@ -619,11 +619,20 @@ export default function CricketMatchDetailsScreen() {
         {/* Scoreboard Hero Header */}
         <View style={styles.heroCard}>
           <View style={styles.heroTopRow}>
-            <View style={styles.formatTag}>
+            <TouchableOpacity
+              style={styles.formatTag}
+              onPress={() => {
+                const seriesId = match.league_key || match.league_name;
+                if (seriesId) {
+                  router.push(`/home/cricket/series/${encodeURIComponent(String(seriesId))}` as any);
+                }
+              }}
+            >
               <Text style={styles.formatTagText}>
-                {match.event_type || 'ODI'} • {match.league_season}
+                {match.event_type || 'ODI'} • {match.league_name || match.league_season}
               </Text>
-            </View>
+              <Ionicons name="chevron-forward" size={12} color="#93c5fd" style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
             {isLive && (
               <View style={styles.liveTag}>
                 <View style={styles.livePulseDot} />
@@ -634,7 +643,15 @@ export default function CricketMatchDetailsScreen() {
 
           <View style={styles.teamsRow}>
             {/* Home Team */}
-            <View style={styles.teamHero}>
+            <TouchableOpacity
+              style={styles.teamHero}
+              onPress={() => {
+                const teamId = match.home_team_key || match.event_home_team;
+                if (teamId) {
+                  router.push(`/home/cricket/teams/${encodeURIComponent(String(teamId))}` as any);
+                }
+              }}
+            >
               <View style={styles.teamHeroLogo}>
                 {match.event_home_team_logo && !homeImgError ? (
                   <Image
@@ -652,7 +669,7 @@ export default function CricketMatchDetailsScreen() {
               {!isUpcoming && (
                 <Text style={styles.teamHeroScore}>{match.event_home_final_result || '0'}</Text>
               )}
-            </View>
+            </TouchableOpacity>
 
             {/* VS Center */}
             <View style={styles.vsCenter}>
@@ -661,7 +678,15 @@ export default function CricketMatchDetailsScreen() {
             </View>
 
             {/* Away Team */}
-            <View style={styles.teamHero}>
+            <TouchableOpacity
+              style={styles.teamHero}
+              onPress={() => {
+                const teamId = match.away_team_key || match.event_away_team;
+                if (teamId) {
+                  router.push(`/home/cricket/teams/${encodeURIComponent(String(teamId))}` as any);
+                }
+              }}
+            >
               <View style={styles.teamHeroLogo}>
                 {match.event_away_team_logo && !awayImgError ? (
                   <Image
@@ -679,7 +704,7 @@ export default function CricketMatchDetailsScreen() {
               {!isUpcoming && (
                 <Text style={styles.teamHeroScore}>{match.event_away_final_result || '0'}</Text>
               )}
-            </View>
+            </TouchableOpacity>
           </View>
 
           {match.event_status_info && (

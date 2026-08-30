@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     marginRight: SPACING.sm,
   },
   activeTab: {
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-    borderColor: '#F59E0B',
+    backgroundColor: 'rgba(59, 130, 246, 0.18)',
+    borderColor: '#3B82F6',
   },
   pressedTab: {
     opacity: 0.7,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
   activeTabText: {
-    color: '#FBBF24',
+    color: '#60A5FA',
     fontWeight: '800',
   },
   soonBadge: {
@@ -98,14 +98,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.4)',
+    borderColor: 'rgba(59, 130, 246, 0.4)',
   },
   soonBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FBBF24',
+    color: '#93C5FD',
     textTransform: 'uppercase',
   },
 });
