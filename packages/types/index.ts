@@ -4001,6 +4001,119 @@ export interface DistributionHubStats {
   };
 }
 
+// ==========================================
+// PHASE 10: CDN, MEDIA OPTIMIZATION, BILLING & ADVERTISER REPORTING
+// ==========================================
+
+// 10A: Media & CDN Optimization Types
+export type ImageFormat = 'webp' | 'avif' | 'jpeg' | 'png' | 'auto';
+
+export interface ImageTransformOptions {
+  width?: number;
+  height?: number;
+  quality?: number;
+  format?: ImageFormat;
+  fit?: 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
+}
+
+export interface OptimizedMediaResult {
+  src: string;
+  srcset: string;
+  width: number;
+  height: number;
+  format: string;
+  blurDataUrl?: string;
+}
+
+// 10B: Billing & Fan Pass Types
+export type SubscriptionTier = 'free' | 'fan_pass' | 'vip_pass' | 'sponsor_pro';
+
+export type SubscriptionStatus =
+  | 'active'
+  | 'trialing'
+  | 'past_due'
+  | 'canceled'
+  | 'unpaid'
+  | 'incomplete';
+
+export interface SubscriptionPlan {
+  id: string;
+  tier: SubscriptionTier;
+  name: string;
+  description: string;
+  priceMonthly: number;
+  priceYearly: number;
+  stripePriceIdMonthly: string;
+  stripePriceIdYearly: string;
+  features: string[];
+  isPopular?: boolean;
+}
+
+export interface UserSubscription {
+  _id?: string;
+  userId: string;
+  userEmail?: string;
+  tenantSlug: string;
+  stripeCustomerId: string;
+  stripeSubscriptionId?: string;
+  tier: SubscriptionTier;
+  status: SubscriptionStatus;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BillingHubStats {
+  mrr: number;
+  arr: number;
+  totalSubscribers: number;
+  activeSubscribers: number;
+  churnRate: number;
+  subscribersByTier: {
+    free: number;
+    fan_pass: number;
+    vip_pass: number;
+    sponsor_pro: number;
+  };
+}
+
+// 10C: Advertiser Reporting & Proof-of-Performance Types
+export interface AdvertiserReportSummary {
+  sponsorId: string;
+  sponsorName: string;
+  tenantSlug: string;
+  campaignName: string;
+  period: string;
+  impressions: number;
+  viewableImpressions: number;
+  viewabilityRate: number;
+  clicks: number;
+  ctr: number;
+  effectiveCpm: number;
+  totalSpend: number;
+  sportBreakdown: Record<string, { impressions: number; clicks: number }>;
+  certificateHash: string;
+  generatedAt: string;
+}
+
+export interface AdvertiserHubStats {
+  activeSponsors: number;
+  totalCampaigns: number;
+  totalDeliveredImpressions: number;
+  averageCtr: number;
+  totalRevenueMonthly: number;
+  topSponsors: Array<{
+    sponsorId: string;
+    sponsorName: string;
+    impressions: number;
+    spend: number;
+    ctr: number;
+  }>;
+}
+
+
 
 
 

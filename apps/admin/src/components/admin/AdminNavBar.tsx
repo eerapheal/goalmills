@@ -172,6 +172,24 @@ const PRIMARY_TABS: PrimaryTab[] = [
         requiredPermission: 'articles:draft',
         badge: 'Social',
       },
+      {
+        id: 'fan_pass_billing',
+        label: 'Fan Pass Billing',
+        href: '/admin/billing',
+        description: 'Stripe recurring billing, fan pass tiers & MRR telemetry',
+        icon: FiDollarSign,
+        requiredPermission: 'articles:draft',
+        badge: 'Revenue',
+      },
+      {
+        id: 'advertiser_reporting',
+        label: 'Advertiser Reports',
+        href: '/admin/advertisers',
+        description: 'Certified Proof-of-Performance, viewability audits & exports',
+        icon: FiAward,
+        requiredPermission: 'articles:draft',
+        badge: 'Audit',
+      },
     ],
   },
   {
@@ -291,6 +309,8 @@ const PRIMARY_TABS: PrimaryTab[] = [
 
 // Quick jump desktop shortcut chips for high frequency operations
 const QUICK_SHORTCUTS = [
+  { label: 'Fan Pass MRR', href: '/admin/billing', icon: FiDollarSign, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
+  { label: 'Sponsor Audit', href: '/admin/advertisers', icon: FiAward, color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20' },
   { label: 'Distribution', href: '/admin/distribution', icon: FiShare2, color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20' },
   { label: 'Warehouse Hub', href: '/admin/warehouse', icon: FiDatabase, color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20' },
   { label: 'Stream & DLQ', href: '/admin/events', icon: FiZap, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },

@@ -461,6 +461,36 @@ export const goalmillsApi = {
       return [];
     }
   },
+
+  // ==========================================
+  // PHASE 10: FAN PASS BILLING & MEDIA SUITE
+  // ==========================================
+
+  getSubscriptionStatus: async (): Promise<any> => {
+    try {
+      const res = await fetch(`${BASE_URL}/billing/subscription`, {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!res.ok) return { tier: 'free', status: 'active' };
+      const data = await res.json();
+      return data.subscription || { tier: 'free', status: 'active' };
+    } catch {
+      return { tier: 'free', status: 'active' };
+    }
+  },
+
+  getAvailablePlans: async (): Promise<any[]> => {
+    try {
+      const res = await fetch(`${BASE_URL}/billing/subscription`, {
+        headers: { 'x-tenant-slug': currentTenantSlug },
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.plans || [];
+    } catch {
+      return [];
+    }
+  },
 };
 
 export default goalmillsApi;
