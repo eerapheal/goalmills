@@ -66,7 +66,7 @@ export default function HomePage() {
       </div>
 
       {/* Featured VIP Sponsor Hero Banner Grid (3 Desktop, 2 Tablet, 1 Mobile) */}
-      <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-3">
+      <div className="max-w-[1400px] mx-auto w-full px-3 sm:px-6 pt-3 min-h-[200px]">
         <SponsoredBannersGrid
           sport={selectedSport === 'live' ? 'all' : selectedSport}
         />
@@ -76,7 +76,7 @@ export default function HomePage() {
       <SportTabs selectedSport={selectedSport} onSelectSport={setSelectedSport} />
 
       {/* Sport Content / Live Dashboard */}
-      <div className="flex-1">{renderSportContent()}</div>
+      <div className="flex-1 min-h-[600px]">{renderSportContent()}</div>
 
       {/* Section 3: GoalMills Sports Intelligence Newsletter Subscription */}
       <NewsletterSubscriptionSection />

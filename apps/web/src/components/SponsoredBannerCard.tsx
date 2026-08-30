@@ -210,16 +210,16 @@ export function SponsoredBannerCard({
               <button
                 onClick={handlePrev}
                 aria-label="Previous Sponsor"
-                className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition"
+                className="min-w-[32px] min-h-[32px] p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition flex items-center justify-center"
               >
-                <FiChevronLeft className="w-3.5 h-3.5" />
+                <FiChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Next Sponsor"
-                className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition"
+                className="min-w-[32px] min-h-[32px] p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition flex items-center justify-center"
               >
-                <FiChevronRight className="w-3.5 h-3.5" />
+                <FiChevronRight className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -227,9 +227,9 @@ export function SponsoredBannerCard({
 
         {/* Headline & Description Body */}
         <div className="mt-1">
-          <h4 className="text-sm sm:text-base font-black text-white leading-snug drop-shadow-sm line-clamp-2">
+          <h3 className="text-sm sm:text-base font-black text-white leading-snug drop-shadow-sm line-clamp-2">
             {currentSponsor.title}
-          </h4>
+          </h3>
           {currentSponsor.tagline && (
             <p className="text-xs text-slate-300 font-medium line-clamp-2 mt-1.5 leading-relaxed drop-shadow-sm">
               {currentSponsor.tagline}
@@ -251,24 +251,28 @@ export function SponsoredBannerCard({
           <FiExternalLink className="w-3.5 h-3.5" />
         </a>
 
-        {/* Indicator dots */}
+        {/* Indicator dots with accessible touch targets */}
         {sponsorships.length > 1 && (
           <div className="flex items-center justify-between pt-1">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
               {sponsorships.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
                   aria-label={`Go to sponsor ${idx + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === currentIndex
-                      ? 'w-5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'
-                      : 'w-1.5 bg-slate-600 hover:bg-slate-400'
-                  }`}
-                />
+                  className="min-w-[32px] min-h-[32px] p-2 -m-1 flex items-center justify-center focus:outline-none"
+                >
+                  <span
+                    className={`h-1.5 rounded-full transition-all duration-300 block ${
+                      idx === currentIndex
+                        ? 'w-5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'
+                        : 'w-1.5 bg-slate-500 hover:bg-slate-300'
+                    }`}
+                  />
+                </button>
               ))}
             </div>
-            <span className="text-[9px] text-slate-400 font-semibold tracking-wide uppercase">
+            <span className="text-[9px] text-slate-300 font-semibold tracking-wide uppercase">
               Official Partner
             </span>
           </div>

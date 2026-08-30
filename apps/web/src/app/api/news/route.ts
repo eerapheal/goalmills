@@ -129,7 +129,9 @@ export async function GET(request: NextRequest) {
       sortOptions = { createdAt: 1 };
     }
 
-    let newsQuery = News.find(query).sort(sortOptions);
+    let newsQuery = News.find(query)
+      .select('-content')
+      .sort(sortOptions);
 
     if (limitParam > 0) {
       const skip = (pageParam - 1) * limitParam;

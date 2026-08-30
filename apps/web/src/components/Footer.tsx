@@ -96,18 +96,18 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 text-xs text-center md:text-left">
+          <p className="text-slate-400 text-xs text-center md:text-left font-medium">
             © {currentYear} GoalMills. All rights reserved. Registered sports data provider.
           </p>
           <div className="flex items-center gap-6">
-            <span className="text-slate-500 text-xs">Developed with Precision</span>
+            <span className="text-slate-400 text-xs font-medium">Developed with Precision</span>
             <div className="flex gap-4">
               {/* Social Placeholders */}
               <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-500/10 hover:border-blue-500/50 transition-all cursor-pointer">
-                <span className="text-xs">𝕏</span>
+                <span className="text-xs text-slate-200 font-bold">𝕏</span>
               </div>
               <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-500/10 hover:border-blue-500/50 transition-all cursor-pointer">
-                <span className="text-xs">IG</span>
+                <span className="text-xs text-slate-200 font-bold">IG</span>
               </div>
             </div>
           </div>
