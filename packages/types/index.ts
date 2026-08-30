@@ -55,19 +55,32 @@ export interface TenantContext {
 export type AnalyticsEventType =
   | 'page_view'
   | 'article_read'
+  | 'article_view'
+  | 'match_view'
+  | 'sports_view'
   | 'scroll_depth'
   | 'video_play'
+  | 'video_complete'
   | 'share'
   | 'search'
+  | 'click'
+  | 'newsletter_signup'
+  | 'newsletter_open'
+  | 'newsletter_click'
+  | 'sponsor_impression'
+  | 'sponsor_click'
   | 'sponsorship_click'
-  | 'newsletter_click';
+  | 'active_read';
 
 export type AnalyticsEntityType =
   | 'article'
   | 'category'
+  | 'match'
   | 'video'
   | 'newsletter'
   | 'sponsorship'
+  | 'author'
+  | 'topic'
   | 'page'
   | 'search';
 
@@ -87,6 +100,9 @@ export interface AnalyticsEventMetadata {
   searchQuery?: string;
   url?: string;
   title?: string;
+  isRecommendationDriven?: boolean;
+  recommendationContext?: string;
+  [key: string]: any;
 }
 
 export interface AnalyticsEvent {
@@ -102,6 +118,15 @@ export interface AnalyticsEvent {
   createdAt?: string | Date;
 }
 
+export interface AnalyticsEventPayload {
+  eventType: AnalyticsEventType;
+  entityType?: AnalyticsEntityType;
+  entityId?: string;
+  sessionHash?: string;
+  metadata?: AnalyticsEventMetadata;
+  timestamp?: string;
+}
+
 export interface ScrollMilestones {
   p25: number;
   p50: number;
@@ -112,24 +137,58 @@ export interface ScrollMilestones {
 export interface ContentMetricSummary {
   _id?: string;
   tenantId?: string;
-  tenantSlug: string;
+  tenantSlug?: string;
   articleId: string;
   articleSlug?: string;
   articleTitle?: string;
+  title?: string;
+  slug?: string;
   categorySlug?: string;
   sportSlug?: string;
   authorId?: string;
   authorSlug?: string;
+  authorName?: string;
   date: string; // YYYY-MM-DD
-  pageViews: number;
+  pageViews?: number;
+  views?: number;
   uniqueReaders: number;
-  totalReadDurationMs: number;
-  avgReadDurationMs: number;
-  scrollMilestones: ScrollMilestones;
-  shares: number;
-  videoPlays: number;
+  totalReadDurationMs?: number;
+  totalDurationMs?: number;
+  avgReadDurationMs?: number;
+  avgReadTimeMs?: number;
+  scrollMilestones?: ScrollMilestones;
+  scroll25Count?: number;
+  scroll50Count?: number;
+  scroll75Count?: number;
+  scroll100Count?: number;
+  shares?: number;
+  shareCount?: number;
+  videoPlays?: number;
   createdAt?: string | Date;
   updatedAt?: string | Date;
+}
+
+export interface AudienceOverviewMetrics {
+  totalPageviews: number;
+  uniqueVisitors: number;
+  avgReadTimeSeconds: number;
+  avgScrollDepth: number;
+  bounceRate: number;
+  topSports: { sport: string; views: number }[];
+  deviceBreakdown: { desktop: number; mobile: number; tablet: number };
+  timeline: { date: string; views: number; uniqueReaders: number }[];
+}
+
+export interface RealtimeTelemetryRadar {
+  activeReaders5m: number;
+  activeReaders30m: number;
+  trendingArticles: {
+    articleId: string;
+    title: string;
+    slug: string;
+    activeCount: number;
+    sport: string;
+  }[];
 }
 
 export interface SportAffinityItem {
@@ -216,37 +275,22 @@ export type RecommendationType =
   | 'newsletter'
   | 'multi';
 
+export type RecommendationCandidateType = 'article' | 'match' | 'video' | 'newsletter' | 'topic';
+
 export type RecommendationContext =
   | 'homepage'
   | 'article_detail'
   | 'match_detail'
   | 'sports_hub'
   | 'mobile_feed'
-  | 'newsletter';
+  | 'newsletter'
+  | 'newsletter_digest';
 
 export type RecommendationAlgorithmType =
   | 'content_similarity'
   | 'trending'
   | 'collaborative_signal'
   | 'personalized_affinity';
-
-export interface RecommendationCandidate {
-  id: string;
-  type: 'article' | 'match' | 'video' | 'newsletter' | 'topic';
-  title: string;
-  slug: string;
-  url: string;
-  image?: string;
-  sportSlug?: string;
-  categorySlug?: string;
-  teamSlug?: string;
-  competitionSlug?: string;
-  score: number;
-  reasonBadge: string;
-  algorithm: RecommendationAlgorithmType;
-  metadata?: Record<string, any>;
-  publishedAt?: string;
-}
 
 export interface RecommendationAlgorithmWeights {
   sportMatchWeight: number; // default: 30
@@ -259,6 +303,42 @@ export interface RecommendationAlgorithmWeights {
   diversityPenalty: number; // default: 10
 }
 
+export interface RecommendationScoreBreakdown {
+  sportScore: number;
+  competitionScore: number;
+  teamScore: number;
+  categoryScore: number;
+  recencyMultiplier: number;
+  popularityBoost: number;
+  affinityBoost: number;
+  finalScore: number;
+}
+
+export interface RecommendationCandidate {
+  id: string;
+  type: RecommendationCandidateType | string;
+  title: string;
+  slug?: string;
+  url?: string;
+  image?: string;
+  sportSlug?: string;
+  sport?: string;
+  categorySlug?: string;
+  category?: string;
+  teamSlug?: string;
+  competitionSlug?: string;
+  competition?: string;
+  score: number;
+  scoreBreakdown?: RecommendationScoreBreakdown;
+  reasonBadge?: string;
+  explanationBadge?: string;
+  algorithm?: RecommendationAlgorithmType;
+  metadata?: Record<string, any>;
+  publishedAt?: string;
+  author?: string;
+  readTime?: number;
+}
+
 export interface RecommendationConfig {
   _id?: string;
   tenantId?: string;
@@ -267,17 +347,20 @@ export interface RecommendationConfig {
   enabledContexts: RecommendationContext[];
   excludedCategorySlugs?: string[];
   maxCandidatesPerSport?: number;
+  createdAt?: string | Date;
   updatedAt?: string | Date;
 }
 
 export interface RecommendationFeedbackPayload {
   recommendationId?: string;
   candidateId: string;
-  candidateType: string;
+  candidateType: RecommendationCandidateType | string;
   context: RecommendationContext;
   action: 'impression' | 'click' | 'dismiss';
+  positionIndex?: number;
   tenantSlug?: string;
   sessionHash?: string;
+  metadata?: Record<string, any>;
   timestamp?: string;
 }
 
@@ -3393,3 +3476,4 @@ export interface NewsletterCampaign {
   createdAt?: string;
   updatedAt?: string;
 }
+

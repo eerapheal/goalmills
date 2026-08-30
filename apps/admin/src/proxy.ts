@@ -32,8 +32,14 @@ const ROUTE_MIN_ROLE: { pathPrefix: string; minRole: UserRole }[] = [
   { pathPrefix: '/categories', minRole: 'editor' },
   { pathPrefix: '/admin/categories', minRole: 'editor' },
   { pathPrefix: '/api/admin/categories', minRole: 'editor' },
+  { pathPrefix: '/recommendations', minRole: 'editor' },
+  { pathPrefix: '/admin/recommendations', minRole: 'editor' },
+  { pathPrefix: '/api/admin/recommendations', minRole: 'editor' },
 
-  // Staff+ (handbook, reports, standup, portal, dashboard)
+  // Staff+ (handbook, reports, standup, portal, dashboard, analytics)
+  { pathPrefix: '/analytics', minRole: 'staff' },
+  { pathPrefix: '/admin/analytics', minRole: 'staff' },
+  { pathPrefix: '/api/admin/analytics', minRole: 'staff' },
   { pathPrefix: '/handbook', minRole: 'staff' },
   { pathPrefix: '/admin/handbook', minRole: 'staff' },
   { pathPrefix: '/reports', minRole: 'staff' },

@@ -268,6 +268,59 @@ export async function cacheSet<T = any>(key: string, value: T, ttlSeconds = 60):
 }
 
 /**
+ * Increment an atomic counter with optional TTL
+ */
+export async function cacheIncr(key: string, ttlSeconds?: number): Promise<number> {
+  let count = 1;
+
+  // 1. In-memory fallback
+  const memEntry = memoryCache.get(key);
+  if (memEntry && typeof memEntry.value === 'number') {
+    count = memEntry.value + 1;
+    memEntry.value = count;
+    if (ttlSeconds && !memEntry.expiresAt) {
+      memEntry.expiresAt = Date.now() + ttlSeconds * 1000;
+    }
+  } else {
+    pruneMemoryCacheIfNeeded();
+    memoryCache.set(key, {
+      value: 1,
+      expiresAt: ttlSeconds ? Date.now() + ttlSeconds * 1000 : Date.now() + 86400 * 1000,
+    });
+  }
+
+  // 2. ioredis client
+  if (redisClient && isRedisConnected) {
+    try {
+      const res = await redisClient.incr(key);
+      if (ttlSeconds && res === 1) {
+        await redisClient.expire(key, ttlSeconds);
+      }
+      return res;
+    } catch {
+      metrics.errors++;
+    }
+  }
+
+  // 3. Upstash REST
+  if (UPSTASH_REST_URL && UPSTASH_REST_TOKEN) {
+    try {
+      const res = await upstashRestPost('INCR', key);
+      if (typeof res === 'number') {
+        if (ttlSeconds && res === 1) {
+          await upstashRestPost('EXPIRE', key, ttlSeconds);
+        }
+        return res;
+      }
+    } catch {
+      metrics.errors++;
+    }
+  }
+
+  return count;
+}
+
+/**
  * Delete cached key across all tiers
  */
 export async function cacheDelete(key: string): Promise<void> {
