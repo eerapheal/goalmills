@@ -22,6 +22,7 @@ import {
 } from '@goalmills/types';
 import { advancedCricketApi } from '../services/advancedCricketApi';
 import { CricketMatchCard } from '../components/CricketMatchCard';
+import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 type CricketTab = 'live' | 'upcoming' | 'results' | 'standings' | 'series' | 'teams';
@@ -548,6 +549,14 @@ export function CricketScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Top Cricket Pulse Wire Ticker */}
+      <PulseNewsTicker
+        sport="cricket"
+        pulseLabel="CRICKET PULSE"
+        actionLabel={activeTab === 'live' ? '📅 Upcoming' : '⚡ Live'}
+        onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
+      />
+
       {/* Search Header */}
       <View style={styles.searchRow}>
         <View style={styles.searchBar}>

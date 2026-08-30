@@ -15,6 +15,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballMatchCard, UnifiedMatchEvent } from '../components/FootballMatchCard';
+import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { apiFootballService, ApiFootballFixtureItem } from '../services/apiFootball';
 import { advancedFootballApi } from '../services/advancedFootballApi';
 
@@ -228,6 +229,14 @@ export function AdvancedFootballScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Top Football Pulse Wire Ticker */}
+      <PulseNewsTicker
+        sport="football"
+        pulseLabel="FOOTBALL PULSE"
+        actionLabel={activeTab === 'live' ? '📅 Upcoming' : '⚡ Live'}
+        onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
+      />
+
       {/* Header Search & Refresh */}
       <View style={styles.headerBar}>
         <View style={styles.searchContainer}>

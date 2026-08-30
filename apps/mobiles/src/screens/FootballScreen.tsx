@@ -21,6 +21,7 @@ import { FixtureCard } from '../components/FixtureCard';
 import { StandingsTable } from '../components/StandingsTable';
 import { NewsCard } from '../components/NewsCard';
 import { VideoCard } from '../components/VideoCard';
+import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'news' | 'videos';
@@ -229,6 +230,14 @@ export function FootballScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Top Football Pulse Wire Ticker */}
+      <PulseNewsTicker
+        sport="football"
+        pulseLabel="FOOTBALL PULSE"
+        actionLabel={activeTab === 'live' ? '📅 Upcoming' : '⚡ Live'}
+        onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
+      />
+
       <View>
         {/* Tabs */}
         <ScrollView

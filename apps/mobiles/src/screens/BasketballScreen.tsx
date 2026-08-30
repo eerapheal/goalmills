@@ -16,6 +16,7 @@ import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { basketballApiService, ApiBasketballGameItem } from '../services/basketballApi';
 import { BasketballMatchCard } from '../components/BasketballMatchCard';
+import { PulseNewsTicker } from '../components/PulseNewsTicker';
 import { GoalmillsLoader } from '../components/GoalmillsLoader';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
@@ -154,6 +155,14 @@ export default function BasketballScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Top Basketball Pulse Wire Ticker */}
+      <PulseNewsTicker
+        sport="basketball"
+        pulseLabel="BASKETBALL PULSE"
+        actionLabel={activeTab === 'live' ? '📅 Upcoming' : '⚡ Live'}
+        onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
+      />
+
       {/* Search Header */}
       <View style={styles.header}>
         <View style={styles.searchBox}>
