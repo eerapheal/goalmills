@@ -3579,4 +3579,127 @@ export interface SearchDiagnosticsStats {
   failedIndexQueueCount: number;
 }
 
+// ==========================================
+// PHASE 7: DISTRIBUTED SPORTS EVENT & STREAM PIPELINE
+// ==========================================
+
+export type SportsEventType =
+  | 'match_goal'
+  | 'match_card'
+  | 'match_penalty'
+  | 'match_var'
+  | 'match_status_change'
+  | 'cricket_wicket'
+  | 'cricket_boundary'
+  | 'basketball_score'
+  | 'matchday_pulse'
+  | 'fan_vote'
+  | 'article_read'
+  | 'video_play'
+  | 'sponsorship_impression'
+  | 'sponsorship_click'
+  | 'recommendation_interaction'
+  | 'breaking_sports_alert'
+  | 'transfer_rumor_surge';
+
+export type SportsStreamPriority = 'realtime' | 'high' | 'standard' | 'batch';
+
+export interface SportsTelemetryPayload {
+  matchId?: string;
+  fixtureId?: string;
+  sportSlug?: string;
+  competitionSlug?: string;
+  homeTeam?: string;
+  awayTeam?: string;
+  score?: string;
+  minute?: number | string;
+  player?: string;
+  actionDetail?: string;
+  articleId?: string;
+  sponsorshipId?: string;
+  candidateId?: string;
+  device?: 'desktop' | 'mobile' | 'tablet';
+  sessionHash?: string;
+  scrollDepth?: number;
+  durationMs?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface StreamEventEnvelope<T = SportsTelemetryPayload> {
+  eventId: string;
+  tenantId?: string;
+  tenantSlug: string;
+  eventType: SportsEventType | string;
+  priority: SportsStreamPriority;
+  timestamp: string;
+  producer: string;
+  idempotencyKey: string;
+  payload: T;
+  retryCount?: number;
+  traceId?: string;
+}
+
+export interface StreamConsumerGroupInfo {
+  name: string;
+  stream: string;
+  consumers: number;
+  pending: number;
+  lastDeliveredId: string;
+  lag: number;
+  status: 'healthy' | 'lagging' | 'degraded';
+}
+
+export interface DeadLetterEventRecord {
+  _id?: string;
+  eventId: string;
+  tenantSlug: string;
+  eventType: SportsEventType | string;
+  streamName: string;
+  consumerGroup: string;
+  payload: Record<string, any>;
+  errorMessage: string;
+  stackTrace?: string;
+  attempts: number;
+  failedAt: string;
+  status: 'pending' | 'resolved' | 'discarded' | 'replayed';
+  replayedAt?: string;
+  resolvedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PipelineThroughputStats {
+  status: 'optimal' | 'elevated' | 'congested';
+  currentEventsPerSec: number;
+  peakEventsPerSec24h: number;
+  totalEventsProcessed24h: number;
+  avgIngestLatencyMs: number;
+  consumerGroups: StreamConsumerGroupInfo[];
+  deadLetterCount: number;
+  unresolvedDeadLetters: number;
+  sportTelemetryBreakdown: {
+    football: number;
+    cricket: number;
+    basketball: number;
+    editorial: number;
+    sponsorship: number;
+  };
+  lastHeartbeat: string;
+}
+
+export interface LiveMatchStreamEvent {
+  matchId: string;
+  sport: 'football' | 'cricket' | 'basketball' | string;
+  league: string;
+  homeTeam: string;
+  awayTeam: string;
+  score: string;
+  minute: string;
+  eventType: 'goal' | 'red_card' | 'wicket' | 'sixer' | 'dunk' | 'buzzer_beater' | 'halftime' | 'fulltime';
+  headline: string;
+  detail: string;
+  timestamp: string;
+}
+
+
 

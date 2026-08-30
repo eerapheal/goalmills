@@ -143,6 +143,15 @@ const PRIMARY_TABS: PrimaryTab[] = [
         requiredPermission: 'articles:draft',
         badge: 'Index',
       },
+      {
+        id: 'event_stream',
+        label: 'Stream & Telemetry',
+        href: '/admin/events',
+        description: 'Real-time sports event broker, live match moments & DLQ',
+        icon: FiZap,
+        requiredPermission: 'articles:draft',
+        badge: 'Stream',
+      },
     ],
   },
   {
@@ -262,6 +271,8 @@ const PRIMARY_TABS: PrimaryTab[] = [
 
 // Quick jump desktop shortcut chips for high frequency operations
 const QUICK_SHORTCUTS = [
+  { label: 'Stream & DLQ', href: '/admin/events', icon: FiZap, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
+  { label: 'Search Index', href: '/admin/search', icon: FiSearch, color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20' },
   { label: 'Recommendations', href: '/admin/recommendations', icon: FiSliders, color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20' },
   { label: 'Analytics', href: '/admin/analytics', icon: FiActivity, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20' },
   { label: 'Portal', href: '/admin/portal', icon: FiLayout, color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20' },
