@@ -18,6 +18,7 @@ export function SportsPulseNewsSection() {
   const fallbackArticles = [
     {
       id: 'art-1',
+      slug: 'champions-league-quarterfinal-tactical-breakdown',
       title: 'Champions League Quarterfinal Tactical Breakdown: High-Press vs Deep Block',
       excerpt:
         "How elite managers are manipulating midfield overloads and half-space runs in this year's knockout stages.",
@@ -28,9 +29,12 @@ export function SportsPulseNewsSection() {
       date: 'Today',
       author: 'Tactical Desk',
       isHot: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'art-2',
+      slug: 'ipl-2026-powerplay-analytics',
       title: 'IPL 2026 Powerplay Analytics: Why Death-Over Strike Rates are Soaring Past 210',
       excerpt:
         'An analytical deep dive into modern T20 boundary percentages and bowler release angle variations.',
@@ -41,9 +45,12 @@ export function SportsPulseNewsSection() {
       date: '2 hrs ago',
       author: 'Cricket Lab',
       isHot: false,
+      imageUrl:
+        'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'art-3',
+      slug: 'nba-playoff-race-clutch-shooting-metrics',
       title: 'NBA Playoff Race: Clutch Shooting Metrics & Fourth-Quarter Defensive Ratings',
       excerpt:
         'Analyzing the top 5 perimeter defenders shutting down scoring champions in the final two minutes.',
@@ -54,9 +61,12 @@ export function SportsPulseNewsSection() {
       date: '4 hrs ago',
       author: 'Hoops Insider',
       isHot: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'art-4',
+      slug: 'european-transfer-window-intel',
       title: 'European Transfer Window Intel: Contract Clauses & Imminent Moves',
       excerpt:
         'Behind-the-scenes breakdown of release clause deadlines and valuation models across top 5 leagues.',
@@ -67,6 +77,8 @@ export function SportsPulseNewsSection() {
       date: '6 hrs ago',
       author: 'Transfer Desk',
       isHot: false,
+      imageUrl:
+        'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80',
     },
   ];
 
@@ -78,9 +90,12 @@ export function SportsPulseNewsSection() {
     thumbnail?: string;
     sport?: string;
   }>({
+    id: '',
     title: 'Top Goals & Decisive Plays of the Week',
     duration: '08:42',
     sport: 'FOOTBALL',
+    thumbnail:
+      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
   });
 
   React.useEffect(() => {
@@ -88,13 +103,13 @@ export function SportsPulseNewsSection() {
     async function fetchLivePulseContent() {
       try {
         const [newsRes, videoRes] = await Promise.all([
-          fetch('/api/news?limit=10').catch(() => null),
+          fetch('/api/news?limit=12').catch(() => null),
           fetch('/api/videos?limit=1').catch(() => null),
         ]);
 
         if (newsRes && newsRes.ok) {
           const data = await newsRes.json();
-          const newsItems = Array.isArray(data) ? data : data.news || [];
+          const newsItems = Array.isArray(data) ? data : data.news || data.data || [];
           if (Array.isArray(newsItems) && newsItems.length > 0 && isMounted) {
             const mapped = newsItems.map((item: any, idx: number) => {
               const cat = (item.sport || item.category || 'football').toLowerCase();
@@ -107,19 +122,30 @@ export function SportsPulseNewsSection() {
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                       : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
 
+              const fallbackCatImage =
+                cat === 'cricket'
+                  ? 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80'
+                  : cat === 'basketball'
+                    ? 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80'
+                    : cat === 'transfers'
+                      ? 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80'
+                      : 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80';
+
               return {
-                id: item._id || `live-art-${idx}`,
+                id: item._id || item.id || `live-art-${idx}`,
+                slug: item.slug || item._id || item.id || `live-art-${idx}`,
                 title: item.title,
                 excerpt: item.summary || item.excerpt || item.title,
                 category: cat,
                 categoryName: cat.charAt(0).toUpperCase() + cat.slice(1),
                 readTime: `${item.readTime || 4} min read`,
                 tagColor,
-                date: item.publishedAt
-                  ? new Date(item.publishedAt).toLocaleDateString()
+                date: item.publishedAt || item.createdAt
+                  ? new Date(item.publishedAt || item.createdAt).toLocaleDateString()
                   : 'Latest',
                 author: item.author || 'GoalMills Sports Desk',
                 isHot: idx === 0 || !!item.isBreaking,
+                imageUrl: item.imageUrl || item.image || item.thumbnailUrl || item.thumbnail || fallbackCatImage,
               };
             });
             setArticles(mapped);
@@ -135,7 +161,7 @@ export function SportsPulseNewsSection() {
               id: v._id || v.id,
               title: v.title || 'Top Goals & Matchday Highlights',
               duration: v.duration || '05:30',
-              thumbnail: v.thumbnailUrl || v.thumbnail,
+              thumbnail: v.thumbnailUrl || v.thumbnail || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
               sport: (v.sport || 'FOOTBALL').toUpperCase(),
             });
           }
@@ -173,10 +199,20 @@ export function SportsPulseNewsSection() {
     }
   };
 
+  const tabs: Array<{ id: 'all' | 'football' | 'cricket' | 'basketball' | 'transfers'; label: string }> = [
+    { id: 'all', label: 'All Pulse' },
+    { id: 'football', label: 'Football' },
+    { id: 'cricket', label: 'Cricket' },
+    { id: 'basketball', label: 'Basketball' },
+    { id: 'transfers', label: 'Transfers' },
+  ];
+
   const filteredArticles =
     activeCategory === 'all'
       ? articles
       : articles.filter((art) => art.category === activeCategory);
+
+  const videoLink = spotlightVideo.id ? `/highlights/${spotlightVideo.id}` : '/highlights';
 
   return (
     <section className="relative bg-[#070E1A] py-16 md:py-24 border-t border-blue-500/20 text-white overflow-hidden">
@@ -184,7 +220,7 @@ export function SportsPulseNewsSection() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 rounded-full blur-[160px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with Title & Filter Pills */}
+        {/* Header with Title & Dynamic Filter Pills */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider mb-3 shadow-sm">
@@ -203,71 +239,106 @@ export function SportsPulseNewsSection() {
             </p>
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#091529] border border-blue-500/20 rounded-2xl shadow-xl">
-            {(['all', 'football', 'cricket', 'basketball', 'transfers'] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-black capitalize transition-all ${
-                  activeCategory === cat
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 scale-[1.02]'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {cat === 'all' ? 'All Pulse' : cat}
-              </button>
-            ))}
+          {/* Dynamic Filter Pills with Article Counts */}
+          <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#091529] border border-blue-500/20 rounded-2xl shadow-xl">
+            {tabs.map((tab) => {
+              const count =
+                tab.id === 'all'
+                  ? articles.length
+                  : articles.filter((a) => a.category === tab.id).length;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCategory(tab.id)}
+                  className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
+                    activeCategory === tab.id
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 scale-[1.02]'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      activeCategory === tab.id
+                        ? 'bg-black/25 text-slate-950'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Main Content Grid: Left Articles / Right Spotlight & Newsletter */}
+        {/* Main Content Grid: Left 2-Col News Articles Grid / Right Spotlight & Newsletter */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Trending Articles Grid (7 Cols) */}
-          <div className="lg:col-span-7 space-y-4">
-            {filteredArticles.map((article) => (
-              <Link
-                href="/news"
-                key={article.id}
-                className="group block bg-[#0B172B]/80 hover:bg-[#0E203C] border border-blue-500/15 hover:border-amber-400/40 rounded-3xl p-5 md:p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-900/20 relative overflow-hidden"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border ${article.tagColor}`}
-                    >
-                      {article.categoryName}
-                    </span>
-                    {article.isHot && (
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
-                        <span>🔥</span> Trending
-                      </span>
+          {/* Left Column: Trending Articles 2-Col Grid (7 Cols on desktop) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              {filteredArticles.map((article) => {
+                const articleUrl = article.slug || article.id ? `/news/${article.slug || article.id}` : '/news';
+                return (
+                  <Link
+                    href={articleUrl}
+                    key={article.id}
+                    className="group relative flex flex-col justify-between rounded-3xl p-5 sm:p-6 transition-all duration-300 border border-blue-500/20 hover:border-amber-400/50 hover:shadow-2xl hover:shadow-amber-500/10 overflow-hidden min-h-[260px]"
+                  >
+                    {/* Background Image with Dark Gradient Scrim */}
+                    {article.imageUrl && (
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                        style={{ backgroundImage: `url(${article.imageUrl})` }}
+                      />
                     )}
-                  </div>
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
-                    <span>🕒 {article.readTime}</span>
-                    <span>•</span>
-                    <span>{article.date}</span>
-                  </span>
-                </div>
+                    {/* Gradient Overlay for high-contrast typography readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#070E1A] via-[#091529]/92 to-[#091529]/75 backdrop-blur-[2px] transition-colors group-hover:via-[#091529]/85" />
 
-                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 transition-colors leading-snug mb-2">
-                  {article.title}
-                </h3>
+                    {/* Content (Z-Indexed over Background) */}
+                    <div className="relative z-10">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-lg border backdrop-blur-sm ${article.tagColor}`}
+                          >
+                            {article.categoryName}
+                          </span>
+                          {article.isHot && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500/30 text-rose-200 border border-rose-500/40 flex items-center gap-1">
+                              <span>🔥</span> Hot
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-300 font-medium">
+                          {article.date}
+                        </span>
+                      </div>
 
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed line-clamp-2">
-                  {article.excerpt}
-                </p>
+                      <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-300 transition-colors leading-snug mb-2 line-clamp-2">
+                        {article.title}
+                      </h3>
 
-                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-semibold">By {article.author}</span>
-                  <span className="text-amber-400 group-hover:text-amber-300 font-bold inline-flex items-center gap-1">
-                    <span>Read Analysis</span>
-                    <FiArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+                      <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">
+                        {article.excerpt}
+                      </p>
+                    </div>
+
+                    {/* Footer Meta */}
+                    <div className="relative z-10 mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                      <span className="text-[11px] text-slate-300 font-medium truncate max-w-[120px]">
+                        By {article.author}
+                      </span>
+                      <span className="text-amber-400 group-hover:text-amber-300 font-bold inline-flex items-center gap-1 text-[11px]">
+                        <span>Read</span>
+                        <FiArrowRight className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
 
             <div className="pt-2 text-center">
               <Link
@@ -284,7 +355,7 @@ export function SportsPulseNewsSection() {
           <div className="lg:col-span-5 space-y-6">
             {/* Highlights Spotlight Card */}
             <Link
-              href="/highlights"
+              href={videoLink}
               className="group block relative bg-gradient-to-br from-[#0B172B] via-[#0E203C] to-[#070E1A] border border-blue-500/25 hover:border-amber-400/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl shadow-xl overflow-hidden"
             >
               <div className="flex items-center justify-between mb-4">
@@ -381,3 +452,4 @@ export function SportsPulseNewsSection() {
     </section>
   );
 }
+
