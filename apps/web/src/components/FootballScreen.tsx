@@ -34,6 +34,20 @@ export const MAJOR_LEAGUES = [
   { id: '207', name: 'Serie A', country: 'Italy', flag: '🇮🇹', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/207_serie-a.png' },
   { id: '175', name: 'Bundesliga', country: 'Germany', flag: '🇩🇪', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/175_bundesliga.png' },
   { id: '168', name: 'Ligue 1', country: 'France', flag: '🇫🇷', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/168_ligue-1.png' },
+  { id: '4', name: 'Europa League', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/4_uefa-europa-league.png' },
+  { id: '6', name: 'AFCON', country: 'Africa', flag: '🌍', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/6_africa-cup-of-nations.png' },
+  { id: '28', name: 'FIFA World Cup', country: 'International', flag: '🌐', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/28_fifa-world-cup.png' },
+  { id: '1', name: 'UEFA EURO', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/1_european-championship.png' },
+  { id: '17', name: 'Copa América', country: 'S. America', flag: '🌎', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/17_copa-america.png' },
+  { id: '5', name: 'Nations League', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/5_uefa-nations-league.png' },
+  { id: '146', name: 'FA Cup', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/146_fa-cup.png' },
+  { id: '19', name: 'CAF CL', country: 'Africa', flag: '🌍', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/19_caf-champions-league.png' },
+  { id: '13', name: 'Libertadores', country: 'S. America', flag: '🌎', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/13_copa-libertadores.png' },
+  { id: '278', name: 'Saudi Pro League', country: 'Saudi Arabia', flag: '🇸🇦', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/278_pro-league.png' },
+  { id: '244', name: 'Eredivisie', country: 'Netherlands', flag: '🇳🇱', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/244_eredivisie.png' },
+  { id: '266', name: 'Liga Portugal', country: 'Portugal', flag: '🇵🇹', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/266_liga-portugal.png' },
+  { id: '322', name: 'Süper Lig', country: 'Turkey', flag: '🇹🇷', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/322_super-lig.png' },
+  { id: '99', name: 'Brasileirão', country: 'Brazil', flag: '🇧🇷', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/99_serie-a.png' },
 ];
 
 export function FootballScreen() {

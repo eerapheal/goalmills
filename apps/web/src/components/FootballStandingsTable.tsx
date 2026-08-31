@@ -10,12 +10,14 @@ interface FootballStandingsTableProps {
   standings: FootballStanding[];
   teams?: FootballTeam[];
   leagueId?: string | number;
+  compact?: boolean;
 }
 
 export function FootballStandingsTable({
   standings,
   teams = [],
   leagueId,
+  compact = false,
 }: FootballStandingsTableProps) {
   // Tournament-specific configurations
   const isUCL = String(leagueId) === '3';

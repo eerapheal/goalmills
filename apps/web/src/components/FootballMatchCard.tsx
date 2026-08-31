@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { buildMatchSlug, footballRoutes, slugify } from '@/lib/slugUtils';
 
 export interface UnifiedWebMatchEvent {
   event_key: string | number;
@@ -84,11 +85,13 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
     return 'VS';
   }, [isFinished, isLive, event.event_final_result, event.event_ft_result]);
 
+  const matchSlug = useMemo(() => buildMatchSlug(event), [event]);
+
   const handleClick = () => {
     if (onPress) {
       onPress();
     } else {
-      router.push(`/matches/${event.event_key}`);
+      router.push(footballRoutes.match(matchSlug));
     }
   };
 
@@ -151,7 +154,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3 relative z-10">
         {/* Home Team */}
         <Link
-          href={event.home_team_key ? `/teams/${event.home_team_key}` : '#'}
+          href={footballRoutes.teamFromName(event.event_home_team)}
           onClick={(e) => e.stopPropagation()}
           className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
         >
@@ -198,7 +201,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
 
         {/* Away Team */}
         <Link
-          href={event.away_team_key ? `/teams/${event.away_team_key}` : '#'}
+          href={footballRoutes.teamFromName(event.event_away_team)}
           onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right hover:text-blue-400 transition-colors"
         >

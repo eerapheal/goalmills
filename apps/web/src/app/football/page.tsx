@@ -19,13 +19,14 @@ import {
 } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
+import { getCompetitionsByCategory } from '@/lib/competitionCategories';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Live Football Scores, Premier League Fixtures, Transfers & Tables | GoalMills',
+  title: 'Live Football Scores, 80+ Leagues, Fixtures, Transfers & Tables | GoalMills',
   description:
-    'Real-time live football scores, Premier League, Champions League, La Liga, Serie A fixtures, confirmed transfer news, match predictions, and league standings.',
+    'Real-time live football scores across 80+ major leagues including Premier League, Champions League, La Liga, Serie A, AFCON, FIFA World Cup. Fixtures, confirmed transfers, match predictions, and league standings.',
 };
 
 export default async function FootballHubPage() {
@@ -70,7 +71,7 @@ export default async function FootballHubPage() {
     console.error('Error loading football hub data:', err);
   }
 
-  const competitions = EntityService.getAllCompetitions();
+  const competitionGroups = getCompetitionsByCategory();
   const topTransfers = EntityService.getTransfers().slice(0, 3);
   const featuredClubs = Object.values(CLUBS_REGISTRY).slice(0, 8);
 
@@ -80,46 +81,23 @@ export default async function FootballHubPage() {
       header={<LiveNewsFlashTicker sport="football" badgeText="FOOTBALL WIRE" />}
       sidebar={
         <div className="space-y-6">
-          {/* Major Competitions Quick Navigator */}
+          {/* Trending Transfers Desk */}
           <div className="rounded-3xl border border-blue-500/20 bg-[#0A162B]/90 p-5 space-y-4 shadow-xl backdrop-blur-md">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <FiAward className="text-amber-400" />
-                <span>Major Competitions</span>
+                <FiTrendingUp className="text-amber-400" />
+                <span>Transfer News & Rumours</span>
               </h3>
-              <span className="text-[10px] text-amber-400 uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                Top Leagues
-              </span>
+              <Link
+                href="/transfers"
+                className="text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline"
+              >
+                View All →
+              </Link>
             </div>
-            <div className="space-y-2">
-              {competitions.map((comp) => (
-                <Link
-                  key={comp.slug}
-                  href={`/football/${comp.slug}`}
-                  className="group flex items-center justify-between p-3 rounded-2xl bg-[#070F1E] hover:bg-blue-600/20 border border-blue-500/15 hover:border-amber-400/40 transition-all shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-9 w-9 rounded-xl bg-slate-900 border border-white/10 p-1.5 flex items-center justify-center group-hover:border-blue-400 transition-colors">
-                      <Image
-                        src={comp.logo}
-                        alt={comp.name}
-                        width={24}
-                        height={24}
-                        className="object-contain"
-                      />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
-                        {comp.name}
-                      </h4>
-                      <p className="text-[10px] text-slate-400">{comp.country}</p>
-                    </div>
-                  </div>
-                  <FiArrowRight
-                    size={14}
-                    className="text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-transform"
-                  />
-                </Link>
+            <div className="space-y-3">
+              {topTransfers.map((t) => (
+                <TransferCenterCard key={t.id} transfer={t} />
               ))}
             </div>
           </div>
@@ -139,7 +117,7 @@ export default async function FootballHubPage() {
               {featuredClubs.map((club) => (
                 <Link
                   key={club.slug}
-                  href={`/football/${club.competitionSlug}/${club.slug}`}
+                  href={`/football/teams/${club.slug}`}
                   className="group flex flex-col items-center text-center p-3 rounded-2xl bg-[#070F1E] hover:bg-blue-600/20 border border-blue-500/15 hover:border-blue-400/40 transition-all"
                 >
                   <div className="relative h-10 w-10 rounded-xl bg-slate-900 border border-white/10 p-1.5 mb-2 flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -158,27 +136,6 @@ export default async function FootballHubPage() {
                     {club.manager}
                   </span>
                 </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Trending Transfers Desk */}
-          <div className="rounded-3xl border border-blue-500/20 bg-[#0A162B]/90 p-5 space-y-4 shadow-xl backdrop-blur-md">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <FiTrendingUp className="text-amber-400" />
-                <span>Transfer News & Rumours</span>
-              </h3>
-              <Link
-                href="/transfers"
-                className="text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline"
-              >
-                View All →
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {topTransfers.map((t) => (
-                <TransferCenterCard key={t.id} transfer={t} />
               ))}
             </div>
           </div>
@@ -209,6 +166,54 @@ export default async function FootballHubPage() {
       {/* Live Match Engine Section */}
       <section className="space-y-4">
         <FootballScreen />
+      </section>
+
+      {/* ─── All 80 Major Competitions Grid ─────────────────────────────── */}
+      <section className="pt-6 border-t border-white/10 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+            <FiAward className="text-amber-400" />
+            <span>All Major Competitions</span>
+          </h2>
+          <span className="text-[10px] text-amber-400 uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+            80+ Leagues
+          </span>
+        </div>
+
+        {competitionGroups.map((group) => (
+          <div key={group.category} className="space-y-3">
+            <h3 className="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <span>{group.icon}</span>
+              <span>{group.label}</span>
+              <span className="text-[10px] text-slate-500 font-mono">({group.competitions.length})</span>
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {group.competitions.map((comp) => (
+                <Link
+                  key={comp.slug}
+                  href={`/football/${comp.slug}`}
+                  className="group flex items-center gap-2.5 p-2.5 rounded-xl bg-[#0B1526]/50 border border-white/5 hover:border-blue-500/30 hover:bg-blue-600/10 transition-all"
+                >
+                  <div className="relative h-8 w-8 rounded-lg bg-white/5 border border-white/10 p-1 flex items-center justify-center shrink-0 group-hover:border-blue-400 transition-colors">
+                    <Image
+                      src={comp.logo}
+                      alt={comp.name}
+                      width={22}
+                      height={22}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-[11px] font-bold text-white group-hover:text-blue-400 transition-colors truncate">
+                      {comp.name}
+                    </h4>
+                    <p className="text-[9px] text-slate-500 truncate">{comp.flag} {comp.country}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
       {/* Featured Articles Grid */}

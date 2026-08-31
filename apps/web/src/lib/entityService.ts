@@ -1,4 +1,5 @@
 import { TransferItem, ArticleType } from '@goalmills/types';
+import { ALL_COMPETITIONS, CompetitionEntry, getCompetitionMap } from './competitionCategories';
 
 export interface CompetitionMeta {
   id: number;
@@ -54,74 +55,29 @@ export interface PlayerMeta {
   };
 }
 
-export const COMPETITIONS_REGISTRY: Record<string, CompetitionMeta> = {
-  'premier-league': {
-    id: 152,
-    name: 'Premier League',
-    slug: 'premier-league',
-    country: 'England',
-    logo: 'https://media.api-sports.io/football/leagues/39.png',
-    season: '2025/2026',
-    featured: true,
-    tier: 1,
-    description: 'The top tier of English football featuring 20 premier clubs.',
-  },
-  'champions-league': {
-    id: 300,
-    name: 'UEFA Champions League',
-    slug: 'champions-league',
-    country: 'Europe',
-    logo: 'https://media.api-sports.io/football/leagues/2.png',
-    season: '2025/2026',
-    featured: true,
-    tier: 1,
-    description: "Europe's most prestigious club football competition.",
-  },
-  'la-liga': {
-    id: 302,
-    name: 'La Liga',
-    slug: 'la-liga',
-    country: 'Spain',
-    logo: 'https://media.api-sports.io/football/leagues/140.png',
-    season: '2025/2026',
-    featured: true,
-    tier: 1,
-    description: 'The pinnacle of Spanish domestic football.',
-  },
-  'serie-a': {
-    id: 207,
-    name: 'Serie A',
-    slug: 'serie-a',
-    country: 'Italy',
-    logo: 'https://media.api-sports.io/football/leagues/135.png',
-    season: '2025/2026',
-    featured: true,
-    tier: 1,
-    description: 'The top league in Italian football with tactical mastery.',
-  },
-  bundesliga: {
-    id: 175,
-    name: 'Bundesliga',
-    slug: 'bundesliga',
-    country: 'Germany',
-    logo: 'https://media.api-sports.io/football/leagues/78.png',
-    season: '2025/2026',
-    featured: true,
-    tier: 1,
-    description: "Germany's top flight known for high-tempo attacking football.",
-  },
-  'african-football': {
-    id: 999,
-    name: 'African Football (CAF / AFCON)',
-    slug: 'african-football',
-    country: 'Africa',
-    logo: 'https://media.api-sports.io/football/leagues/6.png',
-    season: '2025/2026',
-    featured: true,
-    tier: 1,
-    description: 'CAF Champions League, AFCON, and elite African stars across the globe.',
-  },
-};
+/**
+ * Auto-build COMPETITIONS_REGISTRY from the master 80-competition list.
+ * This ensures backward compatibility with code that does COMPETITIONS_REGISTRY['premier-league'].
+ */
+function buildCompetitionsRegistry(): Record<string, CompetitionMeta> {
+  const registry: Record<string, CompetitionMeta> = {};
+  for (const comp of ALL_COMPETITIONS) {
+    registry[comp.slug] = {
+      id: comp.id,
+      name: comp.name,
+      slug: comp.slug,
+      country: comp.country,
+      logo: comp.logo,
+      season: comp.season,
+      featured: comp.featured,
+      tier: comp.tier,
+      description: comp.description,
+    };
+  }
+  return registry;
+}
+
+export const COMPETITIONS_REGISTRY: Record<string, CompetitionMeta> = buildCompetitionsRegistry();
 
 export const CLUBS_REGISTRY: Record<string, ClubMeta> = {
   arsenal: {

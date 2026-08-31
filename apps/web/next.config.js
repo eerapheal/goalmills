@@ -78,6 +78,24 @@ const nextConfig = {
         destination: '/signin',
         permanent: true,
       },
+      // Backward-compat redirects: old ID-based routes → new slug routes
+      {
+        source: '/coaches/:id',
+        destination: '/football/coaches/:id',
+        permanent: true,
+      },
+      {
+        source: '/officials/:id',
+        destination: '/football/officials/:id',
+        permanent: true,
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      // Allow /matches/:id to be served by the legacy match page (still works)
+      // while /football/matches/:slug is the canonical SEO route
     ];
   },
 
