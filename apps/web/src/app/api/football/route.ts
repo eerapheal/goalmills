@@ -51,7 +51,7 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
 
   // Copy existing params
   searchParams.forEach((value, key) => {
-    if (key !== 'met' && key !== 'APIkey' && value) {
+    if (key !== 'met' && key !== 'APIkey' && value !== undefined && value !== null && value !== '') {
       params[key] = value;
     }
   });
@@ -61,6 +61,18 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
   if (m === 'livescore' || m === 'live' || (m === 'fixtures' && searchParams.get('live'))) {
     normalizedMethod = 'Livescore';
     delete params.live;
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (params.country) {
+      params.countryId = params.country;
+      delete params.country;
+    }
+    if (params.match) {
+      params.matchId = params.match;
+      delete params.match;
+    }
   } else if (m === 'fixtures' || m === 'fixture') {
     normalizedMethod = 'Fixtures';
     // If date is passed (YYYY-MM-DD), set from and to
@@ -81,9 +93,14 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
       params.teamId = params.team;
       delete params.team;
     }
-    if (params.id) {
-      params.matchId = params.id;
+    if (params.id || params.match) {
+      params.matchId = params.id || params.match;
       delete params.id;
+      delete params.match;
+    }
+    if (params.country) {
+      params.countryId = params.country;
+      delete params.country;
     }
   } else if (m === 'standings' || m === 'standing') {
     normalizedMethod = 'Standings';
@@ -115,20 +132,81 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
       params.teamId = params.team;
       delete params.team;
     }
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
   } else if (m === 'players' || m === 'player') {
     normalizedMethod = 'Players';
     if (params.player) {
       params.playerId = params.player;
       delete params.player;
     }
+    if (params.team) {
+      params.teamId = params.team;
+      delete params.team;
+    }
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
   } else if (m === 'h2h') {
     normalizedMethod = 'H2H';
-  } else if (m === 'odds') {
+    if (params.firstTeam && !params.firstTeamId) {
+      params.firstTeamId = params.firstTeam;
+      delete params.firstTeam;
+    }
+    if (params.secondTeam && !params.secondTeamId) {
+      params.secondTeamId = params.secondTeam;
+      delete params.secondTeam;
+    }
+  } else if (m === 'odds' || m === 'odd') {
     normalizedMethod = 'Odds';
-  } else if (m === 'comments') {
-    normalizedMethod = 'Comments';
+    if (params.match && !params.matchId) {
+      params.matchId = params.match;
+      delete params.match;
+    }
+    if (params.league && !params.leagueId) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+  } else if (m === 'probabilities' || m === 'probability') {
+    normalizedMethod = 'Probabilities';
+    if (params.match && !params.matchId) {
+      params.matchId = params.match;
+      delete params.match;
+    }
+    if (params.league && !params.leagueId) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+  } else if (m === 'oddslive' || m === 'liveodds') {
+    normalizedMethod = 'OddsLive';
+    if (params.match && !params.matchId) {
+      params.matchId = params.match;
+      delete params.match;
+    }
+    if (params.league && !params.leagueId) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+  } else if (m === 'fullodds' || m === 'full_odds') {
+    normalizedMethod = 'FullOdds';
+    if (params.match && !params.matchId) {
+      params.matchId = params.match;
+      delete params.match;
+    }
+    if (params.league && !params.leagueId) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
   } else if (m === 'videos' || m === 'video') {
     normalizedMethod = 'Videos';
+    if (params.matchId || params.id) {
+      params.eventId = params.matchId || params.id;
+      delete params.matchId;
+      delete params.id;
+    }
   } else if (m === 'countries' || m === 'country') {
     normalizedMethod = 'Countries';
   } else {
@@ -144,24 +222,27 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
  */
 function getTtlForMethod(method: string): number {
   const m = method.toLowerCase();
-  if (m.includes('live')) {
-    return 15; // 15 seconds for live matches
+  if (m === 'livescore') {
+    return 15; // 15 seconds for live scores
   }
-  if (m.includes('fixture') || m.includes('oddslive') || m.includes('comments')) {
-    return 60; // 1 minute for fixtures / live commentary
+  if (m === 'oddslive') {
+    return 30; // 30 seconds for live in-play odds
   }
-  if (m.includes('standing') || m.includes('topscorer') || m.includes('odds')) {
-    return 300; // 5 minutes for standings & odds
+  if (m === 'fixtures') {
+    return 60; // 1 minute for fixtures
+  }
+  if (m === 'standings' || m === 'topscorers' || m === 'odds' || m === 'probabilities' || m === 'fullodds') {
+    return 300; // 5 minutes for standings, odds, predictions
   }
   if (
-    m.includes('league') ||
-    m.includes('team') ||
-    m.includes('country') ||
-    m.includes('player') ||
-    m.includes('h2h') ||
-    m.includes('video')
+    m === 'leagues' ||
+    m === 'teams' ||
+    m === 'countries' ||
+    m === 'players' ||
+    m === 'h2h' ||
+    m === 'videos'
   ) {
-    return 600; // 10 minutes for static metadata
+    return 600; // 10 minutes for static metadata, head to head, and media
   }
   return 60;
 }

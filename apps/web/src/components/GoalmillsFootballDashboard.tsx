@@ -303,12 +303,13 @@ export function GoalmillsFootballDashboard() {
 
               <div className="space-y-3.5">
                 {liveMatches.map((m) => (
-                  <div
+                  <Link
+                    href={`/matches/${m.id}`}
                     key={m.id}
-                    className="rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3.5 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md"
+                    className="block rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3.5 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md group cursor-pointer"
                   >
                     <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
-                      <span className="font-bold text-slate-200 flex items-center gap-1.5 truncate pr-2">
+                      <span className="font-bold text-slate-200 flex items-center gap-1.5 truncate pr-2 group-hover:text-amber-300 transition-colors">
                         <span className="text-amber-400">🏆</span> {m.league}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse flex-shrink-0">
@@ -324,7 +325,7 @@ export function GoalmillsFootballDashboard() {
                           {m.homeCode}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-xs sm:text-sm text-white truncate">{m.homeTeam}</div>
+                          <div className="font-bold text-xs sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.homeTeam}</div>
                           {m.homeGoalScorer && (
                             <div className="text-[10px] text-slate-400 truncate">{m.homeGoalScorer}</div>
                           )}
@@ -342,7 +343,7 @@ export function GoalmillsFootballDashboard() {
                       {/* Away Team */}
                       <div className="flex items-center justify-end gap-2.5 sm:gap-3 min-w-0 text-right">
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-xs sm:text-sm text-white truncate">{m.awayTeam}</div>
+                          <div className="font-bold text-xs sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.awayTeam}</div>
                           {m.awayGoalScorer && (
                             <div className="text-[10px] text-slate-400 truncate">{m.awayGoalScorer}</div>
                           )}
@@ -364,7 +365,7 @@ export function GoalmillsFootballDashboard() {
                         <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: `${m.awayPossession}%` }} />
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

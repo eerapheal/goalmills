@@ -27,6 +27,20 @@ import {
   FootballLiveOddsResponse,
   FootballCommentsResponse,
   FootballFullOddsResponse,
+  FootballCountriesParams,
+  FootballLeaguesParams,
+  FootballFixturesParams,
+  FootballH2HParams,
+  FootballLivescoreParams,
+  FootballStandingsParams,
+  FootballTopscorersParams,
+  FootballTeamsParams,
+  FootballPlayersParams,
+  FootballVideosParams,
+  FootballOddsParams,
+  FootballProbabilitiesParams,
+  FootballLiveOddsParams,
+  FootballFullOddsParams,
   FootballGoalScorer,
   FootballCard,
   FootballStatistic,
@@ -256,11 +270,18 @@ export const advancedFootballApi = {
    * Get list of supported leagues/competitions
    * Endpoint: ?met=Leagues&countryId={id}
    */
-  getLeagues: async (countryId?: number, leagueId?: number): Promise<FootballLeaguesResponse> => {
+  getLeagues: async (
+    paramsOrCountryId?: FootballLeaguesParams | { countryId?: string | number; leagueId?: string | number } | string | number,
+    leagueId?: string | number
+  ): Promise<FootballLeaguesResponse> => {
     try {
-      const params: Record<string, any> = {};
-      if (countryId) params.countryId = countryId;
-      if (leagueId) params.leagueId = leagueId;
+      let params: Record<string, any> = {};
+      if (typeof paramsOrCountryId === 'object' && paramsOrCountryId !== null) {
+        params = { ...paramsOrCountryId };
+      } else {
+        if (paramsOrCountryId) params.countryId = paramsOrCountryId;
+        if (leagueId) params.leagueId = leagueId;
+      }
 
       const response = await fetchFromAPI<FootballLeaguesResponse>('Leagues', params);
       return response;
@@ -272,21 +293,11 @@ export const advancedFootballApi = {
 
   /**
    * Get football fixtures/events
-   * Endpoint: ?met=Fixtures&from={date}&to={date}&leagueId={id}&matchId={id}&teamId={id}
+   * Endpoint: ?met=Fixtures&from={date}&to={date}&leagueId={id}&matchId={id}&teamId={id}&withPlayerStats={1}
    */
-  getFixtures: async (params?: {
-    from?: string;
-    to?: string;
-    leagueId?: number;
-    matchId?: number;
-    teamId?: number;
-    timezone?: string;
-    countryId?: number;
-    leagueGroup?: string;
-    withPlayerStats?: string | number;
-  }): Promise<FootballFixturesResponse> => {
+  getFixtures: async (params?: FootballFixturesParams): Promise<FootballFixturesResponse> => {
     try {
-      // If no date range provided, use default
+      // If no date range provided, use default 7 days back and forward
       const dateRange = params?.from && params?.to ? {} : getDateRange(7, 7);
 
       const apiParams: Record<string, any> = {
@@ -307,16 +318,21 @@ export const advancedFootballApi = {
    * Endpoint: ?met=H2H&firstTeamId={id}&secondTeamId={id}
    */
   getH2H: async (
-    firstTeamId: number,
-    secondTeamId: number,
+    firstTeamIdOrParams: FootballH2HParams | { firstTeamId: string | number; secondTeamId: string | number; timezone?: string } | string | number,
+    secondTeamId?: string | number,
     timezone?: string
   ): Promise<FootballH2HResponse> => {
     try {
-      const params: Record<string, any> = {
-        firstTeamId,
-        secondTeamId,
-      };
-      if (timezone) params.timezone = timezone;
+      let params: Record<string, any> = {};
+      if (typeof firstTeamIdOrParams === 'object' && firstTeamIdOrParams !== null) {
+        params = { ...firstTeamIdOrParams };
+      } else {
+        params = {
+          firstTeamId: firstTeamIdOrParams,
+          secondTeamId,
+        };
+        if (timezone) params.timezone = timezone;
+      }
 
       const response = await fetchFromAPI<FootballH2HResponse>('H2H', params);
       return response;
@@ -335,18 +351,11 @@ export const advancedFootballApi = {
 
   /**
    * Get live football matches
-   * Endpoint: ?met=Livescore&leagueId={id}&matchId={id}&countryId={id}
+   * Endpoint: ?met=Livescore&leagueId={id}&matchId={id}&countryId={id}&withPlayerStats={1}
    */
-  getLivescore: async (params?: {
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
-    timezone?: string;
-    withPlayerStats?: string | number;
-  }): Promise<FootballLivescoreResponse> => {
+  getLivescore: async (params?: FootballLivescoreParams): Promise<FootballLivescoreResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballLivescoreResponse>('Livescore', apiParams);
       return response;
     } catch (error) {
@@ -359,8 +368,15 @@ export const advancedFootballApi = {
    * Get league standings (total, home, away)
    * Endpoint: ?met=Standings&leagueId={id}
    */
-  getStandings: async (leagueId: number): Promise<FootballStandingsResponse> => {
+  getStandings: async (
+    paramsOrLeagueId: FootballStandingsParams | { leagueId: string | number } | string | number
+  ): Promise<FootballStandingsResponse> => {
     try {
+      const leagueId =
+        typeof paramsOrLeagueId === 'object' && paramsOrLeagueId !== null
+          ? (paramsOrLeagueId as any).leagueId
+          : paramsOrLeagueId;
+
       const response = await fetchFromAPI<FootballStandingsResponse>('Standings', { leagueId });
       return response;
     } catch (error) {
@@ -380,8 +396,15 @@ export const advancedFootballApi = {
    * Get top scorers for a league
    * Endpoint: ?met=Topscorers&leagueId={id}
    */
-  getTopscorers: async (leagueId: number): Promise<FootballTopscorersResponse> => {
+  getTopscorers: async (
+    paramsOrLeagueId: FootballTopscorersParams | { leagueId: string | number } | string | number
+  ): Promise<FootballTopscorersResponse> => {
     try {
+      const leagueId =
+        typeof paramsOrLeagueId === 'object' && paramsOrLeagueId !== null
+          ? (paramsOrLeagueId as any).leagueId
+          : paramsOrLeagueId;
+
       const response = await fetchFromAPI<FootballTopscorersResponse>('Topscorers', { leagueId });
       return response;
     } catch (error) {
@@ -394,14 +417,9 @@ export const advancedFootballApi = {
    * Get teams information with players
    * Endpoint: ?met=Teams&leagueId={id}&teamId={id}&teamName={name}
    */
-  getTeams: async (params?: {
-    leagueId?: number;
-    teamId?: number;
-    teamName?: string;
-  }): Promise<FootballTeamsResponse> => {
+  getTeams: async (params?: FootballTeamsParams): Promise<FootballTeamsResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballTeamsResponse>('Teams', apiParams);
       return response;
     } catch (error) {
@@ -414,15 +432,9 @@ export const advancedFootballApi = {
    * Get player information and statistics
    * Endpoint: ?met=Players&playerId={id}&playerName={name}&leagueId={id}&teamId={id}
    */
-  getPlayers: async (params?: {
-    playerId?: number;
-    playerName?: string;
-    leagueId?: number;
-    teamId?: number;
-  }): Promise<FootballPlayersResponse> => {
+  getPlayers: async (params?: FootballPlayersParams): Promise<FootballPlayersResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballPlayersResponse>('Players', apiParams);
       return response;
     } catch (error) {
@@ -435,16 +447,9 @@ export const advancedFootballApi = {
    * Get pre-match odds for events
    * Endpoint: ?met=Odds&from={date}&to={date}&leagueId={id}&matchId={id}&countryId={id}
    */
-  getOdds: async (params?: {
-    from?: string;
-    to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
-  }): Promise<FootballOddsResponse> => {
+  getOdds: async (params?: FootballOddsParams): Promise<FootballOddsResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballOddsResponse>('Odds', apiParams);
       return response;
     } catch (error) {
@@ -457,16 +462,9 @@ export const advancedFootballApi = {
    * Get match probabilities
    * Endpoint: ?met=Probabilities&from={date}&to={date}&leagueId={id}&matchId={id}&countryId={id}
    */
-  getProbabilities: async (params?: {
-    from?: string;
-    to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
-  }): Promise<FootballProbabilitiesResponse> => {
+  getProbabilities: async (params?: FootballProbabilitiesParams): Promise<FootballProbabilitiesResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballProbabilitiesResponse>(
         'Probabilities',
         apiParams
@@ -480,17 +478,11 @@ export const advancedFootballApi = {
 
   /**
    * Get live odds for ongoing events
-   * Endpoint: ?met=OddsLive&leagueId={id}&matchId={id}&countryId={id}
+   * Endpoint: ?met=OddsLive&leagueId={id}&matchId={id}&countryId={id}&timezone={tz}
    */
-  getLiveOdds: async (params?: {
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
-    timezone?: string;
-  }): Promise<FootballLiveOddsResponse> => {
+  getLiveOdds: async (params?: FootballLiveOddsParams): Promise<FootballLiveOddsResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballLiveOddsResponse>('OddsLive', apiParams);
       return response;
     } catch (error) {
@@ -500,48 +492,53 @@ export const advancedFootballApi = {
   },
 
   /**
-   * Get live match comments/commentary
-   * Endpoint: ?met=Comments&from={date}&to={date}&leagueId={id}&matchId={id}&countryId={id}&live={0|1}
-   */
-  getComments: async (params?: {
-    from?: string;
-    to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
-    live?: string | number;
-    timezone?: string;
-  }): Promise<FootballCommentsResponse> => {
-    try {
-      const apiParams: Record<string, any> = params || {};
-
-      const response = await fetchFromAPI<FootballCommentsResponse>('Comments', apiParams);
-      return response;
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      return { success: 1, result: {} };
-    }
-  },
-
-  /**
-   * Get full odds list with all bookmakers and markets
+   * Get full odds list with all bookmakers and markets (Correct Score, 1X2, Over/Under, etc.)
    * Endpoint: ?met=FullOdds&from={date}&to={date}&leagueId={id}&matchId={id}&countryId={id}
    */
-  getFullOdds: async (params?: {
-    from?: string;
-    to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
-  }): Promise<FootballFullOddsResponse> => {
+  getFullOdds: async (params?: FootballFullOddsParams): Promise<FootballFullOddsResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
-
       const response = await fetchFromAPI<FootballFullOddsResponse>('FullOdds', apiParams);
       return response;
     } catch (error) {
       console.error('Error fetching full odds:', error);
       return { success: 1, result: {} };
+    }
+  },
+
+  /**
+   * Get video highlights (Merged API + MongoDB)
+   * Endpoint: ?met=Videos&eventId={id}
+   */
+  getVideos: async (
+    paramsOrEventId?: FootballVideosParams | { eventId: string | number } | string | number
+  ): Promise<FootballVideosResponse> => {
+    try {
+      const eventId =
+        typeof paramsOrEventId === 'object' && paramsOrEventId !== null
+          ? (paramsOrEventId as any).eventId
+          : paramsOrEventId;
+
+      const externalPromise = fetchFromAPI<FootballVideosResponse>(
+        'Videos',
+        eventId ? { eventId } : {}
+      ).catch(() => ({ success: 1, result: [] }));
+
+      const internalPromise = fetch('/api/videos', { cache: 'no-store' })
+        .then((res) => (res.ok ? res.json() : []))
+        .catch(() => []);
+
+      const [externalRes, internalRes] = await Promise.all([externalPromise, internalPromise]);
+
+      const combined = [...(internalRes || []), ...(externalRes?.result || [])];
+
+      return {
+        success: 1,
+        result: combined,
+      };
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+      return { success: 1, result: [] };
     }
   },
 
@@ -591,43 +588,6 @@ export const advancedFootballApi = {
       return data;
     } catch (error) {
       return null;
-    }
-  },
-
-  /**
-   * Get video highlights (Merged API + MongoDB)
-   * Endpoint: ?met=Videos&eventId={id}
-   */
-  getVideos: async (eventId?: number): Promise<FootballVideosResponse> => {
-    try {
-      // 1. Fetch from External API first (if needed, or just use ours?)
-      // The user wants admin uploads. Let's prioritize our DB videos or merge them.
-      // For simplicity/requirement match, let's fetch from our DB.
-      // But typically we might want both. Let's merge.
-
-      const externalPromise = fetchFromAPI<FootballVideosResponse>(
-        'Videos',
-        eventId ? { eventId } : {}
-      ).catch(() => ({ success: 1, result: [] }));
-
-      const internalPromise = fetch('/api/videos', { cache: 'no-store' })
-        .then((res) => (res.ok ? res.json() : []))
-        .catch(() => []);
-
-      const [externalRes, internalRes] = await Promise.all([externalPromise, internalPromise]);
-
-      // Map internal videos to match FootballVideo structure if needed
-      // Our Mongo model has video_title, video_url, etc which matches.
-
-      const combined = [...(internalRes || []), ...(externalRes?.result || [])];
-
-      return {
-        success: 1,
-        result: combined,
-      };
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-      return { success: 1, result: [] };
     }
   },
 };

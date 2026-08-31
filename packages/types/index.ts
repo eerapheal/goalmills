@@ -1246,122 +1246,122 @@ export interface FootballFullOddsResponse {
 
 // API Request Parameter Types
 export interface FootballBaseParams {
-  met: string;
-  APIkey: string;
+  met?: string;
+  APIkey?: string;
 }
 
 export interface FootballCountriesParams extends FootballBaseParams {
-  met: 'Countries';
+  met?: 'Countries';
 }
 
 export interface FootballLeaguesParams extends FootballBaseParams {
-  met: 'Leagues';
-  countryId?: number;
+  met?: 'Leagues';
+  countryId?: number | string;
 }
 
 export interface FootballFixturesParams extends FootballBaseParams {
-  met: 'Fixtures';
-  from: string; // yyyy-mm-dd
-  to: string; // yyyy-mm-dd
+  met?: 'Fixtures';
+  from?: string; // yyyy-mm-dd
+  to?: string; // yyyy-mm-dd
   timezone?: string;
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
-  teamId?: number;
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
+  teamId?: number | string;
   leagueGroup?: string;
   withPlayerStats?: string | number;
 }
 
 export interface FootballH2HParams extends FootballBaseParams {
-  met: 'H2H';
-  firstTeamId: number;
-  secondTeamId: number;
+  met?: 'H2H';
+  firstTeamId: number | string;
+  secondTeamId: number | string;
   timezone?: string;
 }
 
 export interface FootballLivescoreParams extends FootballBaseParams {
-  met: 'Livescore';
+  met?: 'Livescore';
   timezone?: string;
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
   withPlayerStats?: string | number;
 }
 
 export interface FootballStandingsParams extends FootballBaseParams {
-  met: 'Standings';
-  leagueId: number;
+  met?: 'Standings';
+  leagueId: number | string;
 }
 
 export interface FootballTopscorersParams extends FootballBaseParams {
-  met: 'Topscorers';
-  leagueId: number;
+  met?: 'Topscorers';
+  leagueId: number | string;
 }
 
 export interface FootballTeamsParams extends FootballBaseParams {
-  met: 'Teams';
-  leagueId?: number;
-  teamId?: number;
+  met?: 'Teams';
+  leagueId?: number | string;
+  teamId?: number | string;
   teamName?: string;
 }
 
 export interface FootballPlayersParams extends FootballBaseParams {
-  met: 'Players';
-  playerId?: number;
+  met?: 'Players';
+  playerId?: number | string;
   playerName?: string;
-  leagueId?: number;
-  teamId?: number;
+  leagueId?: number | string;
+  teamId?: number | string;
 }
 
 export interface FootballVideosParams extends FootballBaseParams {
-  met: 'Videos';
-  eventId?: number;
+  met?: 'Videos';
+  eventId: number | string;
 }
 
 export interface FootballOddsParams extends FootballBaseParams {
-  met: 'Odds';
+  met?: 'Odds';
   from?: string; // yyyy-mm-dd
   to?: string; // yyyy-mm-dd
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
 }
 
 export interface FootballProbabilitiesParams extends FootballBaseParams {
-  met: 'Probabilities';
+  met?: 'Probabilities';
   from?: string; // yyyy-mm-dd
   to?: string; // yyyy-mm-dd
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
 }
 
 export interface FootballLiveOddsParams extends FootballBaseParams {
-  met: 'OddsLive';
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
+  met?: 'OddsLive';
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
   timezone?: string;
 }
 
 export interface FootballCommentsParams extends FootballBaseParams {
-  met: 'Comments';
+  met?: 'Comments';
   from?: string; // yyyy-mm-dd
   to?: string; // yyyy-mm-dd
   live?: string | number;
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
   timezone?: string;
 }
 
 export interface FootballFullOddsParams extends FootballBaseParams {
-  met: 'FullOdds';
+  met?: 'FullOdds';
   from?: string; // yyyy-mm-dd
   to?: string; // yyyy-mm-dd
-  countryId?: number;
-  leagueId?: number;
-  matchId?: number;
+  countryId?: number | string;
+  leagueId?: number | string;
+  matchId?: number | string;
 }
 
 // API Client Interface
