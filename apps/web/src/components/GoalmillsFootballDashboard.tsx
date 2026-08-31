@@ -306,8 +306,9 @@ export function GoalmillsFootballDashboard() {
                   <Link
                     href={`/matches/${m.id}`}
                     key={m.id}
-                    className="block rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3.5 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md group cursor-pointer"
+                    className="block rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md group cursor-pointer"
                   >
+                    {/* Header info (League name, live status badge) */}
                     <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
                       <span className="font-bold text-slate-200 flex items-center gap-1.5 truncate pr-2 group-hover:text-amber-300 transition-colors">
                         <span className="text-amber-400">🏆</span> {m.league}
@@ -318,44 +319,45 @@ export function GoalmillsFootballDashboard() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
+                    {/* Match Body */}
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3">
                       {/* Home Team */}
-                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
+                      <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
                           {m.homeCode}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-xs sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.homeTeam}</div>
+                          <div className="font-bold text-[11px] sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.homeTeam}</div>
                           {m.homeGoalScorer && (
-                            <div className="text-[10px] text-slate-400 truncate">{m.homeGoalScorer}</div>
+                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeGoalScorer}</div>
                           )}
                         </div>
                       </div>
 
                       {/* Score Badge */}
-                      <div className="flex flex-col items-center justify-center px-3 sm:px-4 py-1.5 rounded-xl bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[64px] sm:min-w-[76px] text-center shadow-inner">
-                        <span className="text-base sm:text-lg font-black text-amber-400 tracking-tight leading-none">
+                      <div className="flex flex-row sm:flex-col items-center justify-center gap-1.5 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
+                        <span className="text-xs sm:text-lg font-black text-amber-400 tracking-tight leading-none">
                           {m.score}
                         </span>
-                        <span className="text-[10px] font-bold text-amber-300 mt-0.5">{m.status}</span>
+                        <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.status}</span>
                       </div>
 
                       {/* Away Team */}
-                      <div className="flex items-center justify-end gap-2.5 sm:gap-3 min-w-0 text-right">
+                      <div className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 text-right">
                         <div className="min-w-0 flex-1">
-                          <div className="font-bold text-xs sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.awayTeam}</div>
+                          <div className="font-bold text-[11px] sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.awayTeam}</div>
                           {m.awayGoalScorer && (
-                            <div className="text-[10px] text-slate-400 truncate">{m.awayGoalScorer}</div>
+                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.awayGoalScorer}</div>
                           )}
                         </div>
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-900/40 border border-red-400/30 flex items-center justify-center text-xs font-black text-white shadow flex-shrink-0">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-900/40 border border-red-400/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
                           {m.awayCode}
                         </div>
                       </div>
                     </div>
 
-                    {/* Possession & xG Progress Bar */}
-                    <div className="mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
+                    {/* Possession & xG Progress Bar - Hidden on mobile viewports */}
+                    <div className="hidden sm:block mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
                       <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
                         <span>Possession {m.homePossession}% • xG {m.homeXg}</span>
                         <span>{m.awayPossession}% • xG {m.awayXg}</span>

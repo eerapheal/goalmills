@@ -21,7 +21,7 @@ const sports: { type: ExtendedSportType; name: string; emoji: string; isComingSo
 
 export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
   return (
-    <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-1.5 overflow-x-auto scrollbar-hide">
+    <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-1.5 overflow-x-auto no-scrollbar">
       <div className="flex items-center gap-1.5 py-0.5">
         {sports.map((sport) => {
           const isSelected = selectedSport === sport.type;

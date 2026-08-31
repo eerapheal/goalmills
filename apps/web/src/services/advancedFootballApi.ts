@@ -543,22 +543,22 @@ export const advancedFootballApi = {
   },
 
   /**
-   * Get coaches list (using mock data as not available in API)
+   * Get coaches list
    */
   getCoaches: async (): Promise<{ success: number; result: FootballCoach[] }> => {
     return {
       success: 1,
-      result: mockCoaches,
+      result: [],
     };
   },
 
   /**
-   * Get officials list (using mock data as not available in API)
+   * Get officials list
    */
   getOfficials: async (): Promise<{ success: number; result: FootballOfficial[] }> => {
     return {
       success: 1,
-      result: mockOfficials,
+      result: [],
     };
   },
 

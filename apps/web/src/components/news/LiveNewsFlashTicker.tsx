@@ -120,8 +120,8 @@ export function LiveNewsFlashTicker({
       <div className="absolute -left-10 top-0 bottom-0 w-24 bg-amber-500/10 blur-xl pointer-events-none" />
       <div className="absolute -right-10 top-0 bottom-0 w-24 bg-blue-500/10 blur-xl pointer-events-none" />
 
-      {/* Live Badge */}
-      <div className="flex-shrink-0 z-10 flex items-center">
+      {/* Live Badge (Hidden on mobile for news text space) */}
+      <div className="hidden sm:flex flex-shrink-0 z-10 items-center">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/35 text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-sm shadow-amber-500/10">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
@@ -134,7 +134,7 @@ export function LiveNewsFlashTicker({
 
       {/* Dynamic Marquee Stream (Hover to Pause) */}
       <div className="relative flex-1 overflow-hidden whitespace-nowrap mask-gradient">
-        <div className="animate-marquee-continuous items-center gap-6 py-0.5">
+        <div className="marquee-scroll-flow items-center gap-6 py-0.5">
           {marqueeItems.map((item, idx) => {
             const newsUrl = getNewsUrl(item);
             return (

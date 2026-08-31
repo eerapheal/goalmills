@@ -261,13 +261,13 @@ mark.article-highlight,
   }
 }
 
-.animate-marquee-continuous {
+.marquee-scroll-flow {
   display: inline-flex;
   width: max-content;
   animation: marquee-continuous-scroll 40s linear infinite;
 }
 
-.animate-marquee-continuous:hover {
+.marquee-scroll-flow:hover {
   animation-play-state: paused;
 }
 

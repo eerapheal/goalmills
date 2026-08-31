@@ -1,2 +1,1 @@
-export { LiveNewsFlashTicker } from './news/LiveNewsFlashTicker';
-export default './news/LiveNewsFlashTicker';
+export { LiveNewsFlashTicker, default } from './news/LiveNewsFlashTicker';

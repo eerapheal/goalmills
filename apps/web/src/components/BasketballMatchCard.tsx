@@ -44,10 +44,13 @@ export function BasketballMatchCard({
   const homeScore = match?.scores?.home?.total ?? 0;
   const awayScore = match?.scores?.away?.total ?? 0;
 
+  const homeName = match?.teams?.home?.name || 'Home';
+  const awayName = match?.teams?.away?.name || 'Away';
+
   return (
     <div
       onClick={handleClick}
-      className={`group relative cursor-pointer rounded-xl border p-2.5 sm:p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group relative cursor-pointer rounded-xl border p-2 sm:p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
         isLive
           ? 'border-blue-500/40 bg-gradient-to-r from-[#0C1A30] via-[#0E203C] to-[#0C1A30] shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:border-blue-400'
           : 'border-blue-500/15 bg-[#0A1424]/90 hover:border-blue-400/40 hover:bg-[#0E1D34]'
@@ -58,9 +61,9 @@ export function BasketballMatchCard({
         <div className="absolute top-0 right-0 w-32 h-16 bg-blue-500/10 blur-2xl pointer-events-none -z-0" />
       )}
 
-      {/* League Header */}
+      {/* League Header - Hidden on mobile viewports for clean look */}
       {!hideLeague && (
-        <div className="mb-2 flex items-center justify-between border-b border-white/5 pb-1.5 text-xs">
+        <div className="hidden sm:flex mb-2 items-center justify-between border-b border-white/5 pb-1.5 text-xs">
           <div className="flex items-center space-x-1.5 truncate">
             {match?.league?.logo ? (
               <img
@@ -100,10 +103,10 @@ export function BasketballMatchCard({
       )}
 
       {/* Teams & Scores */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3 relative z-10">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3 relative z-10">
         {/* Home Team */}
-        <div className="flex items-center space-x-2 min-w-0">
-          <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+          <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
             {match?.teams?.home?.logo ? (
               <img
                 src={match.teams.home.logo}
@@ -114,20 +117,20 @@ export function BasketballMatchCard({
                 }}
               />
             ) : (
-              <span className="text-[9px] font-black text-blue-400">
+              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
                 {(match?.teams?.home?.name || 'HOM').slice(0, 3).toUpperCase()}
               </span>
             )}
           </div>
-          <span className="font-bold text-xs text-white truncate group-hover:text-blue-300 transition-colors">
-            {match?.teams?.home?.name || 'Home Team'}
+          <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
+            {homeName}
           </span>
         </div>
 
         {/* Score & VS Pill */}
-        <div className="flex flex-col items-center justify-center px-2.5 sm:px-3 py-1 rounded-lg bg-slate-950/90 border border-blue-500/30 flex-shrink-0 min-w-[52px] sm:min-w-[60px] text-center shadow-inner">
+        <div className="flex flex-row sm:flex-col items-center justify-center gap-1 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded bg-[#091220] sm:bg-slate-950/90 border border-blue-500/30 flex-shrink-0 min-w-[50px] sm:min-w-[60px] text-center shadow-inner group-hover:border-blue-400/60 transition-colors">
           <span
-            className={`font-black tracking-tight leading-none ${
+            className={`font-black tracking-tight leading-none text-xs sm:text-base ${
               isLive
                 ? 'text-sm sm:text-base text-blue-400'
                 : isFinished
@@ -137,24 +140,19 @@ export function BasketballMatchCard({
           >
             {isUpcoming ? 'VS' : `${homeScore} - ${awayScore}`}
           </span>
-          {isLive && (
-            <span className="text-[8px] font-bold text-blue-300 mt-0.5">
-              {shortStatus || 'LIVE'}
-            </span>
-          )}
-          {isFinished && (
-            <span className="text-[8px] font-bold uppercase text-slate-400 mt-0.5">
-              FINAL
-            </span>
-          )}
+          <span className={`text-[8px] font-bold uppercase sm:mt-0.5 ${
+            isLive ? 'text-blue-300' : 'text-slate-400'
+          }`}>
+            {getStatusDisplay()}
+          </span>
         </div>
 
         {/* Away Team */}
-        <div className="flex items-center justify-end space-x-2 min-w-0 text-right">
-          <span className="font-bold text-xs text-white truncate group-hover:text-blue-300 transition-colors">
-            {match?.teams?.away?.name || 'Away Team'}
+        <div className="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right">
+          <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
+            {awayName}
           </span>
-          <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
+          <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
             {match?.teams?.away?.logo ? (
               <img
                 src={match.teams.away.logo}
@@ -165,7 +163,7 @@ export function BasketballMatchCard({
                 }}
               />
             ) : (
-              <span className="text-[9px] font-black text-blue-400">
+              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
                 {(match?.teams?.away?.name || 'AWY').slice(0, 3).toUpperCase()}
               </span>
             )}

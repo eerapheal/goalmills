@@ -112,9 +112,9 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu (Positioned responsive to avoid screen overflow) */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 md:w-96 rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-white/15 shadow-2xl p-4 z-50 text-slate-200">
+        <div className="fixed sm:absolute left-3 sm:left-auto right-3 sm:right-0 mt-3 w-auto sm:w-96 rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-white/15 shadow-2xl p-4 z-50 text-slate-200">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="font-bold text-white text-base">Alerts &amp; Updates</span>

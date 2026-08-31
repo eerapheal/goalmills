@@ -300,6 +300,7 @@ export function GoalmillsLiveDashboard({
                   key={m.id}
                   className="rounded-xl bg-[#142336] border border-white/5 p-3 sm:p-4 hover:border-amber-500/30 transition duration-300"
                 >
+                  {/* Header info (League name, live status badge) */}
                   <div className="flex items-center justify-between text-xs text-slate-300 mb-2.5">
                     <span className="font-semibold text-slate-200 truncate pr-2">{m.league}</span>
                     <span className="px-2 py-0.5 rounded-full bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[9px] sm:text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse flex-shrink-0">
@@ -308,44 +309,45 @@ export function GoalmillsLiveDashboard({
                     </span>
                   </div>
 
+                  {/* Match Body */}
                   <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3">
                     {/* Home Team */}
-                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-[10px] sm:text-xs font-black text-white shadow flex-shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
                         {m.homeCode}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs sm:text-sm text-white truncate">{m.homeTeam}</div>
+                        <div className="font-bold text-[11px] sm:text-sm text-white truncate">{m.homeTeam}</div>
                         {m.homeScorer && (
-                          <div className="text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
+                          <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
                         )}
                       </div>
                     </div>
 
                     {/* Score & Time */}
-                    <div className="flex flex-col items-center justify-center px-2 sm:px-3 py-1 rounded-xl bg-slate-950/80 border border-amber-500/30 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
-                      <span className="text-base sm:text-lg font-black text-amber-400 tracking-tight leading-none">
+                    <div className="flex flex-row sm:flex-col items-center justify-center gap-1.5 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-slate-950/80 border border-amber-500/30 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
+                      <span className="text-xs sm:text-lg font-black text-amber-400 tracking-tight leading-none">
                         {m.score}
                       </span>
-                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-300 mt-0.5">{m.time}</span>
+                      <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.time}</span>
                     </div>
 
                     {/* Away Team */}
-                    <div className="flex items-center justify-end gap-2 sm:gap-3 min-w-0 text-right">
+                    <div className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 text-right">
                       <div className="min-w-0 flex-1">
-                        <div className="font-bold text-xs sm:text-sm text-white truncate">{m.awayTeam}</div>
+                        <div className="font-bold text-[11px] sm:text-sm text-white truncate">{m.awayTeam}</div>
                         {m.awayScorer && (
-                          <div className="text-[9px] sm:text-[10px] text-slate-300 truncate">{m.awayScorer}</div>
+                          <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.awayScorer}</div>
                         )}
                       </div>
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-900/40 border border-red-400/30 flex items-center justify-center text-[10px] sm:text-xs font-black text-white shadow flex-shrink-0">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-900/40 border border-red-400/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
                         {m.awayCode}
                       </div>
                     </div>
                   </div>
 
-                  {/* Timeline / Possession Progress Bar */}
-                  <div className="mt-2.5 pt-2 border-t border-white/5">
+                  {/* Timeline / Possession Progress Bar - Hidden on mobile viewports */}
+                  <div className="hidden sm:block mt-2.5 pt-2 border-t border-white/5">
                     <div className="flex justify-between text-[9px] sm:text-[10px] text-slate-300 mb-1 font-medium">
                       <span>Possession {m.possession}%</span>
                       <span>{100 - m.possession}%</span>
@@ -542,39 +544,44 @@ export function GoalmillsLiveDashboard({
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead>
-                  <tr className="text-slate-200 border-b border-white/10 text-[10px] uppercase font-bold">
-                    <th className="pb-2 font-bold"># Team</th>
-                    <th className="pb-2 text-center">P</th>
-                    <th className="pb-2 text-center">W</th>
-                    <th className="pb-2 text-center">D</th>
-                    <th className="pb-2 text-center">L</th>
-                    <th className="pb-2 text-center">GD</th>
-                    <th className="pb-2 text-right font-bold text-amber-400">Pts</th>
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="border-b border-white/10 uppercase text-[11px] text-slate-400 font-mono">
+                  <tr>
+                    <th className="py-3 px-2">#</th>
+                    <th className="py-3 px-4">Club</th>
+                    <th className="py-3 px-3 text-center">P</th>
+                    <th className="py-3 px-3 text-center">W</th>
+                    <th className="py-3 px-3 text-center">D</th>
+                    <th className="py-3 px-3 text-center">L</th>
+                    <th className="py-3 px-3 text-center">GD</th>
+                    <th className="py-3 px-4 text-right">PTS</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-white/5 font-mono">
                   {liveStandings.map((team, idx) => (
                     <tr
                       key={team.name}
-                      className={idx === 0 ? "bg-amber-500/10 font-bold text-white" : "text-slate-200 hover:bg-slate-800/30"}
+                      className={idx === 0 ? "bg-amber-500/10" : "hover:bg-white/5"}
                     >
-                      <td className="py-2 px-1 flex items-center gap-2">
-                        <span className={idx === 0 ? "text-amber-400 font-black" : "text-slate-300 font-bold"}>
-                          {team.rank}.
-                        </span>
-                        <span className="w-5 h-5 rounded-full bg-blue-600/40 flex items-center justify-center text-[9px] font-black">
-                          {team.code}
-                        </span>
-                        <span className="truncate max-w-[90px] sm:max-w-none">{team.name}</span>
+                      <td className="py-3 px-2 font-bold text-slate-400">
+                        {team.rank}
                       </td>
-                      <td className="py-2 text-center">{team.p}</td>
-                      <td className="py-2 text-center">{team.w}</td>
-                      <td className="py-2 text-center">{team.d}</td>
-                      <td className="py-2 text-center">{team.l}</td>
-                      <td className="py-2 text-center text-amber-400 font-bold">{team.gd}</td>
-                      <td className={`py-2 text-right font-black ${idx === 0 ? 'text-amber-400' : 'text-white'}`}>
+                      <td className="py-3 px-4 font-bold text-white font-sans">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-blue-600/40 flex items-center justify-center text-[9px] font-black font-mono">
+                            {team.code}
+                          </span>
+                          <span className={idx === 0 ? "text-amber-400 font-black" : "truncate max-w-[90px] sm:max-w-none"}>
+                            {team.name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-center">{team.p}</td>
+                      <td className="py-3 px-3 text-center text-emerald-400">{team.w}</td>
+                      <td className="py-3 px-3 text-center text-slate-400">{team.d}</td>
+                      <td className="py-3 px-3 text-center text-rose-400">{team.l}</td>
+                      <td className="py-3 px-3 text-center">{team.gd}</td>
+                      <td className="py-3 px-4 text-right font-black text-amber-400">
                         {team.pts}
                       </td>
                     </tr>
