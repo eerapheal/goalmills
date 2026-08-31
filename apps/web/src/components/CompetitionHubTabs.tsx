@@ -109,13 +109,13 @@ export function CompetitionHubTabs({
     let list = fixtures;
     if (activeTab === 'live') {
       list = list.filter(f =>
-        f.event_live === '1' || f.event_live === 1 ||
+        String(f.event_live) === '1' ||
         (f.event_status && !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(f.event_status as string))
       );
     } else if (activeTab === 'fixtures') {
       list = list.filter(f =>
         f.event_status === 'Not Started' || f.event_status === 'NS' || f.event_status === 'TBA' ||
-        (f.event_live !== '1' && f.event_live !== 1 && f.event_status !== 'FT' && f.event_status !== 'Finished' && !f.event_final_result)
+        (String(f.event_live) !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished' && !f.event_final_result)
       );
     } else if (activeTab === 'results') {
       list = list.filter(f =>
@@ -211,7 +211,7 @@ export function CompetitionHubTabs({
                     <div className="flex items-center gap-3 p-3.5 rounded-xl bg-[#0B1526]/50 border border-white/5 hover:border-blue-500/30 transition-all">
                       {/* Date/Time */}
                       <div className="text-center w-14 shrink-0">
-                        {match.event_live === '1' || match.event_live === 1 ? (
+                        {String(match.event_live) === '1' ? (
                           <span className="text-[10px] font-black text-red-400 uppercase animate-pulse">
                             {match.event_status}&apos;
                           </span>
