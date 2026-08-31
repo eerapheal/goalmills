@@ -300,7 +300,10 @@ export const advancedFootballApi = {
    * Get list of supported leagues/competitions
    * Endpoint: ?met=Leagues&countryId={id}
    */
-  getLeagues: async (countryId?: number, leagueId?: number): Promise<FootballLeaguesResponse> => {
+  getLeagues: async (
+    countryId?: number | string,
+    leagueId?: number | string
+  ): Promise<FootballLeaguesResponse> => {
     try {
       const params: Record<string, any> = {};
       if (countryId) params.countryId = countryId;
@@ -320,11 +323,11 @@ export const advancedFootballApi = {
   getFixtures: async (params?: {
     from?: string;
     to?: string;
-    leagueId?: number;
-    matchId?: number;
-    teamId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    teamId?: number | string;
     timezone?: string;
-    countryId?: number;
+    countryId?: number | string;
     leagueGroup?: string;
     withPlayerStats?: string | number;
   }): Promise<FootballFixturesResponse> => {
@@ -350,8 +353,8 @@ export const advancedFootballApi = {
    * Endpoint: ?met=H2H&firstTeamId={id}&secondTeamId={id}
    */
   getH2H: async (
-    firstTeamId: number,
-    secondTeamId: number,
+    firstTeamId: number | string,
+    secondTeamId: number | string,
     timezone?: string
   ): Promise<FootballH2HResponse> => {
     try {
@@ -380,9 +383,9 @@ export const advancedFootballApi = {
    * Endpoint: ?met=Livescore&leagueId={id}&matchId={id}&countryId={id}
    */
   getLivescore: async (params?: {
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    countryId?: number | string;
     timezone?: string;
     withPlayerStats?: string | number;
   }): Promise<FootballLivescoreResponse> => {
@@ -400,8 +403,15 @@ export const advancedFootballApi = {
    * Get league standings (total, home, away)
    * Endpoint: ?met=Standings&leagueId={id}
    */
-  getStandings: async (leagueId: number): Promise<FootballStandingsResponse> => {
+  getStandings: async (
+    paramsOrLeagueId: { leagueId?: string | number } | string | number
+  ): Promise<FootballStandingsResponse> => {
     try {
+      const leagueId =
+        typeof paramsOrLeagueId === 'object' && paramsOrLeagueId !== null
+          ? (paramsOrLeagueId as any).leagueId
+          : paramsOrLeagueId;
+
       const response = await fetchFromAPI<FootballStandingsResponse>('Standings', { leagueId });
       return response;
     } catch (error) {
@@ -420,8 +430,15 @@ export const advancedFootballApi = {
    * Get top scorers for a league
    * Endpoint: ?met=Topscorers&leagueId={id}
    */
-  getTopscorers: async (leagueId: number): Promise<FootballTopscorersResponse> => {
+  getTopscorers: async (
+    paramsOrLeagueId: { leagueId?: string | number } | string | number
+  ): Promise<FootballTopscorersResponse> => {
     try {
+      const leagueId =
+        typeof paramsOrLeagueId === 'object' && paramsOrLeagueId !== null
+          ? (paramsOrLeagueId as any).leagueId
+          : paramsOrLeagueId;
+
       const response = await fetchFromAPI<FootballTopscorersResponse>('Topscorers', { leagueId });
       return response;
     } catch (error) {
@@ -434,8 +451,8 @@ export const advancedFootballApi = {
    * Endpoint: ?met=Teams&leagueId={id}&teamId={id}&teamName={name}
    */
   getTeams: async (params?: {
-    leagueId?: number;
-    teamId?: number;
+    leagueId?: number | string;
+    teamId?: number | string;
     teamName?: string;
   }): Promise<FootballTeamsResponse> => {
     try {
@@ -454,10 +471,10 @@ export const advancedFootballApi = {
    * Endpoint: ?met=Players&playerId={id}&playerName={name}&leagueId={id}&teamId={id}
    */
   getPlayers: async (params?: {
-    playerId?: number;
+    playerId?: number | string;
     playerName?: string;
-    leagueId?: number;
-    teamId?: number;
+    leagueId?: number | string;
+    teamId?: number | string;
   }): Promise<FootballPlayersResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
@@ -473,7 +490,7 @@ export const advancedFootballApi = {
    * Get video highlights for events
    * Endpoint: ?met=Videos&eventId={id}
    */
-  getVideos: async (eventId?: number): Promise<FootballVideosResponse> => {
+  getVideos: async (eventId?: number | string): Promise<FootballVideosResponse> => {
     try {
       const params: Record<string, any> = {};
       if (eventId) params.eventId = eventId;
@@ -521,9 +538,9 @@ export const advancedFootballApi = {
   getOdds: async (params?: {
     from?: string;
     to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    countryId?: number | string;
   }): Promise<FootballOddsResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
@@ -542,9 +559,9 @@ export const advancedFootballApi = {
   getProbabilities: async (params?: {
     from?: string;
     to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    countryId?: number | string;
   }): Promise<FootballProbabilitiesResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
@@ -564,9 +581,9 @@ export const advancedFootballApi = {
    * Endpoint: ?met=OddsLive&leagueId={id}&matchId={id}&countryId={id}
    */
   getLiveOdds: async (params?: {
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    countryId?: number | string;
     timezone?: string;
   }): Promise<FootballLiveOddsResponse> => {
     try {
@@ -586,9 +603,9 @@ export const advancedFootballApi = {
   getComments: async (params?: {
     from?: string;
     to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    countryId?: number | string;
     live?: string | number;
     timezone?: string;
   }): Promise<FootballCommentsResponse> => {
@@ -609,9 +626,9 @@ export const advancedFootballApi = {
   getFullOdds: async (params?: {
     from?: string;
     to?: string;
-    leagueId?: number;
-    matchId?: number;
-    countryId?: number;
+    leagueId?: number | string;
+    matchId?: number | string;
+    countryId?: number | string;
   }): Promise<FootballFullOddsResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};

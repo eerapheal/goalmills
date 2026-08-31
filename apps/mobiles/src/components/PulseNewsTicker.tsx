@@ -16,7 +16,7 @@ export interface PulseItem {
 
 interface PulseNewsTickerProps {
   sport?: 'football' | 'cricket' | 'basketball' | 'all';
-  pulseLabel: string;
+  pulseLabel?: string;
   actionLabel?: string;
   onActionPress?: () => void;
   fallbackNews?: PulseItem[];
@@ -31,6 +31,7 @@ export function PulseNewsTicker({
 }: PulseNewsTickerProps) {
   const router = useRouter();
   const [tickerIndex, setTickerIndex] = useState(0);
+  const activePulseLabel = pulseLabel || `${sport.toUpperCase()} PULSE`;
 
   const defaultFallbacks: Record<string, PulseItem[]> = {
     football: [
@@ -127,7 +128,7 @@ export function PulseNewsTicker({
       {/* Pulse Badge */}
       <View style={styles.pulseBadge}>
         <View style={styles.pulseDot} />
-        <Text style={styles.pulseText}>{pulseLabel}</Text>
+        <Text style={styles.pulseText}>{activePulseLabel}</Text>
       </View>
 
       {/* Ticker Headline & Tag */}

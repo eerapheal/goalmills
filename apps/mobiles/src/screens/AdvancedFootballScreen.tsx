@@ -10,28 +10,76 @@ import {
   Pressable,
   TextInput,
   Image,
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballMatchCard, UnifiedMatchEvent } from '../components/FootballMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
-import { RecommendedFeed } from '../components/RecommendedFeed';
-import { apiFootballService, ApiFootballFixtureItem } from '../services/apiFootball';
 import { advancedFootballApi } from '../services/advancedFootballApi';
+import {
+  FootballStanding,
+  FootballTopscorer,
+  FootballProbability,
+  FootballEvent,
+} from '@goalmills/types';
 
-type FootballTab = 'live' | 'upcoming' | 'results' | 'standings';
+type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
+
+const MAJOR_LEAGUES = [
+  { id: '152', name: 'Premier League', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: '3', name: 'Champions League', flag: '🇪🇺' },
+  { id: '302', name: 'La Liga', flag: '🇪🇸' },
+  { id: '207', name: 'Serie A', flag: '🇮🇹' },
+  { id: '175', name: 'Bundesliga', flag: '🇩🇪' },
+  { id: '168', name: 'Ligue 1', flag: '🇫🇷' },
+];
+
+const adaptMatch = (f: FootballEvent): UnifiedMatchEvent => {
+  const isLive =
+    f.event_live === '1' ||
+    (f.event_live as any) === 1 ||
+    ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(f.event_status || '') ||
+    !isNaN(Number(f.event_status));
+
+  return {
+    event_key: f.event_key,
+    event_date: f.event_date,
+    event_time: f.event_time,
+    event_status: f.event_status,
+    event_live: isLive ? '1' : '0',
+    event_home_team: f.event_home_team,
+    home_team_key: f.home_team_key,
+    home_team_logo: f.home_team_logo,
+    event_away_team: f.event_away_team,
+    away_team_key: f.away_team_key,
+    away_team_logo: f.away_team_logo,
+    event_final_result: f.event_final_result,
+    event_ft_result: f.event_ft_result,
+    league_name: f.league_name,
+    league_key: f.league_key,
+    league_logo: f.league_logo,
+    country_name: f.country_name,
+    goalscorers: f.goalscorers,
+  };
+};
 
 export function AdvancedFootballScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
+  const [selectedLeague, setSelectedLeague] = useState('152');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [fixtures, setFixtures] = useState<UnifiedMatchEvent[]>([]);
+  const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
 
-  // Generate 7-day date slider (3 days before, today, 3 days after)
+  const [fixtures, setFixtures] = useState<UnifiedMatchEvent[]>([]);
+  const [standings, setStandings] = useState<FootballStanding[]>([]);
+  const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
+  const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
+
   const dateStrip = useMemo(() => {
     const dates = [];
     const today = new Date();
@@ -40,544 +88,565 @@ export function AdvancedFootballScreen() {
       d.setDate(today.getDate() + i);
       const iso = d.toISOString().split('T')[0];
       const dayName =
-        i === 0
-          ? 'Today'
-          : i === -1
-            ? 'Yest'
-            : i === 1
-              ? 'Tmrw'
-              : d.toLocaleDateString('en-US', { weekday: 'short' });
-      const dayNumber = d.getDate();
-      dates.push({ iso, dayName, dayNumber });
+        i === 0 ? 'Today' : i === -1 ? 'Yest' : i === 1 ? 'Tmrw' :
+          d.toLocaleDateString('en-US', { weekday: 'short' });
+      dates.push({ iso, dayName, dayNumber: d.getDate() });
     }
     return dates;
   }, []);
 
-  // Adapt API-Football Fixture to UnifiedMatchEvent
-  const adaptFixture = (item: ApiFootballFixtureItem): UnifiedMatchEvent => {
-    if (!item) return {} as UnifiedMatchEvent;
-
-    const isLiveShort = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(
-      item?.fixture?.status?.short || ''
-    );
-    const scoreStr =
-      item?.goals?.home !== null &&
-      item?.goals?.home !== undefined &&
-      item?.goals?.away !== null &&
-      item?.goals?.away !== undefined
-        ? `${item.goals.home} - ${item.goals.away}`
-        : undefined;
-
-    const fixtureDate = item?.fixture?.date ? String(item.fixture.date).split('T') : ['', ''];
-
-    return {
-      event_key: item?.fixture?.id || Math.floor(Math.random() * 1000000),
-      event_date: fixtureDate[0] || '',
-      event_time: fixtureDate[1]?.slice(0, 5) || '',
-      event_status: item?.fixture?.status?.short || '',
-      event_live: isLiveShort ? '1' : '0',
-      event_home_team: item?.teams?.home?.name || 'Home Team',
-      home_team_key: item?.teams?.home?.id || 0,
-      home_team_logo: item?.teams?.home?.logo || '',
-      event_away_team: item?.teams?.away?.name || 'Away Team',
-      away_team_key: item?.teams?.away?.id || 0,
-      away_team_logo: item?.teams?.away?.logo || '',
-      event_final_result: scoreStr,
-      event_ft_result: scoreStr,
-      league_name: item?.league?.name || 'General League',
-      league_key: item?.league?.id || 0,
-      league_logo: item?.league?.logo || '',
-      country_name: item?.league?.country || '',
-      country_logo: item?.league?.flag || undefined,
-    };
-  };
-
-  // Load data on demand
-  const fetchMatches = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
+    const numLeague = Number(selectedLeague);
     try {
-      if (activeTab === 'live') {
-        const fallback = await advancedFootballApi.getLivescore();
-        if (
-          fallback &&
-          fallback.success &&
-          Array.isArray(fallback.result) &&
-          fallback.result.length > 0
-        ) {
-          setFixtures(fallback.result as any);
-          return;
-        }
-      } else {
-        const fallback = await advancedFootballApi.getFixtures({
+      if (activeTab === 'standings') {
+        const res = await advancedFootballApi.getStandings(numLeague);
+        const resObj = res?.result as any;
+        const table = resObj?.[standingView] || resObj?.total || (Array.isArray(resObj) ? resObj : []);
+        setStandings(table);
+      } else if (activeTab === 'topscorers') {
+        const res = await advancedFootballApi.getTopscorers(numLeague);
+        setTopscorers(res?.result || []);
+      } else if (activeTab === 'predictions') {
+        const res = await advancedFootballApi.getProbabilities({
           from: selectedDate,
           to: selectedDate,
+          leagueId: numLeague,
         });
-        if (
-          fallback &&
-          fallback.success &&
-          Array.isArray(fallback.result) &&
-          fallback.result.length > 0
-        ) {
-          setFixtures(fallback.result as any);
-          return;
-        }
+        setProbabilities(res?.result || []);
+      } else if (activeTab === 'live') {
+        const res = await advancedFootballApi.getLivescore();
+        const raw = (res?.result as FootballEvent[]) || [];
+        setFixtures(raw.map(adaptMatch));
+      } else {
+        const res = await advancedFootballApi.getFixtures({
+          from: selectedDate,
+          to: selectedDate,
+          leagueId: numLeague,
+        });
+        const raw = (res?.result as FootballEvent[]) || [];
+        setFixtures(raw.map(adaptMatch));
       }
-
-      // Secondary check via apiFootballService
-      try {
-        let raw: ApiFootballFixtureItem[] = [];
-        if (activeTab === 'live') {
-          raw = await apiFootballService.getLiveFixtures();
-        } else {
-          raw = await apiFootballService.getFixturesByDate(selectedDate);
-        }
-        if (Array.isArray(raw) && raw.length > 0) {
-          setFixtures(raw.map(adaptFixture));
-          return;
-        }
-      } catch {
-        // Handled safely
-      }
-
-      setFixtures([]);
-    } catch {
-      setFixtures([]);
+    } catch (err) {
+      console.error('[AdvancedFootballScreen] Error:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [activeTab, selectedDate]);
+  }, [activeTab, selectedLeague, selectedDate, standingView]);
 
-  useEffect(() => {
-    fetchMatches();
-  }, [fetchMatches]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchMatches();
-  };
+  const onRefresh = () => { setRefreshing(true); fetchData(); };
 
-  // Filter and group matches by league
   const filteredFixtures = useMemo(() => {
     if (!Array.isArray(fixtures)) return [];
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter(
-        (f) =>
-          f &&
-          (f.event_live === '1' ||
-            f.event_live === 1 ||
-            (Boolean(f.event_status) &&
-              !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
-                f.event_status as string
-              )))
+      list = list.filter(f =>
+        f.event_live === '1' || f.event_live === 1 ||
+        (Boolean(f.event_status) && !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(f.event_status as string))
       );
     } else if (activeTab === 'upcoming') {
-      list = list.filter(
-        (f) =>
-          f &&
-          (f.event_status === 'Not Started' ||
-            f.event_status === 'NS' ||
-            f.event_status === 'TBA' ||
-            (f.event_live !== '1' &&
-              f.event_live !== 1 &&
-              f.event_status !== 'FT' &&
-              f.event_status !== 'Finished' &&
-              !f.event_final_result))
+      list = list.filter(f =>
+        f.event_status === 'Not Started' || f.event_status === 'NS' || f.event_status === 'TBA' ||
+        (f.event_live !== '1' && f.event_live !== 1 && f.event_status !== 'FT' && f.event_status !== 'Finished' && !f.event_final_result)
       );
     } else if (activeTab === 'results') {
-      list = list.filter(
-        (f) =>
-          f &&
-          (f.event_status === 'FT' ||
-            f.event_status === 'Finished' ||
-            f.event_status === 'AET' ||
-            f.event_status === 'AP' ||
-            Boolean(f.event_final_result && f.event_final_result !== '-'))
+      list = list.filter(f =>
+        f.event_status === 'FT' || f.event_status === 'Finished' ||
+        f.event_status === 'AET' || f.event_status === 'AP' ||
+        Boolean(f.event_final_result && f.event_final_result !== '-')
       );
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (f) =>
-          (f?.event_home_team && f.event_home_team.toLowerCase().includes(q)) ||
-          (f?.event_away_team && f.event_away_team.toLowerCase().includes(q)) ||
-          (f?.league_name && f.league_name.toLowerCase().includes(q))
+      list = list.filter(f =>
+        f.event_home_team?.toLowerCase().includes(q) ||
+        f.event_away_team?.toLowerCase().includes(q) ||
+        (f.league_name && f.league_name.toLowerCase().includes(q))
       );
     }
-
     return list;
   }, [fixtures, activeTab, searchQuery]);
 
-  // Group by league for SectionList
   const sections = useMemo(() => {
-    const groups: {
-      [key: string]: {
-        title: string;
-        logo?: string;
-        league_key?: string | number;
-        data: UnifiedMatchEvent[];
-      };
-    } = {};
-
-    filteredFixtures.forEach((item) => {
-      const leagueTitle = item.league_name || 'Other Matches';
-      if (!groups[leagueTitle]) {
-        groups[leagueTitle] = {
-          title: leagueTitle,
-          logo: item.league_logo,
-          league_key: item.league_key,
-          data: [],
-        };
-      }
-      groups[leagueTitle].data.push(item);
+    const groups: { [k: string]: { title: string; logo?: string; league_key?: string | number; data: UnifiedMatchEvent[] } } = {};
+    filteredFixtures.forEach(item => {
+      const key = item.league_name || 'Other';
+      if (!groups[key]) groups[key] = { title: key, logo: item.league_logo, league_key: item.league_key, data: [] };
+      groups[key].data.push(item);
     });
-
     return Object.values(groups);
   }, [filteredFixtures]);
 
   const tabs: { id: FootballTab; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { id: 'live', label: 'Live', icon: 'radio' },
-    { id: 'upcoming', label: 'Upcoming', icon: 'calendar-outline' },
+    { id: 'upcoming', label: 'Fixtures', icon: 'calendar-outline' },
     { id: 'results', label: 'Results', icon: 'checkmark-circle-outline' },
-    { id: 'standings', label: 'Standings', icon: 'trophy-outline' },
+    { id: 'standings', label: 'Table', icon: 'trophy-outline' },
+    { id: 'topscorers', label: 'Scorers', icon: 'football-outline' },
+    { id: 'predictions', label: 'AI Odds', icon: 'analytics-outline' },
   ];
+
+  const showDatePicker = activeTab === 'upcoming' || activeTab === 'results' || activeTab === 'predictions';
+  const showLeaguePicker = activeTab !== 'live';
 
   return (
     <View style={styles.container}>
-      {/* Top Football Pulse Wire Ticker */}
+      {/* News Ticker */}
       <PulseNewsTicker
         sport="football"
         pulseLabel="FOOTBALL PULSE"
-        actionLabel={activeTab === 'live' ? '📅 Upcoming' : '⚡ Live'}
+        actionLabel={activeTab === 'live' ? '📅 Fixtures' : '⚡ Live'}
         onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
       />
 
-      {/* Header Search & Refresh */}
-      <View style={styles.headerBar}>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={14} color="#94A3B8" />
+      {/* Competition Switcher */}
+      {showLeaguePicker && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.leagueBar}
+          contentContainerStyle={styles.leagueBarContent}
+        >
+          {MAJOR_LEAGUES.map(lg => {
+            const selected = selectedLeague === lg.id;
+            return (
+              <Pressable
+                key={lg.id}
+                style={[styles.leagueChip, selected && styles.leagueChipActive]}
+                onPress={() => setSelectedLeague(lg.id)}
+              >
+                <Text style={styles.leagueChipFlag}>{lg.flag}</Text>
+                <Text style={[styles.leagueChipLabel, selected && styles.leagueChipLabelActive]}>
+                  {lg.name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      )}
+
+      {/* Search + Refresh */}
+      <View style={styles.controlBar}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search-outline" size={14} color="#64748B" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search teams or leagues..."
-            placeholderTextColor="#64748B"
+            placeholder="Search team or competition..."
+            placeholderTextColor="#475569"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          {searchQuery ? (
-            <Pressable onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={14} color="#94A3B8" />
-            </Pressable>
-          ) : null}
         </View>
-
-        <Pressable style={styles.refreshButton} onPress={onRefresh}>
-          <Ionicons name="refresh" size={14} color="#F8FAFC" />
+        <Pressable style={styles.refreshBtn} onPress={() => { setRefreshing(true); fetchData(); }}>
+          <Ionicons name="refresh-outline" size={16} color="#F8FAFC" />
         </Pressable>
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
+      {/* Tab Bar */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabBar} contentContainerStyle={styles.tabBarContent}>
+        {tabs.map(tab => {
+          const active = activeTab === tab.id;
           return (
             <Pressable
               key={tab.id}
-              style={[styles.tabItem, isActive && styles.activeTabItem]}
+              style={[styles.tabBtn, active && styles.tabBtnActive]}
               onPress={() => setActiveTab(tab.id)}
             >
-              <Ionicons
-                name={tab.icon}
-                size={13}
-                color={isActive ? '#60A5FA' : '#94A3B8'}
-                style={{ marginRight: 4 }}
-              />
-              <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{tab.label}</Text>
+              <Ionicons name={tab.icon} size={14} color={active ? '#0F172A' : '#64748B'} />
+              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+              {tab.id === 'live' && (
+                <View style={styles.liveDot} />
+              )}
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
 
-      {/* Date Strip (for upcoming/results) */}
-      {activeTab !== 'live' && activeTab !== 'standings' && (
-        <View style={styles.dateStripContainer}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={dateStrip}
-            keyExtractor={(item) => item.iso}
-            contentContainerStyle={styles.dateStripContent}
-            renderItem={({ item }) => {
-              const isSelected = selectedDate === item.iso;
-              return (
-                <Pressable
-                  style={[styles.dateCard, isSelected && styles.selectedDateCard]}
-                  onPress={() => setSelectedDate(item.iso)}
-                >
-                  <Text style={[styles.dateDayName, isSelected && styles.selectedDateText]}>
-                    {item.dayName}
-                  </Text>
-                  <Text style={[styles.dateDayNumber, isSelected && styles.selectedDateNumber]}>
-                    {item.dayNumber}
-                  </Text>
-                </Pressable>
-              );
-            }}
-          />
+      {/* Date Strip */}
+      {showDatePicker && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dateBar} contentContainerStyle={styles.dateBarContent}>
+          {dateStrip.map(item => {
+            const sel = selectedDate === item.iso;
+            return (
+              <Pressable key={item.iso} style={[styles.datePill, sel && styles.datePillActive]} onPress={() => setSelectedDate(item.iso)}>
+                <Text style={[styles.datePillDay, sel && { color: '#93C5FD' }]}>{item.dayName}</Text>
+                <Text style={[styles.datePillNum, sel && { color: '#F8FAFC' }]}>{item.dayNumber}</Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      )}
+
+      {/* Standings Total/Home/Away Toggle */}
+      {activeTab === 'standings' && (
+        <View style={styles.standingToggleRow}>
+          {(['total', 'home', 'away'] as const).map(v => (
+            <Pressable
+              key={v}
+              style={[styles.standingToggleBtn, standingView === v && styles.standingToggleBtnActive]}
+              onPress={() => setStandingView(v)}
+            >
+              <Text style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}>
+                {v.charAt(0).toUpperCase() + v.slice(1)}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       )}
 
-      {/* Content List */}
+      {/* Main Content */}
       {loading && !refreshing ? (
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#10B981" />
-          <Text style={styles.loadingText}>Fetching match data...</Text>
-        </View>
-      ) : sections.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="football-outline" size={48} color="#334155" />
-          <Text style={styles.emptyTitle}>
-            {activeTab === 'live' ? 'No Live Matches Right Now' : 'No Matches Found'}
-          </Text>
-          <Text style={styles.emptySubtitle}>
-            {activeTab === 'live'
-              ? 'Check upcoming games or select another date.'
-              : 'Try searching for a different team or check back later.'}
-          </Text>
-          <Pressable style={styles.emptyButton} onPress={onRefresh}>
-            <Text style={styles.emptyButtonText}>Refresh Scores</Text>
-          </Pressable>
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#F59E0B" />
+          <Text style={styles.loaderText}>Syncing football telemetry...</Text>
         </View>
       ) : (
-        <SectionList
-          sections={sections}
-          keyExtractor={(item) => String(item.event_key)}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#10B981"
-              colors={['#10B981']}
-            />
-          }
-          renderSectionHeader={({ section }: any) => (
-            <Pressable
-              style={styles.sectionHeader}
-              onPress={() => {
-                if (section.league_key) {
-                  router.push(`/home/football/leagues/${String(section.league_key)}` as any);
-                }
-              }}
-            >
-              {section.logo ? (
-                <Image
-                  source={{ uri: section.logo }}
-                  style={styles.sectionLogo}
-                  resizeMode="contain"
-                />
-              ) : (
-                <Ionicons
-                  name="trophy-outline"
-                  size={14}
-                  color="#3B82F6"
-                  style={{ marginRight: 6 }}
-                />
+        <>
+          {/* Fixtures / Live / Results */}
+          {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
+            <SectionList
+              sections={sections}
+              keyExtractor={(item, index) => `${item.event_key}-${index}`}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              renderSectionHeader={({ section }) => (
+                <View style={styles.sectionHeader}>
+                  {section.logo ? (
+                    <Image source={{ uri: section.logo }} style={styles.sectionLogo} />
+                  ) : (
+                    <Text style={{ fontSize: 14 }}>🏆</Text>
+                  )}
+                  <Text style={styles.sectionTitle} numberOfLines={1}>{section.title}</Text>
+                  {section.league_key && (
+                    <Pressable
+                      onPress={() => router.push(`/(tabs)/home/football/leagues/${section.league_key}` as any)}
+                      style={styles.sectionLink}
+                    >
+                      <Text style={styles.sectionLinkText}>Table</Text>
+                      <Ionicons name="chevron-forward" size={12} color="#3B82F6" />
+                    </Pressable>
+                  )}
+                </View>
               )}
-              <Text style={styles.sectionTitle}>{section.title}</Text>
-              <Text style={styles.sectionCount}>({section.data.length})</Text>
-              <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 'auto' }} />
-            </Pressable>
+              renderItem={({ item }) => <FootballMatchCard event={item} />}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Text style={{ fontSize: 40 }}>⚽</Text>
+                  <Text style={styles.emptyTitle}>No Fixtures Found</Text>
+                  <Text style={styles.emptyText}>
+                    {activeTab === 'live'
+                      ? 'No live matches in progress. Check Upcoming tab.'
+                      : 'No matches scheduled for this date and competition.'}
+                  </Text>
+                </View>
+              }
+              contentContainerStyle={{ paddingBottom: 100 }}
+              stickySectionHeadersEnabled={false}
+            />
           )}
-          renderItem={({ item }) => <FootballMatchCard event={item} />}
-          ListFooterComponent={<RecommendedFeed sportSlug="football" title="Recommended Football Intel" />}
-        />
+
+          {/* Standings Table */}
+          {activeTab === 'standings' && (
+            <ScrollView
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              contentContainerStyle={{ paddingBottom: 100 }}
+            >
+              <View style={styles.tableCard}>
+                {/* Header */}
+                <View style={styles.tableHeaderRow}>
+                  <Text style={[styles.tableCell, styles.rankCol]}>#</Text>
+                  <Text style={[styles.tableCell, styles.teamCol]}>Club</Text>
+                  <Text style={[styles.tableCell, styles.numCol]}>P</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>W</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>D</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>L</Text>
+                  <Text style={[styles.tableCell, styles.numCol]}>GD</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#FBBF24' }]}>PTS</Text>
+                </View>
+                {standings.length === 0 ? (
+                  <Text style={styles.emptyText}>No standings data for this competition.</Text>
+                ) : (
+                  standings.map((row, i) => {
+                    const rank = Number(row.standing_place);
+                    const isUCL = rank <= 4;
+                    const isUEL = rank === 5 || rank === 6;
+                    const isRel = rank >= 18;
+                    return (
+                      <Pressable
+                        key={i}
+                        style={styles.tableRow}
+                        onPress={() => row.team_key && router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)}
+                      >
+                        <View style={[styles.rankCell, isUCL && styles.rankUCL, isUEL && styles.rankUEL, isRel && styles.rankRel]}>
+                          <Text style={styles.rankText}>{row.standing_place || i + 1}</Text>
+                        </View>
+                        <Text style={[styles.tableCell, styles.teamCol, { fontWeight: '700', color: '#F1F5F9' }]} numberOfLines={1}>
+                          {row.standing_team}
+                        </Text>
+                        <Text style={[styles.tableCell, styles.numCol]}>{row.standing_P || 0}</Text>
+                        <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>{row.standing_W || 0}</Text>
+                        <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>{row.standing_D || 0}</Text>
+                        <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>{row.standing_L || 0}</Text>
+                        <Text style={[styles.tableCell, styles.numCol]}>{row.standing_GD || 0}</Text>
+                        <Text style={[styles.tableCell, styles.numCol, { fontWeight: '900', color: '#FBBF24' }]}>{row.standing_PTS || 0}</Text>
+                      </Pressable>
+                    );
+                  })
+                )}
+              </View>
+            </ScrollView>
+          )}
+
+          {/* Top Scorers */}
+          {activeTab === 'topscorers' && (
+            <FlatList
+              data={topscorers}
+              keyExtractor={(_, i) => String(i)}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 8 }}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Text style={{ fontSize: 36 }}>👟</Text>
+                  <Text style={styles.emptyTitle}>No Scorer Data</Text>
+                  <Text style={styles.emptyText}>Top scorer stats not available for this competition.</Text>
+                </View>
+              }
+              renderItem={({ item, index }) => (
+                <Pressable
+                  style={styles.scorerCard}
+                  onPress={() => item.player_key && router.push(`/(tabs)/home/football/players/${item.player_key}` as any)}
+                >
+                  <Text style={styles.scorerRank}>#{item.player_place || index + 1}</Text>
+                  {item.player_image ? (
+                    <Image source={{ uri: item.player_image }} style={styles.scorerPhoto} />
+                  ) : (
+                    <View style={[styles.scorerPhoto, styles.scorerPhotoPlaceholder]}>
+                      <Text style={{ fontSize: 20 }}>👤</Text>
+                    </View>
+                  )}
+                  <View style={{ flex: 1, paddingLeft: 10 }}>
+                    <Text style={styles.scorerName}>{item.player_name}</Text>
+                    <Text style={styles.scorerTeam}>{item.team_name}</Text>
+                  </View>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.scorerGoals}>{item.goals} ⚽</Text>
+                    {item.penalty_goals && item.penalty_goals !== '0' && (
+                      <Text style={styles.scorerPens}>({item.penalty_goals} pens)</Text>
+                    )}
+                  </View>
+                </Pressable>
+              )}
+            />
+          )}
+
+          {/* AI Predictions */}
+          {activeTab === 'predictions' && (
+            <FlatList
+              data={probabilities}
+              keyExtractor={(_, i) => String(i)}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 10 }}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Text style={{ fontSize: 36 }}>🤖</Text>
+                  <Text style={styles.emptyTitle}>No Predictions</Text>
+                  <Text style={styles.emptyText}>No probability forecasts available for the selected date.</Text>
+                </View>
+              }
+              renderItem={({ item }) => {
+                const hw = Number(item.event_HW) || 0;
+                const d = Number(item.event_D) || 0;
+                const aw = Number(item.event_AW) || 0;
+                return (
+                  <Pressable
+                    style={styles.predCard}
+                    onPress={() => item.event_key && router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)}
+                  >
+                    <View style={styles.predHeader}>
+                      <Text style={styles.predLeague} numberOfLines={1}>{item.league_name}</Text>
+                      <Text style={styles.predTime}>{item.event_time}</Text>
+                    </View>
+                    <View style={styles.predTeams}>
+                      <Text style={styles.predTeamHome} numberOfLines={1}>{item.event_home_team}</Text>
+                      <Text style={styles.predVS}>VS</Text>
+                      <Text style={styles.predTeamAway} numberOfLines={1}>{item.event_away_team}</Text>
+                    </View>
+                    {/* Prob Bar */}
+                    <View style={styles.predBarLabels}>
+                      <Text style={[styles.predBarLabel, { color: '#60A5FA' }]}>{hw}%</Text>
+                      <Text style={[styles.predBarLabel, { color: '#94A3B8' }]}>Draw {d}%</Text>
+                      <Text style={[styles.predBarLabel, { color: '#FBBF24' }]}>{aw}%</Text>
+                    </View>
+                    <View style={styles.predBar}>
+                      <View style={{ flex: hw || 1, backgroundColor: '#2563EB', height: '100%' }} />
+                      <View style={{ flex: d || 1, backgroundColor: '#475569', height: '100%' }} />
+                      <View style={{ flex: aw || 1, backgroundColor: '#D97706', height: '100%' }} />
+                    </View>
+                    <View style={styles.predMetrics}>
+                      <Text style={styles.predMetric}>Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text></Text>
+                      <Text style={styles.predMetric}>BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text></Text>
+                    </View>
+                    <Text style={styles.predCTA}>Tap for Full Odds & Match Center →</Text>
+                  </Pressable>
+                );
+              }}
+            />
+          )}
+        </>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0B0F17',
+  container: { flex: 1, backgroundColor: '#080E18' },
+
+  leagueBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
+  leagueBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
+  leagueChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  headerBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 3,
-    gap: 4,
+  leagueChipActive: { backgroundColor: '#1D4ED8', borderColor: '#3B82F6' },
+  leagueChipFlag: { fontSize: 14 },
+  leagueChipLabel: { fontSize: 11, fontWeight: '700', color: '#64748B' },
+  leagueChipLabelActive: { color: '#F8FAFC' },
+
+  controlBar: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: 12, paddingVertical: 8,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
   },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#141C2B',
-    borderRadius: BORDER_RADIUS.sm,
-    paddingHorizontal: 8,
-    height: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+  searchBox: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#0B1526', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  searchInput: {
-    flex: 1,
-    color: '#F8FAFC',
-    fontSize: 11,
-    marginLeft: 4,
-    paddingVertical: 0,
+  searchInput: { flex: 1, color: '#F8FAFC', fontSize: 12 },
+  refreshBtn: {
+    width: 34, height: 34, borderRadius: 10, backgroundColor: '#1D4ED8',
+    alignItems: 'center', justifyContent: 'center',
   },
-  refreshButton: {
-    width: 28,
-    height: 28,
-    borderRadius: BORDER_RADIUS.sm,
-    backgroundColor: '#1E293B',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+
+  tabBar: { flexGrow: 0 },
+  tabBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
+  tabBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  tabBar: {
-    flexDirection: 'row',
-    paddingHorizontal: SPACING.sm,
-    marginBottom: SPACING.xs,
-    gap: 4,
+  tabBtnActive: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
+  tabLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  tabLabelActive: { color: '#0F172A' },
+  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' },
+
+  dateBar: { flexGrow: 0 },
+  dateBarContent: { paddingHorizontal: 10, paddingBottom: 8, gap: 6 },
+  datePill: {
+    alignItems: 'center', minWidth: 54, paddingVertical: 6, paddingHorizontal: 8,
+    borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  tabItem: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 5,
-    backgroundColor: '#141C2B',
-    borderRadius: BORDER_RADIUS.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
+  datePillActive: { borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.15)' },
+  datePillDay: { fontSize: 9, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
+  datePillNum: { fontSize: 14, fontWeight: '900', color: '#94A3B8' },
+
+  standingToggleRow: {
+    flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 8,
   },
-  activeTabItem: {
-    backgroundColor: 'rgba(59, 130, 246, 0.18)',
-    borderColor: '#3B82F6',
+  standingToggleBtn: {
+    flex: 1, paddingVertical: 6, alignItems: 'center', borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  tabLabel: {
-    fontSize: 10,
-    color: '#94A3B8',
-    fontWeight: '600',
-  },
-  activeTabLabel: {
-    color: '#60A5FA',
-    fontWeight: '700',
-  },
-  dateStripContainer: {
-    paddingVertical: 3,
-  },
-  dateStripContent: {
-    paddingHorizontal: SPACING.sm,
-    gap: 4,
-  },
-  dateCard: {
-    width: 36,
-    paddingVertical: 3,
-    borderRadius: BORDER_RADIUS.sm,
-    backgroundColor: '#141C2B',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
-  },
-  selectedDateCard: {
-    backgroundColor: '#3B82F6',
-    borderColor: '#3B82F6',
-  },
-  dateDayName: {
-    fontSize: 8,
-    color: '#94A3B8',
-    fontWeight: '500',
-    marginBottom: 1,
-  },
-  selectedDateText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  dateDayNumber: {
-    fontSize: 11,
-    color: '#F8FAFC',
-    fontWeight: '700',
-  },
-  selectedDateNumber: {
-    color: '#FFFFFF',
-  },
-  listContent: {
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.xxl,
-  },
+  standingToggleBtnActive: { backgroundColor: '#1D4ED8', borderColor: '#3B82F6' },
+  standingToggleLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+
+  loaderContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+  loaderText: { color: '#64748B', fontSize: 12, fontWeight: '600' },
+
+  // Section Headers
   sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: SPACING.sm,
-    marginTop: SPACING.xs,
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: '#080E18', paddingHorizontal: 12, paddingVertical: 8,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
+    marginTop: 6,
   },
-  sectionLogo: {
-    width: 16,
-    height: 16,
-    marginRight: 6,
-    borderRadius: 3,
+  sectionLogo: { width: 18, height: 18, resizeMode: 'contain' },
+  sectionTitle: { flex: 1, fontSize: 11, fontWeight: '900', color: '#F1F5F9', textTransform: 'uppercase', letterSpacing: 0.5 },
+  sectionLink: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  sectionLinkText: { fontSize: 11, fontWeight: '700', color: '#3B82F6' },
+
+  // Standings Table
+  tableCard: {
+    margin: 12, backgroundColor: '#0B1526', borderRadius: 16, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  sectionTitle: {
-    fontSize: 11,
-    color: '#60A5FA',
-    fontWeight: '800',
-    marginRight: 6,
-    textTransform: 'uppercase',
+  tableHeaderRow: {
+    flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
   },
-  sectionCount: {
-    fontSize: 10,
-    color: '#94A3B8',
+  tableRow: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 8,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)',
   },
-  centerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.md,
+  tableCell: { fontSize: 11, color: '#94A3B8', fontFamily: 'monospace' },
+  rankCol: { width: 28 },
+  teamCol: { flex: 2.5, paddingRight: 4 },
+  numCol: { width: 30, textAlign: 'center' },
+  rankCell: {
+    width: 22, height: 22, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 6,
   },
-  loadingText: {
-    color: '#94A3B8',
-    fontSize: 11,
-    marginTop: SPACING.xs,
+  rankUCL: { backgroundColor: 'rgba(59,130,246,0.25)' },
+  rankUEL: { backgroundColor: 'rgba(245,158,11,0.25)' },
+  rankRel: { backgroundColor: 'rgba(239,68,68,0.25)' },
+  rankText: { fontSize: 10, fontWeight: '900', color: '#94A3B8' },
+
+  // Scorers
+  scorerCard: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#0B1526', borderRadius: 14, padding: 12,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: SPACING.lg,
-    marginTop: 20,
+  scorerRank: { width: 26, fontSize: 12, fontWeight: '900', color: '#FBBF24', fontFamily: 'monospace' },
+  scorerPhoto: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1E293B' },
+  scorerPhotoPlaceholder: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  scorerName: { fontSize: 13, fontWeight: '800', color: '#F1F5F9' },
+  scorerTeam: { fontSize: 11, color: '#64748B', marginTop: 1 },
+  scorerGoals: { fontSize: 18, fontWeight: '900', color: '#34D399' },
+  scorerPens: { fontSize: 10, color: '#64748B', fontFamily: 'monospace' },
+
+  // Predictions
+  predCard: {
+    backgroundColor: '#0B1526', borderRadius: 16, padding: 14,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  emptyTitle: {
-    color: '#F8FAFC',
-    fontSize: 12,
-    fontWeight: '800',
-    marginTop: SPACING.xs,
+  predHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  predLeague: { fontSize: 10, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', flex: 1 },
+  predTime: { fontSize: 10, color: '#FBBF24', fontWeight: '800', fontFamily: 'monospace' },
+  predTeams: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  predTeamHome: { flex: 1, fontSize: 12, fontWeight: '800', color: '#60A5FA' },
+  predVS: { fontSize: 10, color: '#475569', marginHorizontal: 8, fontWeight: '700' },
+  predTeamAway: { flex: 1, fontSize: 12, fontWeight: '800', color: '#FBBF24', textAlign: 'right' },
+  predBarLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  predBarLabel: { fontSize: 10, fontWeight: '800', fontFamily: 'monospace' },
+  predBar: {
+    flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden',
+    backgroundColor: '#1E293B', marginBottom: 10,
   },
-  emptySubtitle: {
-    color: '#64748B',
-    fontSize: 10,
-    textAlign: 'center',
-    marginTop: 2,
-    maxWidth: 240,
-  },
-  emptyButton: {
-    marginTop: SPACING.sm,
-    backgroundColor: 'rgba(59, 130, 246, 0.18)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: BORDER_RADIUS.sm,
-    borderWidth: 1,
-    borderColor: '#3B82F6',
-  },
-  emptyButtonText: {
-    color: '#60A5FA',
-    fontWeight: '700',
-    fontSize: 10,
-  },
+  predMetrics: { flexDirection: 'row', gap: 16, marginBottom: 8 },
+  predMetric: { fontSize: 11, color: '#94A3B8', fontWeight: '700' },
+  predCTA: { fontSize: 10, color: '#FBBF24', fontWeight: '800', textAlign: 'right' },
+
+  // Empty
+  emptyContainer: { padding: 48, alignItems: 'center' },
+  emptyTitle: { fontSize: 16, fontWeight: '900', color: '#F8FAFC', marginTop: 8, marginBottom: 4 },
+  emptyText: { fontSize: 12, color: '#475569', textAlign: 'center' },
 });

@@ -7,6 +7,7 @@ import {
   Image,
   Pressable,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,26 +18,30 @@ import {
   FootballStanding,
   FootballTopscorer,
   FootballTeam,
+  FootballProbability,
 } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 
-type LeagueTab = 'fixtures' | 'results' | 'standings' | 'topscorers';
+type LeagueTab = 'fixtures' | 'results' | 'standings' | 'topscorers' | 'teams' | 'predictions';
 
 export default function LeagueDetailPage() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<LeagueTab>('fixtures');
+  const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
   const [league, setLeague] = useState<FootballLeague | null>(null);
   const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
   const [standings, setStandings] = useState<{ name: string; teams: FootballStanding[] }[]>([]);
   const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
   const [teams, setTeams] = useState<FootballTeam[]>([]);
+  const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
 
-  useEffect(() => {
-    loadLeagueData();
-  }, [id]);
+  useEffect(() => { loadLeagueData(); }, [id]);
+
+  const onRefresh = () => { setRefreshing(true); loadLeagueData(); };
 
   const loadLeagueData = async () => {
     try {
@@ -210,10 +215,18 @@ export default function LeagueDetailPage() {
         }
       });
       setTeams(Array.from(teamMap.values()));
+
+      // Predictions for today
+      const todayStr = new Date().toISOString().split('T')[0];
+      const probRes = await advancedFootballApi
+        .getProbabilities({ leagueId, from: todayStr, to: todayStr })
+        .catch(() => ({ result: [] }));
+      setProbabilities(probRes?.result || []);
     } catch (error) {
       console.error('Error loading league data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -407,43 +420,47 @@ export default function LeagueDetailPage() {
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <Pressable
-            style={[styles.tab, activeTab === 'fixtures' && styles.activeTab]}
-            onPress={() => setActiveTab('fixtures')}
-          >
-            <Text style={[styles.tabText, activeTab === 'fixtures' && styles.activeTabText]}>
-              Fixtures
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tab, activeTab === 'results' && styles.activeTab]}
-            onPress={() => setActiveTab('results')}
-          >
-            <Text style={[styles.tabText, activeTab === 'results' && styles.activeTabText]}>
-              Results
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tab, activeTab === 'standings' && styles.activeTab]}
-            onPress={() => setActiveTab('standings')}
-          >
-            <Text style={[styles.tabText, activeTab === 'standings' && styles.activeTabText]}>
-              Standings
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tab, activeTab === 'topscorers' && styles.activeTab]}
-            onPress={() => setActiveTab('topscorers')}
-          >
-            <Text style={[styles.tabText, activeTab === 'topscorers' && styles.activeTabText]}>
-              Top Scorers
-            </Text>
-          </Pressable>
+          {(['fixtures', 'results', 'standings', 'topscorers', 'teams', 'predictions'] as LeagueTab[]).map((t) => {
+            const LABELS: Record<LeagueTab, string> = {
+              fixtures: 'Fixtures', results: 'Results', standings: 'Standings',
+              topscorers: 'Scorers', teams: 'Teams', predictions: 'AI Odds',
+            };
+            return (
+              <Pressable
+                key={t}
+                style={[styles.tab, activeTab === t && styles.activeTab]}
+                onPress={() => setActiveTab(t)}
+              >
+                <Text style={[styles.tabText, activeTab === t && styles.activeTabText]}>
+                  {LABELS[t]}
+                </Text>
+              </Pressable>
+            );
+          })}
         </ScrollView>
       </View>
+      {/* Standings Toggle */}
+      {activeTab === 'standings' && (
+        <View style={styles.standingToggleRow}>
+          {(['total', 'home', 'away'] as const).map((v) => (
+            <Pressable
+              key={v}
+              style={[styles.standingToggleBtn, standingView === v && styles.standingToggleBtnActive]}
+              onPress={() => setStandingView(v)}
+            >
+              <Text style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}>
+                {v.charAt(0).toUpperCase() + v.slice(1)}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
 
       {/* Content */}
-      <ScrollView style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+      >
         {activeTab === 'fixtures' && (
           <View style={styles.section}>
             {fixtures
@@ -541,6 +558,74 @@ export default function LeagueDetailPage() {
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>No top scorers available</Text>
               </View>
+            )}
+          </View>
+        )}
+        {/* ── TEAMS TAB ── */}
+        {activeTab === 'teams' && (
+          <View style={styles.section}>
+            {teams.length === 0 ? (
+              <View style={styles.emptyState}><Text style={styles.emptyText}>No teams data available</Text></View>
+            ) : (
+              <View style={styles.teamsGrid}>
+                {teams.map((t, i) => (
+                  <Pressable
+                    key={i}
+                    style={styles.teamCard}
+                    onPress={() => t.team_key && router.push(`/(tabs)/home/football/teams/${t.team_key}` as any)}
+                  >
+                    {t.team_logo ? (
+                      <Image source={{ uri: t.team_logo }} style={styles.teamCardLogo} />
+                    ) : (
+                      <View style={[styles.teamCardLogo, { backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center' }]}>
+                        <Text style={{ fontSize: 22 }}>🛡️</Text>
+                      </View>
+                    )}
+                    <Text style={styles.teamCardName} numberOfLines={2}>{t.team_name}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+        {/* ── PREDICTIONS TAB ── */}
+        {activeTab === 'predictions' && (
+          <View style={styles.section}>
+            {probabilities.length === 0 ? (
+              <View style={styles.emptyState}><Text style={styles.emptyText}>No predictions for today in this league.</Text></View>
+            ) : (
+              probabilities.map((item, i) => {
+                const hw = Number(item.event_HW) || 0;
+                const d = Number(item.event_D) || 0;
+                const aw = Number(item.event_AW) || 0;
+                return (
+                  <Pressable
+                    key={i}
+                    style={styles.predCard}
+                    onPress={() => item.event_key && router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)}
+                  >
+                    <View style={styles.predTeams}>
+                      <Text style={styles.predHome} numberOfLines={1}>{item.event_home_team}</Text>
+                      <Text style={styles.predVS}>VS</Text>
+                      <Text style={styles.predAway} numberOfLines={1}>{item.event_away_team}</Text>
+                    </View>
+                    <View style={styles.predBarLabels}>
+                      <Text style={[styles.predBarLabel, { color: '#60A5FA' }]}>{hw}%</Text>
+                      <Text style={[styles.predBarLabel, { color: '#94A3B8' }]}>D {d}%</Text>
+                      <Text style={[styles.predBarLabel, { color: '#FBBF24' }]}>{aw}%</Text>
+                    </View>
+                    <View style={styles.predBar}>
+                      <View style={{ flex: hw || 1, backgroundColor: '#2563EB', height: '100%' }} />
+                      <View style={{ flex: d || 1, backgroundColor: '#475569', height: '100%' }} />
+                      <View style={{ flex: aw || 1, backgroundColor: '#D97706', height: '100%' }} />
+                    </View>
+                    <View style={styles.predMetrics}>
+                      <Text style={styles.predMetric}>Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text></Text>
+                      <Text style={styles.predMetric}>BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text></Text>
+                    </View>
+                  </Pressable>
+                );
+              })
             )}
           </View>
         )}
@@ -804,4 +889,47 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
     paddingLeft: SPACING.xs,
   },
+  // Standings toggle
+  standingToggleRow: {
+    flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 8,
+    backgroundColor: COLORS.backgroundDark,
+  },
+  standingToggleBtn: {
+    flex: 1, paddingVertical: 6, alignItems: 'center', borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+  },
+  standingToggleBtnActive: { backgroundColor: '#1D4ED8', borderColor: '#3B82F6' },
+  standingToggleLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  // Teams tab
+  teamsGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10, padding: 4,
+  },
+  teamCard: {
+    width: '30%', alignItems: 'center', gap: 6,
+    backgroundColor: '#0B1526', borderRadius: 14, padding: 12,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+  },
+  teamCardLogo: { width: 52, height: 52, resizeMode: 'contain', borderRadius: 8 },
+  teamCardName: {
+    fontSize: 10, fontWeight: '700', color: '#CBD5E1', textAlign: 'center',
+  },
+  // Predictions
+  predCard: {
+    backgroundColor: '#0B1526', borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)', marginBottom: 8,
+  },
+  predTeams: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  predHome: { flex: 1, fontSize: 12, fontWeight: '800', color: '#60A5FA' },
+  predVS: { fontSize: 10, color: '#475569', marginHorizontal: 8 },
+  predAway: { flex: 1, fontSize: 12, fontWeight: '800', color: '#FBBF24', textAlign: 'right' },
+  predBarLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  predBarLabel: { fontSize: 10, fontWeight: '800', fontFamily: 'monospace' },
+  predBar: {
+    flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden',
+    backgroundColor: '#1E293B', marginBottom: 8,
+  },
+  predMetrics: { flexDirection: 'row', gap: 16 },
+  predMetric: { fontSize: 11, color: '#94A3B8', fontWeight: '700' },
 });
+
+

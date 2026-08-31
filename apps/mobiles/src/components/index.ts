@@ -10,3 +10,6 @@ export { FanPassBanner } from './FanPassBanner';
 export { LiveNewsFlashTicker } from './LiveNewsFlashTicker';
 export { PulseNewsTicker } from './PulseNewsTicker';
 export { NewsCard } from './NewsCard';
+export { FootballMatchCard } from './FootballMatchCard';
+export { TacticalPitch } from './TacticalPitch';
+export { MatchOddsModal } from './MatchOddsModal';

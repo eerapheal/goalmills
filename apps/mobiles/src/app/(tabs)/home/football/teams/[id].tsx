@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   Pressable,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,22 +15,57 @@ import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballTeam, FootballPlayer, FootballEvent, FootballStanding } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
+import { MatchOddsModal } from '../../../../../components/MatchOddsModal';
+import { UnifiedMatchEvent } from '../../../../../components/FootballMatchCard';
 
-type TeamTab = 'squad' | 'fixtures' | 'results' | 'table';
+type TeamTab = 'squad' | 'fixtures' | 'results' | 'table' | 'odds';
+
+const POSITION_ORDER = ['Goalkeepers', 'Defenders', 'Midfielders', 'Forwards', 'Unknown'];
+
+const normalisePosition = (pos: string | undefined): string => {
+  if (!pos) return 'Unknown';
+  const p = pos.toLowerCase();
+  if (p.includes('goal')) return 'Goalkeepers';
+  if (p.includes('def')) return 'Defenders';
+  if (p.includes('mid')) return 'Midfielders';
+  if (p.includes('for') || p.includes('att') || p.includes('win')) return 'Forwards';
+  return pos.charAt(0).toUpperCase() + pos.slice(1);
+};
+
+const toUnified = (f: FootballEvent): UnifiedMatchEvent => ({
+  event_key: f.event_key,
+  event_date: f.event_date,
+  event_time: f.event_time,
+  event_status: f.event_status,
+  event_live: f.event_live,
+  event_home_team: f.event_home_team,
+  home_team_key: f.home_team_key,
+  home_team_logo: f.home_team_logo,
+  event_away_team: f.event_away_team,
+  away_team_key: f.away_team_key,
+  away_team_logo: f.away_team_logo,
+  event_final_result: f.event_final_result,
+  event_ft_result: f.event_ft_result,
+  league_name: f.league_name,
+  league_key: f.league_key,
+  league_logo: f.league_logo,
+});
 
 export default function TeamDetailPage() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TeamTab>('squad');
   const [team, setTeam] = useState<FootballTeam | null>(null);
   const [players, setPlayers] = useState<FootballPlayer[]>([]);
-  const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
+  const [allFixtures, setAllFixtures] = useState<FootballEvent[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
+  const [oddsModal, setOddsModal] = useState<{ visible: boolean; matchId: string; home: string; away: string }>({
+    visible: false, matchId: '', home: '', away: '',
+  });
 
-  useEffect(() => {
-    loadTeamData();
-  }, [id]);
+  useEffect(() => { loadTeamData(); }, [id]);
 
   const loadTeamData = async () => {
     try {
@@ -37,82 +73,92 @@ export default function TeamDetailPage() {
       const teamId = Number(id);
       const today = new Date();
       const currentYear = today.getFullYear();
-      const currentMonth = today.getMonth(); // 0-11
-
-      // Determine season start year (July to June)
-      let seasonStartYear = currentYear;
-      if (currentMonth < 6) {
-        // Jan - Jun
-        seasonStartYear = currentYear - 1;
-      }
-
-      const fromDate = `${seasonStartYear}-07-01`;
-      const toDate = `${seasonStartYear + 1}-06-30`;
-
-      console.log(
-        `🔄 Mobile: Loading team details for ${teamId} (Season: ${seasonStartYear}/${seasonStartYear + 1})...`
-      );
+      const seasonStart = today.getMonth() < 6 ? currentYear - 1 : currentYear;
+      const fromDate = `${seasonStart}-07-01`;
+      const toDate = `${seasonStart + 1}-06-30`;
 
       const [teamsRes, playersRes, fixturesRes] = await Promise.all([
         advancedFootballApi.getTeams({ teamId }).catch(() => ({ result: [] })),
         advancedFootballApi.getPlayers({ teamId }).catch(() => ({ result: [] })),
         advancedFootballApi
-          .getFixtures({
-            from: fromDate,
-            to: toDate,
-            teamId: teamId,
-          })
+          .getFixtures({ from: fromDate, to: toDate, teamId })
           .catch(() => ({ result: [] })),
       ]);
 
-      const teamData = teamsRes.result[0];
-      setTeam(teamData || null);
+      setTeam(teamsRes.result[0] || null);
       setPlayers(playersRes.result || []);
-      setFixtures(fixturesRes.result || []);
+      setAllFixtures((fixturesRes.result as FootballEvent[]) || []);
 
-      // Process Standings with Intelligent Stage Handling
+      // League standings
       if (fixturesRes.result?.[0]?.league_key) {
-        const leagueId = Number(fixturesRes.result[0].league_key);
-        const standingsRes = await advancedFootballApi.getStandings(leagueId).catch(() => null);
-
-        if (standingsRes?.result?.total) {
-          const rawStandings = standingsRes.result.total;
-          const stageGroups: { [key: string]: FootballStanding[] } = {};
-
-          if (Array.isArray(rawStandings)) {
-            rawStandings.forEach((s) => {
-              const stageId = s.fk_stage_key || 'default';
-              if (!stageGroups[stageId]) stageGroups[stageId] = [];
-              stageGroups[stageId].push(s);
-            });
-          } else if (typeof rawStandings === 'object') {
-            // Handle object format if returned
-            Object.keys(rawStandings).forEach((stageName) => {
-              stageGroups[stageName] = (rawStandings as any)[stageName];
-            });
-          }
-
-          let bestStage: FootballStanding[] = [];
-          Object.values(stageGroups).forEach((stageTeams) => {
-            if (stageTeams.length > bestStage.length) {
-              bestStage = stageTeams;
-            }
-          });
-
-          setStandings(bestStage);
+        const leagueId = Number((fixturesRes.result as FootballEvent[])[0].league_key);
+        const standRes = await advancedFootballApi.getStandings(leagueId).catch(() => null);
+        if (standRes?.result) {
+          const res = standRes.result as any;
+          const table = Array.isArray(res) ? res : res.total || [];
+          setStandings(table);
         }
       }
     } catch (error) {
       console.error('Error loading team data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  if (loading) {
+  const onRefresh = () => { setRefreshing(true); loadTeamData(); };
+
+  const handleBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)/home');
+  };
+
+  // Compute derived fixtures
+  const now = new Date().toISOString().split('T')[0];
+  const results = useMemo(
+    () => allFixtures.filter(f => f.event_status === 'FT' || f.event_status === 'Finished' || f.event_status === 'AET').slice(-10).reverse(),
+    [allFixtures]
+  );
+  const upcoming = useMemo(
+    () => allFixtures.filter(f => f.event_date >= now && (f.event_status === 'NS' || f.event_status === 'Not Started' || f.event_status === 'TBA')).slice(0, 10),
+    [allFixtures, now]
+  );
+
+  // Form (last 5 from results)
+  const formBadges = useMemo(() => {
+    return results.slice(0, 5).map(f => {
+      const teamId = String(id);
+      const homeId = String(f.home_team_key);
+      const awayId = String(f.away_team_key);
+      const scoreParts = (f.event_final_result || f.event_ft_result || '-').split(' - ');
+      const homeGoals = parseInt(scoreParts[0] || '0', 10);
+      const awayGoals = parseInt(scoreParts[1] || '0', 10);
+      let outcome: 'W' | 'D' | 'L' = 'D';
+      if (teamId === homeId) outcome = homeGoals > awayGoals ? 'W' : homeGoals < awayGoals ? 'L' : 'D';
+      else if (teamId === awayId) outcome = awayGoals > homeGoals ? 'W' : awayGoals < homeGoals ? 'L' : 'D';
+      return outcome;
+    });
+  }, [results, id]);
+
+  // Group players by position
+  const groupedPlayers = useMemo(() => {
+    const groups: { [k: string]: FootballPlayer[] } = {};
+    players.forEach(p => {
+      const pos = normalisePosition(p.player_type);
+      if (!groups[pos]) groups[pos] = [];
+      groups[pos].push(p);
+    });
+    return groups;
+  }, [players]);
+
+  // Current team standing
+  const myStanding = standings.find(s => String(s.team_key) === String(id));
+
+  if (loading && !refreshing) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.secondary} />
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#F59E0B" />
         <Text style={styles.loadingText}>Loading team details...</Text>
       </View>
     );
@@ -120,449 +166,424 @@ export default function TeamDetailPage() {
 
   if (!team) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Team not found</Text>
+      <View style={styles.center}>
+        <Text style={{ fontSize: 40 }}>🛡️</Text>
+        <Text style={styles.errorTitle}>Team Not Found</Text>
+        <Pressable style={styles.backBtn} onPress={handleBack}>
+          <Text style={styles.backBtnText}>← Go Back</Text>
+        </Pressable>
       </View>
     );
   }
 
-  const groupedPlayers = players.reduce(
-    (acc, player) => {
-      const position = player.player_type || 'Unknown';
-      if (!acc[position]) {
-        acc[position] = [];
-      }
-      acc[position].push(player);
-      return acc;
-    },
-    {} as { [key: string]: FootballPlayer[] }
-  );
+  const TABS: { id: TeamTab; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { id: 'squad', label: 'Squad', icon: 'people-outline' },
+    { id: 'fixtures', label: 'Upcoming', icon: 'calendar-outline' },
+    { id: 'results', label: 'Results', icon: 'checkmark-circle-outline' },
+    { id: 'table', label: 'Table', icon: 'trophy-outline' },
+    { id: 'odds', label: 'AI Odds', icon: 'analytics-outline' },
+  ];
 
-  const renderStandingsTable = () => (
-    <View style={styles.standingsTable}>
-      <View style={styles.standingsHeader}>
-        <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
-        <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
-        <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
-        <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
-      </View>
-      {standings.map((standing, index) => (
-        <View
-          key={`standing-${standing.team_key}-${index}`}
-          style={[
-            styles.standingsRow,
-            String(standing.team_key) === String(id) && styles.highlightedRow,
-          ]}
-        >
-          <Text style={[styles.standingsText, styles.posCol]}>{standing.standing_place}</Text>
-          <Text style={[styles.standingsText, styles.teamCol]} numberOfLines={1}>
-            {standing.standing_team}
-          </Text>
-          <Text style={[styles.standingsText, styles.statCol]}>{standing.standing_P}</Text>
-          <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
-            {standing.standing_PTS}
-          </Text>
-        </View>
-      ))}
-    </View>
-  );
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)/home');
-    }
-  };
+  const formColor = (o: 'W' | 'D' | 'L') =>
+    o === 'W' ? '#34D399' : o === 'D' ? '#94A3B8' : '#F87171';
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Pressable onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#F8FAFC" />
-          </Pressable>
-          {team.team_logo && <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />}
-          <Text style={styles.teamName}>{team.team_name}</Text>
-        </View>
-      </View>
+      {/* ── HERO ── */}
+      <View style={styles.hero}>
+        <Pressable onPress={handleBack} style={styles.heroBack}>
+          <Ionicons name="arrow-back" size={20} color="#F8FAFC" />
+        </Pressable>
 
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <Pressable
-            style={[styles.tab, activeTab === 'squad' && styles.activeTab]}
-            onPress={() => setActiveTab('squad')}
-          >
-            <Text style={[styles.tabText, activeTab === 'squad' && styles.activeTabText]}>
-              Squad
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tab, activeTab === 'fixtures' && styles.activeTab]}
-            onPress={() => setActiveTab('fixtures')}
-          >
-            <Text style={[styles.tabText, activeTab === 'fixtures' && styles.activeTabText]}>
-              Fixtures
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tab, activeTab === 'results' && styles.activeTab]}
-            onPress={() => setActiveTab('results')}
-          >
-            <Text style={[styles.tabText, activeTab === 'results' && styles.activeTabText]}>
-              Results
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.tab, activeTab === 'table' && styles.activeTab]}
-            onPress={() => setActiveTab('table')}
-          >
-            <Text style={[styles.tabText, activeTab === 'table' && styles.activeTabText]}>
-              Table
-            </Text>
-          </Pressable>
-        </ScrollView>
-      </View>
-
-      {/* Content */}
-      <ScrollView style={styles.content}>
-        {activeTab === 'squad' && (
-          <View style={styles.section}>
-            {Object.entries(groupedPlayers).map(([position, positionPlayers]) => (
-              <View key={position} style={styles.positionGroup}>
-                <Text style={styles.positionTitle}>{position}</Text>
-                {positionPlayers.map((player, playerIndex) => (
-                  <Pressable
-                    key={`player-${player.player_key}-${playerIndex}`}
-                    style={({ pressed }) => [styles.playerCard, pressed && styles.pressed]}
-                    onPress={() =>
-                      router.push(`/home/football/players/${player.player_key}` as any)
-                    }
-                  >
-                    <View style={styles.playerInfo}>
-                      {player.player_image && (
-                        <Image source={{ uri: player.player_image }} style={styles.playerImage} />
-                      )}
-                      <View style={styles.playerText}>
-                        <Text style={styles.playerName}>{player.player_name}</Text>
-                        <View style={styles.playerMeta}>
-                          {player.player_number && (
-                            <Text style={styles.playerNumber}>#{player.player_number}</Text>
-                          )}
-                          {player.player_age && (
-                            <Text style={styles.playerAge}>• {player.player_age} years</Text>
-                          )}
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.playerStats}>
-                      <Text style={styles.statText}>⚽ {player.player_goals}</Text>
-                      {player.player_assists && (
-                        <Text style={styles.statText}>🎯 {player.player_assists}</Text>
-                      )}
-                    </View>
-                  </Pressable>
+        <View style={styles.heroContent}>
+          {team.team_logo ? (
+            <Image source={{ uri: team.team_logo }} style={styles.teamLogo} />
+          ) : (
+            <View style={[styles.teamLogo, styles.teamLogoPlaceholder]}>
+              <Text style={{ fontSize: 36 }}>🛡️</Text>
+            </View>
+          )}
+          <View style={styles.heroInfo}>
+            <Text style={styles.teamName}>{team.team_name}</Text>
+            {/* Form row */}
+            {formBadges.length > 0 && (
+              <View style={styles.formRow}>
+                <Text style={styles.formLabel}>Form:</Text>
+                {formBadges.map((o, i) => (
+                  <View key={i} style={[styles.formDot, { backgroundColor: formColor(o) }]}>
+                    <Text style={styles.formLetter}>{o}</Text>
+                  </View>
                 ))}
               </View>
-            ))}
-            {players.length === 0 && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>No players available</Text>
-              </View>
             )}
           </View>
-        )}
-        {activeTab === 'fixtures' && (
-          <View style={styles.section}>
-            {fixtures
-              .filter((f) => {
-                const status = f.event_status?.toLowerCase();
-                const isFinished =
-                  status === 'finished' ||
-                  f.event_status === 'FT' ||
-                  f.event_status === 'AET' ||
-                  f.event_status === 'AP';
-                if (isFinished) return false;
+        </View>
 
-                // Filter for next 90 days
-                const eventDate = new Date(`${f.event_date} ${f.event_time || '00:00'}`);
-                const now = new Date();
-                now.setHours(0, 0, 0, 0); // Start of today
-                const dayDiff = (eventDate.getTime() - now.getTime()) / (1000 * 3600 * 24);
+        {/* Standing card */}
+        {myStanding && (
+          <View style={styles.standingCard}>
+            <View style={styles.standingItem}>
+              <Text style={styles.standingValue}>{myStanding.standing_place}</Text>
+              <Text style={styles.standingKey}>Rank</Text>
+            </View>
+            <View style={styles.standingDivider} />
+            <View style={styles.standingItem}>
+              <Text style={[styles.standingValue, { color: '#34D399' }]}>{myStanding.standing_W || 0}</Text>
+              <Text style={styles.standingKey}>W</Text>
+            </View>
+            <View style={styles.standingItem}>
+              <Text style={[styles.standingValue, { color: '#94A3B8' }]}>{myStanding.standing_D || 0}</Text>
+              <Text style={styles.standingKey}>D</Text>
+            </View>
+            <View style={styles.standingItem}>
+              <Text style={[styles.standingValue, { color: '#F87171' }]}>{myStanding.standing_L || 0}</Text>
+              <Text style={styles.standingKey}>L</Text>
+            </View>
+            <View style={styles.standingDivider} />
+            <View style={styles.standingItem}>
+              <Text style={[styles.standingValue, { color: '#FBBF24' }]}>{myStanding.standing_PTS || 0}</Text>
+              <Text style={styles.standingKey}>PTS</Text>
+            </View>
+          </View>
+        )}
+      </View>
 
-                return dayDiff >= 0 && dayDiff <= 90;
-              })
-              .sort(
-                (a, b) =>
-                  new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime() -
-                  new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime()
-              )
-              .map((event, index) => (
-                <FootballMatchCard key={`fixture-${event.event_key || index}`} event={event} />
-              ))}
-            {fixtures.filter((f) => {
-              const status = f.event_status?.toLowerCase();
-              return (
-                status !== 'finished' &&
-                f.event_status !== 'FT' &&
-                f.event_status !== 'AET' &&
-                f.event_status !== 'AP'
-              );
-            }).length === 0 && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>No upcoming matches available</Text>
+      {/* ── TAB BAR ── */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabBar}
+        contentContainerStyle={styles.tabBarContent}
+      >
+        {TABS.map(tab => {
+          const active = activeTab === tab.id;
+          return (
+            <Pressable
+              key={tab.id}
+              style={[styles.tabBtn, active && styles.tabBtnActive]}
+              onPress={() => setActiveTab(tab.id)}
+            >
+              <Ionicons name={tab.icon} size={13} color={active ? '#0F172A' : '#64748B'} />
+              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      {/* ── CONTENT ── */}
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+        contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 10 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── SQUAD ── */}
+        {activeTab === 'squad' && (
+          <>
+            {players.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={{ fontSize: 36 }}>👥</Text>
+                <Text style={styles.emptyTitle}>Squad Unavailable</Text>
               </View>
-            )}
-          </View>
-        )}
-        {activeTab === 'results' && (
-          <View style={styles.section}>
-            {fixtures
-              .filter((f) => {
-                const status = f.event_status?.toLowerCase();
-                return (
-                  status === 'finished' ||
-                  f.event_status === 'FT' ||
-                  f.event_status === 'AET' ||
-                  f.event_status === 'AP'
-                );
-              })
-              .sort(
-                (a, b) =>
-                  new Date(`${b.event_date} ${b.event_time || '00:00'}`).getTime() -
-                  new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime()
-              )
-              .map((event, index) => (
-                <FootballMatchCard key={`result-${event.event_key || index}`} event={event} />
-              ))}
-            {fixtures.filter((f) => {
-              const status = f.event_status?.toLowerCase();
-              return (
-                status === 'finished' ||
-                f.event_status === 'FT' ||
-                f.event_status === 'AET' ||
-                f.event_status === 'AP'
-              );
-            }).length === 0 && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>No past results available</Text>
-              </View>
-            )}
-          </View>
-        )}
-        {activeTab === 'table' && (
-          <View style={styles.section}>
-            {standings.length > 0 ? (
-              renderStandingsTable()
             ) : (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>No table data available</Text>
+              POSITION_ORDER.filter(pos => groupedPlayers[pos]?.length > 0).map(pos => (
+                <View key={pos} style={styles.positionGroup}>
+                  <Text style={styles.positionTitle}>{pos}</Text>
+                  {groupedPlayers[pos].map((p, i) => (
+                    <Pressable
+                      key={i}
+                      style={styles.playerRow}
+                      onPress={() => p.player_key && router.push(`/(tabs)/home/football/players/${p.player_key}` as any)}
+                    >
+                      {p.player_image ? (
+                        <Image source={{ uri: p.player_image }} style={styles.playerThumb} />
+                      ) : (
+                        <View style={[styles.playerThumb, styles.playerThumbPlaceholder]}>
+                          <Text>👤</Text>
+                        </View>
+                      )}
+                      <View style={styles.playerInfo}>
+                        <Text style={styles.playerName}>{p.player_name}</Text>
+                        <Text style={styles.playerMeta}>
+                          {p.player_country || 'N/A'} · Age {p.player_age || '?'}
+                        </Text>
+                      </View>
+                      <View style={styles.playerStats}>
+                        <Text style={styles.playerGoals}>{p.player_goals || 0} ⚽</Text>
+                        {p.player_rating && (
+                          <Text style={styles.playerRating}>★ {Number(p.player_rating).toFixed(1)}</Text>
+                        )}
+                      </View>
+                      <Text style={styles.playerNumber}>#{p.player_number || '?'}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              ))
+            )}
+          </>
+        )}
+
+        {/* ── UPCOMING FIXTURES ── */}
+        {activeTab === 'fixtures' && (
+          <>
+            {upcoming.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={{ fontSize: 36 }}>📅</Text>
+                <Text style={styles.emptyTitle}>No Upcoming Fixtures</Text>
               </View>
+            ) : (
+              upcoming.map(f => (
+                <FootballMatchCard key={f.event_key} event={toUnified(f)} />
+              ))
+            )}
+          </>
+        )}
+
+        {/* ── RESULTS ── */}
+        {activeTab === 'results' && (
+          <>
+            {results.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={{ fontSize: 36 }}>📋</Text>
+                <Text style={styles.emptyTitle}>No Results Yet</Text>
+              </View>
+            ) : (
+              results.map(f => (
+                <FootballMatchCard key={f.event_key} event={toUnified(f)} />
+              ))
+            )}
+          </>
+        )}
+
+        {/* ── TABLE ── */}
+        {activeTab === 'table' && (
+          <View style={styles.tableCard}>
+            {standings.length === 0 ? (
+              <Text style={styles.emptyTitle}>Standings unavailable.</Text>
+            ) : (
+              <>
+                <View style={styles.tableHeader}>
+                  <Text style={[styles.tableCell, styles.rankCol]}>#</Text>
+                  <Text style={[styles.tableCell, { flex: 2.5, textAlign: 'left' }]}>Club</Text>
+                  <Text style={[styles.tableCell, styles.numCol]}>P</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>W</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>D</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>L</Text>
+                  <Text style={[styles.tableCell, styles.numCol]}>GD</Text>
+                  <Text style={[styles.tableCell, styles.numCol, { color: '#FBBF24' }]}>PTS</Text>
+                </View>
+                {standings.map((row, i) => {
+                  const isMe = String(row.team_key) === String(id) || row.standing_team === team.team_name;
+                  return (
+                    <Pressable
+                      key={i}
+                      style={[styles.tableRow, isMe && styles.tableRowHighlight]}
+                      onPress={() => row.team_key && router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)}
+                    >
+                      <Text style={[styles.tableCell, styles.rankCol, { color: '#64748B' }]}>
+                        {row.standing_place || i + 1}
+                      </Text>
+                      <Text
+                        style={[styles.tableCell, { flex: 2.5, textAlign: 'left', fontWeight: '700', color: isMe ? '#FBBF24' : '#F1F5F9' }]}
+                        numberOfLines={1}
+                      >
+                        {row.standing_team}
+                      </Text>
+                      <Text style={[styles.tableCell, styles.numCol]}>{row.standing_P || 0}</Text>
+                      <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>{row.standing_W || 0}</Text>
+                      <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>{row.standing_D || 0}</Text>
+                      <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>{row.standing_L || 0}</Text>
+                      <Text style={[styles.tableCell, styles.numCol]}>{row.standing_GD || 0}</Text>
+                      <Text style={[styles.tableCell, styles.numCol, { fontWeight: '900', color: '#FBBF24' }]}>{row.standing_PTS || 0}</Text>
+                    </Pressable>
+                  );
+                })}
+              </>
             )}
           </View>
+        )}
+
+        {/* ── AI ODDS / PREDICTIONS ── */}
+        {activeTab === 'odds' && (
+          <>
+            <Text style={styles.oddsTitle}>Tap a fixture to preview odds & AI prediction</Text>
+            {upcoming.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={{ fontSize: 36 }}>📉</Text>
+                <Text style={styles.emptyTitle}>No Upcoming Fixtures</Text>
+                <Text style={styles.emptyText}>Odds are available for future matches.</Text>
+              </View>
+            ) : (
+              upcoming.map(f => (
+                <Pressable
+                  key={f.event_key}
+                  style={styles.oddsFixtureRow}
+                  onPress={() =>
+                    setOddsModal({
+                      visible: true,
+                      matchId: String(f.event_key),
+                      home: f.event_home_team,
+                      away: f.event_away_team,
+                    })
+                  }
+                >
+                  <View style={styles.oddsFixtureInfo}>
+                    <Text style={styles.oddsFixtureDate}>{f.event_date} · {f.event_time || 'TBA'}</Text>
+                    <Text style={styles.oddsFixtureTeams}>
+                      {f.event_home_team} <Text style={{ color: '#475569' }}>vs</Text> {f.event_away_team}
+                    </Text>
+                    <Text style={styles.oddsFixtureLeague} numberOfLines={1}>{f.league_name}</Text>
+                  </View>
+                  <Ionicons name="analytics-outline" size={20} color="#F59E0B" />
+                </Pressable>
+              ))
+            )}
+          </>
         )}
       </ScrollView>
+
+      {/* Odds Modal */}
+      <MatchOddsModal
+        visible={oddsModal.visible}
+        matchId={oddsModal.matchId}
+        homeTeam={oddsModal.home}
+        awayTeam={oddsModal.away}
+        onClose={() => setOddsModal(prev => ({ ...prev, visible: false }))}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.backgroundDark,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundDark,
-  },
-  loadingText: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textLight,
-    marginTop: SPACING.md,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundDark,
-  },
-  errorText: {
-    fontSize: FONT_SIZES.lg,
-    color: COLORS.danger,
-  },
-  header: {
-    backgroundColor: '#141C2B',
-    padding: SPACING.sm,
-    borderBottomWidth: 2,
-    borderBottomColor: '#3B82F6',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    marginRight: SPACING.sm,
-  },
-  teamLogo: {
-    width: 32,
-    height: 32,
-    marginRight: SPACING.sm,
-  },
-  teamName: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#F8FAFC',
-    flex: 1,
-  },
-  tabsContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  container: { flex: 1, backgroundColor: '#080E18' },
+  center: { flex: 1, backgroundColor: '#080E18', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
+  loadingText: { color: '#94A3B8', fontSize: 13, fontWeight: '600' },
+  errorTitle: { fontSize: 18, fontWeight: '900', color: '#F8FAFC', marginTop: 8 },
+  backBtn: { marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#F59E0B', borderRadius: 12 },
+  backBtnText: { color: '#0F172A', fontWeight: '900', fontSize: 13 },
+
+  // Hero
+  hero: {
+    backgroundColor: '#0D1F3C',
+    paddingTop: 52,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    borderBottomColor: 'rgba(59,130,246,0.25)',
   },
-  tab: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    minWidth: 70,
+  heroBack: {
+    position: 'absolute', top: 52, left: 16, zIndex: 10,
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  activeTab: {
-    borderBottomColor: '#3B82F6',
+  heroContent: { flexDirection: 'row', gap: 14, alignItems: 'center', paddingLeft: 44 },
+  teamLogo: { width: 72, height: 72, resizeMode: 'contain', borderRadius: 8 },
+  teamLogoPlaceholder: {
+    backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  tabText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#94A3B8',
+  heroInfo: { flex: 1 },
+  teamName: { fontSize: 20, fontWeight: '900', color: '#F8FAFC' },
+  teamCountry: { fontSize: 12, color: '#64748B', marginTop: 2 },
+  formRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
+  formLabel: { fontSize: 10, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  formDot: {
+    width: 22, height: 22, borderRadius: 11,
+    alignItems: 'center', justifyContent: 'center',
   },
-  activeTabText: {
-    color: '#60A5FA',
-    fontWeight: '800',
+  formLetter: { fontSize: 10, fontWeight: '900', color: '#0F172A' },
+
+  standingCard: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 14, borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    padding: 12, marginTop: 14,
+    justifyContent: 'space-around',
   },
-  content: {
-    flex: 1,
+  standingItem: { alignItems: 'center' },
+  standingValue: { fontSize: 20, fontWeight: '900', color: '#F8FAFC', fontVariant: ['tabular-nums'] },
+  standingKey: { fontSize: 9, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', marginTop: 2 },
+  standingDivider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.1)' },
+
+  // Tabs
+  tabBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
+  tabBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
+  tabBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  section: {
-    padding: SPACING.sm,
-  },
+  tabBtnActive: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
+  tabLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  tabLabelActive: { color: '#0F172A' },
+
+  // Squad
   positionGroup: {
-    marginBottom: SPACING.md,
+    backgroundColor: '#0B1526', borderRadius: 16, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
   positionTitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#60A5FA',
-    marginBottom: SPACING.xs,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 10, fontWeight: '900', color: '#60A5FA',
+    textTransform: 'uppercase', letterSpacing: 0.8,
+    paddingHorizontal: 14, paddingVertical: 8,
+    backgroundColor: 'rgba(37,99,235,0.1)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
   },
-  playerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: BORDER_RADIUS.sm,
-    padding: 8,
-    marginBottom: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+  playerRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 14, paddingVertical: 10,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
   },
-  pressed: {
-    opacity: 0.7,
-    transform: [{ scale: 0.98 }],
+  playerThumb: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1E293B' },
+  playerThumbPlaceholder: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  playerInfo: { flex: 1 },
+  playerName: { fontSize: 12, fontWeight: '800', color: '#F1F5F9' },
+  playerMeta: { fontSize: 10, color: '#64748B', marginTop: 1 },
+  playerStats: { alignItems: 'flex-end', gap: 2 },
+  playerGoals: { fontSize: 11, fontWeight: '700', color: '#34D399' },
+  playerRating: { fontSize: 10, color: '#FBBF24', fontWeight: '700' },
+  playerNumber: { fontSize: 11, fontWeight: '900', color: '#475569', width: 28, textAlign: 'right', fontFamily: 'monospace' },
+
+  // Table
+  tableCard: {
+    backgroundColor: '#0B1526', borderRadius: 16, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  playerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+  tableHeader: {
+    flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
   },
-  playerImage: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  tableRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingVertical: 9, paddingHorizontal: 8,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)',
   },
-  playerText: {
-    flex: 1,
+  tableRowHighlight: { backgroundColor: 'rgba(245,158,11,0.1)' },
+  tableCell: { fontSize: 11, color: '#94A3B8', fontFamily: 'monospace', textAlign: 'center' },
+  rankCol: { width: 26 },
+  numCol: { width: 28, textAlign: 'center' },
+
+  // Odds
+  oddsTitle: {
+    fontSize: 11, color: '#64748B', fontWeight: '700',
+    textTransform: 'uppercase', textAlign: 'center',
+    paddingBottom: 4, letterSpacing: 0.5,
   },
-  playerName: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#F8FAFC',
-    marginBottom: 1,
+  oddsFixtureRow: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#0B1526', borderRadius: 14, padding: 14,
+    borderWidth: 1, borderColor: 'rgba(245,158,11,0.2)',
   },
-  playerMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  playerNumber: {
-    fontSize: 10,
-    color: '#3B82F6',
-    fontWeight: '700',
-  },
-  playerAge: {
-    fontSize: 10,
-    color: '#94A3B8',
-    marginLeft: SPACING.xs,
-  },
-  playerStats: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  statText: {
-    fontSize: 10,
-    color: '#94A3B8',
-    fontWeight: '600',
-  },
-  emptyState: {
-    alignItems: 'center',
-    padding: SPACING.lg,
-  },
-  emptyText: {
-    fontSize: 11,
-    color: '#94A3B8',
-  },
-  standingsTable: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: BORDER_RADIUS.md,
-    overflow: 'hidden',
-  },
-  standingsHeader: {
-    flexDirection: 'row',
-    padding: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  standingsHeaderText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#60A5FA',
-    textTransform: 'uppercase',
-  },
-  standingsRow: {
-    flexDirection: 'row',
-    padding: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
-    alignItems: 'center',
-  },
-  highlightedRow: {
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
-  },
-  standingsText: {
-    fontSize: 10,
-    color: '#F8FAFC',
-    fontWeight: '600',
-  },
-  posCol: { width: 24 },
-  teamCol: { flex: 1 },
-  statCol: { width: 30, textAlign: 'center' },
-  ptsCol: { width: 36, textAlign: 'right' },
-  ptsValue: { color: '#60A5FA', fontWeight: '800' },
+  oddsFixtureInfo: { flex: 1 },
+  oddsFixtureDate: { fontSize: 10, color: '#FBBF24', fontFamily: 'monospace', fontWeight: '700', marginBottom: 4 },
+  oddsFixtureTeams: { fontSize: 13, fontWeight: '800', color: '#F1F5F9', marginBottom: 3 },
+  oddsFixtureLeague: { fontSize: 10, color: '#64748B' },
+
+  // Empty
+  emptyContainer: { padding: 48, alignItems: 'center', gap: 8 },
+  emptyTitle: { fontSize: 15, fontWeight: '900', color: '#F8FAFC' },
+  emptyText: { fontSize: 12, color: '#64748B', textAlign: 'center' },
 });
