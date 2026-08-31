@@ -542,24 +542,29 @@ export const advancedFootballApi = {
     }
   },
 
-  /**
-   * Get coaches list
-   */
   getCoaches: async (): Promise<{ success: number; result: FootballCoach[] }> => {
-    return {
-      success: 1,
-      result: [],
-    };
+    try {
+      const res = await fetch('/api/coaches');
+      if (!res.ok) return { success: 1, result: [] };
+      return await res.json();
+    } catch (error) {
+      console.error('Error fetching coaches:', error);
+      return { success: 1, result: [] };
+    }
   },
 
   /**
    * Get officials list
    */
   getOfficials: async (): Promise<{ success: number; result: FootballOfficial[] }> => {
-    return {
-      success: 1,
-      result: [],
-    };
+    try {
+      const res = await fetch('/api/officials');
+      if (!res.ok) return { success: 1, result: [] };
+      return await res.json();
+    } catch (error) {
+      console.error('Error fetching officials:', error);
+      return { success: 1, result: [] };
+    }
   },
 
   /**

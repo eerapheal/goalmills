@@ -38,7 +38,7 @@ export const MAJOR_LEAGUES = [
 
 export function FootballScreen() {
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
-  const [selectedLeague, setSelectedLeague] = useState<string>('152');
+  const [selectedLeague, setSelectedLeague] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -102,8 +102,10 @@ export function FootballScreen() {
   const fetchMatches = useCallback(async () => {
     setLoading(true);
     try {
+      const targetLeague = selectedLeague === 'all' ? '152' : selectedLeague;
+
       if (activeTab === 'standings') {
-        const res = await advancedFootballApi.getStandings(selectedLeague);
+        const res = await advancedFootballApi.getStandings(targetLeague);
         if (res?.result) {
           const resObj = res.result as any;
           const table = resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
@@ -112,13 +114,13 @@ export function FootballScreen() {
           setStandings([]);
         }
       } else if (activeTab === 'topscorers') {
-        const res = await advancedFootballApi.getTopscorers(selectedLeague);
+        const res = await advancedFootballApi.getTopscorers(targetLeague);
         setTopscorers(res?.result || []);
       } else if (activeTab === 'predictions') {
         const res = await advancedFootballApi.getProbabilities({
           from: selectedDate,
           to: selectedDate,
-          leagueId: selectedLeague,
+          leagueId: targetLeague,
         });
         setProbabilities(res?.result || []);
       } else if (activeTab === 'live') {
@@ -185,6 +187,10 @@ export function FootballScreen() {
       );
     }
 
+    if (selectedLeague !== 'all') {
+      list = list.filter((f) => String(f.league_key) === String(selectedLeague));
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -196,7 +202,7 @@ export function FootballScreen() {
     }
 
     return list;
-  }, [fixtures, activeTab, searchQuery]);
+  }, [fixtures, activeTab, searchQuery, selectedLeague]);
 
   // Group fixtures by competition
   const leagueGroups = useMemo(() => {
@@ -217,7 +223,20 @@ export function FootballScreen() {
       groups[leagueTitle].matches.push(item);
     });
 
-    return Object.values(groups);
+    const MAJOR_LEAGUE_IDS = ['152', '3', '302', '207', '175', '168'];
+
+    return Object.values(groups).sort((a, b) => {
+      const aKeyStr = String(a.league_key || '');
+      const bKeyStr = String(b.league_key || '');
+
+      const aIdx = MAJOR_LEAGUE_IDS.indexOf(aKeyStr);
+      const bIdx = MAJOR_LEAGUE_IDS.indexOf(bKeyStr);
+
+      if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+      if (aIdx !== -1) return -1;
+      if (bIdx !== -1) return 1;
+      return a.title.localeCompare(b.title);
+    });
   }, [filteredFixtures]);
 
   const tabs: { id: FootballTab; label: string; icon: string; badge?: string }[] = [
@@ -277,6 +296,17 @@ export function FootballScreen() {
 
       {/* Major Competition Quick Switcher Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <button
+          onClick={() => setSelectedLeague('all')}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+            selectedLeague === 'all'
+              ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30 scale-[1.02]'
+              : 'bg-[#0B1526] text-slate-300 hover:text-white hover:bg-white/5 border-white/5'
+          }`}
+        >
+          <span>🌍</span>
+          <span>All Leagues</span>
+        </button>
         {MAJOR_LEAGUES.map((leg) => {
           const isSelected = selectedLeague === leg.id;
           return (

@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export interface UnifiedWebMatchEvent {
@@ -149,7 +150,11 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
       {/* Match Body */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3 relative z-10">
         {/* Home Team */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+        <Link
+          href={event.home_team_key ? `/teams/${event.home_team_key}` : '#'}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
+        >
           <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
             {event.home_team_logo ? (
               <img
@@ -169,7 +174,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
           <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
             {event.event_home_team}
           </span>
-        </div>
+        </Link>
 
         {/* Score / VS Center Badge */}
         <div className="flex flex-row sm:flex-col items-center justify-center gap-1 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded bg-[#091220] sm:bg-slate-950/90 border border-blue-500/30 flex-shrink-0 min-w-[50px] sm:min-w-[60px] text-center shadow-inner group-hover:border-blue-400/60 transition-colors">
@@ -192,7 +197,11 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
         </div>
 
         {/* Away Team */}
-        <div className="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right">
+        <Link
+          href={event.away_team_key ? `/teams/${event.away_team_key}` : '#'}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right hover:text-blue-400 transition-colors"
+        >
           <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
             {event.event_away_team}
           </span>
@@ -212,7 +221,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
               </span>
             )}
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );

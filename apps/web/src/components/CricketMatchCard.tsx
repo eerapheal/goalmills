@@ -97,9 +97,13 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
       {/* Teams and Scores Grid */}
       <div className="flex items-center justify-between gap-1.5 sm:gap-3 relative z-10">
         {/* Home Team */}
-        <div className="flex flex-1 items-center space-x-1.5 sm:space-x-2 min-w-0">
+        <Link
+          href={match.home_team_key ? `/cricket/teams/${match.home_team_key}` : '#'}
+          onClick={(e) => e.stopPropagation()}
+          className="flex flex-1 items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
+        >
           <div className="flex h-5.5 w-5.5 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded bg-slate-900/80 border border-white/10 p-0.5 overflow-hidden shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {match.event_away_team_logo && !homeImgError ? (
+            {match.event_home_team_logo && !homeImgError ? (
               <img
                 src={match.event_home_team_logo}
                 alt={homeName}
@@ -129,7 +133,7 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
               <span className="text-[9px] text-slate-400 font-medium hidden sm:inline">Yet to bat</span>
             ) : null}
           </div>
-        </div>
+        </Link>
 
         {/* Center Status / Time Pill */}
         <div className="mx-1 sm:mx-1.5 flex flex-col items-center justify-center shrink-0 min-w-[46px] sm:min-w-[58px] px-1 sm:px-2 py-0.5 rounded bg-[#091220] sm:bg-slate-950/90 border border-blue-500/30 text-center shadow-inner">
@@ -154,7 +158,11 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
         </div>
 
         {/* Away Team */}
-        <div className="flex flex-1 items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right">
+        <Link
+          href={match.away_team_key ? `/cricket/teams/${match.away_team_key}` : '#'}
+          onClick={(e) => e.stopPropagation()}
+          className="flex flex-1 items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right hover:text-blue-400 transition-colors"
+        >
           <div className="min-w-0 flex-1">
             <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-blue-300 truncate block transition-colors">
               {awayName}
@@ -186,7 +194,7 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
               <span className="text-[8px] sm:text-[10px] font-black text-blue-400">{awayName.charAt(0)}</span>
             )}
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Match Result / Status Footer */}

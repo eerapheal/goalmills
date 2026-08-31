@@ -162,9 +162,13 @@ export function GoalmillsFootballDashboard() {
                 isLive,
                 homeTeam: home,
                 homeCode: home.substring(0, 3).toUpperCase(),
+                home_team_key: m.home_team_key,
+                home_team_logo: m.home_team_logo,
                 homeGoalScorer: m.event_scorer || '',
                 awayTeam: away,
                 awayCode: away.substring(0, 3).toUpperCase(),
+                away_team_key: m.away_team_key,
+                away_team_logo: m.away_team_logo,
                 awayGoalScorer: '',
                 score,
                 homePossession: 52,
@@ -180,12 +184,17 @@ export function GoalmillsFootballDashboard() {
             const topHome = topM.event_home_team || 'Man City';
             const topAway = topM.event_away_team || 'Real Madrid';
             setMarqueeMatch({
+              id: topM.event_key,
               league: topM.league_name || 'UEFA Champions League',
               stage: topM.league_round || 'Matchday Fixture',
               homeTeam: topHome,
               homeCode: topHome.substring(0, 4).toUpperCase(),
+              home_team_key: topM.home_team_key,
+              home_team_logo: topM.home_team_logo,
               awayTeam: topAway,
               awayCode: topAway.substring(0, 3).toUpperCase(),
+              away_team_key: topM.away_team_key,
+              away_team_logo: topM.away_team_logo,
               kickoff: topM.event_time || '20:00 GMT',
               venue: topM.event_stadium || 'Official Stadium',
               probability: `Win Probability: ${topHome.substring(0, 4)} 45% • Draw 25% • ${topAway.substring(0, 3)} 30%`,
@@ -322,17 +331,41 @@ export function GoalmillsFootballDashboard() {
                     {/* Match Body */}
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3">
                       {/* Home Team */}
-                      <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
-                          {m.homeCode}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-bold text-[11px] sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.homeTeam}</div>
-                          {m.homeGoalScorer && (
-                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeGoalScorer}</div>
-                          )}
-                        </div>
-                      </div>
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                        }}
+                        className="inline-block"
+                      >
+                        <Link
+                          href={m.home_team_key ? `/teams/${m.home_team_key}` : '#'}
+                          className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-amber-400"
+                        >
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                            {m.home_team_logo ? (
+                              <img
+                                src={m.home_team_logo}
+                                alt={m.homeTeam}
+                                className="h-full w-full object-contain rounded-full"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                                {m.homeCode}
+                              </span>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.homeTeam}</div>
+                            {m.homeGoalScorer && (
+                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeGoalScorer}</div>
+                            )}
+                          </div>
+                        </Link>
+                      </span>
 
                       {/* Score Badge */}
                       <div className="flex flex-row sm:flex-col items-center justify-center gap-1.5 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
@@ -343,17 +376,41 @@ export function GoalmillsFootballDashboard() {
                       </div>
 
                       {/* Away Team */}
-                      <div className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 text-right">
-                        <div className="min-w-0 flex-1">
-                          <div className="font-bold text-[11px] sm:text-sm text-white truncate group-hover:text-amber-300 transition-colors">{m.awayTeam}</div>
-                          {m.awayGoalScorer && (
-                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.awayGoalScorer}</div>
-                          )}
-                        </div>
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-900/40 border border-red-400/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
-                          {m.awayCode}
-                        </div>
-                      </div>
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                        }}
+                        className="inline-block text-right"
+                      >
+                        <Link
+                          href={m.away_team_key ? `/teams/${m.away_team_key}` : '#'}
+                          className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-amber-400"
+                        >
+                          <div className="min-w-0 flex-1 text-right">
+                            <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.awayTeam}</div>
+                            {m.awayGoalScorer && (
+                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayGoalScorer}</div>
+                            )}
+                          </div>
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                            {m.away_team_logo ? (
+                              <img
+                                src={m.away_team_logo}
+                                alt={m.awayTeam}
+                                className="h-full w-full object-contain rounded-full"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                                {m.awayCode}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
+                      </span>
                     </div>
 
                     {/* Possession & xG Progress Bar - Hidden on mobile viewports */}
@@ -430,14 +487,36 @@ export function GoalmillsFootballDashboard() {
                 </span>
               </div>
 
-              <div className="text-center py-2 space-y-2">
+              <Link href={marqueeMatch.id ? `/matches/${marqueeMatch.id}` : '#'} className="block text-center py-2 space-y-2 hover:opacity-95 transition-opacity">
                 <div className="flex items-center justify-around">
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg">
-                      <span className="text-xs font-black text-blue-400">{marqueeMatch.homeCode}</span>
-                    </div>
-                    <span className="text-xs font-bold text-white truncate max-w-[90px]">{marqueeMatch.homeTeam}</span>
-                  </div>
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    className="inline-block"
+                  >
+                    <Link
+                      href={marqueeMatch.home_team_key ? `/teams/${marqueeMatch.home_team_key}` : '#'}
+                      className="flex flex-col items-center gap-1 group/team hover:text-blue-400"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg transition-colors group-hover/team:border-blue-400">
+                        {marqueeMatch.home_team_logo ? (
+                          <img
+                            src={marqueeMatch.home_team_logo}
+                            alt={marqueeMatch.homeTeam}
+                            className="w-full h-full object-contain rounded-lg"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs font-black text-blue-400">{marqueeMatch.homeCode}</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-white truncate max-w-[90px] group-hover/team:text-blue-300 transition-colors">{marqueeMatch.homeTeam}</span>
+                    </Link>
+                  </span>
 
                   <div className="flex flex-col items-center">
                     <span className="text-xs font-black text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-xl">
@@ -446,18 +525,40 @@ export function GoalmillsFootballDashboard() {
                     <span className="text-[10px] text-slate-400 mt-1 font-semibold">{marqueeMatch.venue}</span>
                   </div>
 
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg">
-                      <span className="text-xs font-black text-amber-400">{marqueeMatch.awayCode}</span>
-                    </div>
-                    <span className="text-xs font-bold text-white truncate max-w-[90px]">{marqueeMatch.awayTeam}</span>
-                  </div>
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    className="inline-block"
+                  >
+                    <Link
+                      href={marqueeMatch.away_team_key ? `/teams/${marqueeMatch.away_team_key}` : '#'}
+                      className="flex flex-col items-center gap-1 group/team hover:text-blue-400"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg transition-colors group-hover/team:border-blue-400">
+                        {marqueeMatch.away_team_logo ? (
+                          <img
+                            src={marqueeMatch.away_team_logo}
+                            alt={marqueeMatch.awayTeam}
+                            className="w-full h-full object-contain rounded-lg"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs font-black text-amber-400">{marqueeMatch.awayCode}</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-white truncate max-w-[90px] group-hover/team:text-blue-300 transition-colors">{marqueeMatch.awayTeam}</span>
+                    </Link>
+                  </span>
                 </div>
 
                 <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
                   <span className="font-semibold">{marqueeMatch.probability}</span>
                 </div>
-              </div>
+              </Link>
             </div>
 
             {/* 2. CONFIRMED TRANSFERS SNIPPET */}

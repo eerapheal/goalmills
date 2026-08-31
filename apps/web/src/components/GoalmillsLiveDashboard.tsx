@@ -147,9 +147,13 @@ export function GoalmillsLiveDashboard({
               league: m.league_name || 'Premier League',
               homeTeam: home,
               homeCode: home.substring(0, 3).toUpperCase(),
+              home_team_key: m.home_team_key,
+              home_team_logo: m.home_team_logo,
               homeScorer: m.event_scorer || '',
               awayTeam: away,
               awayCode: away.substring(0, 3).toUpperCase(),
+              away_team_key: m.away_team_key,
+              away_team_logo: m.away_team_logo,
               awayScorer: '',
               score,
               time: m.event_status ? `(${m.event_status}')` : 'LIVE',
@@ -239,7 +243,7 @@ export function GoalmillsLiveDashboard({
       {/* ─── TOP LIVE PULSE BAR ─── */}
       <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse flex-shrink-0">
+          <span className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse flex-shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
             LIVE PULSE
           </span>
@@ -264,7 +268,7 @@ export function GoalmillsLiveDashboard({
             onClick={() => onSelectTab?.('football')}
             className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
           >
-            ⚡ Football Hub
+            Hub
           </button>
         </div>
       </div>
@@ -282,7 +286,7 @@ export function GoalmillsLiveDashboard({
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 <h3 className="text-xs font-black tracking-wider text-slate-200 uppercase">
-                  LIVE FOOTBALL SCORES
+                  Live
                 </h3>
               </div>
               <button
@@ -296,9 +300,10 @@ export function GoalmillsLiveDashboard({
 
             <div className="space-y-3">
               {liveFootballMatches.map((m) => (
-                <div
+                <Link
+                  href={`/matches/${m.id}`}
                   key={m.id}
-                  className="rounded-xl bg-[#142336] border border-white/5 p-3 sm:p-4 hover:border-amber-500/30 transition duration-300"
+                  className="block rounded-xl bg-[#142336] border border-white/5 p-3 sm:p-4 hover:border-amber-500/30 hover:bg-[#192b42] transition duration-300 group cursor-pointer"
                 >
                   {/* Header info (League name, live status badge) */}
                   <div className="flex items-center justify-between text-xs text-slate-300 mb-2.5">
@@ -312,17 +317,41 @@ export function GoalmillsLiveDashboard({
                   {/* Match Body */}
                   <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3">
                     {/* Home Team */}
-                    <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
-                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-900/40 border border-blue-500/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
-                        {m.homeCode}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-[11px] sm:text-sm text-white truncate">{m.homeTeam}</div>
-                        {m.homeScorer && (
-                          <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
-                        )}
-                      </div>
-                    </div>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                      className="inline-block"
+                    >
+                      <Link
+                        href={m.home_team_key ? `/teams/${m.home_team_key}` : '#'}
+                        className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
+                      >
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                          {m.home_team_logo ? (
+                            <img
+                              src={m.home_team_logo}
+                              alt={m.homeTeam}
+                              className="h-full w-full object-contain rounded-full"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                              {m.homeCode}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-blue-300 transition-colors">{m.homeTeam}</div>
+                          {m.homeScorer && (
+                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
+                          )}
+                        </div>
+                      </Link>
+                    </span>
 
                     {/* Score & Time */}
                     <div className="flex flex-row sm:flex-col items-center justify-center gap-1.5 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-slate-950/80 border border-amber-500/30 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
@@ -333,17 +362,41 @@ export function GoalmillsLiveDashboard({
                     </div>
 
                     {/* Away Team */}
-                    <div className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 text-right">
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-[11px] sm:text-sm text-white truncate">{m.awayTeam}</div>
-                        {m.awayScorer && (
-                          <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.awayScorer}</div>
-                        )}
-                      </div>
-                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-900/40 border border-red-400/30 flex items-center justify-center text-[9px] sm:text-xs font-black text-white shadow flex-shrink-0">
-                        {m.awayCode}
-                      </div>
-                    </div>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                      className="inline-block text-right"
+                    >
+                      <Link
+                        href={m.away_team_key ? `/teams/${m.away_team_key}` : '#'}
+                        className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
+                      >
+                        <div className="min-w-0 flex-1 text-right">
+                          <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-blue-300 transition-colors">{m.awayTeam}</div>
+                          {m.awayScorer && (
+                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayScorer}</div>
+                          )}
+                        </div>
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                          {m.away_team_logo ? (
+                            <img
+                              src={m.away_team_logo}
+                              alt={m.awayTeam}
+                              className="h-full w-full object-contain rounded-full"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                              {m.awayCode}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    </span>
                   </div>
 
                   {/* Timeline / Possession Progress Bar - Hidden on mobile viewports */}
@@ -357,7 +410,7 @@ export function GoalmillsLiveDashboard({
                       <div className="bg-slate-700 h-full" style={{ width: `${100 - m.possession}%` }} />
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

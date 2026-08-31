@@ -14,6 +14,8 @@ import {
   FootballProbability,
   FootballVideo,
   FootballStanding,
+  FootballCoach,
+  FootballOfficial,
 } from '@goalmills/types';
 import {
   FiArrowLeft,
@@ -58,6 +60,8 @@ export default function MatchDetailsPage() {
   const [probabilities, setProbabilities] = useState<FootballProbability | null>(null);
   const [videos, setVideos] = useState<FootballVideo[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
+  const [coaches, setCoaches] = useState<FootballCoach[]>([]);
+  const [officials, setOfficials] = useState<FootballOfficial[]>([]);
 
   const loadData = useCallback(async () => {
     if (!matchId) return;
@@ -78,7 +82,7 @@ export default function MatchDetailsPage() {
         const leagueKey = fix.league_key;
 
         // 2. Fetch H2H, Odds, Probabilities, Videos, Standings in parallel
-        const [h2hRes, oddsRes, liveOddsRes, fullOddsRes, probRes, videoRes, standRes] =
+        const [h2hRes, oddsRes, liveOddsRes, fullOddsRes, probRes, videoRes, standRes, coachRes, officialRes] =
           await Promise.allSettled([
             homeKey && awayKey
               ? advancedFootballApi.getH2H(homeKey, awayKey)
@@ -89,6 +93,8 @@ export default function MatchDetailsPage() {
             advancedFootballApi.getProbabilities({ matchId }),
             advancedFootballApi.getVideos(matchId),
             leagueKey ? advancedFootballApi.getStandings(leagueKey) : Promise.resolve(null),
+            advancedFootballApi.getCoaches(),
+            advancedFootballApi.getOfficials(),
           ]);
 
         if (h2hRes.status === 'fulfilled' && h2hRes.value?.result) {
@@ -123,6 +129,14 @@ export default function MatchDetailsPage() {
           const table = Array.isArray(res) ? res : res.total || [];
           setStandings(table);
         }
+
+        if (coachRes.status === 'fulfilled' && coachRes.value?.result) {
+          setCoaches(coachRes.value.result || []);
+        }
+
+        if (officialRes.status === 'fulfilled' && officialRes.value?.result) {
+          setOfficials(officialRes.value.result || []);
+        }
       }
     } catch (err) {
       console.error('[Web Match Details] Error loading data:', err);
@@ -134,6 +148,36 @@ export default function MatchDetailsPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const refereeLink = useMemo(() => {
+    if (!fixture?.event_referee || officials.length === 0) return '#';
+    const idx = officials.findIndex(
+      (o) => o.name.toLowerCase() === fixture.event_referee?.toLowerCase()
+    );
+    return `/officials/${idx !== -1 ? idx : 0}`;
+  }, [fixture?.event_referee, officials]);
+
+  const getCoachLink = useCallback((coachName: string) => {
+    if (!coachName || coaches.length === 0) return '#';
+    const idx = coaches.findIndex(
+      (c) => c.coache.toLowerCase() === coachName.toLowerCase()
+    );
+    return `/coaches/${idx !== -1 ? idx : 0}`;
+  }, [coaches]);
+
+  const getPlayerLinkByName = useCallback((playerName: string) => {
+    if (!playerName || !fixture?.lineups) return '#';
+    const allPlayers = [
+      ...(fixture.lineups.home_team?.starting_lineups || []),
+      ...(fixture.lineups.home_team?.substitutes || []),
+      ...(fixture.lineups.away_team?.starting_lineups || []),
+      ...(fixture.lineups.away_team?.substitutes || []),
+    ];
+    const found = allPlayers.find(
+      (p) => p.player.toLowerCase() === playerName.toLowerCase()
+    );
+    return found?.player_key ? `/players/${found.player_key}` : '#';
+  }, [fixture]);
 
   const isLive =
     fixture?.event_live === '1' ||
@@ -383,7 +427,15 @@ export default function MatchDetailsPage() {
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-white/5">
                   <span className="text-slate-400">Match Referee</span>
-                  <span className="font-bold text-white">{fixture.event_referee || 'Official Referee'}</span>
+                  <span className="font-bold text-white">
+                    {fixture.event_referee ? (
+                      <Link href={refereeLink} className="text-blue-400 hover:text-blue-300 transition-colors hover:underline">
+                        {fixture.event_referee}
+                      </Link>
+                    ) : (
+                      'Official Referee'
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-white/5">
                   <span className="text-slate-400">Home Formation</span>
@@ -479,7 +531,15 @@ export default function MatchDetailsPage() {
                       </span>
                       <span className="text-base">⚽</span>
                       <span className="font-bold text-white">
-                        {g.home_scorer || g.away_scorer}
+                        {g.home_scorer ? (
+                          <Link href={getPlayerLinkByName(g.home_scorer)} className="hover:text-blue-400 transition-colors hover:underline">
+                            {g.home_scorer}
+                          </Link>
+                        ) : g.away_scorer ? (
+                          <Link href={getPlayerLinkByName(g.away_scorer)} className="hover:text-blue-400 transition-colors hover:underline">
+                            {g.away_scorer}
+                          </Link>
+                        ) : null}
                       </span>
                     </div>
                     <span className="font-black font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
@@ -506,7 +566,15 @@ export default function MatchDetailsPage() {
                           }`}
                         />
                         <span className="font-bold text-slate-200">
-                          {c.home_fault || c.away_fault}
+                          {c.home_fault ? (
+                            <Link href={getPlayerLinkByName(c.home_fault)} className="hover:text-blue-400 transition-colors hover:underline">
+                              {c.home_fault}
+                            </Link>
+                          ) : c.away_fault ? (
+                            <Link href={getPlayerLinkByName(c.away_fault)} className="hover:text-blue-400 transition-colors hover:underline">
+                              {c.away_fault}
+                            </Link>
+                          ) : null}
                         </span>
                       </div>
                       <span className="text-[11px] text-slate-400 capitalize">{c.card}</span>
@@ -529,8 +597,18 @@ export default function MatchDetailsPage() {
                         </span>
                         <span className="text-base">🔄</span>
                         <div>
-                          <span className="font-bold text-emerald-400">In: {subIn}</span>
-                          <span className="text-slate-400 ml-2">Out: {subOut}</span>
+                          <span className="font-bold text-emerald-400">
+                            In:{' '}
+                            <Link href={getPlayerLinkByName(subIn)} className="hover:text-emerald-300 transition-colors hover:underline">
+                              {subIn}
+                            </Link>
+                          </span>
+                          <span className="text-slate-400 ml-2">
+                            Out:{' '}
+                            <Link href={getPlayerLinkByName(subOut)} className="hover:text-rose-400 transition-colors hover:underline">
+                              {subOut}
+                            </Link>
+                          </span>
                         </div>
                       </div>
                       <span className="text-[10px] text-slate-500 uppercase font-mono">Sub</span>
@@ -563,14 +641,18 @@ export default function MatchDetailsPage() {
                     </div>
                     <div className="flex flex-wrap justify-around gap-2">
                       {fixture.lineups.home_team.starting_lineups.map((p, idx) => (
-                        <div key={idx} className="flex flex-col items-center">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white shadow-lg border border-white/30">
+                        <Link
+                          href={p.player_key ? `/players/${p.player_key}` : '#'}
+                          key={idx}
+                          className="flex flex-col items-center group/player hover:opacity-80 transition-opacity"
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white shadow-lg border border-white/30 group-hover/player:border-blue-300">
                             {p.player_number || idx + 1}
                           </div>
-                          <span className="mt-1 text-[11px] font-bold text-white max-w-[70px] truncate text-center drop-shadow">
+                          <span className="mt-1 text-[11px] font-bold text-white max-w-[70px] truncate text-center drop-shadow group-hover/player:text-blue-300">
                             {p.player.split(' ').pop()}
                           </span>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -579,14 +661,18 @@ export default function MatchDetailsPage() {
                   <div className="mt-8">
                     <div className="flex flex-wrap justify-around gap-2 mb-4">
                       {fixture.lineups.away_team?.starting_lineups?.map((p, idx) => (
-                        <div key={idx} className="flex flex-col items-center">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-600 text-xs font-black text-white shadow-lg border border-white/30">
+                        <Link
+                          href={p.player_key ? `/players/${p.player_key}` : '#'}
+                          key={idx}
+                          className="flex flex-col items-center group/player hover:opacity-80 transition-opacity"
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-600 text-xs font-black text-white shadow-lg border border-white/30 group-hover/player:border-amber-300">
                             {p.player_number || idx + 1}
                           </div>
-                          <span className="mt-1 text-[11px] font-bold text-white max-w-[70px] truncate text-center drop-shadow">
+                          <span className="mt-1 text-[11px] font-bold text-white max-w-[70px] truncate text-center drop-shadow group-hover/player:text-amber-300">
                             {p.player.split(' ').pop()}
                           </span>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                     <div className="text-center text-xs font-black text-amber-300 uppercase tracking-wider">
@@ -595,7 +681,7 @@ export default function MatchDetailsPage() {
                   </div>
                 </div>
 
-                {/* Substitutes & Coaches */}
+                {/* Substitutes & Coaches Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="rounded-2xl border border-white/10 bg-[#0B1526] p-5 space-y-3">
                     <h4 className="text-xs font-black text-blue-400 uppercase tracking-wider border-b border-white/5 pb-2">
@@ -603,8 +689,14 @@ export default function MatchDetailsPage() {
                     </h4>
                     <ul className="space-y-1.5 text-xs text-slate-300">
                       {fixture.lineups.home_team.substitutes.map((s, idx) => (
-                        <li key={idx} className="flex justify-between py-1 border-b border-white/5">
-                          <span>{s.player}</span>
+                        <li key={idx} className="flex justify-between py-1 border-b border-white/5 items-center">
+                          {s.player_key ? (
+                            <Link href={`/players/${s.player_key}`} className="hover:text-blue-400 transition-colors hover:underline">
+                              {s.player}
+                            </Link>
+                          ) : (
+                            <span>{s.player}</span>
+                          )}
                           <span className="font-mono text-slate-400">#{s.player_number || '-'}</span>
                         </li>
                       ))}
@@ -617,12 +709,45 @@ export default function MatchDetailsPage() {
                     </h4>
                     <ul className="space-y-1.5 text-xs text-slate-300">
                       {fixture.lineups.away_team?.substitutes?.map((s, idx) => (
-                        <li key={idx} className="flex justify-between py-1 border-b border-white/5">
-                          <span>{s.player}</span>
+                        <li key={idx} className="flex justify-between py-1 border-b border-white/5 items-center">
+                          {s.player_key ? (
+                            <Link href={`/players/${s.player_key}`} className="hover:text-amber-400 transition-colors hover:underline">
+                              {s.player}
+                            </Link>
+                          ) : (
+                            <span>{s.player}</span>
+                          )}
                           <span className="font-mono text-slate-400">#{s.player_number || '-'}</span>
                         </li>
                       ))}
                     </ul>
+                  </div>
+                </div>
+
+                {/* Coaches Section */}
+                <div className="rounded-2xl border border-white/10 bg-[#0B1526] p-5 space-y-3">
+                  <h4 className="text-xs font-black text-white uppercase tracking-wider border-b border-white/5 pb-2">
+                    Team Managers / Coaches
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-xs text-slate-300">
+                    <div>
+                      <span className="text-slate-400 block mb-1">Home Coach</span>
+                      <Link
+                        href={getCoachLink(fixture.lineups?.home_team?.coaches?.[0]?.coache || 'Pep Guardiola')}
+                        className="font-bold text-white hover:text-blue-400 transition-colors hover:underline"
+                      >
+                        {fixture.lineups?.home_team?.coaches?.[0]?.coache || 'Pep Guardiola'}
+                      </Link>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block mb-1">Away Coach</span>
+                      <Link
+                        href={getCoachLink(fixture.lineups?.away_team?.coaches?.[0]?.coache || 'Carlo Ancelotti')}
+                        className="font-bold text-white hover:text-amber-400 transition-colors hover:underline"
+                      >
+                        {fixture.lineups?.away_team?.coaches?.[0]?.coache || 'Carlo Ancelotti'}
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </>

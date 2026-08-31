@@ -56,6 +56,7 @@ export function NewsletterSubscriptionSection() {
   const [errorMessage, setErrorMessage] = useState('');
   const [suggestedCorrection, setSuggestedCorrection] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showOptions, setShowOptions] = useState(false);
 
   const toggleTopic = (id: string) => {
     setSelectedTopics((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]));
@@ -213,115 +214,12 @@ export function NewsletterSubscriptionSection() {
             </div>
           ) : (
             /* FORM & PREFERENCES STATE */
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Step 1: Topics Customization */}
-              <div>
-                <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-3 flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
-                      1
-                    </span>
-                    Customize Your Sports & Analytics Topics
-                  </span>
-                  <span className="text-[11px] text-slate-400 font-normal">
-                    {selectedTopics.length} selected
-                  </span>
-                </label>
-
-                <div className="flex flex-wrap gap-2.5">
-                  {TOPICS.map((topic) => {
-                    const isSelected = selectedTopics.includes(topic.id);
-                    return (
-                      <button
-                        type="button"
-                        key={topic.id}
-                        onClick={() => toggleTopic(topic.id)}
-                        className={`group px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
-                          isSelected
-                            ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30'
-                            : 'bg-slate-950/70 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
-                        }`}
-                      >
-                        <span className="text-sm">{topic.icon}</span>
-                        <span>{topic.label}</span>
-                        {isSelected && (
-                          <svg
-                            className="w-3.5 h-3.5 text-blue-200"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={3}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Step 2: Frequency Selector */}
-              <div>
-                <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Step 1: Quick Email Input & Action (Primary Focus for Mobile First) */}
+              <div className="space-y-3">
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
                   <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
-                    2
-                  </span>
-                  Select Delivery Frequency
-                </label>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {FREQUENCIES.map((freq) => {
-                    const isSelected = frequency === freq.id;
-                    return (
-                      <div
-                        key={freq.id}
-                        onClick={() => setFrequency(freq.id)}
-                        className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 relative ${
-                          isSelected
-                            ? 'bg-gradient-to-b from-blue-950/50 to-slate-900 border-blue-500/80 shadow-lg shadow-blue-600/10'
-                            : 'bg-slate-950/50 border-slate-800/80 hover:border-slate-700 text-slate-400'
-                        }`}
-                      >
-                        {freq.badge && (
-                          <span className="absolute top-3 right-3 text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            {freq.badge}
-                          </span>
-                        )}
-                        <div className="flex items-center gap-2 mb-1">
-                          <div
-                            className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                              isSelected ? 'border-blue-400 bg-blue-500' : 'border-slate-600'
-                            }`}
-                          >
-                            {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                          </div>
-                          <span
-                            className={`text-xs font-bold ${
-                              isSelected ? 'text-white' : 'text-slate-300'
-                            }`}
-                          >
-                            {freq.label}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 leading-normal pl-6">
-                          {freq.sublabel}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Step 3: Email Input & Call To Action */}
-              <div>
-                <label className="block text-xs font-black uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
-                    3
+                    🚀
                   </span>
                   Your Email Address
                 </label>
@@ -353,7 +251,7 @@ export function NewsletterSubscriptionSection() {
                         if (suggestedCorrection) setSuggestedCorrection(null);
                       }}
                       placeholder="e.g. alex.ferguson@sportsmedia.com"
-                      className="w-full bg-slate-950 border border-slate-700/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-slate-500 outline-none transition-all"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-slate-500 outline-none transition-all"
                     />
                   </div>
 
@@ -383,7 +281,7 @@ export function NewsletterSubscriptionSection() {
                             d="M4 12a8 8 0 018-8v8H4z"
                           />
                         </svg>
-                        <span>Verifying & Subscribing...</span>
+                        <span>Subscribing...</span>
                       </>
                     ) : (
                       <>
@@ -406,49 +304,141 @@ export function NewsletterSubscriptionSection() {
                   </button>
                 </div>
 
-                {/* Typo Suggestion Helper */}
-                {suggestedCorrection && (
-                  <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-3 animate-fade-in">
-                    <div className="flex items-center gap-2">
-                      <span>💡</span>
-                      <span>
-                        Did you mean{' '}
-                        <strong className="underline text-amber-200 font-mono">
-                          {suggestedCorrection}
-                        </strong>
-                        ?
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleApplySuggestion(suggestedCorrection)}
-                      className="px-3 py-1 bg-amber-500 text-black font-bold rounded-lg text-xs hover:bg-amber-400 transition-colors"
-                    >
-                      Use Suggestion
-                    </button>
-                  </div>
-                )}
-
-                {/* Error Banner */}
-                {errorMessage && !suggestedCorrection && (
-                  <div className="mt-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2 animate-fade-in">
-                    <svg
-                      className="w-4 h-4 flex-shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
+                {/* Options Accordion Toggle */}
+                <div className="pt-2 flex justify-start">
+                  <button
+                    type="button"
+                    onClick={() => setShowOptions(!showOptions)}
+                    className="text-xs font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5 py-1 px-3 rounded-xl bg-slate-950/60 border border-white/5 hover:border-blue-500/30 shadow-inner"
+                  >
+                    <span>{showOptions ? '⚙️ Hide Preferences' : '⚙️ Customize Topics & Frequency'}</span>
+                    <span className="text-[10px] text-blue-400">({selectedTopics.length} sports selected, {frequency} digest)</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Step 2: Advanced Selection (Expandable Accordion) */}
+              {showOptions && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-5 sm:p-6 rounded-2xl bg-slate-950/40 border border-white/5 animate-fade-in space-y-4 lg:space-y-0">
+                  {/* Left: Sports Customization */}
+                  <div className="space-y-3">
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-300 flex items-center justify-between">
+                      <span>🏈 Filter Topics</span>
+                      <span className="text-[11px] text-slate-400 font-normal">
+                        {selectedTopics.length} selected
+                      </span>
+                    </label>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      {TOPICS.map((topic) => {
+                        const isSelected = selectedTopics.includes(topic.id);
+                        return (
+                          <button
+                            type="button"
+                            key={topic.id}
+                            onClick={() => toggleTopic(topic.id)}
+                            className={`group px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border text-left ${
+                              isSelected
+                                ? 'bg-blue-600 text-white border-blue-400 shadow-md'
+                                : 'bg-slate-950/70 text-slate-300 border-slate-850 hover:border-slate-700 hover:text-white'
+                            }`}
+                          >
+                            <span className="text-sm">{topic.icon}</span>
+                            <span className="truncate">{topic.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right: Frequency Selector */}
+                  <div className="space-y-3">
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-300">
+                      📅 Delivery Mode
+                    </label>
+
+                    <div className="space-y-2">
+                      {FREQUENCIES.map((freq) => {
+                        const isSelected = frequency === freq.id;
+                        return (
+                          <div
+                            key={freq.id}
+                            onClick={() => setFrequency(freq.id)}
+                            className={`cursor-pointer rounded-xl p-2.5 border transition-all duration-200 relative flex items-start gap-2.5 ${
+                              isSelected
+                                ? 'bg-gradient-to-b from-blue-950/30 to-slate-900 border-blue-500/80'
+                                : 'bg-slate-950/50 border-slate-855 hover:border-slate-700 text-slate-400'
+                            }`}
+                          >
+                            <div
+                              className={`w-3.5 h-3.5 rounded-full border mt-0.5 flex items-center justify-center flex-shrink-0 ${
+                                isSelected ? 'border-blue-400 bg-blue-500' : 'border-slate-600'
+                              }`}
+                            >
+                              {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                            </div>
+                            <div className="min-w-0">
+                              <span
+                                className={`text-xs font-bold block ${
+                                  isSelected ? 'text-white' : 'text-slate-300'
+                                }`}
+                              >
+                                {freq.label}
+                              </span>
+                              <span className="text-[10px] text-slate-400 block leading-normal">
+                                {freq.sublabel}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Typo Suggestion Helper */}
+              {suggestedCorrection && (
+                <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-3 animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <span>💡</span>
+                    <span>
+                      Did you mean{' '}
+                      <strong className="underline text-amber-200 font-mono">
+                        {suggestedCorrection}
+                      </strong>
+                      ?
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleApplySuggestion(suggestedCorrection)}
+                    className="px-3 py-1 bg-amber-500 text-black font-bold rounded-lg text-xs hover:bg-amber-400 transition-colors"
+                  >
+                    Use Suggestion
+                  </button>
+                </div>
+              )}
+
+              {/* Error Banner */}
+              {errorMessage && !suggestedCorrection && (
+                <div className="mt-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2 animate-fade-in">
+                  <svg
+                    className="w-4 h-4 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>{errorMessage}</span>
+                </div>
+              )}
 
               {/* Trust Indicators & Security Badges */}
               <div className="pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4 text-[11px] text-slate-400">
