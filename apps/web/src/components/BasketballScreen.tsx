@@ -180,13 +180,9 @@ export function BasketballScreen() {
       {/* ─── TOP BASKETBALL PULSE WIRE TICKER ─── */}
       <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            BASKETBALL PULSE
-          </span>
           <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
-            <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold uppercase text-[9px]">
-              {currentPulse?.tag || 'NBA'}
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-red-400 border border-red-500/20 font-bold uppercase text-[9px]">
+            Hot
             </span>
             <Link
               href={pulseLink}

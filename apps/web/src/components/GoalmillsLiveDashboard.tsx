@@ -244,13 +244,9 @@ export function GoalmillsLiveDashboard({
       {/* ─── TOP LIVE PULSE BAR ─── */}
       <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[10px] font-black uppercase tracking-wider animate-pulse flex-shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-            LIVE PULSE
-          </span>
           <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
-            <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
-              {currentPulse?.tag || 'BREAKING'}
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-red-300 border border-red-500/30 font-bold uppercase text-[9px]">
+              Hot
             </span>
             <Link
               href={pulseLink}
