@@ -242,7 +242,7 @@ export function GoalmillsLiveDashboard({
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP LIVE PULSE BAR ─── */}
-      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
             <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-red-300 border border-red-500/30 font-bold uppercase text-[9px]">
@@ -265,7 +265,19 @@ export function GoalmillsLiveDashboard({
             onClick={() => onSelectTab?.('football')}
             className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
           >
-            Hub
+            Football Hub
+          </button>
+          <button
+            onClick={() => onSelectTab?.('basketball')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            Basketball Hub
+          </button>
+          <button
+            onClick={() => onSelectTab?.('cricket')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            Cricket Hub
           </button>
         </div>
       </div>

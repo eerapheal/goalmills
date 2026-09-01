@@ -247,7 +247,7 @@ export function GoalmillsFootballDashboard() {
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP FOOTBALL BREAKING WIRE TICKER ─── */}
-      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
             <Link
@@ -271,7 +271,7 @@ export function GoalmillsFootballDashboard() {
                 : 'bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30'
             }`}
           >
-            {activeSubTab === 'hub' ? 'Score' : 'hub'}
+            {activeSubTab === 'hub' ? 'View All Fixtures' : 'Football Hub'}
           </button>
         </div>
       </div>

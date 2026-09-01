@@ -290,7 +290,7 @@ export function CricketScreen() {
   return (
     <div className="w-full space-y-3.5">
       {/* ─── TOP CRICKET PULSE WIRE TICKER ─── */}
-      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
             <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-red-400 border border-red-500/20 font-bold uppercase text-[9px]">
