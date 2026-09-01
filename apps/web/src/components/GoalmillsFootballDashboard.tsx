@@ -247,34 +247,7 @@ export function GoalmillsFootballDashboard() {
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP FOOTBALL BREAKING WIRE TICKER ─── */}
-      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex items-center justify-between gap-3 backdrop-blur-md shadow-lg">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <div className="min-w-0 flex-1 flex items-center gap-2 text-xs">
-            <Link
-              href={newsLink}
-              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
-            >
-              {currentItem?.title}
-            </Link>
-            <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-              • {currentItem?.time}
-            </span>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={() => setActiveSubTab(activeSubTab === 'hub' ? 'livescores' : 'hub')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border ${
-              activeSubTab === 'livescores'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-sm'
-                : 'bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30'
-            }`}
-          >
-            {activeSubTab === 'hub' ? 'Score' : 'hub'}
-          </button>
-        </div>
-      </div>
 
       {activeSubTab === 'livescores' ? (
         <div className="rounded-2xl border border-blue-500/20 bg-[#091529]/90 p-3 sm:p-4 shadow-xl backdrop-blur-md">
