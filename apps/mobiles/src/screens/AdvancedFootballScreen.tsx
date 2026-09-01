@@ -34,6 +34,20 @@ const MAJOR_LEAGUES = [
   { id: '207', name: 'Serie A', flag: '🇮🇹' },
   { id: '175', name: 'Bundesliga', flag: '🇩🇪' },
   { id: '168', name: 'Ligue 1', flag: '🇫🇷' },
+  { id: '4', name: 'Europa League', flag: '🇪🇺' },
+  { id: '6', name: 'AFCON', flag: '🌍' },
+  { id: '28', name: 'World Cup', flag: '🌐' },
+  { id: '1', name: 'EURO', flag: '🇪🇺' },
+  { id: '17', name: 'Copa América', flag: '🌎' },
+  { id: '5', name: 'Nations League', flag: '🇪🇺' },
+  { id: '146', name: 'FA Cup', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: '19', name: 'CAF CL', flag: '🌍' },
+  { id: '13', name: 'Libertadores', flag: '🌎' },
+  { id: '278', name: 'Saudi Pro', flag: '🇸🇦' },
+  { id: '244', name: 'Eredivisie', flag: '🇳🇱' },
+  { id: '266', name: 'Liga Portugal', flag: '🇵🇹' },
+  { id: '322', name: 'Süper Lig', flag: '🇹🇷' },
+  { id: '99', name: 'Brasileirão', flag: '🇧🇷' },
 ];
 
 const adaptMatch = (f: FootballEvent): UnifiedMatchEvent => {

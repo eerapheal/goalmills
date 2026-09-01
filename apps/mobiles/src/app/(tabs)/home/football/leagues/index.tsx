@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,235 +6,285 @@ import {
   ScrollView,
   Image,
   Pressable,
-  ActivityIndicator,
   TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
-import { FootballLeague } from '@goalmills/types';
-import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
+import {
+  ALL_COMPETITIONS,
+  getCompetitionsByCategory,
+  CompetitionEntry,
+} from '../../../../../lib/competitionCategories';
 
 export default function FootballLeaguesPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [leagues, setLeagues] = useState<FootballLeague[]>([]);
-  const [filteredLeagues, setFilteredLeagues] = useState<FootballLeague[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    loadLeagues();
-  }, []);
+  const competitionGroups = useMemo(() => getCompetitionsByCategory(), []);
 
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredLeagues(leagues);
-    } else {
-      const filtered = leagues.filter(
-        (league) =>
-          league.league_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          league.country_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredLeagues(filtered);
-    }
-  }, [searchQuery, leagues]);
+  const filteredGroups = useMemo(() => {
+    if (!searchQuery.trim()) return competitionGroups;
 
-  const loadLeagues = async () => {
-    try {
-      const response = await advancedFootballApi.getLeagues();
-      setLeagues(response.result);
-      setFilteredLeagues(response.result);
-    } catch (error) {
-      console.error('Error loading leagues:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const query = searchQuery.toLowerCase();
+    return competitionGroups
+      .map(group => ({
+        ...group,
+        competitions: group.competitions.filter(
+          c =>
+            c.name.toLowerCase().includes(query) ||
+            c.country.toLowerCase().includes(query) ||
+            c.slug.toLowerCase().includes(query)
+        ),
+      }))
+      .filter(g => g.competitions.length > 0);
+  }, [competitionGroups, searchQuery]);
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.secondary} />
-        <Text style={styles.loadingText}>Loading leagues...</Text>
-      </View>
-    );
-  }
+  const totalCount = ALL_COMPETITIONS.length;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>🏆 Football Leagues</Text>
-        <Text style={styles.headerSubtitle}>
-          {filteredLeagues.length} league{filteredLeagues.length !== 1 ? 's' : ''}
-        </Text>
+        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+          <Ionicons name="chevron-back" size={22} color={COLORS.textPrimary} />
+        </Pressable>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerTitle}>All Competitions</Text>
+          <Text style={styles.headerSubtitle}>{totalCount} Major Football Leagues & Tournaments</Text>
+        </View>
       </View>
 
-      {/* Search */}
+      {/* Search Bar */}
       <View style={styles.searchContainer}>
+        <Ionicons name="search" size={16} color={COLORS.textSecondary} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search leagues or countries..."
-          placeholderTextColor={COLORS.textLight}
+          placeholder="Search leagues, countries..."
+          placeholderTextColor={COLORS.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
+          autoCapitalize="none"
         />
+        {searchQuery.length > 0 && (
+          <Pressable onPress={() => setSearchQuery('')}>
+            <Ionicons name="close-circle" size={16} color={COLORS.textSecondary} />
+          </Pressable>
+        )}
       </View>
 
-      {/* Leagues List */}
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        {filteredLeagues.map((league) => (
-          <Pressable
-            key={league.league_key}
-            style={({ pressed }) => [styles.leagueCard, pressed && styles.pressed]}
-            onPress={() => router.push(`/home/football/leagues/${league.league_key}` as any)}
-          >
-            <View style={styles.leagueInfo}>
-              {league.league_logo && (
-                <Image source={{ uri: league.league_logo }} style={styles.leagueLogo} />
-              )}
-              <View style={styles.leagueText}>
-                <Text style={styles.leagueName}>{league.league_name}</Text>
-                <View style={styles.countryInfo}>
-                  {league.country_logo && (
-                    <Image source={{ uri: league.country_logo }} style={styles.countryFlag} />
-                  )}
-                  <Text style={styles.countryName}>{league.country_name}</Text>
-                </View>
-              </View>
+      {/* Competition Groups */}
+      {filteredGroups.map(group => (
+        <View key={group.category} style={styles.categorySection}>
+          <View style={styles.categoryHeader}>
+            <Text style={styles.categoryIcon}>{group.icon}</Text>
+            <Text style={styles.categoryLabel}>{group.label}</Text>
+            <View style={styles.countBadge}>
+              <Text style={styles.countBadgeText}>{group.competitions.length}</Text>
             </View>
-            <Text style={styles.arrow}>›</Text>
-          </Pressable>
-        ))}
-
-        {filteredLeagues.length === 0 && (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No leagues found</Text>
-            <Text style={styles.emptySubtext}>Try a different search term</Text>
           </View>
-        )}
-      </ScrollView>
-    </View>
+
+          <View style={styles.competitionGrid}>
+            {group.competitions.map(comp => (
+              <Pressable
+                key={comp.slug}
+                onPress={() => router.push(`/home/football/leagues/${comp.id}` as any)}
+                style={({ pressed }) => [
+                  styles.competitionCard,
+                  pressed && styles.competitionCardPressed,
+                ]}
+              >
+                <View style={styles.competitionLogo}>
+                  <Image
+                    source={{ uri: comp.logo }}
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  />
+                </View>
+                <View style={styles.competitionInfo}>
+                  <Text style={styles.competitionName} numberOfLines={1}>
+                    {comp.name}
+                  </Text>
+                  <Text style={styles.competitionCountry} numberOfLines={1}>
+                    {comp.flag} {comp.country}
+                  </Text>
+                </View>
+                {comp.featured && (
+                  <View style={styles.featuredDot} />
+                )}
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      ))}
+
+      {filteredGroups.length === 0 && (
+        <View style={styles.emptyState}>
+          <Ionicons name="search-outline" size={48} color={COLORS.textSecondary} />
+          <Text style={styles.emptyTitle}>No leagues found</Text>
+          <Text style={styles.emptySubtitle}>Try a different search term</Text>
+        </View>
+      )}
+
+      <View style={{ height: 40 }} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundDark,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundDark,
-  },
-  loadingText: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textLight,
-    marginTop: SPACING.md,
+    backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: 'rgba(0, 31, 63, 0.9)',
-    padding: SPACING.lg,
-    borderBottomWidth: 3,
-    borderBottomColor: COLORS.secondary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.sm,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.sm,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: FONT_SIZES.xxl,
+    fontSize: FONT_SIZES.xl,
     fontWeight: '900',
-    color: COLORS.background,
-    marginBottom: SPACING.xs,
+    color: COLORS.textPrimary,
+    letterSpacing: -0.3,
   },
   headerSubtitle: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textLight,
-    fontWeight: '600',
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
+    marginTop: 2,
   },
   searchContainer: {
-    padding: SPACING.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    paddingHorizontal: SPACING.sm,
+    marginHorizontal: SPACING.md,
+    marginVertical: SPACING.sm,
+    height: 40,
   },
   searchInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.background,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  content: {
     flex: 1,
-  },
-  contentContainer: {
-    padding: SPACING.md,
-  },
-  leagueCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  pressed: {
-    opacity: 0.7,
-    transform: [{ scale: 0.98 }],
-  },
-  leagueInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  leagueLogo: {
-    width: 48,
-    height: 48,
-    marginRight: SPACING.md,
-    borderRadius: BORDER_RADIUS.sm,
-  },
-  leagueText: {
-    flex: 1,
-  },
-  leagueName: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.background,
-    marginBottom: SPACING.xs,
-  },
-  countryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  countryFlag: {
-    width: 20,
-    height: 20,
-    marginRight: SPACING.xs,
-    borderRadius: BORDER_RADIUS.xs,
-  },
-  countryName: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textLight,
+    color: COLORS.textPrimary,
+    marginLeft: SPACING.xs,
   },
-  arrow: {
-    fontSize: 32,
-    color: COLORS.secondary,
-    fontWeight: '300',
+  categorySection: {
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  categoryIcon: {
+    fontSize: 16,
+    marginRight: SPACING.xs,
+  },
+  categoryLabel: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '900',
+    color: COLORS.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    flex: 1,
+  },
+  countBadge: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: BORDER_RADIUS.full,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  countBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: COLORS.textSecondary,
+  },
+  competitionGrid: {
+    gap: SPACING.xs,
+  },
+  competitionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    padding: SPACING.sm,
+    gap: SPACING.sm,
+  },
+  competitionCardPressed: {
+    backgroundColor: 'rgba(59,130,246,0.1)',
+    borderColor: 'rgba(59,130,246,0.3)',
+  },
+  competitionLogo: {
+    width: 32,
+    height: 32,
+    borderRadius: BORDER_RADIUS.md,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+  logoImage: {
+    width: 22,
+    height: 22,
+  },
+  competitionInfo: {
+    flex: 1,
+  },
+  competitionName: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
+  competitionCountry: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    marginTop: 1,
+  },
+  featuredDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#F59E0B',
   },
   emptyState: {
     alignItems: 'center',
-    padding: SPACING.xxl,
+    justifyContent: 'center',
+    paddingVertical: 60,
   },
-  emptyText: {
+  emptyTitle: {
     fontSize: FONT_SIZES.lg,
     fontWeight: '700',
-    color: COLORS.background,
-    marginBottom: SPACING.xs,
+    color: COLORS.textPrimary,
+    marginTop: SPACING.md,
   },
-  emptySubtext: {
+  emptySubtitle: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
   },
 });
