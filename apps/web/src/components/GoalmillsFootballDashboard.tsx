@@ -248,7 +248,6 @@ export function GoalmillsFootballDashboard() {
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP FOOTBALL BREAKING WIRE TICKER ─── */}
 
-
       {activeSubTab === 'livescores' ? (
         <div className="rounded-2xl border border-blue-500/20 bg-[#091529]/90 p-3 sm:p-4 shadow-xl backdrop-blur-md">
           <FootballScreen />
