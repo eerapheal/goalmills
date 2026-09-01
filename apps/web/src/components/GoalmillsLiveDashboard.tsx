@@ -242,6 +242,30 @@ export function GoalmillsLiveDashboard({
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP LIVE PULSE BAR ─── */}
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
+            <Link
+              href={pulseLink}
+              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
+            >
+              {currentPulse?.title}
+            </Link>
+            <span className="text-slate-300 text-[10px] hidden sm:inline flex-shrink-0 font-medium">
+              • {currentPulse?.time}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => onSelectTab?.('football')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            Football Hub
+          </button>
+        </div>
+      </div>
 
       {/* ─── ROW 1: PRIMARY SPORTS INTELLIGENCE GRID ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">

@@ -288,8 +288,35 @@ export function CricketScreen() {
   ];
 
   return (
-    <div className="w-full space-y-3.5">
+    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP CRICKET PULSE WIRE TICKER ─── */}
+      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <div className="min-w-0 flex-col flex items-center gap-2 text-xs">
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
+              {currentPulse?.tag || 'CRICKET'}
+            </span>
+            <Link
+              href={pulseLink}
+              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
+            >
+              {currentPulse?.title}
+            </Link>
+            <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
+              • {currentPulse?.time}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
+          >
+            {activeTab === 'live' ? '📅 Upcoming Fixtures' : '⚡ Live Cricket'}
+          </button>
+        </div>
+      </div>
 
       {/* Smart Control Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-lg">
