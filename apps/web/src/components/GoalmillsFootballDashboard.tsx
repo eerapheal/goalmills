@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
 import {
   FiMoreHorizontal,
   FiPlay,
@@ -318,7 +319,7 @@ export function GoalmillsFootballDashboard() {
               <div className="space-y-3.5">
                 {liveMatches.map((m) => (
                   <Link
-                    href={`/matches/${m.id}`}
+                    href={footballRoutes.matchFromEvent({ event_home_team: m.homeTeam, event_away_team: m.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: m.id })}
                     key={m.id}
                     className="block rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md group cursor-pointer"
                   >
@@ -344,8 +345,8 @@ export function GoalmillsFootballDashboard() {
                         className="inline-block"
                       >
                         <Link
-                          href={m.home_team_key ? `/teams/${m.home_team_key}` : '#'}
-                          className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-amber-400"
+                          href={footballRoutes.teamFromName(m.homeTeam)}
+                          className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                         >
                           <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
                             {m.home_team_logo ? (
@@ -389,8 +390,8 @@ export function GoalmillsFootballDashboard() {
                         className="inline-block text-right"
                       >
                         <Link
-                          href={m.away_team_key ? `/teams/${m.away_team_key}` : '#'}
-                          className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-amber-400"
+                          href={footballRoutes.teamFromName(m.awayTeam)}
+                          className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                         >
                           <div className="min-w-0 flex-1 text-right">
                             <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.awayTeam}</div>
@@ -492,7 +493,10 @@ export function GoalmillsFootballDashboard() {
                 </span>
               </div>
 
-              <Link href={marqueeMatch.id ? `/matches/${marqueeMatch.id}` : '#'} className="block text-center py-2 space-y-2 hover:opacity-95 transition-opacity">
+              <Link
+                href={marqueeMatch.id ? footballRoutes.matchFromEvent({ event_home_team: marqueeMatch.homeTeam, event_away_team: marqueeMatch.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: marqueeMatch.id }) : '#'}
+                className="block text-center py-2 space-y-2 hover:opacity-95 transition-opacity"
+              >
                 <div className="flex items-center justify-around">
                   <span
                     onClick={(e) => {
@@ -502,7 +506,7 @@ export function GoalmillsFootballDashboard() {
                     className="inline-block"
                   >
                     <Link
-                      href={marqueeMatch.home_team_key ? `/teams/${marqueeMatch.home_team_key}` : '#'}
+                      href={footballRoutes.teamFromName(marqueeMatch.homeTeam)}
                       className="flex flex-col items-center gap-1 group/team hover:text-blue-400"
                     >
                       <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg transition-colors group-hover/team:border-blue-400">
@@ -538,7 +542,7 @@ export function GoalmillsFootballDashboard() {
                     className="inline-block"
                   >
                     <Link
-                      href={marqueeMatch.away_team_key ? `/teams/${marqueeMatch.away_team_key}` : '#'}
+                      href={footballRoutes.teamFromName(marqueeMatch.awayTeam)}
                       className="flex flex-col items-center gap-1 group/team hover:text-blue-400"
                     >
                       <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg transition-colors group-hover/team:border-blue-400">

@@ -11,6 +11,7 @@ import {
   FootballLeague,
 } from '@goalmills/types';
 import { GoalmillsLoader } from './GoalmillsLoader';
+import { footballRoutes } from '@/lib/slugUtils';
 import {
   FiRefreshCw,
   FiSearch,
@@ -123,7 +124,7 @@ export function FootballScreen() {
         if (res?.result) {
           const resObj = res.result as any;
           const table = resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
-          setStandings(table);
+          setStandings(Array.isArray(table) ? table : []);
         } else {
           setStandings([]);
         }
@@ -614,7 +615,7 @@ export function FootballScreen() {
                       </div>
 
                       <Link
-                        href={`/matches/${prob.event_key}`}
+                        href={footballRoutes.matchFromEvent(prob)}
                         className="block text-center py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 font-bold text-xs border border-blue-500/30 transition-all mt-2"
                       >
                         View Match Center & Full Odds →

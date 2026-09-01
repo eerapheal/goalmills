@@ -4,6 +4,7 @@ import { Fixture } from '@goalmills/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -27,11 +28,18 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  const matchSlug = buildMatchSlug({
+    event_home_team: teams.home.name,
+    event_away_team: teams.away.name,
+    event_date: fixtureData.date?.split('T')[0],
+    event_key: fixtureData.id,
+  });
+
   const handleCardClick = () => {
     if (onPress) {
       onPress();
     } else {
-      router.push(`/matches/${fixtureData.id}`);
+      router.push(footballRoutes.match(matchSlug));
     }
   };
 
@@ -83,7 +91,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
       <div className="flex items-center justify-between relative z-10">
         {/* Home Team */}
         <Link
-          href={`/teams/${teams.home.id}`}
+          href={footballRoutes.teamFromName(teams.home.name)}
           onClick={(e) => e.stopPropagation()}
           className="flex-1 flex flex-row items-center justify-start gap-2 group-hover:opacity-80 transition-opacity"
         >
@@ -105,7 +113,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
 
         {/* Score/Time Center */}
         <Link
-          href={`/matches/${fixtureData.id}`}
+          href={footballRoutes.match(matchSlug)}
           onClick={(e) => e.stopPropagation()}
           className="flex flex-col items-center justify-center min-w-[70px] px-1"
         >
@@ -147,7 +155,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
 
         {/* Away Team */}
         <Link
-          href={`/teams/${teams.away.id}`}
+          href={footballRoutes.teamFromName(teams.away.name)}
           onClick={(e) => e.stopPropagation()}
           className="flex-1 flex flex-row items-center justify-end gap-2 group-hover:opacity-80 transition-opacity"
         >

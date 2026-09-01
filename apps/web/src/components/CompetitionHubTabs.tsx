@@ -66,7 +66,9 @@ export function CompetitionHubTabs({
         if (res?.result) {
           const resObj = res.result as any;
           const table = resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
-          setStandings(table);
+          setStandings(Array.isArray(table) ? table : []);
+        } else {
+          setStandings([]);
         }
       } else if (activeTab === 'stats') {
         const res = await advancedFootballApi.getTopscorers(competitionId);

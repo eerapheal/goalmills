@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
 import {
   FiMoreHorizontal,
   FiPlay,
@@ -301,7 +302,7 @@ export function GoalmillsLiveDashboard({
             <div className="space-y-3">
               {liveFootballMatches.map((m) => (
                 <Link
-                  href={`/matches/${m.id}`}
+                  href={footballRoutes.matchFromEvent({ event_home_team: m.homeTeam, event_away_team: m.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: m.id })}
                   key={m.id}
                   className="block rounded-xl bg-[#142336] border border-white/5 p-3 sm:p-4 hover:border-amber-500/30 hover:bg-[#192b42] transition duration-300 group cursor-pointer"
                 >
@@ -325,7 +326,7 @@ export function GoalmillsLiveDashboard({
                       className="inline-block"
                     >
                       <Link
-                        href={m.home_team_key ? `/teams/${m.home_team_key}` : '#'}
+                        href={footballRoutes.teamFromName(m.homeTeam)}
                         className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                       >
                         <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
@@ -370,7 +371,7 @@ export function GoalmillsLiveDashboard({
                       className="inline-block text-right"
                     >
                       <Link
-                        href={m.away_team_key ? `/teams/${m.away_team_key}` : '#'}
+                        href={footballRoutes.teamFromName(m.awayTeam)}
                         className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                       >
                         <div className="min-w-0 flex-1 text-right">

@@ -88,9 +88,11 @@ export default function FootballTeamPage() {
             setLeagueName(firstMatch.league_name || '');
             try {
               const standingsRes = await advancedFootballApi.getStandings(Number(firstMatch.league_key));
-              if (standingsRes?.result?.total) {
-                const ts = standingsRes.result.total.find(
-                  (s: FootballStanding) => s.team_key === String(teamId)
+              if (standingsRes?.result) {
+                const resObj = standingsRes.result as any;
+                const table = Array.isArray(resObj) ? resObj : resObj.total || [];
+                const ts = table.find(
+                  (s: FootballStanding) => s && String(s.team_key) === String(teamId)
                 );
                 if (ts) setStanding(ts);
               }
