@@ -175,9 +175,6 @@ export default async function FootballHubPage() {
             <FiAward className="text-amber-400" />
             <span>All Major Competitions</span>
           </h2>
-          <span className="text-[10px] text-amber-400 uppercase font-bold font-mono px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-            80+ Leagues
-          </span>
         </div>
 
         {competitionGroups.map((group) => (

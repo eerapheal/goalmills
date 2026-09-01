@@ -44,9 +44,9 @@ export function GoalmillsFootballDashboard() {
       awayTeam: 'Arsenal',
       awayCode: 'ARS',
       awayGoalScorer: 'B. Saka (76\')',
-      score: '2 - 1',
-      homePossession: 54,
-      awayPossession: 46,
+      score: '1 - 2',
+      homePossession: 44,
+      awayPossession: 56,
       homeXg: '1.82',
       awayXg: '1.45',
     },
@@ -70,12 +70,17 @@ export function GoalmillsFootballDashboard() {
   ]);
 
   const [marqueeMatch, setMarqueeMatch] = useState<{
+    id?: string | number;
     league: string;
     stage: string;
     homeTeam: string;
     homeCode: string;
+    home_team_key?: string | number;
+    home_team_logo?: string;
     awayTeam: string;
     awayCode: string;
+    away_team_key?: string | number;
+    away_team_logo?: string;
     kickoff: string;
     venue: string;
     probability: string;
