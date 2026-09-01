@@ -699,14 +699,14 @@ export function GoalmillsLiveDashboard({
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className="px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] sm:text-[11px] font-black tracking-wider uppercase flex items-center gap-1.5 whitespace-nowrap">
               <FaFire className="w-3 h-3 text-blue-400" />
-              BREAKING INTEL
+              BREAKING NEWS
             </span>
           </div>
 
           {/* Ticker Item with glowing badges */}
           <div className="flex-1 min-w-0 w-full flex items-center justify-between overflow-hidden gap-2">
             <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-              <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black tracking-wider uppercase flex-shrink-0">
+              <span className="hidden md:block px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black tracking-wider uppercase flex-shrink-0">
                 {currentPulse?.tag || 'BREAKING'}
               </span>
               <Link
