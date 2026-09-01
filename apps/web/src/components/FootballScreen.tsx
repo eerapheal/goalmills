@@ -272,10 +272,7 @@ export function FootballScreen() {
           </div>
           <div>
             <h2 className="text-sm font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <span>GoalMills Football Telemetry</span>
-              <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-mono font-bold">
-                API v2.1
-              </span>
+              <span>Football Telemetry</span>
             </h2>
             <p className="text-[11px] text-slate-400">
               Live match events, multi-bookmaker odds, AI predictions, and tables

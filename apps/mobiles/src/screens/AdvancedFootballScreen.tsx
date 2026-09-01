@@ -398,15 +398,20 @@ export function AdvancedFootballScreen() {
                         <View style={[styles.rankCell, isUCL && styles.rankUCL, isUEL && styles.rankUEL, isRel && styles.rankRel]}>
                           <Text style={styles.rankText}>{row.standing_place || i + 1}</Text>
                         </View>
-                        <Text style={[styles.tableCell, styles.teamCol, { fontWeight: '700', color: '#F1F5F9' }]} numberOfLines={1}>
-                          {row.standing_team}
-                        </Text>
+                        <View style={styles.teamColContainer}>
+                          {(row as any).team_logo ? (
+                            <Image source={{ uri: (row as any).team_logo }} style={styles.tableTeamLogo} resizeMode="contain" />
+                          ) : null}
+                          <Text style={styles.teamNameText} numberOfLines={1}>
+                            {row.standing_team}
+                          </Text>
+                        </View>
                         <Text style={[styles.tableCell, styles.numCol]}>{row.standing_P || 0}</Text>
                         <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>{row.standing_W || 0}</Text>
                         <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>{row.standing_D || 0}</Text>
                         <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>{row.standing_L || 0}</Text>
                         <Text style={[styles.tableCell, styles.numCol]}>{row.standing_GD || 0}</Text>
-                        <Text style={[styles.tableCell, styles.numCol, { fontWeight: '900', color: '#FBBF24' }]}>{row.standing_PTS || 0}</Text>
+                        <Text style={[styles.tableCell, styles.ptsCol, { fontWeight: '900', color: '#FBBF24' }]}>{row.standing_PTS || 0}</Text>
                       </Pressable>
                     );
                   })
@@ -611,17 +616,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 8,
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)',
   },
-  tableCell: { fontSize: 11, color: '#94A3B8', fontFamily: 'monospace' },
-  rankCol: { width: 28 },
-  teamCol: { flex: 2.5, paddingRight: 4 },
-  numCol: { width: 30, textAlign: 'center' },
+  tableCell: { fontSize: 10.5, color: '#94A3B8', fontFamily: 'monospace', textAlign: 'center' },
+  rankCol: { width: 22, textAlign: 'center' },
+  teamCol: { flex: 1, textAlign: 'left', paddingLeft: 4 },
+  teamColContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 4, paddingRight: 4 },
+  tableTeamLogo: { width: 16, height: 16, marginRight: 5 },
+  teamNameText: { flex: 1, fontSize: 12, fontWeight: '700', color: '#F1F5F9' },
+  numCol: { width: 23, textAlign: 'center' },
+  ptsCol: { width: 28, textAlign: 'center', fontSize: 11 },
   rankCell: {
-    width: 22, height: 22, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 6,
+    width: 20, height: 20, borderRadius: 5, alignItems: 'center', justifyContent: 'center', marginRight: 4,
   },
   rankUCL: { backgroundColor: 'rgba(59,130,246,0.25)' },
   rankUEL: { backgroundColor: 'rgba(245,158,11,0.25)' },
   rankRel: { backgroundColor: 'rgba(239,68,68,0.25)' },
-  rankText: { fontSize: 10, fontWeight: '900', color: '#94A3B8' },
+  rankText: { fontSize: 9.5, fontWeight: '900', color: '#94A3B8' },
 
   // Scorers
   scorerCard: {
