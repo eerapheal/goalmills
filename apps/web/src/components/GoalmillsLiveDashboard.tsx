@@ -243,20 +243,26 @@ export function GoalmillsLiveDashboard({
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP LIVE PULSE BAR ─── */}
       <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
-            <Link
-              href={pulseLink}
-              className="text-white font-bold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
-            >
-              {currentPulse?.title}
-            </Link>
-            <span className="text-slate-300 text-[10px] hidden sm:inline flex-shrink-0 font-medium">
-              • {currentPulse?.time}
-            </span>
-          </div>
-        </div>
-
+        <div className="hidden md:flex items-center gap-2.5 min-w-0 flex-1">
+             <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
+              
+               <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
+                 FOOTBALL PULSE
+               </span>
+   
+               <Link
+                 href={pulseLink}
+                 className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
+               >
+                 {currentPulse?.title}    
+               </Link>
+   
+               <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
+                 • {currentPulse?.time}
+               </span>
+             </div>
+           </div>
+   
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => onSelectTab?.('football')}
@@ -500,7 +506,7 @@ export function GoalmillsLiveDashboard({
               <div className="flex items-center gap-2">
                 <span className="p-1 rounded-md bg-amber-500/10 text-amber-400 text-xs">🏏</span>
                 <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
-                  LIVE CRICKET SCORECARD
+                  LIVE CRICKET
                 </h3>
               </div>
               <button
@@ -584,10 +590,10 @@ export function GoalmillsLiveDashboard({
               <div className="flex items-center gap-2">
                 <FiAward className="text-amber-400 w-4 h-4" />
                 <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
-                  FOOTBALL STANDINGS TABLE
+                  FOOTBALL TABLE
                 </h3>
               </div>
-              <span className="text-xs font-semibold text-slate-400">Premier League</span>
+              <span className="text-xs font-semibold text-slate-400">EPL</span>
             </div>
 
             <div className="overflow-x-auto">
@@ -644,11 +650,11 @@ export function GoalmillsLiveDashboard({
               <div className="flex items-center gap-2">
                 <FiPlay className="text-amber-400 w-4 h-4" />
                 <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
-                  VIDEO HIGHLIGHTS
+                  HIGHLIGHTS
                 </h3>
               </div>
               <Link href="/highlights" className="text-xs text-amber-400 hover:underline font-bold">
-                View All HD Recaps →
+                HD Recaps →
               </Link>
             </div>
 

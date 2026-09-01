@@ -248,18 +248,20 @@ export function GoalmillsFootballDashboard() {
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
       {/* ─── TOP FOOTBALL BREAKING WIRE TICKER ─── */}
       <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="hidden md:flex items-center gap-2.5 min-w-0 flex-1">
           <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
+           
             <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
               FOOTBALL PULSE
             </span>
 
             <Link
               href={newsLink}
-              className="text-white font-semibold truncate text-xs hover:text-blue-400 hover:underline transition-colors flex-1"
+              className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
             >
               {currentItem?.title}    
             </Link>
+
             <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
               • {currentItem?.time}
             </span>
@@ -299,9 +301,6 @@ export function GoalmillsFootballDashboard() {
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                   <h3 className="text-xs font-black tracking-wider text-white uppercase flex items-center gap-2">
                     <span>LIVE MATCHES & SCORES</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono">
-                      In-Play
-                    </span>
                   </h3>
                 </div>
                 <Link
@@ -438,10 +437,10 @@ export function GoalmillsFootballDashboard() {
                 <div className="flex items-center gap-2">
                   <span className="p-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs">📊</span>
                   <h3 className="text-sm font-black tracking-wider text-white uppercase">
-                    TACTICAL PERFORMANCE & PASSING NETWORK
+                    PERFORMANCE & PASSING
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono">
+                <span className="hidden md:block text-[10px] font-bold text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 font-mono">
                   Matchday Analytics
                 </span>
               </div>
@@ -572,7 +571,7 @@ export function GoalmillsFootballDashboard() {
               <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                 <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                   <FiTrendingUp className="text-amber-400" />
-                  <span>Transfer News & Rumours</span>
+                  <span>Transfer News</span>
                 </h3>
                 <Link href="/transfers" className="text-xs font-bold text-amber-400 hover:underline">
                   View All →
@@ -589,7 +588,7 @@ export function GoalmillsFootballDashboard() {
                       <h4 className="text-xs font-bold text-white">{t.player}</h4>
                       <p className="text-[10px] text-slate-400">{t.summary}</p>
                     </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${t.tagColor}`}>
+                    <span className={`hidden md:block px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black border ${t.tagColor}`}>
                       {t.tag}
                     </span>
                   </div>
@@ -602,9 +601,9 @@ export function GoalmillsFootballDashboard() {
               <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                 <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                   <FiShield className="text-blue-400" />
-                  <span>Popular Football Competitions</span>
+                  <span>Football Competitions</span>
                 </h3>
-                <span className="text-[10px] text-blue-300 font-mono font-bold">Tier 1</span>
+              
               </div>
 
               <div className="grid grid-cols-2 gap-2">
