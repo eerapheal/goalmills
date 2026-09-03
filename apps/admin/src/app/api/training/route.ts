@@ -2,17 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import TrainingProgress from '@/models/TrainingProgress';
 import Employee from '@/models/Employee';
-import { GOALMILLS_TRAINING_MODULES } from '@/lib/trainingCurriculum';
+import {
+  GOALMILLS_TRAINING_MODULES,
+  GOALMILLS_30_DAY_CURRICULUM,
+  NEWSROOM_DAILY_TIMETABLE,
+  NEWSROOM_STANDUP_PROTOCOL,
+  DAILY_SCORECARD_RUBRICS,
+  CERTIFICATION_TIERS,
+} from '@/lib/trainingCurriculum';
 
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get('employeeId');
+    const includeCurriculum = searchParams.get('curriculum') === 'true';
 
+    // If no employee specified, return full curriculum data
     if (!employeeId) {
       return NextResponse.json(
-        { success: true, curriculum: GOALMILLS_TRAINING_MODULES },
+        {
+          success: true,
+          curriculum: GOALMILLS_TRAINING_MODULES,
+          ...(includeCurriculum && {
+            days: GOALMILLS_30_DAY_CURRICULUM,
+            timetable: NEWSROOM_DAILY_TIMETABLE,
+            standup: NEWSROOM_STANDUP_PROTOCOL,
+            scorecardRubrics: DAILY_SCORECARD_RUBRICS,
+            certificationTiers: CERTIFICATION_TIERS,
+          }),
+        },
         { status: 200 }
       );
     }
@@ -33,8 +52,13 @@ export async function GET(req: NextRequest) {
           completedTasks: [],
           submissionLinks: [],
         })),
+        completedDays: [],
+        completedDaysCount: 0,
+        mandatoryDaysTotal: 30,
+        dailyRecords: [],
         overallProgressPercent: 0,
         finalAssessmentCompleted: false,
+        isCertified: false,
       });
     }
 
@@ -42,6 +66,13 @@ export async function GET(req: NextRequest) {
       success: true,
       data: progress,
       curriculum: GOALMILLS_TRAINING_MODULES,
+      ...(includeCurriculum && {
+        days: GOALMILLS_30_DAY_CURRICULUM,
+        timetable: NEWSROOM_DAILY_TIMETABLE,
+        standup: NEWSROOM_STANDUP_PROTOCOL,
+        scorecardRubrics: DAILY_SCORECARD_RUBRICS,
+        certificationTiers: CERTIFICATION_TIERS,
+      }),
     });
   } catch (error: any) {
     return NextResponse.json(
@@ -75,8 +106,13 @@ export async function POST(req: NextRequest) {
           completedTasks: [],
           submissionLinks: [],
         })),
+        completedDays: [],
+        completedDaysCount: 0,
+        mandatoryDaysTotal: 30,
+        dailyRecords: [],
         overallProgressPercent: 0,
         finalAssessmentCompleted: false,
+        isCertified: false,
       });
     }
 
@@ -102,11 +138,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Calculate overall completion percent
-    const completedCount = progress.modules.filter((m: any) => m.status === 'completed').length;
-    progress.overallProgressPercent = Math.round(
-      (completedCount / GOALMILLS_TRAINING_MODULES.length) * 100
+    // Calculate overall completion percent (uses both module completion and 30-day completion)
+    const moduleCompletedCount = progress.modules.filter(
+      (m: any) => m.status === 'completed'
+    ).length;
+    const modulePercent = Math.round(
+      (moduleCompletedCount / GOALMILLS_TRAINING_MODULES.length) * 100
     );
+    const dayPercent = Math.round(
+      ((progress.completedDays?.length || 0) / 30) * 100
+    );
+    // Use the higher of module-based or day-based progress
+    progress.overallProgressPercent = Math.max(modulePercent, dayPercent);
+
+    // Update completedDaysCount to stay in sync
+    progress.completedDaysCount = progress.completedDays?.length || 0;
 
     await progress.save();
 

@@ -8,6 +8,30 @@ const TrainingProgressSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    // 30-Day Mandatory Training Curriculum Tracking
+    completedDays: [{ type: Number, min: 1, max: 30 }],
+    completedDaysCount: {
+      type: Number,
+      default: 0,
+    },
+    mandatoryDaysTotal: {
+      type: Number,
+      default: 30,
+    },
+    dailyRecords: [
+      {
+        day: { type: Number, required: true },
+        reportId: { type: mongoose.Schema.Types.ObjectId, ref: 'DailyReport' },
+        score: { type: Number, min: 0, max: 100 },
+        status: {
+          type: String,
+          enum: ['pending', 'approved', 'revision', 'retraining'],
+          default: 'pending',
+        },
+        gradedAt: { type: String },
+      },
+    ],
+    // Legacy modules for backward compatibility
     modules: [
       {
         moduleId: {
@@ -42,6 +66,16 @@ const TrainingProgressSchema = new mongoose.Schema(
       max: 100,
     },
     finalAssessmentNotes: {
+      type: String,
+    },
+    isCertified: {
+      type: Boolean,
+      default: false,
+    },
+    certificationTier: {
+      type: String,
+    },
+    certificationDate: {
       type: String,
     },
     transitionRecommended: {

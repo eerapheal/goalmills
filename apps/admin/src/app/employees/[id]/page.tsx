@@ -16,8 +16,17 @@ import {
   FiChevronDown,
   FiChevronUp,
   FiTrash2,
+  FiAward,
+  FiClock,
+  FiCheckCircle,
+  FiStar,
+  FiExternalLink,
+  FiBarChart2,
 } from 'react-icons/fi';
-import { GOALMILLS_TRAINING_MODULES } from '@/lib/trainingCurriculum';
+import {
+  GOALMILLS_TRAINING_MODULES,
+  GOALMILLS_30_DAY_CURRICULUM,
+} from '@/lib/trainingCurriculum';
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -26,6 +35,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
   const [training, setTraining] = useState<EmployeeTrainingProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({});
+  const [selectedDayDetail, setSelectedDayDetail] = useState<number | null>(null);
 
   const handleDelete = async () => {
     if (!employee) return;
@@ -58,7 +68,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       setLoading(true);
       const [empRes, trainRes] = await Promise.all([
         fetch(`/api/admin/employees/${id}`),
-        fetch(`/api/training?employeeId=${id}`),
+        fetch(`/api/training?employeeId=${id}&curriculum=true`),
       ]);
 
       const empJson = await empRes.json();
@@ -141,252 +151,410 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  const isTraining = employee.status === 'training';
-  const progressPercent = training?.overallProgressPercent || 0;
+  const completedDays = training?.completedDays || [];
+  const completedDaysCount = completedDays.length;
+  const isCertified = training?.isCertified || (completedDaysCount >= 30 && employee.status !== 'training');
+  const progressPercent = training?.overallProgressPercent || Math.round((completedDaysCount / 30) * 100);
 
   return (
     <div className="space-y-5 sm:space-y-6 text-white">
       {/* Top Breadcrumb & Navigation */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <Link
+          href="/admin/employees"
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white"
+        >
+          <FiArrowLeft size={14} /> Back to Staff Directory
+        </Link>
+
+        <div className="flex items-center gap-2">
           <Link
-            href="/admin/employees"
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white"
+            href={`/admin/employees/${id}/appointment`}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto"
           >
-            <FiArrowLeft size={14} /> Back to Staff Directory
+            <FiFileText size={14} />
+            <span>{employee.appointmentSigned ? 'View Signed Contract' : 'Sign Contract'}</span>
           </Link>
-
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/admin/employees/${id}/appointment`}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto"
-            >
-              <FiFileText size={14} />
-              <span>{employee.appointmentSigned ? 'View Signed Contract' : 'Sign Contract'}</span>
-            </Link>
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold text-xs uppercase tracking-wider transition-all w-full sm:w-auto"
-            >
-              <FiTrash2 size={14} />
-              <span>Delete Employee</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold text-xs uppercase tracking-wider transition-all w-full sm:w-auto"
+          >
+            <FiTrash2 size={14} />
+            <span>Delete Employee</span>
+          </button>
         </div>
+      </div>
 
-        {/* Profile Card */}
-        <div className="glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl space-y-5 sm:space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
-            <div className="flex items-center gap-3.5 sm:gap-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl sm:text-2xl uppercase shadow-lg shadow-blue-500/20 flex-shrink-0">
-                {employee.fullName.slice(0, 2)}
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-lg sm:text-2xl font-black text-white">{employee.fullName}</h1>
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
-                      isTraining
-                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                        : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    }`}
-                  >
-                    {isTraining ? '30-Day Training' : employee.status}
-                  </span>
-                </div>
-                <p className="text-xs text-text-muted mt-0.5">
-                  {employee.jobTitle} • {employee.department}
-                </p>
-              </div>
+      {/* Profile Card */}
+      <div className="glass-card p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl space-y-5 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
+          <div className="flex items-center gap-3.5 sm:gap-4">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl sm:text-2xl uppercase shadow-lg shadow-blue-500/20 flex-shrink-0">
+              {employee.fullName.slice(0, 2)}
             </div>
-
-            <div className="flex items-center gap-4 bg-slate-900/60 p-3 rounded-2xl border border-white/5">
-              <div>
-                <span className="text-[10px] text-text-muted uppercase block font-bold">
-                  Monthly Stipend
-                </span>
-                <span className="text-base sm:text-lg font-black text-emerald-400">
-                  ₦{(employee.currentSalary || 30000).toLocaleString()}
-                </span>
-              </div>
-              <div className="h-8 w-px bg-white/10" />
-              <div>
-                <span className="text-[10px] text-text-muted uppercase block font-bold">
-                  Post-Training
-                </span>
-                <span className="text-base sm:text-lg font-black text-amber-400">
-                  ₦{(employee.startingSalary || 50000).toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact & Employment Meta Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
-              <FiMail className="text-blue-400 flex-shrink-0" size={16} />
-              <div className="truncate">
-                <span className="text-text-muted block text-[10px]">Email Address</span>
-                <span className="text-slate-200 font-semibold truncate block">
-                  {employee.email}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
-              <FiPhone className="text-emerald-400 flex-shrink-0" size={16} />
-              <div>
-                <span className="text-text-muted block text-[10px]">Phone Number</span>
-                <span className="text-slate-200 font-semibold">{employee.phone}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
-              <FiCalendar className="text-amber-400 flex-shrink-0" size={16} />
-              <div>
-                <span className="text-text-muted block text-[10px]">Training Window</span>
-                <span className="text-slate-200 font-semibold">
-                  {employee.startDate} &rarr; {employee.trainingEndDate}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
-              <FiMapPin className="text-purple-400 flex-shrink-0" size={16} />
-              <div className="truncate">
-                <span className="text-text-muted block text-[10px]">Residential Address</span>
-                <span className="text-slate-200 font-semibold truncate block">
-                  {employee.address}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 30-Day Training Checklist Hub */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
-                <FiCheckSquare className="text-amber-400" /> 30-Day Sports Media Training Curriculum
-              </h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-black text-white">{employee.fullName}</h1>
+
+                {/* Training Badge */}
+                {isCertified ? (
+                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                    <FiAward size={14} /> GoalMills Certified Sports Media Specialist
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1.5 animate-pulse shadow-sm">
+                    <FiClock size={14} /> On Training (Day {completedDaysCount + 1}/30)
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-text-muted mt-0.5">
-                Section 4 Intensive Curriculum Progress Tracker ({progressPercent}% Completed)
+                {employee.jobTitle} • {employee.department}
               </p>
             </div>
           </div>
 
-          {/* Progress Bar */}
+          <div className="flex items-center gap-4 bg-slate-900/60 p-3 rounded-2xl border border-white/5">
+            <div>
+              <span className="text-[10px] text-text-muted uppercase block font-bold">
+                Monthly Stipend
+              </span>
+              <span className="text-base sm:text-lg font-black text-emerald-400">
+                ₦{(employee.currentSalary || 30000).toLocaleString()}
+              </span>
+            </div>
+            <div className="h-8 w-px bg-white/10" />
+            <div>
+              <span className="text-[10px] text-text-muted uppercase block font-bold">
+                Post-Training
+              </span>
+              <span className="text-base sm:text-lg font-black text-amber-400">
+                ₦{(employee.startingSalary || 50000).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact & Employment Meta Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
+            <FiMail className="text-blue-400 flex-shrink-0" size={16} />
+            <div className="truncate">
+              <span className="text-text-muted block text-[10px]">Email Address</span>
+              <span className="text-slate-200 font-semibold truncate block">
+                {employee.email}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
+            <FiPhone className="text-emerald-400 flex-shrink-0" size={16} />
+            <div>
+              <span className="text-text-muted block text-[10px]">Phone Number</span>
+              <span className="text-slate-200 font-semibold">{employee.phone}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
+            <FiCalendar className="text-amber-400 flex-shrink-0" size={16} />
+            <div>
+              <span className="text-text-muted block text-[10px]">Training Window</span>
+              <span className="text-slate-200 font-semibold">
+                {employee.startDate} &rarr; {employee.trainingEndDate}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/40 border border-white/5">
+            <FiMapPin className="text-purple-400 flex-shrink-0" size={16} />
+            <div className="truncate">
+              <span className="text-text-muted block text-[10px]">Residential Address</span>
+              <span className="text-slate-200 font-semibold truncate block">
+                {employee.address}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 30-Day Academy Curriculum Progress Tracker */}
+      <div className="glass-card p-5 sm:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
+              <FiCheckSquare className="text-amber-400" /> 30-Day Mandatory Training Curriculum Tracker
+            </h2>
+            <p className="text-xs text-text-muted mt-0.5">
+              GoalMills Sports Media Academy • {completedDaysCount} of 30 Mandatory Days Completed ({progressPercent}%)
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              {30 - completedDaysCount} Days Remaining
+            </span>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs text-slate-400 font-bold">
+            <span>Overall Certification Progress</span>
+            <span className="text-amber-400 font-black">{progressPercent}%</span>
+          </div>
           <div className="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-white/10">
             <div
-              className="bg-gradient-to-r from-amber-500 to-emerald-500 h-full transition-all duration-500"
+              className="bg-gradient-to-r from-amber-500 via-blue-500 to-emerald-500 h-full transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
+        </div>
 
-          {/* Collapsible Modules */}
-          <div className="space-y-4">
-            {GOALMILLS_TRAINING_MODULES.map((module, idx) => {
-              const isOpen = openModules[module.id] ?? true;
-              const modProgress = training?.modules?.find((m) => m.moduleId === module.id);
-              const completedCount = modProgress?.completedTasks?.length || 0;
-              const isModuleDone =
-                modProgress?.status === 'completed' ||
-                (completedCount >= module.checklist.length && module.checklist.length > 0);
+        {/* 30-Day Interactive Calendar Grid */}
+        <div className="space-y-3">
+          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
+            Day-by-Day Progression Matrix (Tap any day to preview lesson & assignments):
+          </span>
+          <div className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-10 gap-2">
+            {Array.from({ length: 30 }, (_, i) => i + 1).map((dayNum) => {
+              const isDone = completedDays.includes(dayNum);
+              const dayRecord = training?.dailyRecords?.find((r: any) => r.day === dayNum);
+              const isSelected = selectedDayDetail === dayNum;
 
               return (
-                <div
-                  key={module.id}
-                  className="glass-card rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden shadow-xl"
+                <button
+                  key={dayNum}
+                  type="button"
+                  onClick={() => setSelectedDayDetail(isSelected ? null : dayNum)}
+                  className={`p-2 rounded-xl text-center border transition-all flex flex-col items-center justify-center ${
+                    isDone
+                      ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-sm'
+                      : isSelected
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-md'
+                      : dayNum === completedDaysCount + 1
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 animate-pulse'
+                      : 'bg-slate-950/60 border-white/5 text-slate-400 hover:border-white/20'
+                  }`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleModule(module.id)}
-                    className="w-full p-4 sm:p-5 flex items-center justify-between bg-slate-900/80 hover:bg-slate-900 transition-colors text-left"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
-                          Module {idx + 1} • {module.category} ({module.weightPercent}%)
-                        </span>
-                        {isModuleDone && (
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
-                            ✓ Completed
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-sm sm:text-base font-black text-white mt-0.5">
-                        {module.title}
-                      </h3>
-                      <p className="text-xs text-text-muted mt-0.5">{module.description}</p>
-                    </div>
-                    <div className="p-2 rounded-xl bg-white/5 text-slate-400">
-                      {isOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
-                    </div>
-                  </button>
-
-                  {isOpen && (
-                    <div className="p-4 sm:p-5 space-y-4 border-t border-white/5">
-                      <div className="space-y-2">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Module Checklist ({completedCount}/{module.checklist.length} Completed):
-                        </span>
-                        <div className="space-y-1.5">
-                          {module.checklist.map((task: string, tIdx: number) => {
-                            const isDone = modProgress?.completedTasks?.includes(task) || false;
-                            return (
-                              <button
-                                key={tIdx}
-                                type="button"
-                                onClick={() => handleToggleTask(module.id, task, !isDone)}
-                                className={`w-full flex items-start gap-2.5 p-2.5 rounded-lg border text-left text-xs transition-all ${
-                                  isDone
-                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300 font-medium'
-                                    : 'bg-slate-950/30 border-white/5 text-slate-300 hover:border-white/20'
-                                }`}
-                              >
-                                <span
-                                  className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded flex items-center justify-center text-xs ${
-                                    isDone
-                                      ? 'bg-emerald-500 text-slate-950 font-bold'
-                                      : 'border border-slate-600'
-                                  }`}
-                                >
-                                  {isDone && '✓'}
-                                </span>
-                                <span className={isDone ? 'line-through opacity-80' : ''}>
-                                  {task}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {module.resources.length > 0 && (
-                        <div className="pt-2 border-t border-white/5 space-y-1">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                            Training Resources & Handbooks:
-                          </span>
-                          <div className="flex flex-wrap gap-2">
-                            {module.resources.map((res: string, rIdx: number) => (
-                              <span
-                                key={rIdx}
-                                className="px-2.5 py-1 rounded-lg bg-slate-950 border border-white/5 text-[11px] text-amber-300/90 font-medium"
-                              >
-                                📖 {res}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                  <span className="text-[10px] uppercase font-bold text-slate-500 block">
+                    Day
+                  </span>
+                  <span className="text-sm sm:text-base font-black">
+                    {dayNum}
+                  </span>
+                  {isDone ? (
+                    <span className="text-[9px] font-bold text-emerald-400 mt-0.5">
+                      {dayRecord?.score ? `${dayRecord.score}pt` : '✓ Done'}
+                    </span>
+                  ) : dayNum === completedDaysCount + 1 ? (
+                    <span className="text-[9px] font-bold text-amber-400 mt-0.5">
+                      Current
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-slate-600 mt-0.5">
+                      Pending
+                    </span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
+
+        {/* Selected Day Lesson Details Modal / Card */}
+        {selectedDayDetail && (() => {
+          const dayData = GOALMILLS_30_DAY_CURRICULUM.find((d) => d.day === selectedDayDetail);
+          const dayRecord = training?.dailyRecords?.find((r: any) => r.day === selectedDayDetail);
+          const isDone = completedDays.includes(selectedDayDetail);
+
+          return (
+            <div className="bg-slate-950 p-4 sm:p-6 rounded-2xl border border-amber-500/30 space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-xs uppercase">
+                    Day {selectedDayDetail}
+                  </span>
+                  <span className="text-xs text-text-muted">Week {dayData?.week}</span>
+                  {isDone && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold">
+                      ✓ Approved & Graded ({dayRecord?.score || 0}/100)
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDayDetail(null)}
+                  className="text-slate-400 hover:text-white text-xs font-bold"
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              <div>
+                <h3 className="text-base font-black text-white">{dayData?.title}</h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  <strong>Daily Output Required:</strong> {dayData?.dailyOutput}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-1.5">
+                  <span className="font-bold text-amber-400 block uppercase text-[10px]">
+                    Curriculum Topics to Study:
+                  </span>
+                  <ul className="space-y-1 text-slate-200">
+                    {dayData?.topics.map((t, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-amber-400">•</span>
+                        <span>{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-1.5">
+                  <span className="font-bold text-blue-400 block uppercase text-[10px]">
+                    Practical Production Tasks:
+                  </span>
+                  <ul className="space-y-1 text-slate-200">
+                    {dayData?.practicalTasks.map((pt, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-blue-400">•</span>
+                        <span>{pt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="text-slate-300">
+                  <strong>Submission:</strong> {dayData?.submissionRequirement}
+                </span>
+                <span className="text-amber-400 font-bold whitespace-nowrap">
+                  Standup Focus: {dayData?.standupFocus}
+                </span>
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* Six Competency Training Modules Checklist */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
+              <FiCheckSquare className="text-blue-400" /> Competency Training Modules
+            </h2>
+            <p className="text-xs text-text-muted mt-0.5">
+              Foundational Core Skills Breakdown
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {GOALMILLS_TRAINING_MODULES.map((module, idx) => {
+            const isOpen = openModules[module.id] ?? false;
+            const modProgress = training?.modules?.find((m) => m.moduleId === module.id);
+            const completedCount = modProgress?.completedTasks?.length || 0;
+            const isModuleDone =
+              modProgress?.status === 'completed' ||
+              (completedCount >= module.checklist.length && module.checklist.length > 0);
+
+            return (
+              <div
+                key={module.id}
+                className="glass-card rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden shadow-xl"
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleModule(module.id)}
+                  className="w-full p-4 sm:p-5 flex items-center justify-between bg-slate-900/80 hover:bg-slate-900 transition-colors text-left"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">
+                        Module {idx + 1} • {module.category} ({module.weightPercent}%)
+                      </span>
+                      {isModuleDone && (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                          ✓ Completed
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-sm sm:text-base font-black text-white mt-0.5">
+                      {module.title}
+                    </h3>
+                    <p className="text-xs text-text-muted mt-0.5">{module.description}</p>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/5 text-slate-400">
+                    {isOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+                  </div>
+                </button>
+
+                {isOpen && (
+                  <div className="p-4 sm:p-5 space-y-4 border-t border-white/5">
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                        Module Checklist ({completedCount}/{module.checklist.length} Completed):
+                      </span>
+                      <div className="space-y-1.5">
+                        {module.checklist.map((task: string, tIdx: number) => {
+                          const isDone = modProgress?.completedTasks?.includes(task) || false;
+                          return (
+                            <button
+                              key={tIdx}
+                              type="button"
+                              onClick={() => handleToggleTask(module.id, task, !isDone)}
+                              className={`w-full flex items-start gap-2.5 p-2.5 rounded-lg border text-left text-xs transition-all ${
+                                isDone
+                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300 font-medium'
+                                  : 'bg-slate-950/30 border-white/5 text-slate-300 hover:border-white/20'
+                              }`}
+                            >
+                              <span
+                                className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded flex items-center justify-center text-xs ${
+                                  isDone
+                                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                                    : 'border border-slate-600'
+                                }`}
+                              >
+                                {isDone && '✓'}
+                              </span>
+                              <span className={isDone ? 'line-through opacity-80' : ''}>
+                                {task}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {module.resources.length > 0 && (
+                      <div className="pt-2 border-t border-white/5 space-y-1">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                          Training Resources & Handbooks:
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {module.resources.map((res: string, rIdx: number) => (
+                            <span
+                              key={rIdx}
+                              className="px-2.5 py-1 rounded-lg bg-slate-950 border border-white/5 text-[11px] text-amber-300/90 font-medium"
+                            >
+                              📖 {res}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

@@ -62,7 +62,46 @@ export async function GET(req: NextRequest) {
 
     const employees = await Employee.find(query).sort({ createdAt: -1 });
 
-    return NextResponse.json({ success: true, count: employees.length, data: employees });
+    // Enrich with training progress (completedDaysCount, isCertified, etc.)
+    const empIds = employees.map((e) => e._id);
+    let progressList: any[] = [];
+    try {
+      if (TrainingProgress && typeof TrainingProgress.find === 'function') {
+        const queryRes = TrainingProgress.find({ employeeId: { $in: empIds } });
+        progressList = typeof queryRes.lean === 'function' ? await queryRes.lean() : await queryRes;
+      }
+    } catch (e) {
+      console.warn('[Employees GET] Could not fetch training progress:', e);
+    }
+    const progressMap = new Map((progressList || []).map((p: any) => [p.employeeId?.toString(), p]));
+
+    const enrichedEmployees = employees.map((emp) => {
+      const p: any = progressMap.get(emp._id.toString());
+      const empObj = emp.toObject ? emp.toObject() : emp;
+      const completedDaysCount = p?.completedDays?.length || p?.completedDaysCount || 0;
+      const isCertified = p?.isCertified || (completedDaysCount >= 30 && emp.status !== 'training');
+
+      return {
+        ...empObj,
+        trainingProgress: p
+          ? {
+              completedDays: p.completedDays || [],
+              completedDaysCount,
+              overallProgressPercent: p.overallProgressPercent || 0,
+              isCertified,
+              certificationTier: p.certificationTier || null,
+            }
+          : {
+              completedDays: [],
+              completedDaysCount: 0,
+              overallProgressPercent: 0,
+              isCertified: false,
+              certificationTier: null,
+            },
+      };
+    });
+
+    return NextResponse.json({ success: true, count: enrichedEmployees.length, data: enrichedEmployees });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to fetch employees' },

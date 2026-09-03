@@ -3015,6 +3015,36 @@ export type TrainingModuleKey =
   | 'audience_growth_analytics'
   | 'repurposing_newsroom_ops';
 
+export interface CurriculumDayItem {
+  day: number; // 1 - 30
+  week: 1 | 2 | 3 | 4;
+  title: string;
+  moduleKey: string;
+  moduleTitle: string;
+  objectives: string[];
+  study: string[];
+  assignment: string[];
+  production: string[];
+  social: string[];
+  publish: string[];
+  submissionChecklist: string[];
+  adminReviewCriteria: string[];
+  resources?: string[];
+}
+
+export interface DailyScorecardBreakdown {
+  research: number; // max 15
+  accuracy: number; // max 15
+  writing: number; // max 15
+  seo: number; // max 10
+  socialMedia: number; // max 10
+  graphicDesign: number; // max 10
+  creativity: number; // max 10
+  publishingDiscipline: number; // max 5
+  analyticsLearning: number; // max 5
+  teamworkReporting: number; // max 5
+}
+
 export interface TrainingModuleItem {
   id: TrainingModuleKey;
   title: string;
@@ -3035,14 +3065,34 @@ export interface EmployeeModuleProgress {
   completedAt?: string;
 }
 
+export interface EmployeeDailyRecord {
+  day: number;
+  reportId?: string;
+  score?: number;
+  status: 'pending' | 'approved' | 'revision' | 'retraining';
+  gradedAt?: string;
+}
+
 export interface EmployeeTrainingProgress {
   _id?: string;
   employeeId: string;
   modules: EmployeeModuleProgress[];
+  completedDays: number[]; // e.g. [1, 2, 3]
+  completedDaysCount: number; // count of completed 30 mandatory days
+  mandatoryDaysTotal: number; // 30
+  dailyRecords?: EmployeeDailyRecord[];
   overallProgressPercent: number;
   finalAssessmentCompleted: boolean;
   finalAssessmentScore?: number;
   finalAssessmentNotes?: string;
+  isCertified?: boolean;
+  certificationTier?:
+    | 'GoalMills Certified Sports Media Professional — Advanced'
+    | 'GoalMills Certified Sports Media Professional'
+    | 'GoalMills Certified Junior Sports Media Professional'
+    | 'Training Extension Required'
+    | 'Not Ready for Independent Publishing';
+  certificationDate?: string;
   transitionRecommended?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -3074,6 +3124,21 @@ export interface DailyContentReport {
   employeeId: string;
   employeeName: string;
   reportDate: string; // YYYY-MM-DD
+  trainingDay?: number; // 1 - 30
+  lessonStudied?: string;
+  articleUrl?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  xUrl?: string;
+  tiktokUrl?: string;
+  youtubeUrl?: string;
+  graphicUrl?: string;
+  source1?: string;
+  source2?: string;
+  learnedTakeaway?: string;
+  struggledWith?: string;
+  improveTomorrow?: string;
+  correctionsCompleted?: string;
   articles: DailyPublishedArticle[];
   socialPosts: DailySocialPost[];
   mediaAssets: DailyMediaAsset[];
@@ -3083,8 +3148,16 @@ export interface DailyContentReport {
   correctionsMade?: string;
   lessonsLearned?: string;
   tasksCompleted: string;
-  reviewStatus: 'pending' | 'reviewed' | 'approved' | 'needs_revision';
-  editorScore?: number; // 1 - 10
+  reviewStatus: 'pending' | 'reviewed' | 'approved' | 'revision' | 'retraining' | 'needs_revision';
+  scorecard?: DailyScorecardBreakdown;
+  totalScore?: number; // 0 - 100
+  performanceRating?:
+    | 'Excellent'
+    | 'Very Good'
+    | 'Good'
+    | 'Improvement Required'
+    | 'Remedial Training';
+  editorScore?: number; // 0 - 100
   editorFeedback?: string;
   reviewedBy?: string;
   reviewedAt?: string;

@@ -51,6 +51,9 @@ vi.mock('@/models/Employee', () => ({
 vi.mock('@/models/TrainingProgress', () => ({
   default: {
     create: vi.fn().mockResolvedValue({ _id: 'tp-1', overallProgressPercent: 0 }),
+    find: vi.fn().mockReturnValue({
+      lean: vi.fn().mockResolvedValue([]),
+    }),
   },
 }));
 
