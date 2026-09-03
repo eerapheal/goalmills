@@ -25,7 +25,7 @@ import {
   FiClock,
   FiAlertCircle,
   FiChevronRight,
-  FiCheckSquare
+  FiCheckSquare,
   FiX,
   FiFilter,
   FiChevronDown,
@@ -277,11 +277,10 @@ export default function EmployeesPage() {
         <button
           type="button"
           onClick={() => setActiveTab('roster')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
-            activeTab === 'roster'
+          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${activeTab === 'roster'
               ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
-          }`}
+            }`}
         >
           <FiUsers size={15} />
           <span>Staff Roster & Badges</span>
@@ -290,11 +289,10 @@ export default function EmployeesPage() {
         <button
           type="button"
           onClick={() => setActiveTab('curriculum')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
-            activeTab === 'curriculum'
+          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${activeTab === 'curriculum'
               ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
-          }`}
+            }`}
         >
           <FiBookOpen size={15} />
           <span>30-Day Academy Curriculum & SOP</span>
@@ -570,11 +568,10 @@ export default function EmployeesPage() {
                             <td className="p-4">
                               <Link
                                 href={`/admin/employees/${emp._id}/appointment`}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                                  emp.appointmentSigned
+                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${emp.appointmentSigned
                                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
                                     : 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20'
-                                }`}
+                                  }`}
                               >
                                 <FiFileText size={12} />
                                 <span>
@@ -697,11 +694,10 @@ export default function EmployeesPage() {
                   setSelectedWeek(wk);
                   setExpandedDay(startDay);
                 }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
-                  selectedWeek === wk
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${selectedWeek === wk
                     ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
-                }`}
+                  }`}
               >
                 {label}
               </button>
@@ -881,17 +877,30 @@ export default function EmployeesPage() {
             <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
               <FiAward className="text-emerald-400" /> Post-Curriculum Certification Tiers & Career Progression
             </h3>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {CERTIFICATION_TIERS.slice(0, 3).map((tier, idx) => (
-                <div key={idx} className="p-4 bg-slate-950/70 rounded-2xl border border-emerald-500/20 space-y-1">
+                <div
+                  key={idx}
+                  className="p-4 bg-slate-950/70 rounded-2xl border border-emerald-500/20 space-y-1"
+                >
                   <span className="text-[10px] font-black uppercase text-emerald-400 block">
                     Score: {tier.min}% – {tier.max}%
                   </span>
-                  <h4 className="text-xs font-bold text-white">{tier.title}</h4>
-                  <p className="text-[11px] text-slate-300">{tier.summary}</p>
+
+                  <h4 className="text-xs font-bold text-white">
+                    {tier.title}
+                  </h4>
+
+                  <p className="text-[11px] text-slate-300">
+                    {tier.summary}
+                  </p>
                 </div>
               ))}
             </div>
+          </div> {/* <-- THIS WAS MISSING */}
+
+
           {/* Section: Newsroom Editorial Policies & Standards */}
           <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
