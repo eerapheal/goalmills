@@ -489,8 +489,25 @@ IMPROVEMENT FOR TOMORROW: [Target]
     'GOALMILLS-Training-Resources-&-Handbooks.pdf'
   );
 
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, pdfBytes);
   console.log(`Generated official PDF handbook successfully at: ${outputPath} (${pdfBytes.length} bytes)`);
+
+  // Also sync to apps/web/public/downloads
+  const webOutputPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'web',
+    'public',
+    'downloads',
+    'GOALMILLS-Training-Resources-&-Handbooks.pdf'
+  );
+  if (fs.existsSync(path.dirname(webOutputPath))) {
+    fs.writeFileSync(webOutputPath, pdfBytes);
+    console.log(`Synced PDF handbook to web at: ${webOutputPath}`);
+  }
 }
 
 generateHandbookPdf().catch((err) => {
