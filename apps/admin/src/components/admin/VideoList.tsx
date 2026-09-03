@@ -17,7 +17,7 @@ import {
   FiPlay,
 } from 'react-icons/fi';
 import { useToast } from '../Toast';
-import { getHighlightThumbnail } from '@/lib/videoUtils';
+import { getHighlightThumbnail, HIGHLIGHT_CATEGORIES } from '@/lib/videoUtils';
 
 export interface VideoItem {
   _id: string;
@@ -38,18 +38,7 @@ interface VideoListProps {
   refreshTrigger?: number;
 }
 
-const CATEGORIES = [
-  'All',
-  'Highlights',
-  'Football',
-  'Premier League',
-  'Champions League',
-  'La Liga',
-  'Basketball',
-  'Cricket',
-  'Interviews',
-  'Behind the Scenes',
-];
+const CATEGORIES = HIGHLIGHT_CATEGORIES;
 
 export default function VideoList({ refreshTrigger = 0 }: VideoListProps) {
   const toast = useToast();

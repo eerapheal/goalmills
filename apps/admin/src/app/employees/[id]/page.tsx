@@ -393,7 +393,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
               <div>
                 <h3 className="text-base font-black text-white">{dayData?.title}</h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  <strong>Daily Output Required:</strong> {dayData?.dailyOutput}
+                  <strong>Daily Output Required:</strong>{' '}
+                  {dayData?.dailyOutput ||
+                    dayData?.production?.join('; ') ||
+                    'Standard daily newsroom deliverable'}
                 </p>
               </div>
 
@@ -403,7 +406,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     Curriculum Topics to Study:
                   </span>
                   <ul className="space-y-1 text-slate-200">
-                    {dayData?.topics.map((t, idx) => (
+                    {(dayData?.topics || dayData?.study || dayData?.objectives || []).map((t, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
                         <span className="text-amber-400">•</span>
                         <span>{t}</span>
@@ -417,7 +420,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     Practical Production Tasks:
                   </span>
                   <ul className="space-y-1 text-slate-200">
-                    {dayData?.practicalTasks.map((pt, idx) => (
+                    {(dayData?.practicalTasks || dayData?.production || dayData?.assignment || []).map((pt, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
                         <span className="text-blue-400">•</span>
                         <span>{pt}</span>
@@ -429,10 +432,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
               <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <span className="text-slate-300">
-                  <strong>Submission:</strong> {dayData?.submissionRequirement}
+                  <strong>Submission:</strong>{' '}
+                  {dayData?.submissionRequirement ||
+                    dayData?.submissionChecklist?.join('; ') ||
+                    'Submit article & media deliverables via portal'}
                 </span>
                 <span className="text-amber-400 font-bold whitespace-nowrap">
-                  Standup Focus: {dayData?.standupFocus}
+                  Standup Focus:{' '}
+                  {dayData?.standupFocus ||
+                    dayData?.objectives?.[0] ||
+                    'Report on daily study, creation, publishing & challenges'}
                 </span>
               </div>
             </div>

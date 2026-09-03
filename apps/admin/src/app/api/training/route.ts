@@ -9,6 +9,7 @@ import {
   NEWSROOM_STANDUP_PROTOCOL,
   DAILY_SCORECARD_RUBRICS,
   CERTIFICATION_TIERS,
+  EDITORIAL_POLICIES,
 } from '@/lib/trainingCurriculum';
 
 export async function GET(req: NextRequest) {
@@ -30,6 +31,7 @@ export async function GET(req: NextRequest) {
             standup: NEWSROOM_STANDUP_PROTOCOL,
             scorecardRubrics: DAILY_SCORECARD_RUBRICS,
             certificationTiers: CERTIFICATION_TIERS,
+            editorialPolicies: EDITORIAL_POLICIES,
           }),
         },
         { status: 200 }
@@ -72,6 +74,7 @@ export async function GET(req: NextRequest) {
         standup: NEWSROOM_STANDUP_PROTOCOL,
         scorecardRubrics: DAILY_SCORECARD_RUBRICS,
         certificationTiers: CERTIFICATION_TIERS,
+        editorialPolicies: EDITORIAL_POLICIES,
       }),
     });
   } catch (error: any) {

@@ -2972,6 +2972,7 @@ export interface Employee {
     tiktok?: string;
   };
   notes?: string;
+  trainingProgress?: Partial<EmployeeTrainingProgress> | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -3030,6 +3031,11 @@ export interface CurriculumDayItem {
   submissionChecklist: string[];
   adminReviewCriteria: string[];
   resources?: string[];
+  dailyOutput?: string;
+  standupFocus?: string;
+  topics?: string[];
+  practicalTasks?: string[];
+  submissionRequirement?: string;
 }
 
 export interface DailyScorecardBreakdown {
@@ -3091,7 +3097,8 @@ export interface EmployeeTrainingProgress {
     | 'GoalMills Certified Sports Media Professional'
     | 'GoalMills Certified Junior Sports Media Professional'
     | 'Training Extension Required'
-    | 'Not Ready for Independent Publishing';
+    | 'Not Ready for Independent Publishing'
+    | null;
   certificationDate?: string;
   transitionRecommended?: boolean;
   createdAt?: string;

@@ -19,6 +19,7 @@ import {
   GOALMILLS_30_DAY_CURRICULUM,
   DAILY_SCORECARD_RUBRICS,
   PERFORMANCE_RATINGS,
+  EDITORIAL_POLICIES,
 } from '@/lib/trainingCurriculum';
 import {
   FiUserCheck,
@@ -45,7 +46,13 @@ import {
   FiShield,
 } from 'react-icons/fi';
 
-type PortalTab = 'daily_report' | 'scorecards' | 'training_checklist' | 'standup' | 'payroll_contract';
+type PortalTab =
+  | 'daily_report'
+  | 'scorecards'
+  | 'training_checklist'
+  | 'standup'
+  | 'payroll_contract'
+  | 'editorial_policies';
 
 export default function StaffPortalPage() {
   const { data: session } = useSession();
@@ -432,6 +439,7 @@ export default function StaffPortalPage() {
               <option value="daily_report">📝 Submit Daily Report</option>
               <option value="scorecards">📊 Graded Scorecards & Feedback</option>
               <option value="training_checklist">🎓 30-Day Training Modules</option>
+              <option value="editorial_policies">⚖️ Editorial Policies & Standards</option>
               <option value="standup">📹 5:00 PM Newsroom Standup</option>
               <option value="payroll_contract">💼 Contract & Pay Slips</option>
             </select>
@@ -481,6 +489,19 @@ export default function StaffPortalPage() {
           >
             <FiAward size={15} />
             <span>30-Day Curriculum</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('editorial_policies')}
+            className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+              activeTab === 'editorial_policies'
+                ? 'bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-500/25'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <FiShield size={15} />
+            <span>Editorial Policies</span>
           </button>
 
           <button
@@ -590,10 +611,16 @@ export default function StaffPortalPage() {
                 </div>
                 <h4 className="text-sm font-bold text-white">{selectedDayCurriculum.title}</h4>
                 <p className="text-xs text-slate-300">
-                  <strong>Production Requirement:</strong> {selectedDayCurriculum.dailyOutput}
+                  <strong>Production Requirement:</strong>{' '}
+                  {selectedDayCurriculum.dailyOutput ||
+                    selectedDayCurriculum.production?.join('; ') ||
+                    'Standard daily newsroom assignment'}
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  <strong>Standup Focus:</strong> {selectedDayCurriculum.standupFocus}
+                  <strong>Standup Focus:</strong>{' '}
+                  {selectedDayCurriculum.standupFocus ||
+                    selectedDayCurriculum.objectives?.join(' • ') ||
+                    selectedDayCurriculum.moduleTitle}
                 </p>
               </div>
             )}
@@ -897,17 +924,29 @@ export default function StaffPortalPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {hasScore && (
-                          <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${
-                            (rep.totalScore || 0) >= 90
+                        {hasScore && (() => {
+                          const total = rep.totalScore || 0;
+                          const ratingConfig = PERFORMANCE_RATINGS.find(
+                            (p) => total >= p.min && total <= p.max
+                          );
+                          const ratingBadge = ratingConfig?.badge || rep.performanceRating || 'Graded';
+                          const ratingClass =
+                            ratingConfig?.color === 'emerald'
                               ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                              : (rep.totalScore || 0) >= 70
+                              : ratingConfig?.color === 'blue'
+                              ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+                              : ratingConfig?.color === 'amber'
                               ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                              : 'bg-red-500/15 text-red-400 border-red-500/30'
-                          }`}>
-                            🏆 {rep.totalScore}/100 ({rep.performanceRating || 'Graded'})
-                          </span>
-                        )}
+                              : ratingConfig?.color === 'orange'
+                              ? 'bg-orange-500/15 text-orange-400 border-orange-500/30'
+                              : 'bg-red-500/15 text-red-400 border-red-500/30';
+
+                          return (
+                            <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${ratingClass}`}>
+                              {ratingBadge} • {total}/100
+                            </span>
+                          );
+                        })()}
 
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                           isApproved
@@ -1227,6 +1266,131 @@ export default function StaffPortalPage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      {/* ========================================================================= */}
+      {/* TAB: EDITORIAL POLICIES & STANDARDS */}
+      {/* ========================================================================= */}
+      {activeTab === 'editorial_policies' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Header Card */}
+          <div className="glass-card p-5 sm:p-7 rounded-3xl border border-amber-500/30 space-y-3 bg-gradient-to-br from-slate-900/90 via-slate-950/90 to-amber-950/20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black uppercase tracking-wider mb-2">
+                  <FiShield /> Official Newsroom Standards
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white">
+                  GoalMills Editorial Policies & Publishing Guidelines
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+                  Mandatory guidelines for all sports journalists, creators, and editors. Adherence to these standards protects GoalMills credibility and ensures journalistic excellence.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <span className="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-amber-400">
+                  Version 2026.1 • Active
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 1. Approval Policy */}
+            <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 space-y-4">
+              <h3 className="text-sm sm:text-base font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                <FiCheckCircle className="text-amber-400" /> 1. Editorial Approval Policy
+              </h3>
+              <div className="space-y-3">
+                {EDITORIAL_POLICIES.approvalPolicy.map((item, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/5 flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <p className="text-xs text-slate-200 leading-relaxed font-medium">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Copyright & Fair Use */}
+            <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 space-y-4">
+              <h3 className="text-sm sm:text-base font-black text-red-400 uppercase tracking-wider flex items-center gap-2">
+                <FiAlertCircle className="text-red-400" /> 2. Copyright & Fair-Use Rules
+              </h3>
+              <div className="space-y-3">
+                {EDITORIAL_POLICIES.copyrightRule.map((rule, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-red-500/10 flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-lg bg-red-500/20 text-red-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                      ✕
+                    </span>
+                    <p className="text-xs text-slate-200 leading-relaxed font-medium">{rule}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Source Hierarchy */}
+            <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 space-y-4">
+              <h3 className="text-sm sm:text-base font-black text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                <FiBookOpen className="text-blue-400" /> 3. Source Verification Hierarchy
+              </h3>
+              <div className="space-y-3">
+                {EDITORIAL_POLICIES.sourcePolicy.map((item, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-blue-500/10 flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                      T{idx + 1}
+                    </span>
+                    <p className="text-xs text-slate-200 leading-relaxed font-medium">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Correction Policy */}
+            <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 space-y-4">
+              <h3 className="text-sm sm:text-base font-black text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                <FiClock className="text-emerald-400" /> 4. Five-Step Correction Protocol
+              </h3>
+              <div className="space-y-3">
+                {EDITORIAL_POLICIES.correctionPolicy.map((step, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-emerald-500/10 flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <p className="text-xs text-slate-200 leading-relaxed font-medium">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Editorial Mistake Database Categories */}
+          <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                  <FiAlertCircle className="text-amber-400" /> Monitored Editorial Mistake Categories
+                </h3>
+                <p className="text-xs text-text-muted mt-0.5">
+                  Submissions and published articles are audited against these 16 error classifications.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-slate-400 bg-white/5 px-3 py-1 rounded-xl w-fit">
+                {EDITORIAL_POLICIES.mistakeDatabaseCategories.length} Categories
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+              {EDITORIAL_POLICIES.mistakeDatabaseCategories.map((cat, idx) => (
+                <div
+                  key={idx}
+                  className="p-2.5 rounded-xl bg-slate-950/80 border border-white/5 flex items-center gap-2 text-xs text-slate-300 font-semibold"
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                  <span className="truncate">{cat}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

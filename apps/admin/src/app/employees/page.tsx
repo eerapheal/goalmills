@@ -25,9 +25,7 @@ import {
   FiClock,
   FiAlertCircle,
   FiChevronRight,
-  FiMail,
-  FiPhone,
-  FiMapPin,
+  FiCheckSquare
   FiX,
   FiFilter,
   FiChevronDown,
@@ -686,34 +684,28 @@ export default function EmployeesPage() {
 
           {/* Week Selector Bar */}
           <div className="glass-card p-3 sm:p-4 rounded-2xl border border-white/10 flex flex-wrap items-center gap-2">
-            {[1, 2, 3, 4, 5, 6].map((wk) => {
-              const weekTitles = [
-                'Week 1: Journalism & Football Research (Days 1–5)',
-                'Week 2: Match Reporting & Analysis (Days 6–10)',
-                'Week 3: Visual Design & Social Growth (Days 11–15)',
-                'Week 4: Video, Shorts & Multimedia (Days 16–20)',
-                'Week 5: Advanced Distribution & Analytics (Days 21–25)',
-                'Week 6: Real-World Newsroom Mastery (Days 26–30)',
-              ];
-
-              return (
-                <button
-                  key={wk}
-                  type="button"
-                  onClick={() => {
-                    setSelectedWeek(wk);
-                    setExpandedDay((wk - 1) * 5 + 1);
-                  }}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
-                    selectedWeek === wk
-                      ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                      : 'bg-white/5 text-slate-300 hover:bg-white/10'
-                  }`}
-                >
-                  Week {wk}
-                </button>
-              );
-            })}
+            {[
+              { wk: 1, label: 'Week 1 (Days 1–7): Journalism & Writing', startDay: 1 },
+              { wk: 2, label: 'Week 2 (Days 8–14): Matchday & Live Reporting', startDay: 8 },
+              { wk: 3, label: 'Week 3 (Days 15–20): Multimedia & Graphics', startDay: 15 },
+              { wk: 4, label: 'Week 4 (Days 21–30): Newsroom Operations', startDay: 21 },
+            ].map(({ wk, label, startDay }) => (
+              <button
+                key={wk}
+                type="button"
+                onClick={() => {
+                  setSelectedWeek(wk);
+                  setExpandedDay(startDay);
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
+                  selectedWeek === wk
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* Days of Selected Week */}
@@ -742,7 +734,10 @@ export default function EmployeesPage() {
                         {dayItem.title}
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        <strong>Daily Production:</strong> {dayItem.dailyOutput}
+                        <strong>Daily Production:</strong>{' '}
+                        {dayItem.dailyOutput ||
+                          dayItem.production?.join('; ') ||
+                          'Standard daily newsroom deliverable'}
                       </p>
                     </div>
 
@@ -759,7 +754,7 @@ export default function EmployeesPage() {
                           📚 Curriculum Topics to Study (8:30 AM – 10:00 AM WAT)
                         </h4>
                         <ul className="space-y-1.5 text-xs text-slate-200">
-                          {dayItem.topics.map((t, i) => (
+                          {(dayItem.topics || dayItem.study || dayItem.objectives || []).map((t, i) => (
                             <li key={i} className="flex items-start gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                               <span>{t}</span>
@@ -774,7 +769,7 @@ export default function EmployeesPage() {
                           ⚡ Practical Production Tasks (10:00 AM – 4:00 PM WAT)
                         </h4>
                         <ul className="space-y-1.5 text-xs text-slate-200">
-                          {dayItem.practicalTasks.map((pt, i) => (
+                          {(dayItem.practicalTasks || dayItem.production || dayItem.assignment || []).map((pt, i) => (
                             <li key={i} className="flex items-start gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
                               <span>{pt}</span>
@@ -790,7 +785,9 @@ export default function EmployeesPage() {
                             Mandatory Submission (By 4:45 PM WAT)
                           </span>
                           <p className="text-xs text-slate-200 font-semibold mt-1">
-                            {dayItem.submissionRequirement}
+                            {dayItem.submissionRequirement ||
+                              dayItem.submissionChecklist?.join('; ') ||
+                              'Submit article & media deliverables via portal'}
                           </p>
                         </div>
                         <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5">
@@ -798,7 +795,9 @@ export default function EmployeesPage() {
                             Standup Focus (5:00 PM WAT Google Meet)
                           </span>
                           <p className="text-xs text-slate-200 font-semibold mt-1">
-                            {dayItem.standupFocus}
+                            {dayItem.standupFocus ||
+                              dayItem.objectives?.[0] ||
+                              'Report on daily study, creation, publishing & challenges'}
                           </p>
                         </div>
                       </div>
@@ -892,6 +891,105 @@ export default function EmployeesPage() {
                   <p className="text-[11px] text-slate-300">{tier.summary}</p>
                 </div>
               ))}
+            </div>
+          {/* Section: Newsroom Editorial Policies & Standards */}
+          <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                  <FiCheckSquare className="text-amber-400" /> GoalMills Newsroom Editorial Policies & Publishing Guidelines
+                </h3>
+                <p className="text-xs text-text-muted mt-0.5">
+                  Core editorial governance rules for verification, copyright, editor sign-offs, and error correction.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl w-fit">
+                Mandatory Newsroom Protocol
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Approval Policy */}
+              <div className="bg-slate-950/70 p-4 rounded-2xl border border-amber-500/20 space-y-2">
+                <span className="text-xs font-black text-amber-400 uppercase tracking-wider block">
+                  1. Editorial Approval Policy
+                </span>
+                <ul className="space-y-1.5 text-xs text-slate-300">
+                  {EDITORIAL_POLICIES.approvalPolicy.map((rule, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-amber-400 font-bold">•</span>
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Copyright Rule */}
+              <div className="bg-slate-950/70 p-4 rounded-2xl border border-red-500/20 space-y-2">
+                <span className="text-xs font-black text-red-400 uppercase tracking-wider block">
+                  2. Copyright & Fair Use Principles
+                </span>
+                <ul className="space-y-1.5 text-xs text-slate-300">
+                  {EDITORIAL_POLICIES.copyrightRule.map((rule, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-red-400 font-bold">✕</span>
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Source Policy */}
+              <div className="bg-slate-950/70 p-4 rounded-2xl border border-blue-500/20 space-y-2">
+                <span className="text-xs font-black text-blue-400 uppercase tracking-wider block">
+                  3. Source Verification Hierarchy
+                </span>
+                <ul className="space-y-1.5 text-xs text-slate-300">
+                  {EDITORIAL_POLICIES.sourcePolicy.map((rule, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-blue-400 font-bold">T{idx + 1}</span>
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Correction Policy */}
+              <div className="bg-slate-950/70 p-4 rounded-2xl border border-emerald-500/20 space-y-2">
+                <span className="text-xs font-black text-emerald-400 uppercase tracking-wider block">
+                  4. Five-Step Correction Protocol
+                </span>
+                <ul className="space-y-1.5 text-xs text-slate-300">
+                  {EDITORIAL_POLICIES.correctionPolicy.map((step, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-emerald-400 font-bold">{idx + 1}.</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Monitored Mistake Categories */}
+            <div className="bg-slate-950/60 p-4 rounded-2xl border border-white/5 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-slate-300 uppercase tracking-wider block">
+                  Monitored Editorial Mistake Categories (Audited During Daily Evaluations)
+                </span>
+                <span className="text-[10px] text-text-muted">
+                  {EDITORIAL_POLICIES.mistakeDatabaseCategories.length} Types
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {EDITORIAL_POLICIES.mistakeDatabaseCategories.map((cat, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-[11px] text-slate-300 font-medium"
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
