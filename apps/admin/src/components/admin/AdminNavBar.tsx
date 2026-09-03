@@ -201,7 +201,7 @@ export default function AdminNavBar({ sidebarCollapsed, onOpenMobileDrawer }: Ad
           QUICK SHORTCUTS — role-filtered chip bar
           Hidden on mobile (sm and below)
       ════════════════════════════════════════════════ */}
-      {shortcuts.length > 0 && (
+      {/* {shortcuts.length > 0 && (
         <div className="hidden md:flex items-center gap-1.5 px-5 pb-3 overflow-x-auto no-scrollbar">
           <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider mr-1 flex-shrink-0">
             ⚡ Quick:
@@ -225,7 +225,7 @@ export default function AdminNavBar({ sidebarCollapsed, onOpenMobileDrawer }: Ad
             );
           })}
         </div>
-      )}
+      )} */}
     </header>
   );
 }
