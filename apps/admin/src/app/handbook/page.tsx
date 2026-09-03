@@ -110,6 +110,16 @@ export default function AdminHandbookPage() {
                 <span>Download Official PDF</span>
               </a>
 
+              <a
+                href="/downloads/ENTERPRISE_ADMIN_OPERATIONS.md"
+                download="GoalMills_Enterprise_Admin_Operations.md"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs sm:text-sm border border-white/10 transition-all hover:scale-[1.02] active:scale-95"
+                title="Download Enterprise Operations Runbook & SOPs"
+              >
+                <FiFileText size={15} className="text-amber-400" />
+                <span>Enterprise Ops Doc</span>
+              </a>
+
               <button
                 onClick={handlePrint}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm border border-white/15 transition-all"
