@@ -1,5 +1,23 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+
+function TabIcon({
+  name,
+  color,
+  focused,
+}: {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
+  focused: boolean;
+}) {
+  return (
+    <View style={styles.iconWrapper}>
+      <Ionicons name={name} size={focused ? 22 : 20} color={color} />
+      {focused && <View style={styles.activeIndicator} />}
+    </View>
+  );
+}
 
 export default function TabLayout() {
   return (
@@ -7,18 +25,24 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#091529',
-          borderTopColor: 'rgba(59, 130, 246, 0.25)',
+          backgroundColor: '#070D18',
+          borderTopColor: 'rgba(59, 130, 246, 0.2)',
           borderTopWidth: 1,
-          height: 62,
-          paddingBottom: 8,
+          height: 66,
+          paddingBottom: 10,
           paddingTop: 6,
+          elevation: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.35,
+          shadowRadius: 12,
         },
-        tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: '#94A3B8',
+        tabBarActiveTintColor: '#60A5FA',
+        tabBarInactiveTintColor: '#475569',
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: '800',
+          fontWeight: '700',
+          marginTop: 1,
         },
       }}
     >
@@ -32,8 +56,8 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Sports',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="football" size={size - 2} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="football" color={color} focused={focused} />
           ),
         }}
       />
@@ -41,8 +65,8 @@ export default function TabLayout() {
         name="transfers"
         options={{
           title: 'Transfers',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="trending-up" size={size - 2} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="trending-up" color={color} focused={focused} />
           ),
         }}
       />
@@ -50,8 +74,8 @@ export default function TabLayout() {
         name="analysis"
         options={{
           title: 'Analysis',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="compass" size={size - 2} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="compass" color={color} focused={focused} />
           ),
         }}
       />
@@ -59,8 +83,8 @@ export default function TabLayout() {
         name="stats"
         options={{
           title: 'Stats',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bar-chart" size={size - 2} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="bar-chart" color={color} focused={focused} />
           ),
         }}
       />
@@ -68,8 +92,8 @@ export default function TabLayout() {
         name="news"
         options={{
           title: 'News',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="newspaper" size={size - 2} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="newspaper" color={color} focused={focused} />
           ),
         }}
       />
@@ -77,11 +101,26 @@ export default function TabLayout() {
         name="highlight"
         options={{
           title: 'Highlights',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="videocam" size={size - 2} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="videocam" color={color} focused={focused} />
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    bottom: -6,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#60A5FA',
+  },
+});

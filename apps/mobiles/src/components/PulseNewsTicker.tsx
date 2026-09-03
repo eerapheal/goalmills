@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SPACING, BORDER_RADIUS } from '@goalmills/ui';
 import { goalmillsApi } from '../services/goalmillsApi';
@@ -33,6 +33,22 @@ export function PulseNewsTicker({
   const [tickerIndex, setTickerIndex] = useState(0);
   const activePulseLabel = pulseLabel || `${sport.toUpperCase()} PULSE`;
 
+  // Animated dot pulse
+  const dotOpacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(dotOpacity, { toValue: 0.15, duration: 600, useNativeDriver: true }),
+        Animated.timing(dotOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, [dotOpacity]);
+
+  // Fade animation between ticker items
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
   const defaultFallbacks: Record<string, PulseItem[]> = {
     football: [
       { id: 'football-1', slug: 'victor-osimhen-signs-landmark-deal', tag: 'TRANSFER', title: 'Victor Osimhen signs landmark deal with €75M release clause', time: '10m ago' },
@@ -63,9 +79,10 @@ export function PulseNewsTicker({
     ],
   };
 
-  const initialItems = fallbackNews && fallbackNews.length > 0
-    ? fallbackNews
-    : (defaultFallbacks[sport] || defaultFallbacks.all);
+  const initialItems =
+    fallbackNews && fallbackNews.length > 0
+      ? fallbackNews
+      : defaultFallbacks[sport] || defaultFallbacks.all;
 
   const [newsList, setNewsList] = useState<PulseItem[]>(initialItems);
 
@@ -104,10 +121,14 @@ export function PulseNewsTicker({
   useEffect(() => {
     if (newsList.length <= 1) return;
     const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % newsList.length);
+      // Fade out → change → fade in
+      Animated.timing(fadeAnim, { toValue: 0, duration: 250, useNativeDriver: true }).start(() => {
+        setTickerIndex((prev) => (prev + 1) % newsList.length);
+        Animated.timing(fadeAnim, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+      });
     }, 5000);
     return () => clearInterval(timer);
-  }, [newsList.length]);
+  }, [newsList.length, fadeAnim]);
 
   const currentItem = newsList[tickerIndex] || newsList[0];
 
@@ -127,26 +148,31 @@ export function PulseNewsTicker({
     <View style={styles.tickerContainer}>
       {/* Pulse Badge */}
       <View style={styles.pulseBadge}>
-        <View style={styles.pulseDot} />
+        <Animated.View style={[styles.pulseDot, { opacity: dotOpacity }]} />
         <Text style={styles.pulseText}>{activePulseLabel}</Text>
       </View>
 
       {/* Ticker Headline & Tag */}
-      <Pressable style={styles.newsContent} onPress={handleNewsPress}>
-        <View style={styles.tagBadge}>
-          <Text style={styles.tagText} numberOfLines={1}>
-            {currentItem?.tag || 'LIVE'}
+      <Animated.View style={[styles.newsContentWrapper, { opacity: fadeAnim }]}>
+        <Pressable style={styles.newsContent} onPress={handleNewsPress}>
+          <View style={styles.tagBadge}>
+            <Text style={styles.tagText} numberOfLines={1}>
+              {currentItem?.tag || 'LIVE'}
+            </Text>
+          </View>
+          <Text style={styles.titleText} numberOfLines={1}>
+            {currentItem?.title}
           </Text>
-        </View>
-        <Text style={styles.titleText} numberOfLines={1}>
-          {currentItem?.title}
-        </Text>
-        <Text style={styles.timeText}>• {currentItem?.time}</Text>
-      </Pressable>
+          <Text style={styles.timeText}>• {currentItem?.time}</Text>
+        </Pressable>
+      </Animated.View>
 
       {/* Action Button (Optional) */}
       {actionLabel && onActionPress && (
-        <Pressable style={styles.actionBtn} onPress={onActionPress}>
+        <Pressable
+          style={({ pressed }) => [styles.actionBtn, pressed && styles.actionBtnPressed]}
+          onPress={onActionPress}
+        >
           <Text style={styles.actionBtnText}>{actionLabel}</Text>
         </Pressable>
       )}
@@ -158,87 +184,97 @@ const styles = StyleSheet.create({
   tickerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0B172B',
-    borderRadius: BORDER_RADIUS.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.25)',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    marginHorizontal: SPACING.sm,
-    marginBottom: 4,
-    minHeight: 28,
+    backgroundColor: '#071020',
+    borderRadius: 0,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    minHeight: 34,
   },
   pulseBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(59, 130, 246, 0.18)',
-    borderRadius: 4,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.35)',
-    paddingHorizontal: 4,
-    paddingVertical: 1.5,
-    marginRight: 5,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    marginRight: 8,
+    flexShrink: 0,
   },
   pulseDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: '#60A5FA',
-    marginRight: 3,
+    marginRight: 4,
   },
   pulseText: {
-    fontSize: 8.5,
+    fontSize: 9,
     fontWeight: '900',
     color: '#60A5FA',
     textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
+  },
+  newsContentWrapper: {
+    flex: 1,
+    overflow: 'hidden',
   },
   newsContent: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     minWidth: 0,
-    marginRight: 4,
+    marginRight: 6,
   },
   tagBadge: {
-    backgroundColor: 'rgba(59, 130, 246, 0.12)',
-    borderRadius: 3,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: 'rgba(59, 130, 246, 0.2)',
-    paddingHorizontal: 3,
-    paddingVertical: 1,
-    marginRight: 4,
-    maxWidth: 55,
+    paddingHorizontal: 4,
+    paddingVertical: 1.5,
+    marginRight: 6,
+    maxWidth: 60,
+    flexShrink: 0,
   },
   tagText: {
-    fontSize: 8,
+    fontSize: 8.5,
     fontWeight: '800',
     color: '#93C5FD',
     textTransform: 'uppercase',
   },
   titleText: {
     flex: 1,
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#F8FAFC',
-    marginRight: 3,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#E2E8F0',
+    marginRight: 5,
   },
   timeText: {
-    fontSize: 8.5,
-    color: '#64748B',
+    fontSize: 9,
+    color: '#475569',
     fontWeight: '600',
+    flexShrink: 0,
   },
   actionBtn: {
-    backgroundColor: 'rgba(59, 130, 246, 0.18)',
-    borderRadius: 4,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.35)',
-    paddingHorizontal: 5,
-    paddingVertical: 2,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    flexShrink: 0,
+  },
+  actionBtnPressed: {
+    opacity: 0.7,
+    backgroundColor: 'rgba(59, 130, 246, 0.25)',
   },
   actionBtnText: {
-    fontSize: 8.5,
-    fontWeight: '900',
+    fontSize: 9,
+    fontWeight: '800',
     color: '#93C5FD',
     textTransform: 'uppercase',
   },

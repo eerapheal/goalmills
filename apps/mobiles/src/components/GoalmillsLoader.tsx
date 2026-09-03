@@ -17,6 +17,7 @@ export function GoalmillsLoader({
 }: GoalmillsLoaderProps) {
   const spinValue = useRef(new Animated.Value(0)).current;
   const pulseValue = useRef(new Animated.Value(1)).current;
+  const dotOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Continuous rotation for outer radar ring
@@ -47,14 +48,24 @@ export function GoalmillsLoader({
       ])
     );
 
+    // Dot pulse
+    const dotAnim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(dotOpacity, { toValue: 0.2, duration: 500, useNativeDriver: true }),
+        Animated.timing(dotOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+      ])
+    );
+
     spinAnim.start();
     pulseAnim.start();
+    dotAnim.start();
 
     return () => {
       spinAnim.stop();
       pulseAnim.stop();
+      dotAnim.stop();
     };
-  }, [spinValue, pulseValue]);
+  }, [spinValue, pulseValue, dotOpacity]);
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -132,7 +143,7 @@ export function GoalmillsLoader({
           ]}
         >
           <Text style={styles.coreText}>GM</Text>
-          <View style={styles.liveDot} />
+          <Animated.View style={[styles.liveDot, { opacity: dotOpacity }]} />
         </Animated.View>
       </View>
 
@@ -142,7 +153,7 @@ export function GoalmillsLoader({
           <Text style={[styles.label, { fontSize: dimensions.fontSize }]}>{label}</Text>
           {sublabel ? (
             <View style={styles.sublabelRow}>
-              <View style={styles.pulseDot} />
+              <Animated.View style={[styles.pulseDot, { opacity: dotOpacity }]} />
               <Text style={[styles.sublabel, { fontSize: dimensions.subSize }]}>{sublabel}</Text>
             </View>
           ) : null}

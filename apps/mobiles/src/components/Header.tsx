@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Image, Text, StyleSheet, TouchableOpacity, Platform, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,6 +11,9 @@ export function Header() {
   const insets = useSafeAreaInsets();
   const [tenantConfig, setTenantConfig] = useState<TenantConfig | null>(null);
 
+  // Animated notification dot
+  const notifDotOpacity = useRef(new Animated.Value(1)).current;
+
   useEffect(() => {
     let mounted = true;
     goalmillsApi.getTenantConfig().then((cfg) => {
@@ -21,15 +24,26 @@ export function Header() {
     };
   }, []);
 
-  const topPadding = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 28) + 4;
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(notifDotOpacity, { toValue: 0.2, duration: 800, useNativeDriver: true }),
+        Animated.timing(notifDotOpacity, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, [notifDotOpacity]);
+
+  const topPadding = Math.max(insets.top, Platform.OS === 'ios' ? 44 : 24) + 4;
   const brandName = tenantConfig?.settings?.brandName || 'GoalMills';
   const primaryColor = tenantConfig?.settings?.primaryColor || '#3B82F6';
   const accentColor = tenantConfig?.settings?.accentColor || '#6366F1';
 
   return (
     <View style={[styles.outerContainer, { paddingTop: topPadding }]}>
-      <View style={styles.navBarPill}>
-        {/* Brand Logo & Title (Exact Web Design) */}
+      <View style={styles.navBar}>
+        {/* Brand Logo & Title */}
         <TouchableOpacity
           style={styles.brandContainer}
           onPress={() => router.push('/(tabs)/home')}
@@ -53,7 +67,7 @@ export function Header() {
             </View>
           </LinearGradient>
 
-          {/* Brand Typography & Subtitle */}
+          {/* Brand Typography */}
           <View style={styles.brandTextContainer}>
             <View style={styles.brandTitleRow}>
               {brandName.toLowerCase() === 'goalmills' ? (
@@ -69,9 +83,9 @@ export function Header() {
           </View>
         </TouchableOpacity>
 
-        {/* Right Navigation & Action Controls */}
+        {/* Right Actions */}
         <View style={styles.rightActions}>
-          {/* Quick Search Action */}
+          {/* Search */}
           <TouchableOpacity
             style={styles.searchButton}
             onPress={() => router.push('/(tabs)/news')}
@@ -92,10 +106,10 @@ export function Header() {
             accessibilityRole="button"
           >
             <Ionicons name="notifications-outline" size={17} color="#60A5FA" />
-            <View style={styles.notificationDot} />
+            <Animated.View style={[styles.notificationDot, { opacity: notifDotOpacity }]} />
           </TouchableOpacity>
 
-          {/* Privacy & Safe Hub */}
+          {/* Privacy */}
           <TouchableOpacity
             style={styles.actionIconButton}
             onPress={() => router.push('/privacy')}
@@ -103,7 +117,7 @@ export function Header() {
             accessibilityLabel="Data Protection & Privacy"
             accessibilityRole="button"
           >
-            <Ionicons name="shield-checkmark-outline" size={16} color="#94A3B8" />
+            <Ionicons name="shield-checkmark-outline" size={16} color="#64748B" />
           </TouchableOpacity>
         </View>
       </View>
@@ -117,23 +131,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(59, 130, 246, 0.15)',
+    borderBottomColor: 'rgba(59, 130, 246, 0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
   },
-  navBarPill: {
+  navBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#0C1726',
-    borderRadius: 14,
+    borderRadius: 13,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.3)',
-    paddingHorizontal: 12,
+    borderColor: 'rgba(59, 130, 246, 0.22)',
+    paddingHorizontal: 10,
     paddingVertical: 7,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
   },
   brandContainer: {
     flexDirection: 'row',
@@ -147,11 +161,6 @@ const styles = StyleSheet.create({
     padding: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
   },
   logoInnerContainer: {
     width: '100%',
@@ -190,10 +199,10 @@ const styles = StyleSheet.create({
   },
   brandSubtitle: {
     fontSize: 8.5,
-    fontWeight: '800',
-    color: '#60A5FA',
+    fontWeight: '700',
+    color: '#475569',
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 0.7,
     marginTop: 1,
   },
   rightActions: {
@@ -205,25 +214,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#0A1424',
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 9,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+    borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 5.5,
   },
   searchButtonText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#94A3B8',
+    color: '#60A5FA',
   },
   actionIconButton: {
     width: 31,
     height: 31,
     borderRadius: 9,
-    backgroundColor: '#0A1424',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -236,8 +245,8 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     backgroundColor: '#EF4444',
-    borderWidth: 1,
-    borderColor: '#0A1424',
+    borderWidth: 1.5,
+    borderColor: '#0C1726',
   },
 });
 

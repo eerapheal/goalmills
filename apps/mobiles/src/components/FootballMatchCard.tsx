@@ -221,8 +221,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   liveCard: {
-    borderColor: 'rgba(16, 185, 129, 0.4)',
-    backgroundColor: '#162234',
+    borderColor: 'rgba(16, 185, 129, 0.45)',
+    backgroundColor: '#0F1C2A',
+    borderWidth: 1.5,
   },
   pressed: {
     opacity: 0.85,
@@ -333,18 +334,18 @@ const styles = StyleSheet.create({
   upcomingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    gap: 5,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: BORDER_RADIUS.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(59, 130, 246, 0.25)',
   },
   upcomingTime: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#94A3B8',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   scoreNumbersContainer: {
     paddingHorizontal: 12,
@@ -360,5 +361,8 @@ const styles = StyleSheet.create({
   },
   liveScoreText: {
     color: '#10B981',
+    textShadowColor: 'rgba(16, 185, 129, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
 });

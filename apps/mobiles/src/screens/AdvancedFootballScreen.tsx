@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,17 +6,18 @@ import {
   FlatList,
   SectionList,
   RefreshControl,
-  ActivityIndicator,
   Pressable,
   TextInput,
   Image,
   ScrollView,
+  Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballMatchCard, UnifiedMatchEvent } from '../components/FootballMatchCard';
 import { PulseNewsTicker } from '../components/PulseNewsTicker';
+import { GoalmillsLoader } from '../components/GoalmillsLoader';
 import { advancedFootballApi } from '../services/advancedFootballApi';
 import {
   FootballStanding,
@@ -88,6 +89,19 @@ export function AdvancedFootballScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
+
+  // Pulsing live dot animation
+  const liveDotOpacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(liveDotOpacity, { toValue: 0.15, duration: 600, useNativeDriver: true }),
+        Animated.timing(liveDotOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, [liveDotOpacity]);
 
   const [fixtures, setFixtures] = useState<UnifiedMatchEvent[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
@@ -208,8 +222,10 @@ export function AdvancedFootballScreen() {
   const showDatePicker = activeTab === 'upcoming' || activeTab === 'results' || activeTab === 'predictions';
   const showLeaguePicker = activeTab !== 'live';
 
-  return (
-    <View style={styles.container}>
+  // Scrollable header: ticker + league chips + search/refresh + date strip + standings toggle
+  // Rendered as ListHeaderComponent on lists so all controls scroll with content
+  const renderScrollableHeader = () => (
+    <View>
       {/* News Ticker */}
       <PulseNewsTicker
         sport="football"
@@ -225,6 +241,7 @@ export function AdvancedFootballScreen() {
           showsHorizontalScrollIndicator={false}
           style={styles.leagueBar}
           contentContainerStyle={styles.leagueBarContent}
+          nestedScrollEnabled
         >
           {MAJOR_LEAGUES.map(lg => {
             const selected = selectedLeague === lg.id;
@@ -261,29 +278,15 @@ export function AdvancedFootballScreen() {
         </Pressable>
       </View>
 
-      {/* Tab Bar */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabBar} contentContainerStyle={styles.tabBarContent}>
-        {tabs.map(tab => {
-          const active = activeTab === tab.id;
-          return (
-            <Pressable
-              key={tab.id}
-              style={[styles.tabBtn, active && styles.tabBtnActive]}
-              onPress={() => setActiveTab(tab.id)}
-            >
-              <Ionicons name={tab.icon} size={14} color={active ? '#0F172A' : '#64748B'} />
-              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
-              {tab.id === 'live' && (
-                <View style={styles.liveDot} />
-              )}
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
       {/* Date Strip */}
       {showDatePicker && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dateBar} contentContainerStyle={styles.dateBarContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.dateBar}
+          contentContainerStyle={styles.dateBarContent}
+          nestedScrollEnabled
+        >
           {dateStrip.map(item => {
             const sel = selectedDate === item.iso;
             return (
@@ -296,7 +299,7 @@ export function AdvancedFootballScreen() {
         </ScrollView>
       )}
 
-      {/* Standings Total/Home/Away Toggle */}
+      {/* Standings toggle (only shown in header when inside standings ScrollView) */}
       {activeTab === 'standings' && (
         <View style={styles.standingToggleRow}>
           {(['total', 'home', 'away'] as const).map(v => (
@@ -312,21 +315,55 @@ export function AdvancedFootballScreen() {
           ))}
         </View>
       )}
+    </View>
+  );
 
-      {/* Main Content */}
+  return (
+    <View style={styles.container}>
+      {/* ── STICKY: Tab Bar only ── */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabBar}
+        contentContainerStyle={styles.tabBarContent}
+      >
+        {tabs.map(tab => {
+          const active = activeTab === tab.id;
+          return (
+            <Pressable
+              key={tab.id}
+              style={[styles.tabBtn, active && styles.tabBtnActive]}
+              onPress={() => setActiveTab(tab.id)}
+            >
+              <Ionicons name={tab.icon} size={14} color={active ? '#F8FAFC' : '#64748B'} />
+              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+              {tab.id === 'live' && (
+                <Animated.View style={[styles.liveDot, { opacity: liveDotOpacity }]} />
+              )}
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      {/* ── SCROLLABLE CONTENT ── */}
       {loading && !refreshing ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#F59E0B" />
-          <Text style={styles.loaderText}>Syncing football telemetry...</Text>
+          <GoalmillsLoader
+            size="md"
+            label="Football Live"
+            sublabel="Syncing match data & league tables..."
+          />
         </View>
       ) : (
         <>
           {/* Fixtures / Live / Results */}
           {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
             <SectionList
+              style={{ flex: 1 }}
               sections={sections}
               keyExtractor={(item, index) => `${item.event_key}-${index}`}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              ListHeaderComponent={renderScrollableHeader}
               renderSectionHeader={({ section }) => (
                 <View style={styles.sectionHeader}>
                   {section.logo ? (
@@ -358,7 +395,7 @@ export function AdvancedFootballScreen() {
                   </Text>
                 </View>
               }
-              contentContainerStyle={{ paddingBottom: 100 }}
+              contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 100 }}
               stickySectionHeadersEnabled={false}
             />
           )}
@@ -366,9 +403,11 @@ export function AdvancedFootballScreen() {
           {/* Standings Table */}
           {activeTab === 'standings' && (
             <ScrollView
+              style={{ flex: 1 }}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
               contentContainerStyle={{ paddingBottom: 100 }}
             >
+              {renderScrollableHeader()}
               <View style={styles.tableCard}>
                 {/* Header */}
                 <View style={styles.tableHeaderRow}>
@@ -382,7 +421,11 @@ export function AdvancedFootballScreen() {
                   <Text style={[styles.tableCell, styles.numCol, { color: '#FBBF24' }]}>PTS</Text>
                 </View>
                 {standings.length === 0 ? (
-                  <Text style={styles.emptyText}>No standings data for this competition.</Text>
+                  <View style={styles.emptyContainer}>
+                    <Text style={{ fontSize: 36 }}>🏆</Text>
+                    <Text style={styles.emptyTitle}>No Data</Text>
+                    <Text style={styles.emptyText}>No standings available for this competition.</Text>
+                  </View>
                 ) : (
                   standings.map((row, i) => {
                     const rank = Number(row.standing_place);
@@ -423,9 +466,11 @@ export function AdvancedFootballScreen() {
           {/* Top Scorers */}
           {activeTab === 'topscorers' && (
             <FlatList
+              style={{ flex: 1 }}
               data={topscorers}
               keyExtractor={(_, i) => String(i)}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              ListHeaderComponent={renderScrollableHeader}
               contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 8 }}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
@@ -465,9 +510,11 @@ export function AdvancedFootballScreen() {
           {/* AI Predictions */}
           {activeTab === 'predictions' && (
             <FlatList
+              style={{ flex: 1 }}
               data={probabilities}
               keyExtractor={(_, i) => String(i)}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              ListHeaderComponent={renderScrollableHeader}
               contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 10 }}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
@@ -524,19 +571,21 @@ export function AdvancedFootballScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#080E18' },
 
+  // League chips
   leagueBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   leagueBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
   leagueChip: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,255,255,0.07)',
   },
-  leagueChipActive: { backgroundColor: '#1D4ED8', borderColor: '#3B82F6' },
+  leagueChipActive: { backgroundColor: 'rgba(59,130,246,0.18)', borderColor: '#3B82F6', borderWidth: 1.5 },
   leagueChipFlag: { fontSize: 14 },
   leagueChipLabel: { fontSize: 11, fontWeight: '700', color: '#64748B' },
-  leagueChipLabelActive: { color: '#F8FAFC' },
+  leagueChipLabelActive: { color: '#93C5FD', fontWeight: '800' },
 
+  // Control bar
   controlBar: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingHorizontal: 12, paddingVertical: 8,
@@ -549,58 +598,64 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, color: '#F8FAFC', fontSize: 12 },
   refreshBtn: {
-    width: 34, height: 34, borderRadius: 10, backgroundColor: '#1D4ED8',
+    width: 34, height: 34, borderRadius: 10,
+    backgroundColor: 'rgba(59,130,246,0.15)',
+    borderWidth: 1, borderColor: 'rgba(59,130,246,0.3)',
     alignItems: 'center', justifyContent: 'center',
   },
 
-  tabBar: { flexGrow: 0 },
+  // Tab bar
+  tabBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   tabBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
   tabBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,255,255,0.07)',
   },
-  tabBtnActive: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
-  tabLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
-  tabLabelActive: { color: '#0F172A' },
-  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' },
+  tabBtnActive: { backgroundColor: 'rgba(59,130,246,0.18)', borderColor: '#3B82F6', borderWidth: 1.5 },
+  tabLabel: { fontSize: 11, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
+  tabLabelActive: { color: '#93C5FD', fontWeight: '800' },
+  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981', marginLeft: 1 },
 
+  // Date strip
   dateBar: { flexGrow: 0 },
   dateBarContent: { paddingHorizontal: 10, paddingBottom: 8, gap: 6 },
   datePill: {
-    alignItems: 'center', minWidth: 54, paddingVertical: 6, paddingHorizontal: 8,
+    alignItems: 'center', minWidth: 52, paddingVertical: 6, paddingHorizontal: 8,
     borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  datePillActive: { borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.15)' },
+  datePillActive: { borderColor: '#3B82F6', borderWidth: 1.5, backgroundColor: 'rgba(59,130,246,0.13)' },
   datePillDay: { fontSize: 9, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
   datePillNum: { fontSize: 14, fontWeight: '900', color: '#94A3B8' },
 
+  // Standing toggle
   standingToggleRow: {
     flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 8,
   },
   standingToggleBtn: {
-    flex: 1, paddingVertical: 6, alignItems: 'center', borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    flex: 1, paddingVertical: 7, alignItems: 'center', borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  standingToggleBtnActive: { backgroundColor: '#1D4ED8', borderColor: '#3B82F6' },
-  standingToggleLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  standingToggleBtnActive: { backgroundColor: 'rgba(59,130,246,0.18)', borderColor: '#3B82F6', borderWidth: 1.5 },
+  standingToggleLabel: { fontSize: 11, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
 
-  loaderContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loaderText: { color: '#64748B', fontSize: 12, fontWeight: '600' },
+  loaderContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
-  // Section Headers
+  // Section Headers — left accent bar, full-width (no horizontal padding override)
   sectionHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#080E18', paddingHorizontal: 12, paddingVertical: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#080E18', paddingHorizontal: 4, paddingVertical: 9,
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
-    marginTop: 6,
+    borderLeftWidth: 3, borderLeftColor: '#1D4ED8',
+    marginTop: 8,
+    paddingLeft: 10,
   },
   sectionLogo: { width: 18, height: 18, resizeMode: 'contain' },
-  sectionTitle: { flex: 1, fontSize: 11, fontWeight: '900', color: '#F1F5F9', textTransform: 'uppercase', letterSpacing: 0.5 },
+  sectionTitle: { flex: 1, fontSize: 11, fontWeight: '900', color: '#E2E8F0', textTransform: 'uppercase', letterSpacing: 0.6 },
   sectionLink: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  sectionLinkText: { fontSize: 11, fontWeight: '700', color: '#3B82F6' },
+  sectionLinkText: { fontSize: 11, fontWeight: '700', color: '#60A5FA' },
 
   // Standings Table
   tableCard: {
@@ -608,15 +663,15 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
   tableHeaderRow: {
-    flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
+    flexDirection: 'row', paddingVertical: 9, paddingHorizontal: 8,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)',
   },
   tableRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 8,
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)',
   },
-  tableCell: { fontSize: 10.5, color: '#94A3B8', fontFamily: 'monospace', textAlign: 'center' },
+  tableCell: { fontSize: 10.5, color: '#94A3B8', fontWeight: '500', textAlign: 'center' },
   rankCol: { width: 22, textAlign: 'center' },
   teamCol: { flex: 1, textAlign: 'left', paddingLeft: 4 },
   teamColContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 4, paddingRight: 4 },
@@ -627,9 +682,9 @@ const styles = StyleSheet.create({
   rankCell: {
     width: 20, height: 20, borderRadius: 5, alignItems: 'center', justifyContent: 'center', marginRight: 4,
   },
-  rankUCL: { backgroundColor: 'rgba(59,130,246,0.25)' },
-  rankUEL: { backgroundColor: 'rgba(245,158,11,0.25)' },
-  rankRel: { backgroundColor: 'rgba(239,68,68,0.25)' },
+  rankUCL: { backgroundColor: 'rgba(59,130,246,0.22)' },
+  rankUEL: { backgroundColor: 'rgba(245,158,11,0.22)' },
+  rankRel: { backgroundColor: 'rgba(239,68,68,0.22)' },
   rankText: { fontSize: 9.5, fontWeight: '900', color: '#94A3B8' },
 
   // Scorers
@@ -638,13 +693,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#0B1526', borderRadius: 14, padding: 12,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
   },
-  scorerRank: { width: 26, fontSize: 12, fontWeight: '900', color: '#FBBF24', fontFamily: 'monospace' },
+  scorerRank: { width: 26, fontSize: 12, fontWeight: '900', color: '#FBBF24' },
   scorerPhoto: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1E293B' },
   scorerPhotoPlaceholder: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   scorerName: { fontSize: 13, fontWeight: '800', color: '#F1F5F9' },
   scorerTeam: { fontSize: 11, color: '#64748B', marginTop: 1 },
   scorerGoals: { fontSize: 18, fontWeight: '900', color: '#34D399' },
-  scorerPens: { fontSize: 10, color: '#64748B', fontFamily: 'monospace' },
+  scorerPens: { fontSize: 10, color: '#64748B', fontWeight: '500' },
 
   // Predictions
   predCard: {
@@ -653,20 +708,20 @@ const styles = StyleSheet.create({
   },
   predHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   predLeague: { fontSize: 10, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', flex: 1 },
-  predTime: { fontSize: 10, color: '#FBBF24', fontWeight: '800', fontFamily: 'monospace' },
+  predTime: { fontSize: 10, color: '#94A3B8', fontWeight: '700' },
   predTeams: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   predTeamHome: { flex: 1, fontSize: 12, fontWeight: '800', color: '#60A5FA' },
   predVS: { fontSize: 10, color: '#475569', marginHorizontal: 8, fontWeight: '700' },
-  predTeamAway: { flex: 1, fontSize: 12, fontWeight: '800', color: '#FBBF24', textAlign: 'right' },
+  predTeamAway: { flex: 1, fontSize: 12, fontWeight: '800', color: '#F8FAFC', textAlign: 'right' },
   predBarLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  predBarLabel: { fontSize: 10, fontWeight: '800', fontFamily: 'monospace' },
+  predBarLabel: { fontSize: 10, fontWeight: '800' },
   predBar: {
     flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden',
     backgroundColor: '#1E293B', marginBottom: 10,
   },
   predMetrics: { flexDirection: 'row', gap: 16, marginBottom: 8 },
-  predMetric: { fontSize: 11, color: '#94A3B8', fontWeight: '700' },
-  predCTA: { fontSize: 10, color: '#FBBF24', fontWeight: '800', textAlign: 'right' },
+  predMetric: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },
+  predCTA: { fontSize: 10, color: '#60A5FA', fontWeight: '700', textAlign: 'right', opacity: 0.8 },
 
   // Empty
   emptyContainer: { padding: 48, alignItems: 'center' },

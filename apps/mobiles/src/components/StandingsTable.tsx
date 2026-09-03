@@ -15,11 +15,11 @@ export function StandingsTable({ standings }: StandingsTableProps) {
       case 'W':
         return COLORS.success;
       case 'D':
-        return COLORS.warning;
+        return '#F59E0B';
       case 'L':
         return COLORS.danger;
       default:
-        return COLORS.textLight;
+        return '#475569';
     }
   };
 
@@ -41,14 +41,17 @@ export function StandingsTable({ standings }: StandingsTableProps) {
           key={standing.team.id}
           style={[
             styles.row,
+            index % 2 === 0 && styles.evenRow,
             index === standings.length - 1 && styles.lastRow,
             standing.rank <= 4 && styles.championsLeagueRow,
             standing.rank === 5 && styles.europaLeagueRow,
           ]}
         >
           {/* Rank */}
-          <View style={styles.rankCell}>
-            <Text style={styles.rank}>{standing.rank}</Text>
+          <View style={[styles.rankCell, styles.rankContainer]}>
+            <Text style={[styles.rank, standing.rank <= 4 && styles.champRank, standing.rank === 5 && styles.europaRank]}>
+              {standing.rank}
+            </Text>
           </View>
 
           {/* Team */}
@@ -78,7 +81,7 @@ export function StandingsTable({ standings }: StandingsTableProps) {
 
           {/* Form */}
           <View style={styles.formCell}>
-            {standing.form?.split('').map((result, i) => (
+            {standing.form?.split('').slice(-5).map((result, i) => (
               <View key={i} style={[styles.matchDot, { backgroundColor: getFormColor(result) }]} />
             ))}
           </View>
@@ -87,22 +90,26 @@ export function StandingsTable({ standings }: StandingsTableProps) {
         </View>
       ))}
 
-      {/* Form Legend */}
+      {/* Zone Legend */}
       <View style={styles.legend}>
-        <Text style={styles.legendTitle}>Recent Form:</Text>
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
-            <View style={[styles.formDot, { backgroundColor: COLORS.success }]} />
-            <Text style={styles.legendText}>Win</Text>
+            <View style={[styles.legendBar, { backgroundColor: '#3B82F6' }]} />
+            <Text style={styles.legendText}>Champions League</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.formDot, { backgroundColor: COLORS.warning }]} />
-            <Text style={styles.legendText}>Draw</Text>
+            <View style={[styles.legendBar, { backgroundColor: '#F59E0B' }]} />
+            <Text style={styles.legendText}>Europa League</Text>
           </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.formDot, { backgroundColor: COLORS.danger }]} />
-            <Text style={styles.legendText}>Loss</Text>
-          </View>
+        </View>
+        <View style={styles.formLegend}>
+          <Text style={styles.legendTitle}>Form: </Text>
+          <View style={[styles.formDot, { backgroundColor: COLORS.success }]} />
+          <Text style={styles.legendText}>W  </Text>
+          <View style={[styles.formDot, { backgroundColor: '#F59E0B' }]} />
+          <Text style={styles.legendText}>D  </Text>
+          <View style={[styles.formDot, { backgroundColor: COLORS.danger }]} />
+          <Text style={styles.legendText}>L</Text>
         </View>
       </View>
     </View>
@@ -111,51 +118,70 @@ export function StandingsTable({ standings }: StandingsTableProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#0E1726',
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
   headerRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 31, 63, 0.8)',
-    paddingVertical: SPACING.sm,
+    backgroundColor: '#0A1220',
+    paddingVertical: 10,
     paddingHorizontal: SPACING.xs,
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(59, 130, 246, 0.3)',
+    alignItems: 'center',
   },
   headerCell: {
     fontSize: FONT_SIZES.xs,
     fontWeight: '700',
-    color: COLORS.background,
+    color: '#94A3B8',
     textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   row: {
     flexDirection: 'row',
-    paddingVertical: SPACING.sm,
+    paddingVertical: 9,
     paddingHorizontal: SPACING.xs,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
     alignItems: 'center',
+  },
+  evenRow: {
+    backgroundColor: 'rgba(255, 255, 255, 0.018)',
   },
   lastRow: {
     borderBottomWidth: 0,
   },
   championsLeagueRow: {
     borderLeftWidth: 3,
-    borderLeftColor: COLORS.secondary,
+    borderLeftColor: '#3B82F6',
   },
   europaLeagueRow: {
     borderLeftWidth: 3,
-    borderLeftColor: COLORS.warning,
+    borderLeftColor: '#F59E0B',
   },
   rankCell: {
     width: 22,
+    textAlign: 'center',
     alignItems: 'center',
+  },
+  rankContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rank: {
     fontSize: FONT_SIZES.xs,
     fontWeight: '700',
-    color: '#94A3B8',
+    color: '#64748B',
+  },
+  champRank: {
+    color: '#60A5FA',
+  },
+  europaRank: {
+    color: '#FBBF24',
   },
   teamCell: {
     flex: 1,
@@ -166,12 +192,12 @@ const styles = StyleSheet.create({
   teamLogo: {
     width: 18,
     height: 18,
-    marginRight: 6,
+    marginRight: 7,
   },
   teamName: {
     fontSize: FONT_SIZES.xs,
     fontWeight: '700',
-    color: '#F8FAFC',
+    color: '#F1F5F9',
     flex: 1,
   },
   statCell: {
@@ -180,7 +206,8 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
+    color: '#94A3B8',
+    fontWeight: '500',
   },
   pointsCell: {
     width: 32,
@@ -192,40 +219,54 @@ const styles = StyleSheet.create({
     color: '#FBBF24',
   },
   positiveGD: {
-    color: COLORS.success,
+    color: '#10B981',
+    fontWeight: '700',
   },
   negativeGD: {
-    color: COLORS.danger,
+    color: '#EF4444',
+    fontWeight: '700',
   },
   legend: {
-    padding: SPACING.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    gap: 4,
   },
   legendTitle: {
     fontSize: FONT_SIZES.xs,
     fontWeight: '600',
-    color: COLORS.background,
-    marginBottom: SPACING.xs,
+    color: '#64748B',
   },
   legendItems: {
     flexDirection: 'row',
     gap: SPACING.md,
+    marginBottom: 2,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 5,
   },
-  formDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 4,
+  legendBar: {
+    width: 10,
+    height: 3,
+    borderRadius: 2,
   },
   legendText: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
+    color: '#64748B',
+  },
+  formLegend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  formDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
   },
   formCell: {
     width: 50,

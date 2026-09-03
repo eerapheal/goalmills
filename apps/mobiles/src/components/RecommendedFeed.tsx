@@ -149,19 +149,19 @@ const styles = StyleSheet.create({
   },
   sublabel: {
     fontSize: 10,
-    color: '#94A3B8',
-    fontFamily: 'monospace',
+    color: '#64748B',
+    fontWeight: '500',
   },
   scrollContent: {
     paddingHorizontal: SPACING.md,
     gap: 12,
   },
   card: {
-    width: 220,
+    width: 200,
     borderRadius: BORDER_RADIUS.lg,
     backgroundColor: '#0F172A',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.09)',
     overflow: 'hidden',
   },
   cardPressed: {
@@ -215,9 +215,10 @@ const styles = StyleSheet.create({
   },
   sportText: {
     fontSize: 10,
-    fontWeight: '600',
-    color: '#94A3B8',
-    fontFamily: 'monospace',
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
 });
 
