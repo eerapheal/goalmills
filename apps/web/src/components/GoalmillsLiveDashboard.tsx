@@ -581,64 +581,6 @@ export function GoalmillsLiveDashboard({
           </div>
 
           {/* 4. FOOTBALL STANDINGS TABLE CARD */}
-          <div className="rounded-xl bg-[#0E1A29]/95 border border-amber-500/20 p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 backdrop-blur-md">
-            <div className="flex items-center justify-between mb-2 border-b border-white/5 pb-2">
-              <div className="flex items-center gap-1.5">
-                <FiAward className="text-amber-400 w-4 h-4" />
-                <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
-                  FOOTBALL TABLE
-                </h3>
-              </div>
-              <span className="text-xs font-semibold text-slate-400">EPL</span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="border-b border-white/10 uppercase text-[11px] text-slate-400 font-mono">
-                  <tr>
-                    <th className="py-2 px-2">#</th>
-                    <th className="py-2 px-3">Club</th>
-                    <th className="py-2 px-2.5 text-center">P</th>
-                    <th className="py-2 px-2.5 text-center">W</th>
-                    <th className="py-2 px-2.5 text-center">D</th>
-                    <th className="py-2 px-2.5 text-center">L</th>
-                    <th className="py-2 px-2.5 text-center">GD</th>
-                    <th className="py-2 px-3 text-right">PTS</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5 font-mono">
-                  {liveStandings.map((team, idx) => (
-                    <tr
-                      key={team.name}
-                      className={idx === 0 ? "bg-amber-500/10" : "hover:bg-white/5"}
-                    >
-                      <td className="py-2 px-2 font-bold text-slate-400">
-                        {team.rank}
-                      </td>
-                      <td className="py-2 px-3 font-bold text-white font-sans">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-full bg-blue-600/40 flex items-center justify-center text-[9px] font-black font-mono">
-                            {team.code}
-                          </span>
-                          <span className={idx === 0 ? "text-amber-400 font-black" : "truncate max-w-[90px] sm:max-w-none"}>
-                            {team.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-2 px-2.5 text-center">{team.p}</td>
-                      <td className="py-2 px-2.5 text-center text-emerald-400">{team.w}</td>
-                      <td className="py-2 px-2.5 text-center text-slate-400">{team.d}</td>
-                      <td className="py-2 px-2.5 text-center text-rose-400">{team.l}</td>
-                      <td className="py-2 px-2.5 text-center">{team.gd}</td>
-                      <td className="py-2 px-3 text-right font-black text-amber-400">
-                        {team.pts}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
 
           {/* 5. VIDEO HIGHLIGHTS CARD */}
           <div className="rounded-xl bg-[#0E1A29]/95 border border-amber-500/20 p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 backdrop-blur-md">

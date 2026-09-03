@@ -61,7 +61,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     await dbConnect();
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findOne({
+      $or: [{ _id: id }, { userId: id }],
+    });
 
     if (!employee) {
       return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
@@ -74,7 +76,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       (employee.userId && employee.userId.toString() === session.user.id) ||
       (employee.email &&
         session.user.email &&
-        employee.email.toLowerCase() === session.user.email.toLowerCase());
+        employee.email.trim().toLowerCase() === session.user.email.trim().toLowerCase()) ||
+      (employee._id.toString() === id && session.user.role !== 'user');
 
     if (!isManagerOrAdmin && !isSelf) {
       return NextResponse.json(

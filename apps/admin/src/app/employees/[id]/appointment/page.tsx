@@ -13,6 +13,8 @@ import {
   FiShield,
   FiFileText,
   FiDownload,
+  FiCopy,
+  FiCheck,
 } from 'react-icons/fi';
 
 export default function AppointmentLetterPage({ params }: { params: Promise<{ id: string }> }) {
@@ -24,6 +26,7 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const fetchAppointment = async () => {
     try {
@@ -107,11 +110,19 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
     );
   }
 
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 py-8 px-4 sm:px-6 pt-[85px] sm:pt-[95px] text-slate-100 print:bg-white print:text-black print:p-0 print:pt-0">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Top Actions Bar (Hidden when printing) */}
-        <div className="flex items-center justify-between glass-card p-4 rounded-2xl border border-white/10 print:hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-card p-4 rounded-2xl border border-white/10 print:hidden">
           <Link
             href={`/admin/employees/${id}`}
             className="inline-flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white"
@@ -119,7 +130,15 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
             <FiArrowLeft size={14} /> Back to Employee Profile
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={handleCopyLink}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs border border-white/10 transition-all active:scale-95"
+              title="Copy direct contract signing URL to share with employee"
+            >
+              {copiedLink ? <FiCheck size={14} className="text-emerald-400" /> : <FiCopy size={14} />}
+              <span>{copiedLink ? 'Link Copied!' : 'Copy Direct Link'}</span>
+            </button>
             <a
               href={`/api/admin/employees/${id}/appointment/pdf`}
               download
@@ -133,7 +152,7 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all"
             >
               <FiPrinter size={14} />
-              <span>Print / Save PDF</span>
+              <span>Print</span>
             </button>
           </div>
         </div>

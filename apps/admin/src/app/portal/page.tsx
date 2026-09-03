@@ -320,11 +320,32 @@ export default function StaffPortalPage() {
                   href={`/admin/employees/${currentEmployee._id}/appointment`}
                   className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1 mt-0.5"
                 >
-                  <span>{currentEmployee.appointmentSigned ? '✓ Signed' : 'Sign Now'}</span>
+                  <span>{currentEmployee.appointmentSigned ? '✓ Signed & Active' : 'Sign Now'}</span>
                   <FiExternalLink size={11} />
                 </Link>
               </div>
             </div>
+
+            {/* Unsigned Contract Alert Banner */}
+            {!currentEmployee.appointmentSigned && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                    <FiAlertCircle size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">Action Required: Official Appointment Letter Unsigned</p>
+                    <p className="text-[11px] text-slate-300">Please review and digitally sign your official employment & training contract.</p>
+                  </div>
+                </div>
+                <Link
+                  href={`/admin/employees/${currentEmployee._id}/appointment`}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md hover:from-amber-400 hover:to-amber-500 transition-all text-center flex-shrink-0"
+                >
+                  Sign Contract Now &rarr;
+                </Link>
+              </div>
+            )}
           </div>
         )}
 

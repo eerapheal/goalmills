@@ -20,7 +20,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     await dbConnect();
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findOne({
+      $or: [{ _id: id }, { userId: id }],
+    });
 
     if (!employee) {
       return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
@@ -33,7 +35,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       (employee.userId && employee.userId.toString() === session.user.id) ||
       (employee.email &&
         session.user.email &&
-        employee.email.toLowerCase() === session.user.email.toLowerCase());
+        employee.email.trim().toLowerCase() === session.user.email.trim().toLowerCase()) ||
+      (employee._id.toString() === id && session.user.role !== 'user');
 
     if (!isManagerOrAdmin && !isSelf) {
       return NextResponse.json(
@@ -43,6 +46,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         },
         { status: 403 }
       );
+    }
+
+    // If staff user is viewing their own contract and userId is not yet linked, link it now
+    if (!employee.userId && session.user.id && isSelf) {
+      await Employee.findByIdAndUpdate(employee._id, { $set: { userId: session.user.id } });
     }
 
     const appointmentData: AppointmentLetterData = {
@@ -93,7 +101,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     await dbConnect();
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findOne({
+      $or: [{ _id: id }, { userId: id }],
+    });
     if (!employee) {
       return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
     }
@@ -105,7 +115,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       (employee.userId && employee.userId.toString() === session.user.id) ||
       (employee.email &&
         session.user.email &&
-        employee.email.toLowerCase() === session.user.email.toLowerCase());
+        employee.email.trim().toLowerCase() === session.user.email.trim().toLowerCase()) ||
+      (employee._id.toString() === id && session.user.role !== 'user');
 
     if (!isManagerOrAdmin && !isSelf) {
       return NextResponse.json(
@@ -128,15 +139,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const cleanSignature = sanitizeHtml(body.employeeSignature);
     const signedAt = new Date().toLocaleDateString('en-GB');
 
+    const updateFields: any = {
+      appointmentSigned: true,
+      appointmentSignedAt: signedAt,
+      employeeSignature: cleanSignature,
+    };
+
+    if (!employee.userId && session?.user?.id) {
+      updateFields.userId = session.user.id;
+    }
+
     const updatedEmployee = await Employee.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          appointmentSigned: true,
-          appointmentSignedAt: signedAt,
-          employeeSignature: cleanSignature,
-        },
-      },
+      employee._id,
+      { $set: updateFields },
       { new: true }
     );
 
