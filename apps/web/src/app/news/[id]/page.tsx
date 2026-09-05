@@ -105,7 +105,11 @@ export async function generateMetadata({
 
   const decoded = decodeURIComponent(id);
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
-  const query = isObjectId ? { $or: [{ _id: decoded }, { slug: decoded }] } : { slug: decoded };
+  // Only serve published articles (or legacy docs without a status field)
+  const statusFilter = { $or: [{ status: 'published' }, { status: { $exists: false } }] };
+  const query = isObjectId
+    ? { $and: [{ $or: [{ _id: decoded }, { slug: decoded }] }, statusFilter] }
+    : { $and: [{ slug: decoded }, statusFilter] };
 
   let news: any = await News.findOne(query)
     .select('title slug excerpt image author createdAt category tags competition')
@@ -114,10 +118,15 @@ export async function generateMetadata({
   if (!news && !isObjectId) {
     const slugClean = decoded.replace(/-/g, ' ');
     news = await News.findOne({
-      $or: [
-        { slug: decoded },
-        { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
-        { title: { $regex: new RegExp(slugClean, 'i') } },
+      $and: [
+        {
+          $or: [
+            { slug: decoded },
+            { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+            { title: { $regex: new RegExp(slugClean, 'i') } },
+          ],
+        },
+        statusFilter,
       ],
     })
       .select('title slug excerpt image author createdAt category tags competition')
@@ -179,17 +188,26 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
   const decoded = decodeURIComponent(id);
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
-  const query = isObjectId ? { $or: [{ _id: decoded }, { slug: decoded }] } : { slug: decoded };
+  // Only serve published articles (or legacy docs without a status field)
+  const statusFilter = { $or: [{ status: 'published' }, { status: { $exists: false } }] };
+  const query = isObjectId
+    ? { $and: [{ $or: [{ _id: decoded }, { slug: decoded }] }, statusFilter] }
+    : { $and: [{ slug: decoded }, statusFilter] };
 
   let news: any = await News.findOne(query).lean();
 
   if (!news && !isObjectId) {
     const slugClean = decoded.replace(/-/g, ' ');
     news = await News.findOne({
-      $or: [
-        { slug: decoded },
-        { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
-        { title: { $regex: new RegExp(slugClean, 'i') } },
+      $and: [
+        {
+          $or: [
+            { slug: decoded },
+            { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+            { title: { $regex: new RegExp(slugClean, 'i') } },
+          ],
+        },
+        statusFilter,
       ],
     }).lean();
   }

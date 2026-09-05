@@ -21,7 +21,7 @@ export default async function NewsPage() {
   try {
     await dbConnect();
     const [newsDocs, catDocs] = await Promise.all([
-      News.find({}).sort({ createdAt: -1 }).lean(),
+      News.find({ $or: [{ status: 'published' }, { status: { $exists: false } }] }).sort({ createdAt: -1 }).lean(),
       Category.find({}).sort({ order: 1, createdAt: 1 }).lean(),
     ]);
 
