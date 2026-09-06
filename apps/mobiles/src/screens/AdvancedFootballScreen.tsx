@@ -234,6 +234,31 @@ export function AdvancedFootballScreen() {
         onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
       />
 
+      {/* Football Hub Quick Navigation Ribbon */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.featuresBar}
+        contentContainerStyle={styles.featuresBarContent}
+      >
+        {[
+          { label: 'Referees & VAR', icon: '🚩', path: '/home/football/officials' },
+          { label: 'Managers', icon: '🧑‍💼', path: '/home/football/coaches' },
+          { label: 'Superstars', icon: '⭐', path: '/home/football/players' },
+          { label: 'Clubs Hub', icon: '🛡️', path: '/home/football/teams' },
+          { label: '80+ Leagues', icon: '🏆', path: '/home/football/leagues' },
+        ].map((f) => (
+          <Pressable
+            key={f.label}
+            onPress={() => router.push(f.path as any)}
+            style={styles.featurePill}
+          >
+            <Text style={styles.featurePillEmoji}>{f.icon}</Text>
+            <Text style={styles.featurePillLabel}>{f.label}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+
       {/* Competition Switcher */}
       {showLeaguePicker && (
         <ScrollView
@@ -727,4 +752,33 @@ const styles = StyleSheet.create({
   emptyContainer: { padding: 48, alignItems: 'center' },
   emptyTitle: { fontSize: 16, fontWeight: '900', color: '#F8FAFC', marginTop: 8, marginBottom: 4 },
   emptyText: { fontSize: 12, color: '#475569', textAlign: 'center' },
+
+  // Features Quick Ribbon
+  featuresBar: {
+    backgroundColor: '#070D18',
+    paddingVertical: 8,
+  },
+  featuresBarContent: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  featurePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0C1728',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.25)',
+    gap: 6,
+  },
+  featurePillEmoji: {
+    fontSize: 14,
+  },
+  featurePillLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#E2E8F0',
+  },
 });

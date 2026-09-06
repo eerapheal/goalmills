@@ -8,7 +8,7 @@ function TabIcon({
   focused,
 }: {
   name: React.ComponentProps<typeof Ionicons>['name'];
-  color: string;
+  color: any;
   focused: boolean;
 }) {
   return (

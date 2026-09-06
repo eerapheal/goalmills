@@ -13,3 +13,5 @@ export { NewsCard } from './NewsCard';
 export { FootballMatchCard } from './FootballMatchCard';
 export { TacticalPitch } from './TacticalPitch';
 export { MatchOddsModal } from './MatchOddsModal';
+export { OfficialImage } from './OfficialImage';
+export { CoachImage } from './CoachImage';
