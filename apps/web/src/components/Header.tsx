@@ -60,8 +60,10 @@ export function Header() {
                 </span>
                 <span className="text-white ml-0.5">MILLS</span>
               </h1>
-              <p className="text-[9px] font-bold text-blue-400 tracking-wider uppercase mt-0.5">
-                Live Scores & Sports News
+              <p className="text-[9px] font-bold tracking-wider uppercase mt-0.5 flex items-center gap-1">
+                <span className="text-amber-400 font-black">Africa</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-blue-300">Live Football 2026/2027</span>
               </p>
             </div>
           </Link>
