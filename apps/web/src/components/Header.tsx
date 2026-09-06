@@ -132,6 +132,10 @@ export function Header() {
               {[
                 { name: 'Live Scores', href: '/', icon: '🔴' },
                 { name: 'Football Hub', href: '/football', icon: '⚽' },
+                { name: 'Players', href: '/football/players', icon: '⭐' },
+                { name: 'Referees & VAR', href: '/football/officials', icon: '🚩' },
+                { name: 'Managers', href: '/football/coaches', icon: '🧑‍💼' },
+                { name: 'Teams & Clubs', href: '/football/teams', icon: '🛡️' },
                 { name: 'Cricket Desk', href: '/cricket', icon: '🏏' },
                 { name: 'Basketball Hub', href: '/basketball', icon: '🏀' },
                 { name: 'News & Pulse', href: '/news', icon: '📰' },

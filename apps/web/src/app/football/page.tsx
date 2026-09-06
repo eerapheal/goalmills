@@ -166,6 +166,58 @@ export default async function FootballHubPage() {
             </Link>
           </div>
 
+          {/* Match Officials & VAR Desk */}
+          <div className="rounded-3xl border border-amber-500/25 bg-gradient-to-br from-[#09152B] to-[#070F1E] p-5 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <span className="text-amber-400">🚩</span>
+                <span>Match Officials & VAR</span>
+              </h3>
+              <Link
+                href="/football/officials"
+                className="text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline"
+              >
+                Explore →
+              </Link>
+            </div>
+            <p className="text-xs text-slate-300">
+              Foul tolerances, cards per game, penalty award ratios, and VAR overturn precision across 14+ elite referees.
+            </p>
+            <Link
+              href="/football/officials"
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 font-bold text-xs uppercase tracking-wider border border-amber-500/30 transition-all"
+            >
+              <span>Inspect Match Officials</span>
+              <FiArrowRight size={13} />
+            </Link>
+          </div>
+
+          {/* World-Class Managers & Tactics */}
+          <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#09152B] to-[#070F1E] p-5 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <span>🧑‍💼</span>
+                <span>Tacticians & Managers</span>
+              </h3>
+              <Link
+                href="/football/coaches"
+                className="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline"
+              >
+                Explore →
+              </Link>
+            </div>
+            <p className="text-xs text-slate-300">
+              Preferred systems, win percentages, pressing styles, and trophy cabinets for top European managers.
+            </p>
+            <Link
+              href="/football/coaches"
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-blue-200 font-bold text-xs uppercase tracking-wider transition-all"
+            >
+              <span>Browse Elite Managers</span>
+              <FiArrowRight size={13} />
+            </Link>
+          </div>
+
           {/* VIP Football Newsletter Box */}
           <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-b from-[#0E1E38] to-[#081224] p-5 space-y-3 shadow-xl">
             <div className="flex items-center gap-2 text-amber-400 font-black text-xs uppercase tracking-wider">
