@@ -19,6 +19,7 @@ import {
   FiZap,
 } from 'react-icons/fi';
 import Link from 'next/link';
+import { getNewsUrl } from '@/lib/slugUtils';
 import type { SearchResponse, SearchResultItem, SearchSuggestionItem } from '@goalmills/types';
 
 function SearchPortalContent() {
@@ -366,7 +367,7 @@ function SearchPortalContent() {
               {searchData.results.map((item) => (
                 <Link
                   key={`${item.entityType}_${item.id}`}
-                  href={item.url || `/news/${item.slug || item.id}`}
+                  href={item.url || getNewsUrl(item)}
                   className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 hover:border-amber-500/40 flex flex-col sm:flex-row items-start gap-4 transition-all group block"
                 >
                   {item.image && (

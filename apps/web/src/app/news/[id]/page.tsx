@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import dbConnect from '@/lib/db';
 import News from '@/models/News';
 import Category from '@/models/Category';
@@ -216,6 +216,17 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
+  // Canonical SEO redirect: If accessed via ObjectId or ID rather than title slug, redirect to title slug URL
+  const canonicalSlug = news.slug || (news.title ? slugify(news.title) : '');
+  if (canonicalSlug && decoded !== canonicalSlug && (isObjectId || decoded === news._id.toString())) {
+    permanentRedirect(`/news/${canonicalSlug}`);
+  }
+
+  // If news document is missing a slug in DB, persist canonical slug
+  if (!news.slug && canonicalSlug) {
+    News.updateOne({ _id: news._id }, { $set: { slug: canonicalSlug } }).catch(() => {});
+  }
+
   const currentDocId = news._id.toString();
 
   const categoryDoc: any = await Category.findOne({
@@ -303,20 +314,22 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     url: getNewsUrl(news),
   });
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
+  const effectiveSlug = canonicalSlug || currentDocId;
+  const articleUrl = `${baseUrl}/news/${effectiveSlug}`;
+
   const articleJsonLd = generateArticleSchema({
-    id: news._id.toString(),
+    id: currentDocId,
     title: news.title,
+    slug: canonicalSlug,
     excerpt: news.excerpt,
     image: news.image,
     createdAt: news.createdAt,
     updatedAt: news.updatedAt,
     authorName: news.author,
     authorUrl: news.authorSlug ? `/authors/${news.authorSlug}` : undefined,
+    url: articleUrl,
   });
-
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
-  const canonicalSlug = news.slug || (news.title ? slugify(news.title) : '') || currentDocId;
-  const articleUrl = `${baseUrl}/news/${canonicalSlug}`;
 
   return (
     <main className="min-h-screen bg-[#070B12] text-white selection:bg-blue-500/30 overflow-x-hidden pt-24 pb-20">

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { BasketballMatchCard } from './BasketballMatchCard';
 import { webBasketballApiService, ApiBasketballGameItem } from '../services/basketballApi';
 import { GoalmillsLoader } from './GoalmillsLoader';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 import { FiRefreshCw, FiSearch, FiCalendar, FiAward, FiActivity } from 'react-icons/fi';
 
 type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
@@ -37,6 +38,7 @@ export function BasketballScreen() {
             const formatted = items.map((item: any) => ({
               id: item._id || item.id,
               _id: item._id || item.id,
+              slug: item.slug || (item.title ? slugify(item.title) : undefined),
               tag: (item.competition || item.category || item.tags?.[0] || 'BASKETBALL').toUpperCase(),
               title: item.title,
               time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
@@ -60,7 +62,7 @@ export function BasketballScreen() {
   }, [pulseNews.length]);
 
   const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
-  const pulseLink = currentPulse?.id || currentPulse?._id ? `/news/${currentPulse.id || currentPulse._id}` : '/news';
+  const pulseLink = getNewsUrl(currentPulse);
 
   // 7-day date slider
   const dateStrip = useMemo(() => {

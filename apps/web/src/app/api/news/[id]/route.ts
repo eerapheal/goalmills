@@ -28,7 +28,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       ? { $or: [{ _id: decodedId }, { slug: decodedId }] }
       : { slug: decodedId };
 
-    const news = await News.findOne(query).lean();
+    let news: any = await News.findOne(query).lean();
+    if (!news && !isObjectId) {
+      const slugClean = decodedId.replace(/-/g, ' ');
+      news = await News.findOne({
+        $or: [
+          { slug: decodedId },
+          { title: { $regex: new RegExp(`^${decodedId.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+          { title: { $regex: new RegExp(slugClean, 'i') } },
+        ],
+      }).lean();
+    }
     if (!news) return NextResponse.json({ message: 'News not found' }, { status: 404 });
 
     await cacheSet(cacheKey, news, 300);

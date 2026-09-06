@@ -1,4 +1,5 @@
 import { EntityBreadcrumbItem } from '@goalmills/types';
+import { slugify } from '../slugUtils';
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
 export const SITE_NAME = 'GoalMills';
@@ -27,6 +28,7 @@ export function generateBreadcrumbSchema(items: EntityBreadcrumbItem[]) {
 export function generateArticleSchema(article: {
   id: string;
   title: string;
+  slug?: string;
   excerpt?: string;
   image?: string;
   createdAt: string;
@@ -35,7 +37,8 @@ export function generateArticleSchema(article: {
   authorUrl?: string;
   url?: string;
 }) {
-  const fullUrl = article.url || `${SITE_URL}/news/${article.id}`;
+  const canonicalSlug = article.slug || slugify(article.title) || article.id;
+  const fullUrl = article.url || `${SITE_URL}/news/${canonicalSlug}`;
   return {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',

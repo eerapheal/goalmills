@@ -3,6 +3,7 @@ import News from '@/models/News';
 import Video from '@/models/Video';
 import NewsletterCampaign from '@/models/NewsletterCampaign';
 import { cacheGet, cacheSet } from '@/lib/redisCache';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 import type {
   SearchFilterOptions,
   SearchResponse,
@@ -130,8 +131,8 @@ export class SearchService {
           entityType: 'article',
           title: art.title,
           snippet: art.excerpt || '',
-          slug: art.slug,
-          url: `/news/${art.slug || art._id}`,
+          slug: art.slug || (art.title ? slugify(art.title) : undefined),
+          url: getNewsUrl(art),
           image: art.image,
           sport: art.sport,
           competition: art.competition,
@@ -279,7 +280,7 @@ export class SearchService {
         title: art.title,
         type: 'article',
         subtitle: `${art.sport || 'Sports'} • ${art.category || 'News'}`,
-        slug: art.slug,
+        slug: art.slug || (art.title ? slugify(art.title) : undefined),
         sport: art.sport,
         image: art.image,
       });

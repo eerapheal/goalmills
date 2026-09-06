@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { getNewsUrl } from '@/lib/slugUtils';
 import { FiTrendingUp, FiPlay, FiMail, FiArrowRight, FiClock, FiCheck } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
 
@@ -275,7 +276,7 @@ export function SportsPulseNewsSection() {
           <div className="lg:col-span-7 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
               {filteredArticles.map((article) => {
-                const articleUrl = article.slug || article.id ? `/news/${article.slug || article.id}` : '/news';
+                const articleUrl = getNewsUrl(article);
                 return (
                   <Link
                     href={articleUrl}

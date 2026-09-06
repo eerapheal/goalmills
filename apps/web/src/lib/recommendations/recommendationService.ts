@@ -3,6 +3,7 @@ import News from '@/models/News';
 import Video from '@/models/Video';
 import RecommendationConfig from '@/models/RecommendationConfig';
 import { cacheGet, cacheSet } from '@/lib/redisCache';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 import type {
   RecommendationCandidate,
   RecommendationContext,
@@ -162,8 +163,8 @@ export const recommendationService = {
           id: art._id.toString(),
           type: 'article',
           title: art.title,
-          slug: art.slug || art._id.toString(),
-          url: `/news/${art.slug || art._id}`,
+          slug: art.slug || (art.title ? slugify(art.title) : art._id.toString()),
+          url: getNewsUrl(art),
           image: art.image,
           sportSlug: art.sportSlug || art.sport,
           categorySlug: art.categorySlug || art.category,

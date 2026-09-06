@@ -12,6 +12,7 @@ import {
 import { CricketMatchCard } from './CricketMatchCard';
 import { GoalmillsLoader } from './GoalmillsLoader';
 import Link from 'next/link';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 type CricketTab = 'live' | 'upcoming' | 'results' | 'standings' | 'series' | 'teams';
 type FormatFilter = 'all' | 'international' | 'franchise' | 'domestic' | 'women';
@@ -44,6 +45,7 @@ export function CricketScreen() {
             const formatted = items.map((item: any) => ({
               id: item._id || item.id,
               _id: item._id || item.id,
+              slug: item.slug || (item.title ? slugify(item.title) : undefined),
               tag: (item.competition || item.category || item.tags?.[0] || 'CRICKET').toUpperCase(),
               title: item.title,
               time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
@@ -67,7 +69,7 @@ export function CricketScreen() {
   }, [pulseNews.length]);
 
   const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
-  const pulseLink = currentPulse?.id || currentPulse?._id ? `/news/${currentPulse.id || currentPulse._id}` : '/news';
+  const pulseLink = getNewsUrl(currentPulse);
 
   const [liveMatches, setLiveMatches] = useState<CricketEvent[]>([]);
   const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
