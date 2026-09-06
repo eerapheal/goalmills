@@ -9,6 +9,7 @@ import { ContentHubLayout } from '@/components/ContentHubLayout';
 import { EntityHeader } from '@/components/EntityHeader';
 import { RelatedArticlesMatrix } from '@/components/RelatedArticlesMatrix';
 import { TransferCenterCard } from '@/components/TransferCenterCard';
+import { PlayerImage } from '@/components/players/PlayerImage';
 import { generatePersonSchema } from '@/lib/seo/schemaGenerator';
 import {
   FiAward,
@@ -131,7 +132,7 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
       <ContentHubLayout
         breadcrumbs={[
           { name: 'Football', url: '/football' },
-          { name: 'Players', url: '/football' },
+          { name: 'Players Hub', url: '/football/players' },
           { name: player.name, url: `/players/${player.slug}` },
         ]}
         header={
@@ -284,22 +285,19 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
     <ContentHubLayout
       breadcrumbs={[
         { name: 'Football', url: '/football' },
-        { name: 'Players', url: '/football' },
+        { name: 'Players Hub', url: '/football/players' },
         { name: p.player_name, url: `/players/${p.player_key || slug}` },
       ]}
       header={
         <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-[#0B1728] via-[#0E1E38] to-[#070F1E] p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="relative h-28 w-28 rounded-3xl bg-slate-900 border-2 border-white/10 p-2 overflow-hidden shadow-2xl flex items-center justify-center">
-              {p.player_image ? (
-                <img
-                  src={p.player_image}
-                  alt={p.player_name}
-                  className="h-full w-full object-cover rounded-2xl"
-                />
-              ) : (
-                <span className="text-5xl">👤</span>
-              )}
+              <PlayerImage
+                src={p.player_image}
+                alt={p.player_name}
+                size={100}
+                rounded="rounded-2xl"
+              />
             </div>
 
             <div className="space-y-2 text-center sm:text-left flex-1">

@@ -16,6 +16,7 @@ import {
   FiAward,
   FiActivity,
   FiMail,
+  FiUsers,
 } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
@@ -137,6 +138,32 @@ export default async function FootballHubPage() {
                 </Link>
               ))}
             </div>
+          </div>
+
+          {/* Superstars & Players Hub Quick Link */}
+          <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#09152B] to-[#070F1E] p-5 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <FiUsers className="text-amber-400" />
+                <span>Superstars & Players</span>
+              </h3>
+              <Link
+                href="/football/players"
+                className="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline"
+              >
+                Explore →
+              </Link>
+            </div>
+            <p className="text-xs text-slate-300">
+              Browse 2025/2026 performance ratings, season goals, assist metrics, and head-to-head comparison intel.
+            </p>
+            <Link
+              href="/football/players"
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-blue-200 font-bold text-xs uppercase tracking-wider transition-all"
+            >
+              <span>Explore 26+ Superstars</span>
+              <FiArrowRight size={13} />
+            </Link>
           </div>
 
           {/* VIP Football Newsletter Box */}

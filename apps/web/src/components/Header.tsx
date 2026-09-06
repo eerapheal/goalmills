@@ -27,6 +27,7 @@ export function Header() {
   const navItems = [
     { name: 'Live Scores', href: '/' },
     { name: 'Football', href: '/football' },
+    { name: 'Players', href: '/football/players' },
     { name: 'Cricket', href: '/cricket' },
     { name: 'Basketball', href: '/basketball' },
     { name: 'News', href: '/news' },
