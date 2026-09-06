@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiShield, FiMapPin, FiAward, FiTrendingUp, FiGlobe } from 'react-icons/fi';
@@ -46,6 +47,8 @@ export function EntityHeader({
   onTabChange,
   actionButton,
 }: EntityHeaderProps) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c172e] via-[#091122] to-[#060b18] p-6 sm:p-8 shadow-2xl backdrop-blur-xl mb-8">
       {/* Background Glow */}
@@ -58,13 +61,19 @@ export function EntityHeader({
           <div className="flex items-center gap-5 sm:gap-6">
             {image && (
               <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-white/[0.04] border border-white/10 p-2.5 shadow-xl flex-shrink-0 flex items-center justify-center overflow-hidden">
-                <Image
-                  src={image}
-                  alt={title}
-                  width={96}
-                  height={96}
-                  className="object-contain max-h-full max-w-full drop-shadow-md"
-                />
+                {!imgError ? (
+                  <Image
+                    src={image}
+                    alt={title}
+                    width={96}
+                    height={96}
+                    className="object-contain max-h-full max-w-full drop-shadow-md"
+                    onError={() => setImgError(true)}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="text-3xl select-none">{flag || '🏆'}</div>
+                )}
               </div>
             )}
 

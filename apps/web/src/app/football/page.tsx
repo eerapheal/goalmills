@@ -19,7 +19,7 @@ import {
 } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
-import { getCompetitionsByCategory } from '@/lib/competitionCategories';
+import { AllMajorCompetitionsSection } from '@/components/competitions/AllMajorCompetitionsSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,7 +71,6 @@ export default async function FootballHubPage() {
     console.error('Error loading football hub data:', err);
   }
 
-  const competitionGroups = getCompetitionsByCategory();
   const topTransfers = EntityService.getTransfers().slice(0, 3);
   const featuredClubs = Object.values(CLUBS_REGISTRY).slice(0, 8);
 
@@ -168,50 +167,8 @@ export default async function FootballHubPage() {
         <FootballScreen />
       </section>
 
-      {/* ─── All 80 Major Competitions Grid ─────────────────────────────── */}
-      <section className="pt-6 border-t border-white/10 space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
-            <FiAward className="text-amber-400" />
-            <span>All Major Competitions</span>
-          </h2>
-        </div>
-
-        {competitionGroups.map((group) => (
-          <div key={group.category} className="space-y-3">
-            <h3 className="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-2">
-              <span>{group.icon}</span>
-              <span>{group.label}</span>
-              <span className="text-[10px] text-slate-500 font-mono">({group.competitions.length})</span>
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-              {group.competitions.map((comp) => (
-                <Link
-                  key={comp.slug}
-                  href={`/football/${comp.slug}`}
-                  className="group flex items-center gap-2.5 p-2.5 rounded-xl bg-[#0B1526]/50 border border-white/5 hover:border-blue-500/30 hover:bg-blue-600/10 transition-all"
-                >
-                  <div className="relative h-8 w-8 rounded-lg bg-white/5 border border-white/10 p-1 flex items-center justify-center shrink-0 group-hover:border-blue-400 transition-colors">
-                    <Image
-                      src={comp.logo}
-                      alt={comp.name}
-                      width={22}
-                      height={22}
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="text-[11px] font-bold text-white group-hover:text-blue-400 transition-colors truncate">
-                      {comp.name}
-                    </h4>
-                    <p className="text-[9px] text-slate-500 truncate">{comp.flag} {comp.country}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
-      </section>
+      {/* ─── All Major Competitions Interactive Section & Dropdown ─────────────────────────────── */}
+      <AllMajorCompetitionsSection />
 
       {/* Featured Articles Grid */}
       {featuredArticles.length > 0 && (

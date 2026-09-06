@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { CompetitionLogo } from '@/components/competitions/CompetitionLogo';
 import { ContentHubLayout } from '@/components/ContentHubLayout';
 import { EntityService } from '@/lib/entityService';
 import { FootballStandingsTable } from '@/components/FootballStandingsTable';
@@ -146,12 +147,10 @@ export default async function StatsHubPage() {
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="h-7 w-7 rounded-lg bg-slate-900 border border-white/10 p-1 flex items-center justify-center">
-                      <Image
+                      <CompetitionLogo
                         src={comp.logo}
                         alt={comp.name}
-                        width={20}
-                        height={20}
-                        className="object-contain"
+                        size={20}
                       />
                     </div>
                     <span className="group-hover:text-amber-300 transition-colors">{comp.name}</span>
