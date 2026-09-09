@@ -62,7 +62,11 @@ export const COMPETITION_CATEGORY_LABELS: Record<CompetitionCategory, { label: s
 
 /**
  * Full 75-competition registry with verified, 100% valid CDN logo URLs
+<<<<<<< HEAD
  * Season Active Campaign
+=======
+ * 2026/2027 Season Active Campaign
+>>>>>>> 4fbf9aa530b2ef2239be014081eccf1113a7416f
  */
 export const ALL_COMPETITIONS: CompetitionEntry[] = [
   // ─── Africa (CAF & Major National Leagues) ──────────────────────────────────

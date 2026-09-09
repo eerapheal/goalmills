@@ -124,7 +124,6 @@ export function AfricanFootballHeroSpotlight({
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-center">
               <span className="block text-lg sm:text-xl font-black text-blue-400 font-mono">
-
               </span>
               <span className="text-[10px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Active Season
