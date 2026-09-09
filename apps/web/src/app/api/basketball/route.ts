@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cacheGet, cacheSet, singleFlight } from '@/lib/redisCache';
+import { broadcastLiveScore } from '@/lib/socketBroadcaster';
 
 let rateLimitBackoffUntil = 0;
 let consecutiveFailures = 0;
 let circuitBreakerOpenUntil = 0;
 
+// Rate-limit spacer: ensures minimum 250ms spacing between outbound upstream fetches
 let lastFetchTime = 0;
 const MIN_FETCH_GAP_MS = 250;
 
@@ -35,30 +37,169 @@ function getApiBaseUrl(): string {
 }
 
 const API_KEY =
+  process.env.ALLSPORTS_API_KEY ||
   process.env.BASKETBALL_API_KEY ||
   process.env.NEXT_PUBLIC_BASKETBALL_API_KEY ||
-  process.env.ALLSPORTS_API_KEY ||
-  '';
+  '95c9b0311d4bfef71b062bb07cf0186dd20a77ac34160b0c2d1a0c24f3c4a008';
 
+/**
+ * Dynamically map and normalize generic/query parameters to AllSportsAPI Basketball v2.0 exact format
+ */
+function normalizeMethodAndParams(
+  method: string,
+  searchParams: URLSearchParams
+): { normalizedMethod: string; params: Record<string, string> } {
+  const m = (method || '').toLowerCase().trim();
+  const params: Record<string, string> = {};
+
+  // Copy existing query params
+  searchParams.forEach((value, key) => {
+    if (key !== 'met' && key !== 'APIkey' && value !== undefined && value !== null && value !== '') {
+      params[key] = value;
+    }
+  });
+
+  let normalizedMethod = 'Livescore';
+
+  if (m === 'livescore' || m === 'live' || (m === 'fixtures' && searchParams.get('live'))) {
+    normalizedMethod = 'Livescore';
+    delete params.live;
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (params.country) {
+      params.countryId = params.country;
+      delete params.country;
+    }
+    if (params.match) {
+      params.matchId = params.match;
+      delete params.match;
+    }
+  } else if (m === 'fixtures' || m === 'fixture' || m === 'games') {
+    normalizedMethod = 'Fixtures';
+    // If single date is passed (YYYY-MM-DD), set from and to
+    if (params.date) {
+      params.from = params.date;
+      params.to = params.date;
+      delete params.date;
+    } else if (!params.from && !params.to && !params.matchId && !params.id) {
+      // Default to today if neither date range nor specific matchId is requested
+      const today = new Date().toISOString().split('T')[0];
+      params.from = today;
+      params.to = today;
+    }
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (params.team) {
+      params.teamId = params.team;
+      delete params.team;
+    }
+    if (params.id || params.match) {
+      params.matchId = params.id || params.match;
+      delete params.id;
+      delete params.match;
+    }
+    if (params.country) {
+      params.countryId = params.country;
+      delete params.country;
+    }
+  } else if (m === 'standings' || m === 'standing') {
+    normalizedMethod = 'Standings';
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+    if (!params.leagueId) {
+      params.leagueId = '766'; // Default to NBA (766) if unspecified
+    }
+  } else if (m === 'leagues' || m === 'league') {
+    normalizedMethod = 'Leagues';
+    if (params.country) {
+      params.countryId = params.country;
+      delete params.country;
+    }
+  } else if (m === 'teams' || m === 'team') {
+    normalizedMethod = 'Teams';
+    if (params.team) {
+      params.teamId = params.team;
+      delete params.team;
+    }
+    if (params.league) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+  } else if (m === 'players' || m === 'player') {
+    normalizedMethod = 'Players';
+    if (params.player) {
+      params.playerId = params.player;
+      delete params.player;
+    }
+    if (params.team) {
+      params.teamId = params.team;
+      delete params.team;
+    }
+  } else if (m === 'h2h') {
+    normalizedMethod = 'H2H';
+    if (params.firstTeam && !params.firstTeamId) {
+      params.firstTeamId = params.firstTeam;
+      delete params.firstTeam;
+    }
+    if (params.secondTeam && !params.secondTeamId) {
+      params.secondTeamId = params.secondTeam;
+      delete params.secondTeam;
+    }
+  } else if (m === 'odds' || m === 'odd') {
+    normalizedMethod = 'Odds';
+    if (params.match && !params.matchId) {
+      params.matchId = params.match;
+      delete params.match;
+    }
+    if (params.league && !params.leagueId) {
+      params.leagueId = params.league;
+      delete params.league;
+    }
+  } else if (m === 'videos' || m === 'video') {
+    normalizedMethod = 'Videos';
+    if (params.matchId || params.id) {
+      params.eventId = params.matchId || params.id;
+      delete params.matchId;
+      delete params.id;
+    }
+  } else if (m === 'countries' || m === 'country') {
+    normalizedMethod = 'Countries';
+  } else {
+    normalizedMethod = method.charAt(0).toUpperCase() + method.slice(1);
+  }
+
+  return { normalizedMethod, params };
+}
+
+/**
+ * Determine dynamic TTL in seconds based on requested method
+ */
 function getTtlForMethod(method: string): number {
   const m = method.toLowerCase();
-  if (m.includes('live')) {
-    return 15;
+  if (m === 'livescore') {
+    return 15; // 15s for live basketball scores
   }
-  if (m.includes('fixture') || m.includes('oddslive')) {
-    return 60;
+  if (m === 'fixtures') {
+    return 60; // 1m for fixtures
   }
-  if (m.includes('standing') || m.includes('odds')) {
-    return 300;
+  if (m === 'standings' || m === 'odds') {
+    return 300; // 5m for standings and odds
   }
   if (
-    m.includes('league') ||
-    m.includes('team') ||
-    m.includes('country') ||
-    m.includes('player') ||
-    m.includes('h2h')
+    m === 'leagues' ||
+    m === 'teams' ||
+    m === 'countries' ||
+    m === 'players' ||
+    m === 'h2h' ||
+    m === 'videos'
   ) {
-    return 600;
+    return 600; // 10m for metadata, rosters, media, and H2H
   }
   return 60;
 }
@@ -66,43 +207,34 @@ function getTtlForMethod(method: string): number {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const method = searchParams.get('met');
+    const rawMethod = searchParams.get('met');
 
-    if (!method) {
+    if (!rawMethod) {
       return NextResponse.json({ error: 'Method parameter (met) is required' }, { status: 400 });
     }
 
-    if (
-      method === 'Odds' &&
-      !searchParams.get('matchId') &&
-      !searchParams.get('leagueId') &&
-      !searchParams.get('from')
-    ) {
-      return NextResponse.json(
-        { success: 1, result: {}, message: 'Mandatory parameters missing, skipping external call' },
-        { status: 200 }
-      );
-    }
+    const { normalizedMethod, params } = normalizeMethodAndParams(rawMethod, searchParams);
 
     const baseUrlStr = getApiBaseUrl();
     const apiUrl = new URL(baseUrlStr);
-    apiUrl.searchParams.append('met', method);
+    apiUrl.searchParams.set('met', normalizedMethod);
 
     if (API_KEY) {
-      apiUrl.searchParams.append('APIkey', API_KEY);
+      apiUrl.searchParams.set('APIkey', API_KEY);
     }
 
-    searchParams.forEach((value, key) => {
-      if (key !== 'met' && value) {
-        apiUrl.searchParams.append(key, value);
+    // Append all normalized dynamic parameters
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        apiUrl.searchParams.set(key, String(value));
       }
     });
 
     const cacheKey = `gm:sport:basketball:${apiUrl.toString()}`;
-    const ttlSeconds = getTtlForMethod(method);
+    const ttlSeconds = getTtlForMethod(normalizedMethod);
     const now = Date.now();
 
-    // 1. Check Redis / Multi-Tier Cache
+    // 1. Check Multi-tier Redis Cache
     const cached = await cacheGet<any>(cacheKey);
     if (cached) {
       return NextResponse.json(cached, {
@@ -137,17 +269,26 @@ export async function GET(request: NextRequest) {
           }
         );
       }
+
       return NextResponse.json(
         {
           success: 1,
           result: [],
           isStale: true,
           message: isCircuitOpen
-            ? 'Basketball provider circuit breaker active, serving fallback'
-            : 'Rate-limited backoff active, serving fallback',
+            ? 'Basketball provider circuit breaker active, serving fallback state'
+            : 'Basketball API rate-limited backoff active, returning client fallback',
           lastUpdatedAt: new Date().toISOString(),
         },
-        { status: 200, headers: { 'Access-Control-Allow-Origin': '*', 'X-Data-Freshness': 'DEGRADED' } }
+        {
+          status: 200,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'X-Data-Freshness': 'DEGRADED',
+          },
+        }
       );
     }
 
@@ -177,7 +318,7 @@ export async function GET(request: NextRequest) {
 
           if (response.status >= 500 && attempts < maxAttempts) {
             console.warn(
-              `Basketball API retry ${attempts}/${maxAttempts} for ${method} due to ${response.status}`
+              `Basketball API retry ${attempts}/${maxAttempts} for ${normalizedMethod} due to ${response.status}`
             );
             await new Promise((resolve) => setTimeout(resolve, 500 * attempts));
             continue;
@@ -195,7 +336,7 @@ export async function GET(request: NextRequest) {
 
       if (!response || !response.ok) {
         const status = response ? response.status : 502;
-        console.warn(`Basketball API status ${status} for ${method}, returning graceful fallback.`);
+        console.warn(`Basketball API status ${status} for ${normalizedMethod}, returning graceful fallback.`);
 
         consecutiveFailures++;
         if (consecutiveFailures >= 5) {
@@ -210,6 +351,7 @@ export async function GET(request: NextRequest) {
         return {
           success: 1,
           result: [],
+          response: [],
           isStale: true,
           lastUpdatedAt: new Date().toISOString(),
           message: `Basketball live feed fallback (status ${status})`,
@@ -230,16 +372,36 @@ export async function GET(request: NextRequest) {
           ? data
           : (data.result ?? data.response ?? data);
 
+      const listResult = Array.isArray(sanitizedResult) ? sanitizedResult : sanitizedResult;
+
       const resultPayload = {
         success: 1,
-        result: Array.isArray(sanitizedResult) ? sanitizedResult : [],
+        result: listResult,
+        response: listResult,
         ...(!Array.isArray(data) ? data : {}),
-        ...(hasUpstreamError ? { message: 'Upstream account notice, using fallback data' } : {}),
+        ...(hasUpstreamError ? { message: 'Upstream notice, using fallback data' } : {}),
         lastUpdatedAt: new Date().toISOString(),
         isStale: false,
       };
 
+      // Cache valid result in Redis
       await cacheSet(cacheKey, resultPayload, ttlSeconds);
+
+      // If live score update, broadcast to connected WebSocket clients in real-time
+      if (normalizedMethod.toLowerCase().includes('live') && Array.isArray(listResult)) {
+        listResult.forEach((match: any) => {
+          if (match.event_key || match.id) {
+            const finalScoreParts = (match.event_final_result || '').split('-');
+            broadcastLiveScore('basketball', String(match.event_key || match.id), {
+              homeScore: finalScoreParts[0]?.trim() || match.scores?.['4thQuarter']?.[0]?.score_home || '0',
+              awayScore: finalScoreParts[1]?.trim() || match.scores?.['4thQuarter']?.[0]?.score_away || '0',
+              status: match.event_status || match.event_quarter || 'LIVE',
+              time: match.event_time,
+            });
+          }
+        });
+      }
+
       return resultPayload;
     });
 

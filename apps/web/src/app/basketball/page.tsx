@@ -8,31 +8,49 @@ import { BasketballScreen } from '@/components/BasketballScreen';
 import { FiAward, FiUsers, FiTrendingUp, FiArrowRight, FiActivity, FiMail } from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
+import { basketballRoutes } from '@/lib/slugUtils';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'NBA Live Scores, Basketball Standings, EuroLeague & Box Scores | GoalMills',
   description:
-    'Real-time NBA live scores, conference standings, EuroLeague results, Basketball Africa League (BAL) fixtures, player box scores, and game previews.',
+    'Real-time NBA live scores, quarter-by-quarter box scores, conference standings, EuroLeague fixtures, team rosters, and game previews on GoalMills.',
+  keywords: [
+    'NBA live scores',
+    'Basketball live scores',
+    'NBA standings 2026',
+    'EuroLeague basketball results',
+    'Quarter box score basketball',
+    'Liga ACB basketball',
+    'Lakers vs Warriors live',
+    'GoalMills Basketball',
+  ],
+  openGraph: {
+    title: 'GoalMills Basketball | Live Scores, Standings & Quarter Box Scores',
+    description:
+      'Real-time NBA live scores, conference standings, EuroLeague fixtures, and comprehensive box scores.',
+    siteName: 'GoalMills Basketball',
+    type: 'website',
+  },
 };
 
 const BASKETBALL_MAJOR_LEAGUES = [
-  { name: 'NBA', slug: '12', type: 'North America' },
-  { name: 'EuroLeague', slug: '120', type: 'European Elite' },
-  { name: 'Basketball Africa League (BAL)', slug: 'bal', type: 'CAF Pan-African' },
-  { name: 'Spanish Liga ACB', slug: '117', type: 'Spain' },
-  { name: 'NCAA Division I', slug: '116', type: 'Collegiate' },
-  { name: 'FIBA World Cup', slug: 'fiba', type: 'International' },
+  { name: 'NBA', slug: 'nba-766', type: 'North America' },
+  { name: 'EuroLeague', slug: 'euroleague-787', type: 'European Elite' },
+  { name: 'Spanish Liga ACB', slug: 'liga-acb-782', type: 'Spain' },
+  { name: 'NCAA Basketball', slug: 'ncaa-812', type: 'Collegiate' },
+  { name: 'Lega Basket Serie A', slug: 'serie-a-772', type: 'Italy' },
+  { name: 'BBL Germany', slug: 'bbl-779', type: 'Germany' },
 ];
 
 const FEATURED_BASKETBALL_TEAMS = [
-  { name: 'Los Angeles Lakers', key: '145', role: '17x NBA Champions' },
-  { name: 'Boston Celtics', key: '138', role: '18x NBA Champions' },
-  { name: 'Golden State Warriors', key: '140', role: '7x NBA Champions' },
-  { name: 'Real Madrid Baloncesto', key: 'madrid', role: '11x EuroLeague Kings' },
-  { name: 'Panathinaikos', key: 'pana', role: '7x EuroLeague Champs' },
-  { name: 'Al Ahly Basketball', key: 'alahly', role: 'BAL Contenders' },
+  { name: 'Los Angeles Lakers', key: 'los-angeles-lakers-1', role: '17x NBA Champions' },
+  { name: 'Boston Celtics', key: 'boston-celtics-7', role: '18x NBA Champions' },
+  { name: 'Golden State Warriors', key: 'golden-state-warriors-20', role: '7x NBA Champions' },
+  { name: 'Brooklyn Nets', key: 'brooklyn-nets-2', role: 'Eastern Conference' },
+  { name: 'Toronto Raptors', key: 'toronto-raptors-3', role: '2019 NBA Champions' },
+  { name: 'Philadelphia 76ers', key: 'philadelphia-76ers-4', role: 'Eastern Contenders' },
 ];
 
 export default async function BasketballHubPage() {
@@ -83,7 +101,7 @@ export default async function BasketballHubPage() {
 
               {/* Subtitle description */}
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time quarter-by-quarter scorelines, NBA conference standings, EuroLeague fixtures, Basketball Africa League results, player stats, and match previews.
+                Real-time quarter-by-quarter scorelines, NBA conference standings, EuroLeague fixtures, player box scores, and game intelligence.
               </p>
 
               {/* Quick Intelligence KPI Cards */}
@@ -118,7 +136,7 @@ export default async function BasketballHubPage() {
                   {BASKETBALL_MAJOR_LEAGUES.map((league) => (
                     <Link
                       key={league.slug}
-                      href={`/basketball/leagues/${league.slug}`}
+                      href={basketballRoutes.league(league.slug)}
                       className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#091529]/80 hover:bg-blue-600/30 border border-blue-500/20 hover:border-amber-400/40 text-xs font-bold text-slate-200 hover:text-white transition-all shadow-md group"
                     >
                       <span className="text-amber-400">🏀</span>
@@ -148,7 +166,7 @@ export default async function BasketballHubPage() {
               {BASKETBALL_MAJOR_LEAGUES.map((league) => (
                 <Link
                   key={league.slug}
-                  href={`/basketball/leagues/${league.slug}`}
+                  href={basketballRoutes.league(league.slug)}
                   className="group flex items-center justify-between p-3 rounded-2xl bg-[#070F1E] hover:bg-blue-600/20 border border-blue-500/15 hover:border-amber-400/40 transition-all shadow-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -186,7 +204,7 @@ export default async function BasketballHubPage() {
               {FEATURED_BASKETBALL_TEAMS.map((team) => (
                 <Link
                   key={team.key}
-                  href={`/basketball/teams/${team.key}`}
+                  href={basketballRoutes.team(team.key)}
                   className="group flex flex-col items-center text-center p-3 rounded-2xl bg-[#070F1E] hover:bg-blue-600/20 border border-blue-500/15 hover:border-blue-400/40 transition-all"
                 >
                   <div className="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 p-1.5 mb-2 flex items-center justify-center font-black text-amber-400 text-sm group-hover:scale-105 transition-transform">

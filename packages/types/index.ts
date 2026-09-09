@@ -2479,6 +2479,16 @@ export interface BasketballOddsResponse {
   };
 }
 
+export interface BasketballVideo {
+  video_title: string;
+  video_url: string;
+}
+
+export interface BasketballVideosResponse {
+  success: 1;
+  result: BasketballVideo[];
+}
+
 // API Request Parameter Types
 export interface BasketballBaseParams {
   met: string;
@@ -2556,6 +2566,12 @@ export interface BasketballOddsParams extends BasketballBaseParams {
   matchId?: number;
 }
 
+export interface BasketballVideosParams extends BasketballBaseParams {
+  met: 'Videos';
+  eventId?: number;
+  matchId?: number;
+}
+
 // API Client Interface
 export interface BasketballAPIClient {
   /**
@@ -2620,6 +2636,11 @@ export interface BasketballAPIClient {
    * Get pre-match odds for events
    */
   getOdds(params: Omit<BasketballOddsParams, 'met'>): Promise<BasketballOddsResponse>;
+
+  /**
+   * Get match videos and highlights
+   */
+  getVideos(params: Omit<BasketballVideosParams, 'met'>): Promise<BasketballVideosResponse>;
 }
 
 // Utility Types

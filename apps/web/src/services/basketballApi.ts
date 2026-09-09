@@ -1,190 +1,52 @@
 /**
- * Complete API-Basketball (v1.5.2) Enterprise Service Client for Next.js Web
- * Implements ALL official endpoints and query parameters strictly according to API-Basketball documentation.
- * Requests are securely proxied through the internal `/api/basketball` route to safeguard provider secrets.
+ * Complete AllSportsAPI Basketball v2.0 Enterprise Service Client for GoalMills Web
+ * Implements ALL official AllSportsAPI basketball endpoints and dynamic query parameters.
+ * Requests are securely proxied through the internal `/api/basketball` route to safeguard provider credentials.
  */
 
-export interface ApiBasketballResponse<T> {
-  get: string;
-  parameters: Record<string, any>;
-  errors: Record<string, string> | any[];
-  results: number;
-  paging: {
-    current: number;
-    total: number;
-  };
-  response: T;
-}
+import {
+  BasketballCountry,
+  BasketballLeague,
+  BasketballEvent,
+  BasketballStanding,
+  BasketballTeam,
+  BasketballPlayer,
+  BasketballVideo,
+  BasketballMatchOdds,
+  BasketballCountriesResponse,
+  BasketballLeaguesResponse,
+  BasketballFixturesResponse,
+  BasketballH2HResponse,
+  BasketballLivescoreResponse,
+  BasketballStandingsResponse,
+  BasketballTeamsResponse,
+  BasketballPlayersResponse,
+  BasketballVideosResponse,
+  BasketballOddsResponse,
+  BasketballCountriesParams,
+  BasketballLeaguesParams,
+  BasketballFixturesParams,
+  BasketballH2HParams,
+  BasketballLivescoreParams,
+  BasketballStandingsParams,
+  BasketballTeamsParams,
+  BasketballPlayersParams,
+  BasketballVideosParams,
+  BasketballOddsParams,
+} from '@goalmills/types';
 
-export interface BasketballCountriesParams {
-  id?: number;
-  name?: string;
-  code?: string;
-  search?: string;
-}
+// API Configuration - Using Next.js API route as proxy to avoid CORS and protect API credentials
+const API_PROXY_URL = '/api/basketball';
 
-export interface BasketballLeaguesParams {
-  id?: number;
-  name?: string;
-  type?: 'league' | 'cup';
-  season?: string;
-  country_id?: number;
-  country?: string;
-  code?: string;
-  search?: string;
-}
-
-export interface BasketballTeamsParams {
-  id?: number;
-  name?: string;
-  league?: number;
-  season?: string;
-  country_id?: number;
-  country?: string;
-  search?: string;
-}
-
-export interface BasketballTeamStatisticsParams {
-  league: number;
-  season: string;
-  team: number;
-  date?: string;
-}
-
-export interface BasketballPlayersParams {
-  id?: number;
-  name?: string;
-  team?: number;
-  season?: string;
-  search?: string;
-}
-
-export interface BasketballStandingsParams {
-  league: number;
-  season: string;
-  team?: number;
-  stage?: string;
-  group?: string;
-}
-
-export interface BasketballGamesParams {
-  id?: number;
-  date?: string;
-  league?: number;
-  season?: string;
-  team?: number;
-  timezone?: string;
-  live?: 'all' | string;
-  status?: string;
-  stage?: string;
-}
-
-export interface BasketballGameTeamStatsParams {
-  id: number;
-}
-
-export interface BasketballGamePlayerStatsParams {
-  id: number;
-  team?: number;
-}
-
-export interface BasketballHeadToHeadParams {
-  h2h: string;
-  date?: string;
-  league?: number;
-  season?: string;
-  timezone?: string;
-}
-
-export interface BasketballOddsParams {
-  league?: number;
-  season?: string;
-  game?: number;
-  bookmaker?: number;
-  bet?: number;
-  date?: string;
-  page?: number;
-}
-
-export interface BasketballOddsBetsParams {
-  id?: number;
-  search?: string;
-}
-
-export interface BasketballOddsBookmakersParams {
-  id?: number;
-  search?: string;
-}
-
-export interface ApiBasketballGameItem {
-  id: number;
-  date: string;
-  time: string;
-  timestamp: number;
-  timezone: string;
-  stage: string | null;
-  week: string | null;
-  status: {
-    long: string;
-    short: string;
-    timer: string | null;
-  };
-  league: {
-    id: number;
-    name: string;
-    type: string;
-    season: string;
-    logo: string;
-  };
-  country: {
-    id: number;
-    name: string;
-    code: string;
-    flag: string;
-  };
-  teams: {
-    home: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-    away: {
-      id: number;
-      name: string;
-      logo: string;
-    };
-  };
-  scores: {
-    home: {
-      quarter_1: number | null;
-      quarter_2: number | null;
-      quarter_3: number | null;
-      quarter_4: number | null;
-      over_time: number | null;
-      total: number | null;
-    };
-    away: {
-      quarter_1: number | null;
-      quarter_2: number | null;
-      quarter_3: number | null;
-      quarter_4: number | null;
-      over_time: number | null;
-      total: number | null;
-    };
-  };
-}
-
-async function requestWebBasketball<T>(
-  endpoint: string,
-  params: Record<string, any> = {},
-  _revalidate: number = 60 // kept for signature compat; TTL is managed by the proxy
-): Promise<T[]> {
-  // Build URL to our own Next.js proxy route
+/**
+ * Helper function to build proxy URL with dynamic parameters
+ */
+const buildUrl = (method: string, params: Record<string, any> = {}): string => {
   const url = new URL(
-    '/api/basketball',
+    API_PROXY_URL,
     typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
   );
-  url.searchParams.append('met', endpoint);
+  url.searchParams.append('met', method);
 
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -192,170 +54,274 @@ async function requestWebBasketball<T>(
     }
   });
 
+  return url.toString();
+};
+
+/**
+ * Helper function to execute API requests with error resilience
+ */
+async function fetchFromAPI<T>(method: string, params: Record<string, any> = {}): Promise<T> {
   try {
-    const response = await fetch(url.toString(), {
+    const url = buildUrl(method, params);
+
+    const response = await fetch(url, {
       method: 'GET',
-      headers: { Accept: 'application/json' },
+      headers: {
+        Accept: 'application/json',
+      },
       cache: 'no-store',
     });
 
     if (!response.ok) {
-      throw new Error(
-        `[API-Basketball Web] Proxy request to ${endpoint} failed: ${response.status} ${response.statusText}`
-      );
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`[Basketball API] Error ${response.status} for ${method}:`, errorData);
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-
-    // The proxy wraps responses as { success, result, ... } or { response, ... }
-    if (data.response && Array.isArray(data.response)) {
-      return data.response;
-    }
-    if (data.result && Array.isArray(data.result)) {
-      return data.result;
-    }
-    if (Array.isArray(data)) {
-      return data;
-    }
-
-    return data.response || data.result || [];
+    return data;
   } catch (error) {
-    console.error(`[API-Basketball Web] Error on GET ${endpoint}:`, error);
+    console.error(`[Basketball API] Error fetching ${method}:`, error);
     throw error;
   }
 }
 
-function wrapResult<T extends any[]>(arr: T): T & { result: any; success: number } {
-  const cloned: any = arr;
-  cloned.result = arr;
-  cloned.success = 1;
-  return cloned;
-}
-
-export const webBasketballApiService = {
-  async getStatus(): Promise<any> {
-    return requestWebBasketball<any>('status', {}, 0);
+/**
+ * AllSportsAPI Basketball Enterprise Service
+ */
+export const basketballApi = {
+  /**
+   * 1. Countries Endpoint
+   * Returns list of supported countries
+   */
+  async getCountries(
+    params: Partial<Omit<BasketballCountriesParams, 'met'>> = {}
+  ): Promise<BasketballCountriesResponse> {
+    return fetchFromAPI<BasketballCountriesResponse>('Countries', params);
   },
 
-  async getTimezones(): Promise<string[]> {
-    return requestWebBasketball<string>('timezone', {}, 86400);
+  /**
+   * 2. Leagues Endpoint
+   * Returns list of supported competitions / leagues
+   */
+  async getLeagues(
+    params: Partial<Omit<BasketballLeaguesParams, 'met'>> = {}
+  ): Promise<BasketballLeaguesResponse> {
+    return fetchFromAPI<BasketballLeaguesResponse>('Leagues', params);
   },
 
-  async getSeasons(): Promise<string[]> {
-    return requestWebBasketball<string>('seasons', {}, 86400);
-  },
-
-  async getCountries(params?: BasketballCountriesParams): Promise<any[]> {
-    return requestWebBasketball<any>('countries', params, 86400);
-  },
-
-  async getLeagues(params?: BasketballLeaguesParams | any): Promise<any> {
-    const res = await requestWebBasketball<any>('leagues', params, 3600);
-    return wrapResult(res);
-  },
-
-  async getTeams(params?: BasketballTeamsParams | any): Promise<any> {
-    const p: any = { ...params };
-    if (p.teamId) {
-      p.id = p.teamId;
-      delete p.teamId;
+  /**
+   * 3. Fixtures Endpoint
+   * Returns scheduled or completed fixtures based on date range, league, team, or match ID
+   */
+  async getFixtures(
+    params: Partial<Omit<BasketballFixturesParams, 'met'>> = {}
+  ): Promise<BasketballFixturesResponse> {
+    const p: Record<string, any> = { ...params };
+    // If no dates provided and no matchId/teamId provided, default to today
+    if (!p.from && !p.to && !p.matchId) {
+      const today = new Date().toISOString().split('T')[0];
+      p.from = today;
+      p.to = today;
     }
-    const res = await requestWebBasketball<any>('teams', p, 86400);
-    return wrapResult(res);
+    return fetchFromAPI<BasketballFixturesResponse>('Fixtures', p);
   },
 
-  async getTeamStatistics(params: BasketballTeamStatisticsParams): Promise<any> {
-    const res = await requestWebBasketball<any>('teams/statistics', params, 43200);
-    return res.length > 0 ? res[0] : res;
+  /**
+   * 4. Livescore Endpoint
+   * Returns playing now basketball events
+   */
+  async getLivescore(
+    params: Partial<Omit<BasketballLivescoreParams, 'met'>> = {}
+  ): Promise<BasketballLivescoreResponse> {
+    return fetchFromAPI<BasketballLivescoreResponse>('Livescore', params);
   },
 
-  async getPlayers(params?: BasketballPlayersParams | any): Promise<any> {
-    const p: any = { ...params };
-    if (p.playerId) {
-      p.id = p.playerId;
-      delete p.playerId;
+  /**
+   * 5. H2H (Head to Head) Endpoint
+   * Returns historical matches between two teams and their recent results
+   */
+  async getH2H(
+    params: Omit<BasketballH2HParams, 'met'>
+  ): Promise<BasketballH2HResponse> {
+    return fetchFromAPI<BasketballH2HResponse>('H2H', params);
+  },
+
+  /**
+   * 6. Standings Endpoint
+   * Returns league standings for a specific league ID (default: 766 for NBA)
+   */
+  async getStandings(
+    params: Partial<Omit<BasketballStandingsParams, 'met'>> = {}
+  ): Promise<BasketballStandingsResponse> {
+    const leagueId = params.leagueId || 766;
+    return fetchFromAPI<BasketballStandingsResponse>('Standings', { leagueId });
+  },
+
+  /**
+   * 7. Teams Endpoint
+   * Returns teams for a league or a specific team by team ID
+   */
+  async getTeams(
+    params: Partial<Omit<BasketballTeamsParams, 'met'>> = {}
+  ): Promise<BasketballTeamsResponse> {
+    return fetchFromAPI<BasketballTeamsResponse>('Teams', params);
+  },
+
+  /**
+   * 8. Players Endpoint
+   * Returns squad players by team ID or player details by player ID
+   */
+  async getPlayers(
+    params: Partial<Omit<BasketballPlayersParams, 'met'>> = {}
+  ): Promise<BasketballPlayersResponse> {
+    return fetchFromAPI<BasketballPlayersResponse>('Players', params);
+  },
+
+  /**
+   * 9. Odds Endpoint
+   * Returns betting odds for events (matchId, leagueId, or date range)
+   */
+  async getOdds(
+    params: Partial<Omit<BasketballOddsParams, 'met'>> = {}
+  ): Promise<BasketballOddsResponse> {
+    return fetchFromAPI<BasketballOddsResponse>('Odds', params);
+  },
+
+  /**
+   * 10. Videos Endpoint
+   * Returns highlight video clips for an event
+   */
+  async getVideos(
+    params: Partial<Omit<BasketballVideosParams, 'met'>> = {}
+  ): Promise<BasketballVideosResponse> {
+    return fetchFromAPI<BasketballVideosResponse>('Videos', params);
+  },
+
+  // ─── High-Level Convenience Helpers ──────────────────────────────────────────
+
+  /**
+   * Fetch currently live basketball games
+   */
+  async getLiveGames(): Promise<BasketballEvent[]> {
+    try {
+      const res = await this.getLivescore();
+      return Array.isArray(res?.result) ? res.result : [];
+    } catch (err) {
+      console.warn('[Basketball API] getLiveGames error:', err);
+      return [];
     }
-    if (p.teamId) {
-      p.team = p.teamId;
-      delete p.teamId;
+  },
+
+  /**
+   * Fetch games for a specific calendar date (YYYY-MM-DD)
+   */
+  async getGamesByDate(date: string, timezone?: string): Promise<BasketballEvent[]> {
+    try {
+      const res = await this.getFixtures({
+        from: date,
+        to: date,
+        timezone,
+      });
+      return Array.isArray(res?.result) ? res.result : [];
+    } catch (err) {
+      console.warn('[Basketball API] getGamesByDate error:', err);
+      return [];
     }
-    const res = await requestWebBasketball<any>('players', p, 86400);
-    return wrapResult(res);
   },
 
-  async getStandings(params: BasketballStandingsParams | any): Promise<any> {
-    const p: any = { ...params };
-    if (p.leagueId) {
-      p.league = p.leagueId;
-      delete p.leagueId;
+  /**
+   * Fetch single match details by numeric event ID or match ID
+   */
+  async getGameById(matchId: number | string): Promise<BasketballEvent | null> {
+    try {
+      const id = Number(matchId);
+      if (isNaN(id) || !id) return null;
+
+      // In AllSportsAPI, passing matchId retrieves the specific event
+      const res = await this.getFixtures({ matchId: id });
+      if (Array.isArray(res?.result) && res.result.length > 0) {
+        return res.result[0];
+      }
+
+      // Fallback: check livescore if match is in-play
+      const liveRes = await this.getLivescore({ matchId: id });
+      if (Array.isArray(liveRes?.result) && liveRes.result.length > 0) {
+        return liveRes.result[0];
+      }
+
+      return null;
+    } catch (err) {
+      console.warn(`[Basketball API] getGameById error for ${matchId}:`, err);
+      return null;
     }
-    if (!p.season) p.season = '2023-2024';
-    const res = await requestWebBasketball<any>('standings', p, 300);
-    const wrapped = wrapResult(res);
-    wrapped.result = { total: res };
-    return wrapped;
   },
 
-  async getFixtures(params?: any): Promise<any> {
-    const p: any = { ...params };
-    if (p.leagueId) {
-      p.league = p.leagueId;
-      delete p.leagueId;
+  /**
+   * Fetch upcoming fixtures within a day window (default 3 days)
+   */
+  async getUpcomingGames(leagueId?: number, days: number = 3): Promise<BasketballEvent[]> {
+    try {
+      const today = new Date();
+      const future = new Date(today);
+      future.setDate(today.getDate() + days);
+
+      const from = today.toISOString().split('T')[0];
+      const to = future.toISOString().split('T')[0];
+
+      const res = await this.getFixtures({
+        from,
+        to,
+        leagueId,
+      });
+
+      const list = Array.isArray(res?.result) ? res.result : [];
+      return list.filter((m) => m.event_status !== 'Finished' && m.event_live !== '1');
+    } catch (err) {
+      console.warn('[Basketball API] getUpcomingGames error:', err);
+      return [];
     }
-    if (p.teamId) {
-      p.team = p.teamId;
-      delete p.teamId;
+  },
+
+  /**
+   * Fetch recent results within a day window (default 3 days)
+   */
+  async getRecentResults(leagueId?: number, days: number = 3): Promise<BasketballEvent[]> {
+    try {
+      const today = new Date();
+      const past = new Date(today);
+      past.setDate(today.getDate() - days);
+
+      const from = past.toISOString().split('T')[0];
+      const to = today.toISOString().split('T')[0];
+
+      const res = await this.getFixtures({
+        from,
+        to,
+        leagueId,
+      });
+
+      const list = Array.isArray(res?.result) ? res.result : [];
+      return list.filter((m) => m.event_status === 'Finished');
+    } catch (err) {
+      console.warn('[Basketball API] getRecentResults error:', err);
+      return [];
     }
-    if (!p.season && (p.league || p.team)) p.season = '2023-2024';
-    const res = await requestWebBasketball<ApiBasketballGameItem>('games', p, 60);
-    return wrapResult(res);
-  },
-
-  async getGames(params: BasketballGamesParams): Promise<ApiBasketballGameItem[]> {
-    return requestWebBasketball<ApiBasketballGameItem>('games', params, 60);
-  },
-
-  async getLiveGames(leaguesFilter?: string): Promise<ApiBasketballGameItem[]> {
-    return requestWebBasketball<ApiBasketballGameItem>(
-      'games',
-      { live: leaguesFilter || 'all' },
-      15
-    );
-  },
-
-  async getGamesByDate(date: string, timezone?: string): Promise<ApiBasketballGameItem[]> {
-    return requestWebBasketball<ApiBasketballGameItem>('games', { date, timezone }, 60);
-  },
-
-  async getGameById(id: number): Promise<ApiBasketballGameItem | null> {
-    const res = await requestWebBasketball<ApiBasketballGameItem>('games', { id }, 30);
-    return res.length > 0 ? res[0] : null;
-  },
-
-  async getHeadToHead(params: BasketballHeadToHeadParams): Promise<ApiBasketballGameItem[]> {
-    return requestWebBasketball<ApiBasketballGameItem>('games/headtohead', params, 600);
-  },
-
-  async getGameTeamStatistics(params: BasketballGameTeamStatsParams): Promise<any[]> {
-    return requestWebBasketball<any>('games/statistics/teams', params, 60);
-  },
-
-  async getGamePlayerStatistics(params: BasketballGamePlayerStatsParams): Promise<any[]> {
-    return requestWebBasketball<any>('games/statistics/players', params, 60);
-  },
-
-  async getOdds(params: BasketballOddsParams): Promise<any[]> {
-    return requestWebBasketball<any>('odds', params, 10800);
-  },
-
-  async getOddsBets(params?: BasketballOddsBetsParams): Promise<any[]> {
-    return requestWebBasketball<any>('odds/bets', params, 86400);
-  },
-
-  async getOddsBookmakers(params?: BasketballOddsBookmakersParams): Promise<any[]> {
-    return requestWebBasketball<any>('odds/bookmakers', params, 86400);
   },
 };
 
-export const basketballApi = webBasketballApiService;
-export default webBasketballApiService;
+// Aliases for compatibility
+export const webBasketballApiService = basketballApi;
+export default basketballApi;
+
+// Re-export core types
+export type {
+  BasketballCountry,
+  BasketballLeague,
+  BasketballEvent,
+  BasketballStanding,
+  BasketballTeam,
+  BasketballPlayer,
+  BasketballVideo,
+  BasketballMatchOdds,
+};

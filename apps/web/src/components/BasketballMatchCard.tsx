@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ApiBasketballGameItem } from '../services/basketballApi';
+import { BasketballEvent } from '@goalmills/types';
+import { basketballRoutes, buildMatchSlug } from '@/lib/slugUtils';
 
 interface BasketballMatchCardProps {
-  match: ApiBasketballGameItem;
+  match: BasketballEvent;
   onPress?: () => void;
   hideLeague?: boolean;
 }
@@ -18,76 +19,123 @@ export function BasketballMatchCard({
 }: BasketballMatchCardProps) {
   const router = useRouter();
 
-  const shortStatus = match?.status?.short || '';
-  const isLive = ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(shortStatus);
-  const isFinished = ['FT', 'AOT'].includes(shortStatus);
+  const isLive =
+    match?.event_live === '1' ||
+    match?.event_live === (1 as any) ||
+    ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter', 'Overtime', 'Halftime', 'LIVE', 'Q1', 'Q2', 'Q3', 'Q4', 'OT', 'HT'].includes(
+      match?.event_status || match?.event_quarter || ''
+    );
+
+  const isFinished =
+    match?.event_status?.toLowerCase() === 'finished' ||
+    match?.event_status === 'FT' ||
+    match?.event_status === 'AOT';
+
   const isUpcoming = !isLive && !isFinished;
+
+  // Extract score parts from event_final_result ("114 - 107") or scores object
+  const { homeScore, awayScore } = useMemo(() => {
+    if (match?.event_final_result && match.event_final_result.includes('-')) {
+      const parts = match.event_final_result.split('-');
+      return {
+        homeScore: parts[0]?.trim() || '0',
+        awayScore: parts[1]?.trim() || '0',
+      };
+    }
+
+    // Fallback: calculate from scores quarters if final is not yet populated
+    if (match?.scores) {
+      const quarters = ['1stQuarter', '2ndQuarter', '3rdQuarter', '4thQuarter', 'Overtime'] as const;
+      let hTotal = 0;
+      let aTotal = 0;
+      let hasScores = false;
+
+      quarters.forEach((q) => {
+        const qArr = match.scores?.[q as keyof typeof match.scores];
+        if (Array.isArray(qArr) && qArr[0]) {
+          const h = parseInt(qArr[0].score_home || '0', 10);
+          const a = parseInt(qArr[0].score_away || '0', 10);
+          if (!isNaN(h) && !isNaN(a)) {
+            hTotal += h;
+            aTotal += a;
+            hasScores = true;
+          }
+        }
+      });
+
+      if (hasScores) {
+        return { homeScore: String(hTotal), awayScore: String(aTotal) };
+      }
+    }
+
+    return { homeScore: '-', awayScore: '-' };
+  }, [match?.event_final_result, match?.scores]);
+
+  const statusDisplay = useMemo(() => {
+    if (isLive) {
+      const q = match?.event_quarter || match?.event_status || 'LIVE';
+      return q.replace(/Quarter/i, 'Q').toUpperCase();
+    }
+    if (isFinished) {
+      return match?.event_status === 'AOT' ? 'FT (OT)' : 'FINAL';
+    }
+    return match?.event_time?.slice(0, 5) || match?.event_date || 'TBD';
+  }, [isLive, isFinished, match?.event_quarter, match?.event_status, match?.event_time, match?.event_date]);
+
+  const matchSlug = useMemo(() => {
+    return buildMatchSlug({
+      event_home_team: match?.event_home_team,
+      event_away_team: match?.event_away_team,
+      event_date: match?.event_date,
+      event_key: match?.event_key,
+    });
+  }, [match]);
 
   const handleClick = () => {
     if (onPress) {
       onPress();
-    } else if (match?.id) {
-      router.push(`/basketball/matches/${match.id}`);
+    } else if (match?.event_key) {
+      router.push(basketballRoutes.match(matchSlug));
     }
   };
 
-  const getStatusDisplay = () => {
-    if (isLive) {
-      if (match?.status?.timer) return `${shortStatus} ${match.status.timer}`;
-      return shortStatus || 'LIVE';
-    }
-    if (isFinished) {
-      return shortStatus === 'AOT' ? 'FT (OT)' : 'FT';
-    }
-    return match?.time || 'TBD';
-  };
-
-  const homeScore = match?.scores?.home?.total ?? 0;
-  const awayScore = match?.scores?.away?.total ?? 0;
-
-  const homeName = match?.teams?.home?.name || 'Home';
-  const awayName = match?.teams?.away?.name || 'Away';
+  const homeName = match?.event_home_team || 'Home';
+  const awayName = match?.event_away_team || 'Away';
 
   return (
     <div
       onClick={handleClick}
-      className={`group relative cursor-pointer rounded-xl border p-2 sm:p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group relative cursor-pointer rounded-2xl border p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
         isLive
-          ? 'border-blue-500/40 bg-gradient-to-r from-[#0C1A30] via-[#0E203C] to-[#0C1A30] shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:border-blue-400'
-          : 'border-blue-500/15 bg-[#0A1424]/90 hover:border-blue-400/40 hover:bg-[#0E1D34]'
+          ? 'border-amber-500/40 bg-gradient-to-br from-[#0B1526] via-[#0E1D38] to-[#0A1322] shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:border-amber-400'
+          : 'border-blue-500/20 bg-[#091322]/90 hover:border-blue-400/40 hover:bg-[#0C1A30]'
       }`}
     >
-      {/* Ambient subtle glow for live matches */}
+      {/* Ambient subtle glow for live games */}
       {isLive && (
-        <div className="absolute top-0 right-0 w-32 h-16 bg-blue-500/10 blur-2xl pointer-events-none -z-0" />
+        <div className="absolute top-0 right-0 w-32 h-16 bg-amber-500/10 blur-2xl pointer-events-none -z-0" />
       )}
 
-      {/* League Header - Hidden on mobile viewports for clean look */}
+      {/* League Header */}
       {!hideLeague && (
-        <div className="hidden sm:flex mb-2 items-center justify-between border-b border-white/5 pb-1.5 text-xs">
+        <div className="mb-2.5 flex items-center justify-between border-b border-white/5 pb-2 text-xs">
           <div className="flex items-center space-x-1.5 truncate">
-            {match?.league?.logo ? (
-              <img
-                src={match.league.logo}
-                alt={match?.league?.name || 'League'}
-                className="h-3.5 w-3.5 object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-blue-400 text-xs">🏀</span>
-            )}
+            <span className="text-amber-400 text-xs">🏀</span>
             <span className="font-bold text-[11px] text-slate-300 group-hover:text-white truncate transition-colors">
-              {match?.league?.name || 'Basketball League'}
+              {match?.league_name || 'Basketball League'}
             </span>
+            {match?.country_name && (
+              <span className="text-[10px] text-slate-500 hidden sm:inline truncate">
+                • {match.country_name}
+              </span>
+            )}
           </div>
 
           {/* Status Badge */}
           {isLive ? (
-            <span className="flex items-center space-x-1 rounded-full border border-blue-500/40 bg-blue-500/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-blue-300 shadow-sm animate-pulse">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-              <span>{getStatusDisplay()}</span>
+            <span className="flex items-center space-x-1 rounded-full border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-300 shadow-sm animate-pulse">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <span>{statusDisplay}</span>
             </span>
           ) : (
             <span
@@ -97,88 +145,115 @@ export function BasketballMatchCard({
                   : 'bg-white/5 text-slate-300 border border-white/10'
               }`}
             >
-              {getStatusDisplay()}
+              {statusDisplay}
             </span>
           )}
         </div>
       )}
 
-      {/* Teams & Scores */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3 relative z-10">
+      {/* Teams and Scores Grid */}
+      <div className="space-y-2">
         {/* Home Team */}
-        <Link
-          href={match?.teams?.home?.id ? `/basketball/teams/${match.teams.home.id}` : '#'}
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
-        >
-          <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {match?.teams?.home?.logo ? (
-              <img
-                src={match.teams.home.logo}
-                alt={match?.teams?.home?.name || 'Home'}
-                className="h-full w-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                {(match?.teams?.home?.name || 'HOM').slice(0, 3).toUpperCase()}
-              </span>
-            )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2.5 truncate">
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-amber-400/40 transition-colors">
+              {match?.event_home_team_logo ? (
+                <img
+                  src={match.event_home_team_logo}
+                  alt={homeName}
+                  className="h-full w-full object-contain p-0.5"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <span className="text-xs font-bold text-slate-400">{homeName.charAt(0)}</span>
+              )}
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-white truncate transition-colors">
+              {homeName}
+            </span>
           </div>
-          <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
-            {homeName}
-          </span>
-        </Link>
 
-        {/* Score & VS Pill */}
-        <div className="flex flex-row sm:flex-col items-center justify-center gap-1 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded bg-[#091220] sm:bg-slate-950/90 border border-blue-500/30 flex-shrink-0 min-w-[50px] sm:min-w-[60px] text-center shadow-inner group-hover:border-blue-400/60 transition-colors">
           <span
-            className={`font-black tracking-tight leading-none text-xs sm:text-base ${
+            className={`font-mono font-black text-sm sm:text-base tabular-nums pl-2 ${
               isLive
-                ? 'text-sm sm:text-base text-blue-400'
+                ? 'text-amber-400'
                 : isFinished
-                  ? 'text-sm sm:text-base text-white'
-                  : 'text-xs text-blue-300'
+                  ? Number(homeScore) > Number(awayScore)
+                    ? 'text-white'
+                    : 'text-slate-400'
+                  : 'text-slate-500'
             }`}
           >
-            {isUpcoming ? 'VS' : `${homeScore} - ${awayScore}`}
-          </span>
-          <span className={`text-[8px] font-bold uppercase sm:mt-0.5 ${
-            isLive ? 'text-blue-300' : 'text-slate-400'
-          }`}>
-            {getStatusDisplay()}
+            {isUpcoming ? '-' : homeScore}
           </span>
         </div>
 
         {/* Away Team */}
-        <Link
-          href={match?.teams?.away?.id ? `/basketball/teams/${match.teams.away.id}` : '#'}
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right hover:text-blue-400 transition-colors"
-        >
-          <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
-            {awayName}
-          </span>
-          <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {match?.teams?.away?.logo ? (
-              <img
-                src={match.teams.away.logo}
-                alt={match?.teams?.away?.name || 'Away'}
-                className="h-full w-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                {(match?.teams?.away?.name || 'AWY').slice(0, 3).toUpperCase()}
-              </span>
-            )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2.5 truncate">
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-amber-400/40 transition-colors">
+              {match?.event_away_team_logo ? (
+                <img
+                  src={match.event_away_team_logo}
+                  alt={awayName}
+                  className="h-full w-full object-contain p-0.5"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <span className="text-xs font-bold text-slate-400">{awayName.charAt(0)}</span>
+              )}
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-white truncate transition-colors">
+              {awayName}
+            </span>
           </div>
-        </Link>
+
+          <span
+            className={`font-mono font-black text-sm sm:text-base tabular-nums pl-2 ${
+              isLive
+                ? 'text-amber-400'
+                : isFinished
+                  ? Number(awayScore) > Number(homeScore)
+                    ? 'text-white'
+                    : 'text-slate-400'
+                  : 'text-slate-500'
+            }`}
+          >
+            {isUpcoming ? '-' : awayScore}
+          </span>
+        </div>
+      </div>
+
+      {/* Quarter Breakdown Mini-Tally (Shown on hover or live) */}
+      {match?.scores && (isLive || isFinished) && (
+        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Quarters</span>
+          <div className="flex items-center gap-2">
+            {['1stQuarter', '2ndQuarter', '3rdQuarter', '4thQuarter'].map((q, idx) => {
+              const qScore = match.scores?.[q as keyof typeof match.scores]?.[0];
+              if (!qScore) return null;
+              return (
+                <span key={q} className="px-1.5 py-0.5 rounded bg-white/5 border border-white/5">
+                  Q{idx + 1}: {qScore.score_home}-{qScore.score_away}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Footer Info / SEO Link */}
+      <div className="mt-2 flex items-center justify-end text-[10px] text-slate-500 group-hover:text-amber-400 transition-colors">
+        <span className="flex items-center gap-1 font-semibold">
+          Game Center →
+        </span>
       </div>
     </div>
   );
 }
+
+export default BasketballMatchCard;

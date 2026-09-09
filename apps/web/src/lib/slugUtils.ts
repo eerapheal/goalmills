@@ -81,6 +81,18 @@ export function extractEventKeyFromSlug(slug: string): string {
 }
 
 /**
+ * Extract a numeric ID or trailing key from any entity slug (e.g. "los-angeles-lakers-1" -> "1", "766" -> "766")
+ */
+export function extractKeyFromSlug(slug: string): string {
+  if (!slug) return '';
+  if (/^\d+$/.test(slug)) return slug;
+  // Check trailing digits after a hyphen
+  const match = slug.match(/-(\d+)$/);
+  if (match) return match[1];
+  return slug;
+}
+
+/**
  * Football route helpers — canonical URL builders
  */
 export const footballRoutes = {
@@ -105,5 +117,32 @@ export const footballRoutes = {
   officialFromName: (name: string) => `/football/officials/${slugify(name)}`,
 
   competition: (slug: string) => `/football/${slug}`,
+};
+
+/**
+ * Basketball route helpers — canonical SEO URL builders
+ */
+export const basketballRoutes = {
+  match: (slug: string) => `/basketball/matches/${slug}`,
+  matchFromEvent: (match: {
+    event_home_team?: string;
+    event_away_team?: string;
+    event_date?: string;
+    event_key?: string | number;
+  }) => `/basketball/matches/${buildMatchSlug(match)}`,
+
+  team: (slug: string) => `/basketball/teams/${slug}`,
+  teamFromName: (name: string, key?: string | number) =>
+    key ? `/basketball/teams/${slugify(name)}-${key}` : `/basketball/teams/${slugify(name)}`,
+
+  league: (slug: string) => `/basketball/leagues/${slug}`,
+  leagueFromName: (name: string, key?: string | number) =>
+    key ? `/basketball/leagues/${slugify(name)}-${key}` : `/basketball/leagues/${slugify(name)}`,
+
+  player: (slug: string) => `/basketball/players/${slug}`,
+  playerFromName: (name: string, key?: string | number) =>
+    key ? `/basketball/players/${slugify(name)}-${key}` : `/basketball/players/${slugify(name)}`,
+
+  competition: (slug: string) => `/basketball/${slug}`,
 };
 

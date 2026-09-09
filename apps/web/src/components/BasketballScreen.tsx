@@ -1,70 +1,49 @@
-"use client";
+'use client';
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { BasketballMatchCard } from './BasketballMatchCard';
-import { webBasketballApiService, ApiBasketballGameItem } from '../services/basketballApi';
+import { basketballApi } from '../services/basketballApi';
+import { BasketballEvent, BasketballStanding } from '@goalmills/types';
 import { GoalmillsLoader } from './GoalmillsLoader';
-import { getNewsUrl, slugify } from '@/lib/slugUtils';
-import { FiRefreshCw, FiSearch, FiCalendar, FiAward, FiActivity } from 'react-icons/fi';
+import { getNewsUrl, slugify, basketballRoutes } from '@/lib/slugUtils';
+import {
+  FiRefreshCw,
+  FiSearch,
+  FiCalendar,
+  FiAward,
+  FiActivity,
+  FiZap,
+  FiTrendingUp,
+  FiShield,
+  FiSliders,
+} from 'react-icons/fi';
 
-type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
+export type BasketballTab = 'live' | 'upcoming' | 'results' | 'standings';
+
+export const MAJOR_BASKETBALL_LEAGUES = [
+  { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐' },
+  { id: '766', name: 'NBA', country: 'USA', flag: '🇺🇸' },
+  { id: '787', name: 'EuroLeague', country: 'Europe', flag: '🇪🇺' },
+  { id: '782', name: 'Liga ACB', country: 'Spain', flag: '🇪🇸' },
+  { id: '812', name: 'NCAA Basketball', country: 'USA', flag: '🇺🇸' },
+  { id: '772', name: 'Lega Basket Serie A', country: 'Italy', flag: '🇮🇹' },
+  { id: '779', name: 'BBL', country: 'Germany', flag: '🇩🇪' },
+  { id: '788', name: 'EuroCup', country: 'Europe', flag: '🇪🇺' },
+];
 
 export function BasketballScreen() {
   const [activeTab, setActiveTab] = useState<BasketballTab>('live');
+  const [selectedLeague, setSelectedLeague] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [games, setGames] = useState<ApiBasketballGameItem[]>([]);
-  const [standings, setStandings] = useState<any[]>([]);
-  const [tickerIndex, setTickerIndex] = useState(0);
-  const [pulseNews, setPulseNews] = useState<
-    { id?: string; _id?: string; tag: string; title: string; time: string }[]
-  >([
-    { id: 'hoops-1', tag: 'NBA PLAYOFFS', title: 'Clutch Shooting Metrics: Fourth-quarter defensive ratings analysis', time: '10m ago' },
-    { id: 'hoops-2', tag: 'TRADE WIRE', title: 'Lakers exploring perimeter shooter deals ahead of trade deadline', time: '30m ago' },
-    { id: 'hoops-3', tag: 'EUROLEAGUE', title: 'Real Madrid vs Panathinaikos: Full tactical breakdown and star matchups', time: '1h ago' },
-    { id: 'hoops-4', tag: 'NBA', title: 'Celtics extend Eastern Conference lead with dominant road victory', time: '2h ago' },
-    { id: 'hoops-5', tag: 'WNBA', title: 'New expansion team rosters and official draft lottery schedule set', time: '4h ago' },
-  ]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function loadBasketballPulseNews() {
-      try {
-        const res = await fetch('/api/news?sport=basketball&limit=8');
-        if (res.ok) {
-          const data = await res.json();
-          const items = Array.isArray(data) ? data : data?.news || data?.data;
-          if (items && items.length > 0) {
-            const formatted = items.map((item: any) => ({
-              id: item._id || item.id,
-              _id: item._id || item.id,
-              slug: item.slug || (item.title ? slugify(item.title) : undefined),
-              tag: (item.competition || item.category || item.tags?.[0] || 'BASKETBALL').toUpperCase(),
-              title: item.title,
-              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
-            }));
-            setPulseNews(formatted);
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to fetch basketball pulse news:', err);
-      }
-    }
-    loadBasketballPulseNews();
-  }, []);
+  const [games, setGames] = useState<BasketballEvent[]>([]);
+  const [standings, setStandings] = useState<BasketballStanding[]>([]);
 
-  useEffect(() => {
-    if (pulseNews.length === 0) return;
-    const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % pulseNews.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [pulseNews.length]);
-
-  const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
-  const pulseLink = getNewsUrl(currentPulse);
-
-  // 7-day date slider
+  // 7-day date strip slider (-3 days, today, +3 days)
   const dateStrip = useMemo(() => {
     const dates = [];
     const today = new Date();
@@ -86,52 +65,87 @@ export function BasketballScreen() {
     return dates;
   }, []);
 
-  const fetchGames = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
     try {
       if (activeTab === 'standings') {
-        const res = await webBasketballApiService.getStandings({
-          league: 12, // NBA
-          season: '2023-2024',
-        });
-        setStandings(res || []);
+        const leagueId = selectedLeague === 'all' ? 766 : Number(selectedLeague);
+        const res = await basketballApi.getStandings({ leagueId });
+        const list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
+        setStandings(list);
+      } else if (activeTab === 'live') {
+        const res = await basketballApi.getLivescore(
+          selectedLeague !== 'all' ? { leagueId: Number(selectedLeague) } : {}
+        );
+        const list = Array.isArray(res?.result) ? res.result : [];
+        setGames(list);
       } else {
-        let raw: ApiBasketballGameItem[] = [];
-        if (activeTab === 'live') {
-          raw = await webBasketballApiService.getLiveGames();
-        } else {
-          raw = await webBasketballApiService.getGamesByDate(selectedDate);
-        }
-        setGames(raw || []);
+        // Upcoming or Results
+        const res = await basketballApi.getFixtures({
+          from: selectedDate,
+          to: selectedDate,
+          ...(selectedLeague !== 'all' ? { leagueId: Number(selectedLeague) } : {}),
+        });
+        const list = Array.isArray(res?.result) ? res.result : [];
+        setGames(list);
       }
     } catch (err) {
-      console.error('[Web BasketballScreen] Error loading games:', err);
+      console.error('[BasketballScreen] Error loading data:', err);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
-  }, [activeTab, selectedDate]);
+  }, [activeTab, selectedLeague, selectedDate]);
 
   useEffect(() => {
-    fetchGames();
-  }, [fetchGames]);
+    loadData();
+  }, [loadData]);
 
+  // Polling interval for live matches (every 15s)
+  useEffect(() => {
+    if (activeTab !== 'live') return;
+    const interval = setInterval(() => {
+      loadData(true);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [activeTab, loadData]);
+
+  const handleManualRefresh = async () => {
+    setRefreshing(true);
+    await loadData(false);
+    setRefreshing(false);
+  };
+
+  // Filtered games based on active tab and search query
   const filteredGames = useMemo(() => {
     let list = Array.isArray(games) ? games : [];
 
     if (activeTab === 'live') {
       list = list.filter((g) => {
-        const short = g?.status?.short || '';
-        return ['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE'].includes(short);
+        const status = g.event_status?.toLowerCase() || '';
+        const quarter = g.event_quarter?.toLowerCase() || '';
+        return (
+          g.event_live === '1' ||
+          status.includes('live') ||
+          status.includes('quarter') ||
+          status.includes('ot') ||
+          status.includes('halftime') ||
+          quarter.includes('quarter')
+        );
       });
     } else if (activeTab === 'upcoming') {
       list = list.filter((g) => {
-        const short = g?.status?.short || '';
-        return !['Q1', 'Q2', 'Q3', 'Q4', 'OT', 'BT', 'HT', 'LIVE', 'FT', 'AOT'].includes(short);
+        const status = g.event_status?.toLowerCase() || '';
+        return (
+          status !== 'finished' &&
+          status !== 'ft' &&
+          status !== 'aot' &&
+          g.event_live !== '1'
+        );
       });
     } else if (activeTab === 'results') {
       list = list.filter((g) => {
-        const short = g?.status?.short || '';
-        return ['FT', 'AOT'].includes(short);
+        const status = g.event_status?.toLowerCase() || '';
+        return status === 'finished' || status === 'ft' || status === 'aot';
       });
     }
 
@@ -139,316 +153,280 @@ export function BasketballScreen() {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         (g) =>
-          (g?.teams?.home?.name || '').toLowerCase().includes(q) ||
-          (g?.teams?.away?.name || '').toLowerCase().includes(q) ||
-          (g?.league?.name || '').toLowerCase().includes(q)
+          (g.event_home_team || '').toLowerCase().includes(q) ||
+          (g.event_away_team || '').toLowerCase().includes(q) ||
+          (g.league_name || '').toLowerCase().includes(q)
       );
     }
 
     return list;
   }, [games, activeTab, searchQuery]);
 
-  // Group by league
-  const leagueGroups = useMemo(() => {
-    const groups: {
-      [key: string]: { title: string; logo?: string; games: ApiBasketballGameItem[] };
-    } = {};
-
-    filteredGames.forEach((game) => {
-      if (!game) return;
-      const leagueTitle = game?.league?.name || 'Basketball Competitions';
-      if (!groups[leagueTitle]) {
-        groups[leagueTitle] = {
-          title: leagueTitle,
-          logo: game?.league?.logo,
-          games: [],
-        };
+  // Group games by league
+  const groupedGames = useMemo(() => {
+    const groups: { [key: string]: { leagueName: string; matches: BasketballEvent[] } } = {};
+    filteredGames.forEach((m) => {
+      const lName = m.league_name || 'Other Basketball Competitions';
+      if (!groups[lName]) {
+        groups[lName] = { leagueName: lName, matches: [] };
       }
-      groups[leagueTitle].games.push(game);
+      groups[lName].matches.push(m);
     });
-
     return Object.values(groups);
   }, [filteredGames]);
 
-  const tabs: { id: BasketballTab; label: string; icon: string; badge?: string }[] = [
-    { id: 'live', label: 'Live Games', icon: '⚡', badge: 'Live' },
-    { id: 'upcoming', label: 'Upcoming', icon: '📅' },
-    { id: 'results', label: 'Results', icon: '✅' },
-    { id: 'standings', label: 'Standings', icon: '🏆' },
-  ];
-
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
-      {/* ─── TOP BASKETBALL PULSE WIRE TICKER ─── */}
-      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
-      <div className="hidden md:flex items-center gap-2.5 min-w-0 flex-1">
-      <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
-       
-        <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
-          BASKETBALL PULSE
-        </span>
-
-        <Link
-          href={pulseLink}
-          className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
-        >
-          {currentPulse?.title}    
-        </Link>
-
-        <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-          • {currentPulse?.time}
-        </span>
-      </div>
-    </div>
-
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
-          >
-            {activeTab === 'live' ? '📅 Upcoming Games' : '⚡ Live Hoops'}
-          </button>
-        </div>
-      </div>
-      
-
-      {/* Smart Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-lg">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30">
-            <span className="text-sm">🏀</span>
-          </div>
-          <div>
-            <h2 className="text-xs sm:text-sm font-black text-white uppercase tracking-tight flex items-center gap-1.5">
-              <span>Basketball LiveScore</span>
-              <span className="px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono font-bold">
-                Court Radar
-              </span>
-            </h2>
-            <p className="text-[10px] text-slate-400">
-              Live quarters, shot telemetry, conference standings, and NBA scorelines
-            </p>
-          </div>
-        </div>
-
-        {/* Search & Refresh */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:w-52">
-            <input
-              type="text"
-              placeholder="Search team or league..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-blue-500/20 bg-[#070E1A] px-2.5 py-1 pl-7 text-[11px] text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all shadow-inner h-7"
-            />
-            <FiSearch className="absolute left-2.5 top-2 text-[10px] text-slate-400" />
-          </div>
-
-          <button
-            onClick={fetchGames}
-            disabled={loading}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black text-[11px] hover:from-blue-400 hover:to-indigo-500 transition-all shadow-sm active:scale-95 disabled:opacity-50 h-7"
-            title="Refresh on demand"
-          >
-            <FiRefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all duration-150 flex-shrink-0 ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-md shadow-blue-600/30'
-                  : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-              {tab.badge && (
-                <span
-                  className={`text-[8px] px-1.5 py-0.2 rounded-full font-mono ${
+    <div className="space-y-6">
+      {/* Top Controls Header */}
+      <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
+        {/* Navigation Tabs Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-[#060D18]/90 border border-white/5">
+            {[
+              { id: 'live', label: 'Live Games', icon: FiActivity, color: 'text-amber-400' },
+              { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
+              { id: 'results', label: 'Results', icon: FiAward, color: 'text-emerald-400' },
+              { id: 'standings', label: 'Standings', icon: FiTrendingUp, color: 'text-purple-400' },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as BasketballTab)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all ${
                     isActive
-                      ? 'bg-blue-400 text-slate-950 font-black'
-                      : 'bg-blue-500/20 text-blue-300'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                  <Icon className={isActive ? 'text-white' : tab.color} />
+                  <span>{tab.label}</span>
+                  {tab.id === 'live' && games.length > 0 && activeTab === 'live' && (
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-black text-[10px] font-mono font-bold">
+                      {games.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* 7-Day Date Slider (Hidden in Standings & Live modes) */}
-      {activeTab !== 'standings' && activeTab !== 'live' && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-          {dateStrip.map((item) => {
-            const isSelected = selectedDate === item.iso;
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all disabled:opacity-50"
+              title="Refresh Live Data"
+            >
+              <FiRefreshCw className={`text-amber-400 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Sync Live</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Date Strip Navigator (for Upcoming and Results) */}
+        {(activeTab === 'upcoming' || activeTab === 'results') && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10">
+            {dateStrip.map((item) => {
+              const isSelected = selectedDate === item.iso;
+              return (
+                <button
+                  key={item.iso}
+                  onClick={() => setSelectedDate(item.iso)}
+                  className={`flex flex-col items-center min-w-[70px] py-2 px-2.5 rounded-2xl border transition-all ${
+                    isSelected
+                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-md'
+                      : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="text-[10px] uppercase font-bold tracking-wider">{item.dayName}</span>
+                  <span className="text-sm font-mono font-black">{item.dayNumber}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Competitions / Leagues Filter Ribbon */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
+            <FiSliders className="text-amber-400" /> Filter:
+          </span>
+          {MAJOR_BASKETBALL_LEAGUES.map((league) => {
+            const isSelected = selectedLeague === league.id;
             return (
               <button
-                key={item.iso}
-                onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[56px] sm:min-w-[64px] flex-col items-center rounded-lg p-1.5 transition-all duration-150 border ${
+                key={league.id}
+                onClick={() => setSelectedLeague(league.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   isSelected
-                    ? 'border-blue-400 bg-blue-600/25 text-blue-300 shadow-md scale-[1.02]'
-                    : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-400 hover:border-blue-400/30 hover:text-white'
+                    ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20 font-black'
+                    : 'bg-[#091529] text-slate-400 hover:text-white border border-white/5 hover:border-white/15'
                 }`}
               >
-                <span className="text-[9px] font-bold uppercase">{item.dayName}</span>
-                <span className="text-xs sm:text-sm font-black">{item.dayNumber}</span>
+                <span>{league.flag}</span>
+                <span>{league.name}</span>
               </button>
             );
           })}
         </div>
-      )}
 
-      {/* Content Feed */}
-      {loading ? (
-        <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
-          <GoalmillsLoader
-            size="md"
-            label="Basketball Desk"
-            sublabel="Syncing live quarter scores & NBA telemetry..."
+        {/* Live Search Filter */}
+        <div className="relative">
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+          <input
+            type="text"
+            placeholder="Search teams, conferences, leagues..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#060D18]/90 border border-white/10 text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50 transition-colors"
           />
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      {loading ? (
+        <div className="py-20 flex flex-col items-center justify-center space-y-3">
+          <GoalmillsLoader />
+          <p className="text-xs text-slate-400 font-bold tracking-wider uppercase animate-pulse">
+            Loading Live Basketball Intelligence...
+          </p>
         </div>
       ) : activeTab === 'standings' ? (
         /* Standings View */
-        <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
-          <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-            <div>
-              <h3 className="text-base font-black text-white flex items-center gap-2 uppercase">
-                <FiAward className="text-amber-400" />
-                <span>NBA Standings & Conference Tables</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Official win-loss percentages and playoff seeds
-              </p>
-            </div>
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono">
-              2025/26 Season
+        <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <FiTrendingUp className="text-amber-400" />
+              <span>Official Standings</span>
+            </h3>
+            <span className="text-xs font-mono font-bold text-slate-400">
+              {standings.length} Teams Listed
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm text-slate-300">
-              <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
-                <tr>
-                  <th className="py-3 px-2 text-center w-8">#</th>
-                  <th className="py-3 px-3">Franchise</th>
-                  <th className="py-3 px-2 text-center">W</th>
-                  <th className="py-3 px-2 text-center">L</th>
-                  <th className="py-3 px-2 text-center">PCT</th>
-                  <th className="py-3 px-2 text-center">GB</th>
-                  <th className="py-3 px-3 text-right font-black text-amber-400">STRK</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 font-medium">
-                {standings.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400 text-xs">
-                      Standings telemetry currently updating.
-                    </td>
+          {standings.length === 0 ? (
+            <div className="py-12 text-center text-slate-400 text-sm">
+              No standings currently available for this league.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-white/10 text-[10px] font-black uppercase text-slate-400">
+                    <th className="py-3 px-2">#</th>
+                    <th className="py-3 px-3">Team</th>
+                    <th className="py-3 px-2 text-center">P</th>
+                    <th className="py-3 px-2 text-center">W</th>
+                    <th className="py-3 px-2 text-center">L</th>
+                    <th className="py-3 px-2 text-center">PCT</th>
+                    <th className="py-3 px-2 text-center hidden sm:table-cell">F</th>
+                    <th className="py-3 px-2 text-center hidden sm:table-cell">A</th>
+                    <th className="py-3 px-2 text-center">Form / Stage</th>
                   </tr>
-                ) : (
-                  standings.map((row: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-blue-600/10 transition-colors">
-                      <td className="py-2.5 px-2 text-center font-bold text-slate-400">
-                        {row.position || idx + 1}
-                      </td>
-                      <td className="py-2.5 px-3 font-bold text-white flex items-center gap-2.5">
-                        {row.team?.logo ? (
-                          <img
-                            src={row.team.logo}
-                            alt={row.team?.name}
-                            className="h-5 w-5 object-contain"
-                          />
-                        ) : (
-                          <span className="text-amber-400">🏀</span>
-                        )}
-                        <span className="truncate">{row.team?.name || 'Team'}</span>
-                      </td>
-                      <td className="py-2.5 px-2 text-center text-emerald-400 font-bold">
-                        {row.games?.win?.total ?? '-'}
-                      </td>
-                      <td className="py-2.5 px-2 text-center text-red-400 font-bold">
-                        {row.games?.lose?.total ?? '-'}
-                      </td>
-                      <td className="py-2.5 px-2 text-center font-mono text-slate-300">
-                        {row.games?.win?.percentage ?? '.500'}
-                      </td>
-                      <td className="py-2.5 px-2 text-center text-slate-400">
-                        {row.gamesBehind ?? '-'}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-black text-amber-400 text-xs">
-                        {row.streak ? `W${row.streak}` : 'W1'}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-medium">
+                  {standings.map((team, idx) => {
+                    const teamSlug = basketballRoutes.teamFromName(
+                      team.standing_team,
+                      team.team_key
+                    );
+                    return (
+                      <tr
+                        key={team.team_key || idx}
+                        className="hover:bg-white/5 transition-colors group"
+                      >
+                        <td className="py-3 px-2 font-mono font-bold text-slate-400 group-hover:text-amber-400">
+                          {team.standing_place || idx + 1}
+                        </td>
+                        <td className="py-3 px-3">
+                          <Link
+                            href={teamSlug}
+                            className="font-bold text-white hover:text-amber-300 transition-colors flex items-center gap-2"
+                          >
+                            <span>{team.standing_team}</span>
+                          </Link>
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono">{team.standing_P}</td>
+                        <td className="py-3 px-2 text-center font-mono text-emerald-400 font-bold">
+                          {team.standing_W}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-rose-400">
+                          {team.standing_L}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono font-bold text-amber-400">
+                          {team.standing_PCT ||
+                            (team.standing_P && Number(team.standing_P) > 0
+                              ? (Number(team.standing_W) / Number(team.standing_P)).toFixed(3)
+                              : '-')}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-slate-400 hidden sm:table-cell">
+                          {team.standing_F}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-slate-400 hidden sm:table-cell">
+                          {team.standing_A}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-[10px] text-slate-400 truncate max-w-[120px]">
+                          {team.league_round || team.standing_place_type || 'Regular'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      ) : leagueGroups.length === 0 ? (
+      ) : groupedGames.length === 0 ? (
         /* Empty State */
-        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-8 text-center backdrop-blur-md">
-          <span className="text-4xl">🏀</span>
-          <h3 className="mt-3 text-base font-bold text-white">
-            {activeTab === 'live' ? 'No Live Basketball Games In-Play' : 'No Games Found'}
-          </h3>
-          <p className="mt-1 text-xs text-slate-400 max-w-sm">
+        <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-12 text-center shadow-xl space-y-3">
+          <div className="text-4xl">🏀</div>
+          <h4 className="text-base font-black text-white">
             {activeTab === 'live'
-              ? 'Check upcoming games or select another date from the calendar.'
-              : 'Try selecting a different date or search filter.'}
+              ? 'No Live Games In-Play Right Now'
+              : `No Matches Scheduled for ${selectedDate}`}
+          </h4>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            {activeTab === 'live'
+              ? 'Check the Upcoming tab for upcoming tip-offs or select another date in Results.'
+              : 'Try selecting a different competition or date using the calendar slider above.'}
           </p>
-          <button
-            onClick={fetchGames}
-            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-all shadow-md"
-          >
-            Refresh Feed
-          </button>
         </div>
       ) : (
-        /* Grouped Games List */
+        /* Matches Grid Grouped by Competition */
         <div className="space-y-6">
-          {leagueGroups.map((group) => (
-            <div
-              key={group.title}
-              className="space-y-3 rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-4 shadow-xl backdrop-blur-md"
-            >
-              {/* League Header */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-                <div className="flex items-center space-x-2">
+          {groupedGames.map((group) => (
+            <div key={group.leagueName} className="space-y-3">
+              {/* Competition Section Header */}
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
                   <span className="text-amber-400">🏀</span>
-                  <h2 className="text-xs font-black uppercase tracking-wider text-white">
-                    {group.title}
-                  </h2>
+                  <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                    {group.leagueName}
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 font-bold border border-blue-500/20">
+                    {group.matches.length}
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                  {group.games.length} {group.games.length === 1 ? 'Game' : 'Games'}
-                </span>
               </div>
 
               {/* Match Cards Grid */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                {group.games.map((game) => (
-                  <BasketballMatchCard key={game.id} match={game} hideLeague />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {group.matches.map((match) => (
+                  <BasketballMatchCard
+                    key={match.event_key || match.home_team_key}
+                    match={match}
+                    hideLeague={false}
+                  />
                 ))}
               </div>
             </div>
           ))}
         </div>
       )}
-    
     </div>
   );
 }
+
+export default BasketballScreen;
