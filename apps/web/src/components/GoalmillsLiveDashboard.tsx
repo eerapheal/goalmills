@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
 import {
   FiMoreHorizontal,
@@ -89,6 +90,7 @@ export function GoalmillsLiveDashboard({
 }: {
   onSelectTab?: (tab: string) => void;
 }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('LIVE SCORES');
   const [tickerIndex, setTickerIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -343,115 +345,131 @@ export function GoalmillsLiveDashboard({
                   <p className="text-xs text-slate-500 mt-1">Check back when matches are in play</p>
                 </div>
               ) : null}
-              {liveFootballMatches.map((m) => (
-                <Link
-                  href={footballRoutes.matchFromEvent({ event_home_team: m.homeTeam, event_away_team: m.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: m.id })}
-                  key={m.id}
-                  className="block rounded-lg bg-[#142336] border border-white/5 p-2 sm:p-2.5 hover:border-amber-500/30 hover:bg-[#192b42] transition duration-300 group cursor-pointer"
-                >
-                  {/* Header info (League name, live status badge) */}
-                  <div className="flex items-center justify-between text-xs text-slate-300 mb-2">
-                    <span className="font-semibold text-slate-400 truncate pr-2">{m.league}</span>
-                    <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.time}</span>
-                  </div>
-
-                  {/* Match Body */}
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2.5">
-                    {/* Home Team */}
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
+              {liveFootballMatches.map((m) => {
+                const matchUrl = footballRoutes.matchFromEvent({
+                  event_home_team: m.homeTeam,
+                  event_away_team: m.awayTeam,
+                  event_date: new Date().toISOString().split('T')[0],
+                  event_key: m.id,
+                });
+                return (
+                  <div
+                    key={m.id}
+                    onClick={() => router.push(matchUrl)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                      }}
-                      className="inline-block"
-                    >
-                      <Link
-                        href={footballRoutes.teamFromName(m.homeTeam)}
-                        className="flex items-center gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
-                      >
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
-                          {m.home_team_logo ? (
-                            <img
-                              src={m.home_team_logo}
-                              alt={m.homeTeam}
-                              className="h-full w-full object-contain rounded-full"
-                              onError={(e) => {
-                                (e.target as HTMLElement).style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                              {m.homeCode}
-                            </span>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">{m.homeTeam}</div>
-                          {m.homeScorer && (
-                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
-                          )}
-                        </div>
-                      </Link>
-                    </span>
+                        router.push(matchUrl);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    className="block rounded-lg bg-[#142336] border border-white/5 p-2 sm:p-2.5 hover:border-amber-500/30 hover:bg-[#192b42] transition duration-300 group cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+                  >
+                    {/* Header info (League name, live status badge) */}
+                    <div className="flex items-center justify-between text-xs text-slate-300 mb-2">
+                      <span className="font-semibold text-slate-400 truncate pr-2">{m.league}</span>
+                      <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.time}</span>
+                    </div>
 
-                    {/* Score & Time */}
-                    <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-0 px-1.5 sm:px-2.5 py-0.5 rounded-lg bg-slate-950/80 border border-amber-500/30 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
-                      <span className="text-xs sm:text-base font-black text-amber-400 tracking-tight leading-none">
-                        {m.score}
+                    {/* Match Body */}
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2.5">
+                      {/* Home Team */}
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className="inline-block"
+                      >
+                        <Link
+                          href={footballRoutes.teamFromName(m.homeTeam)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
+                        >
+                          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                            {m.home_team_logo ? (
+                              <img
+                                src={m.home_team_logo}
+                                alt={m.homeTeam}
+                                className="h-full w-full object-contain rounded-full"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                                {m.homeCode}
+                              </span>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">{m.homeTeam}</div>
+                            {m.homeScorer && (
+                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
+                            )}
+                          </div>
+                        </Link>
+                      </span>
+
+                      {/* Score & Time */}
+                      <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-0 px-1.5 sm:px-2.5 py-0.5 rounded-lg bg-slate-950/80 border border-amber-500/30 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
+                        <span className="text-xs sm:text-base font-black text-amber-400 tracking-tight leading-none">
+                          {m.score}
+                        </span>
+                      </div>
+
+                      {/* Away Team */}
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className="inline-block text-right"
+                      >
+                        <Link
+                          href={footballRoutes.teamFromName(m.awayTeam)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-end gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
+                        >
+                          <div className="min-w-0 flex-1 text-right">
+                            <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">{m.awayTeam}</div>
+                            {m.awayScorer && (
+                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayScorer}</div>
+                            )}
+                          </div>
+                          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                            {m.away_team_logo ? (
+                              <img
+                                src={m.away_team_logo}
+                                alt={m.awayTeam}
+                                className="h-full w-full object-contain rounded-full"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                                {m.awayCode}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
                       </span>
                     </div>
 
-                    {/* Away Team */}
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
-                      className="inline-block text-right"
-                    >
-                      <Link
-                        href={footballRoutes.teamFromName(m.awayTeam)}
-                        className="flex items-center justify-end gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
-                      >
-                        <div className="min-w-0 flex-1 text-right">
-                          <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">{m.awayTeam}</div>
-                          {m.awayScorer && (
-                            <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayScorer}</div>
-                          )}
-                        </div>
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
-                          {m.away_team_logo ? (
-                            <img
-                              src={m.away_team_logo}
-                              alt={m.awayTeam}
-                              className="h-full w-full object-contain rounded-full"
-                              onError={(e) => {
-                                (e.target as HTMLElement).style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                              {m.awayCode}
-                            </span>
-                          )}
-                        </div>
-                      </Link>
-                    </span>
-                  </div>
-
-                  {/* Timeline / Possession Progress Bar - Hidden on mobile viewports */}
-                  <div className="hidden sm:block mt-2 pt-1.5 border-t border-white/5">
-                    <div className="flex justify-between text-[9px] sm:text-[10px] text-slate-300 mb-1 font-medium">
-                      <span>Possession {m.possession}%</span>
-                      <span>{100 - m.possession}%</span>
-                    </div>
-                    <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden flex">
-                      <div className="bg-amber-400 h-full" style={{ width: `${m.possession}%` }} />
-                      <div className="bg-slate-700 h-full" style={{ width: `${100 - m.possession}%` }} />
+                    {/* Timeline / Possession Progress Bar - Hidden on mobile viewports */}
+                    <div className="hidden sm:block mt-2 pt-1.5 border-t border-white/5">
+                      <div className="flex justify-between text-[9px] sm:text-[10px] text-slate-300 mb-1 font-medium">
+                        <span>Possession {m.possession}%</span>
+                        <span>{100 - m.possession}%</span>
+                      </div>
+                      <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden flex">
+                        <div className="bg-amber-400 h-full" style={{ width: `${m.possession}%` }} />
+                        <div className="bg-slate-700 h-full" style={{ width: `${100 - m.possession}%` }} />
+                      </div>
                     </div>
                   </div>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           </div>
 

@@ -61,8 +61,4 @@ const TenantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-TenantSchema.index({ slug: 1 });
-TenantSchema.index({ customDomain: 1 }, { sparse: true });
-TenantSchema.index({ status: 1 });
-
 export default mongoose.models.Tenant || mongoose.model('Tenant', TenantSchema);

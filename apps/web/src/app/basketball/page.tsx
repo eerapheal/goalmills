@@ -77,77 +77,7 @@ export default async function BasketballHubPage() {
     <ContentHubLayout
       breadcrumbs={[{ name: 'Basketball Hub', url: '/basketball' }]}
       header={
-        <div className="space-y-4">
-          {/* Live Basketball Dynamic Flash Ticker */}
-          <LiveNewsFlashTicker sport="basketball" badgeText="HOOPS WIRE" />
-
-          {/* Hero Banner Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-br from-[#08142A] via-[#0B1E3E] to-[#060D18] p-6 sm:p-10 shadow-2xl shadow-blue-950/50">
-            {/* Ambient Lighting */}
-            <div className="absolute top-0 right-0 w-96 h-64 bg-blue-600/15 blur-3xl pointer-events-none -z-0" />
-            <div className="absolute bottom-0 left-1/3 w-80 h-48 bg-amber-500/10 blur-3xl pointer-events-none -z-0" />
-
-            <div className="relative z-10 max-w-4xl space-y-4">
-              {/* Level 1 Sport Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-black uppercase tracking-wider shadow-sm">
-                <span className="text-amber-400">🏀</span>
-                <span>NBA SCORES, BASKETBALL STANDINGS & NEWS</span>
-              </div>
-
-              {/* Main Headline */}
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Global Basketball <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Live Scores & News</span>
-              </h1>
-
-              {/* Subtitle description */}
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time quarter-by-quarter scorelines, NBA conference standings, EuroLeague fixtures, player box scores, and game intelligence.
-              </p>
-
-              {/* Quick Intelligence KPI Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Leagues</span>
-                  <span className="text-lg sm:text-xl font-black text-white">NBA & Euro</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Live Quarters</span>
-                  <span className="text-lg sm:text-xl font-black text-amber-400">Real-Time</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Standings</span>
-                  <span className="text-lg sm:text-xl font-black text-emerald-400">Official</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Club Updates</span>
-                  <span className="text-lg sm:text-xl font-black text-sky-400">Global Info</span>
-                </div>
-              </div>
-
-              {/* Quick Tournaments Ribbon */}
-              <div className="pt-3 border-t border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <FiAward className="text-amber-400 text-xs" />
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Major Basketball Leagues:
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {BASKETBALL_MAJOR_LEAGUES.map((league) => (
-                    <Link
-                      key={league.slug}
-                      href={basketballRoutes.league(league.slug)}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#091529]/80 hover:bg-blue-600/30 border border-blue-500/20 hover:border-amber-400/40 text-xs font-bold text-slate-200 hover:text-white transition-all shadow-md group"
-                    >
-                      <span className="text-amber-400">🏀</span>
-                      <span className="group-hover:text-amber-300 transition-colors">{league.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <></>
       }
       sidebar={
         <div className="space-y-6">

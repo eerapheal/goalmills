@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
 import {
   FiMoreHorizontal,
@@ -21,6 +22,7 @@ import { FootballScreen } from './FootballScreen';
 import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 export function GoalmillsFootballDashboard() {
+  const router = useRouter();
   const [activeSubTab, setActiveSubTab] = useState<'hub' | 'livescores'>('hub');
   const [tickerIndex, setTickerIndex] = useState(0);
   const [pulseNews, setPulseNews] = useState<
@@ -313,121 +315,137 @@ export function GoalmillsFootballDashboard() {
               </div>
 
               <div className="space-y-3.5">
-                {liveMatches.map((m) => (
-                  <Link
-                    href={footballRoutes.matchFromEvent({ event_home_team: m.homeTeam, event_away_team: m.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: m.id })}
-                    key={m.id}
-                    className="block rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md group cursor-pointer"
-                  >
-                    {/* Header info (League name, live status badge) */}
-                    <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
-                      <span className="font-bold text-slate-200 flex items-center gap-1.5 truncate pr-2 group-hover:text-amber-300 transition-colors">
-                        <span className="text-amber-400">🏆</span> {m.league}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse flex-shrink-0">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                        {m.status || 'LIVE'}
-                      </span>
-                    </div>
-
-                    {/* Match Body */}
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3">
-                      {/* Home Team */}
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
+                {liveMatches.map((m) => {
+                  const matchUrl = footballRoutes.matchFromEvent({
+                    event_home_team: m.homeTeam,
+                    event_away_team: m.awayTeam,
+                    event_date: new Date().toISOString().split('T')[0],
+                    event_key: m.id,
+                  });
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => router.push(matchUrl)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                        }}
-                        className="inline-block"
-                      >
-                        <Link
-                          href={footballRoutes.teamFromName(m.homeTeam)}
-                          className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
-                        >
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
-                            {m.home_team_logo ? (
-                              <img
-                                src={m.home_team_logo}
-                                alt={m.homeTeam}
-                                className="h-full w-full object-contain rounded-full"
-                                onError={(e) => {
-                                  (e.target as HTMLElement).style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                                {m.homeCode}
-                              </span>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.homeTeam}</div>
-                            {m.homeGoalScorer && (
-                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeGoalScorer}</div>
-                            )}
-                          </div>
-                        </Link>
-                      </span>
-
-                      {/* Score Badge */}
-                      <div className="flex flex-row sm:flex-col items-center justify-center gap-1.5 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
-                        <span className="text-xs sm:text-lg font-black text-amber-400 tracking-tight leading-none">
-                          {m.score}
+                          router.push(matchUrl);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      className="block rounded-2xl bg-[#0E1F38] border border-blue-500/20 p-3 sm:p-4 hover:border-amber-400/40 transition-all duration-300 shadow-md group cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400/50"
+                    >
+                      {/* Header info (League name, live status badge) */}
+                      <div className="flex items-center justify-between text-xs text-slate-400 mb-2.5">
+                        <span className="font-bold text-slate-200 flex items-center gap-1.5 truncate pr-2 group-hover:text-amber-300 transition-colors">
+                          <span className="text-amber-400">🏆</span> {m.league}
                         </span>
-                        <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.status}</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black tracking-wider flex items-center gap-1.5 animate-pulse flex-shrink-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          {m.status || 'LIVE'}
+                        </span>
                       </div>
 
-                      {/* Away Team */}
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                        }}
-                        className="inline-block text-right"
-                      >
-                        <Link
-                          href={footballRoutes.teamFromName(m.awayTeam)}
-                          className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
+                      {/* Match Body */}
+                      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3">
+                        {/* Home Team */}
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="inline-block"
                         >
-                          <div className="min-w-0 flex-1 text-right">
-                            <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.awayTeam}</div>
-                            {m.awayGoalScorer && (
-                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayGoalScorer}</div>
-                            )}
-                          </div>
-                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
-                            {m.away_team_logo ? (
-                              <img
-                                src={m.away_team_logo}
-                                alt={m.awayTeam}
-                                className="h-full w-full object-contain rounded-full"
-                                onError={(e) => {
-                                  (e.target as HTMLElement).style.display = 'none';
-                                }}
-                              />
-                            ) : (
-                              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                                {m.awayCode}
-                              </span>
-                            )}
-                          </div>
-                        </Link>
-                      </span>
-                    </div>
+                          <Link
+                            href={footballRoutes.teamFromName(m.homeTeam)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
+                          >
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                              {m.home_team_logo ? (
+                                <img
+                                  src={m.home_team_logo}
+                                  alt={m.homeTeam}
+                                  className="h-full w-full object-contain rounded-full"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                                  {m.homeCode}
+                                </span>
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.homeTeam}</div>
+                              {m.homeGoalScorer && (
+                                <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeGoalScorer}</div>
+                              )}
+                            </div>
+                          </Link>
+                        </span>
 
-                    {/* Possession & xG Progress Bar - Hidden on mobile viewports */}
-                    <div className="hidden sm:block mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
-                      <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
-                        <span>Possession {m.homePossession}% • xG {m.homeXg}</span>
-                        <span>{m.awayPossession}% • xG {m.awayXg}</span>
+                        {/* Score Badge */}
+                        <div className="flex flex-row sm:flex-col items-center justify-center gap-1.5 sm:gap-0 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg bg-slate-950/90 border border-amber-500/40 flex-shrink-0 min-w-[56px] sm:min-w-[68px] text-center shadow-inner">
+                          <span className="text-xs sm:text-lg font-black text-amber-400 tracking-tight leading-none">
+                            {m.score}
+                          </span>
+                          <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.status}</span>
+                        </div>
+
+                        {/* Away Team */}
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="inline-block text-right"
+                        >
+                          <Link
+                            href={footballRoutes.teamFromName(m.awayTeam)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
+                          >
+                            <div className="min-w-0 flex-1 text-right">
+                              <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.awayTeam}</div>
+                              {m.awayGoalScorer && (
+                                <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayGoalScorer}</div>
+                              )}
+                            </div>
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
+                              {m.away_team_logo ? (
+                                <img
+                                  src={m.away_team_logo}
+                                  alt={m.awayTeam}
+                                  className="h-full w-full object-contain rounded-full"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
+                                  {m.awayCode}
+                                </span>
+                              )}
+                            </div>
+                          </Link>
+                        </span>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex">
-                        <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full" style={{ width: `${m.homePossession}%` }} />
-                        <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: `${m.awayPossession}%` }} />
+
+                      {/* Possession & xG Progress Bar - Hidden on mobile viewports */}
+                      <div className="hidden sm:block mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
+                        <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
+                          <span>Possession {m.homePossession}% • xG {m.homeXg}</span>
+                          <span>{m.awayPossession}% • xG {m.awayXg}</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex">
+                          <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full" style={{ width: `${m.homePossession}%` }} />
+                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: `${m.awayPossession}%` }} />
+                        </div>
                       </div>
                     </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
