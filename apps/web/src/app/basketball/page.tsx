@@ -1,16 +1,11 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import dbConnect from '@/lib/db';
-import News from '@/models/News';
 import { ContentHubLayout } from '@/components/ContentHubLayout';
-import { RelatedArticlesMatrix } from '@/components/RelatedArticlesMatrix';
 import { BasketballScreen } from '@/components/BasketballScreen';
-import { FiAward, FiUsers, FiTrendingUp, FiArrowRight, FiActivity, FiMail } from 'react-icons/fi';
-import { BlogPost } from '@goalmills/types';
-import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
+import { FiAward, FiUsers, FiArrowRight, FiMail } from 'react-icons/fi';
 import { basketballRoutes } from '@/lib/slugUtils';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'NBA Live Scores, Basketball Standings, EuroLeague & Box Scores | GoalMills',
@@ -53,32 +48,11 @@ const FEATURED_BASKETBALL_TEAMS = [
   { name: 'Philadelphia 76ers', key: 'philadelphia-76ers-4', role: 'Eastern Contenders' },
 ];
 
-export default async function BasketballHubPage() {
-  let featuredArticles: BlogPost[] = [];
-
-  try {
-    await dbConnect();
-    const allDocs = await News.find({
-      $or: [
-        { sportSlug: 'basketball' },
-        { category: { $regex: /basketball|nba|euroleague|bal|fiba/i } },
-      ],
-    })
-      .sort({ isBreaking: -1, views: -1, createdAt: -1 })
-      .limit(6)
-      .lean();
-
-    featuredArticles = JSON.parse(JSON.stringify(allDocs));
-  } catch (err) {
-    console.error('Error loading basketball hub data:', err);
-  }
-
+export default function BasketballHubPage() {
   return (
     <ContentHubLayout
       breadcrumbs={[{ name: 'Basketball Hub', url: '/basketball' }]}
-      header={
-        <></>
-      }
+      header={<></>}
       sidebar={
         <div className="space-y-6">
           {/* Major Competitions Quick Navigator */}
@@ -158,7 +132,7 @@ export default async function BasketballHubPage() {
               <span>Hoops Daily Brief</span>
             </div>
             <h4 className="text-sm font-black text-white">
-              Get Daily Morning NBA Box Scores & Highlights
+              Get Daily Morning NBA Box Scores & Updates
             </h4>
             <p className="text-xs text-slate-300">
               Complete game recaps and playoff race updates delivered before morning tipoff.
@@ -178,17 +152,6 @@ export default async function BasketballHubPage() {
       <section className="space-y-4">
         <BasketballScreen />
       </section>
-
-      {/* Featured Articles Grid */}
-      {featuredArticles.length > 0 && (
-        <div className="pt-6 border-t border-white/10">
-          <RelatedArticlesMatrix
-            title="Top Basketball News & Game Reports"
-            subtitle="Curated match reports, tournament forecasts, and player interviews"
-            articles={featuredArticles}
-          />
-        </div>
-      )}
     </ContentHubLayout>
   );
 }
