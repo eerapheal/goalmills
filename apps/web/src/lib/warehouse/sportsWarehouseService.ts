@@ -254,7 +254,7 @@ export class SportsWarehouseService {
   public async getHistoricalStandings(
     sport: string,
     competitionSlug: string,
-    season = '2025/2026'
+    season = '2026/2027'
   ): Promise<HistoricalStandingsRecord | null> {
     await connectDB();
     const standings = await HistoricalStandings.findOne({

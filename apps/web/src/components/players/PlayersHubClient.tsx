@@ -23,7 +23,7 @@ interface PlayersHubClientProps {
   initialPlayers: PlayerMeta[];
 }
 
-type PositionCategory = 'all' | 'forward' | 'midfielder' | 'defender-gk';
+type PositionCategory = 'all' | 'african' | 'forward' | 'midfielder' | 'defender-gk';
 type SortOption = 'market-value' | 'goals' | 'assists' | 'rating' | 'age-young' | 'age-old';
 
 export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
@@ -66,17 +66,21 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
           if (!matchName && !matchClub && !matchNat && !matchPos) return false;
         }
 
-        // Position category filter
+        // Position & African Category filter
         if (positionFilter !== 'all') {
-          const pos = player.position.toLowerCase();
-          if (positionFilter === 'forward') {
-            if (!pos.includes('striker') && !pos.includes('winger') && !pos.includes('forward'))
-              return false;
-          } else if (positionFilter === 'midfielder') {
-            if (!pos.includes('midfield')) return false;
-          } else if (positionFilter === 'defender-gk') {
-            if (!pos.includes('back') && !pos.includes('defender') && !pos.includes('goalkeeper'))
-              return false;
+          if (positionFilter === 'african') {
+            if (!player.africanOrigin) return false;
+          } else {
+            const pos = player.position.toLowerCase();
+            if (positionFilter === 'forward') {
+              if (!pos.includes('striker') && !pos.includes('winger') && !pos.includes('forward'))
+                return false;
+            } else if (positionFilter === 'midfielder') {
+              if (!pos.includes('midfield')) return false;
+            } else if (positionFilter === 'defender-gk') {
+              if (!pos.includes('back') && !pos.includes('defender') && !pos.includes('goalkeeper'))
+                return false;
+            }
           }
         }
 
@@ -335,7 +339,12 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
         {/* Position Category Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
           {[
-            { key: 'all', label: 'All Positions', count: initialPlayers.length },
+            { key: 'all', label: 'All Players', count: initialPlayers.length },
+            {
+              key: 'african',
+              label: '🌍 African Superstars',
+              count: initialPlayers.filter((p) => p.africanOrigin).length,
+            },
             {
               key: 'forward',
               label: 'Forwards & Strikers',
@@ -361,7 +370,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
               onClick={() => setPositionFilter(tab.key as PositionCategory)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
                 positionFilter === tab.key
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/30'
+                  ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-blue-600 text-white shadow-lg shadow-orange-500/20'
                   : 'bg-[#050C18] text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
               }`}
             >
@@ -425,7 +434,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                 className={`group relative flex flex-col justify-between rounded-3xl border transition-all duration-300 p-4 sm:p-5 overflow-hidden shadow-lg ${
                   isCompared
                     ? 'border-blue-500 bg-[#0C1E3C] shadow-blue-500/20'
-                    : 'border-white/10 bg-gradient-to-b from-[#0B172B]/90 to-[#070F1E]/95 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10'
+                    : 'border-white/10 bg-gradient-to-b from-[#0B172B]/90 to-[#070F1E]/95 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/10'
                 }`}
               >
                 {/* Header: Photo + Number + Market Value */}
@@ -445,9 +454,16 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                     </div>
 
                     <div className="flex flex-col items-end gap-1">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
-                        {player.marketValue}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {player.africanOrigin && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase text-amber-300 bg-amber-500/15 border border-amber-500/30">
+                            Africa
+                          </span>
+                        )}
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+                          {player.marketValue}
+                        </span>
+                      </div>
                       <span className="text-[10px] text-slate-400 font-semibold">
                         {player.age} yrs • {player.height}
                       </span>
@@ -458,7 +474,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                   <div className="space-y-0.5">
                     <Link
                       href={`/players/${player.slug}`}
-                      className="block text-sm font-extrabold text-white group-hover:text-blue-300 transition-colors truncate"
+                      className="block text-sm font-extrabold text-white group-hover:text-amber-300 transition-colors truncate"
                     >
                       {player.name}
                     </Link>
@@ -471,8 +487,24 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                     </p>
                   </div>
 
-                  {/* 2025/2026 Key Season Stats Card */}
-                  <div className="mt-3.5 pt-3 border-t border-white/5 grid grid-cols-3 gap-2 text-center">
+                  {/* Contract & Valuation Intel */}
+                  {(player.contractUntil || player.weeklyWage) && (
+                    <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-300">
+                      {player.contractUntil && (
+                        <span className="text-slate-400">
+                          Exp: <strong className="text-slate-200">{player.contractUntil}</strong>
+                        </span>
+                      )}
+                      {player.weeklyWage && (
+                        <span className="text-emerald-400 font-mono font-bold">
+                          {player.weeklyWage}/wk
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 2026/2027 Key Season Stats Card */}
+                  <div className="mt-2.5 pt-2 border-t border-white/5 grid grid-cols-3 gap-2 text-center">
                     <div className="p-1.5 rounded-xl bg-white/[0.02] border border-white/5">
                       <span className="text-xs font-black text-white block">
                         {player.seasonStats.goals}

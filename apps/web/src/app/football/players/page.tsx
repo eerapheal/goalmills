@@ -11,22 +11,38 @@ import { FiTrendingUp, FiShield, FiMail, FiArrowRight } from 'react-icons/fi';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'World Football Stars, Scouting Stats, Market Values & Ratings | GoalMills',
+  title: 'African Superstars & Global Footballers Market Values (2026/2027) | GoalMills',
   description:
-    'Explore in-depth football player profiles, tactical scouting statistics, 2025/2026 goal and assist leaderboards, verified market values, and head-to-head comparison intel on GoalMills.',
+    'Explore in-depth African football player profiles, authentic 2026/2027 market valuations, contract expiry dates, weekly wages, and scouting statistics for Osimhen, Salah, Lookman, Hakimi, Kudus, and global stars.',
+  keywords: [
+    'African footballers market values 2026/2027',
+    'Victor Osimhen transfer value',
+    'Mohamed Salah weekly wage contract',
+    'Ademola Lookman scouting report',
+    'Achraf Hakimi market value',
+    'African players in Europe stats',
+    'CAF player values',
+    'GoalMills Footballers Hub',
+  ],
   openGraph: {
-    title: 'World Football Stars, Scouting Stats & Ratings | GoalMills',
+    title: 'African Superstars & World Footballers Market Values (2026/2027) | GoalMills',
     description:
-      'Explore in-depth player statistics, market values, and tactical comparison on GoalMills.',
-    siteName: 'GoalMills',
+      'Explore authentic 2026/2027 market values, contract intelligence, and scouting analytics for African superstars and world icons.',
+    siteName: 'GoalMills Africa',
     type: 'website',
   },
 };
 
 export default async function FootballPlayersHubPage() {
-  const players = EntityService.getAllPlayers();
+  const allPlayers = EntityService.getAllPlayers();
+  // Spotlight African players at the top of the hub
+  const players = [
+    ...allPlayers.filter((p) => p.africanOrigin),
+    ...allPlayers.filter((p) => !p.africanOrigin),
+  ];
   const topTransfers = EntityService.getTransfers().slice(0, 3);
-  const featuredClubs = Object.values(CLUBS_REGISTRY).slice(0, 8);
+  const africanClubs = EntityService.getAfricanClubs();
+  const featuredClubs = [...africanClubs, ...Object.values(CLUBS_REGISTRY)].slice(0, 8);
 
   return (
     <ContentHubLayout

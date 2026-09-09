@@ -595,4 +595,21 @@ export const advancedFootballApi = {
       return null;
     }
   },
+
+  /**
+   * Get comprehensive African Football Hub data (2026/2027 Season)
+   * Real market valuations, CAF competitions, domestic powerhouses, and diaspora stars abroad.
+   */
+  getAfricanFootballHubData: async (section: string = 'all', season: string = '2026/2027') => {
+    try {
+      const res = await fetch(`/api/football/africa?section=${encodeURIComponent(section)}&season=${encodeURIComponent(season)}`, {
+        next: { revalidate: 60 },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (error) {
+      console.error('Error fetching African football data:', error);
+      return { success: false, error: 'Failed to fetch African football data' };
+    }
+  },
 };

@@ -21,13 +21,37 @@ import {
 import { BlogPost } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
 import { AllMajorCompetitionsSection } from '@/components/competitions/AllMajorCompetitionsSection';
+import { AfricanFootballHeroSpotlight } from '@/components/football/AfricanFootballHeroSpotlight';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Live Football Scores, 80+ Leagues, Fixtures, Transfers & Tables | GoalMills',
+  title: 'GoalMills Africa | Live Scores, CAF Champions League, NPFL, PSL & 2026/2027 Superstars Market Values',
   description:
-    'Real-time live football scores across 80+ major leagues including Premier League, Champions League, La Liga, Serie A, AFCON, FIFA World Cup. Fixtures, confirmed transfers, match predictions, and league standings.',
+    'Africa’s premier football intelligence platform for the 2026/2027 season. Live CAF Champions League, NPFL, Betway Premiership PSL, Botola Pro scores, AFCON 2027 qualifiers, and authentic real-time market values for Victor Osimhen, Mo Salah, Ademola Lookman, and Achraf Hakimi.',
+  keywords: [
+    'African football live scores',
+    'CAF Champions League 2026/2027',
+    'CAF Confederation Cup',
+    'NPFL live scores Nigeria',
+    'Betway Premiership South Africa PSL',
+    'Botola Pro Morocco live',
+    'Egyptian Premier League Al Ahly',
+    'AFCON 2027 qualifiers',
+    'Victor Osimhen transfer value 2026/2027',
+    'Mohamed Salah Liverpool stats',
+    'Ademola Lookman Atalanta',
+    'Achraf Hakimi PSG',
+    'African superstars in Europe',
+    'GoalMills Africa',
+  ],
+  openGraph: {
+    title: 'GoalMills Africa | Live Scores, CAF Competitions & Superstars (2026/2027)',
+    description:
+      'Live CAF Champions League, NPFL, PSL, AFCON 2027 qualifiers, and real-time market valuations for African football superstars.',
+    siteName: 'GoalMills Africa',
+    type: 'website',
+  },
 };
 
 export default async function FootballHubPage() {
@@ -73,12 +97,14 @@ export default async function FootballHubPage() {
   }
 
   const topTransfers = EntityService.getTransfers().slice(0, 3);
-  const featuredClubs = Object.values(CLUBS_REGISTRY).slice(0, 8);
+  const africanClubs = EntityService.getAfricanClubs();
+  const featuredClubs = [...africanClubs, ...Object.values(CLUBS_REGISTRY)].slice(0, 8);
+  const africanPlayers = EntityService.getAfricanPlayers();
 
   return (
     <ContentHubLayout
       breadcrumbs={[{ name: 'Football Hub', url: '/football' }]}
-      header={<LiveNewsFlashTicker sport="football" badgeText="FOOTBALL WIRE" />}
+      header={<LiveNewsFlashTicker sport="football" badgeText="AFRICA FOOTBALL WIRE" />}
       sidebar={
         <div className="space-y-6">
           {/* Trending Transfers Desk */}
@@ -241,6 +267,9 @@ export default async function FootballHubPage() {
         </div>
       }
     >
+      {/* African Football Power & Superstars Hero Spotlight (2026/2027) */}
+      <AfricanFootballHeroSpotlight initialPlayers={africanPlayers} />
+
       {/* Live Match Engine Section */}
       <section className="space-y-4">
         <FootballScreen />
