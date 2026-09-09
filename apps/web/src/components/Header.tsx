@@ -41,26 +41,15 @@ export function Header() {
         <nav className="rounded-xl border border-blue-500/30 bg-[#0C1726]/95 backdrop-blur-xl px-3 sm:px-4 py-2 shadow-lg flex items-center justify-between">
           {/* Brand Logo & Subtitle */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-500 p-[1.5px] shadow-md shadow-blue-500/20 group-hover:scale-105 transition duration-200">
-              <div className="w-full h-full bg-slate-950 rounded-[7px] flex items-center justify-center overflow-hidden">
+            <div className="rounded-lg group-hover:scale-105 transition duration-200">
                 <Image
                   src="/icon.png"
-                  alt="GoalMills Logo"
-                  width={28}
-                  height={28}
+                  alt="Goal Mills Logo"
+                  width={125}
+                  height={40}
                   className="w-full h-full object-cover"
                 />
               </div>
-            </div>
-
-            <div>
-
-              <p className="text-[9px] font-bold tracking-wider uppercase mt-0.5 flex items-center gap-1">
-                <span className="text-amber-400 font-black">Home</span>
-                <span className="text-slate-500">•</span>
-                <span className="text-blue-300">Of Sports</span>
-              </p>
-            </div>
           </Link>
 
           {/* Desktop Navigation Pills */}
