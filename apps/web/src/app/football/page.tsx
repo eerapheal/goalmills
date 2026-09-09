@@ -268,7 +268,7 @@ export default async function FootballHubPage() {
       }
     >
       {/* African Football Power & Superstars Hero Spotlight (2026/2027) */}
-      <AfricanFootballHeroSpotlight initialPlayers={africanPlayers} />
+      {/* <AfricanFootballHeroSpotlight initialPlayers={africanPlayers} /> */}
 
       {/* Live Match Engine Section */}
       <section className="space-y-4">
