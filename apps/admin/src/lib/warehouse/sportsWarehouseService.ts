@@ -327,7 +327,7 @@ export class SportsWarehouseService {
           halftime: { home: 1, away: 0 },
         },
         events: [
-          { minute: 22, type: 'goal', teamSlug: 'arsenal', player: 'Bukayo Saka', assist: 'Martin Odegaard' },
+          { minute: 21, type: 'goal', teamSlug: 'arsenal', player: 'Bukayo Saka', assist: 'Martin Odegaard' },
           { minute: 54, type: 'goal', teamSlug: 'arsenal', player: 'Kai Havertz' },
           { minute: 71, type: 'goal', teamSlug: 'chelsea', player: 'Cole Palmer' },
           { minute: 88, type: 'goal', teamSlug: 'arsenal', player: 'Declan Rice' },
