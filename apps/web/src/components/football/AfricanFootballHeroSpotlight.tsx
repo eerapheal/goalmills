@@ -57,7 +57,7 @@ export function AfricanFootballHeroSpotlight({
             <span>GoalMills Africa</span>
           </span>
           <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-mono font-bold text-amber-300 border border-amber-500/20">
-            2026/2027 Season Active
+            Season Active
           </span>
           <span className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400 font-medium">
             <FiGlobe className="text-emerald-400" />
@@ -90,7 +90,7 @@ export function AfricanFootballHeroSpotlight({
         <div className="lg:col-span-7 space-y-4">
           <div className="inline-flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-1 border border-amber-500/20 text-xs font-bold text-amber-400">
             <FaFire className="text-orange-400 animate-pulse" />
-            <span>African Superstars 2026/2027 Valuation & Transfer Radar</span>
+            <span>African Superstars Valuation & Transfer Radar</span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
@@ -101,7 +101,7 @@ export function AfricanFootballHeroSpotlight({
           </h2>
 
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
-            Track live CAF Champions League, NPFL, Betway Premiership, and Botola Pro scores, alongside authenticated 2026/2027 real market valuations, contract statuses, and goals across Europe for Osimhen, Salah, Lookman, and Hakimi.
+            Track live CAF Champions League, NPFL, Betway Premiership, and Botola Pro scores, alongside authenticated real market valuations, contract statuses, and goals across Europe for Osimhen, Salah, Lookman, and Hakimi.
           </p>
 
           {/* Key Metrics Quick Ribbon */}
@@ -124,7 +124,7 @@ export function AfricanFootballHeroSpotlight({
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-center">
               <span className="block text-lg sm:text-xl font-black text-blue-400 font-mono">
-                2026/2027
+
               </span>
               <span className="text-[10px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Active Season

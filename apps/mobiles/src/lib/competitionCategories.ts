@@ -3,7 +3,7 @@
  *
  * This file defines the comprehensive list of 75 major football competitions covered by GoalMills,
  * organized by confederation and category, prioritizing African football (CAF & Domestic Leagues)
- * for the 2026/2027 season. Each entry maps to an official high-resolution logo from API-Sports CDN.
+ * for the season. Each entry maps to an official high-resolution logo from API-Sports CDN.
  */
 
 export const LEAGUE_LOGO_BASE = 'https://media.api-sports.io/football/leagues';
@@ -62,7 +62,7 @@ export const COMPETITION_CATEGORY_LABELS: Record<CompetitionCategory, { label: s
 
 /**
  * Full 75-competition registry with verified, 100% valid CDN logo URLs
- * 2026/2027 Season Active Campaign
+ * Season Active Campaign
  */
 export const ALL_COMPETITIONS: CompetitionEntry[] = [
   // ─── Africa (CAF & Major National Leagues) ──────────────────────────────────

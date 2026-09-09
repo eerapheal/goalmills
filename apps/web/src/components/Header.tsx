@@ -54,16 +54,11 @@ export function Header() {
             </div>
 
             <div>
-              <h1 className="text-base sm:text-lg font-black italic tracking-tight text-white flex items-center leading-none">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">
-                  GOAL
-                </span>
-                <span className="text-white ml-0.5">MILLS</span>
-              </h1>
+
               <p className="text-[9px] font-bold tracking-wider uppercase mt-0.5 flex items-center gap-1">
-                <span className="text-amber-400 font-black">Africa</span>
+                <span className="text-amber-400 font-black">Home</span>
                 <span className="text-slate-500">•</span>
-                <span className="text-blue-300">Live Football 2026/2027</span>
+                <span className="text-blue-300">Of Sports</span>
               </p>
             </div>
           </Link>

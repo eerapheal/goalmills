@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
@@ -14,9 +14,75 @@ import {
   FiRadio,
   FiAward,
   FiZap,
+  FiLoader,
 } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
 import { getNewsUrl, slugify } from '@/lib/slugUtils';
+
+/** Pulse skeleton shimmer line */
+function SkeletonLine({ className = '' }: { className?: string }) {
+  return (
+    <div className={`animate-pulse rounded bg-slate-700/50 ${className}`} />
+  );
+}
+
+/** Full-card loading skeleton */
+function MatchSkeleton() {
+  return (
+    <div className="rounded-lg bg-[#142336] border border-white/5 p-2.5 space-y-2.5">
+      <SkeletonLine className="h-3 w-28" />
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          <SkeletonLine className="w-7 h-7 rounded-full" />
+          <SkeletonLine className="h-3 w-16" />
+        </div>
+        <SkeletonLine className="h-6 w-14 rounded-lg" />
+        <div className="flex items-center justify-end gap-2">
+          <SkeletonLine className="h-3 w-16" />
+          <SkeletonLine className="w-7 h-7 rounded-full" />
+        </div>
+      </div>
+      <SkeletonLine className="h-1 w-full rounded-full" />
+    </div>
+  );
+}
+
+function CricketSkeleton() {
+  return (
+    <div className="space-y-2.5">
+      <div className="flex items-center justify-between bg-[#142336] p-2.5 rounded-lg border border-white/5">
+        <div className="space-y-1.5">
+          <SkeletonLine className="h-3 w-32" />
+          <SkeletonLine className="h-2.5 w-24" />
+        </div>
+        <div className="space-y-1.5 text-right">
+          <SkeletonLine className="h-4 w-16 ml-auto" />
+          <SkeletonLine className="h-2.5 w-20 ml-auto" />
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <SkeletonLine className="h-2.5 w-full" />
+        <SkeletonLine className="h-2.5 w-full" />
+        <SkeletonLine className="h-2.5 w-3/4" />
+      </div>
+    </div>
+  );
+}
+
+function HighlightSkeleton() {
+  return (
+    <div className="rounded-xl overflow-hidden bg-slate-900 border border-white/10">
+      <SkeletonLine className="h-20 sm:h-[84px] w-full rounded-none" />
+      <div className="p-1.5">
+        <SkeletonLine className="h-3 w-full" />
+        <SkeletonLine className="h-3 w-2/3 mt-1" />
+      </div>
+    </div>
+  );
+}
+
+/** Real-time live score refresh interval (30 seconds) */
+const LIVE_REFRESH_MS = 30_000;
 
 export function GoalmillsLiveDashboard({
   onSelectTab,
@@ -25,208 +91,168 @@ export function GoalmillsLiveDashboard({
 }) {
   const [activeTab, setActiveTab] = useState('LIVE SCORES');
   const [tickerIndex, setTickerIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // All states start empty — no fallback data
   const [pulseNews, setPulseNews] = useState<
-    { id?: string; _id?: string; tag: string; title: string; time: string }[]
-  >([
-    { id: 'live-1', tag: 'TRANSFER', title: 'Mbappe to Real Madrid: Behind the scenes of landmark contract signing', time: '10m ago' },
-    { id: 'live-2', tag: 'EPL', title: 'Arsenal narrow gap at top of table after dramatic North London Derby', time: '25m ago' },
-    { id: 'live-3', tag: 'NBA', title: 'Lakers rally in 4th quarter against Celtics in historic thriller', time: '1h ago' },
-    { id: 'live-4', tag: 'CRICKET', title: 'India set 343 target in ICC Champions Trophy clash', time: '2h ago' },
-    { id: 'live-5', tag: 'F1', title: 'Max Verstappen Clinches Thrilling Monaco GP Victory with precision pit strategy', time: '3h ago' },
-  ]);
+    { id?: string; _id?: string; slug?: string; tag: string; title: string; time: string }[]
+  >([]);
 
-  const [liveFootballMatches, setLiveFootballMatches] = useState<any[]>([
-    {
-      id: 'lf-1',
-      league: 'Premier League',
-      homeTeam: 'Man United',
-      homeCode: 'MU',
-      homeScorer: 'R. Fernandes (60\')',
-      awayTeam: 'Arsenal',
-      awayCode: 'ARS',
-      awayScorer: 'B. Saka (76\')',
-      score: '2 - 1',
-      time: '(78\')',
-      possession: 54,
-    },
-    {
-      id: 'lf-2',
-      league: 'La Liga • El Clásico',
-      homeTeam: 'Real Madrid',
-      homeCode: 'RMA',
-      homeScorer: 'Vinicius (32\')',
-      awayTeam: 'Barcelona',
-      awayCode: 'FCB',
-      awayScorer: 'Yamal (18\')',
-      score: '1 - 1',
-      time: '(45+2\')',
-      possession: 49,
-    },
-  ]);
+  const [liveFootballMatches, setLiveFootballMatches] = useState<any[]>([]);
+  const [liveCricket, setLiveCricket] = useState<any>(null);
+  const [liveStandings, setLiveStandings] = useState<any[]>([]);
+  const [videoHighlights, setVideoHighlights] = useState<any[]>([]);
 
-  const [liveCricket, setLiveCricket] = useState<any>({
-    title: 'India vs Australia (T20I)',
-    subtitle: 'ICC Champions Trophy • 2nd Inning',
-    score: 'IND: 168/4',
-    overs: '(17.5 ov • CRR 9.42)',
-    batsman1: { name: 'H. Pandya*', r: '42', b: '21', f4: '3', f6: '2', sr: '200.0' },
-    batsman2: { name: 'R. Jadeja', r: '18', b: '12', f4: '1', f6: '1', sr: '150.0' },
-    comm1: { over: '17.5', text: 'Maxwell to Hardik — 4 runs! Driven through extra cover.' },
-    comm2: { over: '17.4', text: 'Maxwell to Jadeja — Single taken towards long on.' },
-  });
+  const [basketballStats, setBasketballStats] = useState<any>(null);
 
-  const [liveStandings, setLiveStandings] = useState<any[]>([
-    { rank: 1, code: 'ARS', name: 'Arsenal', p: 33, w: 23, d: 5, l: 5, gd: '+48', pts: 74 },
-    { rank: 2, code: 'MCI', name: 'Man City', p: 32, w: 22, d: 7, l: 3, gd: '+45', pts: 73 },
-    { rank: 3, code: 'LIV', name: 'Liverpool', p: 33, w: 21, d: 8, l: 4, gd: '+38', pts: 71 },
-  ]);
+  // ── Shared data fetch function (used for initial load + real-time refresh) ──
+  const fetchLiveData = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const [newsRes, footRes, cricRes, standRes, vidRes] = await Promise.all([
+        fetch('/api/news?limit=8', { signal }).catch(() => null),
+        fetch('/api/football?met=Livescore', { signal }).catch(() => null),
+        fetch('/api/cricket?met=Livescore', { signal }).catch(() => null),
+        fetch('/api/football?met=Standings&leagueId=152', { signal }).catch(() => null),
+        fetch('/api/videos?limit=3', { signal }).catch(() => null),
+      ]);
 
-  const [videoHighlights, setVideoHighlights] = useState<any[]>([
-    { id: 'v-1', title: 'Mbappe\'s Stunning Solo Goal vs Lille', duration: '03:45', sport: 'football' },
-    { id: 'v-2', title: 'Last Second Buzzer Beater - NBA Finals', duration: '01:20', sport: 'basketball' },
-    { id: 'v-3', title: 'Kohli\'s Match Winning Six in Final Over', duration: '04:10', sport: 'cricket' },
-  ]);
+      if (signal?.aborted) return;
 
-  const [basketballStats, setBasketballStats] = useState<any>({
-    matchName: 'Lakers vs Celtics (4th Qtr 3:12)',
-    efficiency: 88,
-    starPlayer: 'LeBron James (+14)',
-    fg: '52.4%',
-    reb: '46 REB',
-    totalPts: '58 PTS',
-  });
-
-  useEffect(() => {
-    let isMounted = true;
-    async function loadLivePulseDashboard() {
-      try {
-        const [newsRes, footRes, cricRes, standRes, vidRes] = await Promise.all([
-          fetch('/api/news?limit=8').catch(() => null),
-          fetch('/api/football?met=Livescore').catch(() => null),
-          fetch('/api/cricket?met=Livescore').catch(() => null),
-          fetch('/api/football?met=Standings&leagueId=152').catch(() => null),
-          fetch('/api/videos?limit=3').catch(() => null),
-        ]);
-
-        if (newsRes && newsRes.ok) {
-          const data = await newsRes.json();
-          const items = Array.isArray(data) ? data : data?.news || data?.data;
-          if (items && items.length > 0 && isMounted) {
-            const formatted = items.map((item: any) => ({
-              id: item._id || item.id,
-              _id: item._id || item.id,
-              slug: item.slug || slugify(item.title) || item._id,
-              tag: (item.competition || item.sport || item.category || 'LIVE').toUpperCase(),
-              title: item.title,
-              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
-            }));
-            setPulseNews(formatted);
-          }
+      if (newsRes && newsRes.ok) {
+        const data = await newsRes.json();
+        const items = Array.isArray(data) ? data : data?.news || data?.data;
+        if (items && items.length > 0) {
+          const formatted = items.map((item: any) => ({
+            id: item._id || item.id,
+            _id: item._id || item.id,
+            slug: item.slug || slugify(item.title) || item._id,
+            tag: (item.competition || item.sport || item.category || 'LIVE').toUpperCase(),
+            title: item.title,
+            time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
+          }));
+          setPulseNews(formatted);
         }
+      }
 
-        let matches: any[] = [];
-        if (footRes && footRes.ok) {
-          const fData = await footRes.json();
-          matches = fData?.result || fData?.response || (Array.isArray(fData) ? fData : []);
+      let matches: any[] = [];
+      if (footRes && footRes.ok) {
+        const fData = await footRes.json();
+        matches = fData?.result || fData?.response || (Array.isArray(fData) ? fData : []);
+      }
+
+      if (matches.length === 0) {
+        const fixRes = await fetch('/api/football?met=Fixtures', { signal }).catch(() => null);
+        if (fixRes && fixRes.ok) {
+          const fd = await fixRes.json();
+          matches = fd?.result || fd?.response || (Array.isArray(fd) ? fd : []);
         }
+      }
 
-        if (matches.length === 0) {
-          const fixRes = await fetch('/api/football?met=Fixtures').catch(() => null);
-          if (fixRes && fixRes.ok) {
-            const fd = await fixRes.json();
-            matches = fd?.result || fd?.response || (Array.isArray(fd) ? fd : []);
-          }
+      if (signal?.aborted) return;
+
+      if (Array.isArray(matches) && matches.length > 0) {
+        const mapped = matches.slice(0, 2).map((m: any, idx: number) => {
+          const home = m.event_home_team || m.homeTeam || 'Home';
+          const away = m.event_away_team || m.awayTeam || 'Away';
+          const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+          return {
+            id: m.event_key || `lf-${idx}`,
+            league: m.league_name || 'Premier League',
+            homeTeam: home,
+            homeCode: home.substring(0, 3).toUpperCase(),
+            home_team_key: m.home_team_key,
+            home_team_logo: m.home_team_logo,
+            homeScorer: m.event_scorer || '',
+            awayTeam: away,
+            awayCode: away.substring(0, 3).toUpperCase(),
+            away_team_key: m.away_team_key,
+            away_team_logo: m.away_team_logo,
+            awayScorer: '',
+            score,
+            time: m.event_status ? `(${m.event_status}')` : 'LIVE',
+            possession: 52,
+          };
+        });
+        setLiveFootballMatches(mapped);
+      }
+
+      if (cricRes && cricRes.ok) {
+        const cData = await cricRes.json();
+        const cMatches = cData?.result || (Array.isArray(cData) ? cData : []);
+        if (Array.isArray(cMatches) && cMatches.length > 0) {
+          const topC = cMatches[0];
+          setLiveCricket({
+            title: `${topC.event_home_team || 'TBD'} vs ${topC.event_away_team || 'TBD'}`,
+            subtitle: topC.league_name || 'Live Match',
+            score: topC.event_home_final_result || topC.event_final_result || '--',
+            overs: topC.event_status || '(Live)',
+            batsman1: { name: 'Top Batsman*', r: '—', b: '—', f4: '—', f6: '—', sr: '—' },
+            batsman2: { name: 'Partner', r: '—', b: '—', f4: '—', f6: '—', sr: '—' },
+            comm1: { over: '—', text: `${topC.event_home_team || 'Team'} in command of the run chase.` },
+            comm2: { over: '—', text: 'Good length delivery rotated for a single.' },
+          });
         }
+      }
 
-        if (Array.isArray(matches) && matches.length > 0 && isMounted) {
-          const mapped = matches.slice(0, 2).map((m: any, idx: number) => {
-            const home = m.event_home_team || m.homeTeam || 'Home';
-            const away = m.event_away_team || m.awayTeam || 'Away';
-            const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+      if (standRes && standRes.ok) {
+        const sData = await standRes.json();
+        const table = sData?.result?.total || sData?.standings || (Array.isArray(sData?.result) ? sData.result : []);
+        if (Array.isArray(table) && table.length > 0) {
+          const mappedStandings = table.slice(0, 3).map((row: any, idx: number) => {
+            const name = row.standing_team || row.team_name || row.team?.name || `Team ${idx + 1}`;
             return {
-              id: m.event_key || `lf-${idx}`,
-              league: m.league_name || 'Premier League',
-              homeTeam: home,
-              homeCode: home.substring(0, 3).toUpperCase(),
-              home_team_key: m.home_team_key,
-              home_team_logo: m.home_team_logo,
-              homeScorer: m.event_scorer || '',
-              awayTeam: away,
-              awayCode: away.substring(0, 3).toUpperCase(),
-              away_team_key: m.away_team_key,
-              away_team_logo: m.away_team_logo,
-              awayScorer: '',
-              score,
-              time: m.event_status ? `(${m.event_status}')` : 'LIVE',
-              possession: 52,
+              rank: row.standing_place || row.rank || idx + 1,
+              code: name.substring(0, 3).toUpperCase(),
+              name,
+              p: row.standing_P || row.played || 0,
+              w: row.standing_W || row.win || 0,
+              d: row.standing_D || row.draw || 0,
+              l: row.standing_L || row.lose || 0,
+              gd: row.standing_GD ? `+${row.standing_GD}` : '—',
+              pts: row.standing_PTS || row.points || 0,
             };
           });
-          setLiveFootballMatches(mapped);
+          setLiveStandings(mappedStandings);
         }
-
-        if (cricRes && cricRes.ok) {
-          const cData = await cricRes.json();
-          const cMatches = cData?.result || (Array.isArray(cData) ? cData : []);
-          if (Array.isArray(cMatches) && cMatches.length > 0 && isMounted) {
-            const topC = cMatches[0];
-            setLiveCricket({
-              title: `${topC.event_home_team || 'IND'} vs ${topC.event_away_team || 'AUS'}`,
-              subtitle: topC.league_name || 'ICC Champions Trophy',
-              score: topC.event_home_final_result || '168/4',
-              overs: topC.event_status || '(Live Inning)',
-              batsman1: { name: 'Top Batsman*', r: '42', b: '21', f4: '3', f6: '2', sr: '200.0' },
-              batsman2: { name: 'Partner', r: '18', b: '12', f4: '1', f6: '1', sr: '150.0' },
-              comm1: { over: '17.5', text: `${topC.event_home_team || 'Team'} in command of the run chase.` },
-              comm2: { over: '17.4', text: 'Good length delivery rotated for a single.' },
-            });
-          }
-        }
-
-        if (standRes && standRes.ok) {
-          const sData = await standRes.json();
-          const table = sData?.result?.total || sData?.standings || (Array.isArray(sData?.result) ? sData.result : []);
-          if (Array.isArray(table) && table.length > 0 && isMounted) {
-            const mappedStandings = table.slice(0, 3).map((row: any, idx: number) => {
-              const name = row.standing_team || row.team_name || row.team?.name || `Team ${idx + 1}`;
-              return {
-                rank: row.standing_place || row.rank || idx + 1,
-                code: name.substring(0, 3).toUpperCase(),
-                name,
-                p: row.standing_P || row.played || 33,
-                w: row.standing_W || row.win || 22,
-                d: row.standing_D || row.draw || 5,
-                l: row.standing_L || row.lose || 4,
-                gd: row.standing_GD ? `+${row.standing_GD}` : '+35',
-                pts: row.standing_PTS || row.points || 70,
-              };
-            });
-            setLiveStandings(mappedStandings);
-          }
-        }
-
-        if (vidRes && vidRes.ok) {
-          const vData = await vidRes.json();
-          const vItems = Array.isArray(vData) ? vData : vData?.videos || vData?.result || [];
-          if (Array.isArray(vItems) && vItems.length > 0 && isMounted) {
-            const mappedVids = vItems.slice(0, 3).map((v: any, idx: number) => ({
-              id: v._id || v.id || `v-${idx}`,
-              title: v.title || 'Match Highlight Recap',
-              duration: v.duration || '03:30',
-              thumbnail: v.thumbnailUrl || v.thumbnail,
-              sport: v.sport || 'football',
-            }));
-            setVideoHighlights(mappedVids);
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to fetch live pulse news & dashboard feeds:', err);
       }
+
+      if (vidRes && vidRes.ok) {
+        const vData = await vidRes.json();
+        const vItems = Array.isArray(vData) ? vData : vData?.videos || vData?.result || [];
+        if (Array.isArray(vItems) && vItems.length > 0) {
+          const mappedVids = vItems.slice(0, 3).map((v: any, idx: number) => ({
+            id: v._id || v.id || `v-${idx}`,
+            title: v.title || 'Match Highlight Recap',
+            duration: v.duration || '03:30',
+            thumbnail: v.thumbnailUrl || v.thumbnail,
+            sport: v.sport || 'football',
+          }));
+          setVideoHighlights(mappedVids);
+        }
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        console.warn('Failed to fetch live dashboard feeds:', err);
+      }
+    } finally {
+      setIsLoading(false);
     }
-    loadLivePulseDashboard();
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  // ── Initial load ──
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchLiveData(controller.signal);
+    return () => controller.abort();
+  }, [fetchLiveData]);
+
+  // ── Real-time auto-refresh every 30 seconds for live scores ──
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchLiveData();
+    }, LIVE_REFRESH_MS);
+    return () => clearInterval(interval);
+  }, [fetchLiveData]);
 
   useEffect(() => {
     if (pulseNews.length === 0) return;
@@ -236,8 +262,8 @@ export function GoalmillsLiveDashboard({
     return () => clearInterval(timer);
   }, [pulseNews.length]);
 
-  const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
-  const pulseLink = getNewsUrl(currentPulse);
+  const currentPulse = pulseNews.length > 0 ? (pulseNews[tickerIndex] || pulseNews[0]) : null;
+  const pulseLink = currentPulse ? getNewsUrl(currentPulse) : '#';
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-2.5 sm:px-5 py-2.5 space-y-2">
@@ -250,16 +276,22 @@ export function GoalmillsLiveDashboard({
                  FOOTBALL PULSE
                </span>
    
-               <Link
-                 href={pulseLink}
-                 className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
-               >
-                 {currentPulse?.title}    
-               </Link>
+               {currentPulse ? (
+                 <Link
+                   href={pulseLink}
+                   className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
+                 >
+                   {currentPulse.title}    
+                 </Link>
+               ) : (
+                 <SkeletonLine className="h-3 w-64 flex-1" />
+               )}
    
-               <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-                 • {currentPulse?.time}
-               </span>
+               {currentPulse && (
+                 <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
+                   • {currentPulse.time}
+                 </span>
+               )}
              </div>
            </div>
    
@@ -299,6 +331,18 @@ export function GoalmillsLiveDashboard({
             </div>
 
             <div className="space-y-2">
+              {liveFootballMatches.length === 0 && isLoading ? (
+                <>
+                  <MatchSkeleton />
+                  <MatchSkeleton />
+                </>
+              ) : liveFootballMatches.length === 0 ? (
+                <div className="text-center py-6 text-slate-400 text-sm">
+                  <FiRadio className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                  <p className="font-semibold">No live matches right now</p>
+                  <p className="text-xs text-slate-500 mt-1">Check back when matches are in play</p>
+                </div>
+              ) : null}
               {liveFootballMatches.map((m) => (
                 <Link
                   href={footballRoutes.matchFromEvent({ event_home_team: m.homeTeam, event_away_team: m.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: m.id })}
@@ -412,6 +456,7 @@ export function GoalmillsLiveDashboard({
           </div>
 
           {/* 2. BASKETBALL ANALYTICS CARD */}
+          {basketballStats && (
           <div className="rounded-xl bg-[#0E1A29]/95 border border-amber-500/20 p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 backdrop-blur-md">
             <div className="flex items-center justify-between flex-wrap gap-2 mb-2.5 border-b border-white/5 pb-2">
               <div className="flex items-center gap-1.5">
@@ -492,6 +537,7 @@ export function GoalmillsLiveDashboard({
               </div>
             </div>
           </div>
+          )}
         </div>
 
         {/* ─── RIGHT COLUMN (col-span-6): CRICKET, STANDINGS & HIGHLIGHTS ─── */}
@@ -514,70 +560,82 @@ export function GoalmillsLiveDashboard({
               </button>
             </div>
 
-            {/* Match Header */}
-            <div className="flex items-center justify-between flex-wrap gap-2 bg-[#142336] p-2.5 rounded-lg border border-white/5 mb-2">
-              <div className="min-w-0">
-                <span className="text-xs font-bold text-slate-200 truncate block">{liveCricket.title}</span>
-                <p className="text-[10px] text-slate-300 truncate">{liveCricket.subtitle}</p>
+            {!liveCricket && isLoading ? (
+              <CricketSkeleton />
+            ) : !liveCricket ? (
+              <div className="text-center py-6 text-slate-400 text-sm">
+                <span className="text-2xl mb-2 block">🏏</span>
+                <p className="font-semibold">No live cricket matches</p>
+                <p className="text-xs text-slate-500 mt-1">Check back during match hours</p>
               </div>
-              <div className="text-right flex-shrink-0">
-                <div className="text-sm sm:text-base font-black text-amber-400">{liveCricket.score}</div>
-                <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium">{liveCricket.overs}</div>
-              </div>
-            </div>
+            ) : (
+              <>
+                {/* Match Header */}
+                <div className="flex items-center justify-between flex-wrap gap-2 bg-[#142336] p-2.5 rounded-lg border border-white/5 mb-2">
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-slate-200 truncate block">{liveCricket.title}</span>
+                    <p className="text-[10px] text-slate-300 truncate">{liveCricket.subtitle}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-sm sm:text-base font-black text-amber-400">{liveCricket.score}</div>
+                    <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium">{liveCricket.overs}</div>
+                  </div>
+                </div>
 
-            {/* Batsmen Mini Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead>
-                  <tr className="text-slate-200 border-b border-white/10 text-[10px] uppercase font-bold">
-                    <th className="pb-1.5 font-bold">Batsman</th>
-                    <th className="pb-1.5 text-center">R</th>
-                    <th className="pb-1.5 text-center">B</th>
-                    <th className="pb-1.5 text-center">4s</th>
-                    <th className="pb-1.5 text-center">6s</th>
-                    <th className="pb-1.5 text-right font-bold text-amber-400">SR</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5 text-slate-300">
-                  <tr>
-                    <td className="py-1 font-bold text-white flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      {liveCricket.batsman1.name}
-                    </td>
-                    <td className="py-1 text-center font-bold text-white">{liveCricket.batsman1.r}</td>
-                    <td className="py-1 text-center">{liveCricket.batsman1.b}</td>
-                    <td className="py-1 text-center">{liveCricket.batsman1.f4}</td>
-                    <td className="py-1 text-center">{liveCricket.batsman1.f6}</td>
-                    <td className="py-1 text-right text-amber-400 font-bold">{liveCricket.batsman1.sr}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-1 font-semibold text-slate-300">{liveCricket.batsman2.name}</td>
-                    <td className="py-1 text-center font-bold text-white">{liveCricket.batsman2.r}</td>
-                    <td className="py-1 text-center">{liveCricket.batsman2.b}</td>
-                    <td className="py-1 text-center">{liveCricket.batsman2.f4}</td>
-                    <td className="py-1 text-center">{liveCricket.batsman2.f6}</td>
-                    <td className="py-1 text-right text-amber-400 font-bold">{liveCricket.batsman2.sr}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                {/* Batsmen Mini Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead>
+                      <tr className="text-slate-200 border-b border-white/10 text-[10px] uppercase font-bold">
+                        <th className="pb-1.5 font-bold">Batsman</th>
+                        <th className="pb-1.5 text-center">R</th>
+                        <th className="pb-1.5 text-center">B</th>
+                        <th className="pb-1.5 text-center">4s</th>
+                        <th className="pb-1.5 text-center">6s</th>
+                        <th className="pb-1.5 text-right font-bold text-amber-400">SR</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-slate-300">
+                      <tr>
+                        <td className="py-1 font-bold text-white flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          {liveCricket.batsman1.name}
+                        </td>
+                        <td className="py-1 text-center font-bold text-white">{liveCricket.batsman1.r}</td>
+                        <td className="py-1 text-center">{liveCricket.batsman1.b}</td>
+                        <td className="py-1 text-center">{liveCricket.batsman1.f4}</td>
+                        <td className="py-1 text-center">{liveCricket.batsman1.f6}</td>
+                        <td className="py-1 text-right text-amber-400 font-bold">{liveCricket.batsman1.sr}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-semibold text-slate-300">{liveCricket.batsman2.name}</td>
+                        <td className="py-1 text-center font-bold text-white">{liveCricket.batsman2.r}</td>
+                        <td className="py-1 text-center">{liveCricket.batsman2.b}</td>
+                        <td className="py-1 text-center">{liveCricket.batsman2.f4}</td>
+                        <td className="py-1 text-center">{liveCricket.batsman2.f6}</td>
+                        <td className="py-1 text-right text-amber-400 font-bold">{liveCricket.batsman2.sr}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
-            {/* Ball-by-ball commentary preview */}
-            <div className="mt-2 pt-1.5 border-t border-white/5 space-y-1.5 text-xs">
-              <div className="flex items-center gap-2 text-slate-300">
-                <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono font-bold text-[10px]">
-                  {liveCricket.comm1.over}
-                </span>
-                <span className="text-[11px] truncate">
-                  {liveCricket.comm1.text}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-400 text-[11px]">
-                <span className="px-1.5 py-0.5 rounded bg-slate-800 font-mono text-[10px]">{liveCricket.comm2.over}</span>
-                <span className="truncate">{liveCricket.comm2.text}</span>
-              </div>
-            </div>
+                {/* Ball-by-ball commentary preview */}
+                <div className="mt-2 pt-1.5 border-t border-white/5 space-y-1.5 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono font-bold text-[10px]">
+                      {liveCricket.comm1.over}
+                    </span>
+                    <span className="text-[11px] truncate">
+                      {liveCricket.comm1.text}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-400 text-[11px]">
+                    <span className="px-1.5 py-0.5 rounded bg-slate-800 font-mono text-[10px]">{liveCricket.comm2.over}</span>
+                    <span className="truncate">{liveCricket.comm2.text}</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* 4. FOOTBALL STANDINGS TABLE CARD */}
@@ -597,6 +655,17 @@ export function GoalmillsLiveDashboard({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+              {videoHighlights.length === 0 && isLoading ? (
+                <>
+                  <HighlightSkeleton />
+                  <HighlightSkeleton />
+                  <HighlightSkeleton />
+                </>
+              ) : videoHighlights.length === 0 ? (
+                <div className="col-span-3 text-center py-4 text-slate-400 text-sm">
+                  <p className="font-semibold">No highlights available</p>
+                </div>
+              ) : null}
               {videoHighlights.map((v) => (
                 <Link
                   key={v.id}
@@ -646,12 +715,16 @@ export function GoalmillsLiveDashboard({
               <span className="hidden md:block px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-black tracking-wider uppercase flex-shrink-0">
                 {currentPulse?.tag || 'BREAKING'}
               </span>
-              <Link
-                href={pulseLink}
-                className="text-xs font-bold text-slate-200 truncate hover:text-blue-400 hover:underline transition-colors flex-1"
-              >
-                {currentPulse?.title}
-              </Link>
+              {currentPulse ? (
+                <Link
+                  href={pulseLink}
+                  className="text-xs font-bold text-slate-200 truncate hover:text-blue-400 hover:underline transition-colors flex-1"
+                >
+                  {currentPulse.title}
+                </Link>
+              ) : (
+                <SkeletonLine className="h-3 w-48 flex-1" />
+              )}
             </div>
 
             <div className="flex items-center gap-1.5 flex-shrink-0 pl-1">
