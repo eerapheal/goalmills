@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CricketEvent } from '@goalmills/types';
+import { cricketRoutes, buildMatchSlug } from '@/lib/slugUtils';
 
 interface CricketMatchCardProps {
   match: CricketEvent;
@@ -11,26 +12,39 @@ interface CricketMatchCardProps {
   hideLeague?: boolean;
 }
 
-export function CricketMatchCard({ match, onPress, hideLeague = false }: CricketMatchCardProps) {
+export function CricketMatchCard({
+  match,
+  onPress,
+  hideLeague = false,
+}: CricketMatchCardProps) {
   const router = useRouter();
   const [homeImgError, setHomeImgError] = useState(false);
   const [awayImgError, setAwayImgError] = useState(false);
 
-  const isLive = match.event_live === '1' || match.event_status?.toLowerCase().includes('live');
+  const isLive =
+    match?.event_live === '1' ||
+    match?.event_live === (1 as any) ||
+    match?.event_status?.toLowerCase().includes('live') ||
+    match?.event_status?.toLowerCase().includes('innings') ||
+    match?.event_status?.toLowerCase().includes('break');
+
   const isFinished =
-    match.event_status === 'Finished' ||
-    match.event_status === 'FT' ||
-    match.event_status?.toLowerCase().includes('won') ||
-    match.event_status?.toLowerCase().includes('complete');
+    match?.event_status?.toLowerCase() === 'finished' ||
+    match?.event_status === 'FT' ||
+    match?.event_status?.toLowerCase().includes('won') ||
+    match?.event_status?.toLowerCase().includes('complete') ||
+    match?.event_status?.toLowerCase().includes('draw') ||
+    match?.event_status?.toLowerCase().includes('abandoned');
+
   const isUpcoming = !isLive && !isFinished;
 
-  const homeName = match.event_home_team || 'TBC';
-  const awayName = match.event_away_team || 'TBC';
+  const homeName = match?.event_home_team || 'Home Team';
+  const awayName = match?.event_away_team || 'Away Team';
 
   const formattedTime = useMemo(() => {
-    if (match.event_time) return match.event_time.slice(0, 5);
-    return match.event_date_start || 'TBD';
-  }, [match.event_time, match.event_date_start]);
+    if (match?.event_time) return match.event_time.slice(0, 5);
+    return match?.event_date_start || match?.event_date_stop || (match as any)?.event_date || 'TBD';
+  }, [match?.event_time, match?.event_date_start, match?.event_date_stop, (match as any)?.event_date]);
 
   const statusDisplay = useMemo(() => {
     if (isLive) return 'LIVE';
@@ -38,46 +52,81 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
     return formattedTime;
   }, [isLive, isFinished, formattedTime]);
 
+  const matchSlug = useMemo(() => {
+    return buildMatchSlug({
+      event_home_team: match?.event_home_team,
+      event_away_team: match?.event_away_team,
+      event_date: match?.event_date_start || match?.event_date_stop || (match as any)?.event_date || undefined,
+      event_key: match?.event_key,
+    });
+  }, [match]);
+
   const handleClick = () => {
     if (onPress) {
       onPress();
-    } else {
-      router.push(`/cricket/matches/${match.event_key}`);
+    } else if (match?.event_key) {
+      router.push(cricketRoutes.match(matchSlug));
     }
   };
+
+  const leagueHref = useMemo(() => {
+    if (match?.league_name) {
+      return cricketRoutes.leagueFromName(match.league_name, match.league_key);
+    }
+    return match?.league_key ? `/cricket/leagues/${match.league_key}` : '/cricket';
+  }, [match?.league_name, match?.league_key]);
+
+  const homeHref = useMemo(() => {
+    if (match?.event_home_team) {
+      return cricketRoutes.teamFromName(match.event_home_team, match.home_team_key);
+    }
+    return match?.home_team_key ? `/cricket/teams/${match.home_team_key}` : '#';
+  }, [match?.event_home_team, match?.home_team_key]);
+
+  const awayHref = useMemo(() => {
+    if (match?.event_away_team) {
+      return cricketRoutes.teamFromName(match.event_away_team, match.away_team_key);
+    }
+    return match?.away_team_key ? `/cricket/teams/${match.away_team_key}` : '#';
+  }, [match?.event_away_team, match?.away_team_key]);
 
   return (
     <div
       onClick={handleClick}
-      className={`group relative cursor-pointer rounded-xl border p-2 sm:p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group relative cursor-pointer rounded-2xl border p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
         isLive
-          ? 'border-blue-500/40 bg-gradient-to-r from-[#0C1A30] via-[#0E203C] to-[#0C1A30] shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:border-blue-400'
-          : 'border-blue-500/15 bg-[#0A1424]/90 hover:border-blue-400/40 hover:bg-[#0E1D34]'
+          ? 'border-emerald-500/40 bg-gradient-to-br from-[#07191d] via-[#09252a] to-[#061417] shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-400'
+          : 'border-blue-500/20 bg-[#091322]/90 hover:border-blue-400/40 hover:bg-[#0C1A30]'
       }`}
     >
       {/* Ambient subtle glow for live matches */}
       {isLive && (
-        <div className="absolute top-0 right-0 w-32 h-16 bg-blue-500/10 blur-2xl pointer-events-none -z-0" />
+        <div className="absolute top-0 right-0 w-32 h-16 bg-emerald-500/10 blur-2xl pointer-events-none -z-0" />
       )}
 
-      {/* League Header - Hidden on mobile viewports for clean look */}
+      {/* League Header */}
       {!hideLeague && (
-        <div className="hidden sm:flex mb-2 items-center justify-between border-b border-white/5 pb-1.5 text-xs">
+        <div className="mb-2.5 flex items-center justify-between border-b border-white/5 pb-2 text-xs">
           <div className="flex items-center space-x-1.5 truncate">
-            <span className="text-blue-400 text-xs">🏏</span>
+            <span className="text-emerald-400 text-xs">🏏</span>
             <Link
-              href={match.league_key ? `/cricket/series/${match.league_key}` : `/cricket`}
+              href={leagueHref}
               onClick={(e) => e.stopPropagation()}
-              className="font-bold text-[11px] text-slate-300 hover:text-white transition-colors truncate"
+              className="font-bold text-[11px] text-slate-300 group-hover:text-white truncate transition-colors hover:text-emerald-300"
             >
-              {match.league_name || 'Cricket Tournament'}
+              {match?.league_name || 'Cricket Series'}
             </Link>
+            {match?.event_type && (
+              <span className="text-[10px] text-slate-500 hidden sm:inline truncate">
+                • {match.event_type}
+              </span>
+            )}
           </div>
 
           {/* Status Badge */}
           {isLive ? (
-            <span className="flex items-center space-x-1 rounded-full border border-blue-500/40 bg-blue-500/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-blue-300 shadow-sm animate-pulse">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+            <span className="flex items-center space-x-1 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-300 shadow-sm animate-pulse">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               <span>LIVE</span>
             </span>
           ) : (
@@ -95,121 +144,118 @@ export function CricketMatchCard({ match, onPress, hideLeague = false }: Cricket
       )}
 
       {/* Teams and Scores Grid */}
-      <div className="flex items-center justify-between gap-1.5 sm:gap-3 relative z-10">
+      <div className="space-y-2 relative z-10">
         {/* Home Team */}
-        <Link
-          href={match.home_team_key ? `/cricket/teams/${match.home_team_key}` : '#'}
-          onClick={(e) => e.stopPropagation()}
-          className="flex flex-1 items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
-        >
-          <div className="flex h-5.5 w-5.5 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded bg-slate-900/80 border border-white/10 p-0.5 overflow-hidden shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {match.event_home_team_logo && !homeImgError ? (
-              <img
-                src={match.event_home_team_logo}
-                alt={homeName}
-                className="h-full w-full object-contain"
-                onError={() => setHomeImgError(true)}
-              />
-            ) : (
-              <span className="text-[8px] sm:text-[10px] font-black text-blue-400">{homeName.charAt(0)}</span>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-blue-300 truncate block transition-colors">
+        <div className="flex items-center justify-between">
+          <Link
+            href={homeHref}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center space-x-2.5 truncate hover:text-emerald-300 transition-colors"
+          >
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-emerald-400/40 transition-colors">
+              {match?.event_home_team_logo && !homeImgError ? (
+                <img
+                  src={match.event_home_team_logo}
+                  alt={homeName}
+                  className="h-full w-full object-contain p-0.5"
+                  onError={() => setHomeImgError(true)}
+                />
+              ) : (
+                <span className="text-xs font-bold text-slate-400">{homeName.charAt(0)}</span>
+              )}
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-white truncate transition-colors">
               {homeName}
             </span>
-            {match.event_home_final_result ? (
-              <div className="flex items-baseline space-x-1 mt-0.5">
-                <span className="text-[10px] sm:text-xs font-black text-blue-400 tabular-nums">
-                  {match.event_home_final_result}
-                </span>
-                {match.event_home_rr && (
-                  <span className="hidden sm:inline text-[9px] text-slate-400 font-medium">
-                    (RR: {match.event_home_rr})
-                  </span>
-                )}
-              </div>
-            ) : isUpcoming ? (
-              <span className="text-[9px] text-slate-400 font-medium hidden sm:inline">Yet to bat</span>
-            ) : null}
-          </div>
-        </Link>
+          </Link>
 
-        {/* Center Status / Time Pill */}
-        <div className="mx-1 sm:mx-1.5 flex flex-col items-center justify-center shrink-0 min-w-[46px] sm:min-w-[58px] px-1 sm:px-2 py-0.5 rounded bg-[#091220] sm:bg-slate-950/90 border border-blue-500/30 text-center shadow-inner">
-          {isUpcoming ? (
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-300">
-              {formattedTime}
+          <div className="flex items-baseline space-x-1.5 pl-2">
+            <span
+              className={`font-mono font-black text-xs sm:text-sm tabular-nums ${
+                isLive
+                  ? 'text-emerald-400'
+                  : isFinished
+                    ? 'text-white'
+                    : 'text-slate-500'
+              }`}
+            >
+              {match?.event_home_final_result || (isUpcoming ? '-' : '0')}
             </span>
-          ) : isLive ? (
-            <div className="text-center">
-              <span className="text-[8px] sm:text-[9px] font-black tracking-wider text-blue-400 block leading-tight">
-                INNINGS
+            {match?.event_home_rr && (
+              <span className="text-[9px] text-slate-400 font-medium hidden sm:inline">
+                ({match.event_home_rr})
               </span>
-              <span className="text-[6px] sm:text-[7px] font-bold text-blue-300 uppercase tracking-widest hidden sm:block">
-                LIVE OVERS
-              </span>
-            </div>
-          ) : (
-            <span className="text-[8px] sm:text-[9px] font-black uppercase text-blue-300 tracking-wider">
-              RESULT
-            </span>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Away Team */}
-        <Link
-          href={match.away_team_key ? `/cricket/teams/${match.away_team_key}` : '#'}
-          onClick={(e) => e.stopPropagation()}
-          className="flex flex-1 items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right hover:text-blue-400 transition-colors"
-        >
-          <div className="min-w-0 flex-1">
-            <span className="text-[11px] sm:text-xs font-bold text-white group-hover:text-blue-300 truncate block transition-colors">
+        <div className="flex items-center justify-between">
+          <Link
+            href={awayHref}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center space-x-2.5 truncate hover:text-emerald-300 transition-colors"
+          >
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-emerald-400/40 transition-colors">
+              {match?.event_away_team_logo && !awayImgError ? (
+                <img
+                  src={match.event_away_team_logo}
+                  alt={awayName}
+                  className="h-full w-full object-contain p-0.5"
+                  onError={() => setAwayImgError(true)}
+                />
+              ) : (
+                <span className="text-xs font-bold text-slate-400">{awayName.charAt(0)}</span>
+              )}
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-white truncate transition-colors">
               {awayName}
             </span>
-            {match.event_away_final_result ? (
-              <div className="flex items-baseline justify-end space-x-1 mt-0.5">
-                <span className="text-[10px] sm:text-xs font-black text-blue-400 tabular-nums">
-                  {match.event_away_final_result}
-                </span>
-                {match.event_away_rr && (
-                  <span className="hidden sm:inline text-[9px] text-slate-400 font-medium">
-                    (RR: {match.event_away_rr})
-                  </span>
-                )}
-              </div>
-            ) : isUpcoming ? (
-              <span className="text-[9px] text-slate-400 font-medium hidden sm:inline">Yet to bat</span>
-            ) : null}
-          </div>
-          <div className="flex h-5.5 w-5.5 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded bg-slate-900/80 border border-white/10 p-0.5 overflow-hidden shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {match.event_away_team_logo && !awayImgError ? (
-              <img
-                src={match.event_away_team_logo}
-                alt={awayName}
-                className="h-full w-full object-contain"
-                onError={() => setAwayImgError(true)}
-              />
-            ) : (
-              <span className="text-[8px] sm:text-[10px] font-black text-blue-400">{awayName.charAt(0)}</span>
+          </Link>
+
+          <div className="flex items-baseline space-x-1.5 pl-2">
+            <span
+              className={`font-mono font-black text-xs sm:text-sm tabular-nums ${
+                isLive
+                  ? 'text-emerald-400'
+                  : isFinished
+                    ? 'text-white'
+                    : 'text-slate-500'
+              }`}
+            >
+              {match?.event_away_final_result || (isUpcoming ? '-' : '0')}
+            </span>
+            {match?.event_away_rr && (
+              <span className="text-[9px] text-slate-400 font-medium hidden sm:inline">
+                ({match.event_away_rr})
+              </span>
             )}
           </div>
-        </Link>
+        </div>
       </div>
 
-      {/* Match Result / Status Footer */}
-      {(match.event_status_info || (match.event_status && match.event_status !== 'Finished' && match.event_status !== 'FT')) && (
-        <div className="hidden sm:flex mt-2.5 pt-2 border-t border-white/5 items-center justify-between text-[11px] text-slate-300">
-          <span className="font-semibold text-blue-300 truncate">
-            {match.event_status_info || match.event_status}
+      {/* Match Result / Status Note */}
+      {(match?.event_status_info || match?.event_toss) && (
+        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400">
+          <span className="font-medium text-slate-300 truncate max-w-[240px]">
+            {match?.event_status_info || match?.event_status}
           </span>
-          {match.event_toss && (
-            <span className="text-[10px] text-slate-400 truncate max-w-[200px]">
+          {match?.event_toss && (
+            <span className="text-slate-500 hidden sm:inline truncate max-w-[160px]">
               🪙 {match.event_toss}
             </span>
           )}
         </div>
       )}
+
+      {/* Footer Info / SEO Link */}
+      <div className="mt-2 flex items-center justify-end text-[10px] text-slate-500 group-hover:text-emerald-400 transition-colors">
+        <span className="flex items-center gap-1 font-semibold">
+          Match Center →
+        </span>
+      </div>
     </div>
   );
 }
+
+export default CricketMatchCard;

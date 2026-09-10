@@ -146,3 +146,44 @@ export const basketballRoutes = {
   competition: (slug: string) => `/basketball/${slug}`,
 };
 
+/**
+ * Cricket route helpers — canonical SEO URL builders
+ */
+export const cricketRoutes = {
+  match: (slug: string) => `/cricket/matches/${slug}`,
+  matchFromEvent: (match: {
+    event_home_team?: string;
+    event_away_team?: string;
+    event_date?: string;
+    event_date_start?: string | null;
+    event_key?: string | number;
+  }) =>
+    `/cricket/matches/${buildMatchSlug({
+      event_home_team: match.event_home_team,
+      event_away_team: match.event_away_team,
+      event_date: match.event_date || match.event_date_start || undefined,
+      event_key: match.event_key,
+    })}`,
+
+  team: (slug: string) => `/cricket/teams/${slug}`,
+  teamFromName: (name: string, key?: string | number) =>
+    key ? `/cricket/teams/${slugify(name)}-${key}` : `/cricket/teams/${slugify(name)}`,
+
+  league: (slug: string) => `/cricket/leagues/${slug}`,
+  leagueFromName: (name: string, key?: string | number) =>
+    key ? `/cricket/leagues/${slugify(name)}-${key}` : `/cricket/leagues/${slugify(name)}`,
+
+  series: (slug: string) => `/cricket/series/${slug}`,
+
+  player: (slug: string) => `/cricket/players/${slug}`,
+  playerFromName: (name: string, key?: string | number) =>
+    key ? `/cricket/players/${slugify(name)}-${key}` : `/cricket/players/${slugify(name)}`,
+
+  coach: (slug: string) => `/cricket/coaches/${slug}`,
+  coachFromName: (name: string) => `/cricket/coaches/${slugify(name)}`,
+
+  official: (slug: string) => `/cricket/officials/${slug}`,
+  officialFromName: (name: string) => `/cricket/officials/${slugify(name)}`,
+
+  competition: (slug: string) => `/cricket/${slug}`,
+};

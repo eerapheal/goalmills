@@ -1,88 +1,48 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { advancedCricketApi } from '../services/advancedCricketApi';
-import {
-  CricketEvent,
-  CricketLeague,
-  CricketTeam,
-  CricketStanding,
-  CricketPlayer,
-} from '@goalmills/types';
-import { CricketMatchCard } from './CricketMatchCard';
-import { GoalmillsLoader } from './GoalmillsLoader';
 import Link from 'next/link';
-import { getNewsUrl, slugify } from '@/lib/slugUtils';
+import { CricketMatchCard } from './CricketMatchCard';
+import { cricketApi } from '../services/cricketApi';
+import { CricketEvent, CricketStanding } from '@goalmills/types';
+import { GoalmillsLoader } from './GoalmillsLoader';
+import { cricketRoutes } from '@/lib/slugUtils';
+import {
+  FiRefreshCw,
+  FiSearch,
+  FiCalendar,
+  FiAward,
+  FiActivity,
+  FiTrendingUp,
+  FiSliders,
+} from 'react-icons/fi';
 
-type CricketTab = 'live' | 'upcoming' | 'results' | 'standings' | 'series' | 'teams';
-type FormatFilter = 'all' | 'international' | 'franchise' | 'domestic' | 'women';
+export type CricketTab = 'live' | 'upcoming' | 'results' | 'standings';
+
+export const MAJOR_CRICKET_LEAGUES = [
+  { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐' },
+  { id: 'ipl', name: 'IPL', country: 'India', flag: '🇮🇳' },
+  { id: 'icc-t20', name: 'T20 World Cup', country: 'ICC', flag: '🏆' },
+  { id: 'bbl', name: 'Big Bash League', country: 'Australia', flag: '🇦🇺' },
+  { id: 'psl', name: 'PSL', country: 'Pakistan', flag: '🇵🇰' },
+  { id: 'the-hundred', name: 'The Hundred', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: 'cpl', name: 'CPL T20', country: 'West Indies', flag: '🌴' },
+  { id: 'sa20', name: 'SA20', country: 'South Africa', flag: '🇿🇦' },
+  { id: 'icc-test', name: 'Test Championship', country: 'ICC', flag: '🏏' },
+];
 
 export function CricketScreen() {
   const [activeTab, setActiveTab] = useState<CricketTab>('live');
-  const [formatFilter, setFormatFilter] = useState<FormatFilter>('all');
+  const [selectedLeague, setSelectedLeague] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [tickerIndex, setTickerIndex] = useState(0);
-  const [pulseNews, setPulseNews] = useState<
-    { id?: string; _id?: string; tag: string; title: string; time: string }[]
-  >([
-    { id: 'cricket-1', tag: 'IPL 2026', title: 'Powerplay Analytics: Boundary percentages soar past 210 strike rate', time: '15m ago' },
-    { id: 'cricket-2', tag: 'ICC RANKINGS', title: 'India retain #1 spot in ICC T20 World Championship rankings', time: '40m ago' },
-    { id: 'cricket-3', tag: 'T20 CUP', title: 'Australia announce 15-man squad with surprise pace bowling inclusions', time: '1h ago' },
-    { id: 'cricket-4', tag: 'BBL', title: 'Perth Scorchers vs Sydney Sixers: Tactical pitch report and keys to victory', time: '3h ago' },
-    { id: 'cricket-5', tag: 'WOMEN', title: 'WPL playoffs set: High drama expected in knockout semifinals', time: '5h ago' },
-  ]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function loadCricketPulseNews() {
-      try {
-        const res = await fetch('/api/news?sport=cricket&limit=8');
-        if (res.ok) {
-          const data = await res.json();
-          const items = Array.isArray(data) ? data : data?.news || data?.data;
-          if (items && items.length > 0) {
-            const formatted = items.map((item: any) => ({
-              id: item._id || item.id,
-              _id: item._id || item.id,
-              slug: item.slug || (item.title ? slugify(item.title) : undefined),
-              tag: (item.competition || item.category || item.tags?.[0] || 'CRICKET').toUpperCase(),
-              title: item.title,
-              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
-            }));
-            setPulseNews(formatted);
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to fetch cricket pulse news:', err);
-      }
-    }
-    loadCricketPulseNews();
-  }, []);
+  const [matches, setMatches] = useState<CricketEvent[]>([]);
+  const [standings, setStandings] = useState<CricketStanding[]>([]);
 
-  useEffect(() => {
-    if (pulseNews.length === 0) return;
-    const timer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % pulseNews.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [pulseNews.length]);
-
-  const currentPulse = pulseNews[tickerIndex] || pulseNews[0];
-  const pulseLink = getNewsUrl(currentPulse);
-
-  const [liveMatches, setLiveMatches] = useState<CricketEvent[]>([]);
-  const [fixtures, setFixtures] = useState<CricketEvent[]>([]);
-  const [seriesList, setSeriesList] = useState<CricketLeague[]>([]);
-  const [teamsList, setTeamsList] = useState<CricketTeam[]>([]);
-  const [playersList, setPlayersList] = useState<CricketPlayer[]>([]);
-  const [standingsTab, setStandingsTab] = useState<
-    'IPL' | 'T20_WC' | 'BBL' | 'ICC_TEST' | 'ICC_ODI' | 'ICC_T20'
-  >('IPL');
-  const [standings, setStandings] = useState<Record<string, CricketStanding[]>>({});
-  const [iccRankings, setIccRankings] = useState<any[]>([]);
-
-  // 7-day date slider
+  // 7-day date strip slider (-3 days, today, +3 days)
   const dateStrip = useMemo(() => {
     const dates = [];
     const today = new Date();
@@ -104,138 +64,106 @@ export function CricketScreen() {
     return dates;
   }, []);
 
-  const fetchCricketData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
     try {
-      if (activeTab === 'live') {
-        const res = await advancedCricketApi.getLivescore({ timezone: 'GMT' });
-        setLiveMatches(res.result || []);
-      } else if (activeTab === 'upcoming' || activeTab === 'results') {
-        const fromDate = selectedDate;
-        const toDate = selectedDate;
-        const res = await advancedCricketApi.getFixtures({
-          from: fromDate,
-          to: toDate,
-          timezone: 'GMT',
+      if (activeTab === 'standings') {
+        const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
+        const res = await cricketApi.getStandings(leagueIdParam ? { leagueId: leagueIdParam } : {});
+        const list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
+        setStandings(list);
+      } else if (activeTab === 'live') {
+        const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
+        const res = await cricketApi.getLivescore(leagueIdParam ? { leagueId: leagueIdParam } : {});
+        const list = Array.isArray(res?.result) ? res.result : [];
+        setMatches(list);
+      } else {
+        // Upcoming or Results
+        const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
+        const res = await cricketApi.getFixtures({
+          from: selectedDate,
+          to: selectedDate,
+          ...(leagueIdParam ? { leagueId: leagueIdParam } : {}),
         });
-        setFixtures(res.result || []);
-      } else if (activeTab === 'standings') {
-        const [iplRank, t20WorldCupRank, bblRank, iccTest, iccOdi, iccT20] = await Promise.all([
-          advancedCricketApi.getStandings({ leagueId: 9785 }).catch(() => ({ result: [] })),
-          advancedCricketApi.getStandings({ leagueId: 9843 }).catch(() => ({ result: [] })),
-          advancedCricketApi.getStandings({ leagueId: 9779 }).catch(() => ({ result: [] })),
-          advancedCricketApi.getRankings('test', 'teams', 'men').catch(() => ({
-            format: 'test' as const,
-            category: 'teams' as const,
-            gender: 'men' as const,
-            rankings: [],
-          })),
-          advancedCricketApi.getRankings('odi', 'teams', 'men').catch(() => ({
-            format: 'odi' as const,
-            category: 'teams' as const,
-            gender: 'men' as const,
-            rankings: [],
-          })),
-          advancedCricketApi.getRankings('t20', 'teams', 'men').catch(() => ({
-            format: 't20' as const,
-            category: 'teams' as const,
-            gender: 'men' as const,
-            rankings: [],
-          })),
-        ]);
-
-        setStandings({
-          IPL:
-            (iplRank as any)?.result?.total ||
-            (Array.isArray(iplRank?.result) ? iplRank.result : []),
-          T20_WC:
-            (t20WorldCupRank as any)?.result?.total ||
-            (Array.isArray(t20WorldCupRank?.result) ? t20WorldCupRank.result : []),
-          BBL:
-            (bblRank as any)?.result?.total ||
-            (Array.isArray(bblRank?.result) ? bblRank.result : []),
-        });
-
-        setIccRankings([
-          { key: 'ICC_TEST', title: 'ICC Test Rankings', data: iccTest.rankings || [] },
-          { key: 'ICC_ODI', title: 'ICC ODI Rankings', data: iccOdi.rankings || [] },
-          { key: 'ICC_T20', title: 'ICC T20I Rankings', data: iccT20.rankings || [] },
-        ]);
-      } else if (activeTab === 'series') {
-        const res = await advancedCricketApi.getLeagues();
-        setSeriesList(res.result || []);
-      } else if (activeTab === 'teams') {
-        const [teamsRes, playersRes] = await Promise.all([
-          advancedCricketApi.getTeams().catch(() => ({ result: [] })),
-          advancedCricketApi.getTrendingPlayers().catch(() => []),
-        ]);
-        setTeamsList(teamsRes.result || []);
-        setPlayersList(playersRes || []);
+        const list = Array.isArray(res?.result) ? res.result : [];
+        setMatches(list);
       }
     } catch (err) {
-      console.error('[Web CricketScreen] Error loading cricket data:', err);
+      console.error('[CricketScreen] Error loading data:', err);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
-  }, [activeTab, selectedDate]);
+  }, [activeTab, selectedLeague, selectedDate]);
 
   useEffect(() => {
-    fetchCricketData();
-  }, [fetchCricketData]);
+    loadData();
+  }, [loadData]);
 
-  // Filtering matches by format & search
-  const currentMatchesList = useMemo(() => {
-    let list: CricketEvent[] = [];
+  // Polling interval for live matches (every 15s)
+  useEffect(() => {
+    if (activeTab !== 'live') return;
+    const interval = setInterval(() => {
+      loadData(true);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [activeTab, loadData]);
+
+  const handleManualRefresh = async () => {
+    setRefreshing(true);
+    await loadData(false);
+    setRefreshing(false);
+  };
+
+  // Filtered matches based on active tab, league filter, and search query
+  const filteredMatches = useMemo(() => {
+    let list = Array.isArray(matches) ? matches : [];
+
     if (activeTab === 'live') {
-      list = liveMatches;
+      list = list.filter((m) => {
+        const status = m.event_status?.toLowerCase() || '';
+        return (
+          m.event_live === '1' ||
+          status.includes('live') ||
+          status.includes('innings') ||
+          status.includes('batting') ||
+          status.includes('bowling') ||
+          status.includes('break') ||
+          status.includes('drinks') ||
+          status.includes('tea') ||
+          status.includes('lunch')
+        );
+      });
     } else if (activeTab === 'upcoming') {
-      list = fixtures.filter(
-        (m) => m.event_live !== '1' && m.event_status !== 'Finished' && m.event_status !== 'FT'
-      );
+      list = list.filter((m) => {
+        const status = m.event_status?.toLowerCase() || '';
+        return (
+          status !== 'finished' &&
+          status !== 'ft' &&
+          !status.includes('won') &&
+          !status.includes('complete') &&
+          !status.includes('abandoned') &&
+          m.event_live !== '1'
+        );
+      });
     } else if (activeTab === 'results') {
-      list = fixtures.filter((m) => m.event_status === 'Finished' || m.event_status === 'FT');
+      list = list.filter((m) => {
+        const status = m.event_status?.toLowerCase() || '';
+        return (
+          status === 'finished' ||
+          status === 'ft' ||
+          status.includes('won') ||
+          status.includes('complete') ||
+          status.includes('draw') ||
+          status.includes('abandoned')
+        );
+      });
     }
 
-    if (formatFilter !== 'all') {
+    if (selectedLeague !== 'all') {
+      const filterKey = selectedLeague.toLowerCase();
       list = list.filter((m) => {
-        const league = (m.league_name || '').toLowerCase();
-        const type = (m.event_type || '').toLowerCase();
-        if (formatFilter === 'international') {
-          return (
-            league.includes('icc') ||
-            league.includes('international') ||
-            type.includes('t20i') ||
-            type.includes('odi') ||
-            type.includes('test')
-          );
-        }
-        if (formatFilter === 'franchise') {
-          return (
-            league.includes('ipl') ||
-            league.includes('bbl') ||
-            league.includes('psl') ||
-            league.includes('hundred') ||
-            league.includes('cpl') ||
-            league.includes('sa20') ||
-            league.includes('premier league')
-          );
-        }
-        if (formatFilter === 'domestic') {
-          return (
-            league.includes('trophy') ||
-            league.includes('shield') ||
-            league.includes('cup') ||
-            league.includes('championship')
-          );
-        }
-        if (formatFilter === 'women') {
-          return (
-            league.includes('women') ||
-            type.includes('women') ||
-            (m.event_home_team || '').toLowerCase().includes('women')
-          );
-        }
-        return true;
+        const lName = (m.league_name || '').toLowerCase();
+        return lName.includes(filterKey);
       });
     }
 
@@ -243,550 +171,270 @@ export function CricketScreen() {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         (m) =>
-          (m.event_home_team && m.event_home_team.toLowerCase().includes(q)) ||
-          (m.event_away_team && m.event_away_team.toLowerCase().includes(q)) ||
-          (m.league_name && m.league_name.toLowerCase().includes(q))
+          (m.event_home_team || '').toLowerCase().includes(q) ||
+          (m.event_away_team || '').toLowerCase().includes(q) ||
+          (m.league_name || '').toLowerCase().includes(q) ||
+          (m.event_stadium || '').toLowerCase().includes(q)
       );
     }
 
     return list;
-  }, [activeTab, liveMatches, fixtures, formatFilter, searchQuery]);
+  }, [matches, activeTab, selectedLeague, searchQuery]);
 
-  // Group by league / tournament
-  const leagueGroups = useMemo(() => {
-    const groups: {
-      [key: string]: { title: string; logo?: string; matches: CricketEvent[] };
-    } = {};
-
-    currentMatchesList.forEach((match) => {
-      const title = match.league_name || 'Cricket Matches';
-      if (!groups[title]) {
-        groups[title] = {
-          title,
-          matches: [],
-        };
+  // Group matches by tournament/league
+  const groupedMatches = useMemo(() => {
+    const groups: { [key: string]: { leagueName: string; matches: CricketEvent[] } } = {};
+    filteredMatches.forEach((m) => {
+      const lName = m.league_name || 'International & Domestic Fixtures';
+      if (!groups[lName]) {
+        groups[lName] = { leagueName: lName, matches: [] };
       }
-      groups[title].matches.push(match);
+      groups[lName].matches.push(m);
     });
-
     return Object.values(groups);
-  }, [currentMatchesList]);
-
-  const tabs: { id: CricketTab; label: string; icon: string }[] = [
-    { id: 'live', label: 'Live Matches', icon: '🔴' },
-    { id: 'upcoming', label: 'Upcoming', icon: '📅' },
-    { id: 'results', label: 'Results', icon: '✅' },
-    { id: 'standings', label: 'Standings & Rankings', icon: '🏆' },
-    { id: 'series', label: 'Series', icon: '🏏' },
-    { id: 'teams', label: 'Teams & Players', icon: '👥' },
-  ];
-
-  const formatFilters: { id: FormatFilter; label: string }[] = [
-    { id: 'all', label: 'All Formats' },
-    { id: 'international', label: 'ICC & International' },
-    { id: 'franchise', label: 'T20 Franchise' },
-    { id: 'domestic', label: 'Domestic' },
-    { id: 'women', label: 'Women' },
-  ];
+  }, [filteredMatches]);
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 py-3.5 space-y-4">
-      {/* ─── TOP CRICKET PULSE WIRE TICKER ─── */}
-      <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
-      <div className="hidden md:flex items-center gap-2.5 min-w-0 flex-1">
-      <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
-       
-        <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
-          CRICKET PULSE
-        </span>
-
-        <Link
-          href={pulseLink}
-          className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
-        >
-          {currentPulse?.title}    
-        </Link>
-
-        <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-          • {currentPulse?.time}
-        </span>
-      </div>
-    </div>
-
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30"
-          >
-            {activeTab === 'live' ? '📅 Upcoming Fixtures' : '⚡ Live Cricket'}
-          </button>
-        </div>
-      </div>
-
-      {/* Smart Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-2.5 sm:p-3 rounded-xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-lg">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30">
-            <span className="text-sm">🏏</span>
-          </div>
-          <div>
-            <h2 className="text-xs sm:text-sm font-black text-white uppercase tracking-tight flex items-center gap-1.5">
-              <span>Cricket LiveScore</span>
-              <span className="px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono font-bold">
-                Ball-by-Ball
-              </span>
-            </h2>
-            <p className="text-[10px] text-slate-400">
-              Live overs, tournament tables, series summaries, and ICC world rankings
-            </p>
-          </div>
-        </div>
-
-        {/* Search & Refresh */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:w-52">
-            <input
-              type="text"
-              placeholder="Search teams, series..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-blue-500/20 bg-[#070E1A] px-2.5 py-1 pl-7 text-[11px] text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all shadow-inner h-7"
-            />
-            <span className="absolute left-2.5 top-1.5 text-[10px] text-slate-400">🔍</span>
+    <div className="space-y-6">
+      {/* Top Controls Header */}
+      <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
+        {/* Navigation Tabs Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-[#060D18]/90 border border-white/5">
+            {[
+              { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-emerald-400' },
+              { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
+              { id: 'results', label: 'Results', icon: FiAward, color: 'text-amber-400' },
+              { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-purple-400' },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as CricketTab)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className={isActive ? 'text-white' : tab.color} />
+                  <span>{tab.label}</span>
+                  {tab.id === 'live' && matches.length > 0 && activeTab === 'live' && (
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500 text-black text-[10px] font-mono font-bold">
+                      {matches.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          <button
-            onClick={fetchCricketData}
-            disabled={loading}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black text-[11px] hover:from-blue-400 hover:to-indigo-500 transition-all shadow-sm active:scale-95 disabled:opacity-50 h-7"
-            title="Refresh on demand"
-          >
-            <span>🔄</span>
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-white/10">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all duration-150 flex-shrink-0 ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-md shadow-blue-600/30'
-                  : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
-              }`}
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all disabled:opacity-50"
+              title="Refresh Live Scores"
             >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
+              <FiRefreshCw className={`text-emerald-400 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Sync Live</span>
             </button>
-          );
-        })}
-      </div>
-
-      {/* Format Filter Pills for Matches */}
-      {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-          {formatFilters.map((fmt) => {
-            const isFmtActive = formatFilter === fmt.id;
-            return (
-              <button
-                key={fmt.id}
-                onClick={() => setFormatFilter(fmt.id)}
-                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
-                  isFmtActive
-                    ? 'bg-blue-600 text-white font-black shadow-sm'
-                    : 'bg-[#0B172B]/70 text-slate-400 border border-blue-500/15 hover:border-blue-400/30 hover:text-white'
-                }`}
-              >
-                {fmt.label}
-              </button>
-            );
-          })}
+          </div>
         </div>
-      )}
 
-      {/* Date Strip for upcoming & results */}
-      {activeTab !== 'live' &&
-        activeTab !== 'standings' &&
-        activeTab !== 'series' &&
-        activeTab !== 'teams' && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+        {/* Date Strip Navigator (for Upcoming and Results) */}
+        {(activeTab === 'upcoming' || activeTab === 'results') && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10">
             {dateStrip.map((item) => {
               const isSelected = selectedDate === item.iso;
               return (
                 <button
                   key={item.iso}
                   onClick={() => setSelectedDate(item.iso)}
-                  className={`flex min-w-[56px] sm:min-w-[64px] flex-col items-center rounded-lg p-1.5 transition-all duration-150 border ${
+                  className={`flex flex-col items-center min-w-[70px] py-2 px-2.5 rounded-2xl border transition-all ${
                     isSelected
-                      ? 'border-blue-400 bg-blue-600/25 text-blue-300 shadow-md scale-[1.02]'
-                      : 'border-blue-500/15 bg-[#0B172B]/70 text-slate-400 hover:border-blue-400/30 hover:text-white'
+                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-md'
+                      : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                   }`}
                 >
-                  <span className="text-[9px] font-bold uppercase">{item.dayName}</span>
-                  <span className="text-xs sm:text-sm font-black">{item.dayNumber}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider">{item.dayName}</span>
+                  <span className="text-sm font-mono font-black">{item.dayNumber}</span>
                 </button>
               );
             })}
           </div>
         )}
 
-      {/* Content Area */}
-      {loading ? (
-        <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
-          <GoalmillsLoader
-            size="md"
-            label="Cricket Desk"
-            sublabel="Fetching live overs, wickets & tournament tables..."
+        {/* Competitions / Leagues Filter Ribbon */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
+            <FiSliders className="text-emerald-400" /> Filter:
+          </span>
+          {MAJOR_CRICKET_LEAGUES.map((league) => {
+            const isSelected = selectedLeague === league.id;
+            return (
+              <button
+                key={league.id}
+                onClick={() => setSelectedLeague(league.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  isSelected
+                    ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20 font-black'
+                    : 'bg-[#091529] text-slate-400 hover:text-white border border-white/5 hover:border-white/15'
+                }`}
+              >
+                <span>{league.flag}</span>
+                <span>{league.name}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Live Search Filter */}
+        <div className="relative">
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+          <input
+            type="text"
+            placeholder="Search teams, tournament, stadium..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#060D18]/90 border border-white/10 text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/50 transition-colors"
           />
         </div>
-      ) : activeTab === 'standings' ? (
-        /* Standings & Rankings Hub */
-        <div className="space-y-6">
-          {/* Sub-selector for tournaments & ICC rankings */}
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'IPL', label: 'IPL Table' },
-              { id: 'T20_WC', label: 'ICC T20 World Cup' },
-              { id: 'BBL', label: 'Big Bash League' },
-              { id: 'ICC_TEST', label: 'ICC Test Rankings' },
-              { id: 'ICC_ODI', label: 'ICC ODI Rankings' },
-              { id: 'ICC_T20', label: 'ICC T20I Rankings' },
-            ].map((sub) => {
-              const isSubActive = standingsTab === sub.id;
-              return (
-                <button
-                  key={sub.id}
-                  onClick={() => setStandingsTab(sub.id as any)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                    isSubActive
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                      : 'bg-[#0B172B]/70 text-slate-300 border border-blue-500/15 hover:border-blue-400/30 hover:text-white'
-                  }`}
-                >
-                  {sub.label}
-                </button>
-              );
-            })}
-          </div>
+      </div>
 
-          {/* Standings Table View */}
-          {standingsTab === 'IPL' || standingsTab === 'T20_WC' || standingsTab === 'BBL' ? (
-            <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
-              <h2 className="mb-4 text-base font-black text-white flex items-center gap-2 uppercase tracking-tight">
-                <span className="text-amber-400">🏆</span>
-                <span>
-                  {standingsTab === 'IPL'
-                    ? 'Indian Premier League (IPL) Points Table'
-                    : standingsTab === 'T20_WC'
-                      ? 'ICC T20 World Cup Standings'
-                      : 'Big Bash League (BBL) Standings'}
-                </span>
-              </h2>
-
-              {!standings[standingsTab] || standings[standingsTab].length === 0 ? (
-                <p className="text-sm text-slate-400 py-6 text-center">
-                  Standings for this tournament are currently syncing...
-                </p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs sm:text-sm text-slate-300">
-                    <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
-                      <tr>
-                        <th className="py-3 px-2 text-center w-8">#</th>
-                        <th className="py-3 px-3">Team</th>
-                        <th className="py-3 px-2 text-center">P</th>
-                        <th className="py-3 px-2 text-center">W</th>
-                        <th className="py-3 px-2 text-center">L</th>
-                        <th className="py-3 px-2 text-center">NR</th>
-                        <th className="py-3 px-2 text-center font-mono">NRR</th>
-                        <th className="py-3 px-3 text-right font-black text-amber-400">PTS</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5 font-medium">
-                      {standings[standingsTab].map((row, idx) => (
-                        <tr key={idx} className="hover:bg-blue-600/10 transition-colors">
-                          <td className="py-2.5 px-2 text-center font-bold text-slate-400">
-                            {row.standing_place || idx + 1}
-                          </td>
-                          <td className="py-2.5 px-3 font-bold text-white flex items-center gap-2">
-                            <span className="text-amber-400">🛡️</span>
-                            <span>{row.standing_team}</span>
-                          </td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{row.standing_MP || 0}</td>
-                          <td className="py-2.5 px-2 text-center text-emerald-400 font-bold">
-                            {row.standing_W || 0}
-                          </td>
-                          <td className="py-2.5 px-2 text-center text-red-400 font-bold">
-                            {row.standing_L || 0}
-                          </td>
-                          <td className="py-2.5 px-2 text-center text-slate-400">
-                            {row.standing_NR || 0}
-                          </td>
-                          <td className="py-2.5 px-2 text-center font-mono text-xs text-slate-300">
-                            {row.standing_NRR || '0.00'}
-                          </td>
-                          <td className="py-2.5 px-3 text-right font-black text-amber-400 text-sm">
-                            {row.standing_Pts || 0}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* ICC Team Rankings Table */
-            <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
-              <h2 className="mb-4 text-base font-black text-white flex items-center gap-2 uppercase tracking-tight">
-                <span className="text-amber-400">🌍</span>
-                <span>
-                  {standingsTab === 'ICC_TEST'
-                    ? 'Official ICC Men’s Test Team Rankings'
-                    : standingsTab === 'ICC_ODI'
-                      ? 'Official ICC Men’s ODI Team Rankings'
-                      : 'Official ICC Men’s T20I Team Rankings'}
-                </span>
-              </h2>
-
-              {(() => {
-                const targetObj = iccRankings.find((r) => r.key === standingsTab);
-                const data = targetObj?.data || [];
-                if (data.length === 0) {
-                  return (
-                    <p className="text-sm text-slate-400 py-6 text-center">
-                      ICC Rankings telemetry is loading...
-                    </p>
-                  );
-                }
-                return (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs sm:text-sm text-slate-300">
-                      <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
-                        <tr>
-                          <th className="py-3 px-2 text-center w-12">Rank</th>
-                          <th className="py-3 px-3">Country / Team</th>
-                          <th className="py-3 px-3 text-center">Rating Points</th>
-                          <th className="py-3 px-3 text-right">ICC Rating</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5 font-medium">
-                        {data.map((item: any, idx: number) => (
-                          <tr key={idx} className="hover:bg-blue-600/10 transition-colors">
-                            <td className="py-2.5 px-2 text-center font-bold text-slate-400">
-                              {item.rank || idx + 1}
-                            </td>
-                            <td className="py-2.5 px-3 font-bold text-white">
-                              {item.country || item.team_name}
-                            </td>
-                            <td className="py-2.5 px-3 text-center text-slate-300">
-                              {item.points ? item.points.toLocaleString() : '-'}
-                            </td>
-                            <td className="py-2.5 px-3 text-right font-black text-amber-400">
-                              {item.rating || '-'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              })()}
-            </div>
-          )}
-        </div>
-      ) : activeTab === 'series' ? (
-        /* Series / Tournament Directory */
-        <div className="space-y-4">
-          <h2 className="text-base font-black text-white uppercase tracking-tight">Tournaments & International Tours</h2>
-          {seriesList.length === 0 ? (
-            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-8 text-center backdrop-blur-md">
-              <span className="text-4xl">🏏</span>
-              <h3 className="mt-3 text-base font-bold text-white">No Series Found</h3>
-              <button
-                onClick={fetchCricketData}
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-all shadow-md"
-              >
-                Refresh
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {seriesList
-                .filter(
-                  (s) =>
-                    !searchQuery ||
-                    (s.league_name &&
-                      s.league_name.toLowerCase().includes(searchQuery.toLowerCase()))
-                )
-                .map((series) => (
-                  <Link
-                    key={series.league_key}
-                    href={`/cricket/series/${series.league_key}`}
-                    className="group rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 p-5 hover:border-amber-400/40 hover:bg-[#0E203C] transition-all flex flex-col justify-between shadow-lg"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-amber-400 text-lg">🏏</span>
-                        <span className="text-[10px] font-black uppercase text-amber-300 tracking-wider">
-                          Tournament
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-black text-white group-hover:text-amber-300 transition-colors line-clamp-2">
-                        {series.league_name}
-                      </h3>
-                      {series.country_name && (
-                        <p className="text-xs text-slate-400 mt-1">{series.country_name}</p>
-                      )}
-                    </div>
-                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
-                      <span>View Fixtures & Standings</span>
-                      <span className="text-amber-400 font-bold">&rarr;</span>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          )}
-        </div>
-      ) : activeTab === 'teams' ? (
-        /* Teams & Players Directory */
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-base font-black text-white uppercase tracking-tight mb-3">Trending Cricketers & Profiles</h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {playersList
-                .filter(
-                  (p) =>
-                    !searchQuery ||
-                    (p.player_name &&
-                      p.player_name.toLowerCase().includes(searchQuery.toLowerCase()))
-                )
-                .map((player) => (
-                  <Link
-                    key={player.player_key}
-                    href={`/cricket/players/${player.player_key}`}
-                    className="group rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 p-4 hover:border-amber-400/40 hover:bg-[#0E203C] transition-all flex items-center space-x-3.5 shadow-lg"
-                  >
-                    <div className="h-12 w-12 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
-                      {player.player_image ? (
-                        <img
-                          src={player.player_image}
-                          alt={player.player_name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-base font-black text-amber-400">
-                          {player.player_name.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
-                        {player.player_name}
-                      </h3>
-                      <p className="text-xs text-slate-400 truncate">
-                        {player.player_role || player.player_type || 'Cricket Star'}
-                      </p>
-                      <p className="text-[10px] text-amber-300 font-medium truncate mt-0.5">
-                        {player.player_country || player.team_name}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-base font-black text-white uppercase tracking-tight mb-3">Cricket Teams & Clubs</h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {teamsList
-                .filter(
-                  (t) =>
-                    !searchQuery ||
-                    (t.team_name && t.team_name.toLowerCase().includes(searchQuery.toLowerCase()))
-                )
-                .map((team) => (
-                  <Link
-                    key={team.team_key}
-                    href={`/cricket/teams/${team.team_key}`}
-                    className="group rounded-2xl border border-blue-500/15 bg-[#0B172B]/80 p-4 hover:border-amber-400/40 hover:bg-[#0E203C] transition-all flex items-center space-x-3.5 shadow-lg"
-                  >
-                    <div className="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 p-1 flex items-center justify-center shrink-0">
-                      {team.team_logo ? (
-                        <img
-                          src={team.team_logo}
-                          alt={team.team_name}
-                          className="h-full w-full object-contain"
-                        />
-                      ) : (
-                        <span className="text-sm font-black text-amber-400">
-                          {team.team_name.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
-                        {team.team_name}
-                      </h3>
-                      <p className="text-xs text-slate-400 truncate">
-                        View Squad & Match Schedule &rarr;
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </div>
-        </div>
-      ) : leagueGroups.length === 0 ? (
-        /* Empty State */
-        <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-8 text-center backdrop-blur-md">
-          <span className="text-4xl">🏏</span>
-          <h3 className="mt-3 text-base font-bold text-white">
-            {activeTab === 'live' ? 'No Live Cricket Matches In-Play' : 'No Matches Found'}
-          </h3>
-          <p className="mt-1 text-xs text-slate-400 max-w-sm">
-            {activeTab === 'live'
-              ? 'Check upcoming fixtures or pick another date from the calendar.'
-              : 'Try selecting a different format filter or clearing search query.'}
+      {/* Main Content Area */}
+      {loading ? (
+        <div className="py-20 flex flex-col items-center justify-center space-y-3">
+          <GoalmillsLoader />
+          <p className="text-xs text-slate-400 font-bold tracking-wider uppercase animate-pulse">
+            Loading Live Cricket Intelligence...
           </p>
-          <button
-            onClick={fetchCricketData}
-            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition-all shadow-md"
-          >
-            Refresh Feed
-          </button>
+        </div>
+      ) : activeTab === 'standings' ? (
+        /* Standings / Points Table View */
+        <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <FiTrendingUp className="text-emerald-400" />
+              <span>Official Points Table</span>
+            </h3>
+            <span className="text-xs font-mono font-bold text-slate-400">
+              {standings.length} Teams Listed
+            </span>
+          </div>
+
+          {standings.length === 0 ? (
+            <div className="py-12 text-center text-slate-400 text-sm">
+              No standings currently available for this tournament. Select another competition from the filter ribbon.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-white/10 text-[10px] font-black uppercase text-slate-400">
+                    <th className="py-3 px-2">#</th>
+                    <th className="py-3 px-3">Team</th>
+                    <th className="py-3 px-2 text-center">P</th>
+                    <th className="py-3 px-2 text-center">W</th>
+                    <th className="py-3 px-2 text-center">L</th>
+                    <th className="py-3 px-2 text-center">NR/T</th>
+                    <th className="py-3 px-2 text-center font-bold text-white">PTS</th>
+                    <th className="py-3 px-2 text-center hidden sm:table-cell">NRR</th>
+                    <th className="py-3 px-2 text-center hidden md:table-cell">Stage / Group</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-medium">
+                  {standings.map((team, idx) => {
+                    const teamSlug = cricketRoutes.teamFromName(
+                      team.standing_team,
+                      team.team_key
+                    );
+                    return (
+                      <tr
+                        key={team.team_key || idx}
+                        className="hover:bg-white/5 transition-colors group"
+                      >
+                        <td className="py-3 px-2 font-mono font-bold text-slate-400 group-hover:text-emerald-400">
+                          {team.standing_place || idx + 1}
+                        </td>
+                        <td className="py-3 px-3">
+                          <Link
+                            href={teamSlug}
+                            className="font-bold text-white hover:text-emerald-300 transition-colors flex items-center gap-2"
+                          >
+                            <span>{team.standing_team}</span>
+                          </Link>
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono">{team.standing_MP || '0'}</td>
+                        <td className="py-3 px-2 text-center font-mono text-emerald-400 font-bold">
+                          {team.standing_W || '0'}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-rose-400">
+                          {team.standing_L || '0'}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-slate-400">
+                          {team.standing_NR || '0'}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono font-black text-emerald-400 text-sm">
+                          {team.standing_Pts || '0'}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-slate-300 hidden sm:table-cell">
+                          {team.standing_NRR || '-'}
+                        </td>
+                        <td className="py-3 px-2 text-center font-mono text-[10px] text-slate-400 truncate max-w-[120px] hidden md:table-cell">
+                          {team.league_round || team.standing_place_type || 'Group Stage'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : groupedMatches.length === 0 ? (
+        /* Empty State */
+        <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-12 text-center shadow-xl space-y-3">
+          <div className="text-4xl">🏏</div>
+          <h4 className="text-base font-black text-white">
+            {activeTab === 'live'
+              ? 'No Live Cricket Matches In-Play Right Now'
+              : `No Matches Scheduled for ${selectedDate}`}
+          </h4>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            {activeTab === 'live'
+              ? 'Check the Upcoming tab for upcoming fixtures or select another date in Results.'
+              : 'Try selecting a different tournament or date using the calendar slider above.'}
+          </p>
         </div>
       ) : (
-        /* Grouped Matches List */
+        /* Matches Grid Grouped by Competition */
         <div className="space-y-6">
-          {leagueGroups.map((group) => (
-            <div
-              key={group.title}
-              className="space-y-3 rounded-2xl border border-blue-500/20 bg-[#0A1424]/80 p-4 shadow-xl backdrop-blur-md"
-            >
-              {/* League Header */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-                <div className="flex items-center space-x-2">
-                  <span className="text-amber-400">🏏</span>
-                  <h2 className="text-xs font-black uppercase tracking-wider text-white">
-                    {group.title}
-                  </h2>
+          {groupedMatches.map((group) => (
+            <div key={group.leagueName} className="space-y-3">
+              {/* Competition Section Header */}
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-400">🏏</span>
+                  <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                    {group.leagueName}
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 font-bold border border-blue-500/20">
+                    {group.matches.length}
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                  {group.matches.length} {group.matches.length === 1 ? 'Match' : 'Matches'}
-                </span>
               </div>
 
               {/* Match Cards Grid */}
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {group.matches.map((match) => (
-                  <CricketMatchCard key={match.event_key} match={match} hideLeague />
+                  <CricketMatchCard
+                    key={match.event_key || match.home_team_key}
+                    match={match}
+                    hideLeague={false}
+                  />
                 ))}
               </div>
             </div>
@@ -796,3 +444,5 @@ export function CricketScreen() {
     </div>
   );
 }
+
+export default CricketScreen;
