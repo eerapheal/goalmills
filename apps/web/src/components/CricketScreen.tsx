@@ -240,10 +240,10 @@ export function CricketScreen() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-[#060D18]/90 border border-white/5">
             {[
-              { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-emerald-400' },
+              { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-red-500' },
               { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
-              { id: 'results', label: 'Results', icon: FiAward, color: 'text-amber-400' },
-              { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-purple-400' },
+              { id: 'results', label: 'Results', icon: FiAward, color: 'text-yellow-400' },
+              { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-yellow-400' },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -260,7 +260,7 @@ export function CricketScreen() {
                   <Icon className={isActive ? 'text-white' : tab.color} />
                   <span>{tab.label}</span>
                   {tab.id === 'live' && matches.length > 0 && activeTab === 'live' && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500 text-black text-[10px] font-mono font-bold">
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-red-500 text-white text-[10px] font-mono font-bold animate-pulse">
                       {matches.length}
                     </span>
                   )}
@@ -276,7 +276,7 @@ export function CricketScreen() {
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all disabled:opacity-50"
               title="Refresh Live Scores"
             >
-              <FiRefreshCw className={`text-emerald-400 ${refreshing ? 'animate-spin' : ''}`} />
+              <FiRefreshCw className={`text-blue-400 ${refreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Sync Live</span>
             </button>
           </div>
@@ -293,7 +293,7 @@ export function CricketScreen() {
                   onClick={() => setSelectedDate(item.iso)}
                   className={`flex flex-col items-center min-w-[70px] py-2 px-2.5 rounded-2xl border transition-all ${
                     isSelected
-                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-md'
+                      ? 'bg-blue-600/20 border-blue-500/50 text-blue-300 shadow-md'
                       : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                   }`}
                 >
@@ -308,7 +308,7 @@ export function CricketScreen() {
         {/* Competitions / Leagues Filter Ribbon */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
-            <FiSliders className="text-emerald-400" /> Filter:
+            <FiSliders className="text-yellow-400" /> Filter:
           </span>
           {competitions.map((league) => {
             const isSelected = selectedLeague === league.id;
@@ -318,7 +318,7 @@ export function CricketScreen() {
                 onClick={() => setSelectedLeague(league.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   isSelected
-                    ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20 font-black'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-black'
                     : 'bg-[#091529] text-slate-400 hover:text-white border border-white/5 hover:border-white/15'
                 }`}
               >
@@ -337,7 +337,7 @@ export function CricketScreen() {
             placeholder="Search teams, tournament, stadium..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#060D18]/90 border border-white/10 text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400/50 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#060D18]/90 border border-white/10 text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:border-blue-400/50 transition-colors"
           />
         </div>
       </div>
@@ -355,7 +355,7 @@ export function CricketScreen() {
         <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiTrendingUp className="text-emerald-400" />
+              <FiTrendingUp className="text-yellow-400" />
               <span>Official Points Table</span>
             </h3>
             <span className="text-xs font-mono font-bold text-slate-400">
@@ -375,10 +375,10 @@ export function CricketScreen() {
                     <th className="py-3 px-2">#</th>
                     <th className="py-3 px-3">Team</th>
                     <th className="py-3 px-2 text-center">P</th>
-                    <th className="py-3 px-2 text-center">W</th>
-                    <th className="py-3 px-2 text-center">L</th>
+                    <th className="py-3 px-2 text-center text-blue-400">W</th>
+                    <th className="py-3 px-2 text-center text-rose-400">L</th>
                     <th className="py-3 px-2 text-center">NR/T</th>
-                    <th className="py-3 px-2 text-center font-bold text-white">PTS</th>
+                    <th className="py-3 px-2 text-center font-bold text-yellow-400">PTS</th>
                     <th className="py-3 px-2 text-center hidden sm:table-cell">NRR</th>
                     <th className="py-3 px-2 text-center hidden md:table-cell">Stage / Group</th>
                   </tr>
@@ -394,19 +394,19 @@ export function CricketScreen() {
                         key={team.team_key || idx}
                         className="hover:bg-white/5 transition-colors group"
                       >
-                        <td className="py-3 px-2 font-mono font-bold text-slate-400 group-hover:text-emerald-400">
+                        <td className="py-3 px-2 font-mono font-bold text-slate-400 group-hover:text-yellow-400">
                           {team.standing_place || idx + 1}
                         </td>
                         <td className="py-3 px-3">
                           <Link
                             href={teamSlug}
-                            className="font-bold text-white hover:text-emerald-300 transition-colors flex items-center gap-2"
+                            className="font-bold text-white hover:text-blue-400 transition-colors flex items-center gap-2"
                           >
                             <span>{team.standing_team}</span>
                           </Link>
                         </td>
                         <td className="py-3 px-2 text-center font-mono">{team.standing_MP || '0'}</td>
-                        <td className="py-3 px-2 text-center font-mono text-emerald-400 font-bold">
+                        <td className="py-3 px-2 text-center font-mono text-blue-400 font-bold">
                           {team.standing_W || '0'}
                         </td>
                         <td className="py-3 px-2 text-center font-mono text-rose-400">
@@ -415,7 +415,7 @@ export function CricketScreen() {
                         <td className="py-3 px-2 text-center font-mono text-slate-400">
                           {team.standing_NR || '0'}
                         </td>
-                        <td className="py-3 px-2 text-center font-mono font-black text-emerald-400 text-sm">
+                        <td className="py-3 px-2 text-center font-mono font-black text-yellow-400 text-sm">
                           {team.standing_Pts || '0'}
                         </td>
                         <td className="py-3 px-2 text-center font-mono text-slate-300 hidden sm:table-cell">

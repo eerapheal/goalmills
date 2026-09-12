@@ -118,7 +118,7 @@ export function FootballStandingsTable({
         {/* Numeric Stat Columns */}
         <div className="flex items-center shrink-0">
           <div className="w-7 sm:w-8 text-center">P</div>
-          <div className="hidden sm:block w-7 sm:w-8 text-center text-emerald-400">W</div>
+          <div className="hidden sm:block w-7 sm:w-8 text-center text-blue-400">W</div>
           <div className="hidden sm:block w-7 sm:w-8 text-center text-slate-400">D</div>
           <div className="hidden sm:block w-7 sm:w-8 text-center text-rose-400">L</div>
           <div className="w-8 sm:w-9 text-center">GD</div>
@@ -179,7 +179,7 @@ export function FootballStandingsTable({
                 <div className="w-7 sm:w-8 text-center text-slate-300 font-mono">
                   {standing.standing_P}
                 </div>
-                <div className="hidden sm:block w-7 sm:w-8 text-center text-emerald-400 font-bold font-mono">
+                <div className="hidden sm:block w-7 sm:w-8 text-center text-blue-400 font-bold font-mono">
                   {standing.standing_W}
                 </div>
                 <div className="hidden sm:block w-7 sm:w-8 text-center text-slate-400 font-mono">
@@ -190,7 +190,7 @@ export function FootballStandingsTable({
                 </div>
                 <div
                   className={`w-8 sm:w-9 text-center font-mono text-[11px] sm:text-xs ${
-                    gd > 0 ? 'text-emerald-400' : gd < 0 ? 'text-rose-400' : 'text-slate-400'
+                    gd > 0 ? 'text-blue-400' : gd < 0 ? 'text-rose-400' : 'text-slate-400'
                   }`}
                 >
                   {gd > 0 ? `+${gd}` : gd}
@@ -213,7 +213,7 @@ export function FootballStandingsTable({
                             key={i}
                             className={`w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded text-[8px] sm:text-[9px] font-black ${
                               res === 'W'
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30'
                                 : res === 'D'
                                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                                   : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'

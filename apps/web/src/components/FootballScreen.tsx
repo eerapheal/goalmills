@@ -311,12 +311,12 @@ export function FootballScreen() {
   }, [filteredFixtures]);
 
   const tabs = [
-    { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-blue-400' },
+    { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-red-500' },
     { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
-    { id: 'results', label: 'Results', icon: FiAward, color: 'text-blue-300' },
-    { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-indigo-400' },
-    { id: 'topscorers', label: 'Top Scorers', icon: FiShield, color: 'text-amber-400' },
-    { id: 'predictions', label: 'Predictions', icon: FiZap, color: 'text-cyan-400' },
+    { id: 'results', label: 'Results', icon: FiAward, color: 'text-yellow-400' },
+    { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-blue-400' },
+    { id: 'topscorers', label: 'Top Scorers', icon: FiShield, color: 'text-yellow-400' },
+    { id: 'predictions', label: 'Predictions', icon: FiZap, color: 'text-red-400' },
   ];
 
   return (
@@ -342,7 +342,7 @@ export function FootballScreen() {
                   <Icon className={isActive ? 'text-white' : tab.color} />
                   <span>{tab.label}</span>
                   {tab.id === 'live' && fixtures.length > 0 && activeTab === 'live' && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-blue-500 text-white text-[10px] font-mono font-bold">
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-red-500 text-white text-[10px] font-mono font-bold animate-pulse">
                       {fixtures.length}
                     </span>
                   )}
@@ -470,11 +470,11 @@ export function FootballScreen() {
                       <th className="py-3 px-2 text-center w-8">#</th>
                       <th className="py-3 px-3 font-sans">Club</th>
                       <th className="py-3 px-2 text-center">PL</th>
-                      <th className="py-3 px-2 text-center text-emerald-400">W</th>
+                      <th className="py-3 px-2 text-center text-blue-400">W</th>
                       <th className="py-3 px-2 text-center text-slate-400">D</th>
-                      <th className="py-3 px-2 text-center text-rose-400">L</th>
+                      <th className="py-3 px-2 text-center text-red-400">L</th>
                       <th className="py-3 px-2 text-center">GD</th>
-                      <th className="py-3 px-3 text-right font-black text-amber-400">PTS</th>
+                      <th className="py-3 px-3 text-right font-black text-yellow-400">PTS</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-medium">
@@ -499,9 +499,9 @@ export function FootballScreen() {
                                   isUCL
                                     ? 'bg-blue-600/30 text-blue-300 border border-blue-400/40'
                                     : isUEL
-                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                      ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
                                       : isRelegation
-                                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                        ? 'bg-red-500/20 text-red-300 border border-red-500/30'
                                         : 'text-slate-400'
                                 }`}
                               >
@@ -517,11 +517,11 @@ export function FootballScreen() {
                               </Link>
                             </td>
                             <td className="py-2.5 px-2 text-center text-slate-300">{row.standing_P}</td>
-                            <td className="py-2.5 px-2 text-center text-emerald-400 font-bold">{row.standing_W}</td>
+                            <td className="py-2.5 px-2 text-center text-blue-400 font-bold">{row.standing_W}</td>
                             <td className="py-2.5 px-2 text-center text-slate-400">{row.standing_D}</td>
-                            <td className="py-2.5 px-2 text-center text-rose-400">{row.standing_L}</td>
+                            <td className="py-2.5 px-2 text-center text-red-400">{row.standing_L}</td>
                             <td className="py-2.5 px-2 text-center">{row.standing_GD}</td>
-                            <td className="py-2.5 px-3 text-right font-black text-amber-400">
+                            <td className="py-2.5 px-3 text-right font-black text-yellow-400">
                               {row.standing_PTS}
                             </td>
                           </tr>
@@ -538,7 +538,7 @@ export function FootballScreen() {
           {activeTab === 'topscorers' && (
             <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
               <h3 className="text-base font-black text-white flex items-center gap-2 uppercase border-b border-white/10 pb-3">
-                <FiAward className="text-amber-400" />
+                <FiAward className="text-yellow-400" />
                 <span>Golden Boot & Top Goal Scorers</span>
               </h3>
 
@@ -555,7 +555,7 @@ export function FootballScreen() {
                       className="p-4 rounded-2xl bg-[#0B1526] border border-white/10 hover:border-blue-400/40 transition-all flex items-center justify-between shadow-md group"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="w-6 text-center font-mono font-black text-amber-400 text-sm">
+                        <span className="w-6 text-center font-mono font-black text-yellow-400 text-sm">
                           #{s.player_place || idx + 1}
                         </span>
                         <div className="h-11 w-11 rounded-xl bg-slate-900 border border-white/10 overflow-hidden flex items-center justify-center p-1">
@@ -566,7 +566,7 @@ export function FootballScreen() {
                           )}
                         </div>
                         <div>
-                          <h4 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
+                          <h4 className="text-xs font-bold text-white group-hover:text-yellow-300 transition-colors">
                             {s.player_name}
                           </h4>
                           <p className="text-[11px] text-slate-400">{s.team_name}</p>
@@ -574,7 +574,7 @@ export function FootballScreen() {
                       </div>
 
                       <div className="text-right">
-                        <span className="text-lg font-black text-emerald-400 font-mono">
+                        <span className="text-lg font-black text-yellow-400 font-mono">
                           {s.goals} ⚽
                         </span>
                         {s.penalty_goals && s.penalty_goals !== '0' && (
@@ -594,7 +594,7 @@ export function FootballScreen() {
           {activeTab === 'predictions' && (
             <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
               <h3 className="text-base font-black text-white flex items-center gap-2 uppercase border-b border-white/10 pb-3">
-                <FiTrendingUp className="text-amber-400" />
+                <FiTrendingUp className="text-yellow-400" />
                 <span>AI Match Predictions & Win Probabilities</span>
               </h3>
 
@@ -611,7 +611,7 @@ export function FootballScreen() {
                     >
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-slate-400 font-mono">{prob.league_name}</span>
-                        <span className="text-amber-400 font-bold">{prob.event_time}</span>
+                        <span className="text-yellow-400 font-bold">{prob.event_time}</span>
                       </div>
 
                       <div className="flex justify-between items-center font-bold text-xs text-white">
@@ -624,24 +624,24 @@ export function FootballScreen() {
                       <div className="space-y-1">
                         <div className="flex justify-between text-[10px] font-mono font-bold text-slate-300">
                           <span className="text-blue-400">{prob.event_HW}%</span>
-                          <span className="text-slate-400">Draw {prob.event_D}%</span>
-                          <span className="text-amber-400">{prob.event_AW}%</span>
+                          <span className="text-yellow-400">Draw {prob.event_D}%</span>
+                          <span className="text-red-400">{prob.event_AW}%</span>
                         </div>
                         <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-slate-800">
                           <div style={{ width: `${prob.event_HW}%` }} className="bg-blue-500" />
-                          <div style={{ width: `${prob.event_D}%` }} className="bg-slate-500" />
-                          <div style={{ width: `${prob.event_AW}%` }} className="bg-amber-500" />
+                          <div style={{ width: `${prob.event_D}%` }} className="bg-yellow-500" />
+                          <div style={{ width: `${prob.event_AW}%` }} className="bg-red-500" />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 pt-2 text-[11px]">
                         <div className="p-2 rounded-lg bg-slate-900/80 border border-white/5 flex justify-between">
                           <span className="text-slate-400">Over 2.5:</span>
-                          <span className="font-bold text-emerald-400">{prob.event_O}%</span>
+                          <span className="font-bold text-yellow-400">{prob.event_O}%</span>
                         </div>
                         <div className="p-2 rounded-lg bg-slate-900/80 border border-white/5 flex justify-between">
                           <span className="text-slate-400">Both Score:</span>
-                          <span className="font-bold text-amber-400">{prob.event_bts}%</span>
+                          <span className="font-bold text-red-400">{prob.event_bts}%</span>
                         </div>
                       </div>
 

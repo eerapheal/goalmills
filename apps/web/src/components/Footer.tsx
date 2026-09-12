@@ -1,11 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
+import { BrandColorBand } from './ui/BrandColorBand';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-950 border-t border-white/5 pt-16 pb-8 px-4">
+    <footer className="relative bg-slate-950 border-t border-white/5 pt-16 pb-8 px-4 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0">
+        <BrandColorBand height="h-[2px]" rounded="none" />
+      </div>
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand Column */}

@@ -23,7 +23,7 @@ export function GoalmillsLoader({
       <div className={`inline-flex items-center gap-2 ${className}`}>
         <div className="relative w-4 h-4">
           <div className="absolute inset-0 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
-          <div className="absolute inset-0.5 rounded-full border border-emerald-400/30 border-b-emerald-400 animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
+          <div className="absolute inset-0.5 rounded-full border border-red-500/30 border-b-red-500 animate-spin [animation-duration:1.5s] [animation-direction:reverse]" />
         </div>
         {label && <span className="text-xs font-semibold text-slate-300">{label}</span>}
       </div>
@@ -44,28 +44,28 @@ export function GoalmillsLoader({
       {/* Dynamic Multi-Orbit Radar Pulse */}
       <div className={`relative flex items-center justify-center ${ringDimensions.outer} mb-4`}>
         {/* Ambient Glow */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500/25 via-emerald-500/20 to-amber-500/20 blur-xl animate-pulse" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500/25 via-red-500/20 to-yellow-500/20 blur-xl animate-pulse" />
 
         {/* Outer Orbit (Electric Blue) */}
         <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 border-r-blue-400 animate-spin [animation-duration:1.2s]" />
 
-        {/* Middle Orbit (Live Emerald) */}
-        <div className="absolute inset-1.5 rounded-full border-2 border-transparent border-b-emerald-400 border-l-emerald-500 animate-spin [animation-duration:2s] [animation-direction:reverse]" />
+        {/* Middle Orbit (Live Red) */}
+        <div className="absolute inset-1.5 rounded-full border-2 border-transparent border-b-red-500 border-l-red-400 animate-spin [animation-duration:2s] [animation-direction:reverse]" />
 
-        {/* Inner Orbit (Amber / Gold Accent) */}
-        <div className="absolute inset-3 rounded-full border border-transparent border-t-amber-400 border-r-amber-500 animate-spin [animation-duration:0.8s]" />
+        {/* Inner Orbit (Amber / Gold / Yellow Accent) */}
+        <div className="absolute inset-3 rounded-full border border-transparent border-t-yellow-400 border-r-amber-500 animate-spin [animation-duration:0.8s]" />
 
         {/* Pulsing Core Sports Monogram */}
         <div
           className={`relative ${ringDimensions.core} rounded-full bg-slate-900/90 border border-white/15 flex items-center justify-center shadow-lg shadow-black/50 backdrop-blur-sm`}
         >
-          <span className="text-xs font-black tracking-tighter bg-gradient-to-br from-white via-blue-200 to-emerald-400 bg-clip-text text-transparent animate-pulse">
+          <span className="text-xs font-black tracking-tighter bg-gradient-to-br from-white via-blue-200 to-red-400 bg-clip-text text-transparent animate-pulse">
             GM
           </span>
           {/* Live Ping Indicator */}
           <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
           </span>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function GoalmillsLoader({
             <p
               className={`${ringDimensions.text} text-slate-400 max-w-xs font-medium tracking-wide flex items-center justify-center gap-1.5`}
             >
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               <span>{sublabel}</span>
             </p>
           )}

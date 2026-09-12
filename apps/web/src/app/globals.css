@@ -10,11 +10,15 @@
   --color-primary-dark: #1d4ed8;
   --color-primary-light: #60a5fa;
 
-  --color-secondary: #f59e0b;
-  --color-secondary-dark: #d97706;
-  --color-secondary-light: #fbbf24;
+  --color-secondary: #ef4444;
+  --color-secondary-dark: #dc2626;
+  --color-secondary-light: #f87171;
 
-  --color-accent-green: #10b981;
+  --color-tertiary: #eab308;
+  --color-tertiary-dark: #ca8a04;
+  --color-tertiary-light: #facc15;
+  --color-accent-blue: #3b82f6;
+  --color-accent-yellow: #eab308;
   --color-accent-red: #ef4444;
 
   --color-text-primary: #f8fafc;
@@ -86,6 +90,20 @@ body {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600;
   }
   
+  .brand-trio-gradient {
+    background-image: linear-gradient(90deg, #2563eb 0%, #ef4444 50%, #eab308 100%);
+  }
+
+  .brand-trio-gradient-vertical {
+    background-image: linear-gradient(180deg, #2563eb 0%, #ef4444 50%, #eab308 100%);
+  }
+
+  .brand-trio-text {
+    background-image: linear-gradient(90deg, #3b82f6 0%, #ef4444 50%, #eab308 100%);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
   .text-gradient-gold {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-yellow-300;
   }

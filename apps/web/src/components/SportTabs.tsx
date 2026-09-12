@@ -42,7 +42,7 @@ export function SportTabs({ selectedSport, onSelectSport }: SportTabsProps) {
               <span className="text-xs">{sport.emoji}</span>
               <span>{sport.name}</span>
               {sport.isComingSoon && (
-                <span className="text-[8px] uppercase font-black px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                <span className="text-[8px] uppercase font-black px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
                   Soon
                 </span>
               )}

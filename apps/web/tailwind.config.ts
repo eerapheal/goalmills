@@ -19,13 +19,19 @@ const config: Config = {
           light: '#60a5fa',
         },
         secondary: {
-          DEFAULT: '#f59e0b', // Gold
-          dark: '#d97706',
-          light: '#fbbf24',
+          DEFAULT: '#ef4444', // Red (Live / Alerts)
+          dark: '#dc2626',
+          light: '#f87171',
+        },
+        tertiary: {
+          DEFAULT: '#eab308', // Yellow (Points / Golden Boot / Stats)
+          dark: '#ca8a04',
+          light: '#facc15',
         },
         accent: {
-          green: '#10b981', // For live scores/wins
-          red: '#ef4444', // For losses/alerts
+          blue: '#3b82f6',
+          red: '#ef4444',
+          yellow: '#eab308',
         },
         text: {
           primary: '#f8fafc',
@@ -43,6 +49,8 @@ const config: Config = {
         'hero-gradient': 'linear-gradient(to bottom, transparent, #020617)',
         'blue-gradient': 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
         'gold-gradient': 'linear-gradient(135deg, #d97706 0%, #fbbf24 100%)',
+        'brand-trio': 'linear-gradient(90deg, #2563eb 0%, #ef4444 50%, #eab308 100%)',
+        'brand-trio-135': 'linear-gradient(135deg, #2563eb 0%, #ef4444 50%, #eab308 100%)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
