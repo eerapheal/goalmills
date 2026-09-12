@@ -146,7 +146,7 @@ export default async function FootballPlayersHubPage() {
             Football Superstars & Players Directory
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Official 2025/2026 performance ratings, season goals, assist metrics, market values, and head-to-head scouting comparison across top leagues.
+            Official 2026/2027 performance ratings, season goals, assist metrics, market values, and head-to-head scouting comparison across top leagues.
           </p>
         </div>
 

@@ -106,7 +106,7 @@ export default function FootballHubPage() {
               </Link>
             </div>
             <p className="text-xs text-slate-300">
-              Browse 2025/2026 performance ratings, season goals, assist metrics, and head-to-head comparison intel.
+              Browse 2026/2027 performance ratings, season goals, assist metrics, and head-to-head comparison intel.
             </p>
             <Link
               href="/football/players"

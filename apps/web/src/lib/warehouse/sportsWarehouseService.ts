@@ -56,7 +56,7 @@ export class SportsWarehouseService {
     await Promise.all([
       cacheSet(h2hCacheKeyA, null, 1),
       cacheSet(h2hCacheKeyB, null, 1),
-    ]).catch(() => {});
+    ]).catch(() => { });
 
     return updated as unknown as HistoricalMatchRecord;
   }
@@ -332,7 +332,7 @@ export class SportsWarehouseService {
           name: 'Premier League',
           slug: 'premier-league',
           country: 'England',
-          season: '2025/2026',
+          season: '2026/2027',
         },
         date: '2026-02-10T19:45:00Z',
         status: 'finished',
@@ -380,7 +380,7 @@ export class SportsWarehouseService {
           name: 'Premier League',
           slug: 'premier-league',
           country: 'England',
-          season: '2025/2026',
+          season: '2026/2027',
         },
         date: '2025-10-18T16:30:00Z',
         status: 'finished',
@@ -427,7 +427,7 @@ export class SportsWarehouseService {
           id: 'comp_t20_cup',
           name: 'T20 International Series',
           slug: 't20-international-series',
-          season: '2025/2026',
+          season: '2026/2027',
         },
         date: '2026-01-14T13:30:00Z',
         status: 'finished',

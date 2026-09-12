@@ -950,8 +950,8 @@ export const advancedCricketApi = {
           {
             league_key: '9779',
             league_name: 'Big Bash League (BBL)',
-            league_year: '2025/2026',
-            league_season: '2025/2026',
+            league_year: '2026/2027',
+            league_season: '2026/2027',
             country_name: 'Australia',
           },
           {
@@ -978,8 +978,8 @@ export const advancedCricketApi = {
           {
             league_key: '9850',
             league_name: 'Caribbean Premier League (CPL)',
-            league_year: '2025/2026',
-            league_season: '2025/2026',
+            league_year: '2026/2027',
+            league_season: '2026/2027',
             country_name: 'West Indies',
           },
           {
@@ -1632,9 +1632,9 @@ export const advancedCricketApi = {
         extra: scardRes?.extra || baseMatch?.extra || {},
         lineups: scardRes?.lineups ||
           baseMatch?.lineups || {
-            home_team: { starting_lineups: [] },
-            away_team: { starting_lineups: [] },
-          },
+          home_team: { starting_lineups: [] },
+          away_team: { starting_lineups: [] },
+        },
         comments: commRes || baseMatch?.comments || {},
       };
 

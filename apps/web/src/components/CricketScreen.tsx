@@ -21,14 +21,14 @@ export type CricketTab = 'live' | 'upcoming' | 'results' | 'standings';
 
 export const MAJOR_CRICKET_LEAGUES = [
   { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐' },
-  { id: 'ipl', name: 'IPL', country: 'India', flag: '🇮🇳' },
-  { id: 'icc-t20', name: 'T20 World Cup', country: 'ICC', flag: '🏆' },
-  { id: 'bbl', name: 'Big Bash League', country: 'Australia', flag: '🇦🇺' },
-  { id: 'psl', name: 'PSL', country: 'Pakistan', flag: '🇵🇰' },
-  { id: 'the-hundred', name: 'The Hundred', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  { id: 'cpl', name: 'CPL T20', country: 'West Indies', flag: '🌴' },
-  { id: 'sa20', name: 'SA20', country: 'South Africa', flag: '🇿🇦' },
-  { id: 'icc-test', name: 'Test Championship', country: 'ICC', flag: '🏏' },
+  { id: '745', name: 'IPL', country: 'India', flag: '🇮🇳' },
+  { id: '729', name: 'PSL', country: 'Pakistan', flag: '🇵🇰' },
+  { id: '13464', name: 'Big Bash League', country: 'Australia', flag: '🇦🇺' },
+  { id: '7735', name: 'Caribbean Premier League', country: 'West Indies', flag: '🌴' },
+  { id: '9897', name: 'The Hundred', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: '8459', name: 'SA20', country: 'South Africa', flag: '🇿🇦' },
+  { id: '8453', name: 'BPL', country: 'Bangladesh', flag: '🇧🇩' },
+  { id: '732', name: 'CSA T20', country: 'South Africa', flag: '🇿🇦' },
 ];
 
 export function CricketScreen() {
@@ -38,9 +38,39 @@ export function CricketScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [competitions, setCompetitions] = useState(MAJOR_CRICKET_LEAGUES);
 
   const [matches, setMatches] = useState<CricketEvent[]>([]);
   const [standings, setStandings] = useState<CricketStanding[]>([]);
+
+  // Dynamically load additional active leagues from AllSportsAPI
+  useEffect(() => {
+    cricketApi
+      .getLeagues()
+      .then((res) => {
+        if (Array.isArray(res?.result)) {
+          const activeLeagues = res.result;
+          const priorityKeywords = ['Premier League', 'Super League', 'Big Bash', 'World Cup', 'T20', 'Hundred', 'Championship'];
+          const matched = activeLeagues
+            .filter((l) => priorityKeywords.some((k) => (l.league_name || '').toLowerCase().includes(k.toLowerCase())))
+            .slice(0, 8)
+            .map((l) => ({
+              id: String(l.league_key),
+              name: l.league_name,
+              country: l.country_name || 'Cricket',
+              flag: '🏏',
+            }));
+
+          // Merge without duplicates
+          const existingIds = new Set(MAJOR_CRICKET_LEAGUES.map((c) => c.id));
+          const additions = matched.filter((m) => !existingIds.has(m.id));
+          if (additions.length > 0) {
+            setCompetitions([...MAJOR_CRICKET_LEAGUES, ...additions]);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // 7-day date strip slider (-3 days, today, +3 days)
   const dateStrip = useMemo(() => {
@@ -68,9 +98,13 @@ export function CricketScreen() {
     if (!isBackground) setLoading(true);
     try {
       if (activeTab === 'standings') {
-        const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
-        const res = await cricketApi.getStandings(leagueIdParam ? { leagueId: leagueIdParam } : {});
-        const list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
+        const leagueId = selectedLeague === 'all' || isNaN(Number(selectedLeague)) ? 732 : Number(selectedLeague);
+        const res = await cricketApi.getStandings({ leagueId });
+        let list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
+        if (list.length === 0 && selectedLeague === 'all') {
+          const altRes = await cricketApi.getStandings({ leagueId: 745 });
+          list = altRes?.result?.total || (Array.isArray(altRes?.result) ? altRes.result : []);
+        }
         setStandings(list);
       } else if (activeTab === 'live') {
         const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
@@ -160,10 +194,14 @@ export function CricketScreen() {
     }
 
     if (selectedLeague !== 'all') {
-      const filterKey = selectedLeague.toLowerCase();
+      const matchLeague = competitions.find((c) => c.id === selectedLeague);
       list = list.filter((m) => {
-        const lName = (m.league_name || '').toLowerCase();
-        return lName.includes(filterKey);
+        if (m.league_key && String(m.league_key) === selectedLeague) return true;
+        if (matchLeague) {
+          const lName = (m.league_name || '').toLowerCase();
+          return lName.includes(matchLeague.name.toLowerCase());
+        }
+        return false;
       });
     }
 
@@ -272,7 +310,7 @@ export function CricketScreen() {
           <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
             <FiSliders className="text-emerald-400" /> Filter:
           </span>
-          {MAJOR_CRICKET_LEAGUES.map((league) => {
+          {competitions.map((league) => {
             const isSelected = selectedLeague === league.id;
             return (
               <button

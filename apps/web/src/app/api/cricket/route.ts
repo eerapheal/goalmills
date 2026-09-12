@@ -27,19 +27,28 @@ function getApiBaseUrl(): string {
   let raw =
     process.env.NEXT_PUBLIC_CRICKET_BASE_URL ||
     process.env.CRICKET_BASE_URL ||
-    'https://apiv2.allsportsapi.com/cricket';
+    'https://apiv2.allsportsapi.com/cricket/';
 
   raw = raw.trim();
+  if (raw.includes('cricbuzz') || raw.includes('rapidapi')) {
+    raw = 'https://apiv2.allsportsapi.com/cricket/';
+  }
   if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
     raw = `https://${raw}`;
   }
-  return raw.replace(/\/$/, '');
+  if (!raw.endsWith('/')) {
+    raw = `${raw}/`;
+  }
+  return raw;
 }
 
 const API_KEY =
   process.env.ALLSPORTS_API_KEY ||
-  process.env.CRICKET_API_KEY ||
-  process.env.NEXT_PUBLIC_CRICKET_API_KEY ||
+  (process.env.CRICKET_API_KEY &&
+  !process.env.CRICKET_API_KEY.startsWith('8a82fda') &&
+  !process.env.CRICKET_API_KEY.includes('rapidapi')
+    ? process.env.CRICKET_API_KEY
+    : null) ||
   '95c9b0311d4bfef71b062bb07cf0186dd20a77ac34160b0c2d1a0c24f3c4a008';
 
 /**

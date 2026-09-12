@@ -11,7 +11,7 @@ export async function GET(
     const { slug } = await params;
     const { searchParams } = new URL(req.url);
     const sport = searchParams.get('sport') || 'football';
-    const season = searchParams.get('season') || '2025/2026';
+    const season = searchParams.get('season') || '2026/2027';
 
     const standings = await sportsWarehouseService.getHistoricalStandings(sport, slug, season);
 

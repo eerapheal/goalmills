@@ -230,7 +230,7 @@ export class SportsWarehouseService {
   public async getHistoricalStandings(
     sport: string,
     competitionSlug: string,
-    season = '2025/2026'
+    season = '2026/2027'
   ): Promise<HistoricalStandingsRecord | null> {
     await connectDB();
     const standings = await HistoricalStandings.findOne({
@@ -302,7 +302,7 @@ export class SportsWarehouseService {
           name: 'Premier League',
           slug: 'premier-league',
           country: 'England',
-          season: '2025/2026',
+          season: '2026/2027',
         },
         date: '2026-02-10T19:45:00Z',
         status: 'finished',
@@ -350,7 +350,7 @@ export class SportsWarehouseService {
           name: 'Premier League',
           slug: 'premier-league',
           country: 'England',
-          season: '2025/2026',
+          season: '2026/2027',
         },
         date: '2025-10-18T16:30:00Z',
         status: 'finished',
