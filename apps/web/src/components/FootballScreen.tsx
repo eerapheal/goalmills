@@ -311,12 +311,12 @@ export function FootballScreen() {
   }, [filteredFixtures]);
 
   const tabs = [
-    { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-red-500' },
+    { id: 'live', label: 'Live', icon: FiActivity, color: 'text-red-500' },
     { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
     { id: 'results', label: 'Results', icon: FiAward, color: 'text-yellow-400' },
-    { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-blue-400' },
+    { id: 'standings', label: 'Table', icon: FiTrendingUp, color: 'text-blue-400' },
     { id: 'topscorers', label: 'Top Scorers', icon: FiShield, color: 'text-yellow-400' },
-    { id: 'predictions', label: 'Predictions', icon: FiZap, color: 'text-red-400' },
+    { id: 'predictions', label: 'ODDS', icon: FiZap, color: 'text-red-400' },
   ];
 
   return (
