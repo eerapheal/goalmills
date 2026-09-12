@@ -29,6 +29,7 @@ import Link from 'next/link';
 export type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
 
 export const MAJOR_LEAGUES = [
+  { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐' },
   { id: '152', name: 'Premier League', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/152_premier-league.png' },
   { id: '3', name: 'Champions League', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/3_uefa_champions_league.png' },
   { id: '302', name: 'La Liga', country: 'Spain', flag: '🇪🇸', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/302_la-liga.png' },
@@ -57,12 +58,43 @@ export function FootballScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [competitions, setCompetitions] = useState(MAJOR_LEAGUES);
 
   const [fixtures, setFixtures] = useState<UnifiedWebMatchEvent[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
   const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
   const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
   const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
+
+  // Dynamically load active leagues if available
+  useEffect(() => {
+    advancedFootballApi
+      .getLeagues()
+      .then((res) => {
+        if (Array.isArray(res?.result)) {
+          const activeLeagues = res.result;
+          const priorityKeywords = ['Premier', 'Champions', 'Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'AFCON', 'Cup'];
+          const matched = activeLeagues
+            .filter((l: any) => priorityKeywords.some((k) => (l.league_name || '').toLowerCase().includes(k.toLowerCase())))
+            .slice(0, 10)
+            .map((l: any) => ({
+              id: String(l.league_key),
+              name: l.league_name,
+              country: l.country_name || 'Football',
+              flag: '⚽',
+              logo: l.league_logo,
+            }));
+
+          const existingIds = new Set(MAJOR_LEAGUES.map((c) => c.id));
+          const additions = matched.filter((m: any) => !existingIds.has(m.id));
+          if (additions.length > 0) {
+            setCompetitions([...MAJOR_LEAGUES, ...additions]);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // 7-day date slider (3 days before, today, 3 days after)
   const dateStrip = useMemo(() => {
@@ -114,8 +146,8 @@ export function FootballScreen() {
     };
   };
 
-  const fetchMatches = useCallback(async () => {
-    setLoading(true);
+  const fetchMatches = useCallback(async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
     try {
       const targetLeague = selectedLeague === 'all' ? '152' : selectedLeague;
 
@@ -155,13 +187,28 @@ export function FootballScreen() {
     } catch (err) {
       console.error('[Web FootballScreen] Error loading football telemetry:', err);
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   }, [activeTab, selectedLeague, selectedDate, standingView]);
 
   useEffect(() => {
     fetchMatches();
   }, [fetchMatches]);
+
+  // Polling interval for live matches (every 15s)
+  useEffect(() => {
+    if (activeTab !== 'live') return;
+    const interval = setInterval(() => {
+      fetchMatches(true);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [activeTab, fetchMatches]);
+
+  const handleManualRefresh = async () => {
+    setRefreshing(true);
+    await fetchMatches(false);
+    setRefreshing(false);
+  };
 
   const filteredFixtures = useMemo(() => {
     let list = fixtures;
@@ -203,21 +250,30 @@ export function FootballScreen() {
     }
 
     if (selectedLeague !== 'all') {
-      list = list.filter((f) => String(f.league_key) === String(selectedLeague));
+      const matchLeague = competitions.find((c) => c.id === selectedLeague);
+      list = list.filter((f) => {
+        if (f.league_key && String(f.league_key) === selectedLeague) return true;
+        if (matchLeague) {
+          const lName = (f.league_name || '').toLowerCase();
+          return lName.includes(matchLeague.name.toLowerCase());
+        }
+        return false;
+      });
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
         (f) =>
-          f.event_home_team?.toLowerCase().includes(q) ||
-          f.event_away_team?.toLowerCase().includes(q) ||
-          (f.league_name && f.league_name.toLowerCase().includes(q))
+          (f.event_home_team || '').toLowerCase().includes(q) ||
+          (f.event_away_team || '').toLowerCase().includes(q) ||
+          (f.league_name || '').toLowerCase().includes(q) ||
+          ((f as any).event_stadium || '').toLowerCase().includes(q)
       );
     }
 
     return list;
-  }, [fixtures, activeTab, searchQuery, selectedLeague]);
+  }, [fixtures, activeTab, searchQuery, selectedLeague, competitions]);
 
   // Group fixtures by competition
   const leagueGroups = useMemo(() => {
@@ -254,144 +310,119 @@ export function FootballScreen() {
     });
   }, [filteredFixtures]);
 
-  const tabs: { id: FootballTab; label: string; icon: string; badge?: string }[] = [
-    { id: 'live', label: 'Live Matches', icon: '⚡', badge: 'In-Play' },
-    { id: 'upcoming', label: 'Fixtures', icon: '📅' },
-    { id: 'results', label: 'Results', icon: '✅' },
-    { id: 'standings', label: 'Tables', icon: '🏆' },
-    { id: 'topscorers', label: 'Top Scorers', icon: '👟' },
-    { id: 'predictions', label: 'AI Odds & Form', icon: '🤖' },
+  const tabs = [
+    { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-blue-400' },
+    { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
+    { id: 'results', label: 'Results', icon: FiAward, color: 'text-blue-300' },
+    { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-indigo-400' },
+    { id: 'topscorers', label: 'Top Scorers', icon: FiShield, color: 'text-amber-400' },
+    { id: 'predictions', label: 'Predictions', icon: FiZap, color: 'text-cyan-400' },
   ];
 
   return (
-    <div className="w-full space-y-4">
-      {/* Smart Control Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-[#0B172B]/90 border border-blue-500/20 backdrop-blur-md shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
-            <FiActivity className="w-5 h-5 text-blue-200" />
-          </div>
-          <div>
-            <h2 className="text-sm font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <span>Football Telemetry</span>
-            </h2>
-            <p className="text-[11px] text-slate-400">
-              Live match events, multi-bookmaker odds, AI predictions, and tables
-            </p>
-          </div>
-        </div>
-
-        {/* Search & Refresh Controls */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:w-56">
-            <input
-              type="text"
-              placeholder="Search team or competition..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-blue-500/20 bg-[#070E1A] px-3 py-1.5 pl-8 text-xs text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all shadow-inner h-8"
-            />
-            <FiSearch className="absolute left-2.5 top-2.5 text-xs text-slate-400" />
-          </div>
-
-          <button
-            onClick={fetchMatches}
-            disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-xs hover:from-blue-400 hover:to-indigo-500 transition-all shadow-md active:scale-95 disabled:opacity-50 h-8"
-            title="Refresh on demand"
-          >
-            <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Sync</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Major Competition Quick Switcher Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-        <button
-          onClick={() => setSelectedLeague('all')}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-            selectedLeague === 'all'
-              ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30 scale-[1.02]'
-              : 'bg-[#0B1526] text-slate-300 hover:text-white hover:bg-white/5 border-white/5'
-          }`}
-        >
-          <span>🌍</span>
-          <span>All Leagues</span>
-        </button>
-        {MAJOR_LEAGUES.map((leg) => {
-          const isSelected = selectedLeague === leg.id;
-          return (
-            <button
-              key={leg.id}
-              onClick={() => setSelectedLeague(leg.id)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-                isSelected
-                  ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30 scale-[1.02]'
-                  : 'bg-[#0B1526] text-slate-300 hover:text-white hover:bg-white/5 border-white/5'
-              }`}
-            >
-              <span>{leg.flag}</span>
-              <span>{leg.name}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Primary Module Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 border-b border-white/10">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-150 flex-shrink-0 ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400 shadow-md shadow-blue-600/30'
-                  : 'bg-[#0B172B]/60 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-              {tab.badge && (
-                <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono ${
+    <div className="w-full space-y-6">
+      {/* Top Controls Header */}
+      <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
+        {/* Navigation Tabs Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-[#060D18]/90 border border-white/5">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as FootballTab)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all ${
                     isActive
-                      ? 'bg-amber-400 text-slate-950 font-black'
-                      : 'bg-blue-500/20 text-blue-300'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                  <Icon className={isActive ? 'text-white' : tab.color} />
+                  <span>{tab.label}</span>
+                  {tab.id === 'live' && fixtures.length > 0 && activeTab === 'live' && (
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-blue-500 text-white text-[10px] font-mono font-bold">
+                      {fixtures.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* 7-Day Date Slider (Upcoming & Results & Predictions) */}
-      {(activeTab === 'upcoming' || activeTab === 'results' || activeTab === 'predictions') && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {dateStrip.map((item) => {
-            const isSelected = selectedDate === item.iso;
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing || loading}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all disabled:opacity-50"
+              title="Refresh Live Scores"
+            >
+              <FiRefreshCw className={`text-blue-400 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Sync Live</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Date Strip Navigator (for Upcoming, Results, Predictions) */}
+        {(activeTab === 'upcoming' || activeTab === 'results' || activeTab === 'predictions') && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10">
+            {dateStrip.map((item) => {
+              const isSelected = selectedDate === item.iso;
+              return (
+                <button
+                  key={item.iso}
+                  onClick={() => setSelectedDate(item.iso)}
+                  className={`flex flex-col items-center min-w-[70px] py-2 px-2.5 rounded-2xl border transition-all ${
+                    isSelected
+                      ? 'bg-blue-500/20 border-blue-500/50 text-blue-300 shadow-md shadow-blue-500/20'
+                      : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="text-[10px] uppercase font-bold tracking-wider">{item.dayName}</span>
+                  <span className="text-sm font-mono font-black">{item.dayNumber}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Competitions / Leagues Filter Ribbon */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10">
+          <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
+            <FiSliders className="text-blue-400" /> Filter:
+          </span>
+          {competitions.map((league) => {
+            const isSelected = selectedLeague === league.id;
             return (
               <button
-                key={item.iso}
-                onClick={() => setSelectedDate(item.iso)}
-                className={`flex min-w-[62px] sm:min-w-[70px] flex-col items-center rounded-xl p-2 transition-all duration-150 border ${
+                key={league.id}
+                onClick={() => setSelectedLeague(league.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   isSelected
-                    ? 'border-blue-400 bg-blue-600/30 text-blue-200 shadow-md scale-[1.02]'
-                    : 'border-white/5 bg-[#0B172B]/80 text-slate-400 hover:border-white/20 hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-black'
+                    : 'bg-[#091529] text-slate-400 hover:text-white border border-white/5 hover:border-white/15'
                 }`}
               >
-                <span className="text-[9px] font-bold uppercase">{item.dayName}</span>
-                <span className="text-xs sm:text-sm font-black font-mono">{item.dayNumber}</span>
+                <span>{league.flag}</span>
+                <span>{league.name}</span>
               </button>
             );
           })}
         </div>
-      )}
+
+        {/* Live Search Filter */}
+        <div className="relative">
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+          <input
+            type="text"
+            placeholder="Search teams, tournament, stadium..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#060D18]/90 border border-white/10 text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:border-blue-400/50 transition-colors"
+          />
+        </div>
+      </div>
 
       {/* Loading State */}
       {loading ? (
