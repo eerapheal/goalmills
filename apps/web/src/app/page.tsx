@@ -601,15 +601,15 @@ export default function HomePage() {
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white mb-5">
               Africa&apos;s 
-            
+            <b />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-yellow-300">
                 Sports Hub
               </span>
             </h1>
-            <p className="text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed mb-7">
+            <p className="hidden md:block text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed mb-7">
               Live scores, xG breakdowns, transfer news, and daily digests from the Premier League, AFCON, IPL, and beyond.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="hiddenflex flex-wrap gap-3">
               <a
                 href="#scores"
                 className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors inline-flex items-center gap-1.5 shadow-lg shadow-blue-600/25"
