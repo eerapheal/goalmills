@@ -607,7 +607,7 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="hidden md:block text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed mb-7">
-              Live scores, xG breakdowns, transfer news, and daily digests from the Premier League, AFCON, IPL, and beyond.
+              Live scores, xG breakdowns, transfer news, and daily digests from the Premier League, AFCON, IPL , FIFA, and beyond.
             </p>
             <div className="hiddenflex flex-wrap gap-3">
               <a
