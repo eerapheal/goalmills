@@ -13,6 +13,7 @@ import {
   generatePreflightReport,
   createCampaignRecipientSnapshot,
 } from '@/lib/deliverability/healthGate';
+import { sendEmailViaDirectSmtp } from './directSmtp';
 import type {
   NewsletterAudience,
   NewsletterArticlePreview,
@@ -260,32 +261,8 @@ export async function sendConfirmationEmail(
 
   // 3. Dispatch via Go Mailer microservice priority queue
   try {
-    const payload = {
-      email: recipientEmail,
-      subject,
-      htmlBody,
-      unsubscribeToken: subscriber.unsubscribeToken || '',
-      confirmationToken: subscriber.confirmationToken || '',
-      frequency: subscriber.frequency || 'daily',
-      isHighPriority: true,
-      editorPicks: editorPicks.map((art) => ({
-        id: art._id,
-        title: art.title,
-        slug: art.slug,
-        excerpt: art.excerpt,
-        image: art.image || '',
-        category: art.category,
-        sport: art.sport,
-        readTime: art.readTime,
-        isBreaking: art.isBreaking,
-        isFeatured: art.isFeatured,
-        views: art.views || 0,
-        author: art.author,
-        url: `${siteUrl}/news/${art.slug || art._id}`,
-      })),
-    };
-
-    const res = await fetch(`${mailerServiceUrl}/api/send-confirmation`, {
+    const cleanMailerUrl = mailerServiceUrl.replace(/\/+$/, '');
+    const res = await fetch(`${cleanMailerUrl}/api/send-confirmation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -299,15 +276,32 @@ export async function sendConfirmationEmail(
       }
     }
   } catch (err) {
-    // Go microservice offline or in local dev - handled gracefully
-    console.warn('[Confirmation Dispatch] Go mailer service not reachable, fallback logged:', err);
+    console.warn('[Confirmation Dispatch] Go mailer service not reachable, attempting direct SMTP fallback:', err);
+  }
+
+  // 4. Robust fallback: Dispatch directly via SMTP if Go mailer is offline/unreachable
+  let dispatchedViaDirectSmtp = false;
+  if (!dispatchedViaGo) {
+    try {
+      const smtpRes = await sendEmailViaDirectSmtp({
+        to: recipientEmail,
+        subject,
+        htmlBody,
+        unsubscribeUrl,
+      });
+      dispatchedViaDirectSmtp = smtpRes.success;
+    } catch (smtpErr) {
+      console.error('[Confirmation Dispatch] Direct SMTP fallback error:', smtpErr);
+    }
   }
 
   return {
     success: true,
     message: dispatchedViaGo
       ? "Confirmation email with 2 Editor's Picks queued via Go Mailer"
-      : 'Confirmation email generated and prepared successfully',
+      : dispatchedViaDirectSmtp
+        ? "Confirmation email with 2 Editor's Picks sent successfully via Direct SMTP"
+        : 'Confirmation email generated and prepared successfully',
     editorPicks,
     dispatchedViaGo,
   };

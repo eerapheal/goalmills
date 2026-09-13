@@ -23,22 +23,47 @@ type Config struct {
 	IsSandboxed bool
 }
 
+func loadDotEnv() {
+	for _, path := range []string{".env", "../../.env"} {
+		data, err := os.ReadFile(path)
+		if err == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				line = strings.TrimSpace(line)
+				if line == "" || strings.HasPrefix(line, "#") {
+					continue
+				}
+				parts := strings.SplitN(line, "=", 2)
+				if len(parts) == 2 {
+					k := strings.TrimSpace(parts[0])
+					v := strings.Trim(strings.TrimSpace(parts[1]), `"'`)
+					if os.Getenv(k) == "" {
+						os.Setenv(k, v)
+					}
+				}
+			}
+			break
+		}
+	}
+}
+
 // LoadConfigFromEnv reads environment settings
 func LoadConfigFromEnv() Config {
-	host := os.Getenv("SMTP_HOST")
-	port := os.Getenv("SMTP_PORT")
+	loadDotEnv()
+
+	host := strings.TrimSpace(os.Getenv("SMTP_HOST"))
+	port := strings.TrimSpace(os.Getenv("SMTP_PORT"))
 	if port == "" {
 		port = "587"
 	}
-	fromEmail := os.Getenv("SMTP_FROM_EMAIL")
+	fromEmail := strings.TrimSpace(os.Getenv("SMTP_FROM_EMAIL"))
 	if fromEmail == "" {
 		fromEmail = "hayeswaya@gmail.com"
 	}
-	fromName := os.Getenv("SMTP_FROM_NAME")
+	fromName := strings.TrimSpace(os.Getenv("SMTP_FROM_NAME"))
 	if fromName == "" {
 		fromName = "GoalMills Sports Media"
 	}
-	siteURL := os.Getenv("NEXT_PUBLIC_SITE_URL")
+	siteURL := strings.TrimSpace(os.Getenv("NEXT_PUBLIC_SITE_URL"))
 	if siteURL == "" {
 		siteURL = "https://goalmills-web.vercel.app"
 	}
@@ -46,8 +71,8 @@ func LoadConfigFromEnv() Config {
 	return Config{
 		Host:        host,
 		Port:        port,
-		Username:    os.Getenv("SMTP_USER"),
-		Password:    os.Getenv("SMTP_PASSWORD"),
+		Username:    strings.TrimSpace(os.Getenv("SMTP_USER")),
+		Password:    strings.TrimSpace(os.Getenv("SMTP_PASSWORD")),
 		FromEmail:   fromEmail,
 		FromName:    fromName,
 		SiteURL:     siteURL,

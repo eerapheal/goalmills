@@ -542,10 +542,6 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [fetchMatches, fetchNews]);
 
-  // Dynamic live match count for hero badge
-  const liveCount = useMemo(() => {
-    return matches.filter((m) => m.status === 'LIVE').length;
-  }, [matches]);
 
   // Filtered matches for display
   const displayedMatches = useMemo(() => {
@@ -601,17 +597,11 @@ export default function HomePage() {
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 via-red-500 to-yellow-400" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-28">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-10 lg:py-13">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="flex items-center gap-1.5 bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-black tracking-widest uppercase px-3 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block animate-pulse" />
-                {liveCount > 0 ? `${liveCount} matches live` : 'Live sports wire'}
-              </span>
-            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white mb-5">
-              Africa&apos;s
-              <br />
+              Africa&apos;s 
+            
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-yellow-300">
                 Sports Hub
               </span>
