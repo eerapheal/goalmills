@@ -201,12 +201,12 @@ export default function CricketTeamSlugPage() {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <span className="text-3xl font-black text-emerald-400">{teamName.charAt(0)}</span>
+                  <span className="text-3xl font-black text-red-400">{teamName.charAt(0)}</span>
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-red-400 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
                     Cricket Club
                   </span>
                   <span className="text-xs text-slate-400 font-semibold">• ID #{team?.team_key || teamId}</span>
@@ -218,13 +218,13 @@ export default function CricketTeamSlugPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
+              <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Squad</span>
                 <span className="text-sm font-black text-white">{players.length || '-'}</span>
               </div>
-              <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
+              <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Fixtures</span>
-                <span className="text-sm font-black text-emerald-400">{matches.length || '-'}</span>
+                <span className="text-sm font-black text-red-400">{matches.length || '-'}</span>
               </div>
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function CricketTeamSlugPage() {
             onClick={() => setActiveTab('overview')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all ${
               activeTab === 'overview'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -250,7 +250,7 @@ export default function CricketTeamSlugPage() {
             onClick={() => setActiveTab('fixtures')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all ${
               activeTab === 'fixtures'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -261,7 +261,7 @@ export default function CricketTeamSlugPage() {
             onClick={() => setActiveTab('squad')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all ${
               activeTab === 'squad'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -274,9 +274,9 @@ export default function CricketTeamSlugPage() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Recent Form */}
-            <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 shadow-xl space-y-3">
+            <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 shadow-xl space-y-3">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <FiTrendingUp className="text-emerald-400" />
+                <FiTrendingUp className="text-red-400" />
                 <span>Recent Match Results</span>
               </h3>
               {recentMatches.length === 0 ? (
@@ -291,7 +291,7 @@ export default function CricketTeamSlugPage() {
             </div>
 
             {/* Upcoming Matches */}
-            <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 shadow-xl space-y-3">
+            <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 shadow-xl space-y-3">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <FiCalendar className="text-sky-400" />
                 <span>Upcoming Scheduled Fixtures</span>
@@ -311,7 +311,7 @@ export default function CricketTeamSlugPage() {
 
         {/* Tab 2: Fixtures */}
         {activeTab === 'fixtures' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
               <FiCalendar className="text-sky-400" />
               <span>Team Fixture Schedule</span>
@@ -330,9 +330,9 @@ export default function CricketTeamSlugPage() {
 
         {/* Tab 3: Squad */}
         {activeTab === 'squad' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiUsers className="text-emerald-400" />
+              <FiUsers className="text-red-400" />
               <span>Official Squad Roster</span>
             </h3>
             {players.length === 0 ? (
@@ -347,9 +347,9 @@ export default function CricketTeamSlugPage() {
                     <Link
                       key={p.player_key || idx}
                       href={playerSlug}
-                      className="group p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5 hover:border-emerald-500/40 hover:bg-[#0C1A30] transition-all flex items-center gap-3"
+                      className="group p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5 hover:border-red-500/40 hover:bg-[#1E090D] transition-all flex items-center gap-3"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-emerald-400 flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-red-400 flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
                         {p.player_image ? (
                           <img
                             src={p.player_image}
@@ -361,7 +361,7 @@ export default function CricketTeamSlugPage() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-bold text-white text-xs truncate group-hover:text-emerald-300 transition-colors">
+                        <div className="font-bold text-white text-xs truncate group-hover:text-red-300 transition-colors">
                           {p.player_name}
                         </div>
                         <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">

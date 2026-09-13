@@ -87,7 +87,7 @@ export const FanPassPricingModal: React.FC<FanPassPricingModalProps> = ({
               }`}
             >
               <span>Yearly Billing</span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500 text-black font-extrabold">
+              <span className="px-1.5 py-0.5 rounded text-[10px] bg-yellow-400 text-slate-950 font-extrabold">
                 SAVE 17%
               </span>
             </button>

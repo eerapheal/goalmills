@@ -262,7 +262,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                   </div>
                 </div>
                 <div className="text-right pl-2 shrink-0">
-                  <span className="text-xs font-black text-emerald-400 font-mono">
+                  <span className="text-xs font-black text-yellow-400 font-mono">
                     {p.seasonStats.rating.toFixed(2)}
                   </span>
                   <span className="text-[9px] text-slate-500 block">Rating</span>
@@ -460,7 +460,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                             Africa
                           </span>
                         )}
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black font-mono text-yellow-400 bg-yellow-500/10 border border-yellow-500/20">
                           {player.marketValue}
                         </span>
                       </div>
@@ -496,7 +496,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                         </span>
                       )}
                       {player.weeklyWage && (
-                        <span className="text-emerald-400 font-mono font-bold">
+                        <span className="text-yellow-400 font-mono font-bold">
                           {player.weeklyWage}/wk
                         </span>
                       )}
@@ -522,7 +522,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                       </span>
                     </div>
                     <div className="p-1.5 rounded-xl bg-white/[0.02] border border-white/5">
-                      <span className="text-xs font-black text-emerald-400 block font-mono">
+                      <span className="text-xs font-black text-yellow-400 block font-mono">
                         {player.seasonStats.rating.toFixed(2)}
                       </span>
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">

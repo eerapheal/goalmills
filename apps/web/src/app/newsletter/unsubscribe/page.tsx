@@ -148,7 +148,7 @@ function UnsubscribeContent() {
         <div
           className={`p-3.5 rounded-xl text-xs font-bold ${
             message.type === 'success'
-              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
               : 'bg-red-500/10 text-red-400 border border-red-500/20'
           }`}
         >

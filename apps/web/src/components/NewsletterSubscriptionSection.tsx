@@ -162,7 +162,7 @@ export function NewsletterSubscriptionSection() {
           {status === 'success' ? (
             /* SUCCESS STATE */
             <div className="py-8 text-center max-w-xl mx-auto space-y-6 animate-fade-in">
-              <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400/60 text-emerald-400 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20">
+              <div className="w-20 h-20 rounded-full bg-blue-500/20 border-2 border-blue-400/60 text-blue-400 flex items-center justify-center mx-auto shadow-xl shadow-blue-500/20">
                 <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -445,7 +445,7 @@ export function NewsletterSubscriptionSection() {
                 <div className="flex flex-wrap items-center gap-4">
                   <span className="flex items-center gap-1.5">
                     <svg
-                      className="w-4 h-4 text-emerald-400"
+                      className="w-4 h-4 text-blue-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

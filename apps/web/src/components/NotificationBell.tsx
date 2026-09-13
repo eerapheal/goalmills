@@ -106,8 +106,8 @@ export function NotificationBell() {
         {/* Pulse Dot */}
         {isEnabled && (
           <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
           </span>
         )}
       </button>
@@ -146,7 +146,7 @@ export function NotificationBell() {
                 disabled={loading}
                 className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-all ${
                   isEnabled
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30'
+                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30'
                     : 'bg-blue-600 hover:bg-blue-500 text-white'
                 }`}
               >

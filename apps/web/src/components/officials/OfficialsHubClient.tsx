@@ -84,7 +84,7 @@ export const OfficialsHubClient: React.FC<OfficialsHubClientProps> = ({ initialO
       case 'Strict':
         return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
       case 'Balanced':
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       case 'Permissive':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       default:
@@ -141,7 +141,7 @@ export const OfficialsHubClient: React.FC<OfficialsHubClientProps> = ({ initialO
             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
               Avg Cards / Match
             </span>
-            <span className="text-2xl sm:text-3xl font-black text-emerald-400">
+            <span className="text-2xl sm:text-3xl font-black text-yellow-400">
               {avgYellowsPerGame}
             </span>
           </div>

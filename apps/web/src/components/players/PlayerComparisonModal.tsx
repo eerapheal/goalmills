@@ -206,7 +206,7 @@ export function PlayerComparisonModal({
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span
                     className={`${
-                      isWinnerA ? 'text-emerald-400 font-black' : 'text-slate-300'
+                      isWinnerA ? 'text-yellow-400 font-black' : 'text-slate-300'
                     }`}
                   >
                     {m.valA} {isWinnerA && '★'}
@@ -216,7 +216,7 @@ export function PlayerComparisonModal({
                   </span>
                   <span
                     className={`${
-                      isWinnerB ? 'text-emerald-400 font-black' : 'text-slate-300'
+                      isWinnerB ? 'text-yellow-400 font-black' : 'text-slate-300'
                     }`}
                   >
                     {isWinnerB && '★ '}
@@ -230,7 +230,7 @@ export function PlayerComparisonModal({
                     style={{ width: `${isTie ? 50 : pctA}%` }}
                     className={`h-full transition-all duration-500 ${
                       isWinnerA
-                        ? 'bg-gradient-to-r from-blue-600 to-emerald-400'
+                        ? 'bg-gradient-to-r from-blue-600 to-yellow-400'
                         : 'bg-blue-600/40'
                     }`}
                   />
@@ -238,7 +238,7 @@ export function PlayerComparisonModal({
                     style={{ width: `${isTie ? 50 : pctB}%` }}
                     className={`h-full transition-all duration-500 ${
                       isWinnerB
-                        ? 'bg-gradient-to-l from-indigo-500 to-emerald-400'
+                        ? 'bg-gradient-to-l from-indigo-500 to-yellow-400'
                         : 'bg-indigo-600/40'
                     }`}
                   />

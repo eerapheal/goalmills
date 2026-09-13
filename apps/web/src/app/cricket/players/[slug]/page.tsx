@@ -246,14 +246,14 @@ export default function CricketPlayerSlugPage() {
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 ) : (
-                  <span className="text-3xl font-black text-emerald-400">
+                  <span className="text-3xl font-black text-red-400">
                     {playerName.charAt(0)}
                   </span>
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-red-400 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
                     {player.player_type || 'Cricket Player'}
                   </span>
                   <span className="text-xs text-slate-400 font-semibold">
@@ -274,15 +274,15 @@ export default function CricketPlayerSlugPage() {
 
             {/* Quick KPI badges */}
             <div className="flex items-center gap-2">
-              <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
+              <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Career Runs</span>
-                <span className="text-sm font-black text-emerald-400">
+                <span className="text-sm font-black text-yellow-400">
                   {currentStats?.runs || '-'}
                 </span>
               </div>
-              <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
+              <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Average</span>
-                <span className="text-sm font-black text-sky-400">
+                <span className="text-sm font-black text-blue-400">
                   {currentStats?.average || '-'}
                 </span>
               </div>
@@ -308,7 +308,7 @@ export default function CricketPlayerSlugPage() {
                 onClick={() => setActiveFormat(f.id as FormatTab)}
                 className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -319,59 +319,59 @@ export default function CricketPlayerSlugPage() {
         </div>
 
         {/* Career Stats Grid */}
-        <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
           <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-            <FiAward className="text-emerald-400" />
+            <FiAward className="text-red-400" />
             <span>Career Performance Statistics ({activeFormat.toUpperCase()})</span>
           </h3>
 
           {currentStats ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Matches</span>
                 <span className="text-xl font-mono font-black text-white mt-1 block">
                   {currentStats.matches || '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Innings</span>
                 <span className="text-xl font-mono font-black text-white mt-1 block">
                   {currentStats.innings || '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Runs</span>
-                <span className="text-xl font-mono font-black text-emerald-400 mt-1 block">
+                <span className="text-xl font-mono font-black text-yellow-400 mt-1 block">
                   {currentStats.runs || '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Highest Score</span>
                 <span className="text-xl font-mono font-black text-amber-300 mt-1 block">
                   {currentStats.highestScore || '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Batting Average</span>
-                <span className="text-xl font-mono font-black text-sky-400 mt-1 block">
+                <span className="text-xl font-mono font-black text-blue-400 mt-1 block">
                   {currentStats.average || '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Strike Rate</span>
-                <span className="text-xl font-mono font-black text-teal-300 mt-1 block">
+                <span className="text-xl font-mono font-black text-blue-300 mt-1 block">
                   {currentStats.strikeRate || '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Centuries (100s)</span>
-                <span className="text-xl font-mono font-black text-purple-300 mt-1 block">
+                <span className="text-xl font-mono font-black text-yellow-400 mt-1 block">
                   {currentStats.centuries ?? '-'}
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 text-center">
+              <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Fifties (50s)</span>
-                <span className="text-xl font-mono font-black text-rose-300 mt-1 block">
+                <span className="text-xl font-mono font-black text-red-400 mt-1 block">
                   {currentStats.fifties ?? '-'}
                 </span>
               </div>
@@ -384,7 +384,7 @@ export default function CricketPlayerSlugPage() {
         </div>
 
         {/* Bio & Attributes Card */}
-        <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
           <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
             <FiShield className="text-sky-400" />
             <span>Player Attributes & Intelligence</span>

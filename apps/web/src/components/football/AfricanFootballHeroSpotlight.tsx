@@ -47,7 +47,7 @@ export function AfricanFootballHeroSpotlight({
     <section className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-[#0A162B] via-[#091C36] to-[#06101E] p-5 sm:p-7 shadow-2xl backdrop-blur-xl">
       {/* Subtle Background Glow Elements */}
       <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
 
       {/* Top Tagline & Season Indicator */}
       <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -60,7 +60,7 @@ export function AfricanFootballHeroSpotlight({
             Season Active
           </span>
           <span className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400 font-medium">
-            <FiGlobe className="text-emerald-400" />
+            <FiGlobe className="text-blue-400" />
             <span>CAF & Diaspora Intelligence</span>
           </span>
         </div>
@@ -95,7 +95,7 @@ export function AfricanFootballHeroSpotlight({
 
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
             The World’s #1 Hub for{' '}
-            <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-emerald-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-yellow-400 bg-clip-text text-transparent">
               African Football Power
             </span>
           </h2>
@@ -115,7 +115,7 @@ export function AfricanFootballHeroSpotlight({
               </span>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-center">
-              <span className="block text-lg sm:text-xl font-black text-emerald-400 font-mono">
+              <span className="block text-lg sm:text-xl font-black text-blue-400 font-mono">
                 12 Leagues
               </span>
               <span className="text-[10px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">
@@ -141,7 +141,7 @@ export function AfricanFootballHeroSpotlight({
                   <FaStar className="text-amber-400" />
                   <span>Africa Valuation Leader</span>
                 </span>
-                <span className="text-[10px] font-mono font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
+                <span className="text-[10px] font-mono font-black text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/25">
                   {featuredSuperstar.marketValue}
                 </span>
               </div>
@@ -186,7 +186,7 @@ export function AfricanFootballHeroSpotlight({
                   <span className="text-[9px] uppercase tracking-wider text-slate-400">Assists</span>
                 </div>
                 <div className="bg-white/5 p-2 rounded-xl">
-                  <span className="block font-black text-emerald-400 font-mono">
+                  <span className="block font-black text-yellow-400 font-mono">
                     {featuredSuperstar.seasonStats.rating.toFixed(2)}
                   </span>
                   <span className="text-[9px] uppercase tracking-wider text-slate-400">Rating</span>
@@ -200,7 +200,7 @@ export function AfricanFootballHeroSpotlight({
                     Contract: <strong>{featuredSuperstar.contractUntil}</strong>
                   </span>
                   {featuredSuperstar.weeklyWage && (
-                    <span className="text-emerald-400 font-mono font-bold">
+                    <span className="text-yellow-400 font-mono font-bold">
                       {featuredSuperstar.weeklyWage}/wk
                     </span>
                   )}
@@ -252,7 +252,7 @@ export function AfricanFootballHeroSpotlight({
               <h5 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors truncate max-w-full">
                 {star.name}
               </h5>
-              <span className="text-[10px] font-mono font-bold text-emerald-400">
+              <span className="text-[10px] font-mono font-bold text-yellow-400">
                 {star.marketValue}
               </span>
               <span className="text-[9px] text-slate-400 truncate max-w-full">

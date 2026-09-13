@@ -51,7 +51,7 @@ export default async function TransfersPage() {
       header={
         <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-[#140b2e] via-[#0d1527] to-[#060b18] p-6 sm:p-10 shadow-2xl">
           <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-black uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-black uppercase tracking-widest">
               <FiTrendingUp /> 24/7 TRANSFER ECOSYSTEM
             </div>
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
@@ -72,16 +72,16 @@ export default async function TransfersPage() {
               <span>Transfer Tiers Guide</span>
             </h3>
             <div className="space-y-2.5 text-xs">
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <span className="font-bold text-emerald-400 block">
+              <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                <span className="font-bold text-blue-400 block">
                   Tier 1: Official & Verified
                 </span>
                 <span className="text-slate-300">
                   Direct club announcements and verified signatures.
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <span className="font-bold text-blue-400 block">Tier 2: Advanced Negotiations</span>
+              <div className="p-2.5 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                <span className="font-bold text-yellow-400 block">Tier 2: Advanced Negotiations</span>
                 <span className="text-slate-300">
                   Personal terms agreed & active fee discussions.
                 </span>
@@ -101,7 +101,7 @@ export default async function TransfersPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-600/30 text-emerald-400 text-sm">
+            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-blue-600/30 text-blue-400 text-sm">
               <FiCheckCircle />
             </span>
             <span>Confirmed Done Deals</span>

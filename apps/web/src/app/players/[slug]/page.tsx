@@ -185,7 +185,7 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
                 </div>
                 <div>
                   <span className="text-slate-500 font-bold block">Pass Accuracy:</span>
-                  <span className="text-emerald-400 font-bold">
+                  <span className="text-blue-400 font-bold">
                     {player.seasonStats.passAccuracy}
                   </span>
                 </div>
@@ -196,7 +196,7 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
               <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-5 space-y-4 shadow-xl">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                    <FiTrendingUp className="text-emerald-400" />
+                    <FiTrendingUp className="text-blue-400" />
                     <span>Transfer Status</span>
                   </h3>
                 </div>
@@ -219,11 +219,11 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
               {player.seasonStats.appearances}
             </p>
           </div>
-          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-center">
-            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+          <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-4 text-center">
+            <span className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider">
               Goals Scored
             </span>
-            <p className="text-2xl sm:text-3xl font-black text-emerald-400 mt-1">
+            <p className="text-2xl sm:text-3xl font-black text-yellow-400 mt-1">
               {player.seasonStats.goals}
             </p>
           </div>
@@ -344,7 +344,7 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
               </div>
               <div className="flex justify-between py-1.5 border-b border-white/5">
                 <span className="text-slate-400">Pass Accuracy</span>
-                <span className="font-bold text-emerald-400 font-mono">
+                <span className="font-bold text-blue-400 font-mono">
                   {p.player_passes_accuracy ? `${p.player_passes_accuracy}%` : 'N/A'}
                 </span>
               </div>
@@ -377,11 +377,11 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
             {p.player_match_played || '0'}
           </p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-center shadow-lg">
-          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4 text-center shadow-lg">
+          <span className="text-[10px] font-bold text-yellow-400 uppercase tracking-wider">
             Goals Scored
           </span>
-          <p className="text-2xl sm:text-3xl font-black text-emerald-400 mt-1 font-mono">
+          <p className="text-2xl sm:text-3xl font-black text-yellow-400 mt-1 font-mono">
             {p.player_goals || '0'}
           </p>
         </div>

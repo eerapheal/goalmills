@@ -105,7 +105,7 @@ export function GoalmillsFootballDashboard() {
       player: 'Victor Osimhen',
       summary: 'Napoli → Galatasaray (Permanent €75M)',
       tag: 'DONE DEAL',
-      tagColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      tagColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
     },
     {
       id: 't-2',
@@ -219,7 +219,7 @@ export function GoalmillsFootballDashboard() {
               summary: item.summary || item.excerpt || item.title,
               tag: idx === 0 ? 'DONE DEAL' : 'HOT RUMOR',
               tagColor: idx === 0
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
                 : 'bg-amber-500/20 text-amber-300 border-amber-500/30',
             }));
             setTransfers(mappedTransfers);
@@ -300,7 +300,7 @@ export function GoalmillsFootballDashboard() {
 
               <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
                   <h3 className="text-xs font-black tracking-wider text-white uppercase flex items-center gap-2">
                     <span>LIVE MATCHES & SCORES</span>
                   </h3>
@@ -484,7 +484,7 @@ export function GoalmillsFootballDashboard() {
 
                 {/* Metric 3: xG Difference */}
                 <div className="p-3.5 rounded-2xl bg-[#0E1F38] border border-blue-500/15 flex flex-col items-center justify-center text-center shadow-inner">
-                  <span className="text-2xl sm:text-3xl font-black text-emerald-400">
+                  <span className="text-2xl sm:text-3xl font-black text-yellow-400">
                     +0.84
                   </span>
                   <span className="text-xs font-bold text-white mt-1">xG Delta</span>

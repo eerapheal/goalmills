@@ -94,7 +94,7 @@ export default function HighlightViewTracker({ id, title, url }: HighlightViewTr
           href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="h-8 w-8 rounded-lg bg-white/5 hover:bg-emerald-600 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center transition-all hover:scale-105"
+          className="h-8 w-8 rounded-lg bg-white/5 hover:bg-blue-600 text-slate-300 hover:text-white border border-white/10 flex items-center justify-center transition-all hover:scale-105"
           title="Share to WhatsApp"
         >
           <FaWhatsapp size={14} />
@@ -108,8 +108,8 @@ export default function HighlightViewTracker({ id, title, url }: HighlightViewTr
         >
           {copied ? (
             <>
-              <FiCheck className="text-emerald-400" size={14} />
-              <span className="text-emerald-400">Copied!</span>
+              <FiCheck className="text-blue-400" size={14} />
+              <span className="text-blue-400">Copied!</span>
             </>
           ) : (
             <>

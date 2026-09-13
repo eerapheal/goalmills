@@ -185,7 +185,7 @@ export function BasketballScreen() {
             {[
               { id: 'live', label: 'Live Games', icon: FiActivity, color: 'text-amber-400' },
               { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
-              { id: 'results', label: 'Results', icon: FiAward, color: 'text-emerald-400' },
+              { id: 'results', label: 'Results', icon: FiAward, color: 'text-blue-400' },
               { id: 'standings', label: 'Standings', icon: FiTrendingUp, color: 'text-purple-400' },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -349,7 +349,7 @@ export function BasketballScreen() {
                           </Link>
                         </td>
                         <td className="py-3 px-2 text-center font-mono">{team.standing_P}</td>
-                        <td className="py-3 px-2 text-center font-mono text-emerald-400 font-bold">
+                        <td className="py-3 px-2 text-center font-mono text-blue-400 font-bold">
                           {team.standing_W}
                         </td>
                         <td className="py-3 px-2 text-center font-mono text-rose-400">

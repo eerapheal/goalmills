@@ -200,7 +200,7 @@ export default function NewsletterPage() {
               </div>
               <div className="p-3.5 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md col-span-2 sm:col-span-1">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Delivery Speed</span>
-                <span className="text-xl font-black text-emerald-400">&lt; 60 Secs</span>
+                <span className="text-xl font-black text-blue-400">&lt; 60 Secs</span>
               </div>
             </div>
           </div>
@@ -307,8 +307,8 @@ export default function NewsletterPage() {
                 </div>
 
                 {status === 'success' ? (
-                  <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/60 p-6 text-center space-y-3 animate-in fade-in">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto text-2xl">
+                  <div className="rounded-2xl border border-blue-500/40 bg-blue-950/60 p-6 text-center space-y-3 animate-in fade-in">
+                    <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center mx-auto text-2xl">
                       <FiCheckCircle />
                     </div>
                     <h3 className="text-lg font-black text-white">You&apos;re Officially Subscribed!</h3>
@@ -370,7 +370,7 @@ export default function NewsletterPage() {
                     </button>
 
                     <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400 pt-1">
-                      <span className="flex items-center gap-1"><FiShield className="text-emerald-400" /> No spam ever</span>
+                      <span className="flex items-center gap-1"><FiShield className="text-blue-400" /> No spam ever</span>
                       <span>•</span>
                       <span className="flex items-center gap-1"><FiClock className="text-blue-400" /> Cancel in 1-click</span>
                     </div>
@@ -415,7 +415,7 @@ export default function NewsletterPage() {
                 </div>
 
                 <div className="pt-2 border-t border-white/5 space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/15 px-2 py-0.5 rounded">
                     TRANSFER FLASH
                   </span>
                   <h4 className="text-sm font-black text-white mt-1">

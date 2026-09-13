@@ -138,7 +138,7 @@ export default function CricketLeagueSlugPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-red-400 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
                     Cricket Competition
                   </span>
                   <span className="text-xs text-slate-400 font-semibold">• {countryName}</span>
@@ -153,13 +153,13 @@ export default function CricketLeagueSlugPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
+              <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Teams</span>
                 <span className="text-sm font-black text-white">{standings.length || '-'}</span>
               </div>
-              <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
+              <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
                 <span className="text-[10px] font-bold text-slate-400 block uppercase">Matches</span>
-                <span className="text-sm font-black text-emerald-400">{matches.length || '-'}</span>
+                <span className="text-sm font-black text-red-400">{matches.length || '-'}</span>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function CricketLeagueSlugPage() {
             onClick={() => setActiveTab('standings')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all ${
               activeTab === 'standings'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -185,7 +185,7 @@ export default function CricketLeagueSlugPage() {
             onClick={() => setActiveTab('matches')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all ${
               activeTab === 'matches'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -196,9 +196,9 @@ export default function CricketLeagueSlugPage() {
 
         {/* Tab 1: Points Table Standings */}
         {activeTab === 'standings' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiAward className="text-emerald-400" />
+              <FiAward className="text-red-400" />
               <span>Official Tournament Points Table</span>
             </h3>
 
@@ -214,11 +214,11 @@ export default function CricketLeagueSlugPage() {
                       <th className="py-3 px-3 text-center w-10">Pos</th>
                       <th className="py-3 px-3">Team</th>
                       <th className="py-3 px-2 text-center">P</th>
-                      <th className="py-3 px-2 text-center text-emerald-400">W</th>
+                      <th className="py-3 px-2 text-center text-red-400">W</th>
                       <th className="py-3 px-2 text-center text-rose-400">L</th>
                       <th className="py-3 px-2 text-center text-slate-400">NR</th>
                       <th className="py-3 px-2 text-center text-slate-300">NRR</th>
-                      <th className="py-3 px-3 text-center font-black text-amber-400">PTS</th>
+                      <th className="py-3 px-3 text-center font-black text-yellow-400">PTS</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-mono text-xs">
@@ -233,7 +233,7 @@ export default function CricketLeagueSlugPage() {
                             <span
                               className={`w-6 h-6 inline-flex items-center justify-center rounded-lg text-xs ${
                                 isTop4
-                                  ? 'bg-emerald-500/20 text-emerald-300 font-black'
+                                  ? 'bg-red-500/20 text-red-300 font-black'
                                   : 'text-slate-400'
                               }`}
                             >
@@ -243,18 +243,18 @@ export default function CricketLeagueSlugPage() {
                           <td className="py-3 px-3 font-sans font-bold text-white">
                             <Link
                               href={teamSlug}
-                              className="hover:text-emerald-300 transition-colors flex items-center gap-1.5"
+                              className="hover:text-red-300 transition-colors flex items-center gap-1.5"
                             >
                               <span>{s.standing_team}</span>
                               <FiChevronRight className="opacity-0 group-hover:opacity-100 text-xs text-slate-500" />
                             </Link>
                           </td>
                           <td className="py-3 px-2 text-center text-slate-300">{s.standing_MP || '0'}</td>
-                          <td className="py-3 px-2 text-center font-bold text-emerald-400">{s.standing_W || '0'}</td>
+                          <td className="py-3 px-2 text-center font-bold text-red-400">{s.standing_W || '0'}</td>
                           <td className="py-3 px-2 text-center text-rose-400">{s.standing_L || '0'}</td>
                           <td className="py-3 px-2 text-center text-slate-400">{s.standing_NR || '0'}</td>
                           <td className="py-3 px-2 text-center text-slate-300 font-bold">{s.standing_NRR || '0.000'}</td>
-                          <td className="py-3 px-3 text-center font-black text-amber-400 text-sm">
+                          <td className="py-3 px-3 text-center font-black text-yellow-400 text-sm">
                             {s.standing_Pts || '0'}
                           </td>
                         </tr>
@@ -269,7 +269,7 @@ export default function CricketLeagueSlugPage() {
 
         {/* Tab 2: Matches */}
         {activeTab === 'matches' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
               <FiCalendar className="text-sky-400" />
               <span>Tournament Fixtures & Scorecards</span>

@@ -318,7 +318,7 @@ export function GoalmillsLiveDashboard({
 
             <div className="flex items-center justify-between mb-2 border-b border-white/5 pb-1.5">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
                 <h3 className="text-xs font-black tracking-wider text-red-400 uppercase">
                   Live
                 </h3>

@@ -64,7 +64,7 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
         onClick={handleCopy}
         className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
           copied
-            ? 'bg-green-500/20 border-green-500/50 text-green-500'
+            ? 'bg-blue-500/20 border-blue-500/50 text-blue-500'
             : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white'
         }`}
         aria-label="Copy Link"

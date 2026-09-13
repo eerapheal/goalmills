@@ -78,7 +78,7 @@ export function HeadToHeadCard({
           </div>
         </div>
 
-        <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+        <span className="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-300 text-[10px] font-black uppercase tracking-wider">
           Warehouse Verified
         </span>
       </div>
@@ -86,24 +86,24 @@ export function HeadToHeadCard({
       {/* Teams Win Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-white">
-          <span className="text-emerald-400">{data.teamA.name} ({data.teamAWins}W)</span>
-          <span className="text-slate-400 font-normal text-xs">{data.draws} Draws</span>
-          <span className="text-blue-400">{data.teamB.name} ({data.teamBWins}W)</span>
+          <span className="text-blue-400">{data.teamA.name} ({data.teamAWins}W)</span>
+          <span className="text-yellow-400 font-semibold text-xs">{data.draws} Draws</span>
+          <span className="text-red-400">{data.teamB.name} ({data.teamBWins}W)</span>
         </div>
 
         <div className="h-3 rounded-full bg-slate-900 overflow-hidden flex p-0.5 gap-1 border border-white/10">
           <div
-            className="h-full bg-emerald-500 rounded-l-full transition-all duration-500"
+            className="h-full bg-blue-500 rounded-l-full transition-all duration-500"
             style={{ width: `${Math.max(winPctA, 5)}%` }}
             title={`${data.teamA.name}: ${winPctA}%`}
           />
           <div
-            className="h-full bg-slate-600 transition-all duration-500"
+            className="h-full bg-yellow-500 transition-all duration-500"
             style={{ width: `${Math.max(drawPct, 5)}%` }}
             title={`Draws: ${drawPct}%`}
           />
           <div
-            className="h-full bg-blue-500 rounded-r-full transition-all duration-500"
+            className="h-full bg-red-500 rounded-r-full transition-all duration-500"
             style={{ width: `${Math.max(winPctB, 5)}%` }}
             title={`${data.teamB.name}: ${winPctB}%`}
           />

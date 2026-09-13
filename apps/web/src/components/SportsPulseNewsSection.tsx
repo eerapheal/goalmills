@@ -74,7 +74,7 @@ export function SportsPulseNewsSection() {
       category: 'transfers',
       categoryName: 'Transfers',
       readTime: '4 min read',
-      tagColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      tagColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
       date: '6 hrs ago',
       author: 'Transfer Desk',
       isHot: false,
@@ -120,7 +120,7 @@ export function SportsPulseNewsSection() {
                   : cat === 'basketball'
                     ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
                     : cat === 'transfers'
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                      ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
                       : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
 
               const fallbackCatImage =
@@ -414,8 +414,8 @@ export function SportsPulseNewsSection() {
               </p>
 
               {subscribed ? (
-                <div className="bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2 animate-fade-in">
-                  <FiCheck className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <div className="bg-blue-950/60 border border-blue-500/40 text-blue-300 rounded-2xl p-3.5 text-xs font-bold flex items-center gap-2 animate-fade-in">
+                  <FiCheck className="w-5 h-5 text-blue-400 flex-shrink-0" />
                   <span>You&apos;re in! Check your inbox on matchdays for VIP alerts.</span>
                 </div>
               ) : (

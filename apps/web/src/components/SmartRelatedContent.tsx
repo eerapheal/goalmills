@@ -106,7 +106,7 @@ export function SmartRelatedContent({
           <span>{title}</span>
         </h3>
         <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-          <FiTrendingUp className="text-emerald-400" />
+          <FiTrendingUp className="text-yellow-400" />
           <span>Curated for You</span>
         </span>
       </div>

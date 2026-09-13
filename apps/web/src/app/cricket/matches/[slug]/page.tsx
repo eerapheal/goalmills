@@ -246,8 +246,8 @@ export default function CricketMatchSlugPage() {
           {/* Back & Breadcrumb Bar */}
           <div className="flex items-center justify-between mb-6">
             <BackButton />
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-black uppercase tracking-wider">
-              <span className="text-emerald-400">🏏</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-black uppercase tracking-wider">
+              <span className="text-red-400">🏏</span>
               <span>{match.league_name || 'Cricket Series'}</span>
               {match.league_season && (
                 <span className="text-slate-400">• {match.league_season}</span>
@@ -267,7 +267,7 @@ export default function CricketMatchSlugPage() {
               href={cricketRoutes.teamFromName(homeName, match.home_team_key)}
               className="flex flex-col items-center gap-3 flex-1 max-w-[220px] text-center group"
             >
-              <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-3xl bg-[#0F1D38]/80 border border-white/10 p-2.5 flex items-center justify-center group-hover:border-emerald-400/50 group-hover:scale-105 transition-all shadow-xl">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-3xl bg-[#170B10]/80 border border-white/10 p-2.5 flex items-center justify-center group-hover:border-red-400/50 group-hover:scale-105 transition-all shadow-xl">
                 {match.event_home_team_logo ? (
                   <img
                     src={match.event_home_team_logo}
@@ -275,10 +275,10 @@ export default function CricketMatchSlugPage() {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <span className="text-2xl font-black text-emerald-400">{homeName.charAt(0)}</span>
+                  <span className="text-2xl font-black text-red-400">{homeName.charAt(0)}</span>
                 )}
               </div>
-              <span className="text-xs sm:text-base font-black text-white group-hover:text-emerald-300 transition-colors leading-tight">
+              <span className="text-xs sm:text-base font-black text-white group-hover:text-red-300 transition-colors leading-tight">
                 {homeName}
               </span>
               {match.event_home_rr && (
@@ -291,11 +291,11 @@ export default function CricketMatchSlugPage() {
             {/* Live Center Scoreline */}
             <div className="flex flex-col items-center gap-2 text-center">
               {isLive ? (
-                <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider animate-pulse">
+                <span className="px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-black uppercase tracking-wider animate-pulse">
                   LIVE • {match.event_status || 'IN PLAY'}
                 </span>
               ) : isFinished ? (
-                <span className="px-3 py-1 rounded-full bg-blue-900/40 border border-blue-500/30 text-blue-300 text-[10px] font-black uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full bg-red-900/40 border border-red-500/30 text-red-300 text-[10px] font-black uppercase tracking-wider">
                   MATCH RESULT
                 </span>
               ) : (
@@ -306,9 +306,9 @@ export default function CricketMatchSlugPage() {
 
               {/* Innings scores */}
               <div className="text-2xl sm:text-4xl font-mono font-black text-white tracking-tight flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-                <span className="text-emerald-300">{match.event_home_final_result || '-'}</span>
+                <span className="text-red-300">{match.event_home_final_result || '-'}</span>
                 <span className="text-slate-600 text-lg sm:text-2xl font-sans">vs</span>
-                <span className="text-sky-300">{match.event_away_final_result || '-'}</span>
+                <span className="text-yellow-300">{match.event_away_final_result || '-'}</span>
               </div>
 
               {/* Status Info (e.g. "India won by 5 wickets") */}
@@ -329,7 +329,7 @@ export default function CricketMatchSlugPage() {
               href={cricketRoutes.teamFromName(awayName, match.away_team_key)}
               className="flex flex-col items-center gap-3 flex-1 max-w-[220px] text-center group"
             >
-              <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-3xl bg-[#0F1D38]/80 border border-white/10 p-2.5 flex items-center justify-center group-hover:border-emerald-400/50 group-hover:scale-105 transition-all shadow-xl">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-3xl bg-[#170B10]/80 border border-white/10 p-2.5 flex items-center justify-center group-hover:border-red-400/50 group-hover:scale-105 transition-all shadow-xl">
                 {match.event_away_team_logo ? (
                   <img
                     src={match.event_away_team_logo}
@@ -337,10 +337,10 @@ export default function CricketMatchSlugPage() {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <span className="text-2xl font-black text-emerald-400">{awayName.charAt(0)}</span>
+                  <span className="text-2xl font-black text-red-400">{awayName.charAt(0)}</span>
                 )}
               </div>
-              <span className="text-xs sm:text-base font-black text-white group-hover:text-emerald-300 transition-colors leading-tight">
+              <span className="text-xs sm:text-base font-black text-white group-hover:text-red-300 transition-colors leading-tight">
                 {awayName}
               </span>
               {match.event_away_rr && (
@@ -355,7 +355,7 @@ export default function CricketMatchSlugPage() {
           <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-400">
             {match.event_stadium && (
               <span className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/5 border border-white/5 font-semibold">
-                <FiMapPin className="text-emerald-400" /> {match.event_stadium}
+                <FiMapPin className="text-red-400" /> {match.event_stadium}
               </span>
             )}
             {match.country_name && (
@@ -380,7 +380,7 @@ export default function CricketMatchSlugPage() {
       {/* Main Tabbed Content Area */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-[#0A162B] border border-blue-500/20">
+        <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-[#170B10] border border-red-500/20">
           {[
             { id: 'scorecard', label: 'Scorecard', icon: FiList },
             { id: 'commentary', label: 'Commentary', icon: FiActivity },
@@ -398,7 +398,7 @@ export default function CricketMatchSlugPage() {
                 onClick={() => setActiveTab(tab.id as MatchTab)}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -411,7 +411,7 @@ export default function CricketMatchSlugPage() {
 
         {/* 1. Scorecard Tab */}
         {activeTab === 'scorecard' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-6">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-6">
             {/* Innings Selector Ribbon */}
             {availableInnings.length > 0 && (
               <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10">
@@ -426,7 +426,7 @@ export default function CricketMatchSlugPage() {
                       onClick={() => setActiveInnings(inn)}
                       className={`px-3 py-1 rounded-xl text-xs font-bold capitalize transition-all ${
                         isSelected
-                          ? 'bg-emerald-500 text-black shadow-md font-black'
+                          ? 'bg-red-600 text-white shadow-md font-black'
                           : 'bg-white/5 text-slate-300 hover:bg-white/10'
                       }`}
                     >
@@ -440,7 +440,7 @@ export default function CricketMatchSlugPage() {
             {/* Batsmen Table */}
             <div className="space-y-3">
               <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <span className="text-emerald-400">🏏</span>
+                <span className="text-red-400">🏏</span>
                 <span>Batting Scorecard</span>
               </h4>
 
@@ -467,7 +467,7 @@ export default function CricketMatchSlugPage() {
                           <td className="py-2.5 px-2 font-sans text-slate-400 text-[11px]">
                             {b.status || 'not out'}
                           </td>
-                          <td className="py-2.5 px-2 text-right font-black text-emerald-400 text-sm">
+                          <td className="py-2.5 px-2 text-right font-black text-yellow-400 text-sm">
                             {b.R}
                           </td>
                           <td className="py-2.5 px-2 text-right text-slate-300">{b.B}</td>
@@ -529,7 +529,7 @@ export default function CricketMatchSlugPage() {
                           <td className="py-2.5 px-2 text-right text-slate-300">{bw.O || '-'}</td>
                           <td className="py-2.5 px-2 text-right text-slate-400">{bw.M || '0'}</td>
                           <td className="py-2.5 px-2 text-right text-slate-300">{bw.R || '0'}</td>
-                          <td className="py-2.5 px-2 text-right font-black text-emerald-400 text-sm">
+                          <td className="py-2.5 px-2 text-right font-black text-red-400 text-sm">
                             {bw.W || '0'}
                           </td>
                           <td className="py-2.5 px-3 text-right text-amber-300 font-bold">
@@ -551,9 +551,9 @@ export default function CricketMatchSlugPage() {
 
         {/* 2. Commentary Tab */}
         {activeTab === 'commentary' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiActivity className="text-emerald-400" />
+              <FiActivity className="text-red-400" />
               <span>Ball-by-Ball Live Commentary</span>
             </h3>
 
@@ -570,8 +570,8 @@ export default function CricketMatchSlugPage() {
                         isWicket
                           ? 'bg-rose-950/20 border-rose-500/30'
                           : isBoundary
-                          ? 'bg-emerald-950/20 border-emerald-500/30'
-                          : 'bg-[#060D18]/70 border-white/5'
+                          ? 'bg-yellow-950/20 border-yellow-500/30'
+                          : 'bg-[#0D0609]/70 border-white/5'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
@@ -585,8 +585,8 @@ export default function CricketMatchSlugPage() {
                                 isWicket
                                   ? 'bg-rose-500 text-white'
                                   : isBoundary
-                                  ? 'bg-emerald-500 text-black'
-                                  : 'bg-blue-500/20 text-blue-300'
+                                  ? 'bg-yellow-500 text-slate-950'
+                                  : 'bg-red-500/20 text-red-300'
                               }`}
                             >
                               {isWicket ? 'W' : `${c.runs} runs`}
@@ -609,16 +609,16 @@ export default function CricketMatchSlugPage() {
 
         {/* 3. Lineups Tab */}
         {activeTab === 'lineups' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-6">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-6">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiUsers className="text-emerald-400" />
+              <FiUsers className="text-red-400" />
               <span>Starting XI Lineups</span>
             </h3>
 
             {match.lineups ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Home Lineup */}
-                <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 space-y-3">
+                <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 space-y-3">
                   <div className="flex items-center gap-2 pb-2 border-b border-white/10">
                     {match.event_home_team_logo && (
                       <img
@@ -644,7 +644,7 @@ export default function CricketMatchSlugPage() {
                 </div>
 
                 {/* Away Lineup */}
-                <div className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 space-y-3">
+                <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 space-y-3">
                   <div className="flex items-center gap-2 pb-2 border-b border-white/10">
                     {match.event_away_team_logo && (
                       <img
@@ -679,9 +679,9 @@ export default function CricketMatchSlugPage() {
 
         {/* 4. Fall of Wickets Tab */}
         {activeTab === 'wickets' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiTrendingUp className="text-emerald-400" />
+              <FiTrendingUp className="text-red-400" />
               <span>Fall of Wickets Progression</span>
             </h3>
 
@@ -706,7 +706,7 @@ export default function CricketMatchSlugPage() {
                         <td className="py-3 px-3 font-sans font-bold text-white">
                           {w.batsman}
                         </td>
-                        <td className="py-3 px-3 font-black text-emerald-400 text-sm">
+                        <td className="py-3 px-3 font-black text-yellow-400 text-sm">
                           {w.score}
                         </td>
                         <td className="py-3 px-3 text-slate-300">{w.fall}</td>
@@ -728,7 +728,7 @@ export default function CricketMatchSlugPage() {
 
         {/* 5. Head to Head Tab */}
         {activeTab === 'h2h' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
               <FiAward className="text-amber-400" />
               <span>Head to Head Encounters</span>
@@ -739,7 +739,7 @@ export default function CricketMatchSlugPage() {
                 {h2hData.H2H.map((pastMatch: CricketEvent, idx: number) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -750,7 +750,7 @@ export default function CricketMatchSlugPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-black font-mono text-emerald-400">
+                      <div className="text-sm font-black font-mono text-yellow-400">
                         {pastMatch.event_home_final_result || '-'} : {pastMatch.event_away_final_result || '-'}
                       </div>
                       {pastMatch.event_status_info && (
@@ -772,9 +772,9 @@ export default function CricketMatchSlugPage() {
 
         {/* 6. Betting Odds Tab */}
         {activeTab === 'odds' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-              <FiDollarSign className="text-emerald-400" />
+              <FiDollarSign className="text-red-400" />
               <span>Live Betting Markets & Odds</span>
             </h3>
 
@@ -783,7 +783,7 @@ export default function CricketMatchSlugPage() {
                 {Object.entries(oddsData).map(([marketName, outcomes]: [string, any], idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-2xl bg-[#060D18]/80 border border-white/5 space-y-3"
+                    className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 space-y-3"
                   >
                     <h4 className="text-xs font-black text-white uppercase tracking-wider">
                       {marketName.replace(/_/g, ' ')}
@@ -798,7 +798,7 @@ export default function CricketMatchSlugPage() {
                             <span className="text-[10px] font-bold text-slate-400 block uppercase">
                               {outcome}
                             </span>
-                            <span className="text-sm font-mono font-black text-emerald-400">
+                            <span className="text-sm font-mono font-black text-yellow-400">
                               {typeof bookmakers === 'object'
                                 ? Object.values(bookmakers)[0] as string || '-'
                                 : String(bookmakers)}
@@ -820,38 +820,38 @@ export default function CricketMatchSlugPage() {
 
         {/* 7. Match Info Tab */}
         {activeTab === 'info' && (
-          <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-red-500/20 bg-[#170B10]/90 p-5 sm:p-6 shadow-xl space-y-4">
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
               <FiInfo className="text-sky-400" />
               <span>Match Information & Intelligence</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
+              <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Competition</span>
                 <span className="text-sm font-bold text-white">{match.league_name || 'Cricket Series'}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
+              <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Season / Round</span>
                 <span className="text-sm font-bold text-white">
                   {match.league_season || '-'} • {match.league_round || 'Regular'}
                 </span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
+              <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Venue / Stadium</span>
                 <span className="text-sm font-bold text-white">{match.event_stadium || 'TBD'}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
+              <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Country</span>
                 <span className="text-sm font-bold text-white">{match.country_name || 'Global'}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
+              <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Toss</span>
                 <span className="text-sm font-bold text-amber-300">{match.event_toss || 'Toss not yet recorded'}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
+              <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Player of the Match</span>
-                <span className="text-sm font-bold text-emerald-400">
+                <span className="text-sm font-bold text-yellow-400">
                   {match.event_man_of_match || 'To be decided'}
                 </span>
               </div>

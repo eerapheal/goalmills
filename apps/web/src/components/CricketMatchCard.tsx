@@ -95,24 +95,24 @@ export function CricketMatchCard({
       onClick={handleClick}
       className={`group relative cursor-pointer rounded-2xl border p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
         isLive
-          ? 'border-emerald-500/40 bg-gradient-to-br from-[#07191d] via-[#09252a] to-[#061417] shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:border-emerald-400'
-          : 'border-blue-500/20 bg-[#091322]/90 hover:border-blue-400/40 hover:bg-[#0C1A30]'
+          ? 'border-red-500/50 bg-gradient-to-br from-[#22060b] via-[#1a080d] to-[#120509] shadow-[0_0_20px_rgba(239,68,68,0.22)] hover:border-red-400'
+          : 'border-red-500/20 bg-[#140a10]/90 hover:border-red-400/40 hover:bg-[#1c0e16]'
       }`}
     >
       {/* Ambient subtle glow for live matches */}
       {isLive && (
-        <div className="absolute top-0 right-0 w-32 h-16 bg-emerald-500/10 blur-2xl pointer-events-none -z-0" />
+        <div className="absolute top-0 right-0 w-32 h-16 bg-red-500/10 blur-2xl pointer-events-none -z-0" />
       )}
 
       {/* League Header */}
       {!hideLeague && (
         <div className="mb-2.5 flex items-center justify-between border-b border-white/5 pb-2 text-xs">
           <div className="flex items-center space-x-1.5 truncate">
-            <span className="text-emerald-400 text-xs">🏏</span>
+            <span className="text-red-400 text-xs">🏏</span>
             <Link
               href={leagueHref}
               onClick={(e) => e.stopPropagation()}
-              className="font-bold text-[11px] text-slate-300 group-hover:text-white truncate transition-colors hover:text-emerald-300"
+              className="font-bold text-[11px] text-slate-300 group-hover:text-white truncate transition-colors hover:text-red-300"
             >
               {match?.league_name || 'Cricket Series'}
             </Link>
@@ -125,15 +125,15 @@ export function CricketMatchCard({
 
           {/* Status Badge */}
           {isLive ? (
-            <span className="flex items-center space-x-1 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-300 shadow-sm animate-pulse">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="flex items-center space-x-1 rounded-full border border-red-500/40 bg-red-500/15 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-red-300 shadow-sm animate-pulse">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
               <span>LIVE</span>
             </span>
           ) : (
             <span
               className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                 isFinished
-                  ? 'bg-blue-900/30 text-blue-300 border border-blue-500/20'
+                  ? 'bg-red-950/40 text-red-300 border border-red-500/30'
                   : 'bg-white/5 text-slate-300 border border-white/10'
               }`}
             >
@@ -150,9 +150,9 @@ export function CricketMatchCard({
           <Link
             href={homeHref}
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center space-x-2.5 truncate hover:text-emerald-300 transition-colors"
+            className="flex items-center space-x-2.5 truncate hover:text-red-300 transition-colors"
           >
-            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-emerald-400/40 transition-colors">
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-red-400/40 transition-colors">
               {match?.event_home_team_logo && !homeImgError ? (
                 <img
                   src={match.event_home_team_logo}
@@ -173,7 +173,7 @@ export function CricketMatchCard({
             <span
               className={`font-mono font-black text-xs sm:text-sm tabular-nums ${
                 isLive
-                  ? 'text-emerald-400'
+                  ? 'text-red-400'
                   : isFinished
                     ? 'text-white'
                     : 'text-slate-500'
@@ -194,9 +194,9 @@ export function CricketMatchCard({
           <Link
             href={awayHref}
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center space-x-2.5 truncate hover:text-emerald-300 transition-colors"
+            className="flex items-center space-x-2.5 truncate hover:text-red-300 transition-colors"
           >
-            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-emerald-400/40 transition-colors">
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 overflow-hidden group-hover:border-red-400/40 transition-colors">
               {match?.event_away_team_logo && !awayImgError ? (
                 <img
                   src={match.event_away_team_logo}
@@ -217,7 +217,7 @@ export function CricketMatchCard({
             <span
               className={`font-mono font-black text-xs sm:text-sm tabular-nums ${
                 isLive
-                  ? 'text-emerald-400'
+                  ? 'text-red-400'
                   : isFinished
                     ? 'text-white'
                     : 'text-slate-500'
@@ -249,7 +249,7 @@ export function CricketMatchCard({
       )}
 
       {/* Footer Info / SEO Link */}
-      <div className="mt-2 flex items-center justify-end text-[10px] text-slate-500 group-hover:text-emerald-400 transition-colors">
+      <div className="mt-2 flex items-center justify-end text-[10px] text-slate-500 group-hover:text-red-400 transition-colors">
         <span className="flex items-center gap-1 font-semibold">
           Match Center →
         </span>

@@ -141,7 +141,7 @@ export function SportsIntelligenceSection() {
       subtext: 'Verified official federation feeds',
       icon: (
         <svg
-          className="w-5 h-5 text-emerald-400"
+          className="w-5 h-5 text-blue-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -154,8 +154,8 @@ export function SportsIntelligenceSection() {
           />
         </svg>
       ),
-      glow: 'from-emerald-500/20 to-teal-500/5',
-      borderColor: 'border-emerald-500/30',
+      glow: 'from-blue-500/20 to-blue-500/5',
+      borderColor: 'border-blue-500/30',
     },
     {
       value: '24/7',
@@ -222,7 +222,7 @@ export function SportsIntelligenceSection() {
         'Player disciplinary records & card histories',
       ],
       badge: 'Pro Stats',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
     },
     {
       id: 'odds' as const,
@@ -267,7 +267,7 @@ export function SportsIntelligenceSection() {
       name: 'ATP & WTA Tour',
       flag: '🎾',
       matches: 'Grand Slam',
-      color: 'hover:border-emerald-500/50',
+      color: 'hover:border-yellow-500/50',
     },
   ];
 
@@ -381,7 +381,7 @@ export function SportsIntelligenceSection() {
 
               <div className="flex items-center justify-between pt-2">
                 <div className="text-xs text-slate-400 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                   Active Stream Sync
                 </div>
                 <Link

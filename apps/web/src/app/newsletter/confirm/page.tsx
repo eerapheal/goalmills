@@ -58,14 +58,14 @@ function ConfirmContent() {
         </div>
       ) : success ? (
         <div className="space-y-4">
-          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
             <FiCheckCircle size={22} />
           </div>
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tight">
               Subscription Confirmed!
             </h1>
-            <p className="text-xs text-emerald-400 font-bold mt-1">Verified: {email}</p>
+            <p className="text-xs text-blue-400 font-bold mt-1">Verified: {email}</p>
           </div>
           <p className="text-xs text-text-muted leading-relaxed">
             Your email has been confirmed. You will now receive curated 10:00 AM matchday briefs,

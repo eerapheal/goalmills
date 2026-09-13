@@ -310,8 +310,8 @@ export default function MatchDetailsPage() {
             <div className="flex flex-col items-center justify-center text-center px-4">
               <div className="mb-2">
                 {isLive ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-400 animate-pulse">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-red-400 animate-pulse">
+                    <span className="h-2 w-2 rounded-full bg-red-400" />
                     {fixture.event_status ? `${fixture.event_status}'` : 'LIVE IN PLAY'}
                   </span>
                 ) : (
@@ -456,7 +456,7 @@ export default function MatchDetailsPage() {
             <div className="rounded-2xl border border-white/10 bg-[#0B1526] p-6 space-y-4 shadow-xl flex flex-col justify-between">
               <div>
                 <h3 className="text-sm font-black text-white uppercase tracking-wider border-b border-white/10 pb-3 flex items-center gap-2">
-                  <FiTrendingUp className="text-emerald-400" />
+                  <FiTrendingUp className="text-blue-400" />
                   <span>Win Probabilities & Market Odds</span>
                 </h3>
 
@@ -475,7 +475,7 @@ export default function MatchDetailsPage() {
                     <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
                       <div className="p-3 rounded-xl bg-slate-900/80 border border-white/5">
                         <span className="text-slate-400">Over 2.5 Goals:</span>
-                        <span className="font-bold text-emerald-400 ml-2">{probabilities.event_O}%</span>
+                        <span className="font-bold text-blue-400 ml-2">{probabilities.event_O}%</span>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-900/80 border border-white/5">
                         <span className="text-slate-400">Both Teams to Score:</span>
@@ -523,10 +523,10 @@ export default function MatchDetailsPage() {
                 {fixture.goalscorers?.map((g, idx) => (
                   <div
                     key={`g-${idx}`}
-                    className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs"
+                    className="flex items-center justify-between p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-xs"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-black text-emerald-400 font-mono w-10">
+                      <span className="font-black text-yellow-400 font-mono w-10">
                         {g.time}&apos;
                       </span>
                       <span className="text-base">⚽</span>
@@ -542,7 +542,7 @@ export default function MatchDetailsPage() {
                         ) : null}
                       </span>
                     </div>
-                    <span className="font-black font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+                    <span className="font-black font-mono text-yellow-300 bg-yellow-950/60 px-2 py-0.5 rounded border border-yellow-500/30">
                       {g.score}
                     </span>
                   </div>
@@ -597,9 +597,9 @@ export default function MatchDetailsPage() {
                         </span>
                         <span className="text-base">🔄</span>
                         <div>
-                          <span className="font-bold text-emerald-400">
+                          <span className="font-bold text-blue-400">
                             In:{' '}
-                            <Link href={getPlayerLinkByName(subIn)} className="hover:text-emerald-300 transition-colors hover:underline">
+                            <Link href={getPlayerLinkByName(subIn)} className="hover:text-blue-300 transition-colors hover:underline">
                               {subIn}
                             </Link>
                           </span>
@@ -630,7 +630,7 @@ export default function MatchDetailsPage() {
             ) : (
               <>
                 {/* 2D Tactical Football Pitch */}
-                <div className="relative min-h-[380px] rounded-3xl border-2 border-emerald-500/40 bg-gradient-to-b from-[#082318] to-[#0D3625] p-6 shadow-2xl flex flex-col justify-between overflow-hidden">
+                <div className="relative min-h-[380px] rounded-3xl border-2 border-blue-500/40 bg-gradient-to-b from-[#08152B] to-[#0D2445] p-6 shadow-2xl flex flex-col justify-between overflow-hidden">
                   <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white/20" />
                   <div className="absolute top-1/2 left-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/20" />
 
@@ -842,21 +842,21 @@ export default function MatchDetailsPage() {
           <div className="space-y-6">
             {/* Live Odds if available */}
             {liveOdds.length > 0 && (
-              <div className="rounded-2xl border border-emerald-500/30 bg-[#0A1D1C] p-6 space-y-4 shadow-xl">
-                <h3 className="text-sm font-black text-emerald-400 uppercase tracking-wider border-b border-emerald-500/20 pb-3 flex items-center gap-2">
-                  <FiZap className="text-emerald-400 animate-pulse" />
+              <div className="rounded-2xl border border-red-500/30 bg-[#170B10] p-6 space-y-4 shadow-xl">
+                <h3 className="text-sm font-black text-red-400 uppercase tracking-wider border-b border-red-500/20 pb-3 flex items-center gap-2">
+                  <FiZap className="text-red-400 animate-pulse" />
                   <span>Live In-Play Odds</span>
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {liveOdds.map((lo, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-xl bg-slate-950/60 border border-emerald-500/20 flex flex-col justify-between text-xs"
+                      className="p-3.5 rounded-xl bg-slate-950/60 border border-red-500/20 flex flex-col justify-between text-xs"
                     >
                       <span className="text-slate-400 text-[11px]">{lo.odd_name}</span>
                       <div className="flex justify-between items-center mt-2">
                         <span className="font-bold text-white">{lo.odd_type}</span>
-                        <span className="font-black text-emerald-300 font-mono text-base">
+                        <span className="font-black text-red-300 font-mono text-base">
                           {lo.odd_value}
                         </span>
                       </div>
@@ -906,7 +906,7 @@ export default function MatchDetailsPage() {
                           <td className="py-3 px-3 text-center text-amber-400 font-black">
                             {o.odd_2 || '-'}
                           </td>
-                          <td className="py-3 px-3 text-center text-emerald-400">
+                          <td className="py-3 px-3 text-center text-blue-400">
                             {o['o+2.5'] || '-'}
                           </td>
                           <td className="py-3 px-3 text-center text-rose-400">
@@ -989,7 +989,7 @@ export default function MatchDetailsPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-900/70 border border-white/5 text-center space-y-1">
                     <span className="text-[11px] text-slate-400 uppercase tracking-wider">Over 2.5 Goals</span>
-                    <div className="text-xl font-black text-emerald-400 font-mono">{probabilities.event_O}%</div>
+                    <div className="text-xl font-black text-blue-400 font-mono">{probabilities.event_O}%</div>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-900/70 border border-white/5 text-center space-y-1">
                     <span className="text-[11px] text-slate-400 uppercase tracking-wider">Under 2.5 Goals</span>
@@ -1104,7 +1104,7 @@ export default function MatchDetailsPage() {
                             </span>
                           </td>
                           <td className="py-3 px-3 text-center">{row.standing_P || 0}</td>
-                          <td className="py-3 px-3 text-center text-emerald-400">{row.standing_W || 0}</td>
+                          <td className="py-3 px-3 text-center text-blue-400">{row.standing_W || 0}</td>
                           <td className="py-3 px-3 text-center text-slate-400">{row.standing_D || 0}</td>
                           <td className="py-3 px-3 text-center text-rose-400">{row.standing_L || 0}</td>
                           <td className="py-3 px-3 text-center">{row.standing_GD || 0}</td>

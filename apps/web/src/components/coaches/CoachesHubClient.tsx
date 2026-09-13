@@ -99,7 +99,7 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
               Average Win Rate
             </span>
-            <span className="text-2xl sm:text-3xl font-black text-emerald-400">
+            <span className="text-2xl sm:text-3xl font-black text-blue-400">
               {avgWinRate}%
             </span>
           </div>
@@ -251,12 +251,12 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
                   <div className="bg-[#060D1A]/80 rounded-xl p-3 border border-white/5 mb-4 space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold">
                       <span className="text-slate-400">Career Win Rate</span>
-                      <span className="text-emerald-400 font-black">{coach.winPercentage}%</span>
+                      <span className="text-blue-400 font-black">{coach.winPercentage}%</span>
                     </div>
                     <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden flex">
                       <div
                         style={{ width: `${coach.winPercentage}%` }}
-                        className="bg-emerald-400 h-full rounded-full"
+                        className="bg-blue-500 h-full rounded-full"
                       />
                     </div>
                     <div className="flex justify-between text-[10px] text-slate-500 font-mono">

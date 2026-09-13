@@ -70,7 +70,7 @@ export function TeamTrendWidget({
             <span
               key={i}
               className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-black text-white ${
-                res === 'W' ? 'bg-emerald-500' : res === 'D' ? 'bg-amber-500' : 'bg-rose-500'
+                res === 'W' ? 'bg-blue-500' : res === 'D' ? 'bg-amber-500' : 'bg-rose-500'
               }`}
             >
               {res}
@@ -83,7 +83,7 @@ export function TeamTrendWidget({
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
           <div className="text-[10px] text-slate-400">Avg Goals Scored</div>
-          <div className="text-base font-black text-emerald-400 mt-0.5">{trends.averageGoalsScored} / match</div>
+          <div className="text-base font-black text-yellow-400 mt-0.5">{trends.averageGoalsScored} / match</div>
         </div>
         <div className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
           <div className="text-[10px] text-slate-400">Clean Sheet Rate</div>

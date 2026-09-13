@@ -85,7 +85,7 @@ export default async function StatsHubPage() {
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Expected Goals</span>
-                  <span className="text-lg sm:text-xl font-black text-emerald-400">xG Stats</span>
+                  <span className="text-lg sm:text-xl font-black text-blue-400">xG Stats</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
                   <span className="text-[10px] uppercase font-bold text-slate-400 block">Form Guide</span>

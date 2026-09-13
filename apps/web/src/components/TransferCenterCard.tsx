@@ -15,7 +15,7 @@ export function TransferCenterCard({ transfer, className = '' }: TransferCenterC
     switch (status) {
       case 'done_deal':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">
             <FiCheckCircle size={12} />
             Done Deal
           </span>
