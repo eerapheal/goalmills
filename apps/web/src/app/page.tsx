@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getNewsUrl } from '@/lib/slugUtils';
 
 interface MatchItem {
   id: string;
@@ -31,154 +32,65 @@ interface NewsItem {
   slug: string;
 }
 
-// Rock-solid verified fallback data from the Figma design specification
-const FALLBACK_MATCHES: MatchItem[] = [
-  {
-    id: 'mci-ars-2026',
-    sport: 'Football',
-    league: 'Premier League',
-    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Man City',
-    away: 'Arsenal',
-    hScore: 2,
-    aScore: 1,
-    minute: "67'",
-    status: 'LIVE',
-  },
-  {
-    id: 'nap-juv-2026',
-    sport: 'Football',
-    league: 'Serie A',
-    flag: '🇮🇹',
-    home: 'Napoli',
-    away: 'Juventus',
-    hScore: 3,
-    aScore: 0,
-    minute: "82'",
-    status: 'LIVE',
-  },
-  {
-    id: 'nga-rwa-2026',
-    sport: 'Football',
-    league: 'AFCON Q.',
-    flag: '🌍',
-    home: 'Nigeria',
-    away: 'Rwanda',
-    hScore: 3,
-    aScore: 0,
-    minute: 'FT',
-    status: 'FT',
-  },
-  {
-    id: 'bar-rma-2026',
-    sport: 'Football',
-    league: 'La Liga',
-    flag: '🇪🇸',
-    home: 'Barcelona',
-    away: 'Real Madrid',
-    hScore: 0,
-    aScore: 0,
-    minute: 'SUN 17:00',
-    status: 'UPCOMING',
-  },
-  {
-    id: 'che-bay-2026',
-    sport: 'Football',
-    league: 'UCL',
-    flag: '⭐',
-    home: 'Chelsea',
-    away: 'Bayern',
-    hScore: 1,
-    aScore: 1,
-    minute: "45+2'",
-    status: 'LIVE',
-  },
-  {
-    id: 'dor-lep-2026',
-    sport: 'Football',
-    league: 'Bundesliga',
-    flag: '🇩🇪',
-    home: 'Dortmund',
-    away: 'Leipzig',
-    hScore: 2,
-    aScore: 2,
-    minute: 'FT',
-    status: 'FT',
-  },
-  {
-    id: 'csk-mi-2026',
-    sport: 'Cricket',
-    league: 'IPL 2026',
-    flag: '🏏',
-    home: 'Chennai Super Kings',
-    away: 'Mumbai Indians',
-    hScore: '184/4',
-    aScore: '152/6',
-    minute: '16.4 ov',
-    status: 'LIVE',
-  },
-  {
-    id: 'lal-bos-2026',
-    sport: 'Basketball',
-    league: 'NBA',
-    flag: '🏀',
-    home: 'LA Lakers',
-    away: 'Boston Celtics',
-    hScore: 112,
-    aScore: 108,
-    minute: 'Q4 01:24',
-    status: 'LIVE',
-  },
-];
+interface VideoItem {
+  _id: string;
+  video_title: string;
+  video_url?: string;
+  video_thumbnail?: string;
+  video_description?: string;
+  category?: string;
+  league?: string;
+  duration?: string;
+  views?: number;
+  createdAt?: string;
+}
 
-const FALLBACK_NEWS: NewsItem[] = [
+/**
+ * Top ranking competition priority weight (lower number = higher prestige/priority)
+ */
+function getCompetitionRank(leagueName: string, sport: string): number {
+  if (sport !== 'Football') return 50;
+  const l = (leagueName || '').toLowerCase();
+  if (l.includes('premier league') || l.includes('epl') || (l.includes('premier') && l.includes('england'))) return 1;
+  if (l.includes('la liga') || l.includes('laliga') || l.includes('primera division')) return 2;
+  if (l.includes('champions league') || l.includes('ucl') || l.includes('uefa champions')) return 3;
+  if (l.includes('serie a') || l.includes('italy')) return 4;
+  if (l.includes('bundesliga') || l.includes('germany')) return 5;
+  if (l.includes('ligue 1') || l.includes('france')) return 6;
+  if (l.includes('afcon') || l.includes('africa cup of nations') || l.includes('caf champions') || l.includes('caf confed')) return 7;
+  if (l.includes('npfl') || l.includes('psl') || l.includes('betway premiership') || l.includes('botola') || l.includes('egyptian')) return 8;
+  if (l.includes('europa league') || l.includes('conference league') || l.includes('uel')) return 9;
+  if (l.includes('eredivisie') || l.includes('liga portugal') || l.includes('saudi') || l.includes('mls')) return 10;
+  return 20;
+}
+
+const DEFAULT_VIDEOS: VideoItem[] = [
   {
-    id: '1',
-    category: 'Transfer',
-    tag: 'BREAKING',
-    tagColor: 'bg-red-500',
-    title: "Mbappé's agent in secret talks with PSG as reunion edges closer",
-    excerpt:
-      'Sources inside the Bernabéu say Real Madrid are prepared to listen to offers as the French superstar eyes a sensational return to Paris.',
-    time: '12 min ago',
-    image: 'https://images.unsplash.com/photo-1751394217542-a5a65fca29bb?w=600&h=400&fit=crop&auto=format',
-    slug: 'mbappe-secret-talks-psg-reunion-edges-closer',
+    _id: 'vid-ucl-1',
+    video_title: 'Champions League Epic Comebacks & Best Goals of the Round',
+    video_thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=450&fit=crop&auto=format',
+    category: 'UCL Highlights',
+    league: 'UEFA Champions League',
+    duration: '04:15',
+    views: 18400,
   },
   {
-    id: '2',
-    category: 'AFCON',
-    tag: 'ANALYSIS',
-    tagColor: 'bg-blue-500',
-    title: "Nigeria's front three are the most lethal in Africa right now",
-    excerpt:
-      'xG data paints a picture of a Super Eagles attack at peak efficiency — Osimhen, Lookman, and Chukwueze firing on all cylinders.',
-    time: '1 hr ago',
-    image: 'https://images.unsplash.com/photo-1711645313209-a386d71bc991?w=600&h=400&fit=crop&auto=format',
-    slug: 'nigeria-front-three-most-lethal-in-africa',
-  },
-  {
-    id: '3',
-    category: 'UCL',
-    tag: 'PREVIEW',
-    tagColor: 'bg-yellow-500',
-    title: 'Chelsea vs Bayern: The tactical battle that will decide the semi',
-    excerpt:
-      "Pochettino's high press against Kane's movement. A detailed statistical breakdown of the key midfield duels.",
-    time: '2 hr ago',
-    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&h=400&fit=crop&auto=format',
-    slug: 'chelsea-vs-bayern-tactical-battle-semi-final',
-  },
-  {
-    id: '4',
+    _id: 'vid-pl-2',
+    video_title: 'Premier League Matchday Goals, Skills & Tactical Highlights',
+    video_thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800&h=450&fit=crop&auto=format',
     category: 'Premier League',
-    tag: 'STATS',
-    tagColor: 'bg-blue-500',
-    title: "Haaland's xG numbers are historically unprecedented in the PL",
-    excerpt:
-      'A new StatsBomb report confirms Haaland is converting chances at a rate no PL striker has ever matched across a full season.',
-    time: '3 hr ago',
-    image: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=600&h=400&fit=crop&auto=format',
-    slug: 'haaland-xg-numbers-historically-unprecedented',
+    league: 'Premier League',
+    duration: '03:45',
+    views: 26100,
+  },
+  {
+    _id: 'vid-afcon-3',
+    video_title: 'AFCON Qualifiers: Top Goals, Saves & Star Performances',
+    video_thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=450&fit=crop&auto=format',
+    category: 'AFCON Replays',
+    league: 'CAF Africa',
+    duration: '05:20',
+    views: 14200,
   },
 ];
 
@@ -320,11 +232,55 @@ function MatchCardSkeleton() {
   );
 }
 
+function NewsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 animate-pulse">
+      <div className="lg:col-span-2 rounded-2xl bg-[#0f172a] border border-[#1e293b] overflow-hidden">
+        <div className="h-52 sm:h-64 bg-slate-800" />
+        <div className="p-5 space-y-3">
+          <div className="h-3 w-20 bg-slate-800 rounded" />
+          <div className="h-5 w-4/5 bg-slate-800 rounded" />
+          <div className="h-4 w-full bg-slate-800 rounded" />
+          <div className="h-3 w-16 bg-slate-800 rounded" />
+        </div>
+      </div>
+      <div className="lg:col-span-3 space-y-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="flex gap-4 items-start p-3 bg-[#0f172a] rounded-xl border border-[#1e293b]">
+            <div className="w-20 h-20 rounded-lg bg-slate-800 flex-shrink-0" />
+            <div className="flex-1 space-y-2 py-1">
+              <div className="h-3 w-24 bg-slate-800 rounded" />
+              <div className="h-4 w-5/6 bg-slate-800 rounded" />
+              <div className="h-3 w-16 bg-slate-800 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function VideoCardSkeleton() {
+  return (
+    <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden animate-pulse">
+      <div className="aspect-video bg-slate-800 w-full" />
+      <div className="p-4 space-y-2.5">
+        <div className="h-3 w-20 bg-slate-800 rounded" />
+        <div className="h-4 w-4/5 bg-slate-800 rounded" />
+        <div className="h-3 w-24 bg-slate-800 rounded" />
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
-  const [activeFilter, setActiveFilter] = useState<'All' | 'Live' | 'Football' | 'Cricket' | 'Basketball'>('All');
-  const [matches, setMatches] = useState<MatchItem[]>(FALLBACK_MATCHES);
-  const [news, setNews] = useState<NewsItem[]>(FALLBACK_NEWS);
+  const [activeFilter, setActiveFilter] = useState<'All' | 'Football' | 'Cricket' | 'Basketball'>('All');
+  const [matches, setMatches] = useState<MatchItem[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [videos, setVideos] = useState<VideoItem[]>([]);
   const [isLoadingMatches, setIsLoadingMatches] = useState(true);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(true);
 
   // Newsletter state
   const [email, setEmail] = useState('');
@@ -332,9 +288,8 @@ export default function HomePage() {
   const [subscribed, setSubscribed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const filters: Array<'All' | 'Live' | 'Football' | 'Cricket' | 'Basketball'> = [
+  const filters: Array<'All' | 'Football' | 'Cricket' | 'Basketball'> = [
     'All',
-    'Live',
     'Football',
     'Cricket',
     'Basketball',
@@ -343,10 +298,11 @@ export default function HomePage() {
   // ── Fetch dynamic AllSports matches across Football, Cricket, Basketball ──
   const fetchMatches = useCallback(async () => {
     try {
+      const timestamp = Date.now();
       const [footRes, cricRes, bballRes] = await Promise.all([
-        fetch('/api/football?met=Livescore').catch(() => null),
-        fetch('/api/cricket?met=Livescore').catch(() => null),
-        fetch('/api/basketball?met=Livescore').catch(() => null),
+        fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
+        fetch(`/api/cricket?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
+        fetch(`/api/basketball?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
       ]);
 
       const parsedMatches: MatchItem[] = [];
@@ -358,7 +314,7 @@ export default function HomePage() {
 
         // If no live matches, fetch upcoming/recent fixtures
         if (!Array.isArray(fList) || fList.length === 0) {
-          const fixRes = await fetch('/api/football?met=Fixtures').catch(() => null);
+          const fixRes = await fetch(`/api/football?met=Fixtures&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null);
           if (fixRes && fixRes.ok) {
             const fixData = await fixRes.json();
             fList = fixData?.result || fixData?.response || (Array.isArray(fixData) ? fixData : []);
@@ -366,11 +322,15 @@ export default function HomePage() {
         }
 
         if (Array.isArray(fList)) {
-          fList.slice(0, 10).forEach((m: any, idx: number) => {
+          fList.slice(0, 30).forEach((m: any, idx: number) => {
             const home = m.event_home_team || 'Home Team';
             const away = m.event_away_team || 'Away Team';
             const rawStatus = (m.event_status || '').trim();
-            const isLive = m.event_live === '1' || (rawStatus && !['Finished', 'FT', 'Postponed', 'Cancelled'].includes(rawStatus) && !rawStatus.includes(':'));
+            const isLive =
+              m.event_live === '1' ||
+              (Boolean(rawStatus) &&
+                !['Finished', 'FT', 'Postponed', 'Cancelled', 'Not Started', 'NS', 'TBA', 'Postp.'].includes(rawStatus) &&
+                !rawStatus.includes(':'));
             const isFT = rawStatus === 'Finished' || rawStatus === 'FT';
 
             let status: 'LIVE' | 'FT' | 'UPCOMING' = 'UPCOMING';
@@ -378,7 +338,7 @@ export default function HomePage() {
 
             if (isLive) {
               status = 'LIVE';
-              minute = rawStatus ? `${rawStatus}'` : 'LIVE';
+              minute = rawStatus ? (rawStatus.endsWith("'") ? rawStatus : `${rawStatus}'`) : 'LIVE';
             } else if (isFT) {
               status = 'FT';
               minute = 'FT';
@@ -394,7 +354,7 @@ export default function HomePage() {
             parsedMatches.push({
               id: String(m.event_key || `ft-${idx}`),
               sport: 'Football',
-              league: m.league_name || 'Premier League',
+              league: m.league_name || 'Football League',
               flag: getLeagueFlag(m.league_name, 'Football'),
               home,
               away,
@@ -414,7 +374,7 @@ export default function HomePage() {
         const cData = await cricRes.json();
         const cList = cData?.result || (Array.isArray(cData) ? cData : []);
         if (Array.isArray(cList) && cList.length > 0) {
-          cList.slice(0, 4).forEach((c: any, idx: number) => {
+          cList.slice(0, 8).forEach((c: any, idx: number) => {
             const home = c.event_home_team || 'Team 1';
             const away = c.event_away_team || 'Team 2';
             const rawStatus = (c.event_status || '').trim();
@@ -446,7 +406,7 @@ export default function HomePage() {
         const bData = await bballRes.json();
         const bList = bData?.result || (Array.isArray(bData) ? bData : []);
         if (Array.isArray(bList) && bList.length > 0) {
-          bList.slice(0, 4).forEach((b: any, idx: number) => {
+          bList.slice(0, 8).forEach((b: any, idx: number) => {
             const home = b.event_home_team || 'Home';
             const away = b.event_away_team || 'Away';
             const rawStatus = (b.event_status || '').trim();
@@ -473,27 +433,41 @@ export default function HomePage() {
         }
       }
 
+      // Sort matches: LIVE first, then UPCOMING, then FT; sorted by Competition Ranking
+      parsedMatches.sort((a, b) => {
+        const aStatus = a.status === 'LIVE' ? 0 : a.status === 'UPCOMING' ? 1 : 2;
+        const bStatus = b.status === 'LIVE' ? 0 : b.status === 'UPCOMING' ? 1 : 2;
+        if (aStatus !== bStatus) return aStatus - bStatus;
+
+        const rankA = getCompetitionRank(a.league, a.sport);
+        const rankB = getCompetitionRank(b.league, b.sport);
+        if (rankA !== rankB) return rankA - rankB;
+
+        return a.home.localeCompare(b.home);
+      });
+
       if (parsedMatches.length > 0) {
         setMatches(parsedMatches);
       }
-    } catch {
-      // Keep verified fallback matches seamlessly
+    } catch (err) {
+      console.warn('[HomePage] Match fetch error:', err);
     } finally {
       setIsLoadingMatches(false);
     }
   }, []);
 
-  // ── Fetch dynamic breaking news ──
+  // ── Fetch dynamic breaking news from MongoDB ──
   const fetchNews = useCallback(async () => {
     try {
-      const res = await fetch('/api/news?limit=6');
+      const timestamp = Date.now();
+      const res = await fetch(`/api/news?limit=6&_t=${timestamp}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         const items = Array.isArray(data) ? data : data?.news || data?.data;
         if (Array.isArray(items) && items.length > 0) {
           const mapped: NewsItem[] = items.slice(0, 5).map((item: any, idx: number) => {
             const category = item.category || item.sport || 'Football';
-            const isBreaking = item.isBreaking || idx === 0;
+            const isBreaking = Boolean(item.isBreaking || idx === 0);
             const tag = isBreaking ? 'BREAKING' : (item.articleType?.toUpperCase() || 'ANALYSIS');
             const tagColor = isBreaking
               ? 'bg-red-500'
@@ -512,41 +486,65 @@ export default function HomePage() {
               image:
                 item.featuredImage ||
                 item.image ||
-                FALLBACK_NEWS[idx % FALLBACK_NEWS.length].image,
-              slug: item.slug || item._id || 'sports-news',
+                'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&h=500&fit=crop&auto=format',
+              slug: item.slug || item._id?.toString() || item.id || '',
             };
           });
-
-          // If less than 4, append fallback items to maintain 2-col visual balance
-          if (mapped.length < 4) {
-            const needed = 4 - mapped.length;
-            mapped.push(...FALLBACK_NEWS.slice(0, needed));
-          }
           setNews(mapped);
         }
       }
+    } catch (err) {
+      console.warn('[HomePage] News fetch error:', err);
+    } finally {
+      setIsLoadingNews(false);
+    }
+  }, []);
+
+  // ── Fetch dynamic video highlights ──
+  const fetchVideos = useCallback(async () => {
+    try {
+      const timestamp = Date.now();
+      const res = await fetch(`/api/videos?limit=3&_t=${timestamp}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : data?.videos || data?.data;
+        if (Array.isArray(items) && items.length > 0) {
+          setVideos(items.slice(0, 3));
+        } else {
+          setVideos(DEFAULT_VIDEOS);
+        }
+      } else {
+        setVideos(DEFAULT_VIDEOS);
+      }
     } catch {
-      // Retain fallback news
+      setVideos(DEFAULT_VIDEOS);
+    } finally {
+      setIsLoadingVideos(false);
     }
   }, []);
 
   useEffect(() => {
     fetchMatches();
     fetchNews();
+    fetchVideos();
 
-    // Auto-refresh live matches every 30 seconds
-    const interval = setInterval(() => {
-      fetchMatches();
-    }, 30_000);
+    // Fast 12-second polling for live match center accuracy
+    const matchInterval = setInterval(fetchMatches, 12_000);
+    // 45-second refresh for news and videos
+    const contentInterval = setInterval(() => {
+      fetchNews();
+      fetchVideos();
+    }, 45_000);
 
-    return () => clearInterval(interval);
-  }, [fetchMatches, fetchNews]);
-
+    return () => {
+      clearInterval(matchInterval);
+      clearInterval(contentInterval);
+    };
+  }, [fetchMatches, fetchNews, fetchVideos]);
 
   // Filtered matches for display
   const displayedMatches = useMemo(() => {
     if (activeFilter === 'All') return matches;
-    if (activeFilter === 'Live') return matches.filter((m) => m.status === 'LIVE');
     return matches.filter((m) => m.sport === activeFilter);
   }, [matches, activeFilter]);
 
@@ -589,8 +587,11 @@ export default function HomePage() {
       <section id="scores" className="max-w-7xl mx-auto px-4 sm:px-6 py-10 scroll-mt-24">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
-            <h1 className="text-xl font-black text-white tracking-tight">Scores & Fixtures</h1>
-            <p className="text-slate-400 text-xs mt-0.5">Updated in real-time from AllSports API</p>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <h1 className="text-xl font-black text-white tracking-tight">Scores & Fixtures</h1>
+            </div>
+            <p className="text-slate-400 text-xs mt-0.5">Top-ranked leagues updated in real-time</p>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             {filters.map((f) => (
@@ -603,9 +604,6 @@ export default function HomePage() {
                     : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-[#334155] hover:text-slate-200'
                 }`}
               >
-                {f === 'Live' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block mr-1.5 animate-pulse" />
-                )}
                 {f}
               </button>
             ))}
@@ -616,25 +614,39 @@ export default function HomePage() {
           {isLoadingMatches ? (
             Array.from({ length: 6 }).map((_, i) => <MatchCardSkeleton key={i} />)
           ) : displayedMatches.length > 0 ? (
-            displayedMatches.map((m) => <MatchCard key={`${m.sport}-${m.id}`} m={m} />)
+            displayedMatches.slice(0, 6).map((m) => <MatchCard key={`${m.sport}-${m.id}`} m={m} />)
           ) : (
             <div className="col-span-full text-center py-12 bg-[#0f172a] border border-[#1e293b] rounded-xl">
-              <p className="text-slate-400 text-sm">No matches found for {activeFilter}.</p>
+              <p className="text-slate-400 text-sm">No live or scheduled matches found for {activeFilter}.</p>
               <button
                 onClick={() => setActiveFilter('All')}
                 className="mt-3 text-xs text-blue-400 hover:underline font-semibold"
               >
-                View all fixtures
+                View all sports
               </button>
             </div>
           )}
+        </div>
+
+        {/* View all fixtures button after 6 matches */}
+        <div className="mt-7 flex justify-center">
+          <Link
+            href="/football"
+            className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-blue-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
+          >
+            <span>View All Fixtures & Live Match Center</span>
+            <span className="text-blue-400 group-hover:translate-x-1 transition-transform">→</span>
+          </Link>
         </div>
       </section>
 
       {/* ── 3. Breaking News ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 border-t border-[#1e293b]">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-black text-white tracking-tight">Breaking News</h2>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <h2 className="text-xl font-black text-white tracking-tight">Breaking News</h2>
+          </div>
           <Link
             href="/news"
             className="text-sm text-blue-400 hover:text-blue-300 font-semibold transition-colors hidden sm:block"
@@ -643,77 +655,165 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-          {/* Featured Large Article (2 Cols) */}
-          <div className="lg:col-span-2">
-            {news[0] && (
-              <Link
-                href={`/news/${news[0].slug}`}
-                className="block relative overflow-hidden rounded-2xl bg-[#0f172a] border border-[#1e293b] hover:border-[#334155] transition-all group h-full"
-              >
-                <div className="relative h-52 sm:h-64 overflow-hidden bg-slate-800">
-                  <img
-                    src={news[0].image}
-                    alt={news[0].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/30 to-transparent" />
-                  <span
-                    className={`absolute top-3 left-3 ${news[0].tagColor} text-white text-[10px] font-black tracking-widest uppercase px-2 py-1 rounded`}
-                  >
-                    {news[0].tag}
-                  </span>
-                </div>
-                <div className="p-5">
-                  <span className="text-[10px] font-semibold text-blue-400 tracking-widest uppercase mb-1.5 block">
-                    {news[0].category}
-                  </span>
-                  <h3 className="text-base font-bold text-slate-100 group-hover:text-white leading-snug mb-2">
-                    {news[0].title}
-                  </h3>
-                  <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 mb-2">
-                    {news[0].excerpt}
-                  </p>
-                  <span className="text-xs text-slate-500">{news[0].time}</span>
-                </div>
-              </Link>
-            )}
-          </div>
-
-          {/* List of side news items (3 Cols) */}
-          <div className="lg:col-span-3 space-y-0 divide-y divide-[#1e293b]">
-            {news.slice(1, 4).map((a) => (
-              <Link
-                key={a.id}
-                href={`/news/${a.slug}`}
-                className="flex gap-4 items-start py-3 first:pt-0 cursor-pointer group hover:bg-[#0f172a] rounded-xl px-3 -mx-3 transition-all"
-              >
-                <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
-                  <img
-                    src={a.image}
-                    alt={a.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+        {isLoadingNews ? (
+          <NewsSkeleton />
+        ) : news.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            {/* Featured Large Article (2 Cols) */}
+            <div className="lg:col-span-2">
+              {news[0] && (
+                <Link
+                  href={getNewsUrl({ slug: news[0].slug, id: String(news[0].id), title: news[0].title })}
+                  className="block relative overflow-hidden rounded-2xl bg-[#0f172a] border border-[#1e293b] hover:border-[#334155] transition-all group h-full"
+                >
+                  <div className="relative h-52 sm:h-64 overflow-hidden bg-slate-800">
+                    <img
+                      src={news[0].image}
+                      alt={news[0].title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/30 to-transparent" />
                     <span
-                      className={`${a.tagColor} text-white text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded`}
+                      className={`absolute top-3 left-3 ${news[0].tagColor} text-white text-[10px] font-black tracking-widest uppercase px-2 py-1 rounded`}
                     >
-                      {a.tag}
-                    </span>
-                    <span className="text-[10px] font-semibold text-blue-400 tracking-widest uppercase">
-                      {a.category}
+                      {news[0].tag}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-slate-200 group-hover:text-white leading-snug line-clamp-2 mb-1">
-                    {a.title}
-                  </h3>
-                  <span className="text-xs text-slate-500">{a.time}</span>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-5">
+                    <span className="text-[10px] font-semibold text-blue-400 tracking-widest uppercase mb-1.5 block">
+                      {news[0].category}
+                    </span>
+                    <h3 className="text-base font-bold text-slate-100 group-hover:text-white leading-snug mb-2">
+                      {news[0].title}
+                    </h3>
+                    <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 mb-2">
+                      {news[0].excerpt}
+                    </p>
+                    <span className="text-xs text-slate-500">{news[0].time}</span>
+                  </div>
+                </Link>
+              )}
+            </div>
+
+            {/* List of side news items (3 Cols) */}
+            <div className="lg:col-span-3 space-y-0 divide-y divide-[#1e293b]">
+              {news.slice(1, 4).map((a) => (
+                <Link
+                  key={a.id}
+                  href={getNewsUrl({ slug: a.slug, id: String(a.id), title: a.title })}
+                  className="flex gap-4 items-start py-3 first:pt-0 cursor-pointer group hover:bg-[#0f172a] rounded-xl px-3 -mx-3 transition-all"
+                >
+                  <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
+                    <img
+                      src={a.image}
+                      alt={a.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className={`${a.tagColor} text-white text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded`}
+                      >
+                        {a.tag}
+                      </span>
+                      <span className="text-[10px] font-semibold text-blue-400 tracking-widest uppercase">
+                        {a.category}
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-200 group-hover:text-white leading-snug line-clamp-2 mb-1">
+                      {a.title}
+                    </h3>
+                    <span className="text-xs text-slate-500">{a.time}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
+        ) : (
+          <div className="text-center py-12 bg-[#0f172a] border border-[#1e293b] rounded-2xl">
+            <p className="text-slate-400 text-sm">No breaking stories available right now.</p>
+          </div>
+        )}
+      </section>
+
+      {/* ── 3b. Featured Match Highlights & Videos (Mobile-First Figma Style) ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 border-t border-[#1e293b]">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-[10px] font-black tracking-widest text-red-400 uppercase">Video Match Center</span>
+            </div>
+            <h2 className="text-xl font-black text-white tracking-tight">Match Highlights & Videos</h2>
+          </div>
+          <Link
+            href="/highlights"
+            className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+          >
+            All video replays →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {isLoadingVideos ? (
+            Array.from({ length: 3 }).map((_, i) => <VideoCardSkeleton key={i} />)
+          ) : (videos.length > 0 ? videos : DEFAULT_VIDEOS).map((v) => (
+            <Link
+              key={v._id}
+              href={`/highlights/${v._id}`}
+              className="group block bg-[#0f172a] border border-[#1e293b] hover:border-blue-500/40 rounded-2xl overflow-hidden transition-all duration-300 shadow-md hover:shadow-blue-500/10 flex flex-col"
+            >
+              {/* Thumbnail Container */}
+              <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
+                <img
+                  src={
+                    v.video_thumbnail ||
+                    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=450&fit=crop&auto=format'
+                  }
+                  alt={v.video_title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
+
+                {/* Top Badge */}
+                <div className="absolute top-3 left-3">
+                  <span className="bg-red-600/90 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow">
+                    {v.category || v.league || 'HIGHLIGHTS'}
+                  </span>
+                </div>
+
+                {/* Duration Badge */}
+                {v.duration && (
+                  <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-slate-200 text-[10px] font-mono font-bold px-2 py-0.5 rounded">
+                    {v.duration}
+                  </div>
+                )}
+
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-12 h-12 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-red-600 transition-all duration-300">
+                    <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Meta Info */}
+              <div className="p-4 flex-1 flex flex-col justify-between">
+                <h3 className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                  {v.video_title}
+                </h3>
+                <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+                  <span className="font-semibold text-slate-400">{v.league || 'GoalMills Replays'}</span>
+                  <span className="text-blue-400 font-bold group-hover:translate-x-1 transition-transform">
+                    Watch →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

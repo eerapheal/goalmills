@@ -261,6 +261,31 @@ export async function sendConfirmationEmail(
 
   // 3. Dispatch via Go Mailer microservice priority queue
   try {
+    const payload = {
+      email: recipientEmail,
+      subject,
+      htmlBody,
+      unsubscribeToken: subscriber.unsubscribeToken || '',
+      confirmationToken: subscriber.confirmationToken || '',
+      frequency: subscriber.frequency || 'daily',
+      isHighPriority: true,
+      editorPicks: editorPicks.map((art) => ({
+        id: art._id,
+        title: art.title,
+        slug: art.slug,
+        excerpt: art.excerpt,
+        image: art.image || '',
+        category: art.category,
+        sport: art.sport,
+        readTime: art.readTime,
+        isBreaking: art.isBreaking,
+        isFeatured: art.isFeatured,
+        views: art.views || 0,
+        author: art.author,
+        url: `${siteUrl}/news/${art.slug || art._id}`,
+      })),
+    };
+
     const cleanMailerUrl = mailerServiceUrl.replace(/\/+$/, '');
     const res = await fetch(`${cleanMailerUrl}/api/send-confirmation`, {
       method: 'POST',

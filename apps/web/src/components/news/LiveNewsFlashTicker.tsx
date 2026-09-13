@@ -86,7 +86,8 @@ export function LiveNewsFlashTicker({
         if (sport && sport !== 'all') params.set('sport', sport);
         if (category && category !== 'all') params.set('category', category);
 
-        const res = await fetch(`/api/news/flash?${params.toString()}`);
+        params.set('_t', String(Date.now()));
+        const res = await fetch(`/api/news/flash?${params.toString()}`, { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
         if (isMounted && data.success && Array.isArray(data.posts) && data.posts.length > 0) {
@@ -98,8 +99,8 @@ export function LiveNewsFlashTicker({
     }
 
     loadFlashPosts();
-    // Refresh randomly selected flash news every 60 seconds
-    const interval = setInterval(loadFlashPosts, 60000);
+    // Fast 15s refresh for real-time live flash news reports
+    const interval = setInterval(loadFlashPosts, 15_000);
     return () => {
       isMounted = false;
       clearInterval(interval);

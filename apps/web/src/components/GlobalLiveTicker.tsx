@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getNewsUrl } from '@/lib/slugUtils';
 
 interface TickerItem {
   id: string;
@@ -11,14 +12,11 @@ interface TickerItem {
 }
 
 const DEFAULT_TICKER_ITEMS: TickerItem[] = [
-  { id: '1', text: '🔴 Man City 2–1 Arsenal · 67\'', isLive: true, href: '/football' },
-  { id: '2', text: '⚽ Osimhen brace powers Galatasaray in Derby triumph', href: '/news' },
-  { id: '3', text: '🌍 Nigeria 3–0 Rwanda (AFCON Qualifiers)', href: '/football' },
-  { id: '4', text: '🏏 Kohli masterclass century powers RCB to summit', href: '/cricket' },
-  { id: '5', text: '🏀 Lakers advance past Celtics in thrilling OT duel', href: '/basketball' },
-  { id: '6', text: '⚡ El Clásico: Real Madrid & Barcelona edge pre-match markets', href: '/news' },
-  { id: '7', text: '🔵 Haaland fit & cleared for UCL semi-final clash', href: '/news' },
-  { id: '8', text: '⭐ CAF Champions League group fixtures schedule announced', href: '/football' },
+  { id: '1', text: '🔴 Live Football Match Center & Real-Time Alerts Active', isLive: true, href: '/football' },
+  { id: '2', text: '⚡ Breaking Sports Intelligence, Exclusive Analysis & Transfer Wire', href: '/news' },
+  { id: '3', text: '🏆 CAF Champions League & European Competitions Hub', href: '/football' },
+  { id: '4', text: '🏏 Live Cricket Series & Ball-by-Ball Scoreboard', href: '/cricket' },
+  { id: '5', text: '🏀 NBA Live Game Pulse & Real-Time Box Scores', href: '/basketball' },
 ];
 
 export function GlobalLiveTicker() {
@@ -29,9 +27,10 @@ export function GlobalLiveTicker() {
 
     async function loadDynamicTicker() {
       try {
+        const timestamp = Date.now();
         const [footRes, newsRes] = await Promise.all([
-          fetch('/api/football?met=Livescore').catch(() => null),
-          fetch('/api/news/flash?limit=6').catch(() => null),
+          fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
+          fetch(`/api/news/flash?limit=8&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
         ]);
 
         const items: TickerItem[] = [];
@@ -40,13 +39,13 @@ export function GlobalLiveTicker() {
           const footData = await footRes.json();
           const matches = footData?.result || footData?.response || (Array.isArray(footData) ? footData : []);
           if (Array.isArray(matches) && matches.length > 0) {
-            matches.slice(0, 4).forEach((m: any, idx: number) => {
+            matches.slice(0, 6).forEach((m: any, idx: number) => {
               const home = m.event_home_team || 'Home';
               const away = m.event_away_team || 'Away';
               const score = m.event_final_result || `${m.event_home_final_result ?? 0}–${m.event_away_final_result ?? 0}`;
               const time = m.event_status ? `${m.event_status}'` : 'LIVE';
               items.push({
-                id: `live-m-${idx}`,
+                id: `live-m-${m.event_key || idx}`,
                 text: `🔴 ${home} ${score} ${away} · ${time}`,
                 isLive: true,
                 href: m.event_key ? `/matches/${m.event_key}` : '/football',
@@ -58,11 +57,11 @@ export function GlobalLiveTicker() {
         if (newsRes && newsRes.ok) {
           const newsData = await newsRes.json();
           if (newsData?.success && Array.isArray(newsData.posts)) {
-            newsData.posts.slice(0, 5).forEach((p: any) => {
+            newsData.posts.slice(0, 6).forEach((p: any) => {
               items.push({
                 id: p._id || p.slug,
                 text: `⚡ ${p.title}`,
-                href: `/news/${p.slug || p._id}`,
+                href: getNewsUrl(p),
               });
             });
           }
@@ -77,7 +76,8 @@ export function GlobalLiveTicker() {
     }
 
     loadDynamicTicker();
-    const interval = setInterval(loadDynamicTicker, 45_000);
+    // Fast 15s refresh for real-time live wire updates
+    const interval = setInterval(loadDynamicTicker, 15_000);
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -96,7 +96,7 @@ export function GlobalLiveTicker() {
         <div className="overflow-hidden flex-1 relative mask-gradient">
           <div
             className="flex whitespace-nowrap ticker-track hover:[animation-play-state:paused]"
-            style={{ animation: 'ticker 45s linear infinite' }}
+            style={{ animation: 'ticker 20s linear infinite' }}
           >
             {[0, 1].map((copyIdx) => (
               <div key={copyIdx} className="flex items-center">
