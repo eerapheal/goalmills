@@ -473,7 +473,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                   {/* Player Name & Position */}
                   <div className="space-y-0.5">
                     <Link
-                      href={`/players/${player.slug}`}
+                      href={`/football/players/${player.slug}`}
                       className="block text-sm font-extrabold text-white group-hover:text-amber-300 transition-colors truncate"
                     >
                       {player.name}
@@ -548,7 +548,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                   </button>
 
                   <Link
-                    href={`/players/${player.slug}`}
+                    href={`/football/players/${player.slug}`}
                     className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors group/link"
                   >
                     <span>Scouting Intel</span>

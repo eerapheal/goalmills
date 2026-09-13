@@ -934,7 +934,7 @@ export default function HomePage() {
         </div>
       </section>
       {/* ── 1. Hero Section ── */}
-      <section className="relative overflow-hidden">
+      {/* <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1600&h=900&fit=crop&auto=format"
@@ -973,7 +973,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }
