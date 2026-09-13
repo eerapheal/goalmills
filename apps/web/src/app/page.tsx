@@ -585,53 +585,11 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ── 1. Hero Section ── */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1600&h=900&fit=crop&auto=format"
-            alt="Football stadium"
-            className="w-full h-full object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/60 via-[#020617]/80 to-[#020617]" />
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 via-red-500 to-yellow-400" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-10 lg:py-13">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white mb-5">
-              Africa&apos;s 
-            <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-yellow-300">
-                Sports Hub
-              </span>
-            </h1>
-            <p className="hidden md:block text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed mb-7">
-              Live scores, xG breakdowns, transfer news, and daily digests from the Premier League, AFCON, IPL , FIFA, and beyond.
-            </p>
-            <div className="hiddenflex flex-wrap gap-3">
-              <a
-                href="#scores"
-                className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors inline-flex items-center gap-1.5 shadow-lg shadow-blue-600/25"
-              >
-                Follow Live Scores →
-              </a>
-              <Link
-                href="/football"
-                className="bg-[#1e293b] hover:bg-[#263347] text-slate-200 font-semibold text-sm px-6 py-3 rounded-xl transition-colors border border-[#334155]"
-              >
-                Explore Teams
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── 2. Live Scores & Fixtures ── */}
       <section id="scores" className="max-w-7xl mx-auto px-4 sm:px-6 py-10 scroll-mt-24">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
-            <h2 className="text-xl font-black text-white tracking-tight">Scores & Fixtures</h2>
+            <h1 className="text-xl font-black text-white tracking-tight">Scores & Fixtures</h1>
             <p className="text-slate-400 text-xs mt-0.5">Updated in real-time from AllSports API</p>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -836,6 +794,47 @@ export default function HomePage() {
                   </span>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ── 1. Hero Section ── */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1600&h=900&fit=crop&auto=format"
+            alt="Football stadium"
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/60 via-[#020617]/80 to-[#020617]" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 via-red-500 to-yellow-400" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-10 lg:py-18">
+          <div className="max-w-3xl">
+            <h3 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white mb-5">
+              Africa&apos;s 
+            <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-yellow-300">
+                Sports Hub
+              </span>
+            </h3>
+            <p className="text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed mb-7">
+              Live scores, xG breakdowns, transfer news, and daily digests from the Premier League, AFCON, IPL, and beyond.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="#scores"
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors inline-flex items-center gap-1.5 shadow-lg shadow-blue-600/25"
+              >
+                Follow Live Scores →
+              </a>
+              <Link
+                href="/football"
+                className="bg-[#1e293b] hover:bg-[#263347] text-slate-200 font-semibold text-sm px-6 py-3 rounded-xl transition-colors border border-[#334155]"
+              >
+                Explore Teams
+              </Link>
             </div>
           </div>
         </div>
