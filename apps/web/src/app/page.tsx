@@ -601,7 +601,7 @@ export default function HomePage() {
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-[0.93] tracking-tight text-white mb-5">
               Africa&apos;s 
-            <b />
+            <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-red-400 to-yellow-300">
                 Sports Hub
               </span>
