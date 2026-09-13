@@ -1,181 +1,163 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
-import { FiSearch, FiMenu, FiX, FiActivity } from 'react-icons/fi';
-import { BrandColorBand } from './ui/BrandColorBand';
+import { FiSearch } from 'react-icons/fi';
+
+const NAV_LINKS = [
+  { label: 'Live Scores', href: '/' },
+  { label: 'Football', href: '/football' },
+  { label: 'Cricket', href: '/cricket' },
+  { label: 'Basketball', href: '/basketball' },
+  { label: 'News', href: '/news' },
+  { label: 'Highlights', href: '/highlights' },
+  { label: 'Tables', href: '/stats' },
+];
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
-    setIsOpen(false);
+    setMobileMenuOpen(false);
   }, [pathname]);
 
-  const navItems = [
-    { name: 'Live Scores', href: '/' },
-    { name: 'Football', href: '/football' },
-    { name: 'Cricket', href: '/cricket' },
-    { name: 'Basketball', href: '/basketball' },
-    { name: 'News', href: '/news' },
-    { name: 'Highlights', href: '/highlights' },
-    { name: 'Tables', href: '/stats' },
-  ];
-
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-6 py-2 ${scrolled ? 'bg-slate-950/80 backdrop-blur-md shadow-md' : ''}`}>
-      <div className="max-w-[1400px] mx-auto">
-        <nav className="relative overflow-hidden rounded-xl border border-blue-500/30 bg-[#0C1726]/95 backdrop-blur-xl px-3 sm:px-4 py-2 shadow-lg flex items-center justify-between">
-          <div className="absolute top-0 left-0 right-0">
-            <BrandColorBand height="h-[2px]" rounded="none" />
-          </div>
-          {/* Brand Logo & Subtitle */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="rounded-lg group-hover:scale-105 transition duration-200">
-                <Image
-                  src="/icon.png"
-                  alt="Goal Mills Logo"
-                  width={125}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-[#020617]/95 backdrop-blur-md border-b border-[#1e293b]'
+          : 'bg-[#020617]/80 backdrop-blur-sm border-b border-[#1e293b]/60'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-14">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
+            <Image
+              src="/icon.png"
+              alt="GoalMills"
+              width={115}
+              height={32}
+              priority
+              style={{ width: 'auto', height: 'auto' }}
+              className="h-7 w-auto object-contain transition-transform group-hover:scale-105 duration-200"
+            />
           </Link>
 
-          {/* Desktop Navigation Pills */}
-          <div className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => {
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {NAV_LINKS.map((link) => {
               const isActive =
-                item.href === '/'
+                link.href === '/'
                   ? pathname === '/'
-                  : pathname.startsWith(item.href);
+                  : pathname.startsWith(link.href);
 
               return (
                 <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-150 relative ${
+                  key={link.label}
+                  href={link.href}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-150 ${
                     isActive
-                      ? 'text-blue-400 bg-blue-500/15 shadow-sm border border-blue-500/30'
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                      ? 'text-white bg-[#1e293b] font-semibold'
+                      : 'text-slate-400 hover:text-white hover:bg-[#1e293b]'
                   }`}
                 >
-                  {item.name === 'Live Scores' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
-                  )}
-                  <span>{item.name}</span>
+                  {link.label}
                 </Link>
               );
             })}
-          </div>
+          </nav>
 
-          {/* Right Action Icons: Search, Alerts, Docs */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Right Action Icons & Live CTA */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <Link
               href="/news"
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition hover:border-blue-500/30"
+              className="p-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-all"
+              aria-label="Search articles"
             >
-              <FiSearch className="w-3 h-3 text-blue-400" />
-              <span>Search</span>
+              <FiSearch className="w-4 h-4" />
             </Link>
 
             <NotificationBell />
 
             <Link
-              href="/docs"
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition hover:border-blue-500/30"
+              href="/#scores"
+              className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors shadow-sm"
             >
-              <FiActivity className="w-3 h-3 text-yellow-400" />
-              <span>Docs</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-white inline-block animate-pulse" />
+              Live
             </Link>
-          </div>
 
-          {/* Mobile Hamburger Button */}
-          <div className="flex items-center gap-1.5 lg:hidden">
-            <NotificationBell />
+            {/* Mobile Hamburger Toggle */}
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 rounded-lg bg-slate-900 border border-white/10 text-slate-300 hover:text-white"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-all"
               aria-label="Toggle navigation menu"
             >
-              {isOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
             </button>
           </div>
-        </nav>
+        </div>
+      </div>
 
-        {/* Mobile Navigation Drawer */}
-        {isOpen && (
-          <div className="lg:hidden mt-1.5 p-3 rounded-2xl bg-[#091529]/98 border border-blue-400/30 shadow-2xl backdrop-blur-2xl space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-            {/* Quick Links Grid */}
-            <div className="grid grid-cols-2 gap-1.5">
-              {[
-                { name: 'Live Scores', href: '/', icon: '🔴' },
-                { name: 'Football Hub', href: '/football', icon: '⚽' },
-                { name: 'Players', href: '/football/players', icon: '⭐' },
-                { name: 'Referees & VAR', href: '/football/officials', icon: '🚩' },
-                { name: 'Managers', href: '/football/coaches', icon: '🧑‍💼' },
-                { name: 'Teams & Clubs', href: '/football/teams', icon: '🛡️' },
-                { name: 'Cricket Desk', href: '/cricket', icon: '🏏' },
-                { name: 'Basketball Hub', href: '/basketball', icon: '🏀' },
-                { name: 'News & Pulse', href: '/news', icon: '📰' },
-                { name: 'Video Highlights', href: '/highlights', icon: '🎥' },
-                { name: 'Tables & Stats', href: '/stats', icon: '🏆' },
-                { name: 'VIP Newsletter', href: '/newsletter', icon: '📬' },
-              ].map((item) => {
-                const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                      isActive
-                        ? 'bg-blue-600 text-white font-black shadow-sm'
-                        : 'bg-[#0E1F38] text-slate-200 hover:text-white hover:bg-blue-600/20 border border-blue-500/15'
-                    }`}
-                  >
-                    <span>{item.icon}</span>
-                    <span className="truncate">{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Bottom Actions */}
-            <div className="pt-1.5 border-t border-white/10 flex items-center justify-between gap-2">
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-[#0f172a] border-b border-[#1e293b] animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="max-w-7xl mx-auto px-4 py-3 space-y-1">
+            {NAV_LINKS.map((link) => {
+              const isActive =
+                link.href === '/'
+                  ? pathname === '/'
+                  : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-4 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                    isActive
+                      ? 'text-white bg-[#1e293b] font-semibold'
+                      : 'text-slate-300 hover:text-white hover:bg-[#1e293b]'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <div className="pt-2 border-t border-[#1e293b] mt-2">
               <Link
-                href="/news"
-                onClick={() => setIsOpen(false)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:text-white"
+                href="/#scores"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors"
               >
-                <FiSearch className="text-blue-400" />
-                <span>Search News & Matches</span>
-              </Link>
-              <Link
-                href="/docs"
-                onClick={() => setIsOpen(false)}
-                className="px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1"
-              >
-                <FiActivity className="text-blue-400" />
-                <span>Docs</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-white inline-block animate-pulse" />
+                Live Scores & Fixtures
               </Link>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }
+
+export default Header;

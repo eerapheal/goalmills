@@ -3,20 +3,33 @@
 
 @theme {
   --color-background: #020617;
+  --color-bg: #020617;
   --color-surface: #0f172a;
+  --color-surface-hi: #1e293b;
   --color-surfaceHighlight: #1e293b;
-  
+  --color-surface-hover: #263347;
+  --color-border: #1e293b;
+  --color-border-hi: #334155;
+
   --color-primary: #3b82f6;
   --color-primary-dark: #1d4ed8;
   --color-primary-light: #60a5fa;
+  --color-blue: #3b82f6;
+  --color-blue-dark: #1d4ed8;
+  --color-blue-light: #60a5fa;
 
   --color-secondary: #ef4444;
   --color-secondary-dark: #dc2626;
   --color-secondary-light: #f87171;
+  --color-red: #ef4444;
+  --color-red-dark: #dc2626;
 
   --color-tertiary: #eab308;
   --color-tertiary-dark: #ca8a04;
   --color-tertiary-light: #facc15;
+  --color-yellow: #eab308;
+  --color-yellow-light: #facc15;
+
   --color-accent-blue: #3b82f6;
   --color-accent-yellow: #eab308;
   --color-accent-red: #ef4444;
@@ -24,6 +37,9 @@
   --color-text-primary: #f8fafc;
   --color-text-secondary: #94a3b8;
   --color-text-muted: #64748b;
+  --color-text-1: #f8fafc;
+  --color-text-2: #94a3b8;
+  --color-text-3: #64748b;
 
   --font-sans: "Inter", sans-serif;
   --font-heading: "Inter", sans-serif;
@@ -47,12 +63,48 @@
     100% { transform: translateX(-100%); }
   }
 
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   --animate-marquee: marquee 25s linear infinite;
 }
 
 :root {
   --background: #020617;
   --foreground: #f8fafc;
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+.ticker-track {
+  animation: ticker 40s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+.live-dot {
+  animation: livePulse 1.4s ease-in-out infinite;
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease-out both;
 }
 
 html,
