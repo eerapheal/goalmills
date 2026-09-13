@@ -551,7 +551,7 @@ export function FootballScreen() {
                   {topscorers.map((s, idx) => (
                     <Link
                       key={idx}
-                      href={s.player_key ? `/players/${s.player_key}` : '#'}
+                      href={s.player_key ? `/football/players/${s.player_key}` : '#'}
                       className="p-4 rounded-2xl bg-[#0B1526] border border-white/10 hover:border-blue-400/40 transition-all flex items-center justify-between shadow-md group"
                     >
                       <div className="flex items-center gap-3">
@@ -690,7 +690,7 @@ export function FootballScreen() {
                       </div>
                       {group.league_key && (
                         <Link
-                          href={`/leagues/${group.league_key}`}
+                          href={`/football/${group.league_key}`}
                           className="text-[11px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
                         >
                           <span>League Table</span>

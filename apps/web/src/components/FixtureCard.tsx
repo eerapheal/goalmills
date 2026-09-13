@@ -61,7 +61,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
       <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5 relative z-10">
         <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-2">
           <Link
-            href={`/leagues/${league.id}`}
+            href={`/football/${league.id}`}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <Image

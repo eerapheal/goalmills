@@ -53,7 +53,7 @@ export default function RegionsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {leagues.map((league) => (
             <Link
-              href={`/leagues/${league.id}`}
+              href={`/football/${league.id}`}
               key={league.id}
               className="glass-card p-4 rounded-xl flex items-center gap-4 hover:scale-105 transition-transform duration-300 group"
             >

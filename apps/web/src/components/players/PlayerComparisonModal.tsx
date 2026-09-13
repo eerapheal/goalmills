@@ -152,7 +152,7 @@ export function PlayerComparisonModal({
               </p>
             </div>
             <Link
-              href={`/players/${playerA.slug}`}
+              href={`/football/players/${playerA.slug}`}
               className="text-[10px] font-bold text-slate-300 hover:text-blue-400 flex items-center gap-1 transition-colors"
             >
               <span>View Profile</span>
@@ -181,7 +181,7 @@ export function PlayerComparisonModal({
               </p>
             </div>
             <Link
-              href={`/players/${playerB.slug}`}
+              href={`/football/players/${playerB.slug}`}
               className="text-[10px] font-bold text-slate-300 hover:text-blue-400 flex items-center gap-1 transition-colors"
             >
               <span>View Profile</span>

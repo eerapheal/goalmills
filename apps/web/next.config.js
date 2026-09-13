@@ -78,15 +78,35 @@ const nextConfig = {
         destination: '/signin',
         permanent: true,
       },
-      // Backward-compat redirects: old ID-based routes → new slug routes
+      // Canonical football routes: legacy root routes → /football/*
       {
-        source: '/coaches/:id',
-        destination: '/football/coaches/:id',
+        source: '/matches/:path*',
+        destination: '/football/matches/:path*',
         permanent: true,
       },
       {
-        source: '/officials/:id',
-        destination: '/football/officials/:id',
+        source: '/teams/:path*',
+        destination: '/football/teams/:path*',
+        permanent: true,
+      },
+      {
+        source: '/players/:path*',
+        destination: '/football/players/:path*',
+        permanent: true,
+      },
+      {
+        source: '/coaches/:path*',
+        destination: '/football/coaches/:path*',
+        permanent: true,
+      },
+      {
+        source: '/officials/:path*',
+        destination: '/football/officials/:path*',
+        permanent: true,
+      },
+      {
+        source: '/leagues/:path*',
+        destination: '/football/:path*',
         permanent: true,
       },
     ];

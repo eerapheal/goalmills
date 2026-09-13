@@ -105,7 +105,7 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
             </div>
 
             <div className="flex-1 min-w-0">
-              <Link href={`/players/${scorer.player_key}`} className="block">
+              <Link href={`/football/players/${scorer.player_key}`} className="block">
                 <h3 className="text-white font-bold text-sm truncate group-hover:text-amber-300 transition-colors">
                   {scorer.player_name}
                 </h3>

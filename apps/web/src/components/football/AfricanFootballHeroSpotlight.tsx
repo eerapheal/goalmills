@@ -208,7 +208,7 @@ export function AfricanFootballHeroSpotlight({
               )}
 
               <Link
-                href={`/players/${featuredSuperstar.slug}`}
+                href={`/football/players/${featuredSuperstar.slug}`}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-2.5 text-xs font-black uppercase tracking-wider text-slate-950 hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg"
               >
                 <span>Full Scouting Dossier</span>
@@ -238,7 +238,7 @@ export function AfricanFootballHeroSpotlight({
           {players.slice(0, 6).map((star) => (
             <Link
               key={star.slug}
-              href={`/players/${star.slug}`}
+              href={`/football/players/${star.slug}`}
               className="group flex flex-col items-center text-center p-3 rounded-2xl bg-[#061224]/80 hover:bg-amber-500/10 border border-white/5 hover:border-amber-500/30 transition-all"
             >
               <div className="relative mb-2">

@@ -281,6 +281,7 @@ export default function HomePage() {
   const [isLoadingMatches, setIsLoadingMatches] = useState(true);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
+  const [isAllExpanded, setIsAllExpanded] = useState(false);
 
   // Newsletter state
   const [email, setEmail] = useState('');
@@ -544,9 +545,17 @@ export default function HomePage() {
 
   // Filtered matches for display
   const displayedMatches = useMemo(() => {
-    if (activeFilter === 'All') return matches;
+    if (activeFilter === 'All') {
+      if (!isAllExpanded) return matches.slice(0, 6);
+      // Expanded: compose 18 matches — football base, + up to 3 cricket, + up to 3 basketball
+      const football = matches.filter((m) => m.sport === 'Football');
+      const cricket = matches.filter((m) => m.sport === 'Cricket').slice(0, 3);
+      const basketball = matches.filter((m) => m.sport === 'Basketball').slice(0, 3);
+      const mixed = [...football.slice(0, 18 - cricket.length - basketball.length), ...cricket, ...basketball];
+      return mixed.slice(0, 18);
+    }
     return matches.filter((m) => m.sport === activeFilter);
-  }, [matches, activeFilter]);
+  }, [matches, activeFilter, isAllExpanded]);
 
   // Newsletter submission handler
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -597,7 +606,7 @@ export default function HomePage() {
             {filters.map((f) => (
               <button
                 key={f}
-                onClick={() => setActiveFilter(f)}
+                onClick={() => { setActiveFilter(f); setIsAllExpanded(false); }}
                 className={`flex-shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
                   activeFilter === f
                     ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
@@ -614,7 +623,7 @@ export default function HomePage() {
           {isLoadingMatches ? (
             Array.from({ length: 6 }).map((_, i) => <MatchCardSkeleton key={i} />)
           ) : displayedMatches.length > 0 ? (
-            displayedMatches.slice(0, 6).map((m) => <MatchCard key={`${m.sport}-${m.id}`} m={m} />)
+            displayedMatches.map((m) => <MatchCard key={`${m.sport}-${m.id}`} m={m} />)
           ) : (
             <div className="col-span-full text-center py-12 bg-[#0f172a] border border-[#1e293b] rounded-xl">
               <p className="text-slate-400 text-sm">No live or scheduled matches found for {activeFilter}.</p>
@@ -628,15 +637,41 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* View all fixtures button after 6 matches */}
+        {/* View all fixtures / expand dropdown / sport navigation */}
         <div className="mt-7 flex justify-center">
-          <Link
-            href="/football"
-            className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-blue-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
-          >
-            <span>View All Fixtures & Live Match Center</span>
-            <span className="text-blue-400 group-hover:translate-x-1 transition-transform">→</span>
-          </Link>
+          {activeFilter === 'All' ? (
+            <button
+              onClick={() => setIsAllExpanded(!isAllExpanded)}
+              className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-blue-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group cursor-pointer"
+            >
+              <span>{isAllExpanded ? 'Show Less' : 'View All Fixtures & Live Match Center'}</span>
+              <span className={`text-blue-400 transition-transform ${isAllExpanded ? 'rotate-180' : ''}`}>▼</span>
+            </button>
+          ) : activeFilter === 'Football' ? (
+            <Link
+              href="/football"
+              className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-blue-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
+            >
+              <span>View All Football Fixtures & Live Match Center</span>
+              <span className="text-blue-400 group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          ) : activeFilter === 'Cricket' ? (
+            <Link
+              href="/cricket"
+              className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-emerald-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
+            >
+              <span>Explore All Cricket Matches & Series</span>
+              <span className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          ) : (
+            <Link
+              href="/basketball"
+              className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-orange-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
+            >
+              <span>Explore All Basketball & NBA Games</span>
+              <span className="text-orange-400 group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          )}
         </div>
       </section>
 

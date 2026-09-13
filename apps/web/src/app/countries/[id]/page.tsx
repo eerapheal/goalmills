@@ -115,7 +115,7 @@ export default function CountryPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {leagues.map((league) => (
               <Link
-                href={`/leagues/${league.league_key}`}
+                href={`/football/${league.league_key}`}
                 key={league.league_key}
                 className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
               >

@@ -127,7 +127,7 @@ export default async function ClubHubPage({
               {squadPlayers.map((player) => (
                 <Link
                   key={player.slug}
-                  href={`/players/${player.slug}`}
+                  href={`/football/players/${player.slug}`}
                   className="group flex items-center justify-between p-2.5 rounded-2xl bg-white/[0.02] hover:bg-blue-600/20 border border-white/5 hover:border-blue-500/30 transition-all"
                 >
                   <div className="flex items-center gap-3">

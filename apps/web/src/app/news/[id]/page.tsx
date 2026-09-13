@@ -393,7 +393,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
                 news.players.map((p: any) => (
                   <Link
                     key={p.slug}
-                    href={`/players/${p.slug}`}
+                    href={`/football/players/${p.slug}`}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500/25 transition-colors"
                   >
                     <FiUser size={13} />

@@ -58,7 +58,7 @@ export function StandingsTable({ standings }: StandingsTableProps) {
             {/* Team */}
             <div className="col-span-4 sm:col-span-3 pl-2 flex items-center min-w-0">
               <Link
-                href={`/teams/${standing.team.id}`}
+                href={`/football/teams/${standing.team.id}`}
                 className="flex items-center min-w-0 hover:opacity-80 transition-opacity"
               >
                 <div className="relative w-6 h-6 mr-3 shrink-0">

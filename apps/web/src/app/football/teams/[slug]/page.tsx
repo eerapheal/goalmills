@@ -34,16 +34,17 @@ export default function FootballTeamPage() {
       try {
         setLoading(true);
 
-        // First try to find team by name (slugify matching)
-        const teamsRes = await advancedFootballApi.getTeams({ teamName: slug.replace(/-/g, ' ') });
+        const isNumeric = /^\d+$/.test(slug);
+        const teamsRes = isNumeric
+          ? await advancedFootballApi.getTeams({ teamId: Number(slug) })
+          : await advancedFootballApi.getTeams({ teamName: slug.replace(/-/g, ' ') });
         let teamData: FootballTeam | null = null;
         let teamId: number | null = null;
 
         if (teamsRes?.result && teamsRes.result.length > 0) {
-          // Find best match by slug
-          const bestMatch = teamsRes.result.find(
-            (t: FootballTeam) => slugify(t.team_name) === slug
-          ) || teamsRes.result[0];
+          const bestMatch = isNumeric
+            ? teamsRes.result[0]
+            : teamsRes.result.find((t: FootballTeam) => slugify(t.team_name) === slug) || teamsRes.result[0];
           teamData = bestMatch;
           teamId = Number(bestMatch.team_key);
         }

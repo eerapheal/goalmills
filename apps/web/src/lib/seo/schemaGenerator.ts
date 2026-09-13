@@ -183,7 +183,7 @@ export function generatePersonSchema(player: {
           name: player.teamName,
         }
       : undefined,
-    url: `${SITE_URL}/players/${player.slug}`,
+    url: `${SITE_URL}/football/players/${player.slug}`,
   };
 }
 

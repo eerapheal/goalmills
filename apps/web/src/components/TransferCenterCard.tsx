@@ -109,7 +109,7 @@ export function TransferCenterCard({ transfer, className = '' }: TransferCenterC
       {/* Player Link & Description */}
       <div className="mt-4 pt-3 border-t border-white/5 space-y-1.5">
         <Link
-          href={`/players/${transfer.playerSlug}`}
+          href={`/football/players/${transfer.playerSlug}`}
           className="text-sm sm:text-base font-extrabold text-white hover:text-blue-400 transition-colors flex items-center gap-1.5"
         >
           <span>{transfer.playerName}</span>

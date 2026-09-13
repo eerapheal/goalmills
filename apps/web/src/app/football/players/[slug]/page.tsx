@@ -133,7 +133,7 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
         breadcrumbs={[
           { name: 'Football', url: '/football' },
           { name: 'Players Hub', url: '/football/players' },
-          { name: player.name, url: `/players/${player.slug}` },
+          { name: player.name, url: `/football/players/${player.slug}` },
         ]}
         header={
           <>
@@ -286,7 +286,7 @@ export default async function PlayerHubPage({ params }: { params: Promise<{ slug
       breadcrumbs={[
         { name: 'Football', url: '/football' },
         { name: 'Players Hub', url: '/football/players' },
-        { name: p.player_name, url: `/players/${p.player_key || slug}` },
+        { name: p.player_name, url: `/football/players/${p.player_key || slug}` },
       ]}
       header={
         <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-[#0B1728] via-[#0E1E38] to-[#070F1E] p-6 sm:p-8 shadow-2xl backdrop-blur-xl">

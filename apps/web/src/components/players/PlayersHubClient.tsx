@@ -168,7 +168,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
             {topGoalscorers.map((p, idx) => (
               <Link
                 key={p.slug}
-                href={`/players/${p.slug}`}
+                href={`/football/players/${p.slug}`}
                 className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-amber-500/10 border border-white/5 transition-all"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -207,7 +207,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
             {topPlaymakers.map((p, idx) => (
               <Link
                 key={p.slug}
-                href={`/players/${p.slug}`}
+                href={`/football/players/${p.slug}`}
                 className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-cyan-500/10 border border-white/5 transition-all"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -246,7 +246,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
             {topRated.map((p, idx) => (
               <Link
                 key={p.slug}
-                href={`/players/${p.slug}`}
+                href={`/football/players/${p.slug}`}
                 className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-blue-500/10 border border-white/5 transition-all"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
