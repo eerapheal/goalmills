@@ -179,6 +179,86 @@ export function extractKeyFromSlug(slug: string): string {
 }
 
 /**
+ * Build a canonical dynamic team slug: e.g. "manchester-city-96" or "arsenal-42" or "arsenal"
+ */
+export function buildTeamSlug(
+  team: { team_name?: string; team_key?: string | number } | string,
+  key?: string | number
+): string {
+  if (typeof team === 'string') {
+    const s = slugify(team);
+    return key ? `${s}-${key}` : s;
+  }
+  const s = slugify(team.team_name || '');
+  const k = team.team_key || key;
+  return k ? `${s}-${k}` : s;
+}
+
+export interface ParsedTeamSlug {
+  rawSlug: string;
+  teamKey: string;
+  nameSlug: string;
+}
+
+/**
+ * Parses team slug supporting:
+ * - "manchester-city-96" -> { rawSlug, teamKey: "96", nameSlug: "manchester-city" }
+ * - "manchester-city" -> { rawSlug, teamKey: "", nameSlug: "manchester-city" }
+ * - "96" -> { rawSlug, teamKey: "96", nameSlug: "" }
+ */
+export function parseTeamSlug(slug: string): ParsedTeamSlug {
+  if (!slug) return { rawSlug: '', teamKey: '', nameSlug: '' };
+  if (/^\d+$/.test(slug)) {
+    return { rawSlug: slug, teamKey: slug, nameSlug: '' };
+  }
+  const match = slug.match(/^(.*?)-(\d+)$/);
+  if (match) {
+    return { rawSlug: slug, teamKey: match[2], nameSlug: match[1] };
+  }
+  return { rawSlug: slug, teamKey: '', nameSlug: slug };
+}
+
+/**
+ * Build a canonical dynamic player slug: e.g. "erling-haaland-12345" or "bukayo-saka"
+ */
+export function buildPlayerSlug(
+  player: { player_name?: string; player_key?: string | number } | string,
+  key?: string | number
+): string {
+  if (typeof player === 'string') {
+    const s = slugify(player);
+    return key ? `${s}-${key}` : s;
+  }
+  const s = slugify(player.player_name || '');
+  const k = player.player_key || key;
+  return k ? `${s}-${k}` : s;
+}
+
+export interface ParsedPlayerSlug {
+  rawSlug: string;
+  playerKey: string;
+  nameSlug: string;
+}
+
+/**
+ * Parses player slug supporting:
+ * - "erling-haaland-12345" -> { rawSlug, playerKey: "12345", nameSlug: "erling-haaland" }
+ * - "erling-haaland" -> { rawSlug, playerKey: "", nameSlug: "erling-haaland" }
+ * - "12345" -> { rawSlug, playerKey: "12345", nameSlug: "" }
+ */
+export function parsePlayerSlug(slug: string): ParsedPlayerSlug {
+  if (!slug) return { rawSlug: '', playerKey: '', nameSlug: '' };
+  if (/^\d+$/.test(slug)) {
+    return { rawSlug: slug, playerKey: slug, nameSlug: '' };
+  }
+  const match = slug.match(/^(.*?)-(\d+)$/);
+  if (match) {
+    return { rawSlug: slug, playerKey: match[2], nameSlug: match[1] };
+  }
+  return { rawSlug: slug, playerKey: '', nameSlug: slug };
+}
+
+/**
  * Football route helpers — canonical URL builders
  */
 export const footballRoutes = {
@@ -191,16 +271,20 @@ export const footballRoutes = {
   }) => `/football/matches/${buildMatchSlug(match)}`,
 
   team: (slug: string) => `/football/teams/${slug}`,
-  teamFromName: (name: string) => `/football/teams/${slugify(name)}`,
+  teamFromName: (name: string, key?: string | number) =>
+    key ? `/football/teams/${slugify(name)}-${key}` : `/football/teams/${slugify(name)}`,
 
   player: (slug: string) => `/football/players/${slug}`,
-  playerFromName: (name: string) => `/football/players/${slugify(name)}`,
+  playerFromName: (name: string, key?: string | number) =>
+    key ? `/football/players/${slugify(name)}-${key}` : `/football/players/${slugify(name)}`,
 
   coach: (slug: string) => `/football/coaches/${slug}`,
-  coachFromName: (name: string) => `/football/coaches/${slugify(name)}`,
+  coachFromName: (name: string, key?: string | number) =>
+    key ? `/football/coaches/${slugify(name)}-${key}` : `/football/coaches/${slugify(name)}`,
 
   official: (slug: string) => `/football/officials/${slug}`,
-  officialFromName: (name: string) => `/football/officials/${slugify(name)}`,
+  officialFromName: (name: string, key?: string | number) =>
+    key ? `/football/officials/${slugify(name)}-${key}` : `/football/officials/${slugify(name)}`,
 
   competition: (slug: string) => `/football/${slug}`,
 };
