@@ -41,6 +41,7 @@ import {
   FootballProbabilitiesParams,
   FootballLiveOddsParams,
   FootballFullOddsParams,
+  FootballCommentsParams,
   FootballGoalScorer,
   FootballCard,
   FootballStatistic,
@@ -297,8 +298,8 @@ export const advancedFootballApi = {
    */
   getFixtures: async (params?: FootballFixturesParams): Promise<FootballFixturesResponse> => {
     try {
-      // If no date range provided, use default 7 days back and forward
-      const dateRange = params?.from && params?.to ? {} : getDateRange(7, 7);
+      // If matchId is specified or from/to already set, do not constrain by default date range
+      const dateRange = params?.matchId || (params?.from && params?.to) ? {} : getDateRange(7, 7);
 
       const apiParams: Record<string, any> = {
         ...dateRange,
@@ -539,6 +540,29 @@ export const advancedFootballApi = {
     } catch (error) {
       console.error('Error fetching videos:', error);
       return { success: 1, result: [] };
+    }
+  },
+
+  /**
+   * Get match live commentary/comments
+   * Endpoint: ?met=Comments&matchId={id}
+   */
+  getComments: async (
+    paramsOrMatchId?: FootballCommentsParams | { matchId: string | number } | string | number
+  ): Promise<FootballCommentsResponse> => {
+    try {
+      let params: Record<string, any> = {};
+      if (typeof paramsOrMatchId === 'object' && paramsOrMatchId !== null) {
+        params = { ...paramsOrMatchId };
+      } else if (paramsOrMatchId) {
+        params = { matchId: paramsOrMatchId };
+      }
+
+      const response = await fetchFromAPI<FootballCommentsResponse>('Comments', params);
+      return response;
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      return { success: 1, result: {} };
     }
   },
 

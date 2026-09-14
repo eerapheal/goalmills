@@ -75,12 +75,17 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
     }
   } else if (m === 'fixtures' || m === 'fixture') {
     normalizedMethod = 'Fixtures';
+    if (params.id || params.match) {
+      params.matchId = params.id || params.match;
+      delete params.id;
+      delete params.match;
+    }
     // If date is passed (YYYY-MM-DD), set from and to
     if (params.date) {
       params.from = params.date;
       params.to = params.date;
       delete params.date;
-    } else if (!params.from && !params.to) {
+    } else if (!params.from && !params.to && !params.matchId) {
       const today = new Date().toISOString().split('T')[0];
       params.from = today;
       params.to = today;
@@ -93,14 +98,16 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
       params.teamId = params.team;
       delete params.team;
     }
-    if (params.id || params.match) {
-      params.matchId = params.id || params.match;
-      delete params.id;
-      delete params.match;
-    }
     if (params.country) {
       params.countryId = params.country;
       delete params.country;
+    }
+  } else if (m === 'comments' || m === 'comment') {
+    normalizedMethod = 'Comments';
+    if (params.match || params.id) {
+      params.matchId = params.match || params.id;
+      delete params.match;
+      delete params.id;
     }
   } else if (m === 'standings' || m === 'standing') {
     normalizedMethod = 'Standings';
@@ -222,8 +229,8 @@ function normalizeMethodAndParams(method: string, searchParams: URLSearchParams)
  */
 function getTtlForMethod(method: string): number {
   const m = method.toLowerCase();
-  if (m === 'livescore') {
-    return 15; // 15 seconds for live scores
+  if (m === 'livescore' || m === 'comments') {
+    return 15; // 15 seconds for live scores and live commentary
   }
   if (m === 'oddslive') {
     return 30; // 30 seconds for live in-play odds

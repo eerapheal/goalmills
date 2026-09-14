@@ -47,8 +47,9 @@ export function getNewsSlug(item?: SlugIdentifiable | string | null): string {
 // ─── Football-Specific Slug Utilities ──────────────────────────────────────────
 
 /**
- * Build a match slug:  home-team-vs-away-team-YYYY-MM-DD-eventKey
- * e.g. "arsenal-vs-manchester-city-2026-08-31-12345"
+ * Build a match slug:  home-team-vs-away-team-YYYY-eventKey
+ * e.g. "arsenal-vs-manchester-city-2026-12345" or "arsenal-vs-chelsea-2026"
+ * The year is dynamically computed from event_date or current calendar year.
  */
 export function buildMatchSlug(match: {
   event_home_team?: string;
@@ -58,26 +59,111 @@ export function buildMatchSlug(match: {
 }): string {
   const home = slugify(match.event_home_team || 'home');
   const away = slugify(match.event_away_team || 'away');
-  const date = match.event_date || new Date().toISOString().split('T')[0];
-  const key = match.event_key || '0';
-  return `${home}-vs-${away}-${date}-${key}`;
+  const year = match.event_date ? match.event_date.split('-')[0] : new Date().getFullYear().toString();
+  const key = match.event_key;
+  return key ? `${home}-vs-${away}-${year}-${key}` : `${home}-vs-${away}-${year}`;
+}
+
+export interface ParsedMatchSlug {
+  rawSlug: string;
+  eventKey: string;
+  homeSlug: string;
+  awaySlug: string;
+  year: string;
+}
+
+/**
+ * Parses match slugs of various canonical forms:
+ * - "teama-vs-teamb-2026-12345"
+ * - "teama-vs-teamb-2026"
+ * - "teama-vs-teamb-2026-09-14-12345" (legacy)
+ * - "12345" (pure numeric ID)
+ */
+export function parseMatchSlug(slug: string): ParsedMatchSlug {
+  if (!slug) {
+    return { rawSlug: '', eventKey: '', homeSlug: '', awaySlug: '', year: new Date().getFullYear().toString() };
+  }
+
+  // Pure numeric ID: e.g. "1869244"
+  if (/^\d+$/.test(slug)) {
+    return { rawSlug: slug, eventKey: slug, homeSlug: '', awaySlug: '', year: new Date().getFullYear().toString() };
+  }
+
+  // Legacy format: {home}-vs-{away}-YYYY-MM-DD-{key}
+  const legacyMatch = slug.match(/^(.*?)-vs-(.*?)-(\d{4})-\d{2}-\d{2}-(\d+)$/);
+  if (legacyMatch) {
+    return {
+      rawSlug: slug,
+      homeSlug: legacyMatch[1],
+      awaySlug: legacyMatch[2],
+      year: legacyMatch[3],
+      eventKey: legacyMatch[4],
+    };
+  }
+
+  // Standard format: {home}-vs-{away}-{year}-{key}
+  const standardMatch = slug.match(/^(.*?)-vs-(.*?)-(\d{4})-(\d+)$/);
+  if (standardMatch) {
+    return {
+      rawSlug: slug,
+      homeSlug: standardMatch[1],
+      awaySlug: standardMatch[2],
+      year: standardMatch[3],
+      eventKey: standardMatch[4],
+    };
+  }
+
+  // Keyless format: {home}-vs-{away}-{year} (e.g. "arsenal-vs-chelsea-2026")
+  const keylessMatch = slug.match(/^(.*?)-vs-(.*?)-(\d{4})$/);
+  if (keylessMatch) {
+    return {
+      rawSlug: slug,
+      homeSlug: keylessMatch[1],
+      awaySlug: keylessMatch[2],
+      year: keylessMatch[3],
+      eventKey: '',
+    };
+  }
+
+  // Fallback
+  const fallbackKey = extractEventKeyFromSlug(slug);
+  return {
+    rawSlug: slug,
+    homeSlug: '',
+    awaySlug: '',
+    year: new Date().getFullYear().toString(),
+    eventKey: fallbackKey,
+  };
 }
 
 /**
  * Extract the event key (numeric ID) from a match slug.
+ * e.g. "arsenal-vs-manchester-city-2026-12345" → "12345"
  * e.g. "arsenal-vs-manchester-city-2026-08-31-12345" → "12345"
+ * Returns empty string if slug is purely keyless like "arsenal-vs-chelsea-2026".
  */
 export function extractEventKeyFromSlug(slug: string): string {
-  // Match pattern: ...-YYYY-MM-DD-{eventKey}
-  const match = slug.match(/-(\d{4}-\d{2}-\d{2})-(\d+)$/);
-  if (match) return match[2];
+  if (!slug) return '';
+  // Purely numeric ID
+  if (/^\d+$/.test(slug)) return slug;
 
-  // Fallback: last numeric segment
+  // Legacy pattern: ...-YYYY-MM-DD-{eventKey}
+  const legacyMatch = slug.match(/-(\d{4}-\d{2}-\d{2})-(\d+)$/);
+  if (legacyMatch) return legacyMatch[2];
+
+  // Dynamic Year pattern: ...-{YYYY}-{eventKey}
+  const yearKeyMatch = slug.match(/-(\d{4})-(\d+)$/);
+  if (yearKeyMatch) return yearKeyMatch[2];
+
+  // If slug ends with -{YYYY} without key (e.g. teama-vs-teamb-2026), no event key attached
+  if (/-\d{4}$/.test(slug)) return '';
+
+  // Fallback: last numeric segment after hyphen
   const parts = slug.split('-');
   const lastPart = parts[parts.length - 1];
   if (/^\d+$/.test(lastPart)) return lastPart;
 
-  return slug; // Last resort: treat entire slug as ID
+  return '';
 }
 
 /**
