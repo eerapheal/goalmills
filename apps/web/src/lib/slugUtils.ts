@@ -259,6 +259,47 @@ export function parsePlayerSlug(slug: string): ParsedPlayerSlug {
 }
 
 /**
+ * Build a canonical dynamic coach slug: e.g. "pep-guardiola-19" or "mikel-arteta"
+ */
+export function buildCoachSlug(
+  coach: { name?: string; coache?: string; id?: string | number } | string,
+  key?: string | number
+): string {
+  if (typeof coach === 'string') {
+    const s = slugify(coach);
+    return key ? `${s}-${key}` : s;
+  }
+  const name = (coach as any).name || (coach as any).coache || '';
+  const s = slugify(name);
+  const k = (coach as any).id || key;
+  return k ? `${s}-${k}` : s;
+}
+
+export interface ParsedCoachSlug {
+  rawSlug: string;
+  coachKey: string;
+  nameSlug: string;
+}
+
+/**
+ * Parses coach slug supporting:
+ * - "pep-guardiola-19" -> { rawSlug, coachKey: "19", nameSlug: "pep-guardiola" }
+ * - "pep-guardiola" -> { rawSlug, coachKey: "", nameSlug: "pep-guardiola" }
+ * - "19" -> { rawSlug, coachKey: "19", nameSlug: "" }
+ */
+export function parseCoachSlug(slug: string): ParsedCoachSlug {
+  if (!slug) return { rawSlug: '', coachKey: '', nameSlug: '' };
+  if (/^\d+$/.test(slug)) {
+    return { rawSlug: slug, coachKey: slug, nameSlug: '' };
+  }
+  const match = slug.match(/^(.*?)-(\d+)$/);
+  if (match) {
+    return { rawSlug: slug, coachKey: match[2], nameSlug: match[1] };
+  }
+  return { rawSlug: slug, coachKey: '', nameSlug: slug };
+}
+
+/**
  * Football route helpers — canonical URL builders
  */
 export const footballRoutes = {
