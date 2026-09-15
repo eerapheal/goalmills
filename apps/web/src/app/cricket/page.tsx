@@ -1,52 +1,37 @@
 import { Metadata } from 'next';
-import { ContentHubLayout } from '@/components/ContentHubLayout';
-import { CricketScreen } from '@/components/CricketScreen';
-import {
-  CricketSidebar,
-  INITIAL_MAJOR_TOURNAMENTS,
-  INITIAL_FEATURED_TEAMS,
-} from '@/components/CricketSidebar';
+import { CricketPageClient } from '@/components/cricket/CricketPageClient';
 
-export const revalidate = 3600;
+export const revalidate = 60; // Revalidate every minute for live scores & fresh cricket data
 
 export const metadata: Metadata = {
-  title: 'Live Cricket Scores, IPL 2026/2027, ICC World Cup, Fixtures & Points Tables | GoalMills',
+  title:
+    'Cricket Match Centre | Live Scores, IPL 2026, WTC, Points Tables, DRS & Batters | GoalMills',
   description:
-    'Real-time live cricket scores, ball-by-ball commentary, IPL 2026/2027 points table, ICC Men’s World Cup fixtures, Test match updates, and team standings on GoalMills.',
+    'Live cricket ball-by-ball scorecards, IPL 2026 points table, WTC standings, top run scorers, umpire DRS command desk, team dugouts, and matchday pitch reports.',
   keywords: [
     'Cricket live scores',
-    'IPL 2026/2027 live',
-    'ICC World Cup fixtures',
-    'T20 World Cup live',
-    'Cricket points table',
-    'Test championship live',
+    'IPL 2026 points table',
+    'WTC standings 2025 2026',
+    'Live cricket scorecard',
+    'Virat Kohli runs stats',
+    'T20 World Cup fixtures',
+    'Cricket DRS review tracking',
     'Big Bash League scores',
-    'GoalMills Cricket',
+    'GoalMills Cricket Match Centre',
   ],
   openGraph: {
-    title: 'GoalMills Cricket | Live Scores, IPL, ICC Fixtures & Standings',
+    title: 'GoalMills Cricket Match Centre | Live Scores, Standings & Tactical Intelligence',
     description:
-      'Real-time cricket live scores, ball-by-ball updates, IPL points table, ICC fixtures, and team standings.',
+      'Real-time cricket scores, IPL points table, batter leaderboards, umpire DRS stats, and tactical managerial profiles across 30+ franchise and ICC tournaments.',
     siteName: 'GoalMills Cricket',
     type: 'website',
   },
 };
 
-// Exported verified AllSportsAPI tournament and team definitions
-export const CRICKET_MAJOR_TOURNAMENTS = INITIAL_MAJOR_TOURNAMENTS;
-export const FEATURED_CRICKET_TEAMS = INITIAL_FEATURED_TEAMS;
-
 export default function CricketHubPage() {
   return (
-    <ContentHubLayout
-      breadcrumbs={[{ name: 'Cricket Hub', url: '/cricket' }]}
-      header={<></>}
-      sidebar={<CricketSidebar />}
-    >
-      {/* Live Match Engine Section */}
-      <section className="space-y-4">
-        <CricketScreen />
-      </section>
-    </ContentHubLayout>
+    <main className="min-h-screen bg-[#020617]">
+      <CricketPageClient />
+    </main>
   );
 }

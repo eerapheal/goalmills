@@ -623,7 +623,7 @@ export function FootballPageClient({
       {/* ════════════════════════════════════════
           HERO BANNER
       ════════════════════════════════════════ */}
-      <div className="relative bg-gradient-to-b from-[#0a1628] via-[#040d1a] to-[#020617] border-b border-[#1e293b] overflow-hidden">
+      <div className="hidden md:block relative bg-gradient-to-b from-[#0a1628] via-[#040d1a] to-[#020617] border-b border-[#1e293b] overflow-hidden">
         <div className="absolute inset-0 opacity-15">
           <img
             src="https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1400&h=300&fit=crop&auto=format"
