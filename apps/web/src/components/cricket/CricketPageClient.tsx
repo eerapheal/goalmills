@@ -849,7 +849,7 @@ export function CricketPageClient() {
       {/* ════════════════════════════════════════
           HERO BANNER
       ════════════════════════════════════════ */}
-      <div className="relative bg-gradient-to-b from-[#061a10] via-[#03120b] to-[#020617] border-b border-[#1e293b] overflow-hidden">
+      <div className="hidden md:block relative bg-gradient-to-b from-[#061a10] via-[#03120b] to-[#020617] border-b border-[#1e293b] overflow-hidden">
         <div className="absolute inset-0 opacity-15">
           <img
             src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1400&h=300&fit=crop&auto=format"
