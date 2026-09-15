@@ -697,7 +697,7 @@ export function FootballPageClient({
                 </Link>
               }
             >
-              <div className="divide-y divide-[#1e293b]">
+              <div className="hidden md:block divide-y divide-[#1e293b]">
                 {ANALYSIS_ARTICLES.map((a, i) => (
                   <Link
                     key={i}
