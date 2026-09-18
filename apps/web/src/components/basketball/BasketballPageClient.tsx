@@ -1638,6 +1638,7 @@ export function BasketballPageClient() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<string>('Just now');
   const [showAllFixtures, setShowAllFixtures] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Modal / Drawer state
   const [selectedGameForModal, setSelectedGameForModal] = useState<GameItem | null>(null);
@@ -2067,7 +2068,7 @@ export function BasketballPageClient() {
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_290px] gap-6 items-start">
 
           {/* ── LEFT SIDEBAR ── */}
-          <aside className="space-y-4 lg:sticky lg:top-24">
+          <aside className="hidden lg:block space-y-4 lg:sticky lg:top-24">
 
             {/* Basketball Analysis Section */}
             <SideSection
@@ -2203,6 +2204,137 @@ export function BasketballPageClient() {
 
           {/* ── MAIN CONTENT ── */}
           <div className="min-w-0 space-y-5">
+            {/* Mobile Dropdown Side Menu (Basketball Analysis, Competition Directory, Featured Team Hubs) */}
+            <div className="lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-[#0f172a] border border-[#1e293b] hover:border-orange-500/50 rounded-2xl shadow-sm text-xs font-black uppercase tracking-wider text-slate-200 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="w-7 h-7 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400">
+                    <FiLayers className="w-3.5 h-3.5" />
+                  </span>
+                  <div className="text-left">
+                    <p className="text-xs font-black text-white">Basketball Hubs & Directory</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Analysis · 25+ Competitions · Team Hubs</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-orange-400 border border-slate-700">
+                    {mobileMenuOpen ? 'Close Menu' : 'Explore Menu'}
+                  </span>
+                  <FiChevronDown
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                      mobileMenuOpen ? 'rotate-180 text-orange-400' : ''
+                    }`}
+                  />
+                </div>
+              </button>
+
+              {mobileMenuOpen && (
+                <div className="mt-3 space-y-4 p-3.5 bg-[#080f1e] border border-orange-500/30 rounded-2xl shadow-xl animate-fadeIn">
+                  {/* Basketball Analysis */}
+                  <SideSection
+                    title="Basketball Analysis"
+                    defaultOpen={true}
+                    action={
+                      <Link href="/basketball" className="text-[10px] text-orange-400 hover:text-orange-300 font-bold">
+                        All →
+                      </Link>
+                    }
+                  >
+                    <div className="divide-y divide-[#1e293b]">
+                      {ANALYSIS_ARTICLES.slice(0, 4).map((a, i) => (
+                        <div key={i} className="flex gap-3 p-3 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer">
+                          <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800 border border-slate-700">
+                            <img src={a.img} alt="" className="w-full h-full object-cover opacity-80" />
+                            <span className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}>
+                              {a.tag}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[9px] font-semibold text-orange-400 uppercase tracking-widest mb-0.5">{a.comp}</p>
+                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">{a.title}</h4>
+                            <p className="text-[9px] text-slate-500 mt-1">{a.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </SideSection>
+
+                  {/* Competition Directory */}
+                  <SideSection
+                    title="Competition Directory"
+                    defaultOpen={false}
+                    action={<span className="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 rounded bg-slate-800">25+</span>}
+                  >
+                    <div className="divide-y divide-[#1e293b]">
+                      {COMP_GROUPS.map((group) => (
+                        <div key={group.region}>
+                          <button
+                            onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                            className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#1e293b]/40 transition-colors text-left"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{group.icon}</span>
+                              <span className="text-xs font-semibold text-slate-300">{group.region}</span>
+                            </div>
+                            <FiChevronDown
+                              className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
+                                expandedComp === group.region ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </button>
+                          {expandedComp === group.region && (
+                            <div className="bg-[#080f1f] border-t border-[#1e293b] divide-y divide-[#1e293b]/60">
+                              {group.comps.map((c) => (
+                                <Link
+                                  key={c.name}
+                                  href={c.href || '/basketball'}
+                                  className="flex items-center gap-2 px-3 py-2 hover:bg-[#1e293b]/60 transition-colors"
+                                >
+                                  <span className="text-sm">{c.flag}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-semibold text-slate-300 truncate">{c.name}</p>
+                                    <p className="text-[9px] text-slate-500">{c.country}</p>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </SideSection>
+
+                  {/* Featured Team Hubs */}
+                  <SideSection
+                    title="Featured Team Hubs"
+                    defaultOpen={false}
+                    action={
+                      <Link href="/basketball" className="text-[10px] text-orange-400 hover:text-orange-300 font-bold">
+                        All →
+                      </Link>
+                    }
+                  >
+                    <div className="grid grid-cols-2 gap-px bg-[#1e293b]">
+                      {TEAM_HUBS.map((t) => (
+                        <Link
+                          key={t.name}
+                          href={`/basketball/teams/${t.slug}`}
+                          className="flex flex-col items-center gap-1.5 p-3 bg-[#0f172a] hover:bg-[#131f35] transition-colors text-center"
+                        >
+                          <DynamicTeamLogo name={t.name} logoUrl={t.logo} className="w-8 h-8" />
+                          <p className="text-[10px] font-bold text-slate-200 leading-tight truncate max-w-full">{t.name}</p>
+                          <span className="text-[9px] text-orange-400 font-semibold">Hub →</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </SideSection>
+                </div>
+              )}
+            </div>
 
             {/* Navigation Tabs Bar */}
             <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
@@ -2212,9 +2344,9 @@ export function BasketballPageClient() {
                     { key: 'live', label: 'Live' },
                     { key: 'upcoming', label: 'Upcoming' },
                     { key: 'results', label: 'Results' },
-                    { key: 'standings', label: 'Standings' },
-                    { key: 'leaders', label: 'Stat Leaders' },
-                    { key: 'odds', label: 'Odds & Markets' },
+                    { key: 'standings', label: 'Table' },
+                    { key: 'leaders', label: 'Top Scorer' },
+                    { key: 'odds', label: 'Odds' },
                   ] as const
                 ).map((tab) => (
                   <button
