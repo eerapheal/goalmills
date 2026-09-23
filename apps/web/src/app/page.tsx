@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getNewsUrl } from '@/lib/slugUtils';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 interface MatchItem {
   id: string;
@@ -68,7 +68,7 @@ const DEFAULT_VIDEOS: VideoItem[] = [
   {
     _id: 'vid-ucl-1',
     video_title: 'Champions League Epic Comebacks & Best Goals of the Round',
-    video_thumbnail: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=450&fit=crop&auto=format',
+    video_thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=450&fit=crop&auto=format',
     category: 'UCL Highlights',
     league: 'UEFA Champions League',
     duration: '04:15',
@@ -488,7 +488,7 @@ export default function HomePage() {
                 item.featuredImage ||
                 item.image ||
                 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&h=500&fit=crop&auto=format',
-              slug: item.slug || item._id?.toString() || item.id || '',
+              slug: item.slug || (item.title ? slugify(item.title) : ''),
             };
           });
           setNews(mapped);
@@ -702,10 +702,13 @@ export default function HomePage() {
                   className="block relative overflow-hidden rounded-2xl bg-[#0f172a] border border-[#1e293b] hover:border-[#334155] transition-all group h-full"
                 >
                   <div className="relative h-52 sm:h-64 overflow-hidden bg-slate-800">
-                    <img
+                    <Image
                       src={news[0].image}
                       alt={news[0].title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/30 to-transparent" />
                     <span
@@ -738,11 +741,13 @@ export default function HomePage() {
                   href={getNewsUrl({ slug: a.slug, id: String(a.id), title: a.title })}
                   className="flex gap-4 items-start py-3 first:pt-0 cursor-pointer group hover:bg-[#0f172a] rounded-xl px-3 -mx-3 transition-all"
                 >
-                  <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
-                    <img
+                  <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
+                    <Image
                       src={a.image}
                       alt={a.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      sizes="80px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -801,13 +806,15 @@ export default function HomePage() {
             >
               {/* Thumbnail Container */}
               <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
-                <img
+                <Image
                   src={
                     v.video_thumbnail ||
-                    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=450&fit=crop&auto=format'
+                    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=450&fit=crop&auto=format'
                   }
                   alt={v.video_title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
 

@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { getNewsUrl } from '@/lib/slugUtils';
+import Image from 'next/image';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 import { FiTrendingUp, FiPlay, FiMail, FiArrowRight, FiClock, FiCheck } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
 
-export function SportsPulseNewsSection() {
+export function SportsPulseNewsSection({ initialArticles }: { initialArticles?: any[] } = {}) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [activeCategory, setActiveCategory] = useState<
@@ -31,7 +32,7 @@ export function SportsPulseNewsSection() {
       author: 'Tactical Desk',
       isHot: true,
       imageUrl:
-        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=800&q=80',
     },
     {
       id: 'art-2',
@@ -83,7 +84,38 @@ export function SportsPulseNewsSection() {
     },
   ];
 
-  const [articles, setArticles] = useState(fallbackArticles);
+  const [articles, setArticles] = useState(() => {
+    if (Array.isArray(initialArticles) && initialArticles.length > 0) {
+      return initialArticles.slice(0, 8).map((item: any, idx: number) => {
+        const cat = (item.sport || item.category || 'football').toLowerCase();
+        const tagColor =
+          cat === 'cricket'
+            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+            : cat === 'basketball'
+              ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+              : cat === 'transfers'
+                ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+        return {
+          id: item._id || item.id || `live-art-${idx}`,
+          slug: item.slug || (item.title ? slugify(item.title) : `live-art-${idx}`),
+          title: item.title,
+          excerpt: item.summary || item.excerpt || item.title,
+          category: cat,
+          categoryName: cat.charAt(0).toUpperCase() + cat.slice(1),
+          readTime: `${item.readTime || 4} min read`,
+          tagColor,
+          date: item.publishedAt || item.createdAt
+            ? new Date(item.publishedAt || item.createdAt).toLocaleDateString()
+            : 'Latest',
+          author: item.author || 'GoalMills Sports Desk',
+          isHot: idx === 0 || !!item.isBreaking,
+          imageUrl: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=800&q=80',
+        };
+      });
+    }
+    return fallbackArticles;
+  });
   const [spotlightVideo, setSpotlightVideo] = useState<{
     id?: string;
     title: string;
@@ -130,11 +162,11 @@ export function SportsPulseNewsSection() {
                     ? 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80'
                     : cat === 'transfers'
                       ? 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80'
-                      : 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80';
+                      : 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=800&q=80';
 
               return {
                 id: item._id || item.id || `live-art-${idx}`,
-                slug: item.slug || item._id || item.id || `live-art-${idx}`,
+                slug: item.slug || (item.title ? slugify(item.title) : `live-art-${idx}`),
                 title: item.title,
                 excerpt: item.summary || item.excerpt || item.title,
                 category: cat,
@@ -285,10 +317,15 @@ export function SportsPulseNewsSection() {
                   >
                     {/* Background Image with Dark Gradient Scrim */}
                     {article.imageUrl && (
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                        style={{ backgroundImage: `url(${article.imageUrl})` }}
-                      />
+                      <div className="absolute inset-0 overflow-hidden">
+                        <Image
+                          src={article.imageUrl}
+                          alt={article.title || ''}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
                     )}
                     {/* Gradient Overlay for high-contrast typography readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#070E1A] via-[#091529]/92 to-[#091529]/75 backdrop-blur-[2px] transition-colors group-hover:via-[#091529]/85" />
@@ -370,10 +407,12 @@ export function SportsPulseNewsSection() {
               {/* Video Player Banner */}
               <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-blue-500/20 mb-4 flex items-center justify-center group-hover:border-amber-400/40 transition-colors shadow-inner">
                 {spotlightVideo.thumbnail ? (
-                  <img
+                  <Image
                     src={spotlightVideo.thumbnail}
                     alt={spotlightVideo.title}
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-75 transition-opacity"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                    className="object-cover opacity-60 group-hover:opacity-75 transition-opacity"
                   />
                 ) : null}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />

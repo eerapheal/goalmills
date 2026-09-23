@@ -36,7 +36,7 @@ export function getHighlightThumbnail(url: string, thumbnail?: string): string {
   } catch (e) {
     // fallback
   }
-  return `https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80`;
+  return `https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=800&q=80`;
 }
 
 export const HIGHLIGHT_CATEGORIES = [

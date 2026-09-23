@@ -23,7 +23,7 @@ const DEFAULT_FALLBACKS = [
     targetUrl: 'https://1xbet.com',
     badgeText: 'VIP PARTNER',
     imageUrl:
-      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80',
     sponsorLogo:
       'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=120&auto=format&fit=crop&q=80',
   },

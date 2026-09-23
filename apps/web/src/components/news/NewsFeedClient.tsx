@@ -349,7 +349,7 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                   <Image
                     src={
                       featuredArticle.image ||
-                      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=1200'
+                      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=1200'
                     }
                     alt={featuredArticle.title}
                     fill

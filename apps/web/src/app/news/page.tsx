@@ -21,7 +21,11 @@ export default async function NewsPage() {
   try {
     await dbConnect();
     const [newsDocs, catDocs] = await Promise.all([
-      News.find({ $or: [{ status: 'published' }, { status: { $exists: false } }] }).sort({ createdAt: -1 }).lean(),
+      News.find({ $or: [{ status: 'published' }, { status: { $exists: false } }] })
+        .select('-content')
+        .sort({ createdAt: -1 })
+        .limit(24)
+        .lean(),
       Category.find({}).sort({ order: 1, createdAt: 1 }).lean(),
     ]);
 
@@ -38,8 +42,8 @@ export default async function NewsPage() {
       <div className="fixed bottom-0 right-1/4 h-[600px] w-[600px] bg-amber-500/5 blur-[160px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto">     
-      {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
-      <SportsPulseNewsSection />
+        {/* Section 2: Trending Sports Pulse, Video Highlights & VIP Alerts */}
+        <SportsPulseNewsSection initialArticles={initialNews} />
         <Suspense
           fallback={<div className="py-24 text-center text-slate-400 font-bold">Loading sports pulse...</div>}
         >
