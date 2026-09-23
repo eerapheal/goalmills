@@ -1011,9 +1011,6 @@ export default function CreateNewsForm() {
                   src={image}
                   alt="Cover preview"
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
                 />
               </div>
               <div className="flex-1 min-w-0">

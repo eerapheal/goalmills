@@ -215,7 +215,7 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
         setFetching(false);
         setEcosystemLoading(false);
       });
-  }, [id, toast]);
+  }, [id]);
 
   // Filtered dropdown lists based on selections
   const sportsList = useMemo(() => {
@@ -1131,9 +1131,6 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
                   src={image}
                   alt="Cover preview"
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
                 />
               </div>
               <div className="flex-1 min-w-0">
