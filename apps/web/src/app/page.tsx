@@ -64,35 +64,7 @@ function getCompetitionRank(leagueName: string, sport: string): number {
   return 20;
 }
 
-const DEFAULT_VIDEOS: VideoItem[] = [
-  {
-    _id: 'vid-ucl-1',
-    video_title: 'Champions League Epic Comebacks & Best Goals of the Round',
-    video_thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=450&fit=crop&auto=format',
-    category: 'UCL Highlights',
-    league: 'UEFA Champions League',
-    duration: '04:15',
-    views: 18400,
-  },
-  {
-    _id: 'vid-pl-2',
-    video_title: 'Premier League Matchday Goals, Skills & Tactical Highlights',
-    video_thumbnail: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800&h=450&fit=crop&auto=format',
-    category: 'Premier League',
-    league: 'Premier League',
-    duration: '03:45',
-    views: 26100,
-  },
-  {
-    _id: 'vid-afcon-3',
-    video_title: 'AFCON Qualifiers: Top Goals, Saves & Star Performances',
-    video_thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=450&fit=crop&auto=format',
-    category: 'AFCON Replays',
-    league: 'CAF Africa',
-    duration: '05:20',
-    views: 14200,
-  },
-];
+// No mock video data — videos render from API only
 
 const STATS_BAR = [
   { value: '45K+', label: 'Newsletter subscribers' },
@@ -484,10 +456,7 @@ export default function HomePage() {
               title: item.title,
               excerpt: item.excerpt || (item.content ? item.content.slice(0, 140) + '...' : ''),
               time: formatRelativeTime(item.createdAt),
-              image:
-                item.featuredImage ||
-                item.image ||
-                'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&h=500&fit=crop&auto=format',
+              image: item.featuredImage || item.image || '',
               slug: item.slug || (item.title ? slugify(item.title) : ''),
             };
           });
@@ -798,7 +767,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {isLoadingVideos ? (
             Array.from({ length: 3 }).map((_, i) => <VideoCardSkeleton key={i} />)
-          ) : (videos.length > 0 ? videos : DEFAULT_VIDEOS).map((v) => (
+          ) : videos.length === 0 ? null : videos.map((v) => (
             <Link
               key={v._id}
               href={`/highlights/${v._id}`}
@@ -806,16 +775,17 @@ export default function HomePage() {
             >
               {/* Thumbnail Container */}
               <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
-                <Image
-                  src={
-                    v.video_thumbnail ||
-                    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=450&fit=crop&auto=format'
-                  }
-                  alt={v.video_title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {v.video_thumbnail ? (
+                  <Image
+                    src={v.video_thumbnail}
+                    alt={v.video_title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
 
                 {/* Top Badge */}

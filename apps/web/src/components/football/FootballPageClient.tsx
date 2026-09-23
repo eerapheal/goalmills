@@ -140,12 +140,12 @@ const PL_TABLE: TableEntry[] = [
 ];
 
 const TOP_SCORERS: TopScorer[] = [
-  { rank: 1, name: 'Erling Haaland', team: 'Man City', badge: '🔵', flag: '🇳🇴', goals: 31, assists: 7, apps: 32, photo: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=120&h=120&fit=crop&auto=format', playerId: 'erling-haaland' },
-  { rank: 2, name: 'Victor Osimhen', team: 'Napoli / Al-Ahli', badge: '🔵', flag: '🇳🇬', goals: 26, assists: 5, apps: 30, photo: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=120&h=120&fit=crop&auto=format', playerId: 'victor-osimhen' },
-  { rank: 3, name: 'Kylian Mbappé', team: 'Real Madrid', badge: '⚪', flag: '🇫🇷', goals: 24, assists: 8, apps: 29, photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&auto=format', playerId: 'kylian-mbappe' },
-  { rank: 4, name: 'Bukayo Saka', team: 'Arsenal', badge: '🔴', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', goals: 16, assists: 14, apps: 30, photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&auto=format', playerId: 'bukayo-saka' },
-  { rank: 5, name: 'Harry Kane', team: 'Bayern Munich', badge: '🔴', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', goals: 28, assists: 10, apps: 31, photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&fit=crop&auto=format', playerId: 'harry-kane' },
-  { rank: 6, name: 'Mohamed Salah', team: 'Liverpool', badge: '🔴', flag: '🇪🇬', goals: 22, assists: 13, apps: 32, photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&auto=format', playerId: 'mohamed-salah' },
+  { rank: 1, name: 'Erling Haaland', team: 'Man City', badge: '🔵', flag: '🇳🇴', goals: 31, assists: 7, apps: 32, photo: '', playerId: 'erling-haaland' },
+  { rank: 2, name: 'Victor Osimhen', team: 'Napoli / Al-Ahli', badge: '🔵', flag: '🇳🇬', goals: 26, assists: 5, apps: 30, photo: '', playerId: 'victor-osimhen' },
+  { rank: 3, name: 'Kylian Mbappé', team: 'Real Madrid', badge: '⚪', flag: '🇫🇷', goals: 24, assists: 8, apps: 29, photo: '', playerId: 'kylian-mbappe' },
+  { rank: 4, name: 'Bukayo Saka', team: 'Arsenal', badge: '🔴', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', goals: 16, assists: 14, apps: 30, photo: '', playerId: 'bukayo-saka' },
+  { rank: 5, name: 'Harry Kane', team: 'Bayern Munich', badge: '🔴', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', goals: 28, assists: 10, apps: 31, photo: '', playerId: 'harry-kane' },
+  { rank: 6, name: 'Mohamed Salah', team: 'Liverpool', badge: '🔴', flag: '🇪🇬', goals: 22, assists: 13, apps: 32, photo: '', playerId: 'mohamed-salah' },
 ];
 
 const COMP_GROUPS: CompGroup[] = [
@@ -210,7 +210,7 @@ const ANALYSIS_ARTICLES = [
     title: "How Guardiola's inverted full-backs are breaking every pressing system in Europe",
     time: '2 hr ago',
     comp: 'Premier League',
-    img: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'guardiola-inverted-fullbacks-pressing-system',
   },
   {
@@ -219,7 +219,7 @@ const ANALYSIS_ARTICLES = [
     title: 'Osimhen to Al-Hilal & Premier League suitors: €120m record market valuation report',
     time: '4 hr ago',
     comp: 'Transfer Wire',
-    img: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'osimhen-transfer-valuation-premier-league',
   },
   {
@@ -228,7 +228,7 @@ const ANALYSIS_ARTICLES = [
     title: "Super Eagles' xG dominance and attacking depth make Nigeria 2026/27 favourites",
     time: '6 hr ago',
     comp: 'CAF Africa',
-    img: 'https://images.unsplash.com/photo-1711645313209-a386d71bc991?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'super-eagles-xg-dominance-afcon',
   },
   {
@@ -237,7 +237,7 @@ const ANALYSIS_ARTICLES = [
     title: "Haaland's box conversion rate is statistically unprecedented in top-flight history",
     time: '8 hr ago',
     comp: 'Deep Data',
-    img: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'haaland-conversion-rate-unprecedented',
   },
 ];
@@ -625,14 +625,7 @@ export function FootballPageClient({
           HERO BANNER
       ════════════════════════════════════════ */}
       <div className="hidden md:block relative bg-gradient-to-b from-[#0a1628] via-[#040d1a] to-[#020617] border-b border-[#1e293b] overflow-hidden">
-        <div className="absolute inset-0 opacity-15">
-          <img
-            src="https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1400&h=300&fit=crop&auto=format"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/95 via-transparent to-[#020617]/95" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-slate-900/10 to-transparent pointer-events-none" />
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 via-rose-500 to-amber-400" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">

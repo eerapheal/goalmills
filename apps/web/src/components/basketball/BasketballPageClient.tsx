@@ -266,8 +266,8 @@ export function getBasketballTeamLogo(teamName: string): string {
   if (t.includes('virtus')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/110.png';
   if (t.includes('unicaja')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/112.png';
   if (t.includes('valencia')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/114.png';
-  if (t.includes('petro') || t.includes('luanda')) return 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=120&h=120&fit=crop&auto=format';
-  if (t.includes('monastir')) return 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=120&h=120&fit=crop&auto=format';
+  if (t.includes('petro') || t.includes('luanda')) return `https://ui-avatars.com/api/?name=Petro+Luanda&background=cc0000&color=ffffff&bold=true&size=128`;
+  if (t.includes('monastir')) return `https://ui-avatars.com/api/?name=US+Monastir&background=003366&color=ffffff&bold=true&size=128`;
   if (t.includes('nigeria') || t.includes('patriot')) return 'https://flagcdn.com/w80/ng.png';
   if (t.includes('rwanda')) return 'https://flagcdn.com/w80/rw.png';
   if (t.includes('angola')) return 'https://flagcdn.com/w80/ao.png';
@@ -919,9 +919,9 @@ const LIVE_GAMES_BASELINE: GameItem[] = [
     comp: 'BAL',
     compFlag: '🌍',
     home: 'Petro de Luanda',
-    homeLogo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=120&h=120&fit=crop&auto=format',
+    homeLogo: `https://ui-avatars.com/api/?name=Petro+Luanda&background=cc0000&color=ffffff&bold=true&size=128`,
     away: 'US Monastir',
-    awayLogo: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=120&h=120&fit=crop&auto=format',
+    awayLogo: `https://ui-avatars.com/api/?name=US+Monastir&background=003366&color=ffffff&bold=true&size=128`,
     hScore: 88,
     aScore: 76,
     quarter: 'FT',
@@ -1029,9 +1029,9 @@ const UPCOMING_GAMES_BASELINE: GameItem[] = [
     comp: 'BAL',
     compFlag: '🌍',
     home: 'Al Ahly',
-    homeLogo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=120&h=120&fit=crop&auto=format',
+    homeLogo: `https://ui-avatars.com/api/?name=Al+Ahly&background=cc0000&color=ffffff&bold=true&size=128`,
     away: 'Cape Town Tigers',
-    awayLogo: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=120&h=120&fit=crop&auto=format',
+    awayLogo: `https://ui-avatars.com/api/?name=Cape+Town+Tigers&background=ff6600&color=ffffff&bold=true&size=128`,
     hScore: null,
     aScore: null,
     status: 'UPCOMING',
@@ -1405,7 +1405,7 @@ const ANALYSIS_ARTICLES: AnalysisArticle[] = [
     title: 'How Victor Wembanyama altered shot selection patterns across all 30 NBA teams in Year 2',
     time: '2 hr ago',
     comp: 'NBA Telemetry',
-    img: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=220&fit=crop&auto=format',
+    img: '',
   },
   {
     tag: 'TACTICS',
@@ -1413,7 +1413,7 @@ const ANALYSIS_ARTICLES: AnalysisArticle[] = [
     title: 'The EuroLeague pick-and-roll revolution: Why European spacing is punishing NBA drop coverage',
     time: '3 hr ago',
     comp: 'EuroLeague',
-    img: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&h=220&fit=crop&auto=format',
+    img: '',
   },
   {
     tag: 'STATS',
@@ -1421,7 +1421,7 @@ const ANALYSIS_ARTICLES: AnalysisArticle[] = [
     title: "Luka Dončić's usage rate reaches 42.1% — unsustainable fatigue or mathematical genius?",
     time: '5 hr ago',
     comp: 'NBA Playoffs',
-    img: 'https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=220&fit=crop&auto=format',
+    img: '',
   },
   {
     tag: 'PREVIEW',
@@ -1429,7 +1429,7 @@ const ANALYSIS_ARTICLES: AnalysisArticle[] = [
     title: "Celtics vs Heat tactical preview: Can Spoelstra's 2-3 zone neutralize Tatum?",
     time: '7 hr ago',
     comp: 'NBA Playoffs',
-    img: 'https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?w=400&h=220&fit=crop&auto=format',
+    img: '',
   },
 ];
 
@@ -2003,14 +2003,7 @@ export function BasketballPageClient() {
           HERO SECTION
       ════════════════════════════════════════ */}
       <div className="hidden md:block relative bg-gradient-to-b from-[#1c0e07] via-[#0b0f19] to-[#020617] border-b border-[#1e293b] overflow-hidden">
-        <div className="absolute inset-0 opacity-15 pointer-events-none">
-          <img
-            src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1600&h=400&fit=crop&auto=format"
-            alt="Basketball Court Hero"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/85 to-[#020617]/95" />
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 via-slate-900/10 to-transparent pointer-events-none" />
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-400" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">

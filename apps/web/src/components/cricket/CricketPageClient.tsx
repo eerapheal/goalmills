@@ -354,11 +354,11 @@ const IPL_TABLE: PointsRow[] = [
 ];
 
 const TOP_BATTERS: TopBatter[] = [
-  { rank: 1, name: 'Virat Kohli', playerId: 'virat-kohli', team: 'RCB', badge: '🔴', flag: '🇮🇳', runs: 742, avg: 61.8, sr: 148.4, hs: 113, photo: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=120&h=120&fit=crop&auto=format' },
-  { rank: 2, name: 'Ruturaj Gaikwad', playerId: 'ruturaj-gaikwad', team: 'CSK', badge: '🟡', flag: '🇮🇳', runs: 694, avg: 57.8, sr: 152.1, hs: 108, photo: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=120&h=120&fit=crop&auto=format' },
-  { rank: 3, name: 'Shubman Gill', playerId: 'shubman-gill', team: 'Gujarat Titans', badge: '🔵', flag: '🇮🇳', runs: 671, avg: 55.9, sr: 144.8, hs: 94, photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&auto=format' },
-  { rank: 4, name: 'Heinrich Klaasen', playerId: 'heinrich-klaasen', team: 'Sunrisers', badge: '🟠', flag: '🇿🇦', runs: 648, avg: 54.0, sr: 171.6, hs: 104, photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&auto=format' },
-  { rank: 5, name: 'Nicholas Pooran', playerId: 'nicholas-pooran', team: 'LSG', badge: '🟢', flag: '🌴', runs: 602, avg: 46.3, sr: 178.4, hs: 98, photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&fit=crop&auto=format' },
+  { rank: 1, name: 'Virat Kohli', playerId: 'virat-kohli', team: 'RCB', badge: '🔴', flag: '🇮🇳', runs: 742, avg: 61.8, sr: 148.4, hs: 113, photo: '' },
+  { rank: 2, name: 'Ruturaj Gaikwad', playerId: 'ruturaj-gaikwad', team: 'CSK', badge: '🟡', flag: '🇮🇳', runs: 694, avg: 57.8, sr: 152.1, hs: 108, photo: '' },
+  { rank: 3, name: 'Shubman Gill', playerId: 'shubman-gill', team: 'Gujarat Titans', badge: '🔵', flag: '🇮🇳', runs: 671, avg: 55.9, sr: 144.8, hs: 94, photo: '' },
+  { rank: 4, name: 'Heinrich Klaasen', playerId: 'heinrich-klaasen', team: 'Sunrisers', badge: '🟠', flag: '🇿🇦', runs: 648, avg: 54.0, sr: 171.6, hs: 104, photo: '' },
+  { rank: 5, name: 'Nicholas Pooran', playerId: 'nicholas-pooran', team: 'LSG', badge: '🟢', flag: '🌴', runs: 602, avg: 46.3, sr: 178.4, hs: 98, photo: '' },
 ];
 
 const COMP_GROUPS: CompGroup[] = [
@@ -423,7 +423,7 @@ const ANALYSIS_ARTICLES = [
     title: "How Kohli's off-stump discipline and strike rotation are redefining modern T20 powerplays",
     time: '1 hr ago',
     comp: 'IPL 2026',
-    img: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'kohli-t20-powerplay-discipline-breakdown',
   },
   {
@@ -432,7 +432,7 @@ const ANALYSIS_ARTICLES = [
     title: 'xRuns: The revolutionary tracking metric making T20 franchises completely rethink auction bidding',
     time: '3 hr ago',
     comp: 'Deep Data',
-    img: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'xruns-metric-t20-auction-analytics',
   },
   {
@@ -441,7 +441,7 @@ const ANALYSIS_ARTICLES = [
     title: 'Nigeria cricket is rising on the global radar — and the ICC T20 qualifiers prove the rapid ascent',
     time: '5 hr ago',
     comp: 'T20 WC Qual.',
-    img: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'nigeria-cricket-rising-t20-qualifiers',
   },
   {
@@ -450,7 +450,7 @@ const ANALYSIS_ARTICLES = [
     title: 'India vs Australia Day 3: Will the MCG pitch turn in session 2? Complete pitch & weather debrief',
     time: '8 hr ago',
     comp: 'WTC Final',
-    img: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=240&fit=crop&auto=format',
+    img: '',
     slug: 'india-australia-day-3-pitch-report-wtc',
   },
 ];
@@ -851,14 +851,7 @@ export function CricketPageClient() {
           HERO BANNER
       ════════════════════════════════════════ */}
       <div className="hidden md:block relative bg-gradient-to-b from-[#061a10] via-[#03120b] to-[#020617] border-b border-[#1e293b] overflow-hidden">
-        <div className="absolute inset-0 opacity-15">
-          <img
-            src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1400&h=300&fit=crop&auto=format"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/95 via-transparent to-[#020617]/95" />
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-slate-900/10 to-transparent pointer-events-none" />
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 via-amber-400 to-blue-500" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -1679,10 +1672,10 @@ export function CricketPageClient() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: 'Virat Kohli', slug: 'virat-kohli', team: 'Royal Challengers Bengaluru', role: 'Top-Order Anchor', flag: '🇮🇳', val: '₹21.0 Cr', runs: 742, sr: 148.4, photo: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=120&h=120&fit=crop&auto=format' },
-              { name: 'Jasprit Bumrah', slug: 'jasprit-bumrah', team: 'Mumbai Indians', role: 'Death-Over Specialist', flag: '🇮🇳', val: '₹18.0 Cr', runs: '24 Wkts', sr: 'Econ: 6.4', photo: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=120&h=120&fit=crop&auto=format' },
-              { name: 'Heinrich Klaasen', slug: 'heinrich-klaasen', team: 'Sunrisers Hyderabad', role: 'Middle-Over Enforcer', flag: '🇿🇦', val: '₹17.5 Cr', runs: 648, sr: 171.6, photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&auto=format' },
-              { name: 'Travis Head', slug: 'travis-head', team: 'Sunrisers Hyderabad', role: 'Powerplay Destroyer', flag: '🇦🇺', val: '₹16.5 Cr', runs: 588, sr: 189.2, photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&auto=format' },
+              { name: 'Virat Kohli', slug: 'virat-kohli', team: 'Royal Challengers Bengaluru', role: 'Top-Order Anchor', flag: '🇮🇳', val: '₹21.0 Cr', runs: 742, sr: 148.4, photo: '' },
+              { name: 'Jasprit Bumrah', slug: 'jasprit-bumrah', team: 'Mumbai Indians', role: 'Death-Over Specialist', flag: '🇮🇳', val: '₹18.0 Cr', runs: '24 Wkts', sr: 'Econ: 6.4', photo: '' },
+              { name: 'Heinrich Klaasen', slug: 'heinrich-klaasen', team: 'Sunrisers Hyderabad', role: 'Middle-Over Enforcer', flag: '🇿🇦', val: '₹17.5 Cr', runs: 648, sr: 171.6, photo: '' },
+              { name: 'Travis Head', slug: 'travis-head', team: 'Sunrisers Hyderabad', role: 'Powerplay Destroyer', flag: '🇦🇺', val: '₹16.5 Cr', runs: 588, sr: 189.2, photo: '' },
             ].map((p) => (
               <Link
                 key={p.slug}

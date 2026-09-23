@@ -13,47 +13,6 @@ export interface SponsoredBannerProps {
   accentBadge?: string;
 }
 
-const DEFAULT_FALLBACKS = [
-  {
-    _id: 'default-hero-1',
-    sponsorName: '1xBet Global',
-    title: '300% Welcome Bonus on Live Football & NBA',
-    tagline: 'Instant payouts, xG live metrics, and VIP matchday tournament multipliers.',
-    ctaText: 'Claim 300% Bonus',
-    targetUrl: 'https://1xbet.com',
-    badgeText: 'VIP PARTNER',
-    imageUrl:
-      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80',
-    sponsorLogo:
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    _id: 'default-pulse-2',
-    sponsorName: 'Puma Football Pro',
-    title: 'Next-Gen Ultra 5 Carbon Boots Unveiled',
-    tagline: 'Engineered with aerodynamic carbon chassis for elite match acceleration.',
-    ctaText: 'Shop New Season',
-    targetUrl: 'https://puma.com',
-    badgeText: 'KIT SPONSOR',
-    imageUrl:
-      'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=800&auto=format&fit=crop&q=80',
-    sponsorLogo:
-      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&auto=format&fit=crop&q=80',
-  },
-  {
-    _id: 'default-match-3',
-    sponsorName: 'Fantasy Premier Pulse',
-    title: 'Compete for £100,000 in Gameweek Knockouts',
-    tagline: 'Build your dream 11, analyze fixture xG, and top the global leaderboard.',
-    ctaText: 'Join League Free',
-    targetUrl: 'https://fantasy.premierleague.com',
-    badgeText: 'FANTASY LEAGUE',
-    imageUrl:
-      'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80',
-    sponsorLogo:
-      'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=120&auto=format&fit=crop&q=80',
-  },
-];
 
 export function SponsoredBannerCard({
   placement = 'homepage_hero',
@@ -107,25 +66,10 @@ export function SponsoredBannerCard({
 
           setSponsorships(data.sponsorships);
           setCurrentIndex(offsetIndex);
-        } else if (isMounted) {
-          const fallback =
-            DEFAULT_FALLBACKS[
-              campaignOffset % DEFAULT_FALLBACKS.length
-            ];
-
-          setSponsorships([fallback]);
-          setCurrentIndex(0);
         }
+        // If no real sponsorships, leave array empty — nothing renders
       } catch {
-        if (isMounted) {
-          const fallback =
-            DEFAULT_FALLBACKS[
-              campaignOffset % DEFAULT_FALLBACKS.length
-            ];
-
-          setSponsorships([fallback]);
-          setCurrentIndex(0);
-        }
+        // silent fail — no fake fallback shown
       }
     };
 
@@ -136,11 +80,7 @@ export function SponsoredBannerCard({
     };
   }, [placement, sport, category, campaignOffset]);
 
-  const currentSponsor =
-    sponsorships[currentIndex] ||
-    DEFAULT_FALLBACKS[
-      campaignOffset % DEFAULT_FALLBACKS.length
-    ];
+  const currentSponsor = sponsorships[currentIndex] ?? null;
 
   /*
    * Track impression
@@ -226,10 +166,8 @@ export function SponsoredBannerCard({
     );
   };
 
-  /*
-   * Don't render after closing
-   */
-  if (isClosed) {
+  // Don't render after closing or if no real sponsorships loaded
+  if (isClosed || sponsorships.length === 0 || !currentSponsor) {
     return null;
   }
 
