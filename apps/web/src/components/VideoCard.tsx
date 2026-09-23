@@ -26,11 +26,15 @@ export function VideoCard({ video, onPress }: VideoCardProps) {
     >
       {/* Thumbnail Container */}
       <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
-        <img
-          src={video.thumbnail || 'https://picsum.photos/seed/vid/800/450'}
-          alt={video.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {video.thumbnail ? (
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
+        )}
 
         {/* Play Overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/20">

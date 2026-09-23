@@ -27,11 +27,15 @@ export function BlogCard({ post, onPress }: BlogCardProps) {
     >
       {/* Cover Image */}
       <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
-        <img
-          src={post.image || 'https://picsum.photos/seed/blog/800/450'}
-          alt={post.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {post.image ? (
+          <img
+            src={post.image}
+            alt={post.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#141C2B] via-transparent to-transparent opacity-60" />
 
         {post.category ? (

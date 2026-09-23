@@ -346,17 +346,18 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
             >
               <div className="grid grid-cols-1 lg:grid-cols-12">
                 <div className="relative aspect-[16/9] lg:aspect-auto lg:col-span-7 h-64 sm:h-80 lg:h-[420px] overflow-hidden">
-                  <Image
-                    src={
-                      featuredArticle.image ||
-                      'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&q=80&w=1200'
-                    }
-                    alt={featuredArticle.title}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
+                  {featuredArticle.image ? (
+                    <Image
+                      src={featuredArticle.image}
+                      alt={featuredArticle.title}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#08142A] via-transparent to-transparent lg:hidden" />
                 </div>
 
@@ -419,13 +420,17 @@ export default function NewsFeedClient({ initialNews, initialCategories }: NewsF
                 <div>
                   {/* Image */}
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-900">
-                    <Image
-                      src={item.image || `https://picsum.photos/seed/${item._id}/800/600`}
-                      alt={item.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
+                    )}
                     <div className="absolute top-3 left-3 flex items-center gap-1.5">
                       {item.isBreaking && (
                         <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[9px] font-black uppercase tracking-wider shadow-md">
