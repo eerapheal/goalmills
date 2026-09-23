@@ -26,7 +26,8 @@ export default function ErrorBoundary({
         <div className="space-y-2">
           <h1 className="text-3xl font-black text-white tracking-tight">Something Went Wrong</h1>
           <p className="text-sm text-slate-400 leading-relaxed">
-            Our live data feed encountered an unexpected disruption. Our resilience systems are actively reconciling.
+            Our live data feed encountered an unexpected disruption. Our resilience systems are
+            actively reconciling.
           </p>
         </div>
 

@@ -1,4 +1,8 @@
-import { RecommendationCandidate, RecommendationContext, RecommendationType } from '@goalmills/types';
+import {
+  RecommendationCandidate,
+  RecommendationContext,
+  RecommendationType,
+} from '@goalmills/types';
 import { newsHistoryUtil } from '../utils/newsHistory';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://goalmills.com/api';
@@ -52,7 +56,11 @@ export const mobileRecommendationService = {
 
       if (res.ok) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.recommendations) && json.recommendations.length > 0) {
+        if (
+          json.success &&
+          Array.isArray(json.recommendations) &&
+          json.recommendations.length > 0
+        ) {
           return json.recommendations;
         }
       }
@@ -107,7 +115,11 @@ export const mobileRecommendationService = {
   /**
    * Dispatches recommendation click telemetry
    */
-  trackClick: (candidateId: string, candidateType = 'article', context: RecommendationContext = 'mobile_feed') => {
+  trackClick: (
+    candidateId: string,
+    candidateType = 'article',
+    context: RecommendationContext = 'mobile_feed'
+  ) => {
     fetch(`${BASE_URL}/recommendations/feedback`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

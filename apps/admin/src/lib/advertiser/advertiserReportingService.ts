@@ -3,10 +3,7 @@
  */
 
 import crypto from 'crypto';
-import type {
-  AdvertiserReportSummary,
-  AdvertiserHubStats,
-} from '@goalmills/types';
+import type { AdvertiserReportSummary, AdvertiserHubStats } from '@goalmills/types';
 import { AdvertiserReportModel } from '../../models/AdvertiserReport';
 import Sponsorship from '../../models/Sponsorship';
 import { connectDB } from '../db';
@@ -43,7 +40,10 @@ export class AdvertiserReportingService {
     const sportBreakdown: Record<string, { impressions: number; clicks: number }> = {
       football: { impressions: Math.round(impressions * 0.65), clicks: Math.round(clicks * 0.68) },
       cricket: { impressions: Math.round(impressions * 0.2), clicks: Math.round(clicks * 0.18) },
-      basketball: { impressions: Math.round(impressions * 0.15), clicks: Math.round(clicks * 0.14) },
+      basketball: {
+        impressions: Math.round(impressions * 0.15),
+        clicks: Math.round(clicks * 0.14),
+      },
     };
 
     const payloadToSign = `${sponsorId}:${tenantSlug}:${period}:${impressions}:${clicks}:${totalSpend}`;

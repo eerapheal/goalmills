@@ -105,11 +105,18 @@ export function MatchOddsModal({
                 <Text style={styles.sectionTitle}>🤖 AI Win Probability</Text>
                 <View style={styles.probLabels}>
                   <Text style={styles.probHome}>
-                    {homeTeam.split(' ').pop()}{'\n'}{hwPct}%
+                    {homeTeam.split(' ').pop()}
+                    {'\n'}
+                    {hwPct}%
                   </Text>
-                  <Text style={styles.probDraw}>Draw{'\n'}{dPct}%</Text>
+                  <Text style={styles.probDraw}>
+                    Draw{'\n'}
+                    {dPct}%
+                  </Text>
                   <Text style={styles.probAway}>
-                    {awayTeam.split(' ').pop()}{'\n'}{awPct}%
+                    {awayTeam.split(' ').pop()}
+                    {'\n'}
+                    {awPct}%
                   </Text>
                 </View>
                 <View style={styles.probBar}>
@@ -157,13 +164,25 @@ export function MatchOddsModal({
                     <Text style={[styles.oddsCell, styles.oddsBookie]} numberOfLines={1}>
                       {o.odd_bookmakers}
                     </Text>
-                    <Text style={[styles.oddsCell, styles.oddsNum, { color: '#60A5FA', fontWeight: '900' }]}>
+                    <Text
+                      style={[
+                        styles.oddsCell,
+                        styles.oddsNum,
+                        { color: '#60A5FA', fontWeight: '900' },
+                      ]}
+                    >
                       {o.odd_1 || '-'}
                     </Text>
                     <Text style={[styles.oddsCell, styles.oddsNum, { color: '#CBD5E1' }]}>
                       {o.odd_x || '-'}
                     </Text>
-                    <Text style={[styles.oddsCell, styles.oddsNum, { color: '#FBBF24', fontWeight: '900' }]}>
+                    <Text
+                      style={[
+                        styles.oddsCell,
+                        styles.oddsNum,
+                        { color: '#FBBF24', fontWeight: '900' },
+                      ]}
+                    >
                       {o.odd_2 || '-'}
                     </Text>
                     <Text style={[styles.oddsCell, styles.oddsNum, { color: '#34D399' }]}>
@@ -179,7 +198,9 @@ export function MatchOddsModal({
 
             {!probability && odds.length === 0 && (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No odds or predictions available for this match.</Text>
+                <Text style={styles.emptyText}>
+                  No odds or predictions available for this match.
+                </Text>
               </View>
             )}
 

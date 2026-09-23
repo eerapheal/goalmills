@@ -19,16 +19,12 @@ export async function POST(req: NextRequest) {
       if (!item.eventType || !item.payload) continue;
 
       // 1. Dispatch to stream producer (high throughput buffer)
-      const envelope = await sportsEventProducer.publishEvent(
-        item.eventType,
-        item.payload,
-        {
-          tenantSlug: tenantContext.tenantSlug,
-          tenantId: tenantContext.tenantId,
-          priority: 'standard',
-          producer: 'web-beacon',
-        }
-      );
+      const envelope = await sportsEventProducer.publishEvent(item.eventType, item.payload, {
+        tenantSlug: tenantContext.tenantSlug,
+        tenantId: tenantContext.tenantId,
+        priority: 'standard',
+        producer: 'web-beacon',
+      });
 
       // 2. Asynchronously process via worker
       sportsEventWorker.processEvent(envelope).catch((err) => {

@@ -54,10 +54,7 @@ const SEPARATOR = '   •   ';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function LiveNewsFlashTicker({
-  sport,
-  badgeText = 'LIVE FLASH',
-}: LiveNewsFlashTickerProps) {
+export function LiveNewsFlashTicker({ sport, badgeText = 'LIVE FLASH' }: LiveNewsFlashTickerProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<FlashPost[]>(FALLBACK_POSTS);
 

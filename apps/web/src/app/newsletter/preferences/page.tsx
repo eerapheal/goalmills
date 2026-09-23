@@ -5,7 +5,15 @@ import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
-import { FiMail, FiCheck, FiBell, FiCalendar, FiShield, FiAlertCircle, FiArrowRight } from 'react-icons/fi';
+import {
+  FiMail,
+  FiCheck,
+  FiBell,
+  FiCalendar,
+  FiShield,
+  FiAlertCircle,
+  FiArrowRight,
+} from 'react-icons/fi';
 import Link from 'next/link';
 
 function PreferencesContent() {
@@ -33,7 +41,9 @@ function PreferencesContent() {
       }
 
       try {
-        const queryParam = token ? `token=${encodeURIComponent(token)}` : `email=${encodeURIComponent(emailParam)}`;
+        const queryParam = token
+          ? `token=${encodeURIComponent(token)}`
+          : `email=${encodeURIComponent(emailParam)}`;
         const res = await fetch(`/api/newsletter/preferences?${queryParam}`);
         const data = await res.json();
 
@@ -222,7 +232,9 @@ function PreferencesContent() {
                   <span className="text-xs font-bold text-white flex items-center gap-1.5">
                     <FiBell className="text-amber-400" /> Breaking Sports Flash Alerts
                   </span>
-                  <p className="text-[11px] text-slate-400">Receive urgent breaking alerts for major match results and events</p>
+                  <p className="text-[11px] text-slate-400">
+                    Receive urgent breaking alerts for major match results and events
+                  </p>
                 </div>
                 <input
                   type="checkbox"
@@ -237,7 +249,9 @@ function PreferencesContent() {
                   <span className="text-xs font-bold text-white flex items-center gap-1.5">
                     <FiShield className="text-blue-400" /> Pause All Emails (Vacation Mode)
                   </span>
-                  <p className="text-[11px] text-slate-400">Temporarily pause newsletters without losing your subscription history</p>
+                  <p className="text-[11px] text-slate-400">
+                    Temporarily pause newsletters without losing your subscription history
+                  </p>
                 </div>
                 <input
                   type="checkbox"

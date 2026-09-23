@@ -137,7 +137,9 @@ export const goalmillsApi = {
    * Calls GET /api/news/flash and returns posts with { _id, title, slug }.
    * Results are cached for 45 s so each screen refresh gets fresh random items.
    */
-  getFlashNews: async (sport?: string): Promise<{ _id: string; title: string; slug?: string }[]> => {
+  getFlashNews: async (
+    sport?: string
+  ): Promise<{ _id: string; title: string; slug?: string }[]> => {
     const cacheKey = `mobile:flash:${currentTenantSlug}:${sport || 'all'}`;
     const cached = await mobileCache.get<{ _id: string; title: string; slug?: string }[]>(cacheKey);
     if (cached) return cached;
@@ -253,7 +255,10 @@ export const goalmillsApi = {
     }
   },
 
-  trackSponsorshipEvent: async (id: string, type: 'impression' | 'click' = 'impression'): Promise<void> => {
+  trackSponsorshipEvent: async (
+    id: string,
+    type: 'impression' | 'click' = 'impression'
+  ): Promise<void> => {
     if (!id || id.startsWith('default_')) return;
     try {
       await fetch(`${BASE_URL}/sponsorships/${id}/track?type=${type}`, {
@@ -284,7 +289,9 @@ export const goalmillsApi = {
   getNewsletterPreferences: async (tokenOrEmail: string): Promise<any | null> => {
     try {
       const isEmail = tokenOrEmail.includes('@');
-      const param = isEmail ? `email=${encodeURIComponent(tokenOrEmail)}` : `token=${encodeURIComponent(tokenOrEmail)}`;
+      const param = isEmail
+        ? `email=${encodeURIComponent(tokenOrEmail)}`
+        : `token=${encodeURIComponent(tokenOrEmail)}`;
       const response = await fetch(`${BASE_URL}/newsletter/preferences?${param}`, {
         headers: { 'x-tenant-slug': currentTenantSlug },
       });
@@ -555,4 +562,3 @@ export const goalmillsApi = {
 };
 
 export default goalmillsApi;
-

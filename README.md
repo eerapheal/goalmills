@@ -24,18 +24,18 @@
 
 ## 👨‍💻 Author & Intellectual Property Rights
 
-| Attribute | Details |
-| :--- | :--- |
-| **Principal Author & Architect** | **Ekpenisi Erue Raphael** |
-| **Platform Organization** | **GoalMills** |
-| **Platform Version** | **3.0.0 (Production Release Candidate)** |
-| **Monorepo Repository** | `eerapheal/goalmills` |
+| Attribute                        | Details                                  |
+| :------------------------------- | :--------------------------------------- |
+| **Principal Author & Architect** | **Ekpenisi Erue Raphael**                |
+| **Platform Organization**        | **GoalMills**                            |
+| **Platform Version**             | **3.0.0 (Production Release Candidate)** |
+| **Monorepo Repository**          | `eerapheal/goalmills`                    |
 
 ### 🔒 Strict Proprietary Rights & Ownership Notice
 
 > **IMPORTANT & EXCLUSIVE NOTICE:**  
-> **All rights reserved.** This software, codebase, architecture, design system, algorithms, data normalization engines, microservices, and all related intellectual property are the **exclusive proprietary property of Ekpenisi Erue Raphael and GoalMills**.  
->  
+> **All rights reserved.** This software, codebase, architecture, design system, algorithms, data normalization engines, microservices, and all related intellectual property are the **exclusive proprietary property of Ekpenisi Erue Raphael and GoalMills**.
+>
 > **NO INDIVIDUAL, ENTITY, OR THIRD PARTY HAS ANY RIGHT, LICENSE, OR PERMISSION TO COPY, MODIFY, DISTRIBUTE, REPRODUCE, SUBLICENSE, DECOMPILE, EXTRACT, OR CREATE DERIVATIVE WORKS FROM ANY PIECE OR PART OF THIS CODEBASE** without the express, prior written authorization and direct consent from **Ekpenisi Erue Raphael** and **GoalMills**. Unauthorized usage, mirroring, or exploitation is strictly prohibited and subject to full civil and criminal legal enforcement.
 
 ---
@@ -97,11 +97,13 @@ flowchart TD
 ```
 
 ### Active Sports
+
 - **⚽ Football**: Premier League, UEFA Champions League, La Liga, Serie A, Bundesliga, World Cup. Real-time scores, lineups, standings, H2H analysis, form guides, and live events (goals, VAR, bookings).
 - **🏏 Cricket**: ICC Tournaments, IPL, Test/ODI/T20 series. Live smart scorecards (`runs/wickets (overs)`), ball-by-ball commentary, ICC team & player rankings, and series stats.
 - **🏀 Basketball**: NBA, EuroLeague, international tournaments. Live period gamecast, quarter breakdowns (Q1–Q4, Overtime), team box scores, and efficiency ratings.
 
 ### Future Sports (Isolated behind "Coming Soon" states)
+
 - **🎾 Tennis**, **⚾ Baseball**, **🏒 Hockey** (Pre-architected, zero fake mock data).
 
 ---
@@ -163,6 +165,7 @@ goalmills/
 ## 🚀 Quick Start & Installation
 
 ### Prerequisites
+
 - **Node.js**: `>= 20.0.0`
 - **pnpm**: `>= 9.0.0`
 - **Go**: `>= 1.23` (for mailer service)
@@ -170,6 +173,7 @@ goalmills/
 - **Redis** (optional; memory fallback activates automatically)
 
 ### 1. Clone & Install Dependencies
+
 ```bash
 git clone https://github.com/eerapheal/goalmills.git
 cd goalmills
@@ -177,13 +181,16 @@ pnpm install
 ```
 
 ### 2. Configure Environment Variables
+
 Copy `.env.example` to `apps/web/.env` and `apps/admin/.env`:
+
 ```bash
 cp .env.example apps/web/.env
 cp .env.example apps/admin/.env
 ```
 
 Key environment variables:
+
 ```env
 MONGODB_URI=mongodb+srv://...
 REDIS_URL=rediss://...
@@ -195,6 +202,7 @@ BASKETBALL_API_KEY=your_allsports_key
 ```
 
 ### 3. Run Development Workspaces
+
 ```bash
 # Run all workspaces simultaneously
 pnpm dev
@@ -206,6 +214,7 @@ pnpm --filter mobile start  # Expo development server
 ```
 
 ### 4. Run Test Suites & Typechecks
+
 ```bash
 # Run full Vitest suite (57 test files, 168 tests)
 pnpm --filter web test
@@ -228,6 +237,7 @@ pnpm --filter admin build
 ## 📊 Technical Verification & Reports
 
 All production verification reports are documented in `/docs`:
+
 - [Production Readiness Scorecard (96/100)](docs/production-readiness.md)
 - [Security Final Report & Threat Model](docs/security-final-report.md)
 - [Performance & Web Vitals Audit](docs/performance-final-report.md)
@@ -242,4 +252,4 @@ All production verification reports are documented in `/docs`:
 ## 📄 License & Proprietary Notice
 
 **Copyright © 2026 Ekpenisi Erue Raphael & GoalMills. All Rights Reserved.**  
-*Strictly Private & Proprietary. No part of this software may be reproduced, distributed, or utilized without written authorization.*
+_Strictly Private & Proprietary. No part of this software may be reproduced, distributed, or utilized without written authorization._

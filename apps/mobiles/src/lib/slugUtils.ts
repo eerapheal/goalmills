@@ -1,6 +1,6 @@
 /**
  * Slug Utilities for GoalMills Mobile App
- * 
+ *
  * Adapted from web slugUtils.ts for Expo Router navigation.
  * Mobile routes use IDs for deep linking but slugify for display.
  */

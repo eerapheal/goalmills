@@ -22,7 +22,11 @@ export async function GET(request: NextRequest) {
     if (plan && plan !== 'all') query.plan = plan;
     if (search) {
       const sRegex = new RegExp(search.trim(), 'i');
-      query.$or = [{ name: { $regex: sRegex } }, { slug: { $regex: sRegex } }, { customDomain: { $regex: sRegex } }];
+      query.$or = [
+        { name: { $regex: sRegex } },
+        { slug: { $regex: sRegex } },
+        { customDomain: { $regex: sRegex } },
+      ];
     }
 
     const tenants = await Tenant.find(query).sort({ createdAt: -1 }).lean();
@@ -38,7 +42,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (err: any) {
     console.error('Error fetching tenants:', err);
-    return NextResponse.json({ success: false, error: err.message || 'Failed to fetch tenants' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message || 'Failed to fetch tenants' },
+      { status: 500 }
+    );
   }
 }
 
@@ -58,7 +65,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
+    const cleanSlug = slug
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9-]/g, '');
     if (!cleanSlug) {
       return NextResponse.json(
         { success: false, error: 'Invalid tenant slug format' },
@@ -104,13 +114,19 @@ export async function POST(request: NextRequest) {
       ownerId: session?.user?.id || undefined,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: `Tenant "${newTenant.name}" provisioned successfully`,
-      tenant: newTenant,
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: `Tenant "${newTenant.name}" provisioned successfully`,
+        tenant: newTenant,
+      },
+      { status: 201 }
+    );
   } catch (err: any) {
     console.error('Error creating tenant:', err);
-    return NextResponse.json({ success: false, error: err.message || 'Failed to create tenant' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message || 'Failed to create tenant' },
+      { status: 500 }
+    );
   }
 }

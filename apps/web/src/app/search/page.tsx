@@ -165,9 +165,7 @@ function SearchPortalContent() {
                       <p className="text-xs font-bold text-white group-hover:text-amber-400 truncate">
                         {sug.title}
                       </p>
-                      {sug.subtitle && (
-                        <p className="text-[10px] text-slate-400">{sug.subtitle}</p>
-                      )}
+                      {sug.subtitle && <p className="text-[10px] text-slate-400">{sug.subtitle}</p>}
                     </div>
                   </div>
                   <FiChevronRight size={14} className="text-slate-500 group-hover:text-white" />
@@ -182,21 +180,26 @@ function SearchPortalContent() {
           <span className="text-slate-500 font-bold uppercase text-[10px] flex-shrink-0">
             Trending:
           </span>
-          {['Arsenal', 'Champions League', 'Virat Kohli', 'IPL 2026', 'Lakers', 'Transfer Radar'].map(
-            (tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => {
-                  setQuery(tag);
-                  setShowSuggestions(false);
-                }}
-                className="px-3 py-1 rounded-full bg-slate-900/80 hover:bg-amber-500/10 border border-white/10 hover:border-amber-500/30 text-slate-300 hover:text-amber-400 font-medium text-xs whitespace-nowrap transition-all"
-              >
-                {tag}
-              </button>
-            )
-          )}
+          {[
+            'Arsenal',
+            'Champions League',
+            'Virat Kohli',
+            'IPL 2026',
+            'Lakers',
+            'Transfer Radar',
+          ].map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                setQuery(tag);
+                setShowSuggestions(false);
+              }}
+              className="px-3 py-1 rounded-full bg-slate-900/80 hover:bg-amber-500/10 border border-white/10 hover:border-amber-500/30 text-slate-300 hover:text-amber-400 font-medium text-xs whitespace-nowrap transition-all"
+            >
+              {tag}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -442,9 +445,12 @@ function SearchPortalContent() {
           ) : query ? (
             <div className="glass-card p-12 rounded-3xl border border-white/10 text-center space-y-3">
               <FiSearch size={36} className="mx-auto text-amber-400 opacity-60" />
-              <h3 className="text-base font-bold text-white">No results found for &ldquo;{query}&rdquo;</h3>
+              <h3 className="text-base font-bold text-white">
+                No results found for &ldquo;{query}&rdquo;
+              </h3>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Try checking for spelling errors, using more general sports keywords, or removing active category filters.
+                Try checking for spelling errors, using more general sports keywords, or removing
+                active category filters.
               </p>
             </div>
           ) : (
@@ -452,7 +458,8 @@ function SearchPortalContent() {
               <FiZap size={36} className="mx-auto text-amber-400 opacity-60" />
               <h3 className="text-base font-bold text-white">Instant GoalMills Search Engine</h3>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Search across live sports matches, transfer rumours, video highlights, and editorial breaking news.
+                Search across live sports matches, transfer rumours, video highlights, and editorial
+                breaking news.
               </p>
             </div>
           )}

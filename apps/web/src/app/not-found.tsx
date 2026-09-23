@@ -13,7 +13,8 @@ export default function NotFound() {
         <div className="space-y-2">
           <h1 className="text-3xl font-black text-white tracking-tight">404 - Page Not Found</h1>
           <p className="text-sm text-slate-400 leading-relaxed">
-            The sports intelligence feed, article, or match page you are looking for has been moved, expired, or does not exist.
+            The sports intelligence feed, article, or match page you are looking for has been moved,
+            expired, or does not exist.
           </p>
         </div>
 

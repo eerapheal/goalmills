@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!candidateId) {
-      return NextResponse.json({ success: false, message: 'candidateId is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'candidateId is required' },
+        { status: 400 }
+      );
     }
 
     // 1. Increment Real-time Feedback Counters in Redis

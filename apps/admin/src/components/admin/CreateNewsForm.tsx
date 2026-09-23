@@ -1073,7 +1073,8 @@ export default function CreateNewsForm() {
 
           {!isDirectPublisher && (
             <p className="text-[11px] text-amber-400 text-center font-medium">
-              ℹ️ Your role submits drafts to the Editorial Queue for review. An Editor, Manager, or Super Admin will review and approve.
+              ℹ️ Your role submits drafts to the Editorial Queue for review. An Editor, Manager, or
+              Super Admin will review and approve.
             </p>
           )}
         </div>

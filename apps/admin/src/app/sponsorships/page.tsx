@@ -114,11 +114,21 @@ export default function SponsorshipManagementPage() {
         priority: Number(formData.priority) || 1,
         budget: formData.budget ? Number(formData.budget) : undefined,
         budgetControls: {
-          dailyBudget: formData.budgetControls.dailyBudget ? Number(formData.budgetControls.dailyBudget) : undefined,
-          maxImpressions: formData.budgetControls.maxImpressions ? Number(formData.budgetControls.maxImpressions) : undefined,
-          maxClicks: formData.budgetControls.maxClicks ? Number(formData.budgetControls.maxClicks) : undefined,
-          cpmRate: formData.budgetControls.cpmRate ? Number(formData.budgetControls.cpmRate) : undefined,
-          cpcRate: formData.budgetControls.cpcRate ? Number(formData.budgetControls.cpcRate) : undefined,
+          dailyBudget: formData.budgetControls.dailyBudget
+            ? Number(formData.budgetControls.dailyBudget)
+            : undefined,
+          maxImpressions: formData.budgetControls.maxImpressions
+            ? Number(formData.budgetControls.maxImpressions)
+            : undefined,
+          maxClicks: formData.budgetControls.maxClicks
+            ? Number(formData.budgetControls.maxClicks)
+            : undefined,
+          cpmRate: formData.budgetControls.cpmRate
+            ? Number(formData.budgetControls.cpmRate)
+            : undefined,
+          cpcRate: formData.budgetControls.cpcRate
+            ? Number(formData.budgetControls.cpcRate)
+            : undefined,
           pacing: formData.budgetControls.pacing || 'asap',
         },
       };
@@ -203,8 +213,12 @@ export default function SponsorshipManagementPage() {
         countries: item.targeting?.countries || [],
       },
       budgetControls: {
-        dailyBudget: item.budgetControls?.dailyBudget ? String(item.budgetControls.dailyBudget) : '',
-        maxImpressions: item.budgetControls?.maxImpressions ? String(item.budgetControls.maxImpressions) : '',
+        dailyBudget: item.budgetControls?.dailyBudget
+          ? String(item.budgetControls.dailyBudget)
+          : '',
+        maxImpressions: item.budgetControls?.maxImpressions
+          ? String(item.budgetControls.maxImpressions)
+          : '',
         maxClicks: item.budgetControls?.maxClicks ? String(item.budgetControls.maxClicks) : '',
         cpmRate: item.budgetControls?.cpmRate ? String(item.budgetControls.cpmRate) : '',
         cpcRate: item.budgetControls?.cpcRate ? String(item.budgetControls.cpcRate) : '',
@@ -254,7 +268,8 @@ export default function SponsorshipManagementPage() {
   const totalImpressions = sponsorships.reduce((acc, curr) => acc + (curr.impressions || 0), 0);
   const totalClicks = sponsorships.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
   const totalSpent = sponsorships.reduce((acc, curr) => acc + (curr.spent || 0), 0);
-  const overallCtr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : '0.00';
+  const overallCtr =
+    totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : '0.00';
 
   return (
     <div className="space-y-6">
@@ -268,7 +283,8 @@ export default function SponsorshipManagementPage() {
             Sponsorship & Ad Engine
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Manage multi-tenant commercial partnerships, contextual banner slots, telemetry pacing, and real-time CTR analytics.
+            Manage multi-tenant commercial partnerships, contextual banner slots, telemetry pacing,
+            and real-time CTR analytics.
           </p>
         </div>
 
@@ -333,7 +349,11 @@ export default function SponsorshipManagementPage() {
             <FiPieChart className="text-teal-400 w-4 h-4" />
           </div>
           <div className="text-2xl font-black text-white mt-2">
-            ${totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            $
+            {totalSpent.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </div>
         </div>
       </div>
@@ -401,7 +421,8 @@ export default function SponsorshipManagementPage() {
           <FiDollarSign className="w-12 h-12 text-slate-600 mx-auto mb-3" />
           <h3 className="text-base font-bold text-white">No Sponsorship Campaigns Found</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-            Create your first commercial partnership or banner placement to monetize audience engagement.
+            Create your first commercial partnership or banner placement to monetize audience
+            engagement.
           </p>
         </div>
       ) : (
@@ -427,7 +448,8 @@ export default function SponsorshipManagementPage() {
                   const clicks = item.clicks || 0;
                   const ctr = impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
                   const isCapped =
-                    (item.budgetControls?.maxImpressions && impressions >= item.budgetControls.maxImpressions) ||
+                    (item.budgetControls?.maxImpressions &&
+                      impressions >= item.budgetControls.maxImpressions) ||
                     (item.budget && item.spent && item.spent >= item.budget);
 
                   return (
@@ -446,9 +468,13 @@ export default function SponsorshipManagementPage() {
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-white text-sm line-clamp-1">{item.title}</div>
+                            <div className="font-bold text-white text-sm line-clamp-1">
+                              {item.title}
+                            </div>
                             <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                              <span className="font-medium text-emerald-400">{item.sponsorName}</span>
+                              <span className="font-medium text-emerald-400">
+                                {item.sponsorName}
+                              </span>
                               <span>•</span>
                               <span className="uppercase text-[10px] tracking-wider px-1.5 py-0.5 rounded bg-white/5">
                                 {item.badgeText || 'SPONSOR'}
@@ -483,8 +509,8 @@ export default function SponsorshipManagementPage() {
                             item.status === 'active'
                               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                               : item.status === 'paused'
-                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                           }`}
                         >
                           {item.status === 'active' ? (
@@ -569,7 +595,8 @@ export default function SponsorshipManagementPage() {
                   {editingId ? 'Edit Sponsorship Campaign' : 'Create New Sponsorship Campaign'}
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Configure commercial placement, multi-tenant scoping, and telemetry budget controls.
+                  Configure commercial placement, multi-tenant scoping, and telemetry budget
+                  controls.
                 </p>
               </div>
               <button
@@ -584,7 +611,9 @@ export default function SponsorshipManagementPage() {
               {/* Organization / Tenant Scoping */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300">Target Organization (Tenant) *</label>
+                  <label className="text-xs font-semibold text-slate-300">
+                    Target Organization (Tenant) *
+                  </label>
                   <select
                     value={formData.tenantId}
                     onChange={(e) => {
@@ -641,7 +670,9 @@ export default function SponsorshipManagementPage() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-slate-300">Sponsor / Brand Name *</label>
+                  <label className="text-xs font-semibold text-slate-300">
+                    Sponsor / Brand Name *
+                  </label>
                   <input
                     type="text"
                     required
@@ -655,7 +686,9 @@ export default function SponsorshipManagementPage() {
 
               {/* Target URL */}
               <div>
-                <label className="text-xs font-semibold text-slate-300">Target Destination URL *</label>
+                <label className="text-xs font-semibold text-slate-300">
+                  Target Destination URL *
+                </label>
                 <input
                   type="url"
                   required
@@ -724,7 +757,9 @@ export default function SponsorshipManagementPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-300">Total Budget ($)</label>
+                    <label className="text-[11px] font-semibold text-slate-300">
+                      Total Budget ($)
+                    </label>
                     <input
                       type="number"
                       step="0.01"
@@ -736,14 +771,19 @@ export default function SponsorshipManagementPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-300">Max Impressions Cap</label>
+                    <label className="text-[11px] font-semibold text-slate-300">
+                      Max Impressions Cap
+                    </label>
                     <input
                       type="number"
                       value={formData.budgetControls.maxImpressions}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          budgetControls: { ...formData.budgetControls, maxImpressions: e.target.value },
+                          budgetControls: {
+                            ...formData.budgetControls,
+                            maxImpressions: e.target.value,
+                          },
                         })
                       }
                       placeholder="e.g. 100000"
@@ -752,7 +792,9 @@ export default function SponsorshipManagementPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-slate-300">CPM Rate ($ / 1k imp)</label>
+                    <label className="text-[11px] font-semibold text-slate-300">
+                      CPM Rate ($ / 1k imp)
+                    </label>
                     <input
                       type="number"
                       step="0.01"
@@ -773,7 +815,9 @@ export default function SponsorshipManagementPage() {
               {/* Priority & Status */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300">Priority Weight (1-100)</label>
+                  <label className="text-xs font-semibold text-slate-300">
+                    Priority Weight (1-100)
+                  </label>
                   <input
                     type="number"
                     min="1"

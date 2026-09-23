@@ -22,9 +22,7 @@ import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 /** Pulse skeleton shimmer line */
 function SkeletonLine({ className = '' }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded bg-slate-700/50 ${className}`} />
-  );
+  return <div className={`animate-pulse rounded bg-slate-700/50 ${className}`} />;
 }
 
 /** Full-card loading skeleton */
@@ -85,11 +83,7 @@ function HighlightSkeleton() {
 /** Real-time live score refresh interval (30 seconds) */
 const LIVE_REFRESH_MS = 30_000;
 
-export function GoalmillsLiveDashboard({
-  onSelectTab,
-}: {
-  onSelectTab?: (tab: string) => void;
-}) {
+export function GoalmillsLiveDashboard({ onSelectTab }: { onSelectTab?: (tab: string) => void }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('LIVE SCORES');
   const [tickerIndex, setTickerIndex] = useState(0);
@@ -130,7 +124,9 @@ export function GoalmillsLiveDashboard({
             slug: item.slug || slugify(item.title) || item._id,
             tag: (item.competition || item.sport || item.category || 'LIVE').toUpperCase(),
             title: item.title,
-            time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
+            time: item.createdAt
+              ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago`
+              : 'Recent',
           }));
           setPulseNews(formatted);
         }
@@ -156,7 +152,10 @@ export function GoalmillsLiveDashboard({
         const mapped = matches.slice(0, 2).map((m: any, idx: number) => {
           const home = m.event_home_team || m.homeTeam || 'Home';
           const away = m.event_away_team || m.awayTeam || 'Away';
-          const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+          const score =
+            m.event_final_result ||
+            m.event_ft_result ||
+            `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
           return {
             id: m.event_key || `lf-${idx}`,
             league: m.league_name || 'Premier League',
@@ -190,7 +189,10 @@ export function GoalmillsLiveDashboard({
             overs: topC.event_status || '(Live)',
             batsman1: { name: 'Top Batsman*', r: '—', b: '—', f4: '—', f6: '—', sr: '—' },
             batsman2: { name: 'Partner', r: '—', b: '—', f4: '—', f6: '—', sr: '—' },
-            comm1: { over: '—', text: `${topC.event_home_team || 'Team'} in command of the run chase.` },
+            comm1: {
+              over: '—',
+              text: `${topC.event_home_team || 'Team'} in command of the run chase.`,
+            },
             comm2: { over: '—', text: 'Good length delivery rotated for a single.' },
           });
         }
@@ -198,7 +200,10 @@ export function GoalmillsLiveDashboard({
 
       if (standRes && standRes.ok) {
         const sData = await standRes.json();
-        const table = sData?.result?.total || sData?.standings || (Array.isArray(sData?.result) ? sData.result : []);
+        const table =
+          sData?.result?.total ||
+          sData?.standings ||
+          (Array.isArray(sData?.result) ? sData.result : []);
         if (Array.isArray(table) && table.length > 0) {
           const mappedStandings = table.slice(0, 3).map((row: any, idx: number) => {
             const name = row.standing_team || row.team_name || row.team?.name || `Team ${idx + 1}`;
@@ -264,7 +269,7 @@ export function GoalmillsLiveDashboard({
     return () => clearInterval(timer);
   }, [pulseNews.length]);
 
-  const currentPulse = pulseNews.length > 0 ? (pulseNews[tickerIndex] || pulseNews[0]) : null;
+  const currentPulse = pulseNews.length > 0 ? pulseNews[tickerIndex] || pulseNews[0] : null;
   const pulseLink = currentPulse ? getNewsUrl(currentPulse) : '#';
 
   return (
@@ -272,31 +277,30 @@ export function GoalmillsLiveDashboard({
       {/* ─── TOP LIVE PULSE BAR ─── */}
       <div className="rounded-lg bg-[#0B172B]/95 border border-blue-500/20 p-1.5 sm:p-2 flex flex-col md:flex-row items-center justify-between gap-2 shadow-lg backdrop-blur-md min-h-[46px]">
         <div className="hidden md:flex items-center gap-2 min-w-0 flex-1">
-             <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
-              
-               <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
-                 FOOTBALL PULSE
-               </span>
-   
-               {currentPulse ? (
-                 <Link
-                   href={pulseLink}
-                   className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
-                 >
-                   {currentPulse.title}    
-                 </Link>
-               ) : (
-                 <SkeletonLine className="h-3 w-64 flex-1" />
-               )}
-   
-               {currentPulse && (
-                 <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-                   • {currentPulse.time}
-                 </span>
-               )}
-             </div>
-           </div>
-   
+          <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
+            <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
+              FOOTBALL PULSE
+            </span>
+
+            {currentPulse ? (
+              <Link
+                href={pulseLink}
+                className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
+              >
+                {currentPulse.title}
+              </Link>
+            ) : (
+              <SkeletonLine className="h-3 w-64 flex-1" />
+            )}
+
+            {currentPulse && (
+              <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
+                • {currentPulse.time}
+              </span>
+            )}
+          </div>
+        </div>
+
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => onSelectTab?.('football')}
@@ -319,9 +323,7 @@ export function GoalmillsLiveDashboard({
             <div className="flex items-center justify-between mb-2 border-b border-white/5 pb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
-                <h3 className="text-xs font-black tracking-wider text-red-400 uppercase">
-                  Live
-                </h3>
+                <h3 className="text-xs font-black tracking-wider text-red-400 uppercase">Live</h3>
               </div>
               <button
                 onClick={() => onSelectTab?.('football')}
@@ -369,7 +371,9 @@ export function GoalmillsLiveDashboard({
                     {/* Header info (League name, live status badge) */}
                     <div className="flex items-center justify-between text-xs text-slate-300 mb-2">
                       <span className="font-semibold text-slate-400 truncate pr-2">{m.league}</span>
-                      <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.time}</span>
+                      <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">
+                        {m.time}
+                      </span>
                     </div>
 
                     {/* Match Body */}
@@ -403,9 +407,13 @@ export function GoalmillsLiveDashboard({
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">{m.homeTeam}</div>
+                            <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">
+                              {m.homeTeam}
+                            </div>
                             {m.homeScorer && (
-                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeScorer}</div>
+                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">
+                                {m.homeScorer}
+                              </div>
                             )}
                           </div>
                         </Link>
@@ -431,9 +439,13 @@ export function GoalmillsLiveDashboard({
                           className="flex items-center justify-end gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
                         >
                           <div className="min-w-0 flex-1 text-right">
-                            <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">{m.awayTeam}</div>
+                            <div className="font-bold text-[10px] sm:text-xs text-white truncate hover:text-blue-300 transition-colors">
+                              {m.awayTeam}
+                            </div>
                             {m.awayScorer && (
-                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayScorer}</div>
+                              <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">
+                                {m.awayScorer}
+                              </div>
                             )}
                           </div>
                           <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
@@ -463,8 +475,14 @@ export function GoalmillsLiveDashboard({
                         <span>{100 - m.possession}%</span>
                       </div>
                       <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden flex">
-                        <div className="bg-amber-400 h-full" style={{ width: `${m.possession}%` }} />
-                        <div className="bg-slate-700 h-full" style={{ width: `${100 - m.possession}%` }} />
+                        <div
+                          className="bg-amber-400 h-full"
+                          style={{ width: `${m.possession}%` }}
+                        />
+                        <div
+                          className="bg-slate-700 h-full"
+                          style={{ width: `${100 - m.possession}%` }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -475,86 +493,96 @@ export function GoalmillsLiveDashboard({
 
           {/* 2. BASKETBALL ANALYTICS CARD */}
           {basketballStats && (
-          <div className="rounded-xl bg-[#0E1A29]/95 border border-amber-500/20 p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 backdrop-blur-md">
-            <div className="flex items-center justify-between flex-wrap gap-2 mb-2.5 border-b border-white/5 pb-2">
-              <div className="flex items-center gap-1.5">
-                <span className="p-1 rounded-md bg-amber-500/10 text-amber-400 text-xs">🏀</span>
-                <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
-                  BASKETBALL ANALYTICS
-                </h3>
+            <div className="rounded-xl bg-[#0E1A29]/95 border border-amber-500/20 p-3 sm:p-3.5 shadow-xl shadow-amber-950/20 backdrop-blur-md">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2.5 border-b border-white/5 pb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="p-1 rounded-md bg-amber-500/10 text-amber-400 text-xs">🏀</span>
+                  <h3 className="text-sm font-black tracking-wider text-slate-200 uppercase">
+                    BASKETBALL ANALYTICS
+                  </h3>
+                </div>
+                <span className="text-[10px] sm:text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                  {basketballStats.matchName}
+                </span>
               </div>
-              <span className="text-[10px] sm:text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-                {basketballStats.matchName}
-              </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                {/* Radial Player Efficiency */}
+                <div className="p-2.5 rounded-lg bg-[#142336] border border-white/5 flex flex-col items-center justify-center text-center">
+                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        className="text-slate-800"
+                        strokeWidth="3.5"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-amber-400"
+                        strokeDasharray={`${basketballStats.efficiency}, 100`}
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <div className="absolute text-xs sm:text-sm font-black text-white">
+                      {basketballStats.efficiency}%
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-slate-200 mt-0.5">Player Efficiency</span>
+                  <span className="text-[10px] text-slate-300 font-medium">
+                    {basketballStats.starPlayer}
+                  </span>
+                </div>
+
+                {/* Points in Paint Bar Chart */}
+                <div className="p-2.5 rounded-lg bg-[#142336] border border-white/5 flex flex-col justify-between">
+                  <span className="text-xs font-bold text-slate-200 text-center">
+                    Points in Paint
+                  </span>
+                  <div className="flex items-end justify-between h-12 sm:h-14 px-2 gap-1 pt-2">
+                    <div className="w-full flex flex-col items-center gap-1">
+                      <div className="w-full bg-amber-400/80 rounded-t h-[60%]" />
+                      <span className="text-[9px] text-slate-300 font-medium">Q1</span>
+                    </div>
+                    <div className="w-full flex flex-col items-center gap-1">
+                      <div className="w-full bg-amber-400 rounded-t h-[85%]" />
+                      <span className="text-[9px] text-slate-300 font-medium">Q2</span>
+                    </div>
+                    <div className="w-full flex flex-col items-center gap-1">
+                      <div className="w-full bg-amber-400/60 rounded-t h-[40%]" />
+                      <span className="text-[9px] text-slate-300 font-medium">Q3</span>
+                    </div>
+                    <div className="w-full flex flex-col items-center gap-1">
+                      <div className="w-full bg-orange-400 rounded-t h-[95%]" />
+                      <span className="text-[9px] text-slate-300 font-medium">Q4</span>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-amber-400 text-center font-bold mt-0.5">
+                    Total: {basketballStats.totalPts}
+                  </div>
+                </div>
+
+                {/* Team Gauges */}
+                <div className="p-2.5 rounded-lg bg-[#142336] border border-white/5 flex flex-col justify-around text-center">
+                  <div>
+                    <div className="text-base sm:text-lg font-black text-orange-400">
+                      {basketballStats.fg}
+                    </div>
+                    <span className="text-xs font-bold text-slate-200">Team FG%</span>
+                  </div>
+                  <div className="border-t border-white/5 pt-2">
+                    <div className="text-base sm:text-lg font-black text-amber-400">
+                      {basketballStats.reb}
+                    </div>
+                    <span className="text-xs font-bold text-slate-200">Total Rebounds</span>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-              {/* Radial Player Efficiency */}
-              <div className="p-2.5 rounded-lg bg-[#142336] border border-white/5 flex flex-col items-center justify-center text-center">
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-slate-800"
-                      strokeWidth="3.5"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className="text-amber-400"
-                      strokeDasharray={`${basketballStats.efficiency}, 100`}
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute text-xs sm:text-sm font-black text-white">{basketballStats.efficiency}%</div>
-                </div>
-                <span className="text-xs font-bold text-slate-200 mt-0.5">Player Efficiency</span>
-                <span className="text-[10px] text-slate-300 font-medium">{basketballStats.starPlayer}</span>
-              </div>
-
-              {/* Points in Paint Bar Chart */}
-              <div className="p-2.5 rounded-lg bg-[#142336] border border-white/5 flex flex-col justify-between">
-                <span className="text-xs font-bold text-slate-200 text-center">Points in Paint</span>
-                <div className="flex items-end justify-between h-12 sm:h-14 px-2 gap-1 pt-2">
-                  <div className="w-full flex flex-col items-center gap-1">
-                    <div className="w-full bg-amber-400/80 rounded-t h-[60%]" />
-                    <span className="text-[9px] text-slate-300 font-medium">Q1</span>
-                  </div>
-                  <div className="w-full flex flex-col items-center gap-1">
-                    <div className="w-full bg-amber-400 rounded-t h-[85%]" />
-                    <span className="text-[9px] text-slate-300 font-medium">Q2</span>
-                  </div>
-                  <div className="w-full flex flex-col items-center gap-1">
-                    <div className="w-full bg-amber-400/60 rounded-t h-[40%]" />
-                    <span className="text-[9px] text-slate-300 font-medium">Q3</span>
-                  </div>
-                  <div className="w-full flex flex-col items-center gap-1">
-                    <div className="w-full bg-orange-400 rounded-t h-[95%]" />
-                    <span className="text-[9px] text-slate-300 font-medium">Q4</span>
-                  </div>
-                </div>
-                <div className="text-[10px] text-amber-400 text-center font-bold mt-0.5">
-                  Total: {basketballStats.totalPts}
-                </div>
-              </div>
-
-              {/* Team Gauges */}
-              <div className="p-2.5 rounded-lg bg-[#142336] border border-white/5 flex flex-col justify-around text-center">
-                <div>
-                  <div className="text-base sm:text-lg font-black text-orange-400">{basketballStats.fg}</div>
-                  <span className="text-xs font-bold text-slate-200">Team FG%</span>
-                </div>
-                <div className="border-t border-white/5 pt-2">
-                  <div className="text-base sm:text-lg font-black text-amber-400">{basketballStats.reb}</div>
-                  <span className="text-xs font-bold text-slate-200">Total Rebounds</span>
-                </div>
-              </div>
-            </div>
-          </div>
           )}
         </div>
 
@@ -591,12 +619,18 @@ export function GoalmillsLiveDashboard({
                 {/* Match Header */}
                 <div className="flex items-center justify-between flex-wrap gap-2 bg-[#142336] p-2.5 rounded-lg border border-white/5 mb-2">
                   <div className="min-w-0">
-                    <span className="text-xs font-bold text-slate-200 truncate block">{liveCricket.title}</span>
+                    <span className="text-xs font-bold text-slate-200 truncate block">
+                      {liveCricket.title}
+                    </span>
                     <p className="text-[10px] text-slate-300 truncate">{liveCricket.subtitle}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className="text-sm sm:text-base font-black text-amber-400">{liveCricket.score}</div>
-                    <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium">{liveCricket.overs}</div>
+                    <div className="text-sm sm:text-base font-black text-amber-400">
+                      {liveCricket.score}
+                    </div>
+                    <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium">
+                      {liveCricket.overs}
+                    </div>
                   </div>
                 </div>
 
@@ -619,19 +653,29 @@ export function GoalmillsLiveDashboard({
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           {liveCricket.batsman1.name}
                         </td>
-                        <td className="py-1 text-center font-bold text-white">{liveCricket.batsman1.r}</td>
+                        <td className="py-1 text-center font-bold text-white">
+                          {liveCricket.batsman1.r}
+                        </td>
                         <td className="py-1 text-center">{liveCricket.batsman1.b}</td>
                         <td className="py-1 text-center">{liveCricket.batsman1.f4}</td>
                         <td className="py-1 text-center">{liveCricket.batsman1.f6}</td>
-                        <td className="py-1 text-right text-amber-400 font-bold">{liveCricket.batsman1.sr}</td>
+                        <td className="py-1 text-right text-amber-400 font-bold">
+                          {liveCricket.batsman1.sr}
+                        </td>
                       </tr>
                       <tr>
-                        <td className="py-1 font-semibold text-slate-300">{liveCricket.batsman2.name}</td>
-                        <td className="py-1 text-center font-bold text-white">{liveCricket.batsman2.r}</td>
+                        <td className="py-1 font-semibold text-slate-300">
+                          {liveCricket.batsman2.name}
+                        </td>
+                        <td className="py-1 text-center font-bold text-white">
+                          {liveCricket.batsman2.r}
+                        </td>
                         <td className="py-1 text-center">{liveCricket.batsman2.b}</td>
                         <td className="py-1 text-center">{liveCricket.batsman2.f4}</td>
                         <td className="py-1 text-center">{liveCricket.batsman2.f6}</td>
-                        <td className="py-1 text-right text-amber-400 font-bold">{liveCricket.batsman2.sr}</td>
+                        <td className="py-1 text-right text-amber-400 font-bold">
+                          {liveCricket.batsman2.sr}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -643,12 +687,12 @@ export function GoalmillsLiveDashboard({
                     <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono font-bold text-[10px]">
                       {liveCricket.comm1.over}
                     </span>
-                    <span className="text-[11px] truncate">
-                      {liveCricket.comm1.text}
-                    </span>
+                    <span className="text-[11px] truncate">{liveCricket.comm1.text}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-400 text-[11px]">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 font-mono text-[10px]">{liveCricket.comm2.over}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-slate-800 font-mono text-[10px]">
+                      {liveCricket.comm2.over}
+                    </span>
                     <span className="truncate">{liveCricket.comm2.text}</span>
                   </div>
                 </div>

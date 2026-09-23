@@ -211,9 +211,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                 className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-cyan-500/10 border border-white/5 transition-all"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-xs font-black text-cyan-400 font-mono w-4">
-                    #{idx + 1}
-                  </span>
+                  <span className="text-xs font-black text-cyan-400 font-mono w-4">#{idx + 1}</span>
                   <PlayerImage src={p.photo} alt={p.name} size={32} rounded="rounded-lg" />
                   <div className="min-w-0">
                     <h5 className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors truncate">
@@ -250,9 +248,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                 className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-blue-500/10 border border-white/5 transition-all"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-xs font-black text-blue-400 font-mono w-4">
-                    #{idx + 1}
-                  </span>
+                  <span className="text-xs font-black text-blue-400 font-mono w-4">#{idx + 1}</span>
                   <PlayerImage src={p.photo} alt={p.name} size={32} rounded="rounded-lg" />
                   <div className="min-w-0">
                     <h5 className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors truncate">
@@ -348,9 +344,8 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
             {
               key: 'forward',
               label: 'Forwards & Strikers',
-              count: initialPlayers.filter((p) =>
-                /striker|winger|forward/i.test(p.position)
-              ).length,
+              count: initialPlayers.filter((p) => /striker|winger|forward/i.test(p.position))
+                .length,
             },
             {
               key: 'midfielder',
@@ -360,9 +355,8 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
             {
               key: 'defender-gk',
               label: 'Defenders & Keepers',
-              count: initialPlayers.filter((p) =>
-                /back|defender|goalkeeper/i.test(p.position)
-              ).length,
+              count: initialPlayers.filter((p) => /back|defender|goalkeeper/i.test(p.position))
+                .length,
             },
           ].map((tab) => (
             <button
@@ -478,9 +472,7 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
                     >
                       {player.name}
                     </Link>
-                    <p className="text-xs font-bold text-blue-400 truncate">
-                      {player.position}
-                    </p>
+                    <p className="text-xs font-bold text-blue-400 truncate">{player.position}</p>
                     <p className="text-[11px] text-slate-400 truncate flex items-center gap-1.5 pt-0.5">
                       <span>{player.countryFlag}</span>
                       <span>{player.clubName}</span>

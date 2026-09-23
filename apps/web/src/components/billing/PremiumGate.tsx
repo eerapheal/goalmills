@@ -42,9 +42,7 @@ export const PremiumGate: React.FC<PremiumGateProps> = ({
       </div>
 
       <div className="max-w-md mx-auto space-y-1.5">
-        <h4 className="text-lg sm:text-xl font-black text-white tracking-tight">
-          {fallbackTitle}
-        </h4>
+        <h4 className="text-lg sm:text-xl font-black text-white tracking-tight">{fallbackTitle}</h4>
         <p className="text-xs sm:text-sm text-slate-400">{fallbackDescription}</p>
       </div>
 

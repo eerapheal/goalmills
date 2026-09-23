@@ -84,7 +84,14 @@ export interface TopScorer {
 export interface CompGroup {
   region: string;
   icon: string;
-  comps: { name: string; flag: string; tier: string; season: string; country: string; href?: string }[];
+  comps: {
+    name: string;
+    flag: string;
+    tier: string;
+    season: string;
+    country: string;
+    href?: string;
+  }[];
 }
 
 export interface ClubHub {
@@ -99,53 +106,512 @@ export interface ClubHub {
 // ─── Curated Fallback / Baseline Data (from Figma) ─────────────────────────────
 
 const DEFAULT_LIVE_FIXTURES: FixtureItem[] = [
-  { id: 'mci-ars-2026', comp: 'Premier League', compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', home: 'Man City', homeBadge: '🔵', away: 'Arsenal', awayBadge: '🔴', hScore: 2, aScore: 1, minute: 67, status: 'LIVE', stadium: 'Etihad Stadium' },
-  { id: 'nap-juv-2026', comp: 'Serie A', compFlag: '🇮🇹', home: 'Napoli', homeBadge: '🔵', away: 'Juventus', awayBadge: '⚫', hScore: 3, aScore: 0, minute: 82, status: 'LIVE', stadium: 'Stadio Diego Maradona' },
-  { id: 'che-bay-2026', comp: 'UCL', compFlag: '⭐', home: 'Chelsea', homeBadge: '🔵', away: 'Bayern', awayBadge: '🔴', hScore: 1, aScore: 1, minute: 45, status: 'HT', stadium: 'Stamford Bridge' },
-  { id: 'psg-lyo-2026', comp: 'Ligue 1', compFlag: '🇫🇷', home: 'PSG', homeBadge: '🔵', away: 'Lyon', awayBadge: '⚪', hScore: 2, aScore: 0, minute: 71, status: 'LIVE', stadium: 'Parc des Princes' },
-  { id: 'nga-rwa-2026', comp: 'AFCON Q.', compFlag: '🌍', home: 'Nigeria', homeBadge: '🟢', away: 'Rwanda', awayBadge: '🔵', hScore: 3, aScore: 0, minute: null, status: 'FT', stadium: 'Godswill Akpabio Stadium' },
-  { id: 'dor-rbl-2026', comp: 'Bundesliga', compFlag: '🇩🇪', home: 'Dortmund', homeBadge: '🟡', away: 'Leipzig', awayBadge: '🔴', hScore: 2, aScore: 2, minute: null, status: 'FT', stadium: 'Signal Iduna Park' },
+  {
+    id: 'mci-ars-2026',
+    comp: 'Premier League',
+    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    home: 'Man City',
+    homeBadge: '🔵',
+    away: 'Arsenal',
+    awayBadge: '🔴',
+    hScore: 2,
+    aScore: 1,
+    minute: 67,
+    status: 'LIVE',
+    stadium: 'Etihad Stadium',
+  },
+  {
+    id: 'nap-juv-2026',
+    comp: 'Serie A',
+    compFlag: '🇮🇹',
+    home: 'Napoli',
+    homeBadge: '🔵',
+    away: 'Juventus',
+    awayBadge: '⚫',
+    hScore: 3,
+    aScore: 0,
+    minute: 82,
+    status: 'LIVE',
+    stadium: 'Stadio Diego Maradona',
+  },
+  {
+    id: 'che-bay-2026',
+    comp: 'UCL',
+    compFlag: '⭐',
+    home: 'Chelsea',
+    homeBadge: '🔵',
+    away: 'Bayern',
+    awayBadge: '🔴',
+    hScore: 1,
+    aScore: 1,
+    minute: 45,
+    status: 'HT',
+    stadium: 'Stamford Bridge',
+  },
+  {
+    id: 'psg-lyo-2026',
+    comp: 'Ligue 1',
+    compFlag: '🇫🇷',
+    home: 'PSG',
+    homeBadge: '🔵',
+    away: 'Lyon',
+    awayBadge: '⚪',
+    hScore: 2,
+    aScore: 0,
+    minute: 71,
+    status: 'LIVE',
+    stadium: 'Parc des Princes',
+  },
+  {
+    id: 'nga-rwa-2026',
+    comp: 'AFCON Q.',
+    compFlag: '🌍',
+    home: 'Nigeria',
+    homeBadge: '🟢',
+    away: 'Rwanda',
+    awayBadge: '🔵',
+    hScore: 3,
+    aScore: 0,
+    minute: null,
+    status: 'FT',
+    stadium: 'Godswill Akpabio Stadium',
+  },
+  {
+    id: 'dor-rbl-2026',
+    comp: 'Bundesliga',
+    compFlag: '🇩🇪',
+    home: 'Dortmund',
+    homeBadge: '🟡',
+    away: 'Leipzig',
+    awayBadge: '🔴',
+    hScore: 2,
+    aScore: 2,
+    minute: null,
+    status: 'FT',
+    stadium: 'Signal Iduna Park',
+  },
 ];
 
 const DEFAULT_UPCOMING_FIXTURES: FixtureItem[] = [
-  { id: 'bar-rma-2026', comp: 'La Liga', compFlag: '🇪🇸', home: 'Barcelona', homeBadge: '🔵', away: 'Real Madrid', awayBadge: '⚪', hScore: null, aScore: null, minute: null, status: 'UPCOMING', time: '17:00', date: 'Today', stadium: 'Spotify Camp Nou' },
-  { id: 'liv-tot-2026', comp: 'Premier League', compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', home: 'Liverpool', homeBadge: '🔴', away: 'Tottenham', awayBadge: '⚪', hScore: null, aScore: null, minute: null, status: 'UPCOMING', time: '14:00', date: 'Today', stadium: 'Anfield' },
-  { id: 'rma-atl-2026', comp: 'UCL', compFlag: '⭐', home: 'Real Madrid', homeBadge: '⚪', away: 'Atlético', awayBadge: '🔴', hScore: null, aScore: null, minute: null, status: 'UPCOMING', time: '20:00', date: 'Tue 17 Sep', stadium: 'Santiago Bernabéu' },
-  { id: 'mar-sen-2026', comp: 'AFCON Q.', compFlag: '🌍', home: 'Morocco', homeBadge: '🔴', away: 'Senegal', awayBadge: '🟢', hScore: null, aScore: null, minute: null, status: 'UPCOMING', time: '20:00', date: 'Wed 18 Sep', stadium: 'Stade Mohammed V' },
-  { id: 'bay-dor-2026', comp: 'Bundesliga', compFlag: '🇩🇪', home: 'Bayern', homeBadge: '🔴', away: 'Dortmund', awayBadge: '🟡', hScore: null, aScore: null, minute: null, status: 'UPCOMING', time: '18:30', date: 'Sat 20 Sep', stadium: 'Allianz Arena' },
-  { id: 'int-mil-2026', comp: 'Serie A', compFlag: '🇮🇹', home: 'Inter', homeBadge: '🔵', away: 'AC Milan', awayBadge: '🔴', hScore: null, aScore: null, minute: null, status: 'UPCOMING', time: '20:45', date: 'Sun 21 Sep', stadium: 'San Siro' },
+  {
+    id: 'bar-rma-2026',
+    comp: 'La Liga',
+    compFlag: '🇪🇸',
+    home: 'Barcelona',
+    homeBadge: '🔵',
+    away: 'Real Madrid',
+    awayBadge: '⚪',
+    hScore: null,
+    aScore: null,
+    minute: null,
+    status: 'UPCOMING',
+    time: '17:00',
+    date: 'Today',
+    stadium: 'Spotify Camp Nou',
+  },
+  {
+    id: 'liv-tot-2026',
+    comp: 'Premier League',
+    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    home: 'Liverpool',
+    homeBadge: '🔴',
+    away: 'Tottenham',
+    awayBadge: '⚪',
+    hScore: null,
+    aScore: null,
+    minute: null,
+    status: 'UPCOMING',
+    time: '14:00',
+    date: 'Today',
+    stadium: 'Anfield',
+  },
+  {
+    id: 'rma-atl-2026',
+    comp: 'UCL',
+    compFlag: '⭐',
+    home: 'Real Madrid',
+    homeBadge: '⚪',
+    away: 'Atlético',
+    awayBadge: '🔴',
+    hScore: null,
+    aScore: null,
+    minute: null,
+    status: 'UPCOMING',
+    time: '20:00',
+    date: 'Tue 17 Sep',
+    stadium: 'Santiago Bernabéu',
+  },
+  {
+    id: 'mar-sen-2026',
+    comp: 'AFCON Q.',
+    compFlag: '🌍',
+    home: 'Morocco',
+    homeBadge: '🔴',
+    away: 'Senegal',
+    awayBadge: '🟢',
+    hScore: null,
+    aScore: null,
+    minute: null,
+    status: 'UPCOMING',
+    time: '20:00',
+    date: 'Wed 18 Sep',
+    stadium: 'Stade Mohammed V',
+  },
+  {
+    id: 'bay-dor-2026',
+    comp: 'Bundesliga',
+    compFlag: '🇩🇪',
+    home: 'Bayern',
+    homeBadge: '🔴',
+    away: 'Dortmund',
+    awayBadge: '🟡',
+    hScore: null,
+    aScore: null,
+    minute: null,
+    status: 'UPCOMING',
+    time: '18:30',
+    date: 'Sat 20 Sep',
+    stadium: 'Allianz Arena',
+  },
+  {
+    id: 'int-mil-2026',
+    comp: 'Serie A',
+    compFlag: '🇮🇹',
+    home: 'Inter',
+    homeBadge: '🔵',
+    away: 'AC Milan',
+    awayBadge: '🔴',
+    hScore: null,
+    aScore: null,
+    minute: null,
+    status: 'UPCOMING',
+    time: '20:45',
+    date: 'Sun 21 Sep',
+    stadium: 'San Siro',
+  },
 ];
 
 const DEFAULT_RESULTS: FixtureItem[] = [
-  { id: 'mci-dor-2026', comp: 'UCL', compFlag: '⭐', home: 'Man City', homeBadge: '🔵', away: 'Dortmund', awayBadge: '🟡', hScore: 3, aScore: 0, minute: null, status: 'FT', date: 'Yesterday', stadium: 'Etihad Stadium' },
-  { id: 'liv-mci-2026', comp: 'Premier League', compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', home: 'Liverpool', homeBadge: '🔴', away: 'Man City', awayBadge: '🔵', hScore: 1, aScore: 1, minute: null, status: 'FT', date: '2 days ago', stadium: 'Anfield' },
-  { id: 'rma-fcb-2026', comp: 'La Liga', compFlag: '🇪🇸', home: 'Real Madrid', homeBadge: '⚪', away: 'Barça', awayBadge: '🔵', hScore: 2, aScore: 3, minute: null, status: 'FT', date: 'Aug 31', stadium: 'Bernabéu' },
-  { id: 'cmr-gha-2026', comp: 'AFCON Q.', compFlag: '🌍', home: 'Cameroon', homeBadge: '🟢', away: 'Ghana', awayBadge: '🟡', hScore: 1, aScore: 0, minute: null, status: 'FT', date: 'Aug 29', stadium: 'Olembe Stadium' },
-  { id: 'ars-che-2026', comp: 'Premier League', compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', home: 'Arsenal', homeBadge: '🔴', away: 'Chelsea', awayBadge: '🔵', hScore: 2, aScore: 0, minute: null, status: 'FT', date: 'Aug 28', stadium: 'Emirates Stadium' },
-  { id: 'bay-lev-2026', comp: 'Bundesliga', compFlag: '🇩🇪', home: 'Bayern', homeBadge: '🔴', away: 'Leverkusen', awayBadge: '🔴', hScore: 2, aScore: 1, minute: null, status: 'FT', date: 'Aug 27', stadium: 'Allianz Arena' },
+  {
+    id: 'mci-dor-2026',
+    comp: 'UCL',
+    compFlag: '⭐',
+    home: 'Man City',
+    homeBadge: '🔵',
+    away: 'Dortmund',
+    awayBadge: '🟡',
+    hScore: 3,
+    aScore: 0,
+    minute: null,
+    status: 'FT',
+    date: 'Yesterday',
+    stadium: 'Etihad Stadium',
+  },
+  {
+    id: 'liv-mci-2026',
+    comp: 'Premier League',
+    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    home: 'Liverpool',
+    homeBadge: '🔴',
+    away: 'Man City',
+    awayBadge: '🔵',
+    hScore: 1,
+    aScore: 1,
+    minute: null,
+    status: 'FT',
+    date: '2 days ago',
+    stadium: 'Anfield',
+  },
+  {
+    id: 'rma-fcb-2026',
+    comp: 'La Liga',
+    compFlag: '🇪🇸',
+    home: 'Real Madrid',
+    homeBadge: '⚪',
+    away: 'Barça',
+    awayBadge: '🔵',
+    hScore: 2,
+    aScore: 3,
+    minute: null,
+    status: 'FT',
+    date: 'Aug 31',
+    stadium: 'Bernabéu',
+  },
+  {
+    id: 'cmr-gha-2026',
+    comp: 'AFCON Q.',
+    compFlag: '🌍',
+    home: 'Cameroon',
+    homeBadge: '🟢',
+    away: 'Ghana',
+    awayBadge: '🟡',
+    hScore: 1,
+    aScore: 0,
+    minute: null,
+    status: 'FT',
+    date: 'Aug 29',
+    stadium: 'Olembe Stadium',
+  },
+  {
+    id: 'ars-che-2026',
+    comp: 'Premier League',
+    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    home: 'Arsenal',
+    homeBadge: '🔴',
+    away: 'Chelsea',
+    awayBadge: '🔵',
+    hScore: 2,
+    aScore: 0,
+    minute: null,
+    status: 'FT',
+    date: 'Aug 28',
+    stadium: 'Emirates Stadium',
+  },
+  {
+    id: 'bay-lev-2026',
+    comp: 'Bundesliga',
+    compFlag: '🇩🇪',
+    home: 'Bayern',
+    homeBadge: '🔴',
+    away: 'Leverkusen',
+    awayBadge: '🔴',
+    hScore: 2,
+    aScore: 1,
+    minute: null,
+    status: 'FT',
+    date: 'Aug 27',
+    stadium: 'Allianz Arena',
+  },
 ];
 
 const PL_TABLE: TableEntry[] = [
-  { pos: 1, team: 'Man City', slug: 'manchester-city', badge: '🔵', p: 32, w: 23, d: 5, l: 4, gd: 46, pts: 74, form: ['W', 'W', 'D', 'W', 'W'], zone: 'champions' },
-  { pos: 2, team: 'Arsenal', slug: 'arsenal', badge: '🔴', p: 32, w: 22, d: 4, l: 6, gd: 43, pts: 70, form: ['L', 'W', 'W', 'W', 'D'], zone: 'champions' },
-  { pos: 3, team: 'Liverpool', slug: 'liverpool', badge: '🔴', p: 32, w: 20, d: 6, l: 6, gd: 30, pts: 66, form: ['W', 'D', 'W', 'L', 'W'], zone: 'champions' },
-  { pos: 4, team: 'Aston Villa', slug: 'aston-villa', badge: '🟣', p: 32, w: 18, d: 5, l: 9, gd: 16, pts: 59, form: ['W', 'W', 'L', 'W', 'D'], zone: 'champions' },
-  { pos: 5, team: 'Chelsea', slug: 'chelsea', badge: '🔵', p: 32, w: 17, d: 6, l: 9, gd: 11, pts: 57, form: ['D', 'W', 'W', 'L', 'W'], zone: 'europa' },
-  { pos: 6, team: 'Tottenham', slug: 'tottenham', badge: '⚪', p: 32, w: 16, d: 5, l: 11, gd: 8, pts: 53, form: ['L', 'W', 'D', 'W', 'L'], zone: 'europa' },
-  { pos: 7, team: 'Newcastle', slug: 'newcastle', badge: '⚫', p: 32, w: 14, d: 8, l: 10, gd: 5, pts: 50, form: ['W', 'D', 'W', 'W', 'L'] },
-  { pos: 8, team: 'Brighton', slug: 'brighton', badge: '🔵', p: 32, w: 13, d: 9, l: 10, gd: 4, pts: 48, form: ['D', 'W', 'L', 'D', 'W'] },
-  { pos: 17, team: 'Nottm Forest', slug: 'nottingham-forest', badge: '🔴', p: 32, w: 9, d: 5, l: 18, gd: -18, pts: 32, form: ['L', 'L', 'D', 'L', 'W'], zone: 'relegation' },
-  { pos: 18, team: 'Luton Town', slug: 'luton-town', badge: '🟠', p: 32, w: 7, d: 4, l: 21, gd: -28, pts: 25, form: ['L', 'D', 'L', 'L', 'L'], zone: 'relegation' },
-  { pos: 19, team: 'Sheffield Utd', slug: 'sheffield-united', badge: '🔴', p: 32, w: 5, d: 4, l: 23, gd: -42, pts: 19, form: ['L', 'L', 'L', 'D', 'L'], zone: 'relegation' },
+  {
+    pos: 1,
+    team: 'Man City',
+    slug: 'manchester-city',
+    badge: '🔵',
+    p: 32,
+    w: 23,
+    d: 5,
+    l: 4,
+    gd: 46,
+    pts: 74,
+    form: ['W', 'W', 'D', 'W', 'W'],
+    zone: 'champions',
+  },
+  {
+    pos: 2,
+    team: 'Arsenal',
+    slug: 'arsenal',
+    badge: '🔴',
+    p: 32,
+    w: 22,
+    d: 4,
+    l: 6,
+    gd: 43,
+    pts: 70,
+    form: ['L', 'W', 'W', 'W', 'D'],
+    zone: 'champions',
+  },
+  {
+    pos: 3,
+    team: 'Liverpool',
+    slug: 'liverpool',
+    badge: '🔴',
+    p: 32,
+    w: 20,
+    d: 6,
+    l: 6,
+    gd: 30,
+    pts: 66,
+    form: ['W', 'D', 'W', 'L', 'W'],
+    zone: 'champions',
+  },
+  {
+    pos: 4,
+    team: 'Aston Villa',
+    slug: 'aston-villa',
+    badge: '🟣',
+    p: 32,
+    w: 18,
+    d: 5,
+    l: 9,
+    gd: 16,
+    pts: 59,
+    form: ['W', 'W', 'L', 'W', 'D'],
+    zone: 'champions',
+  },
+  {
+    pos: 5,
+    team: 'Chelsea',
+    slug: 'chelsea',
+    badge: '🔵',
+    p: 32,
+    w: 17,
+    d: 6,
+    l: 9,
+    gd: 11,
+    pts: 57,
+    form: ['D', 'W', 'W', 'L', 'W'],
+    zone: 'europa',
+  },
+  {
+    pos: 6,
+    team: 'Tottenham',
+    slug: 'tottenham',
+    badge: '⚪',
+    p: 32,
+    w: 16,
+    d: 5,
+    l: 11,
+    gd: 8,
+    pts: 53,
+    form: ['L', 'W', 'D', 'W', 'L'],
+    zone: 'europa',
+  },
+  {
+    pos: 7,
+    team: 'Newcastle',
+    slug: 'newcastle',
+    badge: '⚫',
+    p: 32,
+    w: 14,
+    d: 8,
+    l: 10,
+    gd: 5,
+    pts: 50,
+    form: ['W', 'D', 'W', 'W', 'L'],
+  },
+  {
+    pos: 8,
+    team: 'Brighton',
+    slug: 'brighton',
+    badge: '🔵',
+    p: 32,
+    w: 13,
+    d: 9,
+    l: 10,
+    gd: 4,
+    pts: 48,
+    form: ['D', 'W', 'L', 'D', 'W'],
+  },
+  {
+    pos: 17,
+    team: 'Nottm Forest',
+    slug: 'nottingham-forest',
+    badge: '🔴',
+    p: 32,
+    w: 9,
+    d: 5,
+    l: 18,
+    gd: -18,
+    pts: 32,
+    form: ['L', 'L', 'D', 'L', 'W'],
+    zone: 'relegation',
+  },
+  {
+    pos: 18,
+    team: 'Luton Town',
+    slug: 'luton-town',
+    badge: '🟠',
+    p: 32,
+    w: 7,
+    d: 4,
+    l: 21,
+    gd: -28,
+    pts: 25,
+    form: ['L', 'D', 'L', 'L', 'L'],
+    zone: 'relegation',
+  },
+  {
+    pos: 19,
+    team: 'Sheffield Utd',
+    slug: 'sheffield-united',
+    badge: '🔴',
+    p: 32,
+    w: 5,
+    d: 4,
+    l: 23,
+    gd: -42,
+    pts: 19,
+    form: ['L', 'L', 'L', 'D', 'L'],
+    zone: 'relegation',
+  },
 ];
 
 const TOP_SCORERS: TopScorer[] = [
-  { rank: 1, name: 'Erling Haaland', team: 'Man City', badge: '🔵', flag: '🇳🇴', goals: 31, assists: 7, apps: 32, photo: '', playerId: 'erling-haaland' },
-  { rank: 2, name: 'Victor Osimhen', team: 'Napoli / Al-Ahli', badge: '🔵', flag: '🇳🇬', goals: 26, assists: 5, apps: 30, photo: '', playerId: 'victor-osimhen' },
-  { rank: 3, name: 'Kylian Mbappé', team: 'Real Madrid', badge: '⚪', flag: '🇫🇷', goals: 24, assists: 8, apps: 29, photo: '', playerId: 'kylian-mbappe' },
-  { rank: 4, name: 'Bukayo Saka', team: 'Arsenal', badge: '🔴', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', goals: 16, assists: 14, apps: 30, photo: '', playerId: 'bukayo-saka' },
-  { rank: 5, name: 'Harry Kane', team: 'Bayern Munich', badge: '🔴', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', goals: 28, assists: 10, apps: 31, photo: '', playerId: 'harry-kane' },
-  { rank: 6, name: 'Mohamed Salah', team: 'Liverpool', badge: '🔴', flag: '🇪🇬', goals: 22, assists: 13, apps: 32, photo: '', playerId: 'mohamed-salah' },
+  {
+    rank: 1,
+    name: 'Erling Haaland',
+    team: 'Man City',
+    badge: '🔵',
+    flag: '🇳🇴',
+    goals: 31,
+    assists: 7,
+    apps: 32,
+    photo: '',
+    playerId: 'erling-haaland',
+  },
+  {
+    rank: 2,
+    name: 'Victor Osimhen',
+    team: 'Napoli / Al-Ahli',
+    badge: '🔵',
+    flag: '🇳🇬',
+    goals: 26,
+    assists: 5,
+    apps: 30,
+    photo: '',
+    playerId: 'victor-osimhen',
+  },
+  {
+    rank: 3,
+    name: 'Kylian Mbappé',
+    team: 'Real Madrid',
+    badge: '⚪',
+    flag: '🇫🇷',
+    goals: 24,
+    assists: 8,
+    apps: 29,
+    photo: '',
+    playerId: 'kylian-mbappe',
+  },
+  {
+    rank: 4,
+    name: 'Bukayo Saka',
+    team: 'Arsenal',
+    badge: '🔴',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    goals: 16,
+    assists: 14,
+    apps: 30,
+    photo: '',
+    playerId: 'bukayo-saka',
+  },
+  {
+    rank: 5,
+    name: 'Harry Kane',
+    team: 'Bayern Munich',
+    badge: '🔴',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    goals: 28,
+    assists: 10,
+    apps: 31,
+    photo: '',
+    playerId: 'harry-kane',
+  },
+  {
+    rank: 6,
+    name: 'Mohamed Salah',
+    team: 'Liverpool',
+    badge: '🔴',
+    flag: '🇪🇬',
+    goals: 22,
+    assists: 13,
+    apps: 32,
+    photo: '',
+    playerId: 'mohamed-salah',
+  },
 ];
 
 const COMP_GROUPS: CompGroup[] = [
@@ -153,52 +619,206 @@ const COMP_GROUPS: CompGroup[] = [
     region: 'Africa (CAF)',
     icon: '🌍',
     comps: [
-      { name: 'AFCON 2026/2027', flag: '🏆', tier: 'INT', season: '2026/27', country: 'Africa', href: '/football' },
-      { name: 'CAF Champions League', flag: '🏆', tier: 'T1', season: '2025/26', country: 'Africa', href: '/football' },
-      { name: 'CAF Confederation Cup', flag: '🥈', tier: 'T2', season: '2025/26', country: 'Africa', href: '/football' },
-      { name: 'NPFL — Nigeria', flag: '🇳🇬', tier: 'T1', season: '2025/26', country: 'Nigeria', href: '/football' },
-      { name: 'Betway Premiership PSL', flag: '🇿🇦', tier: 'T1', season: '2025/26', country: 'South Africa', href: '/football' },
-      { name: 'Botola Pro — Morocco', flag: '🇲🇦', tier: 'T1', season: '2025/26', country: 'Morocco', href: '/football' },
+      {
+        name: 'AFCON 2026/2027',
+        flag: '🏆',
+        tier: 'INT',
+        season: '2026/27',
+        country: 'Africa',
+        href: '/football',
+      },
+      {
+        name: 'CAF Champions League',
+        flag: '🏆',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Africa',
+        href: '/football',
+      },
+      {
+        name: 'CAF Confederation Cup',
+        flag: '🥈',
+        tier: 'T2',
+        season: '2025/26',
+        country: 'Africa',
+        href: '/football',
+      },
+      {
+        name: 'NPFL — Nigeria',
+        flag: '🇳🇬',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Nigeria',
+        href: '/football',
+      },
+      {
+        name: 'Betway Premiership PSL',
+        flag: '🇿🇦',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'South Africa',
+        href: '/football',
+      },
+      {
+        name: 'Botola Pro — Morocco',
+        flag: '🇲🇦',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Morocco',
+        href: '/football',
+      },
     ],
   },
   {
     region: 'Top 5 European Leagues',
     icon: '⭐',
     comps: [
-      { name: 'Premier League', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier: 'T1', season: '2025/26', country: 'England', href: '/football' },
-      { name: 'La Liga', flag: '🇪🇸', tier: 'T1', season: '2025/26', country: 'Spain', href: '/football' },
-      { name: 'Bundesliga', flag: '🇩🇪', tier: 'T1', season: '2025/26', country: 'Germany', href: '/football' },
-      { name: 'Serie A', flag: '🇮🇹', tier: 'T1', season: '2025/26', country: 'Italy', href: '/football' },
-      { name: 'Ligue 1', flag: '🇫🇷', tier: 'T1', season: '2025/26', country: 'France', href: '/football' },
+      {
+        name: 'Premier League',
+        flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'England',
+        href: '/football',
+      },
+      {
+        name: 'La Liga',
+        flag: '🇪🇸',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Spain',
+        href: '/football',
+      },
+      {
+        name: 'Bundesliga',
+        flag: '🇩🇪',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Germany',
+        href: '/football',
+      },
+      {
+        name: 'Serie A',
+        flag: '🇮🇹',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Italy',
+        href: '/football',
+      },
+      {
+        name: 'Ligue 1',
+        flag: '🇫🇷',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'France',
+        href: '/football',
+      },
     ],
   },
   {
     region: 'European Cups',
     icon: '🏆',
     comps: [
-      { name: 'UEFA Champions League', flag: '⭐', tier: 'T1', season: '2025/26', country: 'Europe', href: '/football' },
-      { name: 'UEFA Europa League', flag: '🟠', tier: 'T2', season: '2025/26', country: 'Europe', href: '/football' },
-      { name: 'UEFA Conference League', flag: '🟢', tier: 'T3', season: '2025/26', country: 'Europe', href: '/football' },
-      { name: 'UEFA Super Cup', flag: '🏅', tier: 'T1', season: '2025/26', country: 'Europe', href: '/football' },
+      {
+        name: 'UEFA Champions League',
+        flag: '⭐',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Europe',
+        href: '/football',
+      },
+      {
+        name: 'UEFA Europa League',
+        flag: '🟠',
+        tier: 'T2',
+        season: '2025/26',
+        country: 'Europe',
+        href: '/football',
+      },
+      {
+        name: 'UEFA Conference League',
+        flag: '🟢',
+        tier: 'T3',
+        season: '2025/26',
+        country: 'Europe',
+        href: '/football',
+      },
+      {
+        name: 'UEFA Super Cup',
+        flag: '🏅',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Europe',
+        href: '/football',
+      },
     ],
   },
   {
     region: 'FIFA Competitions',
     icon: '🌐',
     comps: [
-      { name: 'FIFA World Cup 2026', flag: '🌎', tier: 'INT', season: '2026', country: 'Global', href: '/football' },
-      { name: 'FIFA Club World Cup', flag: '🏆', tier: 'INT', season: '2025', country: 'Global', href: '/football' },
-      { name: 'FIFA U-20 World Cup', flag: '🏆', tier: 'INT', season: '2025', country: 'Global', href: '/football' },
+      {
+        name: 'FIFA World Cup 2026',
+        flag: '🌎',
+        tier: 'INT',
+        season: '2026',
+        country: 'Global',
+        href: '/football',
+      },
+      {
+        name: 'FIFA Club World Cup',
+        flag: '🏆',
+        tier: 'INT',
+        season: '2025',
+        country: 'Global',
+        href: '/football',
+      },
+      {
+        name: 'FIFA U-20 World Cup',
+        flag: '🏆',
+        tier: 'INT',
+        season: '2025',
+        country: 'Global',
+        href: '/football',
+      },
     ],
   },
   {
     region: 'South & North America',
     icon: '🌎',
     comps: [
-      { name: 'Copa Libertadores', flag: '🏆', tier: 'T1', season: '2025/26', country: 'South America', href: '/football' },
-      { name: 'Série A — Brazil', flag: '🇧🇷', tier: 'T1', season: '2025', country: 'Brazil', href: '/football' },
-      { name: 'MLS — North America', flag: '🇺🇸', tier: 'T1', season: '2025', country: 'USA', href: '/football' },
-      { name: 'Liga MX — Mexico', flag: '🇲🇽', tier: 'T1', season: '2025/26', country: 'Mexico', href: '/football' },
+      {
+        name: 'Copa Libertadores',
+        flag: '🏆',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'South America',
+        href: '/football',
+      },
+      {
+        name: 'Série A — Brazil',
+        flag: '🇧🇷',
+        tier: 'T1',
+        season: '2025',
+        country: 'Brazil',
+        href: '/football',
+      },
+      {
+        name: 'MLS — North America',
+        flag: '🇺🇸',
+        tier: 'T1',
+        season: '2025',
+        country: 'USA',
+        href: '/football',
+      },
+      {
+        name: 'Liga MX — Mexico',
+        flag: '🇲🇽',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Mexico',
+        href: '/football',
+      },
     ],
   },
 ];
@@ -242,7 +862,16 @@ const ANALYSIS_ARTICLES = [
   },
 ];
 
-const COMP_FILTERS = ['All', '🏴󠁧󠁢󠁥󠁮󠁧󠁿 PL', '🇪🇸 La Liga', '🇮🇹 Serie A', '🇩🇪 Bundesliga', '⭐ UCL', '🌍 AFCON', '🇳🇬 NPFL'];
+const COMP_FILTERS = [
+  'All',
+  '🏴󠁧󠁢󠁥󠁮󠁧󠁿 PL',
+  '🇪🇸 La Liga',
+  '🇮🇹 Serie A',
+  '🇩🇪 Bundesliga',
+  '⭐ UCL',
+  '🌍 AFCON',
+  '🇳🇬 NPFL',
+];
 
 // ─── Sub-Components ───────────────────────────────────────────────────────────
 
@@ -396,9 +1025,7 @@ function SideSection({
       <div className={`${open ? 'block' : 'hidden'} lg:block`}>
         {children}
         {action && (
-          <div className="px-4 py-2 border-t border-[#1e293b] lg:hidden bg-[#0a1120]">
-            {action}
-          </div>
+          <div className="px-4 py-2 border-t border-[#1e293b] lg:hidden bg-[#0a1120]">{action}</div>
         )}
       </div>
     </div>
@@ -430,7 +1057,8 @@ export function FootballPageClient({
 
   // Dynamic Matches State
   const [liveFixtures, setLiveFixtures] = useState<FixtureItem[]>(DEFAULT_LIVE_FIXTURES);
-  const [upcomingFixtures, setUpcomingFixtures] = useState<FixtureItem[]>(DEFAULT_UPCOMING_FIXTURES);
+  const [upcomingFixtures, setUpcomingFixtures] =
+    useState<FixtureItem[]>(DEFAULT_UPCOMING_FIXTURES);
   const [resultsFixtures, setResultsFixtures] = useState<FixtureItem[]>(DEFAULT_RESULTS);
 
   // Daily Brief Newsletter State
@@ -489,8 +1117,13 @@ export function FootballPageClient({
         if (Array.isArray(fList) && fList.length > 0) {
           const parsedLive: FixtureItem[] = fList.slice(0, 20).map((m: any, idx: number) => {
             const rawStatus = (m.event_status || '').trim();
-            const isHT = rawStatus.toLowerCase().includes('ht') || rawStatus.toLowerCase().includes('half');
-            const minute = rawStatus ? (rawStatus.endsWith("'") ? rawStatus.replace("'", '') : rawStatus) : 'LIVE';
+            const isHT =
+              rawStatus.toLowerCase().includes('ht') || rawStatus.toLowerCase().includes('half');
+            const minute = rawStatus
+              ? rawStatus.endsWith("'")
+                ? rawStatus.replace("'", '')
+                : rawStatus
+              : 'LIVE';
             return {
               id: String(m.event_key || `live-${idx}`),
               comp: m.league_name || 'Football League',
@@ -501,8 +1134,12 @@ export function FootballPageClient({
               away: m.event_away_team || 'Away',
               awayBadge: '🔴',
               awayLogo: m.away_team_logo,
-              hScore: m.event_final_result ? m.event_final_result.split('-')[0]?.trim() : (m.event_home_final_result ?? 0),
-              aScore: m.event_final_result ? m.event_final_result.split('-')[1]?.trim() : (m.event_away_final_result ?? 0),
+              hScore: m.event_final_result
+                ? m.event_final_result.split('-')[0]?.trim()
+                : (m.event_home_final_result ?? 0),
+              aScore: m.event_final_result
+                ? m.event_final_result.split('-')[1]?.trim()
+                : (m.event_away_final_result ?? 0),
               minute: isHT ? 'HT' : minute,
               status: isHT ? 'HT' : 'LIVE',
               stadium: m.event_stadium || undefined,
@@ -513,10 +1150,13 @@ export function FootballPageClient({
       }
 
       // Fetch fixtures for upcoming/results
-      const fixRes = await fetch(`/api/football?met=Fixtures&_t=${timestamp}`, { cache: 'no-store' });
+      const fixRes = await fetch(`/api/football?met=Fixtures&_t=${timestamp}`, {
+        cache: 'no-store',
+      });
       if (fixRes.ok) {
         const fixData = await fixRes.json();
-        const fixList = fixData?.result || fixData?.response || (Array.isArray(fixData) ? fixData : []);
+        const fixList =
+          fixData?.result || fixData?.response || (Array.isArray(fixData) ? fixData : []);
         if (Array.isArray(fixList) && fixList.length > 0) {
           const up: FixtureItem[] = [];
           const ft: FixtureItem[] = [];
@@ -533,8 +1173,12 @@ export function FootballPageClient({
               away: m.event_away_team || 'Away',
               awayBadge: '⚫',
               awayLogo: m.away_team_logo,
-              hScore: m.event_final_result ? m.event_final_result.split('-')[0]?.trim() : (m.event_home_final_result ?? null),
-              aScore: m.event_final_result ? m.event_final_result.split('-')[1]?.trim() : (m.event_away_final_result ?? null),
+              hScore: m.event_final_result
+                ? m.event_final_result.split('-')[0]?.trim()
+                : (m.event_home_final_result ?? null),
+              aScore: m.event_final_result
+                ? m.event_final_result.split('-')[1]?.trim()
+                : (m.event_away_final_result ?? null),
               minute: null,
               status: isFinished ? 'FT' : 'UPCOMING',
               time: m.event_time || undefined,
@@ -549,7 +1193,9 @@ export function FootballPageClient({
         }
       }
 
-      setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setLastSyncTime(
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      );
     } catch {
       // Fallbacks already in state
     } finally {
@@ -580,7 +1226,8 @@ export function FootballPageClient({
       if (cleanFilter === 'seriea') return c.includes('serie a') || c.includes('italy');
       if (cleanFilter === 'bundesliga') return c.includes('bundesliga') || c.includes('germany');
       if (cleanFilter === 'ucl') return c.includes('champions league') || c.includes('ucl');
-      if (cleanFilter === 'afcon') return c.includes('afcon') || c.includes('caf') || c.includes('africa');
+      if (cleanFilter === 'afcon')
+        return c.includes('afcon') || c.includes('caf') || c.includes('africa');
       if (cleanFilter === 'npfl') return c.includes('npfl') || c.includes('nigeria');
       return c.includes(cleanFilter);
     });
@@ -647,8 +1294,8 @@ export function FootballPageClient({
                 Football Match Centre
               </h1>
               <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-2xl leading-relaxed">
-                Live scores, fixtures, tables, tactical analytics, and superstar valuations across 75+
-                competitions — from the Premier League and Champions League to CAF and AFCON.
+                Live scores, fixtures, tables, tactical analytics, and superstar valuations across
+                75+ competitions — from the Premier League and Champions League to CAF and AFCON.
               </p>
             </div>
 
@@ -734,7 +1381,9 @@ export function FootballPageClient({
                 {COMP_GROUPS.map((group) => (
                   <div key={group.region}>
                     <button
-                      onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                      onClick={() =>
+                        setExpandedComp(expandedComp === group.region ? null : group.region)
+                      }
                       className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors text-left"
                     >
                       <div className="flex items-center gap-2">
@@ -853,7 +1502,9 @@ export function FootballPageClient({
                   </span>
                   <div className="text-left">
                     <p className="text-xs font-black text-white">Football Hubs</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Analysis · Club Hubs · 75+ Competitions</p>
+                    <p className="text-[10px] text-slate-400 font-normal">
+                      Analysis · Club Hubs · 75+ Competitions
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -875,7 +1526,10 @@ export function FootballPageClient({
                     title="Football Analysis"
                     defaultOpen={true}
                     action={
-                      <Link href="/analysis" className="text-[10px] text-blue-400 hover:text-blue-300 font-bold">
+                      <Link
+                        href="/analysis"
+                        className="text-[10px] text-blue-400 hover:text-blue-300 font-bold"
+                      >
                         All →
                       </Link>
                     }
@@ -888,14 +1542,24 @@ export function FootballPageClient({
                           className="flex gap-3 p-3 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer"
                         >
                           <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
-                            <img src={a.img} alt="" className="w-full h-full object-cover opacity-85" />
-                            <span className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}>
+                            <img
+                              src={a.img}
+                              alt=""
+                              className="w-full h-full object-cover opacity-85"
+                            />
+                            <span
+                              className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}
+                            >
                               {a.tag}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[9px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">{a.comp}</p>
-                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">{a.title}</h4>
+                            <p className="text-[9px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">
+                              {a.comp}
+                            </p>
+                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">
+                              {a.title}
+                            </h4>
                             <p className="text-[9px] text-slate-500 mt-1">{a.time}</p>
                           </div>
                         </Link>
@@ -907,18 +1571,24 @@ export function FootballPageClient({
                   <SideSection
                     title="Competition Directory"
                     defaultOpen={false}
-                    action={<span className="text-[10px] text-slate-500 font-semibold">75+ Leagues</span>}
+                    action={
+                      <span className="text-[10px] text-slate-500 font-semibold">75+ Leagues</span>
+                    }
                   >
                     <div className="divide-y divide-[#1e293b]">
                       {COMP_GROUPS.map((group) => (
                         <div key={group.region}>
                           <button
-                            onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                            onClick={() =>
+                              setExpandedComp(expandedComp === group.region ? null : group.region)
+                            }
                             className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#1e293b]/40 transition-colors text-left"
                           >
                             <div className="flex items-center gap-2">
                               <span className="text-sm">{group.icon}</span>
-                              <span className="text-xs font-semibold text-slate-300">{group.region}</span>
+                              <span className="text-xs font-semibold text-slate-300">
+                                {group.region}
+                              </span>
                             </div>
                             <FiChevronDown
                               className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
@@ -936,7 +1606,9 @@ export function FootballPageClient({
                                 >
                                   <span className="text-sm">{c.flag}</span>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] font-semibold text-slate-300 truncate">{c.name}</p>
+                                    <p className="text-[11px] font-semibold text-slate-300 truncate">
+                                      {c.name}
+                                    </p>
                                     <p className="text-[9px] text-slate-500">{c.country}</p>
                                   </div>
                                 </Link>
@@ -953,7 +1625,10 @@ export function FootballPageClient({
                     title="Featured Club Hubs"
                     defaultOpen={false}
                     action={
-                      <Link href="/football/teams" className="text-[10px] text-blue-400 hover:text-blue-300 font-bold">
+                      <Link
+                        href="/football/teams"
+                        className="text-[10px] text-blue-400 hover:text-blue-300 font-bold"
+                      >
                         All →
                       </Link>
                     }
@@ -972,7 +1647,9 @@ export function FootballPageClient({
                               <span className="text-base">⚽</span>
                             )}
                           </div>
-                          <p className="text-[10px] font-bold text-slate-200 leading-tight line-clamp-1">{club.shortName || club.name}</p>
+                          <p className="text-[10px] font-bold text-slate-200 leading-tight line-clamp-1">
+                            {club.shortName || club.name}
+                          </p>
                           <span className="text-[9px] text-blue-400 font-semibold">Hub →</span>
                         </Link>
                       ))}
@@ -1073,21 +1750,26 @@ export function FootballPageClient({
             {mainTab === 'table' && (
               <div className="space-y-4">
                 <div className="flex gap-2 flex-wrap">
-                  {['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'CAF Champions League'].map(
-                    (l) => (
-                      <button
-                        key={l}
-                        onClick={() => setTableLeague(l)}
-                        className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all cursor-pointer ${
-                          tableLeague === l
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                            : 'border-[#1e293b] text-slate-400 hover:border-[#334155] hover:text-white'
-                        }`}
-                      >
-                        {l}
-                      </button>
-                    )
-                  )}
+                  {[
+                    'Premier League',
+                    'La Liga',
+                    'Serie A',
+                    'Bundesliga',
+                    'Ligue 1',
+                    'CAF Champions League',
+                  ].map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => setTableLeague(l)}
+                      className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all cursor-pointer ${
+                        tableLeague === l
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                          : 'border-[#1e293b] text-slate-400 hover:border-[#334155] hover:text-white'
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
@@ -1288,9 +1970,7 @@ export function FootballPageClient({
                           </p>
                         </div>
                         <div className="hidden sm:block">
-                          <p className="text-sm font-black text-slate-300 tabular-nums">
-                            {p.apps}
-                          </p>
+                          <p className="text-sm font-black text-slate-300 tabular-nums">{p.apps}</p>
                           <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
                             Apps
                           </p>
@@ -1313,8 +1993,8 @@ export function FootballPageClient({
                   Match Odds & Real-Time Markets
                 </h3>
                 <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-                  Upcoming fixtures will display comprehensive 1X2 odds, over/under goal markets, and
-                  win probabilities powered by certified bookmaker feeds.
+                  Upcoming fixtures will display comprehensive 1X2 odds, over/under goal markets,
+                  and win probabilities powered by certified bookmaker feeds.
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
                   <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
@@ -1538,10 +2218,14 @@ export function FootballPageClient({
 
                 <div className="mt-4 pt-3 border-t border-[#1e293b] flex items-center justify-between text-xs text-slate-400">
                   <span>
-                    Goals: <strong className="text-white font-bold">{p.seasonStats?.goals ?? 18}</strong>
+                    Goals:{' '}
+                    <strong className="text-white font-bold">{p.seasonStats?.goals ?? 18}</strong>
                   </span>
                   <span>
-                    Assists: <strong className="text-blue-400 font-bold">{p.seasonStats?.assists ?? 6}</strong>
+                    Assists:{' '}
+                    <strong className="text-blue-400 font-bold">
+                      {p.seasonStats?.assists ?? 6}
+                    </strong>
                   </span>
                   <span className="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
                     Age {p.age}
@@ -1602,7 +2286,9 @@ export function FootballPageClient({
                     <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
                       <span>{o.countryFlag}</span>
                       <span>{o.country}</span>
-                      <span className="text-[10px] text-slate-500">· FIFA since {o.fifaBadgeSince}</span>
+                      <span className="text-[10px] text-slate-500">
+                        · FIFA since {o.fifaBadgeSince}
+                      </span>
                     </p>
                   </div>
                   <span
@@ -1741,8 +2427,8 @@ export function FootballPageClient({
 
                 <p className="text-sm text-slate-300 leading-relaxed">
                   Start your morning with our curated tactical briefing, breaking African transfer
-                  wires, injury alerts, and VAR debriefs synthesized for coaches, scouts, and football
-                  fanatics.
+                  wires, injury alerts, and VAR debriefs synthesized for coaches, scouts, and
+                  football fanatics.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
@@ -1776,7 +2462,8 @@ export function FootballPageClient({
                     </div>
                     <h4 className="text-base font-bold text-white">You&apos;re subscribed!</h4>
                     <p className="text-xs text-slate-400">
-                      Tomorrow&apos;s Football Daily Brief will arrive in your inbox at 10:00 AM WAT.
+                      Tomorrow&apos;s Football Daily Brief will arrive in your inbox at 10:00 AM
+                      WAT.
                     </p>
                   </div>
                 ) : (
@@ -1786,7 +2473,8 @@ export function FootballPageClient({
                         Get the Morning Debrief
                       </h4>
                       <p className="text-xs text-slate-400 mt-1">
-                        Join 45,000+ football scouts, managers, and fans. 100% free, unsubscribe anytime.
+                        Join 45,000+ football scouts, managers, and fans. 100% free, unsubscribe
+                        anytime.
                       </p>
                     </div>
 

@@ -7,9 +7,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const cleanData = sanitizeObject(body);
 
-    const testEmails = Array.isArray(cleanData.testEmails) && cleanData.testEmails.length > 0
-      ? cleanData.testEmails
-      : [cleanData.email || 'editor@goalmills.com'];
+    const testEmails =
+      Array.isArray(cleanData.testEmails) && cleanData.testEmails.length > 0
+        ? cleanData.testEmails
+        : [cleanData.email || 'editor@goalmills.com'];
 
     const testRecipients = testEmails.map((email: string, idx: number) => ({
       email: email.trim().toLowerCase(),
@@ -21,7 +22,9 @@ export async function POST(request: NextRequest) {
       campaignId: cleanData.campaignId || `test_campaign_${Date.now()}`,
       subject: `[TEST PREVIEW] ${cleanData.title || cleanData.subject || 'GoalMills Sports Intel'}`,
       previewText: cleanData.previewText || 'Test preview of newsletter broadcast',
-      editorialNote: cleanData.editorialNote || 'This is an internal test preview sent from the GoalMills Admin Console.',
+      editorialNote:
+        cleanData.editorialNote ||
+        'This is an internal test preview sent from the GoalMills Admin Console.',
       frequency: cleanData.frequencyTier || 'Daily',
       isHighPriority: true,
       articleIds: cleanData.articleIds || [],

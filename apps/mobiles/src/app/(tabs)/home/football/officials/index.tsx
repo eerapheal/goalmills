@@ -1,13 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  TextInput,
-  StatusBar,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@goalmills/ui';
@@ -83,13 +75,29 @@ export default function OfficialsScreen() {
       case 'High-Card Index':
         return { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', border: 'rgba(239, 68, 68, 0.3)' };
       case 'Strict':
-        return { bg: 'rgba(245, 158, 11, 0.15)', text: '#FBBF24', border: 'rgba(245, 158, 11, 0.3)' };
+        return {
+          bg: 'rgba(245, 158, 11, 0.15)',
+          text: '#FBBF24',
+          border: 'rgba(245, 158, 11, 0.3)',
+        };
       case 'Balanced':
-        return { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', border: 'rgba(16, 185, 129, 0.3)' };
+        return {
+          bg: 'rgba(16, 185, 129, 0.15)',
+          text: '#34D399',
+          border: 'rgba(16, 185, 129, 0.3)',
+        };
       case 'Permissive':
-        return { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA', border: 'rgba(59, 130, 246, 0.3)' };
+        return {
+          bg: 'rgba(59, 130, 246, 0.15)',
+          text: '#60A5FA',
+          border: 'rgba(59, 130, 246, 0.3)',
+        };
       default:
-        return { bg: 'rgba(100, 116, 139, 0.15)', text: '#94A3B8', border: 'rgba(100, 116, 139, 0.3)' };
+        return {
+          bg: 'rgba(100, 116, 139, 0.15)',
+          text: '#94A3B8',
+          border: 'rgba(100, 116, 139, 0.3)',
+        };
     }
   };
 
@@ -105,7 +113,8 @@ export default function OfficialsScreen() {
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>🚩 Match Officials & VAR</Text>
           <Text style={styles.headerSubtitle}>
-            {filteredOfficials.length} Elite Referee{filteredOfficials.length !== 1 ? 's' : ''} Tracked
+            {filteredOfficials.length} Elite Referee{filteredOfficials.length !== 1 ? 's' : ''}{' '}
+            Tracked
           </Text>
         </View>
       </View>
@@ -166,9 +175,7 @@ export default function OfficialsScreen() {
                 onPress={() => setSelectedComp(tab.id)}
                 style={[styles.filterChip, isActive && styles.filterChipActive]}
               >
-                <Text
-                  style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
-                >
+                <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
                   {tab.label}
                 </Text>
               </Pressable>
@@ -188,10 +195,7 @@ export default function OfficialsScreen() {
               <Pressable
                 key={opt.id}
                 onPress={() => setSelectedStrictness(opt.id)}
-                style={[
-                  styles.strictChip,
-                  isActive && styles.strictChipActive,
-                ]}
+                style={[styles.strictChip, isActive && styles.strictChipActive]}
               >
                 <Text style={[styles.strictChipText, isActive && styles.strictChipTextActive]}>
                   {opt.label}

@@ -66,7 +66,8 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
             style={styles.leagueInfo}
             onPress={(e) => {
               e.stopPropagation();
-              const seriesId = (match as any).league_key || (match as any).series_id || match.league_name;
+              const seriesId =
+                (match as any).league_key || (match as any).series_id || match.league_name;
               if (seriesId) {
                 router.push(`/home/cricket/series/${String(seriesId)}` as any);
               }
@@ -101,7 +102,10 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
             style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
             onPress={(e) => {
               e.stopPropagation();
-              const teamKey = (match as any).home_team_key || (match as any).event_home_team_key || match.event_home_team;
+              const teamKey =
+                (match as any).home_team_key ||
+                (match as any).event_home_team_key ||
+                match.event_home_team;
               if (teamKey) {
                 router.push(`/home/cricket/teams/${encodeURIComponent(String(teamKey))}` as any);
               }
@@ -141,7 +145,10 @@ export const CricketMatchCard: React.FC<CricketMatchCardProps> = ({
             style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
             onPress={(e) => {
               e.stopPropagation();
-              const teamKey = (match as any).away_team_key || (match as any).event_away_team_key || match.event_away_team;
+              const teamKey =
+                (match as any).away_team_key ||
+                (match as any).event_away_team_key ||
+                match.event_away_team;
               if (teamKey) {
                 router.push(`/home/cricket/teams/${encodeURIComponent(String(teamKey))}` as any);
               }

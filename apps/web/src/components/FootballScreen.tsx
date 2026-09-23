@@ -26,30 +26,151 @@ import {
 } from 'react-icons/fi';
 import Link from 'next/link';
 
-export type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
+export type FootballTab =
+  'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
 
 export const MAJOR_LEAGUES = [
   { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐' },
-  { id: '152', name: 'Premier League', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/152_premier-league.png' },
-  { id: '3', name: 'Champions League', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/3_uefa_champions_league.png' },
-  { id: '302', name: 'La Liga', country: 'Spain', flag: '🇪🇸', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/302_la-liga.png' },
-  { id: '207', name: 'Serie A', country: 'Italy', flag: '🇮🇹', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/207_serie-a.png' },
-  { id: '175', name: 'Bundesliga', country: 'Germany', flag: '🇩🇪', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/175_bundesliga.png' },
-  { id: '168', name: 'Ligue 1', country: 'France', flag: '🇫🇷', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/168_ligue-1.png' },
-  { id: '4', name: 'Europa League', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/4_uefa-europa-league.png' },
-  { id: '6', name: 'AFCON', country: 'Africa', flag: '🌍', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/6_africa-cup-of-nations.png' },
-  { id: '28', name: 'FIFA World Cup', country: 'International', flag: '🌐', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/28_fifa-world-cup.png' },
-  { id: '1', name: 'UEFA EURO', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/1_european-championship.png' },
-  { id: '17', name: 'Copa América', country: 'S. America', flag: '🌎', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/17_copa-america.png' },
-  { id: '5', name: 'Nations League', country: 'Europe', flag: '🇪🇺', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/5_uefa-nations-league.png' },
-  { id: '146', name: 'FA Cup', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/146_fa-cup.png' },
-  { id: '19', name: 'CAF CL', country: 'Africa', flag: '🌍', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/19_caf-champions-league.png' },
-  { id: '13', name: 'Libertadores', country: 'S. America', flag: '🌎', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/13_copa-libertadores.png' },
-  { id: '278', name: 'Saudi Pro League', country: 'Saudi Arabia', flag: '🇸🇦', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/278_pro-league.png' },
-  { id: '244', name: 'Eredivisie', country: 'Netherlands', flag: '🇳🇱', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/244_eredivisie.png' },
-  { id: '266', name: 'Liga Portugal', country: 'Portugal', flag: '🇵🇹', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/266_liga-portugal.png' },
-  { id: '322', name: 'Süper Lig', country: 'Turkey', flag: '🇹🇷', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/322_super-lig.png' },
-  { id: '99', name: 'Brasileirão', country: 'Brazil', flag: '🇧🇷', logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/99_serie-a.png' },
+  {
+    id: '152',
+    name: 'Premier League',
+    country: 'England',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/152_premier-league.png',
+  },
+  {
+    id: '3',
+    name: 'Champions League',
+    country: 'Europe',
+    flag: '🇪🇺',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/3_uefa_champions_league.png',
+  },
+  {
+    id: '302',
+    name: 'La Liga',
+    country: 'Spain',
+    flag: '🇪🇸',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/302_la-liga.png',
+  },
+  {
+    id: '207',
+    name: 'Serie A',
+    country: 'Italy',
+    flag: '🇮🇹',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/207_serie-a.png',
+  },
+  {
+    id: '175',
+    name: 'Bundesliga',
+    country: 'Germany',
+    flag: '🇩🇪',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/175_bundesliga.png',
+  },
+  {
+    id: '168',
+    name: 'Ligue 1',
+    country: 'France',
+    flag: '🇫🇷',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/168_ligue-1.png',
+  },
+  {
+    id: '4',
+    name: 'Europa League',
+    country: 'Europe',
+    flag: '🇪🇺',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/4_uefa-europa-league.png',
+  },
+  {
+    id: '6',
+    name: 'AFCON',
+    country: 'Africa',
+    flag: '🌍',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/6_africa-cup-of-nations.png',
+  },
+  {
+    id: '28',
+    name: 'FIFA World Cup',
+    country: 'International',
+    flag: '🌐',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/28_fifa-world-cup.png',
+  },
+  {
+    id: '1',
+    name: 'UEFA EURO',
+    country: 'Europe',
+    flag: '🇪🇺',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/1_european-championship.png',
+  },
+  {
+    id: '17',
+    name: 'Copa América',
+    country: 'S. America',
+    flag: '🌎',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/17_copa-america.png',
+  },
+  {
+    id: '5',
+    name: 'Nations League',
+    country: 'Europe',
+    flag: '🇪🇺',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/5_uefa-nations-league.png',
+  },
+  {
+    id: '146',
+    name: 'FA Cup',
+    country: 'England',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/146_fa-cup.png',
+  },
+  {
+    id: '19',
+    name: 'CAF CL',
+    country: 'Africa',
+    flag: '🌍',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/19_caf-champions-league.png',
+  },
+  {
+    id: '13',
+    name: 'Libertadores',
+    country: 'S. America',
+    flag: '🌎',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/13_copa-libertadores.png',
+  },
+  {
+    id: '278',
+    name: 'Saudi Pro League',
+    country: 'Saudi Arabia',
+    flag: '🇸🇦',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/278_pro-league.png',
+  },
+  {
+    id: '244',
+    name: 'Eredivisie',
+    country: 'Netherlands',
+    flag: '🇳🇱',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/244_eredivisie.png',
+  },
+  {
+    id: '266',
+    name: 'Liga Portugal',
+    country: 'Portugal',
+    flag: '🇵🇹',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/266_liga-portugal.png',
+  },
+  {
+    id: '322',
+    name: 'Süper Lig',
+    country: 'Turkey',
+    flag: '🇹🇷',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/322_super-lig.png',
+  },
+  {
+    id: '99',
+    name: 'Brasileirão',
+    country: 'Brazil',
+    flag: '🇧🇷',
+    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/99_serie-a.png',
+  },
 ];
 
 export function FootballScreen() {
@@ -74,9 +195,22 @@ export function FootballScreen() {
       .then((res) => {
         if (Array.isArray(res?.result)) {
           const activeLeagues = res.result;
-          const priorityKeywords = ['Premier', 'Champions', 'Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'AFCON', 'Cup'];
+          const priorityKeywords = [
+            'Premier',
+            'Champions',
+            'Liga',
+            'Serie A',
+            'Bundesliga',
+            'Ligue 1',
+            'AFCON',
+            'Cup',
+          ];
           const matched = activeLeagues
-            .filter((l: any) => priorityKeywords.some((k) => (l.league_name || '').toLowerCase().includes(k.toLowerCase())))
+            .filter((l: any) =>
+              priorityKeywords.some((k) =>
+                (l.league_name || '').toLowerCase().includes(k.toLowerCase())
+              )
+            )
             .slice(0, 10)
             .map((l: any) => ({
               id: String(l.league_key),
@@ -146,50 +280,54 @@ export function FootballScreen() {
     };
   };
 
-  const fetchMatches = useCallback(async (isBackground = false) => {
-    if (!isBackground) setLoading(true);
-    try {
-      const targetLeague = selectedLeague === 'all' ? '152' : selectedLeague;
+  const fetchMatches = useCallback(
+    async (isBackground = false) => {
+      if (!isBackground) setLoading(true);
+      try {
+        const targetLeague = selectedLeague === 'all' ? '152' : selectedLeague;
 
-      if (activeTab === 'standings') {
-        const res = await advancedFootballApi.getStandings(targetLeague);
-        if (res?.result) {
-          const resObj = res.result as any;
-          const table = resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
-          setStandings(Array.isArray(table) ? table : []);
+        if (activeTab === 'standings') {
+          const res = await advancedFootballApi.getStandings(targetLeague);
+          if (res?.result) {
+            const resObj = res.result as any;
+            const table =
+              resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
+            setStandings(Array.isArray(table) ? table : []);
+          } else {
+            setStandings([]);
+          }
+        } else if (activeTab === 'topscorers') {
+          const res = await advancedFootballApi.getTopscorers(targetLeague);
+          setTopscorers(res?.result || []);
+        } else if (activeTab === 'predictions') {
+          const res = await advancedFootballApi.getProbabilities({
+            from: selectedDate,
+            to: selectedDate,
+            leagueId: targetLeague,
+          });
+          setProbabilities(res?.result || []);
+        } else if (activeTab === 'live') {
+          const res = await advancedFootballApi.getLivescore();
+          const raw = res?.result || [];
+          setFixtures(raw.map(adaptMatch));
         } else {
-          setStandings([]);
+          // 'upcoming' or 'results'
+          const res = await advancedFootballApi.getFixtures({
+            from: selectedDate,
+            to: selectedDate,
+            leagueId: selectedLeague !== 'all' ? selectedLeague : undefined,
+          });
+          const raw = res?.result || [];
+          setFixtures(raw.map(adaptMatch));
         }
-      } else if (activeTab === 'topscorers') {
-        const res = await advancedFootballApi.getTopscorers(targetLeague);
-        setTopscorers(res?.result || []);
-      } else if (activeTab === 'predictions') {
-        const res = await advancedFootballApi.getProbabilities({
-          from: selectedDate,
-          to: selectedDate,
-          leagueId: targetLeague,
-        });
-        setProbabilities(res?.result || []);
-      } else if (activeTab === 'live') {
-        const res = await advancedFootballApi.getLivescore();
-        const raw = res?.result || [];
-        setFixtures(raw.map(adaptMatch));
-      } else {
-        // 'upcoming' or 'results'
-        const res = await advancedFootballApi.getFixtures({
-          from: selectedDate,
-          to: selectedDate,
-          leagueId: selectedLeague !== 'all' ? selectedLeague : undefined,
-        });
-        const raw = res?.result || [];
-        setFixtures(raw.map(adaptMatch));
+      } catch (err) {
+        console.error('[Web FootballScreen] Error loading football telemetry:', err);
+      } finally {
+        if (!isBackground) setLoading(false);
       }
-    } catch (err) {
-      console.error('[Web FootballScreen] Error loading football telemetry:', err);
-    } finally {
-      if (!isBackground) setLoading(false);
-    }
-  }, [activeTab, selectedLeague, selectedDate, standingView]);
+    },
+    [activeTab, selectedLeague, selectedDate, standingView]
+  );
 
   useEffect(() => {
     fetchMatches();
@@ -278,7 +416,12 @@ export function FootballScreen() {
   // Group fixtures by competition
   const leagueGroups = useMemo(() => {
     const groups: {
-      [key: string]: { title: string; logo?: string; league_key?: string | number; matches: UnifiedWebMatchEvent[] };
+      [key: string]: {
+        title: string;
+        logo?: string;
+        league_key?: string | number;
+        matches: UnifiedWebMatchEvent[];
+      };
     } = {};
 
     filteredFixtures.forEach((item) => {
@@ -379,7 +522,9 @@ export function FootballScreen() {
                       : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                   }`}
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-wider">{item.dayName}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                    {item.dayName}
+                  </span>
                   <span className="text-sm font-mono font-black">{item.dayNumber}</span>
                 </button>
               );
@@ -427,7 +572,11 @@ export function FootballScreen() {
       {/* Loading State */}
       {loading ? (
         <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
-          <GoalmillsLoader size="lg" label="GoalMills Football" sublabel="Syncing live match telemetry..." />
+          <GoalmillsLoader
+            size="lg"
+            label="GoalMills Football"
+            sublabel="Syncing live match telemetry..."
+          />
         </div>
       ) : (
         <>
@@ -480,7 +629,10 @@ export function FootballScreen() {
                   <tbody className="divide-y divide-white/5 font-medium">
                     {standings.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-400 text-xs font-sans">
+                        <td
+                          colSpan={8}
+                          className="py-12 text-center text-slate-400 text-xs font-sans"
+                        >
                           No standings telemetry available for this competition.
                         </td>
                       </tr>
@@ -516,10 +668,18 @@ export function FootballScreen() {
                                 {row.standing_team}
                               </Link>
                             </td>
-                            <td className="py-2.5 px-2 text-center text-slate-300">{row.standing_P}</td>
-                            <td className="py-2.5 px-2 text-center text-blue-400 font-bold">{row.standing_W}</td>
-                            <td className="py-2.5 px-2 text-center text-slate-400">{row.standing_D}</td>
-                            <td className="py-2.5 px-2 text-center text-red-400">{row.standing_L}</td>
+                            <td className="py-2.5 px-2 text-center text-slate-300">
+                              {row.standing_P}
+                            </td>
+                            <td className="py-2.5 px-2 text-center text-blue-400 font-bold">
+                              {row.standing_W}
+                            </td>
+                            <td className="py-2.5 px-2 text-center text-slate-400">
+                              {row.standing_D}
+                            </td>
+                            <td className="py-2.5 px-2 text-center text-red-400">
+                              {row.standing_L}
+                            </td>
                             <td className="py-2.5 px-2 text-center">{row.standing_GD}</td>
                             <td className="py-2.5 px-3 text-right font-black text-yellow-400">
                               {row.standing_PTS}
@@ -560,7 +720,11 @@ export function FootballScreen() {
                         </span>
                         <div className="h-11 w-11 rounded-xl bg-slate-900 border border-white/10 overflow-hidden flex items-center justify-center p-1">
                           {s.player_image ? (
-                            <img src={s.player_image} alt={s.player_name} className="h-full w-full object-cover rounded-lg" />
+                            <img
+                              src={s.player_image}
+                              alt={s.player_name}
+                              className="h-full w-full object-cover rounded-lg"
+                            />
                           ) : (
                             <span className="text-lg">👤</span>
                           )}
@@ -680,7 +844,11 @@ export function FootballScreen() {
                     <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2.5">
                         {group.logo ? (
-                          <img src={group.logo} alt={group.title} className="h-5 w-5 object-contain" />
+                          <img
+                            src={group.logo}
+                            alt={group.title}
+                            className="h-5 w-5 object-contain"
+                          />
                         ) : (
                           <span className="text-base">🏆</span>
                         )}

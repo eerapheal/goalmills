@@ -37,7 +37,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .lean();
 
     const newsRoutes: MetadataRoute.Sitemap = newsArticles.map((article: any) => {
-      const slug = article.slug || (article.title ? slugify(article.title) : '') || article._id.toString();
+      const slug =
+        article.slug || (article.title ? slugify(article.title) : '') || article._id.toString();
       return {
         url: `${baseUrl}/news/${slug}`,
         lastModified: article.updatedAt ? new Date(article.updatedAt) : new Date(),

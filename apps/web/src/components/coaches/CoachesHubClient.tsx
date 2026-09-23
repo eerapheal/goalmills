@@ -45,7 +45,8 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
           coach.preferredFormation.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesComp =
-          selectedComp === 'all' || coach.competitionSlug.toLowerCase() === selectedComp.toLowerCase();
+          selectedComp === 'all' ||
+          coach.competitionSlug.toLowerCase() === selectedComp.toLowerCase();
 
         return matchesSearch && matchesComp;
       })
@@ -80,8 +81,8 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
             World-Class Football Managers & Tactical Architects
           </h1>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Analyze win percentages, preferred formations, pressing philosophies, and trophy cabinets
-            for Europe’s premier football managers.
+            Analyze win percentages, preferred formations, pressing philosophies, and trophy
+            cabinets for Europe’s premier football managers.
           </p>
         </div>
 
@@ -99,9 +100,7 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
               Average Win Rate
             </span>
-            <span className="text-2xl sm:text-3xl font-black text-blue-400">
-              {avgWinRate}%
-            </span>
+            <span className="text-2xl sm:text-3xl font-black text-blue-400">{avgWinRate}%</span>
           </div>
           <div className="bg-slate-950/60 rounded-2xl p-4 border border-white/5">
             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
@@ -115,9 +114,7 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
               Primary System
             </span>
-            <span className="text-xl sm:text-2xl font-black text-blue-400">
-              Positional 4-3-3
-            </span>
+            <span className="text-xl sm:text-2xl font-black text-blue-400">Positional 4-3-3</span>
           </div>
         </div>
       </div>
@@ -153,9 +150,15 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent text-blue-400 font-bold outline-none cursor-pointer"
             >
-              <option value="winRate" className="bg-slate-900 text-white">Highest Win Rate %</option>
-              <option value="trophies" className="bg-slate-900 text-white">Most Trophies</option>
-              <option value="matches" className="bg-slate-900 text-white">Most Matches Managed</option>
+              <option value="winRate" className="bg-slate-900 text-white">
+                Highest Win Rate %
+              </option>
+              <option value="trophies" className="bg-slate-900 text-white">
+                Most Trophies
+              </option>
+              <option value="matches" className="bg-slate-900 text-white">
+                Most Matches Managed
+              </option>
             </select>
           </div>
         </div>

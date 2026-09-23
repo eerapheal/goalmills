@@ -461,9 +461,7 @@ export default function CricketMatchSlugPage() {
                     <tbody className="divide-y divide-white/5 font-mono text-xs">
                       {currentInningsPlayers.batsmen.map((b, idx) => (
                         <tr key={idx} className="hover:bg-white/5">
-                          <td className="py-2.5 px-3 font-sans font-bold text-white">
-                            {b.player}
-                          </td>
+                          <td className="py-2.5 px-3 font-sans font-bold text-white">{b.player}</td>
                           <td className="py-2.5 px-2 font-sans text-slate-400 text-[11px]">
                             {b.status || 'not out'}
                           </td>
@@ -560,8 +558,14 @@ export default function CricketMatchSlugPage() {
             {currentComments.length > 0 ? (
               <div className="space-y-3 pt-2">
                 {currentComments.map((c, idx) => {
-                  const isWicket = c.post?.toLowerCase().includes('out') || c.post?.toLowerCase().includes('wicket');
-                  const isBoundary = c.post?.includes('FOUR') || c.post?.includes('SIX') || c.runs === '4' || c.runs === '6';
+                  const isWicket =
+                    c.post?.toLowerCase().includes('out') ||
+                    c.post?.toLowerCase().includes('wicket');
+                  const isBoundary =
+                    c.post?.includes('FOUR') ||
+                    c.post?.includes('SIX') ||
+                    c.runs === '4' ||
+                    c.runs === '6';
 
                   return (
                     <div
@@ -570,8 +574,8 @@ export default function CricketMatchSlugPage() {
                         isWicket
                           ? 'bg-rose-950/20 border-rose-500/30'
                           : isBoundary
-                          ? 'bg-yellow-950/20 border-yellow-500/30'
-                          : 'bg-[#0D0609]/70 border-white/5'
+                            ? 'bg-yellow-950/20 border-yellow-500/30'
+                            : 'bg-[#0D0609]/70 border-white/5'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
@@ -585,8 +589,8 @@ export default function CricketMatchSlugPage() {
                                 isWicket
                                   ? 'bg-rose-500 text-white'
                                   : isBoundary
-                                  ? 'bg-yellow-500 text-slate-950'
-                                  : 'bg-red-500/20 text-red-300'
+                                    ? 'bg-yellow-500 text-slate-950'
+                                    : 'bg-red-500/20 text-red-300'
                               }`}
                             >
                               {isWicket ? 'W' : `${c.runs} runs`}
@@ -700,19 +704,11 @@ export default function CricketMatchSlugPage() {
                   <tbody className="divide-y divide-white/5 text-xs font-mono">
                     {currentWickets.map((w, i) => (
                       <tr key={i} className="hover:bg-white/5">
-                        <td className="py-3 px-3 font-sans font-bold text-rose-400">
-                          #{i + 1}
-                        </td>
-                        <td className="py-3 px-3 font-sans font-bold text-white">
-                          {w.batsman}
-                        </td>
-                        <td className="py-3 px-3 font-black text-yellow-400 text-sm">
-                          {w.score}
-                        </td>
+                        <td className="py-3 px-3 font-sans font-bold text-rose-400">#{i + 1}</td>
+                        <td className="py-3 px-3 font-sans font-bold text-white">{w.batsman}</td>
+                        <td className="py-3 px-3 font-black text-yellow-400 text-sm">{w.score}</td>
                         <td className="py-3 px-3 text-slate-300">{w.fall}</td>
-                        <td className="py-3 px-3 font-sans text-slate-300">
-                          {w.balwer || '-'}
-                        </td>
+                        <td className="py-3 px-3 font-sans text-slate-300">{w.balwer || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -743,7 +739,8 @@ export default function CricketMatchSlugPage() {
                   >
                     <div className="space-y-1">
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {pastMatch.league_name} • {pastMatch.event_date_start || pastMatch.event_date_stop}
+                        {pastMatch.league_name} •{' '}
+                        {pastMatch.event_date_start || pastMatch.event_date_stop}
                       </div>
                       <div className="font-bold text-white text-sm">
                         {pastMatch.event_home_team} vs {pastMatch.event_away_team}
@@ -751,7 +748,8 @@ export default function CricketMatchSlugPage() {
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-black font-mono text-yellow-400">
-                        {pastMatch.event_home_final_result || '-'} : {pastMatch.event_away_final_result || '-'}
+                        {pastMatch.event_home_final_result || '-'} :{' '}
+                        {pastMatch.event_away_final_result || '-'}
                       </div>
                       {pastMatch.event_status_info && (
                         <div className="text-[11px] text-amber-300 font-medium">
@@ -790,21 +788,23 @@ export default function CricketMatchSlugPage() {
                     </h4>
                     {typeof outcomes === 'object' && outcomes !== null && (
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                        {Object.entries(outcomes).map(([outcome, bookmakers]: [string, any], bIdx) => (
-                          <div
-                            key={bIdx}
-                            className="p-3 rounded-xl bg-white/5 border border-white/5 text-center"
-                          >
-                            <span className="text-[10px] font-bold text-slate-400 block uppercase">
-                              {outcome}
-                            </span>
-                            <span className="text-sm font-mono font-black text-yellow-400">
-                              {typeof bookmakers === 'object'
-                                ? Object.values(bookmakers)[0] as string || '-'
-                                : String(bookmakers)}
-                            </span>
-                          </div>
-                        ))}
+                        {Object.entries(outcomes).map(
+                          ([outcome, bookmakers]: [string, any], bIdx) => (
+                            <div
+                              key={bIdx}
+                              className="p-3 rounded-xl bg-white/5 border border-white/5 text-center"
+                            >
+                              <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                                {outcome}
+                              </span>
+                              <span className="text-sm font-mono font-black text-yellow-400">
+                                {typeof bookmakers === 'object'
+                                  ? (Object.values(bookmakers)[0] as string) || '-'
+                                  : String(bookmakers)}
+                              </span>
+                            </div>
+                          )
+                        )}
                       </div>
                     )}
                   </div>
@@ -828,29 +828,45 @@ export default function CricketMatchSlugPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Competition</span>
-                <span className="text-sm font-bold text-white">{match.league_name || 'Cricket Series'}</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Competition
+                </span>
+                <span className="text-sm font-bold text-white">
+                  {match.league_name || 'Cricket Series'}
+                </span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Season / Round</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Season / Round
+                </span>
                 <span className="text-sm font-bold text-white">
                   {match.league_season || '-'} • {match.league_round || 'Regular'}
                 </span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Venue / Stadium</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Venue / Stadium
+                </span>
                 <span className="text-sm font-bold text-white">{match.event_stadium || 'TBD'}</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Country</span>
-                <span className="text-sm font-bold text-white">{match.country_name || 'Global'}</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Country
+                </span>
+                <span className="text-sm font-bold text-white">
+                  {match.country_name || 'Global'}
+                </span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">Toss</span>
-                <span className="text-sm font-bold text-amber-300">{match.event_toss || 'Toss not yet recorded'}</span>
+                <span className="text-sm font-bold text-amber-300">
+                  {match.event_toss || 'Toss not yet recorded'}
+                </span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#0D0609]/80 border border-white/5">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Player of the Match</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Player of the Match
+                </span>
                 <span className="text-sm font-bold text-yellow-400">
                   {match.event_man_of_match || 'To be decided'}
                 </span>

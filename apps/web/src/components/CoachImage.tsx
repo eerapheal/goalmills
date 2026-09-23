@@ -50,7 +50,10 @@ export const CoachImage: React.FC<CoachImageProps> = ({
       {clubLogo ? (
         <div
           className="absolute -bottom-1 -right-1 rounded-full overflow-hidden border-2 border-slate-950 shadow-md bg-slate-900 p-0.5"
-          style={{ width: Math.max(18, Math.round(size * 0.35)), height: Math.max(18, Math.round(size * 0.35)) }}
+          style={{
+            width: Math.max(18, Math.round(size * 0.35)),
+            height: Math.max(18, Math.round(size * 0.35)),
+          }}
           title="Club Crest"
         >
           <Image
@@ -65,7 +68,10 @@ export const CoachImage: React.FC<CoachImageProps> = ({
       ) : countryFlag ? (
         <div
           className="absolute -bottom-1 -right-1 rounded-full overflow-hidden border-2 border-slate-950 shadow-md bg-slate-900"
-          style={{ width: Math.max(16, Math.round(size * 0.35)), height: Math.max(16, Math.round(size * 0.35)) }}
+          style={{
+            width: Math.max(16, Math.round(size * 0.35)),
+            height: Math.max(16, Math.round(size * 0.35)),
+          }}
           title="Nationality"
         >
           <Image

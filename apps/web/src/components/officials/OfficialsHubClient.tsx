@@ -181,11 +181,21 @@ export const OfficialsHubClient: React.FC<OfficialsHubClientProps> = ({ initialO
                 onChange={(e) => setSelectedStrictness(e.target.value)}
                 className="bg-transparent text-slate-200 font-bold outline-none cursor-pointer"
               >
-                <option value="all" className="bg-slate-900 text-white">All Strictness</option>
-                <option value="Strict" className="bg-slate-900 text-white">Strict</option>
-                <option value="Balanced" className="bg-slate-900 text-white">Balanced</option>
-                <option value="Permissive" className="bg-slate-900 text-white">Permissive</option>
-                <option value="High-Card Index" className="bg-slate-900 text-white">High-Card Index</option>
+                <option value="all" className="bg-slate-900 text-white">
+                  All Strictness
+                </option>
+                <option value="Strict" className="bg-slate-900 text-white">
+                  Strict
+                </option>
+                <option value="Balanced" className="bg-slate-900 text-white">
+                  Balanced
+                </option>
+                <option value="Permissive" className="bg-slate-900 text-white">
+                  Permissive
+                </option>
+                <option value="High-Card Index" className="bg-slate-900 text-white">
+                  High-Card Index
+                </option>
               </select>
             </div>
 
@@ -197,10 +207,18 @@ export const OfficialsHubClient: React.FC<OfficialsHubClientProps> = ({ initialO
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="bg-transparent text-amber-400 font-bold outline-none cursor-pointer"
               >
-                <option value="matches" className="bg-slate-900 text-white">Most Matches</option>
-                <option value="yellows" className="bg-slate-900 text-white">Highest Yellows/Game</option>
-                <option value="reds" className="bg-slate-900 text-white">Highest Reds/Game</option>
-                <option value="fouls" className="bg-slate-900 text-white">Most Fouls/Game</option>
+                <option value="matches" className="bg-slate-900 text-white">
+                  Most Matches
+                </option>
+                <option value="yellows" className="bg-slate-900 text-white">
+                  Highest Yellows/Game
+                </option>
+                <option value="reds" className="bg-slate-900 text-white">
+                  Highest Reds/Game
+                </option>
+                <option value="fouls" className="bg-slate-900 text-white">
+                  Most Fouls/Game
+                </option>
               </select>
             </div>
           </div>
@@ -233,7 +251,8 @@ export const OfficialsHubClient: React.FC<OfficialsHubClientProps> = ({ initialO
           <FiAlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-white mb-1">No Match Officials Found</h3>
           <p className="text-sm text-slate-400 max-w-md mx-auto mb-4">
-            No referees match "{searchQuery}" under the selected filters. Try broadening your criteria.
+            No referees match "{searchQuery}" under the selected filters. Try broadening your
+            criteria.
           </p>
           <button
             onClick={() => {

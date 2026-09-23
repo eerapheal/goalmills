@@ -63,7 +63,13 @@ function normalizeMethodAndParams(
 
   // Copy existing query params
   searchParams.forEach((value, key) => {
-    if (key !== 'met' && key !== 'APIkey' && value !== undefined && value !== null && value !== '') {
+    if (
+      key !== 'met' &&
+      key !== 'APIkey' &&
+      value !== undefined &&
+      value !== null &&
+      value !== ''
+    ) {
       params[key] = value;
     }
   });
@@ -301,7 +307,9 @@ export async function GET(request: NextRequest) {
 
       if (!response || !response.ok) {
         const status = response ? response.status : 502;
-        console.warn(`Cricket API status ${status} for ${normalizedMethod}, returning graceful fallback.`);
+        console.warn(
+          `Cricket API status ${status} for ${normalizedMethod}, returning graceful fallback.`
+        );
 
         consecutiveFailures++;
         if (consecutiveFailures >= 5) {

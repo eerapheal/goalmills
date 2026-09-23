@@ -13,7 +13,9 @@ export function slugify(text?: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-export function getNewsTarget(item?: { id?: string; _id?: string; slug?: string; title?: string } | null): string {
+export function getNewsTarget(
+  item?: { id?: string; _id?: string; slug?: string; title?: string } | null
+): string {
   if (!item) return '';
   if (item.slug && item.slug.trim()) return item.slug.trim();
   if (item.title && item.title.trim()) {

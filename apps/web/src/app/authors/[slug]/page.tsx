@@ -6,7 +6,15 @@ import News from '@/models/News';
 import { EntityService } from '@/lib/entityService';
 import { ContentHubLayout } from '@/components/ContentHubLayout';
 import { RelatedArticlesMatrix } from '@/components/RelatedArticlesMatrix';
-import { FiFeather, FiCheckCircle, FiTwitter, FiLinkedin, FiShield, FiClock, FiAward } from 'react-icons/fi';
+import {
+  FiFeather,
+  FiCheckCircle,
+  FiTwitter,
+  FiLinkedin,
+  FiShield,
+  FiClock,
+  FiAward,
+} from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 
 export const dynamic = 'force-dynamic';
@@ -35,7 +43,8 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   }
 
   let authoredArticles: BlogPost[] = [];
-  let trainingStatus: { isTrainee: boolean; isCertified: boolean; completedDays: number } | null = null;
+  let trainingStatus: { isTrainee: boolean; isCertified: boolean; completedDays: number } | null =
+    null;
 
   try {
     await dbConnect();

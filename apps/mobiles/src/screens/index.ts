@@ -5,5 +5,3 @@ export { default as BasketballScreen } from './BasketballScreen';
 export { AdvancedFootballScreen } from './AdvancedFootballScreen';
 export { NewsletterPreferencesScreen } from './NewsletterPreferencesScreen';
 export { SearchScreen } from './SearchScreen';
-
-

@@ -69,8 +69,8 @@ export default function FootballTeamsHubPage() {
               Football Clubs, Squads & Stadiums
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Discover in-depth analytics, confirmed transfers, player ratings, and fixture calendars
-              for premier football clubs across top leagues.
+              Discover in-depth analytics, confirmed transfers, player ratings, and fixture
+              calendars for premier football clubs across top leagues.
             </p>
           </div>
         </div>

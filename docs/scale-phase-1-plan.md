@@ -3,6 +3,7 @@
 ## Multi-Tenant Architecture
 
 ### 1. Objective
+
 Transform GoalMills into a robust, isolated multi-tenant publishing platform supporting sports publishers, brand clubs, and independent media networks, while retaining 100% backward compatibility for the primary GoalMills deployment.
 
 ---

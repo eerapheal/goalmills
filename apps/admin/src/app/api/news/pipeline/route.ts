@@ -105,7 +105,9 @@ export async function GET(request: NextRequest) {
     // Sport filter
     if (sportFilter && sportFilter !== 'all') {
       const sRegex = new RegExp(sportFilter, 'i');
-      conditions.push({ $or: [{ sportSlug: sportFilter.toLowerCase() }, { sport: { $regex: sRegex } }] });
+      conditions.push({
+        $or: [{ sportSlug: sportFilter.toLowerCase() }, { sport: { $regex: sRegex } }],
+      });
     }
 
     // Category filter
@@ -212,7 +214,10 @@ export async function POST(request: NextRequest) {
     if (action === 'approve') {
       if (!canApprove) {
         return NextResponse.json(
-          { success: false, message: 'Forbidden: Editor, Manager, or Super Admin role required to approve.' },
+          {
+            success: false,
+            message: 'Forbidden: Editor, Manager, or Super Admin role required to approve.',
+          },
           { status: 403 }
         );
       }
@@ -255,7 +260,10 @@ export async function POST(request: NextRequest) {
     if (action === 'reject') {
       if (!canApprove) {
         return NextResponse.json(
-          { success: false, message: 'Forbidden: Editor or Super Admin role required to reject articles.' },
+          {
+            success: false,
+            message: 'Forbidden: Editor or Super Admin role required to reject articles.',
+          },
           { status: 403 }
         );
       }
@@ -348,7 +356,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
       }
       const article = await News.findById(id).setOptions({ includeAllStatuses: true });
-      if (!article) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+      if (!article)
+        return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
       article.isBreaking = !article.isBreaking;
       await article.save();
       await cacheInvalidatePattern('cache:news:*');
@@ -364,7 +373,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
       }
       const article = await News.findById(id).setOptions({ includeAllStatuses: true });
-      if (!article) return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
+      if (!article)
+        return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
       article.isFeatured = !article.isFeatured;
       await article.save();
       await cacheInvalidatePattern('cache:news:*');
@@ -383,7 +393,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
       }
       if (!Array.isArray(ids) || ids.length === 0) {
-        return NextResponse.json({ success: false, message: 'No article IDs provided' }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: 'No article IDs provided' },
+          { status: 400 }
+        );
       }
 
       const result = await News.updateMany(
@@ -415,7 +428,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 });
       }
       if (!Array.isArray(ids) || ids.length === 0) {
-        return NextResponse.json({ success: false, message: 'No article IDs provided' }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: 'No article IDs provided' },
+          { status: 400 }
+        );
       }
 
       const result = await News.updateMany(
@@ -443,13 +459,21 @@ export async function POST(request: NextRequest) {
     // ─────────────────────────────────────────────────────────────────────────
     if (action === 'batch_delete') {
       if (!canDeleteAny) {
-        return NextResponse.json({ success: false, message: 'Forbidden: Cannot delete articles' }, { status: 403 });
+        return NextResponse.json(
+          { success: false, message: 'Forbidden: Cannot delete articles' },
+          { status: 403 }
+        );
       }
       if (!Array.isArray(ids) || ids.length === 0) {
-        return NextResponse.json({ success: false, message: 'No article IDs provided' }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: 'No article IDs provided' },
+          { status: 400 }
+        );
       }
 
-      const result = await News.deleteMany({ _id: { $in: ids } }).setOptions({ includeAllStatuses: true });
+      const result = await News.deleteMany({ _id: { $in: ids } }).setOptions({
+        includeAllStatuses: true,
+      });
       await cacheInvalidatePattern('cache:news:*');
 
       return NextResponse.json({
@@ -459,7 +483,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: false, message: `Unknown action '${action}'` }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: `Unknown action '${action}'` },
+      { status: 400 }
+    );
   } catch (error: any) {
     console.error('Error handling pipeline action:', error);
     return NextResponse.json(

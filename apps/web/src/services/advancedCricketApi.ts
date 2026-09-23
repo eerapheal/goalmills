@@ -1632,9 +1632,9 @@ export const advancedCricketApi = {
         extra: scardRes?.extra || baseMatch?.extra || {},
         lineups: scardRes?.lineups ||
           baseMatch?.lineups || {
-          home_team: { starting_lineups: [] },
-          away_team: { starting_lineups: [] },
-        },
+            home_team: { starting_lineups: [] },
+            away_team: { starting_lineups: [] },
+          },
         comments: commRes || baseMatch?.comments || {},
       };
 

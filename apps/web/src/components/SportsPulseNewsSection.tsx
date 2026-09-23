@@ -25,9 +25,10 @@ function mapArticle(item: any, idx: number) {
     categoryName: cat.charAt(0).toUpperCase() + cat.slice(1),
     readTime: `${item.readTime || 4} min read`,
     tagColor,
-    date: item.publishedAt || item.createdAt
-      ? new Date(item.publishedAt || item.createdAt).toLocaleDateString()
-      : 'Latest',
+    date:
+      item.publishedAt || item.createdAt
+        ? new Date(item.publishedAt || item.createdAt).toLocaleDateString()
+        : 'Latest',
     author: item.author || 'GoalMills Sports Desk',
     isHot: idx === 0 || !!item.isBreaking,
     imageUrl: item.imageUrl || item.image || item.thumbnailUrl || item.thumbnail || '',
@@ -157,7 +158,10 @@ export function SportsPulseNewsSection({ initialArticles }: { initialArticles?: 
     }
   };
 
-  const tabs: Array<{ id: 'all' | 'football' | 'cricket' | 'basketball' | 'transfers'; label: string }> = [
+  const tabs: Array<{
+    id: 'all' | 'football' | 'cricket' | 'basketball' | 'transfers';
+    label: string;
+  }> = [
     { id: 'all', label: 'All Pulse' },
     { id: 'football', label: 'Football' },
     { id: 'cricket', label: 'Cricket' },
@@ -166,9 +170,7 @@ export function SportsPulseNewsSection({ initialArticles }: { initialArticles?: 
   ];
 
   const filteredArticles =
-    activeCategory === 'all'
-      ? articles
-      : articles.filter((art) => art.category === activeCategory);
+    activeCategory === 'all' ? articles : articles.filter((art) => art.category === activeCategory);
 
   const videoLink = spotlightVideo.id ? `/highlights/${spotlightVideo.id}` : '/highlights';
 
@@ -422,4 +424,3 @@ export function SportsPulseNewsSection({ initialArticles }: { initialArticles?: 
     </section>
   );
 }
-

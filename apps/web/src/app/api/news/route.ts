@@ -44,9 +44,7 @@ export async function GET(request: NextRequest) {
       ...tenantFilter,
     };
 
-    const conditions: any[] = [
-      { $or: [{ status: 'published' }, { status: { $exists: false } }] },
-    ];
+    const conditions: any[] = [{ $or: [{ status: 'published' }, { status: { $exists: false } }] }];
 
     if (exclude) {
       const excludeList = exclude.split(',').filter((id) => id.match(/^[0-9a-fA-F]{24}$/));
@@ -64,7 +62,9 @@ export async function GET(request: NextRequest) {
 
     if (sportParam && sportParam !== 'all') {
       const sRegex = new RegExp(sportParam, 'i');
-      conditions.push({ $or: [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }] });
+      conditions.push({
+        $or: [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }],
+      });
     }
 
     if (competitionParam && competitionParam !== 'all') {
@@ -79,7 +79,9 @@ export async function GET(request: NextRequest) {
 
     if (categoryParam && categoryParam !== 'all') {
       const catRegex = new RegExp(categoryParam.replace(/-/g, ' '), 'i');
-      conditions.push({ $or: [{ categorySlug: categoryParam.toLowerCase() }, { category: { $regex: catRegex } }] });
+      conditions.push({
+        $or: [{ categorySlug: categoryParam.toLowerCase() }, { category: { $regex: catRegex } }],
+      });
     }
 
     if (team) {
@@ -95,7 +97,9 @@ export async function GET(request: NextRequest) {
 
     if (player) {
       const playerRegex = new RegExp(player.replace(/-/g, ' '), 'i');
-      conditions.push({ $or: [{ players: { $in: [playerRegex] } }, { tags: { $in: [playerRegex] } }] });
+      conditions.push({
+        $or: [{ players: { $in: [playerRegex] } }, { tags: { $in: [playerRegex] } }],
+      });
     }
 
     if (articleType && articleType !== 'all') {
@@ -104,7 +108,9 @@ export async function GET(request: NextRequest) {
 
     if (authorParam && authorParam !== 'all') {
       const authRegex = new RegExp(authorParam.replace(/-/g, ' '), 'i');
-      conditions.push({ $or: [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: authRegex } }] });
+      conditions.push({
+        $or: [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: authRegex } }],
+      });
     }
 
     if (filterType === 'breaking') {
@@ -151,9 +157,7 @@ export async function GET(request: NextRequest) {
       sortOptions = { createdAt: 1 };
     }
 
-    let newsQuery = News.find(query)
-      .select('-content')
-      .sort(sortOptions);
+    let newsQuery = News.find(query).select('-content').sort(sortOptions);
 
     if (limitParam > 0) {
       const skip = (pageParam - 1) * limitParam;

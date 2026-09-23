@@ -169,7 +169,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                 slug: t.slug.toLowerCase().trim(),
                 logo: t.logo,
                 sportSlug: (body.sportSlug || 'football').toLowerCase().trim(),
-                competitionSlug: body.competitionSlug ? body.competitionSlug.toLowerCase().trim() : undefined,
+                competitionSlug: body.competitionSlug
+                  ? body.competitionSlug.toLowerCase().trim()
+                  : undefined,
                 isCustom: true,
               },
             },
@@ -192,8 +194,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                 slug: p.slug.toLowerCase().trim(),
                 photo: p.photo,
                 sportSlug: (body.sportSlug || 'football').toLowerCase().trim(),
-                competitionSlug: body.competitionSlug ? body.competitionSlug.toLowerCase().trim() : undefined,
-                clubSlug: body.teams && body.teams[0]?.slug ? body.teams[0].slug.toLowerCase().trim() : undefined,
+                competitionSlug: body.competitionSlug
+                  ? body.competitionSlug.toLowerCase().trim()
+                  : undefined,
+                clubSlug:
+                  body.teams && body.teams[0]?.slug
+                    ? body.teams[0].slug.toLowerCase().trim()
+                    : undefined,
                 isCustom: true,
               },
             },

@@ -22,10 +22,12 @@ export function SponsoredBannerCard({
       title: 'GoalMills VIP Match & Fantasy Hub',
       sponsorName: 'GoalMills Official',
       badgeText: 'VIP SPONSOR',
-      tagline: 'Instant live scores, detailed statistics & tactical match debriefs with verified xG metrics',
+      tagline:
+        'Instant live scores, detailed statistics & tactical match debriefs with verified xG metrics',
       ctaText: 'Claim VIP Match Pass',
       targetUrl: 'https://goalmills.com',
-      imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+      imageUrl:
+        'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
     });
   }, [placement, sport, category]);
 
@@ -46,11 +48,7 @@ export function SponsoredBannerCard({
       {/* Background Banner Image */}
       {sponsorship.imageUrl && (
         <View style={styles.bgImageContainer}>
-          <Image
-            source={{ uri: sponsorship.imageUrl }}
-            style={styles.bgImage}
-            resizeMode="cover"
-          />
+          <Image source={{ uri: sponsorship.imageUrl }} style={styles.bgImage} resizeMode="cover" />
           <View style={styles.bgOverlay} />
         </View>
       )}

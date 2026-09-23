@@ -15,7 +15,11 @@ import {
   FiGlobe,
   FiMessageSquare,
 } from 'react-icons/fi';
-import type { DistributionHubStats, SyndicationJob, DistributionChannelType } from '@goalmills/types';
+import type {
+  DistributionHubStats,
+  SyndicationJob,
+  DistributionChannelType,
+} from '@goalmills/types';
 
 export default function ContentDistributionStudio() {
   const [stats, setStats] = useState<DistributionHubStats | null>(null);
@@ -140,7 +144,8 @@ export default function ContentDistributionStudio() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Automated social syndication, match recaps, editorial safety gates, and public RSS feeds.
+                Automated social syndication, match recaps, editorial safety gates, and public RSS
+                feeds.
               </p>
             </div>
           </div>
@@ -164,7 +169,9 @@ export default function ContentDistributionStudio() {
           }`}
         >
           <span>{feedback.message}</span>
-          <button onClick={() => setFeedback(null)} className="text-white/60 hover:text-white">✕</button>
+          <button onClick={() => setFeedback(null)} className="text-white/60 hover:text-white">
+            ✕
+          </button>
         </div>
       )}
 
@@ -228,7 +235,9 @@ export default function ContentDistributionStudio() {
 
           <div className="space-y-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Sport</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Sport
+              </label>
               <select
                 value={sport}
                 onChange={(e) => setSport(e.target.value)}
@@ -242,7 +251,9 @@ export default function ContentDistributionStudio() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Headline / Banner</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Headline / Banner
+              </label>
               <input
                 type="text"
                 placeholder="e.g. BREAKING: Arsenal seal Champions League qualification"
@@ -253,7 +264,9 @@ export default function ContentDistributionStudio() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Post Body & Summary</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Post Body & Summary
+              </label>
               <textarea
                 rows={3}
                 placeholder="Full bulletin copy, match recap details, or editorial summary..."
@@ -264,7 +277,9 @@ export default function ContentDistributionStudio() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Article or Match Link (Optional)</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Article or Match Link (Optional)
+              </label>
               <input
                 type="text"
                 placeholder="https://goalmills.com/news/..."
@@ -275,7 +290,9 @@ export default function ContentDistributionStudio() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-2">Target Channels</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-2">
+                Target Channels
+              </label>
               <div className="flex flex-wrap gap-2">
                 {[
                   { id: 'x_twitter', label: 'X / Twitter' },
@@ -348,8 +365,8 @@ export default function ContentDistributionStudio() {
                         j.status === 'dispatched'
                           ? 'bg-emerald-500/10 text-emerald-400'
                           : j.status === 'pending_approval'
-                          ? 'bg-amber-500/10 text-amber-400'
-                          : 'bg-rose-500/10 text-rose-400'
+                            ? 'bg-amber-500/10 text-amber-400'
+                            : 'bg-rose-500/10 text-rose-400'
                       }`}
                     >
                       {j.status}

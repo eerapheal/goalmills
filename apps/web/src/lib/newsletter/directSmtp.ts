@@ -36,16 +36,24 @@ function sendCommand(socket: net.Socket | tls.TLSSocket, cmd?: string): Promise<
  * Uses native Node.js net/tls sockets (zero dependencies) with RFC 5321/5322 compliance.
  * Works seamlessly with Gmail, AWS SES, SendGrid, Mailgun, and custom SMTP relays.
  */
-export async function sendEmailViaDirectSmtp(options: DirectSmtpOptions): Promise<{ success: boolean; messageId?: string; error?: string }> {
+export async function sendEmailViaDirectSmtp(
+  options: DirectSmtpOptions
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
   const port = parseInt((process.env.SMTP_PORT || '587').trim(), 10);
   const user = (process.env.SMTP_USER || '').trim();
   const pass = (process.env.SMTP_PASSWORD || '').trim();
   const fromEmail = (options.fromEmail || process.env.SMTP_FROM_EMAIL || user).trim();
-  const fromName = (options.fromName || process.env.SMTP_FROM_NAME || 'GoalMills Sports Media').trim();
+  const fromName = (
+    options.fromName ||
+    process.env.SMTP_FROM_NAME ||
+    'GoalMills Sports Media'
+  ).trim();
 
   if (!host || !user || !pass) {
-    console.warn('[Direct SMTP] Missing SMTP configuration in environment. Skipping email dispatch.');
+    console.warn(
+      '[Direct SMTP] Missing SMTP configuration in environment. Skipping email dispatch.'
+    );
     return { success: false, error: 'SMTP configuration incomplete' };
   }
 
@@ -82,7 +90,10 @@ export async function sendEmailViaDirectSmtp(options: DirectSmtpOptions): Promis
           if (!greeting.startsWith('220')) {
             cleanup();
             socket.end('QUIT\r\n');
-            return resolve({ success: false, error: `Invalid server greeting: ${greeting.trim()}` });
+            return resolve({
+              success: false,
+              error: `Invalid server greeting: ${greeting.trim()}`,
+            });
           }
 
           // 2. EHLO
@@ -114,7 +125,10 @@ export async function sendEmailViaDirectSmtp(options: DirectSmtpOptions): Promis
           if (!authRes.startsWith('235')) {
             cleanup();
             socket.end('QUIT\r\n');
-            return resolve({ success: false, error: `SMTP Authentication failed: ${authRes.trim()}` });
+            return resolve({
+              success: false,
+              error: `SMTP Authentication failed: ${authRes.trim()}`,
+            });
           }
 
           // 5. MAIL FROM
@@ -168,7 +182,9 @@ export async function sendEmailViaDirectSmtp(options: DirectSmtpOptions): Promis
           socket.end('QUIT\r\n');
 
           if (sendResult.startsWith('250')) {
-            console.log(`[Direct SMTP] Email successfully delivered to ${options.to} (Message-ID: ${messageId})`);
+            console.log(
+              `[Direct SMTP] Email successfully delivered to ${options.to} (Message-ID: ${messageId})`
+            );
             return resolve({ success: true, messageId });
           } else {
             return resolve({ success: false, error: `Delivery error: ${sendResult.trim()}` });

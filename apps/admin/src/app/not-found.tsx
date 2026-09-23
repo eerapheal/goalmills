@@ -13,7 +13,8 @@ export default function AdminNotFound() {
         <div className="space-y-2">
           <h1 className="text-2xl font-black text-white">404 - Admin Resource Not Found</h1>
           <p className="text-xs text-slate-400 leading-relaxed">
-            The requested operations dashboard, campaign, or user profile was not found or has been purged.
+            The requested operations dashboard, campaign, or user profile was not found or has been
+            purged.
           </p>
         </div>
 

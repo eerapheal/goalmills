@@ -101,7 +101,9 @@ export function AfricanFootballHeroSpotlight({
           </h2>
 
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
-            Track live CAF Champions League, NPFL, Betway Premiership, and Botola Pro scores, alongside authenticated real market valuations, contract statuses, and goals across Europe for Osimhen, Salah, Lookman, and Hakimi.
+            Track live CAF Champions League, NPFL, Betway Premiership, and Botola Pro scores,
+            alongside authenticated real market valuations, contract statuses, and goals across
+            Europe for Osimhen, Salah, Lookman, and Hakimi.
           </p>
 
           {/* Key Metrics Quick Ribbon */}
@@ -123,8 +125,7 @@ export function AfricanFootballHeroSpotlight({
               </span>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-center">
-              <span className="block text-lg sm:text-xl font-black text-blue-400 font-mono">
-              </span>
+              <span className="block text-lg sm:text-xl font-black text-blue-400 font-mono"></span>
               <span className="text-[10px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Active Season
               </span>
@@ -183,7 +184,9 @@ export function AfricanFootballHeroSpotlight({
                   <span className="block font-black text-white">
                     {featuredSuperstar.seasonStats.assists}
                   </span>
-                  <span className="text-[9px] uppercase tracking-wider text-slate-400">Assists</span>
+                  <span className="text-[9px] uppercase tracking-wider text-slate-400">
+                    Assists
+                  </span>
                 </div>
                 <div className="bg-white/5 p-2 rounded-xl">
                   <span className="block font-black text-yellow-400 font-mono">

@@ -80,9 +80,20 @@ export default function BasketballMatchSlugPage() {
   const isLive =
     match?.event_live === '1' ||
     match?.event_live === (1 as any) ||
-    ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter', 'Overtime', 'Halftime', 'LIVE', 'Q1', 'Q2', 'Q3', 'Q4', 'OT'].includes(
-      match?.event_status || match?.event_quarter || ''
-    );
+    [
+      '1st Quarter',
+      '2nd Quarter',
+      '3rd Quarter',
+      '4th Quarter',
+      'Overtime',
+      'Halftime',
+      'LIVE',
+      'Q1',
+      'Q2',
+      'Q3',
+      'Q4',
+      'OT',
+    ].includes(match?.event_status || match?.event_quarter || '');
 
   const isFinished =
     match?.event_status?.toLowerCase() === 'finished' ||
@@ -112,7 +123,9 @@ export default function BasketballMatchSlugPage() {
       '@type': 'SportsEvent',
       name: `${homeName} vs ${awayName}`,
       description: `${homeName} vs ${awayName} Live Score, Quarter Box Scores and Player Stats for ${match.league_name || 'Basketball'}`,
-      startDate: match.event_date ? `${match.event_date}T${match.event_time || '00:00:00'}` : undefined,
+      startDate: match.event_date
+        ? `${match.event_date}T${match.event_time || '00:00:00'}`
+        : undefined,
       sport: 'Basketball',
       homeTeam: {
         '@type': 'SportsTeam',
@@ -148,7 +161,8 @@ export default function BasketballMatchSlugPage() {
         <span className="text-5xl mb-4">🏀</span>
         <h1 className="text-2xl font-black text-white mb-2">Game Not Found</h1>
         <p className="text-sm text-slate-400 max-w-md mb-6">
-          {error || 'The requested basketball game could not be found or has not been scheduled yet.'}
+          {error ||
+            'The requested basketball game could not be found or has not been scheduled yet.'}
         </p>
         <Link
           href="/basketball"
@@ -328,16 +342,30 @@ export default function BasketballMatchSlugPage() {
                     <tr className="hover:bg-white/5">
                       <td className="py-3 px-3 text-left font-sans font-bold text-white flex items-center gap-2">
                         {match.event_home_team_logo && (
-                          <img src={match.event_home_team_logo} alt="" className="w-5 h-5 object-contain" />
+                          <img
+                            src={match.event_home_team_logo}
+                            alt=""
+                            className="w-5 h-5 object-contain"
+                          />
                         )}
                         <span>{homeName}</span>
                       </td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['1stQuarter']?.[0]?.score_home || '-'}</td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['2ndQuarter']?.[0]?.score_home || '-'}</td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['3rdQuarter']?.[0]?.score_home || '-'}</td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['4thQuarter']?.[0]?.score_home || '-'}</td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['1stQuarter']?.[0]?.score_home || '-'}
+                      </td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['2ndQuarter']?.[0]?.score_home || '-'}
+                      </td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['3rdQuarter']?.[0]?.score_home || '-'}
+                      </td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['4thQuarter']?.[0]?.score_home || '-'}
+                      </td>
                       {match.scores.Overtime && (
-                        <td className="py-3 px-2 text-amber-400">{match.scores.Overtime?.[0]?.score_home || '-'}</td>
+                        <td className="py-3 px-2 text-amber-400">
+                          {match.scores.Overtime?.[0]?.score_home || '-'}
+                        </td>
                       )}
                       <td className="py-3 px-3 font-black text-amber-400 text-base">{homeScore}</td>
                     </tr>
@@ -345,16 +373,30 @@ export default function BasketballMatchSlugPage() {
                     <tr className="hover:bg-white/5">
                       <td className="py-3 px-3 text-left font-sans font-bold text-white flex items-center gap-2">
                         {match.event_away_team_logo && (
-                          <img src={match.event_away_team_logo} alt="" className="w-5 h-5 object-contain" />
+                          <img
+                            src={match.event_away_team_logo}
+                            alt=""
+                            className="w-5 h-5 object-contain"
+                          />
                         )}
                         <span>{awayName}</span>
                       </td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['1stQuarter']?.[0]?.score_away || '-'}</td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['2ndQuarter']?.[0]?.score_away || '-'}</td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['3rdQuarter']?.[0]?.score_away || '-'}</td>
-                      <td className="py-3 px-2 text-slate-300">{match.scores['4thQuarter']?.[0]?.score_away || '-'}</td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['1stQuarter']?.[0]?.score_away || '-'}
+                      </td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['2ndQuarter']?.[0]?.score_away || '-'}
+                      </td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['3rdQuarter']?.[0]?.score_away || '-'}
+                      </td>
+                      <td className="py-3 px-2 text-slate-300">
+                        {match.scores['4thQuarter']?.[0]?.score_away || '-'}
+                      </td>
                       {match.scores.Overtime && (
-                        <td className="py-3 px-2 text-amber-400">{match.scores.Overtime?.[0]?.score_away || '-'}</td>
+                        <td className="py-3 px-2 text-amber-400">
+                          {match.scores.Overtime?.[0]?.score_away || '-'}
+                        </td>
                       )}
                       <td className="py-3 px-3 font-black text-amber-400 text-base">{awayScore}</td>
                     </tr>
@@ -390,7 +432,9 @@ export default function BasketballMatchSlugPage() {
                     <div key={idx} className="space-y-1.5 text-xs">
                       <div className="flex items-center justify-between font-bold">
                         <span className="font-mono text-white text-sm">{stat.home}</span>
-                        <span className="text-[11px] uppercase tracking-wider text-slate-400">{stat.type}</span>
+                        <span className="text-[11px] uppercase tracking-wider text-slate-400">
+                          {stat.type}
+                        </span>
                         <span className="font-mono text-white text-sm">{stat.away}</span>
                       </div>
                       <div className="h-2 rounded-full bg-white/5 flex overflow-hidden">
@@ -429,9 +473,14 @@ export default function BasketballMatchSlugPage() {
                 </span>
                 <div className="space-y-2 text-xs">
                   {match.lineups?.home_team?.starting_lineups?.map((p, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5"
+                    >
                       <span className="font-bold text-white">{p.player}</span>
-                      <span className="text-[10px] text-slate-400">{p.player_position || 'STARTER'}</span>
+                      <span className="text-[10px] text-slate-400">
+                        {p.player_position || 'STARTER'}
+                      </span>
                     </div>
                   )) || <p className="text-slate-500 text-xs">Starting lineup not yet submitted</p>}
                 </div>
@@ -443,7 +492,10 @@ export default function BasketballMatchSlugPage() {
                     </span>
                     <div className="space-y-2 text-xs">
                       {match.lineups.home_team.substitutes.map((p, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5"
+                        >
                           <span className="text-slate-300">{p.player}</span>
                           <span className="text-[10px] text-slate-500">BENCH</span>
                         </div>
@@ -465,9 +517,14 @@ export default function BasketballMatchSlugPage() {
                 </span>
                 <div className="space-y-2 text-xs">
                   {match.lineups?.away_team?.starting_lineups?.map((p, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5"
+                    >
                       <span className="font-bold text-white">{p.player}</span>
-                      <span className="text-[10px] text-slate-400">{p.player_position || 'STARTER'}</span>
+                      <span className="text-[10px] text-slate-400">
+                        {p.player_position || 'STARTER'}
+                      </span>
                     </div>
                   )) || <p className="text-slate-500 text-xs">Starting lineup not yet submitted</p>}
                 </div>
@@ -479,7 +536,10 @@ export default function BasketballMatchSlugPage() {
                     </span>
                     <div className="space-y-2 text-xs">
                       {match.lineups.away_team.substitutes.map((p, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5"
+                        >
                           <span className="text-slate-300">{p.player}</span>
                           <span className="text-[10px] text-slate-500">BENCH</span>
                         </div>
@@ -500,7 +560,8 @@ export default function BasketballMatchSlugPage() {
               <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <span>🏀</span> {homeName} Box Score
               </h4>
-              {match.player_statistics?.home_team && match.player_statistics.home_team.length > 0 ? (
+              {match.player_statistics?.home_team &&
+              match.player_statistics.home_team.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse font-mono">
                     <thead>
@@ -518,19 +579,33 @@ export default function BasketballMatchSlugPage() {
                       {match.player_statistics.home_team.map((p, idx) => (
                         <tr key={idx} className="hover:bg-white/5">
                           <td className="py-2.5 px-3 font-sans font-bold text-white">{p.player}</td>
-                          <td className="py-2.5 px-2 text-center font-black text-amber-400">{p.player_points}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_total_rebounds}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_assists}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_blocks}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_steals}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-400">{p.player_minutes}&apos;</td>
+                          <td className="py-2.5 px-2 text-center font-black text-amber-400">
+                            {p.player_points}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_total_rebounds}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_assists}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_blocks}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_steals}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-400">
+                            {p.player_minutes}&apos;
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 py-4 text-center">Individual player box scores not yet available.</p>
+                <p className="text-xs text-slate-500 py-4 text-center">
+                  Individual player box scores not yet available.
+                </p>
               )}
             </div>
 
@@ -539,7 +614,8 @@ export default function BasketballMatchSlugPage() {
               <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <span>🏀</span> {awayName} Box Score
               </h4>
-              {match.player_statistics?.away_team && match.player_statistics.away_team.length > 0 ? (
+              {match.player_statistics?.away_team &&
+              match.player_statistics.away_team.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse font-mono">
                     <thead>
@@ -557,19 +633,33 @@ export default function BasketballMatchSlugPage() {
                       {match.player_statistics.away_team.map((p, idx) => (
                         <tr key={idx} className="hover:bg-white/5">
                           <td className="py-2.5 px-3 font-sans font-bold text-white">{p.player}</td>
-                          <td className="py-2.5 px-2 text-center font-black text-amber-400">{p.player_points}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_total_rebounds}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_assists}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_blocks}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-300">{p.player_steals}</td>
-                          <td className="py-2.5 px-2 text-center text-slate-400">{p.player_minutes}&apos;</td>
+                          <td className="py-2.5 px-2 text-center font-black text-amber-400">
+                            {p.player_points}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_total_rebounds}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_assists}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_blocks}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-300">
+                            {p.player_steals}
+                          </td>
+                          <td className="py-2.5 px-2 text-center text-slate-400">
+                            {p.player_minutes}&apos;
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 py-4 text-center">Individual player box scores not yet available.</p>
+                <p className="text-xs text-slate-500 py-4 text-center">
+                  Individual player box scores not yet available.
+                </p>
               )}
             </div>
           </div>
@@ -590,11 +680,15 @@ export default function BasketballMatchSlugPage() {
                     className="flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/5 text-xs hover:border-white/15 transition-all"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-500 font-mono text-[10px]">{item.event_date}</span>
+                      <span className="text-slate-500 font-mono text-[10px]">
+                        {item.event_date}
+                      </span>
                       <span className="text-slate-400 font-semibold">• {item.league_name}</span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="font-bold text-white text-right">{item.event_home_team}</span>
+                      <span className="font-bold text-white text-right">
+                        {item.event_home_team}
+                      </span>
                       <span className="px-2.5 py-1 rounded-lg bg-[#060D18] font-mono font-black text-amber-400">
                         {item.event_final_result}
                       </span>
@@ -622,16 +716,24 @@ export default function BasketballMatchSlugPage() {
             {oddsData && Object.keys(oddsData).length > 0 ? (
               <div className="space-y-4">
                 {Object.entries(oddsData).map(([marketKey, marketVal]: [string, any]) => (
-                  <div key={marketKey} className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
+                  <div
+                    key={marketKey}
+                    className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3"
+                  >
                     <span className="text-xs font-black uppercase text-amber-400 tracking-wider">
                       {marketKey}
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {Object.entries(marketVal).map(([subKey, subVal]: [string, any]) => (
-                        <div key={subKey} className="p-2.5 rounded-xl bg-[#060D18] border border-white/5 flex items-center justify-between">
+                        <div
+                          key={subKey}
+                          className="p-2.5 rounded-xl bg-[#060D18] border border-white/5 flex items-center justify-between"
+                        >
                           <span className="text-slate-400 text-xs">{subKey}</span>
                           <span className="font-mono font-black text-emerald-400 text-sm">
-                            {typeof subVal === 'object' ? Object.values(subVal)[0] as any : String(subVal)}
+                            {typeof subVal === 'object'
+                              ? (Object.values(subVal)[0] as any)
+                              : String(subVal)}
                           </span>
                         </div>
                       ))}

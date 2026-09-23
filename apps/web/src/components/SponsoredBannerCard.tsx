@@ -13,7 +13,6 @@ export interface SponsoredBannerProps {
   accentBadge?: string;
 }
 
-
 export function SponsoredBannerCard({
   placement = 'homepage_hero',
   sport = 'all',
@@ -49,9 +48,7 @@ export function SponsoredBannerCard({
           queryParams.set('category', category);
         }
 
-        const res = await fetch(
-          `/api/sponsorships?${queryParams.toString()}`
-        );
+        const res = await fetch(`/api/sponsorships?${queryParams.toString()}`);
 
         const data = await res.json();
 
@@ -61,8 +58,7 @@ export function SponsoredBannerCard({
           data.sponsorships.length > 0 &&
           isMounted
         ) {
-          const offsetIndex =
-            campaignOffset % data.sponsorships.length;
+          const offsetIndex = campaignOffset % data.sponsorships.length;
 
           setSponsorships(data.sponsorships);
           setCurrentIndex(offsetIndex);
@@ -86,16 +82,10 @@ export function SponsoredBannerCard({
    * Track impression
    */
   useEffect(() => {
-    if (
-      currentSponsor?._id &&
-      !currentSponsor._id.startsWith('default-')
-    ) {
-      fetch(
-        `/api/sponsorships/${currentSponsor._id}/track?type=impression`,
-        {
-          method: 'POST',
-        }
-      ).catch(() => {});
+    if (currentSponsor?._id && !currentSponsor._id.startsWith('default-')) {
+      fetch(`/api/sponsorships/${currentSponsor._id}/track?type=impression`, {
+        method: 'POST',
+      }).catch(() => {});
     }
   }, [currentSponsor?._id]);
 
@@ -108,9 +98,7 @@ export function SponsoredBannerCard({
     }
 
     const timer = setInterval(() => {
-      setCurrentIndex(
-        (prev) => (prev + 1) % sponsorships.length
-      );
+      setCurrentIndex((prev) => (prev + 1) % sponsorships.length);
     }, 6000);
 
     return () => clearInterval(timer);
@@ -120,16 +108,10 @@ export function SponsoredBannerCard({
    * Track click
    */
   const handleClick = () => {
-    if (
-      currentSponsor?._id &&
-      !currentSponsor._id.startsWith('default-')
-    ) {
-      fetch(
-        `/api/sponsorships/${currentSponsor._id}/track?type=click`,
-        {
-          method: 'POST',
-        }
-      ).catch(() => {});
+    if (currentSponsor?._id && !currentSponsor._id.startsWith('default-')) {
+      fetch(`/api/sponsorships/${currentSponsor._id}/track?type=click`, {
+        method: 'POST',
+      }).catch(() => {});
     }
   };
 
@@ -149,21 +131,14 @@ export function SponsoredBannerCard({
     e.preventDefault();
     e.stopPropagation();
 
-    setCurrentIndex(
-      (prev) =>
-        (prev - 1 + sponsorships.length) %
-        sponsorships.length
-    );
+    setCurrentIndex((prev) => (prev - 1 + sponsorships.length) % sponsorships.length);
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    setCurrentIndex(
-      (prev) =>
-        (prev + 1) % sponsorships.length
-    );
+    setCurrentIndex((prev) => (prev + 1) % sponsorships.length);
   };
 
   // Don't render after closing or if no real sponsorships loaded
@@ -224,15 +199,13 @@ export function SponsoredBannerCard({
 
       {/* Content */}
       <div className="relative z-10 p-3">
-        
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
-          
           <div className="flex min-w-0 items-center gap-2">
-            
             {/* Sponsor Logo */}
             {currentSponsor?.sponsorLogo && (
-              <div className="
+              <div
+                className="
                 flex
                 h-8
                 w-8
@@ -244,7 +217,8 @@ export function SponsoredBannerCard({
                 border
                 border-white/10
                 bg-white/5
-              ">
+              "
+              >
                 <img
                   src={currentSponsor.sponsorLogo}
                   alt={currentSponsor.sponsorName || 'Sponsor'}
@@ -255,25 +229,27 @@ export function SponsoredBannerCard({
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="
+                <span
+                  className="
                   text-[8px]
                   font-bold
                   uppercase
                   tracking-widest
                   text-amber-400
-                ">
-                  {accentBadge ||
-                    currentSponsor?.badgeText ||
-                    'Sponsored'}
+                "
+                >
+                  {accentBadge || currentSponsor?.badgeText || 'Sponsored'}
                 </span>
               </div>
 
-              <p className="
+              <p
+                className="
                 truncate
                 text-[10px]
                 font-semibold
                 text-slate-400
-              ">
+              "
+              >
                 {currentSponsor?.sponsorName}
               </p>
             </div>
@@ -311,19 +287,22 @@ export function SponsoredBannerCard({
 
         {/* Main Content */}
         <div className="mt-2">
-          <h3 className="
+          <h3
+            className="
             max-w-[340px]
             text-sm
             font-extrabold
             leading-tight
             text-white
             line-clamp-2
-          ">
+          "
+          >
             {currentSponsor?.title}
           </h3>
 
           {currentSponsor?.tagline && (
-            <p className="
+            <p
+              className="
               mt-1
               max-w-[390px]
               text-[10px]
@@ -331,20 +310,22 @@ export function SponsoredBannerCard({
               leading-relaxed
               text-slate-400
               line-clamp-1
-            ">
+            "
+            >
               {currentSponsor.tagline}
             </p>
           )}
         </div>
 
         {/* Bottom Row */}
-        <div className="
+        <div
+          className="
           mt-3
           flex
           items-center
           gap-2
-        ">
-          
+        "
+        >
           {/* CTA */}
           <a
             href={currentSponsor?.targetUrl}
@@ -377,9 +358,7 @@ export function SponsoredBannerCard({
               active:scale-[0.98]
             "
           >
-            <span className="truncate">
-              {currentSponsor?.ctaText || 'View Offer'}
-            </span>
+            <span className="truncate">{currentSponsor?.ctaText || 'View Offer'}</span>
 
             <FiExternalLink className="h-3 w-3 shrink-0" />
           </a>
@@ -438,13 +417,15 @@ export function SponsoredBannerCard({
 
         {/* Carousel Indicators */}
         {sponsorships.length > 1 && (
-          <div className="
+          <div
+            className="
             mt-2
             flex
             items-center
             justify-center
             gap-1
-          ">
+          "
+          >
             {sponsorships.map((_, idx) => (
               <button
                 key={idx}
@@ -460,11 +441,7 @@ export function SponsoredBannerCard({
                     rounded-full
                     transition-all
                     duration-300
-                    ${
-                      idx === currentIndex
-                        ? 'w-4 bg-amber-400'
-                        : 'w-1 bg-slate-600'
-                    }
+                    ${idx === currentIndex ? 'w-4 bg-amber-400' : 'w-1 bg-slate-600'}
                   `}
                 />
               </button>

@@ -73,7 +73,9 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
   const [source, setSource] = useState('');
   const [category, setCategory] = useState('');
   const [customCategory, setCustomCategory] = useState('');
-  const [status, setStatus] = useState<'draft' | 'pending_approval' | 'published' | 'rejected' | 'archived'>('published');
+  const [status, setStatus] = useState<
+    'draft' | 'pending_approval' | 'published' | 'rejected' | 'archived'
+  >('published');
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
   const [reviewedBy, setReviewedBy] = useState<string | null>(null);
   const [publishedAt, setPublishedAt] = useState<string | null>(null);
@@ -603,7 +605,8 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           <div>
             <h4 className="text-sm font-bold text-amber-300">Pending Editorial Review</h4>
             <p className="text-xs text-amber-200 mt-0.5">
-              This article is currently in the review queue awaiting approval from an Editor or Super Admin.
+              This article is currently in the review queue awaiting approval from an Editor or
+              Super Admin.
             </p>
           </div>
         </div>

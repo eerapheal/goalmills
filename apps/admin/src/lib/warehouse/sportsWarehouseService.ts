@@ -137,7 +137,8 @@ export class SportsWarehouseService {
         draws,
         teamAGoals,
         teamBGoals,
-        avgGoalsPerMatch: totalMatches > 0 ? parseFloat(((teamAGoals + teamBGoals) / totalMatches).toFixed(2)) : 0,
+        avgGoalsPerMatch:
+          totalMatches > 0 ? parseFloat(((teamAGoals + teamBGoals) / totalMatches).toFixed(2)) : 0,
         mostCommonScoreline,
         cleanSheetsTeamA,
         cleanSheetsTeamB,
@@ -196,7 +197,8 @@ export class SportsWarehouseService {
         if (Array.isArray(m.events)) {
           for (const evt of m.events) {
             if (evt.type === 'goal' && (!evt.teamSlug || evt.teamSlug === teamSlug)) {
-              const min = typeof evt.minute === 'number' ? evt.minute : parseInt(String(evt.minute), 10) || 0;
+              const min =
+                typeof evt.minute === 'number' ? evt.minute : parseInt(String(evt.minute), 10) || 0;
               if (min <= 30) earlyGoals++;
               else if (min <= 60) midGoals++;
               else lateGoals++;
@@ -327,7 +329,13 @@ export class SportsWarehouseService {
           halftime: { home: 1, away: 0 },
         },
         events: [
-          { minute: 21, type: 'goal', teamSlug: 'arsenal', player: 'Bukayo Saka', assist: 'Martin Odegaard' },
+          {
+            minute: 21,
+            type: 'goal',
+            teamSlug: 'arsenal',
+            player: 'Bukayo Saka',
+            assist: 'Martin Odegaard',
+          },
           { minute: 54, type: 'goal', teamSlug: 'arsenal', player: 'Kai Havertz' },
           { minute: 71, type: 'goal', teamSlug: 'chelsea', player: 'Cole Palmer' },
           { minute: 88, type: 'goal', teamSlug: 'arsenal', player: 'Declan Rice' },

@@ -3,10 +3,7 @@ import { sportsWarehouseService } from '@/lib/warehouse/sportsWarehouseService';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const { searchParams } = new URL(req.url);

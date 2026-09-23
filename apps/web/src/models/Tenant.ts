@@ -13,7 +13,10 @@ const TenantSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [/^[a-z0-9-]+$/, 'Tenant slug can only contain lowercase alphanumeric characters and hyphens'],
+      match: [
+        /^[a-z0-9-]+$/,
+        'Tenant slug can only contain lowercase alphanumeric characters and hyphens',
+      ],
     },
     status: {
       type: String,

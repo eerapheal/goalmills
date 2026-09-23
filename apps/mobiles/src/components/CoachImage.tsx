@@ -30,12 +30,7 @@ export const CoachImage: React.FC<CoachImageProps> = ({
 
   return (
     <View style={[{ width: size, height: size }, styles.wrapper, style]}>
-      <View
-        style={[
-          styles.imageContainer,
-          { width: size, height: size, borderRadius },
-        ]}
-      >
+      <View style={[styles.imageContainer, { width: size, height: size, borderRadius }]}>
         <Image
           source={{ uri: finalSrc }}
           style={{ width: size, height: size, borderRadius }}

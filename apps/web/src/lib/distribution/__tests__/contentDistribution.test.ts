@@ -167,7 +167,7 @@ describe('Phase 9: Automated Content Distribution & Multi-Channel Syndication En
       awayTeam: 'Chelsea',
       score: '3 - 1',
       competition: 'Premier League',
-      scorers: ['Saka 22\'', 'Havertz 54\'', 'Rice 88\''],
+      scorers: ["Saka 22'", "Havertz 54'", "Rice 88'"],
     };
 
     const jobs = await distributionService.processMatchRecap(match);

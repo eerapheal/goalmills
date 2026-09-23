@@ -39,9 +39,14 @@ export default function LeagueDetailPage() {
   const [teams, setTeams] = useState<FootballTeam[]>([]);
   const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
 
-  useEffect(() => { loadLeagueData(); }, [id]);
+  useEffect(() => {
+    loadLeagueData();
+  }, [id]);
 
-  const onRefresh = () => { setRefreshing(true); loadLeagueData(); };
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadLeagueData();
+  };
 
   const loadLeagueData = async () => {
     try {
@@ -420,10 +425,23 @@ export default function LeagueDetailPage() {
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {(['fixtures', 'results', 'standings', 'topscorers', 'teams', 'predictions'] as LeagueTab[]).map((t) => {
+          {(
+            [
+              'fixtures',
+              'results',
+              'standings',
+              'topscorers',
+              'teams',
+              'predictions',
+            ] as LeagueTab[]
+          ).map((t) => {
             const LABELS: Record<LeagueTab, string> = {
-              fixtures: 'Fixtures', results: 'Results', standings: 'Standings',
-              topscorers: 'Scorers', teams: 'Teams', predictions: 'AI Odds',
+              fixtures: 'Fixtures',
+              results: 'Results',
+              standings: 'Standings',
+              topscorers: 'Scorers',
+              teams: 'Teams',
+              predictions: 'AI Odds',
             };
             return (
               <Pressable
@@ -445,10 +463,15 @@ export default function LeagueDetailPage() {
           {(['total', 'home', 'away'] as const).map((v) => (
             <Pressable
               key={v}
-              style={[styles.standingToggleBtn, standingView === v && styles.standingToggleBtnActive]}
+              style={[
+                styles.standingToggleBtn,
+                standingView === v && styles.standingToggleBtnActive,
+              ]}
               onPress={() => setStandingView(v)}
             >
-              <Text style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}>
+              <Text
+                style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}
+              >
                 {v.charAt(0).toUpperCase() + v.slice(1)}
               </Text>
             </Pressable>
@@ -459,7 +482,9 @@ export default function LeagueDetailPage() {
       {/* Content */}
       <ScrollView
         style={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+        }
       >
         {activeTab === 'fixtures' && (
           <View style={styles.section}>
@@ -565,23 +590,38 @@ export default function LeagueDetailPage() {
         {activeTab === 'teams' && (
           <View style={styles.section}>
             {teams.length === 0 ? (
-              <View style={styles.emptyState}><Text style={styles.emptyText}>No teams data available</Text></View>
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No teams data available</Text>
+              </View>
             ) : (
               <View style={styles.teamsGrid}>
                 {teams.map((t, i) => (
                   <Pressable
                     key={i}
                     style={styles.teamCard}
-                    onPress={() => t.team_key && router.push(`/(tabs)/home/football/teams/${t.team_key}` as any)}
+                    onPress={() =>
+                      t.team_key && router.push(`/(tabs)/home/football/teams/${t.team_key}` as any)
+                    }
                   >
                     {t.team_logo ? (
                       <Image source={{ uri: t.team_logo }} style={styles.teamCardLogo} />
                     ) : (
-                      <View style={[styles.teamCardLogo, { backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center' }]}>
+                      <View
+                        style={[
+                          styles.teamCardLogo,
+                          {
+                            backgroundColor: '#1E293B',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          },
+                        ]}
+                      >
                         <Text style={{ fontSize: 22 }}>🛡️</Text>
                       </View>
                     )}
-                    <Text style={styles.teamCardName} numberOfLines={2}>{t.team_name}</Text>
+                    <Text style={styles.teamCardName} numberOfLines={2}>
+                      {t.team_name}
+                    </Text>
                   </Pressable>
                 ))}
               </View>
@@ -592,7 +632,9 @@ export default function LeagueDetailPage() {
         {activeTab === 'predictions' && (
           <View style={styles.section}>
             {probabilities.length === 0 ? (
-              <View style={styles.emptyState}><Text style={styles.emptyText}>No predictions for today in this league.</Text></View>
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No predictions for today in this league.</Text>
+              </View>
             ) : (
               probabilities.map((item, i) => {
                 const hw = Number(item.event_HW) || 0;
@@ -602,12 +644,19 @@ export default function LeagueDetailPage() {
                   <Pressable
                     key={i}
                     style={styles.predCard}
-                    onPress={() => item.event_key && router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)}
+                    onPress={() =>
+                      item.event_key &&
+                      router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)
+                    }
                   >
                     <View style={styles.predTeams}>
-                      <Text style={styles.predHome} numberOfLines={1}>{item.event_home_team}</Text>
+                      <Text style={styles.predHome} numberOfLines={1}>
+                        {item.event_home_team}
+                      </Text>
                       <Text style={styles.predVS}>VS</Text>
-                      <Text style={styles.predAway} numberOfLines={1}>{item.event_away_team}</Text>
+                      <Text style={styles.predAway} numberOfLines={1}>
+                        {item.event_away_team}
+                      </Text>
                     </View>
                     <View style={styles.predBarLabels}>
                       <Text style={[styles.predBarLabel, { color: '#60A5FA' }]}>{hw}%</Text>
@@ -620,8 +669,12 @@ export default function LeagueDetailPage() {
                       <View style={{ flex: aw || 1, backgroundColor: '#D97706', height: '100%' }} />
                     </View>
                     <View style={styles.predMetrics}>
-                      <Text style={styles.predMetric}>Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text></Text>
-                      <Text style={styles.predMetric}>BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text></Text>
+                      <Text style={styles.predMetric}>
+                        Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text>
+                      </Text>
+                      <Text style={styles.predMetric}>
+                        BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text>
+                      </Text>
                     </View>
                   </Pressable>
                 );
@@ -904,45 +957,80 @@ const styles = StyleSheet.create({
   },
   // Standings toggle
   standingToggleRow: {
-    flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 8,
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingBottom: 8,
     backgroundColor: COLORS.backgroundDark,
   },
   standingToggleBtn: {
-    flex: 1, paddingVertical: 6, alignItems: 'center', borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    flex: 1,
+    paddingVertical: 6,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   standingToggleBtnActive: { backgroundColor: '#1D4ED8', borderColor: '#3B82F6' },
-  standingToggleLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  standingToggleLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
   // Teams tab
   teamsGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 10, padding: 4,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    padding: 4,
   },
   teamCard: {
-    width: '30%', alignItems: 'center', gap: 6,
-    backgroundColor: '#0B1526', borderRadius: 14, padding: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    width: '30%',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#0B1526',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   teamCardLogo: { width: 52, height: 52, resizeMode: 'contain', borderRadius: 8 },
   teamCardName: {
-    fontSize: 10, fontWeight: '700', color: '#CBD5E1', textAlign: 'center',
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#CBD5E1',
+    textAlign: 'center',
   },
   // Predictions
   predCard: {
-    backgroundColor: '#0B1526', borderRadius: 14, padding: 14,
-    borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)', marginBottom: 8,
+    backgroundColor: '#0B1526',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.2)',
+    marginBottom: 8,
   },
-  predTeams: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  predTeams: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   predHome: { flex: 1, fontSize: 12, fontWeight: '800', color: '#60A5FA' },
   predVS: { fontSize: 10, color: '#475569', marginHorizontal: 8 },
   predAway: { flex: 1, fontSize: 12, fontWeight: '800', color: '#FBBF24', textAlign: 'right' },
   predBarLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   predBarLabel: { fontSize: 10, fontWeight: '800', fontFamily: 'monospace' },
   predBar: {
-    flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden',
-    backgroundColor: '#1E293B', marginBottom: 8,
+    flexDirection: 'row',
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+    backgroundColor: '#1E293B',
+    marginBottom: 8,
   },
   predMetrics: { flexDirection: 'row', gap: 16 },
   predMetric: { fontSize: 11, color: '#94A3B8', fontWeight: '700' },
 });
-
-

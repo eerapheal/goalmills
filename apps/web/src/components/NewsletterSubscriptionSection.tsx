@@ -311,8 +311,12 @@ export function NewsletterSubscriptionSection() {
                     onClick={() => setShowOptions(!showOptions)}
                     className="text-xs font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5 py-1 px-3 rounded-xl bg-slate-950/60 border border-white/5 hover:border-blue-500/30 shadow-inner"
                   >
-                    <span>{showOptions ? '⚙️ Hide Preferences' : '⚙️ Customize Topics & Frequency'}</span>
-                    <span className="text-[10px] text-blue-400">({selectedTopics.length} sports selected, {frequency} digest)</span>
+                    <span>
+                      {showOptions ? '⚙️ Hide Preferences' : '⚙️ Customize Topics & Frequency'}
+                    </span>
+                    <span className="text-[10px] text-blue-400">
+                      ({selectedTopics.length} sports selected, {frequency} digest)
+                    </span>
                   </button>
                 </div>
               </div>

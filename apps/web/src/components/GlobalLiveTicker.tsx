@@ -12,8 +12,17 @@ interface TickerItem {
 }
 
 const DEFAULT_TICKER_ITEMS: TickerItem[] = [
-  { id: '1', text: '🔴 Live Football Match Center & Real-Time Alerts Active', isLive: true, href: '/football' },
-  { id: '2', text: '⚡ Breaking Sports Intelligence, Exclusive Analysis & Transfer Wire', href: '/news' },
+  {
+    id: '1',
+    text: '🔴 Live Football Match Center & Real-Time Alerts Active',
+    isLive: true,
+    href: '/football',
+  },
+  {
+    id: '2',
+    text: '⚡ Breaking Sports Intelligence, Exclusive Analysis & Transfer Wire',
+    href: '/news',
+  },
   { id: '3', text: '🏆 CAF Champions League & European Competitions Hub', href: '/football' },
   { id: '4', text: '🏏 Live Cricket Series & Ball-by-Ball Scoreboard', href: '/cricket' },
   { id: '5', text: '🏀 NBA Live Game Pulse & Real-Time Box Scores', href: '/basketball' },
@@ -29,7 +38,9 @@ export function GlobalLiveTicker() {
       try {
         const timestamp = Date.now();
         const [footRes, newsRes] = await Promise.all([
-          fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
+          fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(
+            () => null
+          ),
           fetch(`/api/news/flash?limit=8&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
         ]);
 
@@ -37,12 +48,15 @@ export function GlobalLiveTicker() {
 
         if (footRes && footRes.ok) {
           const footData = await footRes.json();
-          const matches = footData?.result || footData?.response || (Array.isArray(footData) ? footData : []);
+          const matches =
+            footData?.result || footData?.response || (Array.isArray(footData) ? footData : []);
           if (Array.isArray(matches) && matches.length > 0) {
             matches.slice(0, 6).forEach((m: any, idx: number) => {
               const home = m.event_home_team || 'Home';
               const away = m.event_away_team || 'Away';
-              const score = m.event_final_result || `${m.event_home_final_result ?? 0}–${m.event_away_final_result ?? 0}`;
+              const score =
+                m.event_final_result ||
+                `${m.event_home_final_result ?? 0}–${m.event_away_final_result ?? 0}`;
               const time = m.event_status ? `${m.event_status}'` : 'LIVE';
               items.push({
                 id: `live-m-${m.event_key || idx}`,
@@ -101,7 +115,10 @@ export function GlobalLiveTicker() {
             {[0, 1].map((copyIdx) => (
               <div key={copyIdx} className="flex items-center">
                 {tickerItems.map((item, idx) => (
-                  <span key={`${copyIdx}-${item.id}-${idx}`} className="text-xs text-slate-300 px-4 inline-flex items-center">
+                  <span
+                    key={`${copyIdx}-${item.id}-${idx}`}
+                    className="text-xs text-slate-300 px-4 inline-flex items-center"
+                  >
                     {item.href ? (
                       <Link
                         href={item.href}

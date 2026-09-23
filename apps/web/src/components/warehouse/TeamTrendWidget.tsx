@@ -41,7 +41,9 @@ export function TeamTrendWidget({
 
   if (loading) {
     return (
-      <div className={`p-6 rounded-3xl bg-slate-950/60 border border-white/10 animate-pulse ${className}`}>
+      <div
+        className={`p-6 rounded-3xl bg-slate-950/60 border border-white/10 animate-pulse ${className}`}
+      >
         <div className="h-5 w-40 bg-white/10 rounded mb-4" />
         <div className="h-20 bg-white/5 rounded-xl" />
       </div>
@@ -51,7 +53,9 @@ export function TeamTrendWidget({
   if (!trends) return null;
 
   return (
-    <div className={`p-5 rounded-3xl border border-white/10 bg-slate-950/80 space-y-4 ${className}`}>
+    <div
+      className={`p-5 rounded-3xl border border-white/10 bg-slate-950/80 space-y-4 ${className}`}
+    >
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2">
           <FiTrendingUp className="text-amber-400" />
@@ -83,11 +87,15 @@ export function TeamTrendWidget({
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
           <div className="text-[10px] text-slate-400">Avg Goals Scored</div>
-          <div className="text-base font-black text-yellow-400 mt-0.5">{trends.averageGoalsScored} / match</div>
+          <div className="text-base font-black text-yellow-400 mt-0.5">
+            {trends.averageGoalsScored} / match
+          </div>
         </div>
         <div className="p-2.5 rounded-xl bg-slate-900/60 border border-white/5">
           <div className="text-[10px] text-slate-400">Clean Sheet Rate</div>
-          <div className="text-base font-black text-blue-400 mt-0.5">{trends.cleanSheetPercentage}%</div>
+          <div className="text-base font-black text-blue-400 mt-0.5">
+            {trends.cleanSheetPercentage}%
+          </div>
         </div>
       </div>
 
@@ -100,15 +108,21 @@ export function TeamTrendWidget({
         <div className="grid grid-cols-3 gap-1.5 text-center text-[10px]">
           <div className="p-2 rounded-lg bg-slate-900 border border-white/5">
             <span className="text-slate-400 block">0 - 30m</span>
-            <span className="text-xs font-bold text-white mt-0.5 block">{trends.goalTimingBreakdown.early0to30m} goals</span>
+            <span className="text-xs font-bold text-white mt-0.5 block">
+              {trends.goalTimingBreakdown.early0to30m} goals
+            </span>
           </div>
           <div className="p-2 rounded-lg bg-slate-900 border border-white/5">
             <span className="text-slate-400 block">31 - 60m</span>
-            <span className="text-xs font-bold text-white mt-0.5 block">{trends.goalTimingBreakdown.mid31to60m} goals</span>
+            <span className="text-xs font-bold text-white mt-0.5 block">
+              {trends.goalTimingBreakdown.mid31to60m} goals
+            </span>
           </div>
           <div className="p-2 rounded-lg bg-slate-900 border border-white/5">
             <span className="text-slate-400 block">61 - 90+m</span>
-            <span className="text-xs font-bold text-white mt-0.5 block">{trends.goalTimingBreakdown.late61to90m} goals</span>
+            <span className="text-xs font-bold text-white mt-0.5 block">
+              {trends.goalTimingBreakdown.late61to90m} goals
+            </span>
           </div>
         </div>
       </div>

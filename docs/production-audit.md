@@ -42,6 +42,7 @@ goalmills/
 ## 3. Frontend Architecture
 
 ### Assessment: `STRONG` (Classified: `LOW RISK`)
+
 - **Server vs Client Component Segregation**: Public news, article pages, video detail pages, and static metadata leverage Server Components and ISR caching. Interactive live score screens (`FootballScreen`, `CricketScreen`, `BasketballScreen`) operate as Client Components fetching through rate-limited proxy routes.
 - **Strict Separation of Concerns**: Public portal (`apps/web`) is completely stripped of authentication libraries, login/register routes, user profiles, and NextAuth wrappers.
 - **Component Design**: Shared loaders (`GoalmillsLoader`), skeletons (`GoalmillsCardSkeleton`), match cards, and sport tabs share design tokens from `@goalmills/ui`.
@@ -51,6 +52,7 @@ goalmills/
 ## 4. Backend Architecture
 
 ### Assessment: `STRONG` (Classified: `LOW RISK`)
+
 - Next.js Route Handlers (`app/api/*`) act as edge proxies and API endpoints.
 - Upstream requests to sports data providers are protected by a rate-limiting spacer (minimum 250ms gap between outbound upstream fetches) to prevent 429 burst rejections.
 - Real-time updates delivered via Server-Sent Events (`/api/realtime/stream`) and Socket.io gateway broadcasting.
@@ -60,6 +62,7 @@ goalmills/
 ## 5. Database Architecture
 
 ### Assessment: `SOLID` (Classified: `LOW RISK`)
+
 - **Engine**: MongoDB with Mongoose connection pooling (`@/lib/db.ts`) with cached connections across serverless function invocations.
 - **Indexes**:
   - `News`: Indexed on `categorySlug`, `sportSlug`, `createdAt`, `status`, `views`.
@@ -72,6 +75,7 @@ goalmills/
 ## 6. Redis Architecture
 
 ### Assessment: `PRODUCTION READY` (Classified: `LOW RISK`)
+
 - **Connection**: Supports `REDIS_URL` with TLS (`rediss://`), `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD`.
 - **Resilience**: Features automatic fallback to in-memory store (`MemoryCacheStore`) if Redis Cloud is unreachable.
 - **TTL Strategy**:
@@ -86,6 +90,7 @@ goalmills/
 ## 7. Sports API Architecture & Ingestion
 
 ### Assessment: `EXCELLENT` (Classified: `LOW RISK`)
+
 - **Active Providers**: AllSportsAPI (Football, Basketball), API-Sports / API-Football (Fixtures, Standings), Cricbuzz (Cricket).
 - **Domain Normalization**: All UI components consume standard unified entities (`UnifiedWebMatchEvent`, `UnifiedWebStandingItem`, `CricketMatchEvent`).
 - **Sport Separation**:
@@ -97,6 +102,7 @@ goalmills/
 ## 8. Authentication Architecture
 
 ### Assessment: `STRONG` (Classified: `LOW RISK`)
+
 - `apps/web`: 100% Unauthenticated public portal. Zero authentication endpoints, zero NextAuth dependencies, zero credential attack surfaces.
 - `apps/admin`: NextAuth v4 Credentials provider, JWT session strategy, bcryptjs password hashing (cost 10), HttpOnly/Secure session cookies.
 
@@ -105,6 +111,7 @@ goalmills/
 ## 9. Authorization & RBAC Architecture
 
 ### Assessment: `STRONG` (Classified: `LOW RISK`)
+
 - Strict server-side role enforcement via `serverAuth.ts` and `rbac.ts`.
 - Supported roles: `user`, `contributor`, `staff`, `editor`, `manager`, `super-admin`.
 - Role verification executed on every mutation (create, edit, publish, delete).
@@ -114,6 +121,7 @@ goalmills/
 ## 10. Security Assessment
 
 ### Findings:
+
 1. **Secret Scanning**: `NO CRITICAL EXPOSURES IN SOURCE`. Sensitive keys are confined to server-side `.env` files.
 2. **Security Headers**: Configured in `proxy.ts` (`Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`).
 3. **CORS**: Restricted to approved origins (`localhost`, `goalmills.com`, `*.vercel.app`).
@@ -124,6 +132,7 @@ goalmills/
 ## 11. Performance Assessment
 
 ### Targets & Current Status:
+
 - **Core Web Vitals**:
   - TTFB: Target <200ms (Edge caching + Redis cached responses)
   - LCP: Target <1.8s (Above-fold sports feed prioritization)
@@ -135,6 +144,7 @@ goalmills/
 ## 12. SEO Assessment
 
 ### Assessment: `PRODUCTION READY` (Classified: `LOW RISK`)
+
 - Dynamic metadata generation in [layout.tsx](file:///d:/New%20folder/goalmills/apps/web/src/app/layout.tsx).
 - Dynamic JSON-LD structured data generator (`Organization`, `NewsArticle`, `SportsEvent`).
 - OpenGraph and Twitter Cards configured with 1200x630 share graphics.
@@ -145,6 +155,7 @@ goalmills/
 ## 13. Accessibility Assessment
 
 ### Assessment: `GOOD` (Classified: `LOW RISK`)
+
 - Semantic HTML (`<header>`, `<nav>`, `<main>`, `<section>`, `<footer>`, `<table>`).
 - Proper ARIA states on tabs, notification bells, modal dialogs, and interactive sport selectors.
 - Sufficient color contrast ratios across dark mode palettes (`#0A0E27`, `#141C2B`, `#3B82F6`, `#10B981`).
@@ -154,6 +165,7 @@ goalmills/
 ## 14. UI/UX Assessment
 
 ### Assessment: `EXCELLENT` (Classified: `LOW RISK`)
+
 - Dynamic live scorecards with status badges (Live, HT, FT, Upcoming).
 - 7-day date slider for past results and upcoming fixtures.
 - Informative empty states and search filters.
@@ -164,6 +176,7 @@ goalmills/
 ## 15. Mobile Assessment
 
 ### Assessment: `SOLID` (Classified: `LOW RISK`)
+
 - `apps/mobiles` built with Expo 52 and Expo Router.
 - Touch targets conform to minimum 44x44 pt standards.
 - Native sport tabs and cards mirror the web experience with offline fallbacks.
@@ -173,6 +186,7 @@ goalmills/
 ## 16. Data Integrity Assessment
 
 ### Assessment: `VERIFIED` (Classified: `LOW RISK`)
+
 - **No Mock Live Scores**: Live score feeds query live API providers through Redis cache.
 - Standings tables normalized to handle both AllSportsAPI and API-Sports structures without runtime errors.
 - Real-time timestamp tracking and cache freshness metadata (`X-Cache: HIT / MISS`).
@@ -214,6 +228,7 @@ goalmills/
 ## 21. Testing Assessment
 
 ### Test Suite Health:
+
 - `apps/web`: **23/23 Test Suites Passed (61/61 Unit & Integration Tests)**.
 - `apps/admin`: **29/29 Test Suites Passed (78/78 Unit & Integration Tests)**.
 - Typecheck (`tsc --noEmit`): **0 Errors** across all workspaces.
@@ -229,12 +244,12 @@ goalmills/
 
 ## 23. Technical Debt & Remediations Applied
 
-| Area | Former Issue | Resolution Applied |
-| :--- | :--- | :--- |
-| **Service Worker** | `process is not defined` in `firebase-messaging-sw.js` | Converted to URL parameter parsing and native Web Push handling. |
-| **Standings UI** | `Cannot read properties of undefined (reading 'logo')` | Implemented `UnifiedWebStandingItem` with robust multi-provider adapter. |
-| **Auth Coupling** | Auth endpoints and models inside public web app | Completely separated: `apps/web` is 100% public; `apps/admin` manages all auth. |
-| **Sport Tabs** | Orphaned tennis platform files | Removed tennis implementation files and categorized Tennis/Baseball/Hockey as Coming Soon. |
+| Area               | Former Issue                                           | Resolution Applied                                                                         |
+| :----------------- | :----------------------------------------------------- | :----------------------------------------------------------------------------------------- |
+| **Service Worker** | `process is not defined` in `firebase-messaging-sw.js` | Converted to URL parameter parsing and native Web Push handling.                           |
+| **Standings UI**   | `Cannot read properties of undefined (reading 'logo')` | Implemented `UnifiedWebStandingItem` with robust multi-provider adapter.                   |
+| **Auth Coupling**  | Auth endpoints and models inside public web app        | Completely separated: `apps/web` is 100% public; `apps/admin` manages all auth.            |
+| **Sport Tabs**     | Orphaned tennis platform files                         | Removed tennis implementation files and categorized Tennis/Baseball/Hockey as Coming Soon. |
 
 ---
 
@@ -257,6 +272,7 @@ goalmills/
 ## 26. Critical Risks Assessment
 
 All critical risks identified during discovery have been mitigated:
+
 - `RBAC Bypass`: Mitigated via server-side session checks in `apps/admin`.
 - `API Quota Exhaustion`: Mitigated via Redis TTL caching & 250ms fetch spacing.
 - `Credential Leakage`: Mitigated via server-only environment configurations.

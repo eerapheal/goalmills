@@ -99,10 +99,7 @@ export function SearchScreen() {
           )}
         </View>
 
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={() => performSearch(query, sport)}
-        >
+        <TouchableOpacity style={styles.searchButton} onPress={() => performSearch(query, sport)}>
           <Text style={styles.searchButtonText}>Search</Text>
         </TouchableOpacity>
       </View>
@@ -123,12 +120,7 @@ export function SearchScreen() {
               if (query.trim()) performSearch(query, item.id);
             }}
           >
-            <Text
-              style={[
-                styles.filterChipText,
-                sport === item.id && styles.filterChipTextActive,
-              ]}
-            >
+            <Text style={[styles.filterChipText, sport === item.id && styles.filterChipTextActive]}>
               {item.label}
             </Text>
           </TouchableOpacity>
@@ -154,9 +146,7 @@ export function SearchScreen() {
                 <Text style={styles.suggestionTitle} numberOfLines={1}>
                   {sug.title}
                 </Text>
-                {sug.subtitle && (
-                  <Text style={styles.suggestionSubtitle}>{sug.subtitle}</Text>
-                )}
+                {sug.subtitle && <Text style={styles.suggestionSubtitle}>{sug.subtitle}</Text>}
               </View>
               <Ionicons name="arrow-forward" size={14} color="#64748B" />
             </TouchableOpacity>
@@ -182,17 +172,13 @@ export function SearchScreen() {
           }
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.resultCard}>
-              {item.image && (
-                <Image source={{ uri: item.image }} style={styles.resultImage} />
-              )}
+              {item.image && <Image source={{ uri: item.image }} style={styles.resultImage} />}
               <View style={styles.resultDetails}>
                 <View style={styles.badgeRow}>
                   <View style={styles.typeBadge}>
                     <Text style={styles.typeBadgeText}>{item.entityType}</Text>
                   </View>
-                  {item.sport && (
-                    <Text style={styles.sportTag}>{item.sport}</Text>
-                  )}
+                  {item.sport && <Text style={styles.sportTag}>{item.sport}</Text>}
                 </View>
 
                 <Text style={styles.resultTitle} numberOfLines={2}>

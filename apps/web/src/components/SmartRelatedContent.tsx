@@ -140,7 +140,9 @@ export function SmartRelatedContent({
 
             {/* Footer */}
             <div className="mt-4 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="capitalize font-mono font-medium">{item.sportSlug || 'General'}</span>
+              <span className="capitalize font-mono font-medium">
+                {item.sportSlug || 'General'}
+              </span>
               <span className="inline-flex items-center gap-1 text-amber-400 group-hover:translate-x-0.5 transition-transform font-bold text-[10px]">
                 <span>Read</span>
                 <FiArrowRight size={10} />

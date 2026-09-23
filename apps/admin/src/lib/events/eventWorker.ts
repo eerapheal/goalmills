@@ -49,7 +49,9 @@ export class SportsEventWorker {
     return false;
   }
 
-  public async processEvent(envelope: StreamEventEnvelope): Promise<{ success: boolean; duplicate?: boolean; error?: string }> {
+  public async processEvent(
+    envelope: StreamEventEnvelope
+  ): Promise<{ success: boolean; duplicate?: boolean; error?: string }> {
     try {
       if (this.isDuplicate(envelope.idempotencyKey)) {
         return { success: true, duplicate: true };

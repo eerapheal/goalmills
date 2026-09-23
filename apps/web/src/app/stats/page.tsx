@@ -7,7 +7,15 @@ import { EntityService } from '@/lib/entityService';
 import { FootballStandingsTable } from '@/components/FootballStandingsTable';
 import { FootballTopScorers } from '@/components/FootballTopScorers';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
-import { FiActivity, FiAward, FiBarChart2, FiGlobe, FiShield, FiTrendingUp, FiArrowRight } from 'react-icons/fi';
+import {
+  FiActivity,
+  FiAward,
+  FiBarChart2,
+  FiGlobe,
+  FiShield,
+  FiTrendingUp,
+  FiArrowRight,
+} from 'react-icons/fi';
 import { FootballStanding, FootballTopscorer } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
 
@@ -65,30 +73,42 @@ export default async function StatsHubPage() {
 
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                Standings & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">Top Scorers Center</span>
+                Standings &{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-amber-300">
+                  Top Scorers Center
+                </span>
               </h1>
 
               {/* Subtitle description */}
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-                Real-time league tables, top goalscorers, playmakers, clean sheets, expected goals (xG), and 5-match team form records across major world competitions.
+                Real-time league tables, top goalscorers, playmakers, clean sheets, expected goals
+                (xG), and 5-match team form records across major world competitions.
               </p>
 
               {/* Quick Intelligence KPI Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Competitions</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Competitions
+                  </span>
                   <span className="text-lg sm:text-xl font-black text-white">Top 5 Leagues</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Golden Boot</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Golden Boot
+                  </span>
                   <span className="text-lg sm:text-xl font-black text-amber-400">Live Goals</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Expected Goals</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Expected Goals
+                  </span>
                   <span className="text-lg sm:text-xl font-black text-blue-400">xG Stats</span>
                 </div>
                 <div className="p-3 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Form Guide</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Form Guide
+                  </span>
                   <span className="text-lg sm:text-xl font-black text-sky-400">5-Match Form</span>
                 </div>
               </div>
@@ -116,7 +136,9 @@ export default async function StatsHubPage() {
                       className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#091529]/80 hover:bg-blue-600/30 border border-blue-500/20 hover:border-amber-400/40 text-xs font-bold text-slate-200 hover:text-white transition-all shadow-md group"
                     >
                       <span>{league.flag}</span>
-                      <span className="group-hover:text-amber-300 transition-colors">{league.name}</span>
+                      <span className="group-hover:text-amber-300 transition-colors">
+                        {league.name}
+                      </span>
                     </Link>
                   ))}
                 </div>
@@ -147,13 +169,11 @@ export default async function StatsHubPage() {
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="h-7 w-7 rounded-lg bg-slate-900 border border-white/10 p-1 flex items-center justify-center">
-                      <CompetitionLogo
-                        src={comp.logo}
-                        alt={comp.name}
-                        size={20}
-                      />
+                      <CompetitionLogo src={comp.logo} alt={comp.name} size={20} />
                     </div>
-                    <span className="group-hover:text-amber-300 transition-colors">{comp.name}</span>
+                    <span className="group-hover:text-amber-300 transition-colors">
+                      {comp.name}
+                    </span>
                   </div>
                   <span className="text-[11px] text-amber-400 font-bold group-hover:translate-x-1 transition-transform">
                     &rarr;
@@ -178,7 +198,10 @@ export default async function StatsHubPage() {
                 { name: 'Thibaut Courtois', team: 'Real Madrid', cleanSheets: 13, saves: '80%' },
                 { name: 'Alisson Becker', team: 'Liverpool', cleanSheets: 12, saves: '79%' },
               ].map((keeper, i) => (
-                <div key={keeper.name} className="p-3 rounded-2xl bg-[#070F1E] border border-blue-500/15 flex items-center justify-between">
+                <div
+                  key={keeper.name}
+                  className="p-3 rounded-2xl bg-[#070F1E] border border-blue-500/15 flex items-center justify-between"
+                >
                   <div className="flex items-center gap-2.5">
                     <span className="w-6 h-6 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-xs font-black text-amber-400">
                       {i + 1}
@@ -189,7 +212,9 @@ export default async function StatsHubPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-black text-amber-400">{keeper.cleanSheets} CS</span>
+                    <span className="text-xs font-black text-amber-400">
+                      {keeper.cleanSheets} CS
+                    </span>
                     <p className="text-[9px] text-slate-500">{keeper.saves} Save %</p>
                   </div>
                 </div>

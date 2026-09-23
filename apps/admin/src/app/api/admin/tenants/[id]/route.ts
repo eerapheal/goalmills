@@ -7,10 +7,7 @@ import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requirePermission('system:settings');
   if (error) return error;
 
@@ -33,14 +30,14 @@ export async function GET(
     return NextResponse.json({ success: true, tenant });
   } catch (err: any) {
     console.error('Error fetching tenant:', err);
-    return NextResponse.json({ success: false, error: err.message || 'Failed to fetch tenant' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message || 'Failed to fetch tenant' },
+      { status: 500 }
+    );
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requirePermission('system:settings');
   if (error) return error;
 
@@ -93,7 +90,10 @@ export async function PATCH(
     });
   } catch (err: any) {
     console.error('Error updating tenant:', err);
-    return NextResponse.json({ success: false, error: err.message || 'Failed to update tenant' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message || 'Failed to update tenant' },
+      { status: 500 }
+    );
   }
 }
 
@@ -137,6 +137,9 @@ export async function DELETE(
     });
   } catch (err: any) {
     console.error('Error deleting tenant:', err);
-    return NextResponse.json({ success: false, error: err.message || 'Failed to delete tenant' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message || 'Failed to delete tenant' },
+      { status: 500 }
+    );
   }
 }

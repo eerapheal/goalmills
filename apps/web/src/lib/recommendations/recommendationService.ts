@@ -62,7 +62,9 @@ export const recommendationService = {
   /**
    * Main recommendation dispatch method
    */
-  getRecommendations: async (params: GetRecommendationsParams): Promise<RecommendationCandidate[]> => {
+  getRecommendations: async (
+    params: GetRecommendationsParams
+  ): Promise<RecommendationCandidate[]> => {
     const {
       tenantSlug = 'goalmills',
       context,
@@ -96,10 +98,7 @@ export const recommendationService = {
         articleFilter._id = { $ne: currentId };
       }
 
-      const articles = await News.find(articleFilter)
-        .sort({ createdAt: -1 })
-        .limit(30)
-        .lean();
+      const articles = await News.find(articleFilter).sort({ createdAt: -1 }).limit(30).lean();
 
       for (const art of articles as any[]) {
         let score = 0;
@@ -112,12 +111,18 @@ export const recommendationService = {
           reasonBadge = `⚽ Top ${art.sport || 'Sports'} Intel`;
         }
 
-        if (competitionSlug && (art.competitionSlug === competitionSlug || art.competition === competitionSlug)) {
+        if (
+          competitionSlug &&
+          (art.competitionSlug === competitionSlug || art.competition === competitionSlug)
+        ) {
           score += weights.competitionMatchWeight;
           reasonBadge = `🏆 ${art.competition || 'League'} Coverage`;
         }
 
-        if (teamSlug && (art.relatedTeam === teamSlug || (art.tags && art.tags.includes(teamSlug)))) {
+        if (
+          teamSlug &&
+          (art.relatedTeam === teamSlug || (art.tags && art.tags.includes(teamSlug)))
+        ) {
           score += weights.teamOverlapWeight;
           reasonBadge = `⭐ ${teamSlug} Analysis`;
         }
@@ -156,7 +161,10 @@ export const recommendationService = {
         }
 
         // Recency Decay
-        const recencyMultiplier = calculateRecencyMultiplier(art.createdAt || art.publishedAt, weights.recencyDecayHours);
+        const recencyMultiplier = calculateRecencyMultiplier(
+          art.createdAt || art.publishedAt,
+          weights.recencyDecayHours
+        );
         const finalScore = Math.round(score * recencyMultiplier * popularityMultiplier);
 
         candidates.push({
@@ -173,7 +181,9 @@ export const recommendationService = {
           score: Math.max(finalScore, 10),
           reasonBadge,
           algorithm,
-          publishedAt: art.createdAt ? new Date(art.createdAt).toISOString() : new Date().toISOString(),
+          publishedAt: art.createdAt
+            ? new Date(art.createdAt).toISOString()
+            : new Date().toISOString(),
         });
       }
     }
@@ -186,17 +196,17 @@ export const recommendationService = {
           videoFilter._id = { $ne: currentId };
         }
 
-        const videoDocs = await Video.find(videoFilter)
-          .sort({ createdAt: -1 })
-          .limit(10)
-          .lean();
+        const videoDocs = await Video.find(videoFilter).sort({ createdAt: -1 }).limit(10).lean();
 
         for (const vid of videoDocs as any[]) {
           let score = 20;
           if (sportSlug && (vid.sport === sportSlug || vid.category === sportSlug)) {
             score += weights.sportMatchWeight;
           }
-          const recencyMultiplier = calculateRecencyMultiplier(vid.createdAt, weights.recencyDecayHours);
+          const recencyMultiplier = calculateRecencyMultiplier(
+            vid.createdAt,
+            weights.recencyDecayHours
+          );
           const finalScore = Math.round(score * recencyMultiplier);
 
           candidates.push({
@@ -211,7 +221,9 @@ export const recommendationService = {
             score: Math.max(finalScore, 15),
             reasonBadge: '🎥 Video Highlight',
             algorithm: 'content_similarity',
-            publishedAt: vid.createdAt ? new Date(vid.createdAt).toISOString() : new Date().toISOString(),
+            publishedAt: vid.createdAt
+              ? new Date(vid.createdAt).toISOString()
+              : new Date().toISOString(),
           });
         }
       } catch {}

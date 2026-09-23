@@ -1,18 +1,20 @@
 # GoalMills — Production SEO & Structured Data Report
 
 **Date:** 2026-08-29  
-**Version:** 3.0.0  
+**Version:** 3.0.0
 
 ---
 
 ## 1. Discovery & Indexing Architecture
 
 ### 1.1 Dynamic XML Sitemap (`/sitemap.xml`)
+
 - Generated dynamically via Next.js metadata route `apps/web/src/app/sitemap.ts`.
 - Automatically streams all published, non-deleted news articles (`/news/[id]`) and video highlights (`/highlights/[id]`).
 - Includes static hubs (`/`, `/docs`) with appropriate priority (`1.0` for home, `0.8` for news, `0.7` for highlights).
 
 ### 1.2 Robots Configuration (`/robots.txt`)
+
 - Allows public web crawlers full access to editorial and sports data.
 - Explicitly blocks administrative routes (`/admin/`), internal APIs (`/api/`), and build assets (`/_next/`).
 - Declares canonical sitemap reference: `Sitemap: https://goalmills.com/sitemap.xml`.

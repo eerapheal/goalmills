@@ -48,40 +48,168 @@ interface QuickShortcut {
 
 const ALL_SHORTCUTS: QuickShortcut[] = [
   // CMS (articles:draft)
-  { label: 'Create Article', href: '/admin/news/new',        icon: FiPlusCircle, color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',         requiredPermission: 'articles:draft' },
-  { label: 'Analytics',      href: '/admin/analytics',       icon: FiActivity,   color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',     requiredPermission: 'articles:draft' },
-  { label: 'Ecosystem',      href: '/admin/ecosystem',       icon: FiCompass,    color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20',         requiredPermission: 'articles:draft' },
-  { label: 'Newsletter',     href: '/admin/newsletter',      icon: FiMail,       color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20', requiredPermission: 'articles:draft' },
-  { label: 'Distribution',   href: '/admin/distribution',   icon: FiShare2,     color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20', requiredPermission: 'articles:draft' },
-  { label: 'AI Recs',        href: '/admin/recommendations', icon: FiSliders,    color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20',         requiredPermission: 'articles:draft' },
-  { label: 'Fan Pass',       href: '/admin/billing',         icon: FiDollarSign, color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',     requiredPermission: 'articles:draft' },
-  { label: 'Sponsors',       href: '/admin/advertisers',     icon: FiAward,      color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20', requiredPermission: 'articles:draft' },
-  { label: 'Stream',         href: '/admin/events',          icon: FiZap,        color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',     requiredPermission: 'articles:draft' },
-  { label: 'Warehouse',      href: '/admin/warehouse',       icon: FiDatabase,   color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',         requiredPermission: 'articles:draft' },
-  { label: 'Search',         href: '/admin/search',          icon: FiSearch,     color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',         requiredPermission: 'articles:draft' },
-  { label: 'Categories',     href: '/admin/categories',      icon: FiLayers,     color: 'text-rose-400 border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20',         requiredPermission: 'categories:manage' },
+  {
+    label: 'Create Article',
+    href: '/admin/news/new',
+    icon: FiPlusCircle,
+    color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Analytics',
+    href: '/admin/analytics',
+    icon: FiActivity,
+    color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Ecosystem',
+    href: '/admin/ecosystem',
+    icon: FiCompass,
+    color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Newsletter',
+    href: '/admin/newsletter',
+    icon: FiMail,
+    color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Distribution',
+    href: '/admin/distribution',
+    icon: FiShare2,
+    color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'AI Recs',
+    href: '/admin/recommendations',
+    icon: FiSliders,
+    color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10 hover:bg-cyan-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Fan Pass',
+    href: '/admin/billing',
+    icon: FiDollarSign,
+    color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Sponsors',
+    href: '/admin/advertisers',
+    icon: FiAward,
+    color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Stream',
+    href: '/admin/events',
+    icon: FiZap,
+    color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Warehouse',
+    href: '/admin/warehouse',
+    icon: FiDatabase,
+    color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Search',
+    href: '/admin/search',
+    icon: FiSearch,
+    color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',
+    requiredPermission: 'articles:draft',
+  },
+  {
+    label: 'Categories',
+    href: '/admin/categories',
+    icon: FiLayers,
+    color: 'text-rose-400 border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20',
+    requiredPermission: 'categories:manage',
+  },
   // HR (role-scoped)
-  { label: 'Staff Portal',   href: '/admin/portal',          icon: FiLayout,     color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20', requiredPermission: 'articles:read' },
-  { label: 'Daily Reports',  href: '/admin/reports',         icon: FiCheckSquare, color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',        requiredPermission: 'reports:read_own' },
-  { label: 'Stand-up',       href: '/admin/standup',         icon: FiCalendar,   color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20', requiredPermission: 'standup:attend' },
-  { label: 'Handbook',       href: '/admin/handbook',        icon: FiBookOpen,   color: 'text-amber-300 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',     requiredPermission: 'handbook:read' },
-  { label: 'Payroll',        href: '/admin/payroll',         icon: FiDollarSign, color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20', requiredPermission: 'payroll:read' },
-  { label: 'Evaluations',    href: '/admin/evaluations',     icon: FiAward,      color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',     requiredPermission: 'evaluations:read' },
+  {
+    label: 'Staff Portal',
+    href: '/admin/portal',
+    icon: FiLayout,
+    color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10 hover:bg-indigo-500/20',
+    requiredPermission: 'articles:read',
+  },
+  {
+    label: 'Daily Reports',
+    href: '/admin/reports',
+    icon: FiCheckSquare,
+    color: 'text-blue-400 border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/20',
+    requiredPermission: 'reports:read_own',
+  },
+  {
+    label: 'Stand-up',
+    href: '/admin/standup',
+    icon: FiCalendar,
+    color: 'text-purple-400 border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/20',
+    requiredPermission: 'standup:attend',
+  },
+  {
+    label: 'Handbook',
+    href: '/admin/handbook',
+    icon: FiBookOpen,
+    color: 'text-amber-300 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',
+    requiredPermission: 'handbook:read',
+  },
+  {
+    label: 'Payroll',
+    href: '/admin/payroll',
+    icon: FiDollarSign,
+    color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20',
+    requiredPermission: 'payroll:read',
+  },
+  {
+    label: 'Evaluations',
+    href: '/admin/evaluations',
+    icon: FiAward,
+    color: 'text-amber-400 border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20',
+    requiredPermission: 'evaluations:read',
+  },
   // Admin-only
-  { label: 'Employees',      href: '/admin/employees',       icon: FiUsers,      color: 'text-slate-300 border-white/10 bg-white/5 hover:bg-white/10',                   requiredPermission: 'employees:read' },
-  { label: 'Sponsorships',   href: '/admin/sponsorships',    icon: FiShield,     color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20', requiredPermission: 'articles:draft' },
+  {
+    label: 'Employees',
+    href: '/admin/employees',
+    icon: FiUsers,
+    color: 'text-slate-300 border-white/10 bg-white/5 hover:bg-white/10',
+    requiredPermission: 'employees:read',
+  },
+  {
+    label: 'Sponsorships',
+    href: '/admin/sponsorships',
+    icon: FiShield,
+    color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20',
+    requiredPermission: 'articles:draft',
+  },
 ];
 
 function getRoleBadge(role?: string): { label: string; cls: string } {
   const map: Record<string, { label: string; cls: string }> = {
-    'super-admin': { label: 'Super Admin', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
-    manager:       { label: 'Manager',     cls: 'bg-blue-500/15 text-blue-300 border-blue-500/30' },
-    editor:        { label: 'Editor',      cls: 'bg-purple-500/15 text-purple-300 border-purple-500/30' },
-    staff:         { label: 'Staff',       cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-    contributor:   { label: 'Contributor', cls: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' },
-    user:          { label: 'Reader',      cls: 'bg-slate-500/15 text-slate-300 border-slate-500/30' },
+    'super-admin': {
+      label: 'Super Admin',
+      cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    },
+    manager: { label: 'Manager', cls: 'bg-blue-500/15 text-blue-300 border-blue-500/30' },
+    editor: { label: 'Editor', cls: 'bg-purple-500/15 text-purple-300 border-purple-500/30' },
+    staff: { label: 'Staff', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
+    contributor: { label: 'Contributor', cls: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' },
+    user: { label: 'Reader', cls: 'bg-slate-500/15 text-slate-300 border-slate-500/30' },
   };
-  return map[role || ''] || { label: role || 'Admin', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
+  return (
+    map[role || ''] || {
+      label: role || 'Admin',
+      cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    }
+  );
 }
 
 function isPathActive(currentPath: string, href: string): boolean {
@@ -121,7 +249,6 @@ export default function AdminNavBar({ sidebarCollapsed, onOpenMobileDrawer }: Ad
           TOP ROW — Brand / Identity / Actions
       ════════════════════════════════════════════════ */}
       <div className="flex items-center gap-3 px-3 sm:px-5 py-3">
-
         {/* Mobile menu button */}
         <button
           onClick={onOpenMobileDrawer}
@@ -150,7 +277,9 @@ export default function AdminNavBar({ sidebarCollapsed, onOpenMobileDrawer }: Ad
         </Link>
 
         {/* Role badge — visible from sm */}
-        <span className={`hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${roleBadge.cls}`}>
+        <span
+          className={`hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${roleBadge.cls}`}
+        >
           {roleBadge.label}
         </span>
 

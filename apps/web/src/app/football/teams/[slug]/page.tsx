@@ -39,8 +39,8 @@ function FormBadge({ result }: { result: 'W' | 'D' | 'L' | string }) {
         r === 'W'
           ? 'bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.15)]'
           : r === 'D'
-          ? 'bg-slate-600/40 text-slate-300 border border-slate-600/30'
-          : 'bg-red-500/20 text-red-400 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.15)]'
+            ? 'bg-slate-600/40 text-slate-300 border border-slate-600/30'
+            : 'bg-red-500/20 text-red-400 border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.15)]'
       }`}
     >
       {r}
@@ -89,7 +89,10 @@ function getCompAbbr(compName?: string): string {
   if (lower.includes('world cup')) return 'WC';
   const words = compName.split(/\s+/).filter(Boolean);
   if (words.length >= 2) {
-    return words.slice(0, 3).map((w) => w[0].toUpperCase()).join('');
+    return words
+      .slice(0, 3)
+      .map((w) => w[0].toUpperCase())
+      .join('');
   }
   return compName.slice(0, 3).toUpperCase();
 }
@@ -158,7 +161,10 @@ export default function FootballTeamPage() {
 
         // 2. If not found by ID, search by name
         if (!teamData) {
-          const searchName = (localClub?.shortName || localClub?.name || resolvedSlug).replace(/-/g, ' ');
+          const searchName = (localClub?.shortName || localClub?.name || resolvedSlug).replace(
+            /-/g,
+            ' '
+          );
           const nameRes = await advancedFootballApi.getTeams({ teamName: searchName });
           if (nameRes?.result && nameRes.result.length > 0) {
             const exactMatch = nameRes.result.find(
@@ -216,10 +222,10 @@ export default function FootballTeamPage() {
               player_type: p.position.includes('Goalkeeper')
                 ? 'Goalkeepers'
                 : p.position.includes('Back')
-                ? 'Defenders'
-                : p.position.includes('Mid')
-                ? 'Midfielders'
-                : 'Forwards',
+                  ? 'Defenders'
+                  : p.position.includes('Mid')
+                    ? 'Midfielders'
+                    : 'Forwards',
               player_age: String(p.age),
               player_match_played: String(p.seasonStats.appearances || 18),
               player_goals: String(p.seasonStats.goals || 0),
@@ -270,7 +276,9 @@ export default function FootballTeamPage() {
             setLeagueSlug(slugify(refMatch.league_name));
           }
           try {
-            const standingsRes = await advancedFootballApi.getStandings(Number(refMatch.league_key));
+            const standingsRes = await advancedFootballApi.getStandings(
+              Number(refMatch.league_key)
+            );
             if (standingsRes?.result) {
               const resObj = standingsRes.result as any;
               const table = Array.isArray(resObj) ? resObj : resObj.total || [];
@@ -316,7 +324,8 @@ export default function FootballTeamPage() {
             photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(
               localClub.manager
             )}&background=0f172a&color=38bdf8&size=128&bold=true`,
-            nationality: (teamData as any).team_country || clubMeta?.competitionName || 'International',
+            nationality:
+              (teamData as any).team_country || clubMeta?.competitionName || 'International',
             flag: '🌍',
             since: '2023',
             winRate: 64,
@@ -326,7 +335,8 @@ export default function FootballTeamPage() {
           coachResolved = {
             name: 'Head Coach',
             photo: `https://ui-avatars.com/api/?name=Head+Coach&background=0f172a&color=38bdf8&size=128&bold=true`,
-            nationality: (teamData as any).team_country || clubMeta?.competitionName || 'International',
+            nationality:
+              (teamData as any).team_country || clubMeta?.competitionName || 'International',
             flag: '📋',
             since: '2024',
             winRate: 58,
@@ -448,8 +458,20 @@ export default function FootballTeamPage() {
       { label: 'Clean Sheets', value: cleanSheets, max: 38, color: 'bg-green-500' },
       { label: 'Avg. Possession %', value: 62, max: 100, color: 'bg-yellow-500' },
       { label: 'Pass Accuracy %', value: 89, max: 100, color: 'bg-blue-400' },
-      { label: 'xG Per Game', value: parseFloat(xG) || 2.1, max: 4, color: 'bg-purple-500', decimals: 1 },
-      { label: 'Shots Per Game', value: parseFloat(shots) || 16.4, max: 30, color: 'bg-cyan-500', decimals: 1 },
+      {
+        label: 'xG Per Game',
+        value: parseFloat(xG) || 2.1,
+        max: 4,
+        color: 'bg-purple-500',
+        decimals: 1,
+      },
+      {
+        label: 'Shots Per Game',
+        value: parseFloat(shots) || 16.4,
+        max: 30,
+        color: 'bg-cyan-500',
+        decimals: 1,
+      },
       { label: 'Tackles Won %', value: 64, max: 100, color: 'bg-orange-500' },
     ];
   }, [seasonStats]);
@@ -459,7 +481,12 @@ export default function FootballTeamPage() {
     const groups: {
       category: string;
       label: string;
-      players: (FootballPlayer & { rating: number; apps: number; goals: number; assists: number })[];
+      players: (FootballPlayer & {
+        rating: number;
+        apps: number;
+        goals: number;
+        assists: number;
+      })[];
     }[] = [
       { category: 'Goalkeepers', label: 'Goalkeepers', players: [] },
       { category: 'Defenders', label: 'Defenders', players: [] },
@@ -472,7 +499,12 @@ export default function FootballTeamPage() {
       let targetIndex = 2; // Midfielders default
       if (type.includes('goal') || type.includes('keeper') || type === 'gk') {
         targetIndex = 0;
-      } else if (type.includes('defen') || type.includes('back') || type === 'df' || type === 'cb') {
+      } else if (
+        type.includes('defen') ||
+        type.includes('back') ||
+        type === 'df' ||
+        type === 'cb'
+      ) {
         targetIndex = 1;
       } else if (type.includes('mid') || type === 'mf' || type === 'cm' || type === 'dm') {
         targetIndex = 2;
@@ -649,7 +681,9 @@ export default function FootballTeamPage() {
               },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <p className={`text-xl sm:text-2xl font-black tabular-nums ${s.color || 'text-white'}`}>
+                <p
+                  className={`text-xl sm:text-2xl font-black tabular-nums ${s.color || 'text-white'}`}
+                >
                   {s.value}
                 </p>
                 <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mt-0.5">
@@ -785,7 +819,9 @@ export default function FootballTeamPage() {
                         <div className="flex items-center gap-4 sm:gap-6 text-right shrink-0">
                           <div>
                             <p className="text-sm font-black text-yellow-400">{p.goals}</p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Goals</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                              Goals
+                            </p>
                           </div>
                           <div>
                             <p className="text-sm font-black text-blue-400">{p.assists}</p>
@@ -801,7 +837,9 @@ export default function FootballTeamPage() {
                             >
                               {p.rating}
                             </p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Rtg</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                              Rtg
+                            </p>
                           </div>
                         </div>
                       </Link>
@@ -881,15 +919,21 @@ export default function FootballTeamPage() {
                         <div className="hidden sm:flex items-center gap-5 text-right shrink-0">
                           <div>
                             <p className="text-sm font-black text-white">{p.apps}</p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Apps</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                              Apps
+                            </p>
                           </div>
                           <div>
                             <p className="text-sm font-black text-yellow-400">{p.goals}</p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">G</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                              G
+                            </p>
                           </div>
                           <div>
                             <p className="text-sm font-black text-blue-400">{p.assists}</p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">A</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                              A
+                            </p>
                           </div>
                           <div>
                             <p
@@ -899,7 +943,9 @@ export default function FootballTeamPage() {
                             >
                               {p.rating}
                             </p>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Rtg</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest">
+                              Rtg
+                            </p>
                           </div>
                         </div>
                         <svg

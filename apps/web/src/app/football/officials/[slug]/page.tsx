@@ -196,7 +196,9 @@ export default function OfficialDetailPage({ params }: OfficialDetailPageProps) 
             <span className="text-2xl sm:text-3xl font-black text-emerald-400">
               {official.varAccuracy}
             </span>
-            <span className="text-[10px] text-slate-500 block mt-1 font-mono">Overturns upheld</span>
+            <span className="text-[10px] text-slate-500 block mt-1 font-mono">
+              Overturns upheld
+            </span>
           </div>
         </div>
 
@@ -210,7 +212,8 @@ export default function OfficialDetailPage({ params }: OfficialDetailPageProps) 
                 <span>Disciplinary Profile</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Referees with a <strong className="text-amber-400">{official.strictnessRating}</strong> rating
+                Referees with a{' '}
+                <strong className="text-amber-400">{official.strictnessRating}</strong> rating
                 maintain high disciplinary thresholds. Their bookings-per-fixture metric (
                 {official.yellowCardsPerGame}) compares to the European elite benchmark of 3.82.
               </p>

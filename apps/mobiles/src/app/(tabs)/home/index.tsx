@@ -48,9 +48,7 @@ export default function HomeScreen() {
 
               <View style={[styles.comingSoonBadge, { borderColor: `${cfg.color}60` }]}>
                 <View style={[styles.comingSoonDot, { backgroundColor: cfg.color }]} />
-                <Text style={[styles.comingSoonBadgeText, { color: cfg.color }]}>
-                  COMING SOON
-                </Text>
+                <Text style={[styles.comingSoonBadgeText, { color: cfg.color }]}>COMING SOON</Text>
               </View>
 
               <Text style={styles.comingSoonTitle}>
@@ -58,7 +56,8 @@ export default function HomeScreen() {
               </Text>
 
               <Text style={styles.comingSoonSubtext}>
-                We're working hard to bring you real-time {selectedSport} scores, fixtures, and statistics. Stay tuned!
+                We're working hard to bring you real-time {selectedSport} scores, fixtures, and
+                statistics. Stay tuned!
               </Text>
 
               <View style={styles.comingSoonFeatures}>

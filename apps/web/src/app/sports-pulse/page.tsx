@@ -5,7 +5,15 @@ import News from '@/models/News';
 import { ContentHubLayout } from '@/components/ContentHubLayout';
 import { RelatedArticlesMatrix } from '@/components/RelatedArticlesMatrix';
 import { SportsPulseNewsSection } from '@/components/SportsPulseNewsSection';
-import { FiTrendingUp, FiActivity, FiZap, FiVideo, FiCompass, FiLayers, FiRadio } from 'react-icons/fi';
+import {
+  FiTrendingUp,
+  FiActivity,
+  FiZap,
+  FiVideo,
+  FiCompass,
+  FiLayers,
+  FiRadio,
+} from 'react-icons/fi';
 import { BlogPost } from '@goalmills/types';
 
 export const dynamic = 'force-dynamic';
@@ -99,8 +107,8 @@ export default async function SportsPulsePage() {
                 </span>
               </h1>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Stay informed with curated matchday analysis, breaking tournament stories,
-                instant HD video highlights, and real-time VIP sports pulse alerts.
+                Stay informed with curated matchday analysis, breaking tournament stories, instant
+                HD video highlights, and real-time VIP sports pulse alerts.
               </p>
             </div>
           </div>

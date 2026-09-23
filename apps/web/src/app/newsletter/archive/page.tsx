@@ -44,7 +44,8 @@ export default function NewsletterArchivePage() {
             Newsletter <span className="text-amber-400">Archive</span>
           </h1>
           <p className="text-sm sm:text-base text-slate-300">
-            Browse through our past daily digests, tactical briefings, and breaking sports intel dispatches.
+            Browse through our past daily digests, tactical briefings, and breaking sports intel
+            dispatches.
           </p>
 
           <div className="pt-2">
@@ -118,7 +119,8 @@ export default function NewsletterArchivePage() {
             <FiMail size={36} className="mx-auto text-amber-400 opacity-60" />
             <h3 className="text-lg font-bold text-white">No Public Editions Yet</h3>
             <p className="text-xs text-slate-400">
-              Our editorial team dispatches daily at 10:00 AM WAT. Sign up now to receive the next edition directly in your inbox.
+              Our editorial team dispatches daily at 10:00 AM WAT. Sign up now to receive the next
+              edition directly in your inbox.
             </p>
           </div>
         )}
@@ -132,9 +134,7 @@ export default function NewsletterArchivePage() {
                   <span className="text-[10px] font-black uppercase text-amber-400 font-mono">
                     {selectedEdition.frequencyTier || 'Daily'} Digest
                   </span>
-                  <h2 className="text-xl font-black text-white mt-1">
-                    {selectedEdition.title}
-                  </h2>
+                  <h2 className="text-xl font-black text-white mt-1">{selectedEdition.title}</h2>
                 </div>
                 <button
                   onClick={() => setSelectedEdition(null)}
@@ -163,7 +163,9 @@ export default function NewsletterArchivePage() {
                       >
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-white truncate">{art.title}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{art.sport} • {art.category}</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">
+                            {art.sport} • {art.category}
+                          </p>
                         </div>
                         {art.slug && (
                           <Link

@@ -266,14 +266,7 @@ export interface RealtimeAnalyticsSummary {
 // Phase 5: Recommendation Engine Types
 // ---------------------------------------------------------------------------
 export type RecommendationType =
-  | 'article'
-  | 'match'
-  | 'team'
-  | 'league'
-  | 'sport'
-  | 'video'
-  | 'newsletter'
-  | 'multi';
+  'article' | 'match' | 'team' | 'league' | 'sport' | 'video' | 'newsletter' | 'multi';
 
 export type RecommendationCandidateType = 'article' | 'match' | 'video' | 'newsletter' | 'topic';
 
@@ -287,10 +280,7 @@ export type RecommendationContext =
   | 'newsletter_digest';
 
 export type RecommendationAlgorithmType =
-  | 'content_similarity'
-  | 'trending'
-  | 'collaborative_signal'
-  | 'personalized_affinity';
+  'content_similarity' | 'trending' | 'collaborative_signal' | 'personalized_affinity';
 
 export interface RecommendationAlgorithmWeights {
   sportMatchWeight: number; // default: 30
@@ -382,8 +372,6 @@ export interface RecommendationMetricStats {
   }[];
 }
 
-
-
 export type SponsorshipPlacement =
   | 'homepage_hero'
   | 'sports_pulse'
@@ -433,7 +421,8 @@ export interface Sponsorship {
   imageUrl?: string;
   tagline?: string;
   ctaText?: string;
-  sportSlug?: 'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string;
+  sportSlug?:
+    'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string;
   badgeText?: string;
   status?: 'active' | 'paused' | 'expired' | 'draft' | 'trash';
   startDate?: string | Date;
@@ -3185,11 +3174,7 @@ export interface DailyContentReport {
   scorecard?: DailyScorecardBreakdown;
   totalScore?: number; // 0 - 100
   performanceRating?:
-    | 'Excellent'
-    | 'Very Good'
-    | 'Good'
-    | 'Improvement Required'
-    | 'Remedial Training';
+    'Excellent' | 'Very Good' | 'Good' | 'Improvement Required' | 'Remedial Training';
   editorScore?: number; // 0 - 100
   editorFeedback?: string;
   reviewedBy?: string;
@@ -3387,7 +3372,13 @@ export interface NewsletterTemplate {
   name: string;
   slug: string;
   description?: string;
-  category: 'daily_digest' | 'breaking_news' | 'weekend_preview' | 'tactical_debrief' | 'transfer_radar' | 'custom';
+  category:
+    | 'daily_digest'
+    | 'breaking_news'
+    | 'weekend_preview'
+    | 'tactical_debrief'
+    | 'transfer_radar'
+    | 'custom';
   subjectFormat: string;
   headerTitle: string;
   headerSubtitle: string;
@@ -3396,7 +3387,13 @@ export interface NewsletterTemplate {
   sections: {
     id: string;
     title: string;
-    type: 'top_stories' | 'tactical_focus' | 'transfer_radar' | 'stats_leaderboard' | 'sponsor_slot' | 'editor_notes';
+    type:
+      | 'top_stories'
+      | 'tactical_focus'
+      | 'transfer_radar'
+      | 'stats_leaderboard'
+      | 'sponsor_slot'
+      | 'editor_notes';
     itemLimit: number;
   }[];
   footerText?: string;
@@ -3588,13 +3585,7 @@ export interface NewsletterCampaign {
 // ============================================================================
 
 export type SearchEntityType =
-  | 'article'
-  | 'video'
-  | 'match'
-  | 'team'
-  | 'player'
-  | 'competition'
-  | 'newsletter';
+  'article' | 'video' | 'match' | 'team' | 'player' | 'competition' | 'newsletter';
 
 export interface SearchResultItem {
   id: string;
@@ -3801,7 +3792,8 @@ export interface LiveMatchStreamEvent {
   awayTeam: string;
   score: string;
   minute: string;
-  eventType: 'goal' | 'red_card' | 'wicket' | 'sixer' | 'dunk' | 'buzzer_beater' | 'halftime' | 'fulltime';
+  eventType:
+    'goal' | 'red_card' | 'wicket' | 'sixer' | 'dunk' | 'buzzer_beater' | 'halftime' | 'fulltime';
   headline: string;
   detail: string;
   timestamp: string;
@@ -3838,7 +3830,17 @@ export interface HistoricalMatchScore {
 
 export interface HistoricalMatchEvent {
   minute: number | string;
-  type: 'goal' | 'card' | 'red_card' | 'yellow_card' | 'wicket' | 'boundary' | 'point' | 'substitution' | 'var' | string;
+  type:
+    | 'goal'
+    | 'card'
+    | 'red_card'
+    | 'yellow_card'
+    | 'wicket'
+    | 'boundary'
+    | 'point'
+    | 'substitution'
+    | 'var'
+    | string;
   teamSlug?: string;
   player: string;
   assist?: string;
@@ -4019,11 +4021,7 @@ export type DistributionChannelType =
   | string;
 
 export type DistributionTriggerEvent =
-  | 'article_publish'
-  | 'match_recap'
-  | 'breaking_news'
-  | 'score_alert'
-  | 'manual_broadcast';
+  'article_publish' | 'match_recap' | 'breaking_news' | 'score_alert' | 'manual_broadcast';
 
 export interface DistributionRule {
   _id?: string;
@@ -4135,12 +4133,7 @@ export interface OptimizedMediaResult {
 export type SubscriptionTier = 'free' | 'fan_pass' | 'vip_pass' | 'sponsor_pro';
 
 export type SubscriptionStatus =
-  | 'active'
-  | 'trialing'
-  | 'past_due'
-  | 'canceled'
-  | 'unpaid'
-  | 'incomplete';
+  'active' | 'trialing' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete';
 
 export interface SubscriptionPlan {
   id: string;
@@ -4218,9 +4211,3 @@ export interface AdvertiserHubStats {
     ctr: number;
   }>;
 }
-
-
-
-
-
-

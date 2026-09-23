@@ -34,9 +34,7 @@ export default function FootballCoachesHubPage() {
               <FiShield className="w-4 h-4" />
               <span>Tactical Intelligence</span>
             </div>
-            <h4 className="text-sm font-black text-white">
-              The Systems Shaping Modern Football
-            </h4>
+            <h4 className="text-sm font-black text-white">The Systems Shaping Modern Football</h4>
             <p className="text-xs text-slate-300 leading-relaxed">
               From inverted fullbacks to aggressive rest-defense, modern tactical battles are won on
               the touchline. Discover comprehensive career records and silverware achievements for
@@ -84,7 +82,8 @@ export default function FootballCoachesHubPage() {
               </h3>
             </div>
             <p className="text-xs text-slate-300">
-              Inspect referee foul tolerances, cards per match, and VAR review accuracy across European football.
+              Inspect referee foul tolerances, cards per match, and VAR review accuracy across
+              European football.
             </p>
             <Link
               href="/football/officials"

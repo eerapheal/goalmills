@@ -115,11 +115,7 @@ export function NewsletterPreferencesScreen() {
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          <TouchableOpacity
-            style={styles.loadButton}
-            onPress={loadPreferences}
-            disabled={loading}
-          >
+          <TouchableOpacity style={styles.loadButton} onPress={loadPreferences} disabled={loading}>
             {loading ? (
               <ActivityIndicator color="#0F172A" size="small" />
             ) : (
@@ -148,14 +144,10 @@ export function NewsletterPreferencesScreen() {
                 style={[styles.sportChip, isSelected && styles.sportChipActive]}
                 onPress={() => toggleSport(item.id)}
               >
-                <Text
-                  style={[styles.sportChipText, isSelected && styles.sportChipTextActive]}
-                >
+                <Text style={[styles.sportChipText, isSelected && styles.sportChipTextActive]}>
                   {item.label}
                 </Text>
-                {isSelected && (
-                  <Ionicons name="checkmark-circle" size={14} color="#F59E0B" />
-                )}
+                {isSelected && <Ionicons name="checkmark-circle" size={14} color="#F59E0B" />}
               </TouchableOpacity>
             );
           })}
@@ -173,17 +165,11 @@ export function NewsletterPreferencesScreen() {
           ].map((f) => (
             <TouchableOpacity
               key={f.id}
-              style={[
-                styles.freqButton,
-                frequency === f.id && styles.freqButtonActive,
-              ]}
+              style={[styles.freqButton, frequency === f.id && styles.freqButtonActive]}
               onPress={() => setFrequency(f.id as any)}
             >
               <Text
-                style={[
-                  styles.freqButtonText,
-                  frequency === f.id && styles.freqButtonTextActive,
-                ]}
+                style={[styles.freqButtonText, frequency === f.id && styles.freqButtonTextActive]}
               >
                 {f.label}
               </Text>
@@ -222,11 +208,7 @@ export function NewsletterPreferencesScreen() {
       </View>
 
       {/* Save Button */}
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={handleSave}
-        disabled={saving}
-      >
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
         {saving ? (
           <ActivityIndicator color="#0F172A" />
         ) : (

@@ -1,13 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  TextInput,
-  StatusBar,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { EntityService, CLUBS_REGISTRY } from '../../../../../lib/entityService';
@@ -41,7 +33,8 @@ export default function CoachesScreen() {
           coach.preferredFormation.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesComp =
-          selectedComp === 'all' || coach.competitionSlug.toLowerCase() === selectedComp.toLowerCase();
+          selectedComp === 'all' ||
+          coach.competitionSlug.toLowerCase() === selectedComp.toLowerCase();
 
         return matchesSearch && matchesComp;
       })
@@ -73,7 +66,8 @@ export default function CoachesScreen() {
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle}>🧑‍💼 Football Managers</Text>
           <Text style={styles.headerSubtitle}>
-            {filteredCoaches.length} Elite Tactician{filteredCoaches.length !== 1 ? 's' : ''} Profiled
+            {filteredCoaches.length} Elite Tactician{filteredCoaches.length !== 1 ? 's' : ''}{' '}
+            Profiled
           </Text>
         </View>
       </View>
@@ -130,9 +124,7 @@ export default function CoachesScreen() {
                 onPress={() => setSelectedComp(tab.id)}
                 style={[styles.filterChip, isActive && styles.filterChipActive]}
               >
-                <Text
-                  style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
-                >
+                <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
                   {tab.label}
                 </Text>
               </Pressable>

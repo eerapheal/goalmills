@@ -23,10 +23,7 @@ import {
   FiExternalLink,
   FiBarChart2,
 } from 'react-icons/fi';
-import {
-  GOALMILLS_TRAINING_MODULES,
-  GOALMILLS_30_DAY_CURRICULUM,
-} from '@/lib/trainingCurriculum';
+import { GOALMILLS_TRAINING_MODULES, GOALMILLS_30_DAY_CURRICULUM } from '@/lib/trainingCurriculum';
 
 export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -153,8 +150,10 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   const completedDays = training?.completedDays || [];
   const completedDaysCount = completedDays.length;
-  const isCertified = training?.isCertified || (completedDaysCount >= 30 && employee.status !== 'training');
-  const progressPercent = training?.overallProgressPercent || Math.round((completedDaysCount / 30) * 100);
+  const isCertified =
+    training?.isCertified || (completedDaysCount >= 30 && employee.status !== 'training');
+  const progressPercent =
+    training?.overallProgressPercent || Math.round((completedDaysCount / 30) * 100);
 
   return (
     <div className="space-y-5 sm:space-y-6 text-white">
@@ -241,9 +240,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             <FiMail className="text-blue-400 flex-shrink-0" size={16} />
             <div className="truncate">
               <span className="text-text-muted block text-[10px]">Email Address</span>
-              <span className="text-slate-200 font-semibold truncate block">
-                {employee.email}
-              </span>
+              <span className="text-slate-200 font-semibold truncate block">{employee.email}</span>
             </div>
           </div>
 
@@ -282,10 +279,12 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
             <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
-              <FiCheckSquare className="text-amber-400" /> 30-Day Mandatory Training Curriculum Tracker
+              <FiCheckSquare className="text-amber-400" /> 30-Day Mandatory Training Curriculum
+              Tracker
             </h2>
             <p className="text-xs text-text-muted mt-0.5">
-              GoalMills Sports Media Academy • {completedDaysCount} of 30 Mandatory Days Completed ({progressPercent}%)
+              GoalMills Sports Media Academy • {completedDaysCount} of 30 Mandatory Days Completed (
+              {progressPercent}%)
             </p>
           </div>
 
@@ -330,30 +329,22 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
                     isDone
                       ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-sm'
                       : isSelected
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-md'
-                      : dayNum === completedDaysCount + 1
-                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 animate-pulse'
-                      : 'bg-slate-950/60 border-white/5 text-slate-400 hover:border-white/20'
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-300 shadow-md'
+                        : dayNum === completedDaysCount + 1
+                          ? 'bg-amber-500/10 border-amber-500/30 text-amber-400 animate-pulse'
+                          : 'bg-slate-950/60 border-white/5 text-slate-400 hover:border-white/20'
                   }`}
                 >
-                  <span className="text-[10px] uppercase font-bold text-slate-500 block">
-                    Day
-                  </span>
-                  <span className="text-sm sm:text-base font-black">
-                    {dayNum}
-                  </span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500 block">Day</span>
+                  <span className="text-sm sm:text-base font-black">{dayNum}</span>
                   {isDone ? (
                     <span className="text-[9px] font-bold text-emerald-400 mt-0.5">
                       {dayRecord?.score ? `${dayRecord.score}pt` : '✓ Done'}
                     </span>
                   ) : dayNum === completedDaysCount + 1 ? (
-                    <span className="text-[9px] font-bold text-amber-400 mt-0.5">
-                      Current
-                    </span>
+                    <span className="text-[9px] font-bold text-amber-400 mt-0.5">Current</span>
                   ) : (
-                    <span className="text-[9px] text-slate-600 mt-0.5">
-                      Pending
-                    </span>
+                    <span className="text-[9px] text-slate-600 mt-0.5">Pending</span>
                   )}
                 </button>
               );
@@ -362,91 +353,99 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         {/* Selected Day Lesson Details Modal / Card */}
-        {selectedDayDetail && (() => {
-          const dayData = GOALMILLS_30_DAY_CURRICULUM.find((d) => d.day === selectedDayDetail);
-          const dayRecord = training?.dailyRecords?.find((r: any) => r.day === selectedDayDetail);
-          const isDone = completedDays.includes(selectedDayDetail);
+        {selectedDayDetail &&
+          (() => {
+            const dayData = GOALMILLS_30_DAY_CURRICULUM.find((d) => d.day === selectedDayDetail);
+            const dayRecord = training?.dailyRecords?.find((r: any) => r.day === selectedDayDetail);
+            const isDone = completedDays.includes(selectedDayDetail);
 
-          return (
-            <div className="bg-slate-950 p-4 sm:p-6 rounded-2xl border border-amber-500/30 space-y-4 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-xs uppercase">
-                    Day {selectedDayDetail}
-                  </span>
-                  <span className="text-xs text-text-muted">Week {dayData?.week}</span>
-                  {isDone && (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold">
-                      ✓ Approved & Graded ({dayRecord?.score || 0}/100)
+            return (
+              <div className="bg-slate-950 p-4 sm:p-6 rounded-2xl border border-amber-500/30 space-y-4 animate-fade-in">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-xs uppercase">
+                      Day {selectedDayDetail}
                     </span>
-                  )}
+                    <span className="text-xs text-text-muted">Week {dayData?.week}</span>
+                    {isDone && (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold">
+                        ✓ Approved & Graded ({dayRecord?.score || 0}/100)
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDayDetail(null)}
+                    className="text-slate-400 hover:text-white text-xs font-bold"
+                  >
+                    ✕ Close
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedDayDetail(null)}
-                  className="text-slate-400 hover:text-white text-xs font-bold"
-                >
-                  ✕ Close
-                </button>
-              </div>
 
-              <div>
-                <h3 className="text-base font-black text-white">{dayData?.title}</h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  <strong>Daily Output Required:</strong>{' '}
-                  {dayData?.dailyOutput ||
-                    dayData?.production?.join('; ') ||
-                    'Standard daily newsroom deliverable'}
-                </p>
-              </div>
+                <div>
+                  <h3 className="text-base font-black text-white">{dayData?.title}</h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    <strong>Daily Output Required:</strong>{' '}
+                    {dayData?.dailyOutput ||
+                      dayData?.production?.join('; ') ||
+                      'Standard daily newsroom deliverable'}
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-1.5">
-                  <span className="font-bold text-amber-400 block uppercase text-[10px]">
-                    Curriculum Topics to Study:
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-1.5">
+                    <span className="font-bold text-amber-400 block uppercase text-[10px]">
+                      Curriculum Topics to Study:
+                    </span>
+                    <ul className="space-y-1 text-slate-200">
+                      {(dayData?.topics || dayData?.study || dayData?.objectives || []).map(
+                        (t, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <span className="text-amber-400">•</span>
+                            <span>{t}</span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+
+                  <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-1.5">
+                    <span className="font-bold text-blue-400 block uppercase text-[10px]">
+                      Practical Production Tasks:
+                    </span>
+                    <ul className="space-y-1 text-slate-200">
+                      {(
+                        dayData?.practicalTasks ||
+                        dayData?.production ||
+                        dayData?.assignment ||
+                        []
+                      ).map((pt, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-blue-400">•</span>
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span className="text-slate-300">
+                    <strong>Submission:</strong>{' '}
+                    {dayData?.submissionRequirement ||
+                      dayData?.submissionChecklist?.join('; ') ||
+                      'Submit article & media deliverables via portal'}
                   </span>
-                  <ul className="space-y-1 text-slate-200">
-                    {(dayData?.topics || dayData?.study || dayData?.objectives || []).map((t, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <span className="text-amber-400">•</span>
-                        <span>{t}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-1.5">
-                  <span className="font-bold text-blue-400 block uppercase text-[10px]">
-                    Practical Production Tasks:
+                  <span className="text-amber-400 font-bold whitespace-nowrap">
+                    Standup Focus:{' '}
+                    {dayData?.standupFocus ||
+                      dayData?.objectives?.[0] ||
+                      'Report on daily study, creation, publishing & challenges'}
                   </span>
-                  <ul className="space-y-1 text-slate-200">
-                    {(dayData?.practicalTasks || dayData?.production || dayData?.assignment || []).map((pt, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <span className="text-blue-400">•</span>
-                        <span>{pt}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </div>
-
-              <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span className="text-slate-300">
-                  <strong>Submission:</strong>{' '}
-                  {dayData?.submissionRequirement ||
-                    dayData?.submissionChecklist?.join('; ') ||
-                    'Submit article & media deliverables via portal'}
-                </span>
-                <span className="text-amber-400 font-bold whitespace-nowrap">
-                  Standup Focus:{' '}
-                  {dayData?.standupFocus ||
-                    dayData?.objectives?.[0] ||
-                    'Report on daily study, creation, publishing & challenges'}
-                </span>
-              </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
       </div>
 
       {/* Six Competency Training Modules Checklist */}
@@ -456,9 +455,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
             <h2 className="text-base sm:text-xl font-black text-white flex items-center gap-2">
               <FiCheckSquare className="text-blue-400" /> Competency Training Modules
             </h2>
-            <p className="text-xs text-text-muted mt-0.5">
-              Foundational Core Skills Breakdown
-            </p>
+            <p className="text-xs text-text-muted mt-0.5">Foundational Core Skills Breakdown</p>
           </div>
         </div>
 

@@ -121,7 +121,9 @@ describe('Data Integrity & Normalization Suite', () => {
       const normalized = adaptStandingTest(rawAllSports);
       expect(normalized).not.toBeNull();
       expect(normalized?.team_name).toBe('Manchester City');
-      expect(normalized?.team_logo).toBe('https://apiv2.allsportsapi.com/logo-football/man_city.jpg');
+      expect(normalized?.team_logo).toBe(
+        'https://apiv2.allsportsapi.com/logo-football/man_city.jpg'
+      );
       expect(normalized?.played).toBe('25');
       expect(normalized?.win).toBe('17');
       expect(normalized?.points).toBe('56');

@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
-import { resolveTenantContext, buildTenantFilter, DEFAULT_TENANT_ID, DEFAULT_TENANT_SLUG } from '../tenantContext';
+import {
+  resolveTenantContext,
+  buildTenantFilter,
+  DEFAULT_TENANT_ID,
+  DEFAULT_TENANT_SLUG,
+} from '../tenantContext';
 
 vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),

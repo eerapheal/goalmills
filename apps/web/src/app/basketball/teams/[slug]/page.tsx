@@ -143,7 +143,9 @@ export default function BasketballTeamSlugPage() {
                   <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
                     Basketball Club
                   </span>
-                  <span className="text-xs text-slate-400 font-semibold">• ID #{team?.team_key || teamId}</span>
+                  <span className="text-xs text-slate-400 font-semibold">
+                    • ID #{team?.team_key || teamId}
+                  </span>
                 </div>
                 <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1">
                   {teamName}
@@ -231,7 +233,9 @@ export default function BasketballTeamSlugPage() {
                 <span>Upcoming Schedule</span>
               </h3>
               {upcomingMatches.length === 0 ? (
-                <p className="text-xs text-slate-500 py-3">No upcoming fixtures scheduled at this time.</p>
+                <p className="text-xs text-slate-500 py-3">
+                  No upcoming fixtures scheduled at this time.
+                </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {upcomingMatches.slice(0, 4).map((m) => (
@@ -290,8 +294,10 @@ export default function BasketballTeamSlugPage() {
                             alt={p.player_name}
                             className="w-full h-full object-cover rounded-xl"
                           />
+                        ) : p.player_number ? (
+                          `#${p.player_number}`
                         ) : (
-                          p.player_number ? `#${p.player_number}` : '🏀'
+                          '🏀'
                         )}
                       </div>
                       <div className="truncate">
@@ -299,7 +305,8 @@ export default function BasketballTeamSlugPage() {
                           {p.player_name}
                         </span>
                         <span className="text-[10px] text-slate-400">
-                          {p.player_type || 'Player'}{p.player_age ? ` • ${p.player_age}y` : ''}
+                          {p.player_type || 'Player'}
+                          {p.player_age ? ` • ${p.player_age}y` : ''}
                         </span>
                       </div>
                     </Link>

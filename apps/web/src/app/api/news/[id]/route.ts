@@ -34,7 +34,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       news = await News.findOne({
         $or: [
           { slug: decodedId },
-          { title: { $regex: new RegExp(`^${decodedId.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+          {
+            title: {
+              $regex: new RegExp(`^${decodedId.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i'),
+            },
+          },
           { title: { $regex: new RegExp(slugClean, 'i') } },
         ],
       }).lean();

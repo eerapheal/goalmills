@@ -35,7 +35,11 @@ export async function GET(request: NextRequest) {
       isDeleted: { $ne: true },
       $and: [
         {
-          $or: [{ startDate: { $exists: false } }, { startDate: null }, { startDate: { $lte: now } }],
+          $or: [
+            { startDate: { $exists: false } },
+            { startDate: null },
+            { startDate: { $lte: now } },
+          ],
         },
         {
           $or: [{ endDate: { $exists: false } }, { endDate: null }, { endDate: { $gte: now } }],
@@ -61,34 +65,40 @@ export async function GET(request: NextRequest) {
       .lean();
 
     // In-memory filter for budget caps and targeting parameters
-    const eligibleSponsorships = rawSponsorships.filter((s: any) => {
-      // 1. Budget and impression caps
-      if (s.budgetControls?.maxImpressions && s.impressions >= s.budgetControls.maxImpressions) {
-        return false;
-      }
-      if (s.budgetControls?.maxClicks && s.clicks >= s.budgetControls.maxClicks) {
-        return false;
-      }
-      if (s.budget && s.spent && s.spent >= s.budget) {
-        return false;
-      }
-
-      // 2. Device targeting
-      if (device !== 'all' && s.targeting?.devices && s.targeting.devices.length > 0) {
-        if (!s.targeting.devices.includes('all') && !s.targeting.devices.includes(device)) {
+    const eligibleSponsorships = rawSponsorships
+      .filter((s: any) => {
+        // 1. Budget and impression caps
+        if (s.budgetControls?.maxImpressions && s.impressions >= s.budgetControls.maxImpressions) {
           return false;
         }
-      }
-
-      // 3. Competition targeting
-      if (competition !== 'all' && s.targeting?.competitions && s.targeting.competitions.length > 0) {
-        if (!s.targeting.competitions.includes(competition)) {
+        if (s.budgetControls?.maxClicks && s.clicks >= s.budgetControls.maxClicks) {
           return false;
         }
-      }
+        if (s.budget && s.spent && s.spent >= s.budget) {
+          return false;
+        }
 
-      return true;
-    }).slice(0, limit);
+        // 2. Device targeting
+        if (device !== 'all' && s.targeting?.devices && s.targeting.devices.length > 0) {
+          if (!s.targeting.devices.includes('all') && !s.targeting.devices.includes(device)) {
+            return false;
+          }
+        }
+
+        // 3. Competition targeting
+        if (
+          competition !== 'all' &&
+          s.targeting?.competitions &&
+          s.targeting.competitions.length > 0
+        ) {
+          if (!s.targeting.competitions.includes(competition)) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .slice(0, limit);
 
     // Cache for 60 seconds
     await cacheSet(cacheKey, eligibleSponsorships, 60);

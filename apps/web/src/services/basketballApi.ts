@@ -141,9 +141,7 @@ export const basketballApi = {
    * 5. H2H (Head to Head) Endpoint
    * Returns historical matches between two teams and their recent results
    */
-  async getH2H(
-    params: Omit<BasketballH2HParams, 'met'>
-  ): Promise<BasketballH2HResponse> {
+  async getH2H(params: Omit<BasketballH2HParams, 'met'>): Promise<BasketballH2HResponse> {
     return fetchFromAPI<BasketballH2HResponse>('H2H', params);
   },
 

@@ -158,7 +158,9 @@ export default function CricketLeagueSlugPage() {
                 <span className="text-sm font-black text-white">{standings.length || '-'}</span>
               </div>
               <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">Matches</span>
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                  Matches
+                </span>
                 <span className="text-sm font-black text-red-400">{matches.length || '-'}</span>
               </div>
             </div>
@@ -232,9 +234,7 @@ export default function CricketLeagueSlugPage() {
                           <td className="py-3 px-3 text-center font-sans font-black">
                             <span
                               className={`w-6 h-6 inline-flex items-center justify-center rounded-lg text-xs ${
-                                isTop4
-                                  ? 'bg-red-500/20 text-red-300 font-black'
-                                  : 'text-slate-400'
+                                isTop4 ? 'bg-red-500/20 text-red-300 font-black' : 'text-slate-400'
                               }`}
                             >
                               {pos}
@@ -249,11 +249,21 @@ export default function CricketLeagueSlugPage() {
                               <FiChevronRight className="opacity-0 group-hover:opacity-100 text-xs text-slate-500" />
                             </Link>
                           </td>
-                          <td className="py-3 px-2 text-center text-slate-300">{s.standing_MP || '0'}</td>
-                          <td className="py-3 px-2 text-center font-bold text-red-400">{s.standing_W || '0'}</td>
-                          <td className="py-3 px-2 text-center text-rose-400">{s.standing_L || '0'}</td>
-                          <td className="py-3 px-2 text-center text-slate-400">{s.standing_NR || '0'}</td>
-                          <td className="py-3 px-2 text-center text-slate-300 font-bold">{s.standing_NRR || '0.000'}</td>
+                          <td className="py-3 px-2 text-center text-slate-300">
+                            {s.standing_MP || '0'}
+                          </td>
+                          <td className="py-3 px-2 text-center font-bold text-red-400">
+                            {s.standing_W || '0'}
+                          </td>
+                          <td className="py-3 px-2 text-center text-rose-400">
+                            {s.standing_L || '0'}
+                          </td>
+                          <td className="py-3 px-2 text-center text-slate-400">
+                            {s.standing_NR || '0'}
+                          </td>
+                          <td className="py-3 px-2 text-center text-slate-300 font-bold">
+                            {s.standing_NRR || '0.000'}
+                          </td>
                           <td className="py-3 px-3 text-center font-black text-yellow-400 text-sm">
                             {s.standing_Pts || '0'}
                           </td>

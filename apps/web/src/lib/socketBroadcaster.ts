@@ -85,7 +85,12 @@ export function broadcastLiveScore(sport: string, matchId: string, payload: any)
 /**
  * Broadcast real-time match status change (e.g. Halftime, Fulltime, Postponed)
  */
-export function broadcastMatchStatus(sport: string, matchId: string, status: string, payload: any = {}) {
+export function broadcastMatchStatus(
+  sport: string,
+  matchId: string,
+  status: string,
+  payload: any = {}
+) {
   realtimeHub.broadcast(
     `match:status_change`,
     { sport, matchId, status, ...payload },

@@ -45,13 +45,22 @@ const API_KEY =
 /**
  * Map generic/API-Football parameter and method names to AllSportsAPI's exact format
  */
-function normalizeMethodAndParams(method: string, searchParams: URLSearchParams): { normalizedMethod: string; params: Record<string, string> } {
+function normalizeMethodAndParams(
+  method: string,
+  searchParams: URLSearchParams
+): { normalizedMethod: string; params: Record<string, string> } {
   const m = (method || '').toLowerCase().trim();
   const params: Record<string, string> = {};
 
   // Copy existing params
   searchParams.forEach((value, key) => {
-    if (key !== 'met' && key !== 'APIkey' && value !== undefined && value !== null && value !== '') {
+    if (
+      key !== 'met' &&
+      key !== 'APIkey' &&
+      value !== undefined &&
+      value !== null &&
+      value !== ''
+    ) {
       params[key] = value;
     }
   });
@@ -238,7 +247,13 @@ function getTtlForMethod(method: string): number {
   if (m === 'fixtures') {
     return 60; // 1 minute for fixtures
   }
-  if (m === 'standings' || m === 'topscorers' || m === 'odds' || m === 'probabilities' || m === 'fullodds') {
+  if (
+    m === 'standings' ||
+    m === 'topscorers' ||
+    m === 'odds' ||
+    m === 'probabilities' ||
+    m === 'fullodds'
+  ) {
     return 300; // 5 minutes for standings, odds, predictions
   }
   if (
@@ -386,7 +401,9 @@ export async function GET(request: NextRequest) {
 
       if (!response || !response.ok) {
         const status = response ? response.status : 502;
-        console.warn(`Football API status ${status} for ${normalizedMethod}, returning graceful fallback.`);
+        console.warn(
+          `Football API status ${status} for ${normalizedMethod}, returning graceful fallback.`
+        );
 
         consecutiveFailures++;
         if (consecutiveFailures >= 5) {
@@ -442,8 +459,10 @@ export async function GET(request: NextRequest) {
         listResult.forEach((match: any) => {
           if (match.event_key || match.id) {
             broadcastLiveScore('football', String(match.event_key || match.id), {
-              homeScore: match.event_final_result?.split('-')?.[0]?.trim() || match.event_home_team_score,
-              awayScore: match.event_final_result?.split('-')?.[1]?.trim() || match.event_away_team_score,
+              homeScore:
+                match.event_final_result?.split('-')?.[0]?.trim() || match.event_home_team_score,
+              awayScore:
+                match.event_final_result?.split('-')?.[1]?.trim() || match.event_away_team_score,
               status: match.event_status,
               time: match.event_time,
             });

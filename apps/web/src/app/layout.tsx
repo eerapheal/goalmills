@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://goalmills.com'),
   referrer: 'no-referrer',
   title: {
-    default: 'GoalMills Africa | Live Football Scores, CAF Champions League & 2026/2027 Superstars Market Values',
+    default:
+      'GoalMills Africa | Live Football Scores, CAF Champions League & 2026/2027 Superstars Market Values',
     template: '%s | GoalMills Africa',
   },
   description:

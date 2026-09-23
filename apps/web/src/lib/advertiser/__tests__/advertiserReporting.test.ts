@@ -47,7 +47,11 @@ describe('Phase 10C: Advertiser Proof-of-Performance & Reporting Engine', () => 
   });
 
   it('should generate verifiable Proof-of-Performance report with cryptographic SHA-256 hash', async () => {
-    const report = await reportingService.generateCampaignReport('sp_emirates', '2026-02', 'goalmills');
+    const report = await reportingService.generateCampaignReport(
+      'sp_emirates',
+      '2026-02',
+      'goalmills'
+    );
 
     expect(report).toBeDefined();
     expect(report.sponsorName).toBe('Fly Emirates Global');
@@ -71,7 +75,9 @@ describe('Phase 10C: Advertiser Proof-of-Performance & Reporting Engine', () => 
   it('should export formatted CSV for advertiser reconciliation audit', async () => {
     const csv = await reportingService.exportCampaignsCsv('goalmills');
 
-    expect(csv).toContain('Sponsor ID,Sponsor Name,Delivered Impressions,Spend (USD),CTR (%),Status');
+    expect(csv).toContain(
+      'Sponsor ID,Sponsor Name,Delivered Impressions,Spend (USD),CTR (%),Status'
+    );
     expect(csv).toContain('Fly Emirates Global');
     expect(csv).toContain('Audited & Verified');
   });

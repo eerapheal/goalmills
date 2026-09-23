@@ -6,10 +6,7 @@ import { isValidObjectId, sanitizeObject } from '@/lib/security';
 import { logAdminAction } from '@/lib/auditLog';
 import { resolveTenantContext } from '@/lib/tenantContext';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { session, error } = await requirePermission('articles:read');
     if (error) return error;
@@ -32,10 +29,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { session, error } = await requirePermission('articles:publish');
     if (error) return error;
@@ -55,8 +49,15 @@ export async function PUT(
       return NextResponse.json({ error: 'Sponsorship not found' }, { status: 404 });
     }
 
-    if (!tenantContext.isSuperAdmin && existing.tenantId && existing.tenantId !== tenantContext.tenantId) {
-      return NextResponse.json({ error: 'Forbidden: Cannot edit campaign of another organization' }, { status: 403 });
+    if (
+      !tenantContext.isSuperAdmin &&
+      existing.tenantId &&
+      existing.tenantId !== tenantContext.tenantId
+    ) {
+      return NextResponse.json(
+        { error: 'Forbidden: Cannot edit campaign of another organization' },
+        { status: 403 }
+      );
     }
 
     const updated = await Sponsorship.findByIdAndUpdate(
@@ -92,7 +93,10 @@ export async function PUT(
     return NextResponse.json({ success: true, sponsorship: updated });
   } catch (error: any) {
     console.error('[Admin Sponsorship PUT] Error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to update sponsorship' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to update sponsorship' },
+      { status: 500 }
+    );
   }
 }
 
@@ -117,8 +121,15 @@ export async function DELETE(
       return NextResponse.json({ error: 'Sponsorship not found' }, { status: 404 });
     }
 
-    if (!tenantContext.isSuperAdmin && existing.tenantId && existing.tenantId !== tenantContext.tenantId) {
-      return NextResponse.json({ error: 'Forbidden: Cannot delete campaign of another organization' }, { status: 403 });
+    if (
+      !tenantContext.isSuperAdmin &&
+      existing.tenantId &&
+      existing.tenantId !== tenantContext.tenantId
+    ) {
+      return NextResponse.json(
+        { error: 'Forbidden: Cannot delete campaign of another organization' },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(request.url);

@@ -47,7 +47,8 @@ export function FootballStandingsTable({
       return 'text-slate-500';
     }
 
-    if (rank === 1) return 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20 scale-105';
+    if (rank === 1)
+      return 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20 scale-105';
     if (rank <= 4) return 'bg-blue-600/20 text-blue-300 border border-blue-500/30 font-bold';
     if (rank >= 18) return 'bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold';
     return 'text-slate-400 group-hover:text-white';
@@ -123,9 +124,7 @@ export function FootballStandingsTable({
           <div className="hidden sm:block w-7 sm:w-8 text-center text-rose-400">L</div>
           <div className="w-8 sm:w-9 text-center">GD</div>
           <div className="w-8 sm:w-10 text-center text-amber-400 font-black">Pts</div>
-          {!compact && (
-            <div className="hidden xl:block w-28 text-center">Form (Last 5)</div>
-          )}
+          {!compact && <div className="hidden xl:block w-28 text-center">Form (Last 5)</div>}
         </div>
       </div>
 
@@ -226,10 +225,7 @@ export function FootballStandingsTable({
                       ) : (
                         <div className="flex gap-1 opacity-20">
                           {[...Array(5)].map((_, i) => (
-                            <div
-                              key={i}
-                              className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-white/10"
-                            />
+                            <div key={i} className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-white/10" />
                           ))}
                         </div>
                       );

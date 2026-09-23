@@ -1,7 +1,7 @@
 # GoalMills — Production Redis Architecture & Configuration Guide
 
 **Version:** 2.0.0  
-**Status:** PRODUCTION ACTIVE  
+**Status:** PRODUCTION ACTIVE
 
 ---
 
@@ -50,6 +50,7 @@ REDIS_PASSWORD=
 ```
 
 ### Connection Resilience
+
 - **Connect Timeout:** 5000ms
 - **Max Retries Per Request:** 2
 - **Exponential Retry Strategy:** Cap at 2000ms
@@ -61,16 +62,16 @@ REDIS_PASSWORD=
 
 All keys follow the standardized GoalMills namespace `gm:`:
 
-| Key Pattern | Description | TTL | Fallback Behavior |
-| :--- | :--- | :--- | :--- |
-| `gm:sport:football:live` | Active live football scores | 15s | Serve stale if circuit trips |
-| `gm:sport:football:fixtures:{date}` | Scheduled matches for date | 60s | Serve cached with revalidate |
-| `gm:sport:football:standings:{id}` | League table standings | 300s | Multi-provider normalized |
-| `gm:sport:cricket:live` | Live cricket scorecards | 15s | Cricbuzz/AllSports format |
-| `gm:sport:basketball:live` | Live basketball quarters | 15s | Overtime & period points |
-| `gm:sponsorships:{placement}:{sport}` | Active ad placements | 60s | Cached partner banner |
-| `rate:track:{ip}` | Anti-bot telemetry rate limit | 60s | Max 20 events/min |
-| `dedup:imp:{id}:{ip}` | Impression deduplication | 10s | Drop duplicate views |
+| Key Pattern                           | Description                   | TTL  | Fallback Behavior            |
+| :------------------------------------ | :---------------------------- | :--- | :--------------------------- |
+| `gm:sport:football:live`              | Active live football scores   | 15s  | Serve stale if circuit trips |
+| `gm:sport:football:fixtures:{date}`   | Scheduled matches for date    | 60s  | Serve cached with revalidate |
+| `gm:sport:football:standings:{id}`    | League table standings        | 300s | Multi-provider normalized    |
+| `gm:sport:cricket:live`               | Live cricket scorecards       | 15s  | Cricbuzz/AllSports format    |
+| `gm:sport:basketball:live`            | Live basketball quarters      | 15s  | Overtime & period points     |
+| `gm:sponsorships:{placement}:{sport}` | Active ad placements          | 60s  | Cached partner banner        |
+| `rate:track:{ip}`                     | Anti-bot telemetry rate limit | 60s  | Max 20 events/min            |
+| `dedup:imp:{id}:{ip}`                 | Impression deduplication      | 10s  | Drop duplicate views         |
 
 ---
 

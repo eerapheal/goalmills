@@ -76,16 +76,18 @@ export default function CricketTeamSlugPage() {
 
         // If team was not in Teams list, infer from match fixtures
         if (!foundTeam && matchList.length > 0) {
-          const m = matchList.find(
-            (item) =>
-              Number(item.home_team_key) === teamId ||
-              Number(item.away_team_key) === teamId ||
-              slugify(item.event_home_team) === slug ||
-              slugify(item.event_away_team) === slug
-          ) || matchList[0];
+          const m =
+            matchList.find(
+              (item) =>
+                Number(item.home_team_key) === teamId ||
+                Number(item.away_team_key) === teamId ||
+                slugify(item.event_home_team) === slug ||
+                slugify(item.event_away_team) === slug
+            ) || matchList[0];
 
           if (m) {
-            const isHome = Number(m.home_team_key) === teamId || slugify(m.event_home_team) === slug;
+            const isHome =
+              Number(m.home_team_key) === teamId || slugify(m.event_home_team) === slug;
             const inferred: CricketTeam = {
               team_key: String(isHome ? m.home_team_key : m.away_team_key),
               team_name: isHome ? m.event_home_team : m.event_away_team,
@@ -104,8 +106,11 @@ export default function CricketTeamSlugPage() {
           // Extract from lineups across matches
           const playerMap = new Map<string, CricketTeamPlayerItem>();
           matchList.forEach((m) => {
-            const isHome = Number(m.home_team_key) === teamId || slugify(m.event_home_team) === slug;
-            const lineup = isHome ? m.lineups?.home_team?.starting_lineups : m.lineups?.away_team?.starting_lineups;
+            const isHome =
+              Number(m.home_team_key) === teamId || slugify(m.event_home_team) === slug;
+            const lineup = isHome
+              ? m.lineups?.home_team?.starting_lineups
+              : m.lineups?.away_team?.starting_lineups;
             if (Array.isArray(lineup)) {
               lineup.forEach((p, idx) => {
                 if (p.player && !playerMap.has(p.player)) {
@@ -209,7 +214,9 @@ export default function CricketTeamSlugPage() {
                   <span className="text-[10px] font-black uppercase tracking-wider text-red-400 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
                     Cricket Club
                   </span>
-                  <span className="text-xs text-slate-400 font-semibold">• ID #{team?.team_key || teamId}</span>
+                  <span className="text-xs text-slate-400 font-semibold">
+                    • ID #{team?.team_key || teamId}
+                  </span>
                 </div>
                 <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mt-1">
                   {teamName}
@@ -223,7 +230,9 @@ export default function CricketTeamSlugPage() {
                 <span className="text-sm font-black text-white">{players.length || '-'}</span>
               </div>
               <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">Fixtures</span>
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                  Fixtures
+                </span>
                 <span className="text-sm font-black text-red-400">{matches.length || '-'}</span>
               </div>
             </div>
@@ -280,7 +289,9 @@ export default function CricketTeamSlugPage() {
                 <span>Recent Match Results</span>
               </h3>
               {recentMatches.length === 0 ? (
-                <p className="text-xs text-slate-500 py-3">No recent completed fixtures on record.</p>
+                <p className="text-xs text-slate-500 py-3">
+                  No recent completed fixtures on record.
+                </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {recentMatches.slice(0, 4).map((m) => (
@@ -297,7 +308,9 @@ export default function CricketTeamSlugPage() {
                 <span>Upcoming Scheduled Fixtures</span>
               </h3>
               {upcomingMatches.length === 0 ? (
-                <p className="text-xs text-slate-500 py-3">No upcoming fixtures scheduled in the near window.</p>
+                <p className="text-xs text-slate-500 py-3">
+                  No upcoming fixtures scheduled in the near window.
+                </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {upcomingMatches.slice(0, 4).map((m) => (
@@ -317,7 +330,9 @@ export default function CricketTeamSlugPage() {
               <span>Team Fixture Schedule</span>
             </h3>
             {matches.length === 0 ? (
-              <p className="text-xs text-slate-500 py-6 text-center">No fixtures found for this team.</p>
+              <p className="text-xs text-slate-500 py-6 text-center">
+                No fixtures found for this team.
+              </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {matches.map((m) => (

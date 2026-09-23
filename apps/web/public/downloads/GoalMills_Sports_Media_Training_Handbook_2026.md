@@ -1,4 +1,5 @@
 # GOALMILLS
+
 ## Training Resources & Handbooks
 
 ### Complete Sports Blogging Master Tutorial: Writing, Social Media, Canva Graphics & Traffic Growth
@@ -136,6 +137,7 @@ Find sports news → research → write articles → optimize for Google → pub
 You can use this system for a football, cricket, basketball, general sports, or multi-sport website.
 
 # PART 1 — UNDERSTANDING THE SPORTS BLOGGING BUSINESS IN FULL DETAIL
+
 Before you learn how to write an article, design a graphic, or post on social media, you need to understand what you are actually building.
 If you misunderstand this part, you can spend one year publishing hundreds of articles and still get very little traffic.
 A successful sports blog is not simply a website where articles are posted.
@@ -179,321 +181,325 @@ RETURN VISITORS
 ▼
 MONETIZATION
 Your goal is to gradually build this entire machine.
+
 1. WHAT IS A SPORTS MEDIA BUSINESS?
-Let's use a simple example.
-Imagine Arsenal play Chelsea tonight.
-A normal person watches the game and talks about it.
-A sports blogger sees a content opportunity.
-Before the match:
-Arsenal vs Chelsea Preview
-Arsenal vs Chelsea Prediction
-Possible Lineups
-Team News
-Injury Updates
-Key Players to Watch
-Head-to-Head Statistics
-During the match:
-Live Updates
-Goal Updates
-Half-Time Reaction
-Red Card Updates
-Statistics
-Tactical Observations
-After the match:
-Match Report
-Player Ratings
-Manager Reactions
-Tactical Analysis
-Match Statistics
-Player of the Match
-Social Media Reactions
-What's Next?
-From one football match, you could potentially create 15–30 pieces of content.
-That is the difference between:
-A person who occasionally writes sports articles
-and
-A person building a sports media company.
+   Let's use a simple example.
+   Imagine Arsenal play Chelsea tonight.
+   A normal person watches the game and talks about it.
+   A sports blogger sees a content opportunity.
+   Before the match:
+   Arsenal vs Chelsea Preview
+   Arsenal vs Chelsea Prediction
+   Possible Lineups
+   Team News
+   Injury Updates
+   Key Players to Watch
+   Head-to-Head Statistics
+   During the match:
+   Live Updates
+   Goal Updates
+   Half-Time Reaction
+   Red Card Updates
+   Statistics
+   Tactical Observations
+   After the match:
+   Match Report
+   Player Ratings
+   Manager Reactions
+   Tactical Analysis
+   Match Statistics
+   Player of the Match
+   Social Media Reactions
+   What's Next?
+   From one football match, you could potentially create 15–30 pieces of content.
+   That is the difference between:
+   A person who occasionally writes sports articles
+   and
+   A person building a sports media company.
 2. YOUR REAL PRODUCT IS NOT THE ARTICLE
-This is one of the most important things to understand.
-You might think:
-I write an article
-↓
-People read it
-↓
-I get traffic
-But the real system is bigger:
-INFORMATION
-↓
-CONTENT
-↓
-ATTENTION
-↓
-AUDIENCE
-↓
-TRUST
-↓
-COMMUNITY
-↓
-REVENUE
-The article is only a vehicle.
-Your real long-term asset is your:
-Audience
-Brand
-Website authority
-Search visibility
-Social following
-Email subscribers
-Returning readers
-Reputation
-For example:
-A new article may receive 500 visitors.
-But if 50 of those visitors:
-Follow your Instagram
-Subscribe to your newsletter
-Download your app
-Follow you on X
-Return to your website
-Then the article has created something more valuable than 500 temporary pageviews.
+   This is one of the most important things to understand.
+   You might think:
+   I write an article
+   ↓
+   People read it
+   ↓
+   I get traffic
+   But the real system is bigger:
+   INFORMATION
+   ↓
+   CONTENT
+   ↓
+   ATTENTION
+   ↓
+   AUDIENCE
+   ↓
+   TRUST
+   ↓
+   COMMUNITY
+   ↓
+   REVENUE
+   The article is only a vehicle.
+   Your real long-term asset is your:
+   Audience
+   Brand
+   Website authority
+   Search visibility
+   Social following
+   Email subscribers
+   Returning readers
+   Reputation
+   For example:
+   A new article may receive 500 visitors.
+   But if 50 of those visitors:
+   Follow your Instagram
+   Subscribe to your newsletter
+   Download your app
+   Follow you on X
+   Return to your website
+   Then the article has created something more valuable than 500 temporary pageviews.
 3. THE FOUR MAIN ASSETS YOU ARE BUILDING
-From day one, your sports platform should focus on building four major assets.
-Asset 1: Content Library
-This is every valuable piece of content you publish.
-Examples:
-1,000 Articles
-500 Player Profiles
-300 Match Previews
-200 Tactical Analyses
-100 Statistics Pages
-50 Evergreen Guides
-Over time, your website becomes a library.
-For example, imagine someone searches:
-Victor Osimhen career statistics
-They find your article.
-Another person searches:
-Victor Osimhen transfer news
-They find another article.
-Another searches:
-Victor Osimhen biography
-Again, they find your website.
-Eventually, search engines and users begin associating your website with that topic.
-This is called building topical authority.
-Asset 2: Audience
-Your audience is the group of people who repeatedly consume your content.
-Examples:
-100,000 Instagram followers
-50,000 X followers
-20,000 email subscribers
-10,000 app users
-Do not focus only on followers.
-A page with:
-500,000 followers
-but almost no engagement may be less valuable than:
-50,000 highly engaged followers
-You want an audience that:
-Reads
-Comments
-Shares
-Returns
-Trusts your reporting
-Recommends your platform
-Asset 3: Brand
-Your brand is what people think when they hear your name.
-For example, you want readers to think:
-Breaking football news?
-→ GoalMills
-or:
-African football analysis?
-→ Your Brand
-or:
-Fast and reliable sports updates?
-→ Your Brand
-A strong brand gives you an advantage.
-Two websites may publish exactly the same story.
-But readers may choose the one they trust.
-That is why you must develop a clear identity.
-Asset 4: Distribution
-Creating good content is not enough.
-You need a system that gets the content in front of people.
-Your distribution channels could include:
-Google Search
-Google Discover
-Instagram
-Facebook
-X
-TikTok
-YouTube
-Email
-WhatsApp
-Telegram
-Mobile Push Notifications
-Direct Traffic
-Think of your website as the content headquarters.
-Your social media accounts are the distribution channels.
-WEBSITE
-│
-┌────────────┼────────────┐
-▼ ▼ ▼
-INSTAGRAM X FACEBOOK
-│ │ │
-▼ ▼ ▼
-AUDIENCE AUDIENCE AUDIENCE
-│ │ │
-└────────────┼────────────┘
-▼
-WEBSITE
-The goal is not simply to gain followers.
-The goal is to create a loop:
-WEBSITE
-↓
-SOCIAL MEDIA
-↓
-NEW AUDIENCE
-↓
-WEBSITE VISIT
-↓
-EMAIL / FOLLOW
-↓
-RETURNING AUDIENCE
-↓
-MORE CONTENT
-↓
-MORE SHARING
-↓
-MORE TRAFFIC
-This is your sports media growth flywheel.
+   From day one, your sports platform should focus on building four major assets.
+   Asset 1: Content Library
+   This is every valuable piece of content you publish.
+   Examples:
+   1,000 Articles
+   500 Player Profiles
+   300 Match Previews
+   200 Tactical Analyses
+   100 Statistics Pages
+   50 Evergreen Guides
+   Over time, your website becomes a library.
+   For example, imagine someone searches:
+   Victor Osimhen career statistics
+   They find your article.
+   Another person searches:
+   Victor Osimhen transfer news
+   They find another article.
+   Another searches:
+   Victor Osimhen biography
+   Again, they find your website.
+   Eventually, search engines and users begin associating your website with that topic.
+   This is called building topical authority.
+   Asset 2: Audience
+   Your audience is the group of people who repeatedly consume your content.
+   Examples:
+   100,000 Instagram followers
+   50,000 X followers
+   20,000 email subscribers
+   10,000 app users
+   Do not focus only on followers.
+   A page with:
+   500,000 followers
+   but almost no engagement may be less valuable than:
+   50,000 highly engaged followers
+   You want an audience that:
+   Reads
+   Comments
+   Shares
+   Returns
+   Trusts your reporting
+   Recommends your platform
+   Asset 3: Brand
+   Your brand is what people think when they hear your name.
+   For example, you want readers to think:
+   Breaking football news?
+   → GoalMills
+   or:
+   African football analysis?
+   → Your Brand
+   or:
+   Fast and reliable sports updates?
+   → Your Brand
+   A strong brand gives you an advantage.
+   Two websites may publish exactly the same story.
+   But readers may choose the one they trust.
+   That is why you must develop a clear identity.
+   Asset 4: Distribution
+   Creating good content is not enough.
+   You need a system that gets the content in front of people.
+   Your distribution channels could include:
+   Google Search
+   Google Discover
+   Instagram
+   Facebook
+   X
+   TikTok
+   YouTube
+   Email
+   WhatsApp
+   Telegram
+   Mobile Push Notifications
+   Direct Traffic
+   Think of your website as the content headquarters.
+   Your social media accounts are the distribution channels.
+   WEBSITE
+   │
+   ┌────────────┼────────────┐
+   ▼ ▼ ▼
+   INSTAGRAM X FACEBOOK
+   │ │ │
+   ▼ ▼ ▼
+   AUDIENCE AUDIENCE AUDIENCE
+   │ │ │
+   └────────────┼────────────┘
+   ▼
+   WEBSITE
+   The goal is not simply to gain followers.
+   The goal is to create a loop:
+   WEBSITE
+   ↓
+   SOCIAL MEDIA
+   ↓
+   NEW AUDIENCE
+   ↓
+   WEBSITE VISIT
+   ↓
+   EMAIL / FOLLOW
+   ↓
+   RETURNING AUDIENCE
+   ↓
+   MORE CONTENT
+   ↓
+   MORE SHARING
+   ↓
+   MORE TRAFFIC
+   This is your sports media growth flywheel.
 4. UNDERSTANDING YOUR TARGET AUDIENCE
-You cannot write effectively for:
-Everyone who likes sports.
-That audience is too broad.
-Instead, define who you want to serve.
-For example:
-Audience A — Casual Football Fan
-They want:
-Breaking news
-Transfer news
-Match results
-Short updates
-Viral content
-They don't necessarily want a 4,000-word tactical article.
-Audience B — Hardcore Football Fan
-They want:
-Tactical analysis
-Statistics
-Detailed player information
-Transfer analysis
-Formation breakdowns
-Audience C — Nigerian Sports Audience
-They may strongly care about:
-Super Eagles
-NPFL
-Nigerian players abroad
-Victor Osimhen
-Ademola Lookman
-African competitions
-Premier League
-Audience D — Young Social Media Audience
-They may prefer:
-Short videos
-Fast graphics
-Memes
-Rankings
-Debates
-Statistics
-Player comparisons
-The same story can be presented differently for different audiences.
+   You cannot write effectively for:
+   Everyone who likes sports.
+   That audience is too broad.
+   Instead, define who you want to serve.
+   For example:
+   Audience A — Casual Football Fan
+   They want:
+   Breaking news
+   Transfer news
+   Match results
+   Short updates
+   Viral content
+   They don't necessarily want a 4,000-word tactical article.
+   Audience B — Hardcore Football Fan
+   They want:
+   Tactical analysis
+   Statistics
+   Detailed player information
+   Transfer analysis
+   Formation breakdowns
+   Audience C — Nigerian Sports Audience
+   They may strongly care about:
+   Super Eagles
+   NPFL
+   Nigerian players abroad
+   Victor Osimhen
+   Ademola Lookman
+   African competitions
+   Premier League
+   Audience D — Young Social Media Audience
+   They may prefer:
+   Short videos
+   Fast graphics
+   Memes
+   Rankings
+   Debates
+   Statistics
+   Player comparisons
+   The same story can be presented differently for different audiences.
 5. CREATE YOUR AUDIENCE PERSONAS
-Before publishing regularly, create at least 3–5 audience personas.
-Example:
-Persona 1: "The Daily Fan"
-Age: 18–35
-Interest: Football news
-Device: Mobile
-Behavior: Checks sports news multiple times daily
-Wants:
+   Before publishing regularly, create at least 3–5 audience personas.
+   Example:
+   Persona 1: "The Daily Fan"
+   Age: 18–35
+   Interest: Football news
+   Device: Mobile
+   Behavior: Checks sports news multiple times daily
+   Wants:
+
 - Fast news
 - Transfers
 - Match scores
 - Short content
-Persona 2: "The Analyst"
-Interest:
-Tactics
-Statistics
-Player performance
-Wants:
+  Persona 2: "The Analyst"
+  Interest:
+  Tactics
+  Statistics
+  Player performance
+  Wants:
 - Deep analysis
 - Data
 - Detailed articles
-Persona 3: "The Local Supporter"
-Interest:
-Nigerian football
-African football
-Nigerian players abroad
-Wants:
+  Persona 3: "The Local Supporter"
+  Interest:
+  Nigerian football
+  African football
+  Nigerian players abroad
+  Wants:
 - Relevant local stories
 - Fast updates
 - Original coverage
-This helps you decide what content to create.
+  This helps you decide what content to create.
+
 6. DEFINE YOUR CONTENT POSITIONING
-You need to answer:
-Why should someone visit my sports website instead of hundreds of other sports websites?
-Your answer is your positioning.
-Bad positioning:
-We post sports news.
-Thousands of websites already do that.
-Better positioning:
-We provide fast football news,
-deep analysis and comprehensive coverage
-of African and international football.
-Or:
-We turn football data and match events
-into easy-to-understand stories for modern fans.
-Or:
-We are a mobile-first sports media platform
-covering football with real-time updates,
-analysis and engaging visual content.
-Your positioning should guide your decisions.
-If your brand promises:
-FAST + ACCURATE + ANALYTICAL
-Then your content should reflect those values.
+   You need to answer:
+   Why should someone visit my sports website instead of hundreds of other sports websites?
+   Your answer is your positioning.
+   Bad positioning:
+   We post sports news.
+   Thousands of websites already do that.
+   Better positioning:
+   We provide fast football news,
+   deep analysis and comprehensive coverage
+   of African and international football.
+   Or:
+   We turn football data and match events
+   into easy-to-understand stories for modern fans.
+   Or:
+   We are a mobile-first sports media platform
+   covering football with real-time updates,
+   analysis and engaging visual content.
+   Your positioning should guide your decisions.
+   If your brand promises:
+   FAST + ACCURATE + ANALYTICAL
+   Then your content should reflect those values.
 7. CHOOSE YOUR CONTENT PILLARS
-A content pillar is a major area your platform consistently covers.
-For a football platform, you might have:
-PILLAR 1
-BREAKING NEWS
-PILLAR 2
-MATCH COVERAGE
-PILLAR 3
-TRANSFERS
-PILLAR 4
-TACTICAL ANALYSIS
-PILLAR 5
-STATISTICS
-PILLAR 6
-PLAYER STORIES
-PILLAR 7
-AFRICAN FOOTBALL
-Each pillar contains many smaller topics.
-For example:
-TRANSFERS
-│
-┌────────────────┼────────────────┐
-▼ ▼ ▼
-Rumours Confirmed Analysis
-│ │ │
-▼ ▼ ▼
-Player Links Contract Details Is It a Good Fit?
-Club Interest Transfer Fee Tactical Impact
-Agent Reports Official Statement Squad Impact
-This gives your website structure.
+   A content pillar is a major area your platform consistently covers.
+   For a football platform, you might have:
+   PILLAR 1
+   BREAKING NEWS
+   PILLAR 2
+   MATCH COVERAGE
+   PILLAR 3
+   TRANSFERS
+   PILLAR 4
+   TACTICAL ANALYSIS
+   PILLAR 5
+   STATISTICS
+   PILLAR 6
+   PLAYER STORIES
+   PILLAR 7
+   AFRICAN FOOTBALL
+   Each pillar contains many smaller topics.
+   For example:
+   TRANSFERS
+   │
+   ┌────────────────┼────────────────┐
+   ▼ ▼ ▼
+   Rumours Confirmed Analysis
+   │ │ │
+   ▼ ▼ ▼
+   Player Links Contract Details Is It a Good Fit?
+   Club Interest Transfer Fee Tactical Impact
+   Agent Reports Official Statement Squad Impact
+   This gives your website structure.
 8. UNDERSTAND THE DIFFERENT TYPES OF SPORTS CONTENT
-Not all content has the same purpose.
-You should understand the role of each one.
-A. Breaking News Content
-Purpose:
-SPEED
-+
-TRAFFIC
-+
+   Not all content has the same purpose.
+   You should understand the role of each one.
+   A. Breaking News Content
+   Purpose:
+   SPEED
+
+-
+
+TRAFFIC +
 SOCIAL ENGAGEMENT
 Example:
 Breaking: Arsenal Confirm New Signing
@@ -509,8 +515,7 @@ Victor Osimhen Biography
 This content can continue generating traffic for months or years.
 C. Match Content
 Purpose:
-CAPTURE SEARCH DEMAND
-+
+CAPTURE SEARCH DEMAND +
 ENGAGE EXISTING AUDIENCE
 Examples:
 Arsenal vs Chelsea Prediction
@@ -518,10 +523,8 @@ Arsenal vs Chelsea Possible Lineups
 Arsenal vs Chelsea Player Ratings
 D. Feature Content
 Purpose:
-BRAND AUTHORITY
-+
-BACKLINKS
-+
+BRAND AUTHORITY +
+BACKLINKS +
 LOYAL READERS
 Examples:
 The Rise of African Players in European Football
@@ -529,15 +532,12 @@ How Modern Football Scouting Has Changed
 These require more research but can establish your authority.
 E. Opinion Content
 Purpose:
-COMMENTS
-+
-DEBATE
-+
+COMMENTS +
+DEBATE +
 ENGAGEMENT
 Example:
 Why Arsenal Should Not Sell Their Star Player
-Opinion content can perform extremely well on social media.
-9. CREATE YOUR CONTENT MIX
+Opinion content can perform extremely well on social media. 9. CREATE YOUR CONTENT MIX
 Do not publish only breaking news.
 Imagine your entire website depends on:
 BREAKING NEWS
@@ -562,8 +562,7 @@ A starting content mix could be:
 20% Match Coverage
 10% Analysis
 10% Features / Opinion
-You can adjust this based on your audience.
-10. UNDERSTAND THE SPORTS CONTENT LIFECYCLE
+You can adjust this based on your audience. 10. UNDERSTAND THE SPORTS CONTENT LIFECYCLE
 Every sports story has a life.
 For example:
 TRANSFER RUMOUR
@@ -591,6 +590,7 @@ PERFORMANCE ANALYSIS
 A beginner might write only one article:
 Player Signs for Arsenal
 A professional content operation sees multiple content opportunities:
+
 1. Why Arsenal Want the Player
 2. Player Statistics
 3. Transfer Rumour
@@ -602,197 +602,193 @@ A professional content operation sees multiple content opportunities:
 9. First Match
 10. Player Rating
 11. First Month Analysis
-One major story can become an entire content series.
-11. THINK LIKE A CONTENT OPERATOR
-Every time you see a sports story, ask:
-Question 1:
-Is this news?
-Question 2:
-Can people search for this?
-Question 3:
-Can this become a social media graphic?
-Question 4:
-Can this become a video?
-Question 5:
-Can this become an evergreen article?
-Question 6:
-Can we create follow-up content?
-For example:
-Manchester United sign Player X
-Content possibilities:
-NEWS ARTICLE
-INSTAGRAM BREAKING GRAPHIC
-X BREAKING POST
-FACEBOOK ARTICLE
-TIKTOK VIDEO
-PLAYER PROFILE
-STATISTICS ARTICLE
-TACTICAL ANALYSIS
-YOUTUBE DISCUSSION
-TRANSFER IMPACT ARTICLE
-This is called content repurposing.
-12. THE DIFFERENCE BETWEEN CONTENT AND CONTENT ASSETS
-This is another important concept.
-A random post:
-Arsenal won 2–1.
-That is content.
-But:
-Arsenal 2–1 Chelsea:
-5 Tactical Reasons Arsenal Won
-with:
-Statistics
-Tactical diagrams
-Player analysis
-Internal links
-Social graphics
-Video explanation
-can become a content asset.
-A content asset continues producing value.
-Your goal is to create a growing library of assets.
-Imagine:
-YEAR 1
-500 articles
-YEAR 2
-1,500 articles
-YEAR 3
-3,000 articles
-YEAR 4
-5,000+ articles
-If those articles are high-quality and well-organized, your website becomes increasingly valuable.
-13. YOUR WEBSITE SHOULD HAVE A CONTENT ARCHITECTURE
-Your sports website should not look like:
-HOME PAGE
-│
-├── Random Article
-├── Random Article
-├── Random Article
-├── Random Article
-Instead:
-HOME
-│
-├── FOOTBALL
-│ │
-│ ├── PREMIER LEAGUE
-│ │ ├── Arsenal
-│ │ ├── Chelsea
-│ │ ├── Liverpool
-│ │ └── Manchester United
-│ │
-│ ├── CHAMPIONS LEAGUE
-│ │
-│ ├── TRANSFERS
-│ │
-│ └── AFRICAN FOOTBALL
-│
-├── BASKETBALL
-│
-├── CRICKET
-│
-├── ANALYSIS
-│
-└── OPINION
-This helps you:
-Organize content
-Build topic authority
-Improve navigation
-Create internal links
-Help search engines understand your site
-14. BUILD AN EDITORIAL MISSION
-Your editorial mission defines what your platform stands for.
-For example:
-Our mission is to provide fast, accurate and engaging sports coverage while combining breaking news, intelligent analysis, data and visual storytelling for modern sports fans.
-This sounds simple, but it helps with decision-making.
-Suppose a viral story appears.
-Ask:
-Does it fit our audience?
-Does it fit our brand?
-Can we add value?
-Is the information reliable?
-If the answer is no, you don't have to publish it.
-15. CREATE EDITORIAL STANDARDS FROM DAY ONE
-Even if you are working alone, create rules.
-Your standards should include:
-Accuracy
-Never knowingly publish false information.
-Attribution
-Give proper credit for information, quotes and original reporting.
-Corrections
-If you make an error:
-CORRECT IT
-Do not silently continue spreading incorrect information.
-Opinion vs News
-Clearly separate:
-FACT
-from:
-OPINION
-Rumours
-Label rumours clearly.
-For example:
-Reports suggest...
-The player has been linked with...
-Do not write:
-Player WILL join Arsenal
-unless it is genuinely confirmed.
-16. UNDERSTAND THE SPORTS NEWS COMPETITION
-You will compete against major organizations.
-But that does not mean you cannot grow.
-You should not try to beat major global sports companies by copying their strategy.
-Instead, find opportunities they may not prioritize.
-Examples:
-Nigerian football
-African football
-Local player stories
-Detailed player profiles
-Emerging leagues
-Specific club communities
-Data-driven analysis
-Mobile-first content
-Fast visual updates
-You can start narrow.
-For example:
-AFRICAN FOOTBALL
-│
-▼
-NIGERIAN PLAYERS
-│
-▼
-NIGERIAN PLAYERS IN EUROPE
-Become strong in one area first.
-Then expand.
-17. BUILD A COMPETITIVE ADVANTAGE
-Ask:
-What can my platform do better?
-Possible advantages:
-Speed
-You publish fast.
-Focus
-You cover a specific audience better.
-Analysis
-You explain stories better.
-Technology
-You use automation and sports data.
-Visual Content
-You create better graphics.
-Community
-You engage directly with fans.
-Localization
-You understand a local audience.
-For your sports platform, a powerful advantage could combine:
-SPORTS DATA
-+
-FAST NEWS
-+
-AI ASSISTANCE
-+
-HUMAN EDITING
-+
-GRAPHICS
-+
-VIDEO
-+
+    One major story can become an entire content series.
+12. THINK LIKE A CONTENT OPERATOR
+    Every time you see a sports story, ask:
+    Question 1:
+    Is this news?
+    Question 2:
+    Can people search for this?
+    Question 3:
+    Can this become a social media graphic?
+    Question 4:
+    Can this become a video?
+    Question 5:
+    Can this become an evergreen article?
+    Question 6:
+    Can we create follow-up content?
+    For example:
+    Manchester United sign Player X
+    Content possibilities:
+    NEWS ARTICLE
+    INSTAGRAM BREAKING GRAPHIC
+    X BREAKING POST
+    FACEBOOK ARTICLE
+    TIKTOK VIDEO
+    PLAYER PROFILE
+    STATISTICS ARTICLE
+    TACTICAL ANALYSIS
+    YOUTUBE DISCUSSION
+    TRANSFER IMPACT ARTICLE
+    This is called content repurposing.
+13. THE DIFFERENCE BETWEEN CONTENT AND CONTENT ASSETS
+    This is another important concept.
+    A random post:
+    Arsenal won 2–1.
+    That is content.
+    But:
+    Arsenal 2–1 Chelsea:
+    5 Tactical Reasons Arsenal Won
+    with:
+    Statistics
+    Tactical diagrams
+    Player analysis
+    Internal links
+    Social graphics
+    Video explanation
+    can become a content asset.
+    A content asset continues producing value.
+    Your goal is to create a growing library of assets.
+    Imagine:
+    YEAR 1
+    500 articles
+    YEAR 2
+    1,500 articles
+    YEAR 3
+    3,000 articles
+    YEAR 4
+    5,000+ articles
+    If those articles are high-quality and well-organized, your website becomes increasingly valuable.
+14. YOUR WEBSITE SHOULD HAVE A CONTENT ARCHITECTURE
+    Your sports website should not look like:
+    HOME PAGE
+    │
+    ├── Random Article
+    ├── Random Article
+    ├── Random Article
+    ├── Random Article
+    Instead:
+    HOME
+    │
+    ├── FOOTBALL
+    │ │
+    │ ├── PREMIER LEAGUE
+    │ │ ├── Arsenal
+    │ │ ├── Chelsea
+    │ │ ├── Liverpool
+    │ │ └── Manchester United
+    │ │
+    │ ├── CHAMPIONS LEAGUE
+    │ │
+    │ ├── TRANSFERS
+    │ │
+    │ └── AFRICAN FOOTBALL
+    │
+    ├── BASKETBALL
+    │
+    ├── CRICKET
+    │
+    ├── ANALYSIS
+    │
+    └── OPINION
+    This helps you:
+    Organize content
+    Build topic authority
+    Improve navigation
+    Create internal links
+    Help search engines understand your site
+15. BUILD AN EDITORIAL MISSION
+    Your editorial mission defines what your platform stands for.
+    For example:
+    Our mission is to provide fast, accurate and engaging sports coverage while combining breaking news, intelligent analysis, data and visual storytelling for modern sports fans.
+    This sounds simple, but it helps with decision-making.
+    Suppose a viral story appears.
+    Ask:
+    Does it fit our audience?
+    Does it fit our brand?
+    Can we add value?
+    Is the information reliable?
+    If the answer is no, you don't have to publish it.
+16. CREATE EDITORIAL STANDARDS FROM DAY ONE
+    Even if you are working alone, create rules.
+    Your standards should include:
+    Accuracy
+    Never knowingly publish false information.
+    Attribution
+    Give proper credit for information, quotes and original reporting.
+    Corrections
+    If you make an error:
+    CORRECT IT
+    Do not silently continue spreading incorrect information.
+    Opinion vs News
+    Clearly separate:
+    FACT
+    from:
+    OPINION
+    Rumours
+    Label rumours clearly.
+    For example:
+    Reports suggest...
+    The player has been linked with...
+    Do not write:
+    Player WILL join Arsenal
+    unless it is genuinely confirmed.
+17. UNDERSTAND THE SPORTS NEWS COMPETITION
+    You will compete against major organizations.
+    But that does not mean you cannot grow.
+    You should not try to beat major global sports companies by copying their strategy.
+    Instead, find opportunities they may not prioritize.
+    Examples:
+    Nigerian football
+    African football
+    Local player stories
+    Detailed player profiles
+    Emerging leagues
+    Specific club communities
+    Data-driven analysis
+    Mobile-first content
+    Fast visual updates
+    You can start narrow.
+    For example:
+    AFRICAN FOOTBALL
+    │
+    ▼
+    NIGERIAN PLAYERS
+    │
+    ▼
+    NIGERIAN PLAYERS IN EUROPE
+    Become strong in one area first.
+    Then expand.
+18. BUILD A COMPETITIVE ADVANTAGE
+    Ask:
+    What can my platform do better?
+    Possible advantages:
+    Speed
+    You publish fast.
+    Focus
+    You cover a specific audience better.
+    Analysis
+    You explain stories better.
+    Technology
+    You use automation and sports data.
+    Visual Content
+    You create better graphics.
+    Community
+    You engage directly with fans.
+    Localization
+    You understand a local audience.
+    For your sports platform, a powerful advantage could combine:
+    SPORTS DATA
+
+-
+
+FAST NEWS +
+AI ASSISTANCE +
+HUMAN EDITING +
+GRAPHICS +
+VIDEO +
 MOBILE-FIRST EXPERIENCE
-This can help you produce content efficiently—but accuracy and editorial review must remain central.
-18. UNDERSTAND YOUR CONTENT ECONOMICS
+This can help you produce content efficiently—but accuracy and editorial review must remain central. 18. UNDERSTAND YOUR CONTENT ECONOMICS
 Every article has a cost.
 Even if you write it yourself, your time has value.
 Suppose:
@@ -818,8 +814,7 @@ TRAFFIC GENERATED
 vs
 ENGAGEMENT
 vs
-REVENUE POTENTIAL
-19. CREATE A CONTENT PRIORITY SYSTEM
+REVENUE POTENTIAL 19. CREATE A CONTENT PRIORITY SYSTEM
 Not every story deserves the same effort.
 Use a scoring system.
 For every story, score:
@@ -846,8 +841,7 @@ Audience: 8
 Long-Term: 10
 TOTAL: 36
 Both are valuable, but for different reasons.
-This helps you decide what to prioritize.
-20. YOUR COMPLETE PART 1 FOUNDATION
+This helps you decide what to prioritize. 20. YOUR COMPLETE PART 1 FOUNDATION
 Before moving to article writing, you should have these things clearly defined:
 A. Your brand
 Brand Name:
@@ -933,7 +927,9 @@ RETURNING USERS
 ▼
 REVENUE
 Part 1 is the foundation. If this structure is clear, the next stage—Part 2: choosing and defining your sports niche and target audience in full operational detail—becomes much easier.
+
 # PART 2 — CHOOSING AND DEFINING YOUR SPORTS NICHE
+
 Part 1 explained what a sports media business is.
 Now we move to one of the most important decisions you will make:
 What exactly will your sports platform focus on, and who are you creating content for?
@@ -958,49 +954,48 @@ Difficult social-media growth
 Not enough resources
 Audience confusion
 A better strategy is to start with a clear niche, build authority, then expand.
+
 1. WHAT IS A NICHE?
-A niche is a specific area of the sports market you decide to focus on.
-For example:
-Very broad
-Sports
-Slightly narrower
-Football
-More specific
-European Football
-Even more specific
-Premier League Football
-Highly specific
-Premier League Transfer News
-You can visualize it like this:
-SPORTS
-│
-├── FOOTBALL
-│ │
-│ ├── PREMIER LEAGUE
-│ │ │
-│ │ ├── NEWS
-│ │ ├── TRANSFERS
-│ │ ├── MATCHES
-│ │ └── ANALYSIS
-│ │
-│ ├── LA LIGA
-│ ├── CHAMPIONS LEAGUE
-│ └── AFRICAN FOOTBALL
-│
-├── BASKETBALL
-├── CRICKET
-└── TENNIS
-The goal is to find the balance between:
-AUDIENCE SIZE
-+
-LOWER COMPETITION
-+
-YOUR KNOWLEDGE
-+
-CONTENT AVAILABILITY
-+
-MONETIZATION POTENTIAL
-2. THE BIGGEST MISTAKE: STARTING TOO BROAD
+   A niche is a specific area of the sports market you decide to focus on.
+   For example:
+   Very broad
+   Sports
+   Slightly narrower
+   Football
+   More specific
+   European Football
+   Even more specific
+   Premier League Football
+   Highly specific
+   Premier League Transfer News
+   You can visualize it like this:
+   SPORTS
+   │
+   ├── FOOTBALL
+   │ │
+   │ ├── PREMIER LEAGUE
+   │ │ │
+   │ │ ├── NEWS
+   │ │ ├── TRANSFERS
+   │ │ ├── MATCHES
+   │ │ └── ANALYSIS
+   │ │
+   │ ├── LA LIGA
+   │ ├── CHAMPIONS LEAGUE
+   │ └── AFRICAN FOOTBALL
+   │
+   ├── BASKETBALL
+   ├── CRICKET
+   └── TENNIS
+   The goal is to find the balance between:
+   AUDIENCE SIZE
+
+-
+
+LOWER COMPETITION +
+YOUR KNOWLEDGE +
+CONTENT AVAILABILITY +
+MONETIZATION POTENTIAL 2. THE BIGGEST MISTAKE: STARTING TOO BROAD
 Imagine you launch a website called:
 World Sports Daily
 On your first day, you want to publish:
@@ -1032,8 +1027,7 @@ BUILD TRAFFIC
 ↓
 BUILD AUDIENCE
 ↓
-EXPAND
-3. THE NICHE SELECTION FORMULA
+EXPAND 3. THE NICHE SELECTION FORMULA
 Before choosing your niche, evaluate five things.
 A. Passion and knowledge
 Ask:
@@ -1089,8 +1083,7 @@ MORE DETAILED
 FASTER
 MORE LOCAL
 MORE VISUAL
-MORE DATA-DRIVEN
-4. YOUR NICHE DOES NOT HAVE TO BE ONLY ONE SPORT
+MORE DATA-DRIVEN 4. YOUR NICHE DOES NOT HAVE TO BE ONLY ONE SPORT
 There are several ways to define a niche.
 MODEL 1: ONE SPORT
 Example:
@@ -1142,8 +1135,7 @@ SECONDARY
 BASKETBALL — 10%
 CRICKET — 10%
 OTHER SPORTS — 10%
-This allows you to build authority in football first while testing other sports.
-5. THE BEST NICHE STRUCTURE FOR A NEW SPORTS PLATFORM
+This allows you to build authority in football first while testing other sports. 5. THE BEST NICHE STRUCTURE FOR A NEW SPORTS PLATFORM
 For your situation, I would recommend a Football-First Sports Media Model.
 The structure could look like:
 YOUR SPORTS BRAND
@@ -1166,8 +1158,7 @@ Nigerian Football
 Player Profiles
 Statistics
 Analysis
-This gives you enough content opportunities without spreading yourself too thin.
-6. DEFINE YOUR PRIMARY AUDIENCE
+This gives you enough content opportunities without spreading yourself too thin. 6. DEFINE YOUR PRIMARY AUDIENCE
 Your niche is what you cover.
 Your audience is who you cover it for.
 These are different.
@@ -1186,8 +1177,7 @@ You need to choose a primary audience.
 For example:
 Mobile-first football fans aged approximately 16–40 who want fast news, match updates, transfers, statistics, and engaging football content.
 That is much clearer than:
-Everyone.
-7. CREATE YOUR IDEAL READER PROFILE
+Everyone. 7. CREATE YOUR IDEAL READER PROFILE
 Let's create an example.
 Primary persona: The Daily Football Fan
 Profile
@@ -1220,8 +1210,7 @@ ACCURATE
 VISUAL
 EASY TO READ
 MOBILE FRIENDLY
-Your platform should solve these problems.
-8. CREATE SECONDARY AUDIENCE PERSONAS
+Your platform should solve these problems. 8. CREATE SECONDARY AUDIENCE PERSONAS
 You should not have only one audience type.
 Create secondary groups.
 Persona 2: The Statistics Fan
@@ -1256,8 +1245,7 @@ Debates
 Quick facts
 Memes
 Interesting statistics
-This is why your content cannot exist only as articles.
-9. UNDERSTAND THE AUDIENCE JOURNEY
+This is why your content cannot exist only as articles. 9. UNDERSTAND THE AUDIENCE JOURNEY
 Your audience does not immediately become loyal.
 The journey may look like this:
 SEES POST
@@ -1296,8 +1284,7 @@ WEBSITE VISITOR
 RETURNING READER
 ↓
 COMMUNITY MEMBER
-That is much more valuable than a single viral post.
-10. CHOOSE YOUR GEOGRAPHIC STRATEGY
+That is much more valuable than a single viral post. 10. CHOOSE YOUR GEOGRAPHIC STRATEGY
 This is extremely important.
 Your content can target:
 Local
@@ -1311,10 +1298,8 @@ Global
 International Sports
 You can combine these.
 For example:
-GLOBAL FOOTBALL
-+
-AFRICAN PERSPECTIVE
-+
+GLOBAL FOOTBALL +
+AFRICAN PERSPECTIVE +
 STRONG NIGERIAN COVERAGE
 That gives your brand a unique identity.
 Example:
@@ -1324,8 +1309,7 @@ But:
 How Nigerian Players Performed in the Premier League
 is more focused.
 You are not changing the sport.
-You are changing the angle.
-11. FIND YOUR UNIQUE CONTENT ANGLE
+You are changing the angle. 11. FIND YOUR UNIQUE CONTENT ANGLE
 The same story can be covered in many ways.
 Example story:
 Arsenal win 3–1.
@@ -1342,8 +1326,7 @@ Player angle
 Why Bukayo Saka Was the Difference
 Opinion
 Is Arsenal Now Ready to Win the Premier League?
-One event can create multiple articles for different audiences.
-12. BUILD YOUR NICHE MAP
+One event can create multiple articles for different audiences. 12. BUILD YOUR NICHE MAP
 Create a document like this.
 LEVEL 1: SPORT
 FOOTBALL
@@ -1398,8 +1381,7 @@ Nigerian Football
 ✓
 ✓
 You do not have to fill every box immediately.
-This simply gives you a roadmap.
-13. HOW TO AVOID CONTENT CHAOS
+This simply gives you a roadmap. 13. HOW TO AVOID CONTENT CHAOS
 Without a niche strategy, your publishing may look like:
 Monday:
 Manchester United transfer
@@ -1431,10 +1413,10 @@ NIGERIAN PLAYERS ABROAD
 ├── Iwobi
 ├── Chukwueze
 └── Weekly Performance Report
-Clusters make your website feel organized and authoritative.
-14. CREATE YOUR "CORE 20" TOPICS
+Clusters make your website feel organized and authoritative. 14. CREATE YOUR "CORE 20" TOPICS
 At launch, choose around 20 core topics you want to become known for.
 Example for a football-first platform:
+
 1. Premier League News
 2. Arsenal
 3. Chelsea
@@ -1455,102 +1437,103 @@ Example for a football-first platform:
 18. Tactical Analysis
 19. Football Records
 20. Football Explainers
-These topics become your initial content territory.
-15. CREATE A NICHE EXPANSION PLAN
-Don't expand randomly.
-Use phases.
-Phase 1: Foundation
-FOOTBALL ONLY
-Focus:
-Premier League
-Champions League
-African Football
-Nigerian Football
-Transfers
-Phase 2: Authority
-Add:
-Player databases
-Statistics
-Rankings
-Predictions
-More leagues
-Phase 3: Expansion
-Add:
-Basketball
-Cricket
-Tennis
-Other major sports
-Phase 4: Full Sports Platform
-Eventually:
-FOOTBALL
-BASKETBALL
-CRICKET
-TENNIS
-ATHLETICS
-RUGBY
-OTHER SPORTS
-But only expand when your existing system can support it.
-16. HOW TO KNOW IF A NICHE IS WORKING
-After publishing consistently, measure:
-SEARCH TRAFFIC
-SOCIAL REACH
-ENGAGEMENT
-RETURNING VISITORS
-ARTICLE PERFORMANCE
-FOLLOWER GROWTH
-TIME ON PAGE
-For example:
-AFRICAN FOOTBALL
-10 articles
-50,000 views
-while:
-TENNIS
-20 articles
-2,000 views
-That data may suggest you should invest more resources in African football.
-Your niche strategy should evolve based on real performance.
-17. THE NICHE DECISION FRAMEWORK
-Before choosing a topic, score it.
-Factor
-Score 1–10
-Your knowledge
-/10
-Audience demand
-/10
-Social potential
-/10
-SEO potential
-/10
-Competition opportunity
-/10
-Monetization potential
-/10
-Content availability
-/10
-Example:
-TOPIC:
-African Football
-Knowledge: 9
-Demand: 8
-Social: 9
-SEO: 8
-Opportunity: 9
-Monetization: 7
-Content: 9
-TOTAL: 59/70
-Do this for several possible niches.
-Then compare.
-18. MY RECOMMENDED NICHE STRUCTURE FOR YOUR SPORTS PLATFORM
-Based on your goal of building a larger sports media platform rather than a small personal blog, I recommend:
-Primary Identity
-FOOTBALL-FIRST DIGITAL SPORTS MEDIA PLATFORM
-Primary Audience
-MOBILE-FIRST SPORTS FANS
-Geographic Advantage
-GLOBAL FOOTBALL
-+
-AFRICAN FOOTBALL
-+
+    These topics become your initial content territory.
+21. CREATE A NICHE EXPANSION PLAN
+    Don't expand randomly.
+    Use phases.
+    Phase 1: Foundation
+    FOOTBALL ONLY
+    Focus:
+    Premier League
+    Champions League
+    African Football
+    Nigerian Football
+    Transfers
+    Phase 2: Authority
+    Add:
+    Player databases
+    Statistics
+    Rankings
+    Predictions
+    More leagues
+    Phase 3: Expansion
+    Add:
+    Basketball
+    Cricket
+    Tennis
+    Other major sports
+    Phase 4: Full Sports Platform
+    Eventually:
+    FOOTBALL
+    BASKETBALL
+    CRICKET
+    TENNIS
+    ATHLETICS
+    RUGBY
+    OTHER SPORTS
+    But only expand when your existing system can support it.
+22. HOW TO KNOW IF A NICHE IS WORKING
+    After publishing consistently, measure:
+    SEARCH TRAFFIC
+    SOCIAL REACH
+    ENGAGEMENT
+    RETURNING VISITORS
+    ARTICLE PERFORMANCE
+    FOLLOWER GROWTH
+    TIME ON PAGE
+    For example:
+    AFRICAN FOOTBALL
+    10 articles
+    50,000 views
+    while:
+    TENNIS
+    20 articles
+    2,000 views
+    That data may suggest you should invest more resources in African football.
+    Your niche strategy should evolve based on real performance.
+23. THE NICHE DECISION FRAMEWORK
+    Before choosing a topic, score it.
+    Factor
+    Score 1–10
+    Your knowledge
+    /10
+    Audience demand
+    /10
+    Social potential
+    /10
+    SEO potential
+    /10
+    Competition opportunity
+    /10
+    Monetization potential
+    /10
+    Content availability
+    /10
+    Example:
+    TOPIC:
+    African Football
+    Knowledge: 9
+    Demand: 8
+    Social: 9
+    SEO: 8
+    Opportunity: 9
+    Monetization: 7
+    Content: 9
+    TOTAL: 59/70
+    Do this for several possible niches.
+    Then compare.
+24. MY RECOMMENDED NICHE STRUCTURE FOR YOUR SPORTS PLATFORM
+    Based on your goal of building a larger sports media platform rather than a small personal blog, I recommend:
+    Primary Identity
+    FOOTBALL-FIRST DIGITAL SPORTS MEDIA PLATFORM
+    Primary Audience
+    MOBILE-FIRST SPORTS FANS
+    Geographic Advantage
+    GLOBAL FOOTBALL
+
+-
+
+AFRICAN FOOTBALL +
 STRONG NIGERIAN COVERAGE
 Core Content
 BREAKING NEWS
@@ -1605,142 +1588,146 @@ Decide what you will not cover initially.
 The key lesson from Part 2 is:
 You do not need to cover everything to become a major sports platform. You need to become useful and recognizable to a specific audience first.
 The next part should logically be Part 3: Building Your Sports Content Categories and Complete Website Content Architecture, where we design the actual category structure, URL structure, article types, tags, club pages, player pages, competition pages, internal linking structure, and how the entire sports website content system should be organized.
+
 # PART 3 — BUILDING YOUR SPORTS CONTENT CATEGORIES AND COMPLETE WEBSITE CONTENT ARCHITECTURE
 
 1. What Part 3 Will Build
-By the end of this part, you should have a complete blueprint for organizing your sports platform:
-HOME
-│
-├── SPORT
-│ ├── COMPETITION
-│ │ ├── CLUB/TEAM
-│ │ │ ├── NEWS
-│ │ │ ├── MATCHES
-│ │ │ ├── PLAYERS
-│ │ │ └── STATISTICS
-│ │ │
-│ │ ├── FIXTURES
-│ │ ├── RESULTS
-│ │ ├── TABLE
-│ │ └── COMPETITION NEWS
-│ │
-│ ├── TRANSFERS
-│ ├── ANALYSIS
-│ └── FEATURES
-│
-├── PLAYERS
-├── TEAMS
-├── MATCHES
-├── STATS
-└── OTHER SPORTS
-The goal is to avoid this:
-/news/article-1
-/news/article-2
-/news/article-3
-/news/article-4
-A website with hundreds or thousands of disconnected articles eventually becomes difficult to manage.
-Instead, every article should belong to a clear content ecosystem.
-Google also recommends organizing sites logically, using descriptive URLs, and making important pages discoverable through links. Google specifically emphasizes crawlable links and descriptive anchor text for helping users and search engines understand relationships between pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com))
-Useful references:
-[Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?rd=2&visit_id=639171826714484495-2888065406&utm_source=chatgpt.com)
-[Google URL Structure Best Practices](https://developers.google.com/search/docs/crawling-indexing/url-structure?utm_source=chatgpt.com)
-[Google Internal Linking Best Practices](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com)
+   By the end of this part, you should have a complete blueprint for organizing your sports platform:
+   HOME
+   │
+   ├── SPORT
+   │ ├── COMPETITION
+   │ │ ├── CLUB/TEAM
+   │ │ │ ├── NEWS
+   │ │ │ ├── MATCHES
+   │ │ │ ├── PLAYERS
+   │ │ │ └── STATISTICS
+   │ │ │
+   │ │ ├── FIXTURES
+   │ │ ├── RESULTS
+   │ │ ├── TABLE
+   │ │ └── COMPETITION NEWS
+   │ │
+   │ ├── TRANSFERS
+   │ ├── ANALYSIS
+   │ └── FEATURES
+   │
+   ├── PLAYERS
+   ├── TEAMS
+   ├── MATCHES
+   ├── STATS
+   └── OTHER SPORTS
+   The goal is to avoid this:
+   /news/article-1
+   /news/article-2
+   /news/article-3
+   /news/article-4
+   A website with hundreds or thousands of disconnected articles eventually becomes difficult to manage.
+   Instead, every article should belong to a clear content ecosystem.
+   Google also recommends organizing sites logically, using descriptive URLs, and making important pages discoverable through links. Google specifically emphasizes crawlable links and descriptive anchor text for helping users and search engines understand relationships between pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com))
+   Useful references:
+   [Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?rd=2&visit_id=639171826714484495-2888065406&utm_source=chatgpt.com)
+   [Google URL Structure Best Practices](https://developers.google.com/search/docs/crawling-indexing/url-structure?utm_source=chatgpt.com)
+   [Google Internal Linking Best Practices](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com)
 2. THE FOUR LEVELS OF YOUR CONTENT ARCHITECTURE
-Your sports platform should have four major levels.
-LEVEL 1
-SPORT
-↓
-LEVEL 2
-COMPETITION / CATEGORY
-↓
-LEVEL 3
-ENTITY
-↓
-LEVEL 4
-CONTENT
-For football:
-FOOTBALL
-│
-▼
-PREMIER LEAGUE
-│
-▼
-ARSENAL
-│
-├── NEWS
-├── PLAYERS
-├── MATCHES
-├── TRANSFERS
-└── STATISTICS
-Let's look at each level.
-LEVEL 1 — SPORT
-This is your highest-level content category.
-Examples:
-Football
-Basketball
-Cricket
-Tennis
-Athletics
-Rugby
-Your initial platform may look like:
-/
-├── football
-├── basketball
-├── cricket
-└── other-sports
-If football is your primary focus, it should receive the strongest architecture and the largest amount of content.
-Example:
-FOOTBALL
-│
-├── Premier League
-├── Champions League
-├── La Liga
-├── Serie A
-├── Bundesliga
-├── Transfers
-├── African Football
-├── Nigerian Football
-├── International Football
-├── Analysis
-└── Features
-LEVEL 2 — COMPETITIONS AND MAJOR TOPICS
-Inside football, organize content around things fans naturally follow.
-For example:
-FOOTBALL
-│
-├── PREMIER LEAGUE
-├── CHAMPIONS LEAGUE
-├── LA LIGA
-├── SERIE A
-├── BUNDESLIGA
-├── EUROPA LEAGUE
-├── CAF CHAMPIONS LEAGUE
-├── AFCON
-└── FIFA WORLD CUP
-Each competition should eventually become a content hub.
-For example:
-PREMIER LEAGUE
-│
-├── Latest News
-├── Fixtures
-├── Results
-├── League Table
-├── Clubs
-├── Players
-├── Top Scorers
-├── Statistics
-├── Match Previews
-├── Match Reports
-└── Analysis
-A user visiting:
-/football/premier-league
-should not see only a list of articles.
-They should enter a Premier League information hub.
-Example page layout:
-------------------------------------------------
+   Your sports platform should have four major levels.
+   LEVEL 1
+   SPORT
+   ↓
+   LEVEL 2
+   COMPETITION / CATEGORY
+   ↓
+   LEVEL 3
+   ENTITY
+   ↓
+   LEVEL 4
+   CONTENT
+   For football:
+   FOOTBALL
+   │
+   ▼
+   PREMIER LEAGUE
+   │
+   ▼
+   ARSENAL
+   │
+   ├── NEWS
+   ├── PLAYERS
+   ├── MATCHES
+   ├── TRANSFERS
+   └── STATISTICS
+   Let's look at each level.
+   LEVEL 1 — SPORT
+   This is your highest-level content category.
+   Examples:
+   Football
+   Basketball
+   Cricket
+   Tennis
+   Athletics
+   Rugby
+   Your initial platform may look like:
+   /
+   ├── football
+   ├── basketball
+   ├── cricket
+   └── other-sports
+   If football is your primary focus, it should receive the strongest architecture and the largest amount of content.
+   Example:
+   FOOTBALL
+   │
+   ├── Premier League
+   ├── Champions League
+   ├── La Liga
+   ├── Serie A
+   ├── Bundesliga
+   ├── Transfers
+   ├── African Football
+   ├── Nigerian Football
+   ├── International Football
+   ├── Analysis
+   └── Features
+   LEVEL 2 — COMPETITIONS AND MAJOR TOPICS
+   Inside football, organize content around things fans naturally follow.
+   For example:
+   FOOTBALL
+   │
+   ├── PREMIER LEAGUE
+   ├── CHAMPIONS LEAGUE
+   ├── LA LIGA
+   ├── SERIE A
+   ├── BUNDESLIGA
+   ├── EUROPA LEAGUE
+   ├── CAF CHAMPIONS LEAGUE
+   ├── AFCON
+   └── FIFA WORLD CUP
+   Each competition should eventually become a content hub.
+   For example:
+   PREMIER LEAGUE
+   │
+   ├── Latest News
+   ├── Fixtures
+   ├── Results
+   ├── League Table
+   ├── Clubs
+   ├── Players
+   ├── Top Scorers
+   ├── Statistics
+   ├── Match Previews
+   ├── Match Reports
+   └── Analysis
+   A user visiting:
+   /football/premier-league
+   should not see only a list of articles.
+   They should enter a Premier League information hub.
+   Example page layout:
+
+---
+
 PREMIER LEAGUE
 Latest news, fixtures, results and statistics
 ------------------------------------------------
+
 [ FEATURED STORY ]
 LATEST NEWS
 Article
@@ -1753,8 +1740,8 @@ TRENDING ARTICLES
 CLUBS
 MORE FROM THE PREMIER LEAGUE
 ------------------------------------------------
-This makes the page useful even if the visitor does not click an article immediately.
-3. THE CONTENT HUB STRATEGY
+
+This makes the page useful even if the visitor does not click an article immediately. 3. THE CONTENT HUB STRATEGY
 Think of every major topic as a hub.
 For example:
 PREMIER LEAGUE
@@ -1773,8 +1760,7 @@ Liverpool Liverpool vs Haaland
 ▼
 ARTICLES
 This creates relationships between your pages.
-Google's documentation explains that internal links help it discover pages and understand how content relates within a site, while important pages should be linked from other relevant pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com))
-4. YOUR FOOTBALL CATEGORY ARCHITECTURE
+Google's documentation explains that internal links help it discover pages and understand how content relates within a site, while important pages should be linked from other relevant pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com)) 4. YOUR FOOTBALL CATEGORY ARCHITECTURE
 For a football-first sports platform, I recommend this structure.
 FOOTBALL
 │
@@ -1817,8 +1803,7 @@ FOOTBALL
 │
 └── FEATURES
 You do not need to build every section on your first day.
-The important thing is to design the system so you can expand without rebuilding your entire platform.
-5. CATEGORY VS TAG: DO NOT CONFUSE THEM
+The important thing is to design the system so you can expand without rebuilding your entire platform. 5. CATEGORY VS TAG: DO NOT CONFUSE THEM
 This is extremely important.
 Categories
 Categories are your major content areas.
@@ -1869,8 +1854,7 @@ Victor Osimhen
 Premier League
 Nigeria
 Transfers
-Every tag or entity should have a clear purpose.
-6. BUILDING CLUB PAGES
+Every tag or entity should have a clear purpose. 6. BUILDING CLUB PAGES
 Club pages can become extremely powerful content hubs.
 Example:
 /football/premier-league/arsenal
@@ -1888,12 +1872,14 @@ ARSENAL
 └── Related Articles
 The page architecture:
 ------------------------------------------------
+
 ARSENAL FC
 [ CLUB HEADER ]
 Logo
 League Position
 Next Match
 ------------------------------------------------
+
 LATEST ARSENAL NEWS
 ARTICLE
 ARTICLE
@@ -1906,6 +1892,7 @@ TRANSFER NEWS
 ARSENAL STATISTICS
 MORE ARSENAL CONTENT
 ------------------------------------------------
+
 Now, every Arsenal-related article can link back to the Arsenal hub.
 Example:
 Article:
@@ -1915,8 +1902,7 @@ Internal links:
 → Arsenal Transfers
 → Player Profile
 → Premier League
-This creates a network.
-7. PLAYER PAGE ARCHITECTURE
+This creates a network. 7. PLAYER PAGE ARCHITECTURE
 Player pages are excellent long-term content assets.
 Example:
 /players/victor-osimhen
@@ -1948,8 +1934,7 @@ PROFILE STATS NEWS
 ├── Biography ├── Assists ├── Interviews
 └── History └── Matches └── Analysis
 A player should become an entity, not simply a tag.
-This is important when your platform becomes larger.
-8. THE ENTITY-FIRST SPORTS WEBSITE
+This is important when your platform becomes larger. 8. THE ENTITY-FIRST SPORTS WEBSITE
 Eventually, your sports platform should understand the relationships between:
 PLAYER
 TEAM
@@ -2002,8 +1987,7 @@ MATCH PAGE
 │
 └── Same article appears
 You write the article once, but your system distributes it throughout your website.
-For your future GoalMills-style sports platform, this is much better than manually creating unrelated categories.
-9. THE MATCH PAGE
+For your future GoalMills-style sports platform, this is much better than manually creating unrelated categories. 9. THE MATCH PAGE
 A match should have its own permanent page.
 Example:
 /matches/arsenal-vs-chelsea-2026
@@ -2038,8 +2022,7 @@ Tactical Analysis
 The match page becomes the central hub for everything related to that game.
 Schema.org provides a SportsEvent type with properties such as homeTeam, awayTeam, competitor, startDate, and related event information, which can be useful when designing your structured sports data model. ([Schema.org](https://schema.org/SportsEvent?utm_source=chatgpt.com))
 Reference:
-[Schema.org SportsEvent Documentation](https://schema.org/SportsEvent?utm_source=chatgpt.com)
-10. THE MATCH CONTENT TREE
+[Schema.org SportsEvent Documentation](https://schema.org/SportsEvent?utm_source=chatgpt.com) 10. THE MATCH CONTENT TREE
 One match should create this structure:
 MATCH
 │
@@ -2065,8 +2048,7 @@ ARSENAL VS CHELSEA
 ├── Match Report
 ├── Player Ratings
 └── Tactical Analysis
-This creates a powerful content cluster.
-11. COMPETITION PAGES
+This creates a powerful content cluster. 11. COMPETITION PAGES
 Every major competition should have a permanent hub.
 Example:
 /football/premier-league
@@ -2095,8 +2077,7 @@ PREMIER LEAGUE 2026/27
 ├── Statistics
 ├── Top Scorers
 └── Articles
-This is especially useful as your platform grows.
-12. THE TRANSFER CONTENT SYSTEM
+This is especially useful as your platform grows. 12. THE TRANSFER CONTENT SYSTEM
 Transfers should not simply be one category containing random articles.
 Build a transfer ecosystem.
 TRANSFERS
@@ -2118,8 +2099,7 @@ TRANSFER
 ├── Official Announcement
 ├── Player Profile
 └── Tactical Analysis
-One transfer can generate an entire content chain.
-13. YOUR ANALYSIS SECTION
+One transfer can generate an entire content chain. 13. YOUR ANALYSIS SECTION
 Do not mix all analysis into general news.
 Create a dedicated hub:
 /analysis
@@ -2137,8 +2117,7 @@ ANALYSIS
 ├── Victor Osimhen's Playing Style
 ├── Why Player X Fits Chelsea
 └── 5 Statistics That Explain the Match
-Analysis content usually has a longer life than simple breaking news.
-14. YOUR STATISTICS ARCHITECTURE
+Analysis content usually has a longer life than simple breaking news. 14. YOUR STATISTICS ARCHITECTURE
 If you want to build a serious sports platform, statistics should eventually become a separate product area.
 Example:
 /stats
@@ -2176,8 +2155,7 @@ DATABASE
 STATISTICS ENGINE
 ↓
 YOUR WEBSITE
-This allows automatic updates.
-15. THE ARTICLE ARCHITECTURE
+This allows automatic updates. 15. THE ARTICLE ARCHITECTURE
 Every article should contain structured relationships.
 For example:
 ARTICLE
@@ -2215,8 +2193,7 @@ ARTICLE
 ├── ARTICLE TYPE
 ├── AUTHOR
 └── TAGS
-This is a scalable architecture.
-16. URL STRUCTURE
+This is a scalable architecture. 16. URL STRUCTURE
 Your URLs should be readable and consistent.
 Google recommends descriptive, human-readable URLs and using hyphens rather than underscores to separate words. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/url-structure?utm_source=chatgpt.com))
 Reference:
@@ -2239,16 +2216,14 @@ or, if you prefer a simpler universal article system:
 For a large sports platform, I generally prefer stable entity URLs plus simple, descriptive article URLs.
 Avoid unnecessarily deep URLs like:
 /football/premier-league/arsenal/news/transfers/summer/2026/article-title
-The URL becomes difficult to maintain if your content later belongs to multiple sections.
-17. DO NOT CHANGE URLs WITHOUT A PLAN
+The URL becomes difficult to maintain if your content later belongs to multiple sections. 17. DO NOT CHANGE URLs WITHOUT A PLAN
 Imagine you initially publish:
 /news/victor-osimhen-transfer
 Later you change it to:
 /football/transfers/victor-osimhen-transfer-news
 If you do this carelessly, you can lose traffic and create broken links.
 Therefore, design your architecture early.
-Choose a URL strategy that can survive future growth.
-18. BREADCRUMBS
+Choose a URL strategy that can survive future growth. 18. BREADCRUMBS
 Every article should have visible navigation.
 Example:
 Home
@@ -2260,8 +2235,7 @@ On the page:
 Home > Football > Premier League > Arsenal
 Breadcrumbs help users understand where they are within the site hierarchy. Google also supports BreadcrumbList structured data and recommends validating structured data before deployment. ([Google for Developers](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb?utm_source=chatgpt.com))
 Reference:
-[Google Breadcrumb Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb?utm_source=chatgpt.com)
-19. INTERNAL LINKING ARCHITECTURE
+[Google Breadcrumb Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb?utm_source=chatgpt.com) 19. INTERNAL LINKING ARCHITECTURE
 This is one of the most important parts of the entire system.
 Imagine you write:
 Arsenal Defeat Chelsea 3–1
@@ -2289,67 +2263,78 @@ TEAM PAGE LEAGUE PAGE PLAYER PAGE
 MATCH
 Google recommends using crawlable links, descriptive anchor text, and contextual internal links so that users and search engines can better understand and discover related pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com))
 Reference:
-[Google SEO Link Best Practices](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com)
-20. RELATED ARTICLES SYSTEM
+[Google SEO Link Best Practices](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com) 20. RELATED ARTICLES SYSTEM
 At the end of every article, don't show completely random posts.
 Use relationships.
 Example article:
 Victor Osimhen Linked With Arsenal
 Show:
 RELATED ARTICLES
+
 1. Victor Osimhen Player Profile
 2. Arsenal Transfer News
 3. Arsenal's Latest Signings
 4. Victor Osimhen Statistics
 5. Why Osimhen Could Fit Arsenal
-Your recommendation system can use:
-Same Player
-+
-Same Team
-+
-Same Competition
-+
-Same Match
-+
+   Your recommendation system can use:
+   Same Player
+
+-
+
+Same Team +
+Same Competition +
+Same Match +
 Same Topic
-Eventually, this can be automated.
-21. THE HOMEPAGE ARCHITECTURE
+Eventually, this can be automated. 21. THE HOMEPAGE ARCHITECTURE
 Your homepage should not simply show:
 Latest Articles
 Latest Articles
 Latest Articles
 Instead:
 ------------------------------------------------
+
 LOGO
 Navigation
 ------------------------------------------------
+
 BREAKING NEWS
 ------------------------------------------------
+
 TOP STORIES
 ------------------------------------------------
+
 LATEST FOOTBALL
 ------------------------------------------------
+
 TRENDING TRANSFERS
 ------------------------------------------------
+
 UPCOMING MATCHES
 ------------------------------------------------
+
 LATEST RESULTS
 ------------------------------------------------
+
 PREMIER LEAGUE
 ------------------------------------------------
+
 AFRICAN FOOTBALL
 ------------------------------------------------
+
 ANALYSIS
 ------------------------------------------------
+
 OTHER SPORTS
 ------------------------------------------------
+
 MOST READ
 ------------------------------------------------
+
 The homepage should act as your editorial control center.
 It tells visitors:
-This is what matters right now.
-22. THE MOST IMPORTANT PAGES ON YOUR WEBSITE
+This is what matters right now. 22. THE MOST IMPORTANT PAGES ON YOUR WEBSITE
 Your platform should eventually have several page types.
+
 1. Homepage
 2. Sport Pages
 3. Competition Pages
@@ -2362,212 +2347,214 @@ Your platform should eventually have several page types.
 10. Author Pages
 11. Search Pages
 12. About Page
-A larger version may add:
-Rankings
-Predictions
-Videos
-Podcasts
-Live Blog Pages
-Newsletter Pages
-User Profiles
-23. AUTHOR PAGES
-Do not ignore your writers.
-Each author should have:
-AUTHOR NAME
-Photo
-Biography
-Specialization
-Articles
-Social Profiles where appropriate
-Example:
-AUTHOR
-Raphael
-Specialization:
-Football
-Transfers
-African Football
-Latest Articles:
-Article
-Article
-Article
-This helps establish editorial identity and allows readers to understand who created the content.
-24. ORGANIZATION AND BRAND INFORMATION
-Your website should also clearly explain who is behind it.
-Create:
-/about
-Include:
-Who you are
-What the platform covers
-Your editorial mission
-Contact information
-Editorial standards
-Corrections policy
-Privacy policy
-Terms
-For structured data, Google provides Organization documentation explaining how organization information can help Google understand and disambiguate a site's organization details, including properties such as name, URL and logo where applicable. ([Google for Developers](https://developers.google.com/search/docs/appearance/structured-data/organization?utm_source=chatgpt.com))
-Reference:
-[Google Organization Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data/organization?utm_source=chatgpt.com)
-25. YOUR CONTENT DATABASE MODEL
-Since you are also building a technology platform, I recommend thinking about your architecture at the database level.
-A simplified model:
-SPORT
-│
-├── id
-├── name
-└── slug
-COMPETITION
-│
-├── id
-├── sport_id
-├── name
-└── slug
-TEAM
-│
-├── id
-├── competition_id
-├── name
-└── slug
-PLAYER
-│
-├── id
-├── team_id
-├── name
-└── slug
-MATCH
-│
-├── id
-├── competition_id
-├── home_team_id
-├── away_team_id
-├── date
-└── status
-ARTICLE
-│
-├── id
-├── title
-├── slug
-├── content
-├── author_id
-├── article_type
-└── published_at
-Then create relationship tables where needed:
-ARTICLE_PLAYER
-ARTICLE_TEAM
-ARTICLE_COMPETITION
-ARTICLE_MATCH
-ARTICLE_TAG
-This is much more scalable than storing everything as a simple category.
-26. YOUR COMPLETE CONTENT RELATIONSHIP MAP
-Your final architecture could look like this:
-SPORT
-│
-┌──────┴──────┐
-│ │
-COMPETITION CATEGORY
-│
-┌─────────┼─────────┐
-│ │ │
-▼ ▼ ▼
-TEAM PLAYER MATCH
-│ │ │
-└─────────┼─────────┘
-▼
-ARTICLE
-│
-┌─────────┼──────────┐
-▼ ▼ ▼
-SEO SOCIAL VIDEO
-│
-▼
-AUDIENCE
-This means your platform is not just:
-A collection of blog posts.
-It becomes a sports content database and publishing engine.
-27. THE LAUNCH VERSION VS THE ENTERPRISE VERSION
-Do not try to build everything immediately.
-MVP ARCHITECTURE
-Start with:
-HOME
-FOOTBALL
-│
-├── Premier League
-├── Champions League
-├── Transfers
-├── African Football
-└── Nigerian Football
-ANALYSIS
-PLAYERS
-MATCHES
-ARTICLES
-Focus on publishing quality content.
-GROWTH ARCHITECTURE
-Add:
-TEAM PAGES
-PLAYER PAGES
-COMPETITION PAGES
-MATCH PAGES
-FIXTURES
-RESULTS
-LEAGUE TABLES
-STATISTICS
-ENTERPRISE ARCHITECTURE
-Eventually:
-MULTI-SPORT PLATFORM
-│
-├── FOOTBALL
-│ ├── Competitions
-│ ├── Teams
-│ ├── Players
-│ ├── Matches
-│ ├── Statistics
-│ └── News
-│
-├── BASKETBALL
-│
-├── CRICKET
-│
-├── TENNIS
-│
-├── VIDEO
-│
-├── LIVE COVERAGE
-│
-├── PREDICTIONS
-│
-└── PERSONALIZED FEEDS
-PART 3 IMPLEMENTATION CHECKLIST
-Before moving to Part 4, you should define:
-Your top-level sports.
-Your main football competitions.
-Your content categories.
-Your article types.
-Your team-page structure.
-Your player-page structure.
-Your match-page structure.
-Your competition-page structure.
-Your statistics architecture.
-Your URL structure.
-Your breadcrumb system.
-Your internal-linking strategy.
-Your related-content system.
-Your article metadata structure.
-Your database entity relationships.
-Your MVP version.
-Your future expansion architecture.
-The key lesson from Part 3
-Think of your platform like a sports information network:
-PLAYER ↔ TEAM ↔ MATCH ↔ COMPETITION ↔ ARTICLE
-Every piece of content should connect to something else.
-That structure helps readers discover more content, makes the platform easier to manage as it grows, and creates a foundation for automated related content, sports-data integrations, SEO, and personalized feeds. Google's guidance also supports logical site organization, descriptive URLs, crawlable links, and clear relationships between pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com))
-Core references for this part
-[Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?rd=2&visit_id=639171826714484495-2888065406&utm_source=chatgpt.com)
-[Google URL Structure Best Practices](https://developers.google.com/search/docs/crawling-indexing/url-structure?utm_source=chatgpt.com)
-[Google Internal Linking Guide](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com)
-[Google Breadcrumb Markup Guide](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb?utm_source=chatgpt.com)
-[Schema.org SportsEvent Reference](https://schema.org/SportsEvent?utm_source=chatgpt.com)
-[Google Organization Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data/organization?utm_source=chatgpt.com)
-Next: Part 4 — Building Your Sports News Discovery and Research System, covering exactly where to find stories, how to monitor hundreds of sources, verify breaking news, track journalists and clubs, organize story leads, identify trending topics, and build a professional daily newsroom workflow.
+    A larger version may add:
+    Rankings
+    Predictions
+    Videos
+    Podcasts
+    Live Blog Pages
+    Newsletter Pages
+    User Profiles
+13. AUTHOR PAGES
+    Do not ignore your writers.
+    Each author should have:
+    AUTHOR NAME
+    Photo
+    Biography
+    Specialization
+    Articles
+    Social Profiles where appropriate
+    Example:
+    AUTHOR
+    Raphael
+    Specialization:
+    Football
+    Transfers
+    African Football
+    Latest Articles:
+    Article
+    Article
+    Article
+    This helps establish editorial identity and allows readers to understand who created the content.
+14. ORGANIZATION AND BRAND INFORMATION
+    Your website should also clearly explain who is behind it.
+    Create:
+    /about
+    Include:
+    Who you are
+    What the platform covers
+    Your editorial mission
+    Contact information
+    Editorial standards
+    Corrections policy
+    Privacy policy
+    Terms
+    For structured data, Google provides Organization documentation explaining how organization information can help Google understand and disambiguate a site's organization details, including properties such as name, URL and logo where applicable. ([Google for Developers](https://developers.google.com/search/docs/appearance/structured-data/organization?utm_source=chatgpt.com))
+    Reference:
+    [Google Organization Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data/organization?utm_source=chatgpt.com)
+15. YOUR CONTENT DATABASE MODEL
+    Since you are also building a technology platform, I recommend thinking about your architecture at the database level.
+    A simplified model:
+    SPORT
+    │
+    ├── id
+    ├── name
+    └── slug
+    COMPETITION
+    │
+    ├── id
+    ├── sport_id
+    ├── name
+    └── slug
+    TEAM
+    │
+    ├── id
+    ├── competition_id
+    ├── name
+    └── slug
+    PLAYER
+    │
+    ├── id
+    ├── team_id
+    ├── name
+    └── slug
+    MATCH
+    │
+    ├── id
+    ├── competition_id
+    ├── home_team_id
+    ├── away_team_id
+    ├── date
+    └── status
+    ARTICLE
+    │
+    ├── id
+    ├── title
+    ├── slug
+    ├── content
+    ├── author_id
+    ├── article_type
+    └── published_at
+    Then create relationship tables where needed:
+    ARTICLE_PLAYER
+    ARTICLE_TEAM
+    ARTICLE_COMPETITION
+    ARTICLE_MATCH
+    ARTICLE_TAG
+    This is much more scalable than storing everything as a simple category.
+16. YOUR COMPLETE CONTENT RELATIONSHIP MAP
+    Your final architecture could look like this:
+    SPORT
+    │
+    ┌──────┴──────┐
+    │ │
+    COMPETITION CATEGORY
+    │
+    ┌─────────┼─────────┐
+    │ │ │
+    ▼ ▼ ▼
+    TEAM PLAYER MATCH
+    │ │ │
+    └─────────┼─────────┘
+    ▼
+    ARTICLE
+    │
+    ┌─────────┼──────────┐
+    ▼ ▼ ▼
+    SEO SOCIAL VIDEO
+    │
+    ▼
+    AUDIENCE
+    This means your platform is not just:
+    A collection of blog posts.
+    It becomes a sports content database and publishing engine.
+17. THE LAUNCH VERSION VS THE ENTERPRISE VERSION
+    Do not try to build everything immediately.
+    MVP ARCHITECTURE
+    Start with:
+    HOME
+    FOOTBALL
+    │
+    ├── Premier League
+    ├── Champions League
+    ├── Transfers
+    ├── African Football
+    └── Nigerian Football
+    ANALYSIS
+    PLAYERS
+    MATCHES
+    ARTICLES
+    Focus on publishing quality content.
+    GROWTH ARCHITECTURE
+    Add:
+    TEAM PAGES
+    PLAYER PAGES
+    COMPETITION PAGES
+    MATCH PAGES
+    FIXTURES
+    RESULTS
+    LEAGUE TABLES
+    STATISTICS
+    ENTERPRISE ARCHITECTURE
+    Eventually:
+    MULTI-SPORT PLATFORM
+    │
+    ├── FOOTBALL
+    │ ├── Competitions
+    │ ├── Teams
+    │ ├── Players
+    │ ├── Matches
+    │ ├── Statistics
+    │ └── News
+    │
+    ├── BASKETBALL
+    │
+    ├── CRICKET
+    │
+    ├── TENNIS
+    │
+    ├── VIDEO
+    │
+    ├── LIVE COVERAGE
+    │
+    ├── PREDICTIONS
+    │
+    └── PERSONALIZED FEEDS
+    PART 3 IMPLEMENTATION CHECKLIST
+    Before moving to Part 4, you should define:
+    Your top-level sports.
+    Your main football competitions.
+    Your content categories.
+    Your article types.
+    Your team-page structure.
+    Your player-page structure.
+    Your match-page structure.
+    Your competition-page structure.
+    Your statistics architecture.
+    Your URL structure.
+    Your breadcrumb system.
+    Your internal-linking strategy.
+    Your related-content system.
+    Your article metadata structure.
+    Your database entity relationships.
+    Your MVP version.
+    Your future expansion architecture.
+    The key lesson from Part 3
+    Think of your platform like a sports information network:
+    PLAYER ↔ TEAM ↔ MATCH ↔ COMPETITION ↔ ARTICLE
+    Every piece of content should connect to something else.
+    That structure helps readers discover more content, makes the platform easier to manage as it grows, and creates a foundation for automated related content, sports-data integrations, SEO, and personalized feeds. Google's guidance also supports logical site organization, descriptive URLs, crawlable links, and clear relationships between pages. ([Google for Developers](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com))
+    Core references for this part
+    [Google SEO Starter Guide](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?rd=2&visit_id=639171826714484495-2888065406&utm_source=chatgpt.com)
+    [Google URL Structure Best Practices](https://developers.google.com/search/docs/crawling-indexing/url-structure?utm_source=chatgpt.com)
+    [Google Internal Linking Guide](https://developers.google.com/search/docs/crawling-indexing/links-crawlable?authuser=2&utm_source=chatgpt.com)
+    [Google Breadcrumb Markup Guide](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb?utm_source=chatgpt.com)
+    [Schema.org SportsEvent Reference](https://schema.org/SportsEvent?utm_source=chatgpt.com)
+    [Google Organization Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data/organization?utm_source=chatgpt.com)
+    Next: Part 4 — Building Your Sports News Discovery and Research System, covering exactly where to find stories, how to monitor hundreds of sources, verify breaking news, track journalists and clubs, organize story leads, identify trending topics, and build a professional daily newsroom workflow.
+
 # PART 4 — SPORTS NEWS DISCOVERY, RESEARCH & VERIFICATION SYSTEM
+
 Now that you have your sports niche and website architecture, the next major skill is learning how to consistently find stories worth publishing.
 A professional sports blog should never depend on:
 “Let me open Google and see what football news I can find.”
@@ -2587,673 +2574,705 @@ SHOULD I PUBLISH NOW?
 ↓
 WHERE SHOULD I DISTRIBUTE IT?
 This is the foundation of professional sports publishing.
+
 1. UNDERSTAND THE SPORTS NEWS CYCLE
-Sports news moves through stages.
-For example:
-RUMOUR
-↓
-REPORT
-↓
-CONFIRMATION
-↓
-OFFICIAL ANNOUNCEMENT
-↓
-REACTION
-↓
-ANALYSIS
-↓
-LONG-TERM STORY
-Imagine a player is linked with Arsenal.
-At 8:00 AM:
-Journalist reports Arsenal are interested.
-At 9:30 AM:
-More journalists report the same story.
-At 11:00 AM:
-Negotiations reportedly begin.
-At 2:00 PM:
-Agreement reportedly reached.
-At 4:00 PM:
-Medical scheduled.
-At 6:00 PM:
-Club officially announces signing.
-The mistake of a beginner is to write one article and stop.
-A professional newsroom sees multiple content opportunities.
-8:00 AM
-Transfer Report
-↓
-11:00 AM
-Negotiations Update
-↓
-2:00 PM
-Agreement Report
-↓
-6:00 PM
-Official Announcement
-↓
-7:00 PM
-Player Profile
-↓
-8:00 PM
-What He Adds to the Team
-↓
-Next Day
-Full Transfer Analysis
-One event can therefore produce an entire content campaign.
+   Sports news moves through stages.
+   For example:
+   RUMOUR
+   ↓
+   REPORT
+   ↓
+   CONFIRMATION
+   ↓
+   OFFICIAL ANNOUNCEMENT
+   ↓
+   REACTION
+   ↓
+   ANALYSIS
+   ↓
+   LONG-TERM STORY
+   Imagine a player is linked with Arsenal.
+   At 8:00 AM:
+   Journalist reports Arsenal are interested.
+   At 9:30 AM:
+   More journalists report the same story.
+   At 11:00 AM:
+   Negotiations reportedly begin.
+   At 2:00 PM:
+   Agreement reportedly reached.
+   At 4:00 PM:
+   Medical scheduled.
+   At 6:00 PM:
+   Club officially announces signing.
+   The mistake of a beginner is to write one article and stop.
+   A professional newsroom sees multiple content opportunities.
+   8:00 AM
+   Transfer Report
+   ↓
+   11:00 AM
+   Negotiations Update
+   ↓
+   2:00 PM
+   Agreement Report
+   ↓
+   6:00 PM
+   Official Announcement
+   ↓
+   7:00 PM
+   Player Profile
+   ↓
+   8:00 PM
+   What He Adds to the Team
+   ↓
+   Next Day
+   Full Transfer Analysis
+   One event can therefore produce an entire content campaign.
 2. BUILD YOUR NEWS SOURCING PYRAMID
-Not every source has the same reliability.
-Build your sources into levels.
-LEVEL 1
-OFFICIAL SOURCES
-▲
-│
-LEVEL 2
-TRUSTED JOURNALISTS /
-MAJOR NEWS ORGANIZATIONS
-▲
-│
-LEVEL 3
-SPECIALIST SPORTS MEDIA
-▲
-│
-LEVEL 4
-SOCIAL MEDIA REPORTS
-▲
-│
-LEVEL 5
-FAN ACCOUNTS / FORUMS
-The lower you go, the more verification you need.
+   Not every source has the same reliability.
+   Build your sources into levels.
+   LEVEL 1
+   OFFICIAL SOURCES
+   ▲
+   │
+   LEVEL 2
+   TRUSTED JOURNALISTS /
+   MAJOR NEWS ORGANIZATIONS
+   ▲
+   │
+   LEVEL 3
+   SPECIALIST SPORTS MEDIA
+   ▲
+   │
+   LEVEL 4
+   SOCIAL MEDIA REPORTS
+   ▲
+   │
+   LEVEL 5
+   FAN ACCOUNTS / FORUMS
+   The lower you go, the more verification you need.
 3. LEVEL 1 — OFFICIAL SOURCES
-These should be your strongest sources.
-Examples:
-Clubs
-Official club websites and verified social accounts.
-For example:
-[Arsenal Official Website](https://www.arsenal.com/?utm_source=chatgpt.com)
-[Chelsea Official Website](https://www.chelseafc.com/?utm_source=chatgpt.com)
-[Liverpool Official Website](https://www.liverpoolfc.com/?utm_source=chatgpt.com)
-[Manchester United Official Website](https://www.manutd.com/?utm_source=chatgpt.com)
-[Manchester City Official Website](https://www.mancity.com/?utm_source=chatgpt.com)
-Competitions
-Use the competition's official website whenever possible.
-For example:
-[Premier League](https://www.premierleague.com/?utm_source=chatgpt.com)
-[UEFA](https://www.uefa.com/?utm_source=chatgpt.com)
-[FIFA](https://www.fifa.com/?utm_source=chatgpt.com)
-[CAF](https://www.cafonline.com/?utm_source=chatgpt.com)
-These are particularly useful for:
-Fixtures
-Results
-Disciplinary decisions
-Official announcements
-Competition regulations
-Squads
-Tournament information
+   These should be your strongest sources.
+   Examples:
+   Clubs
+   Official club websites and verified social accounts.
+   For example:
+   [Arsenal Official Website](https://www.arsenal.com/?utm_source=chatgpt.com)
+   [Chelsea Official Website](https://www.chelseafc.com/?utm_source=chatgpt.com)
+   [Liverpool Official Website](https://www.liverpoolfc.com/?utm_source=chatgpt.com)
+   [Manchester United Official Website](https://www.manutd.com/?utm_source=chatgpt.com)
+   [Manchester City Official Website](https://www.mancity.com/?utm_source=chatgpt.com)
+   Competitions
+   Use the competition's official website whenever possible.
+   For example:
+   [Premier League](https://www.premierleague.com/?utm_source=chatgpt.com)
+   [UEFA](https://www.uefa.com/?utm_source=chatgpt.com)
+   [FIFA](https://www.fifa.com/?utm_source=chatgpt.com)
+   [CAF](https://www.cafonline.com/?utm_source=chatgpt.com)
+   These are particularly useful for:
+   Fixtures
+   Results
+   Disciplinary decisions
+   Official announcements
+   Competition regulations
+   Squads
+   Tournament information
 4. LEVEL 2 — TRUSTED JOURNALISTS
-Sports journalism is heavily driven by specialist reporters.
-You should identify journalists who consistently cover:
-Premier League
-Transfers
-Arsenal
-Chelsea
-Liverpool
-Manchester United
-African football
-Nigerian football
-Don't simply follow the most popular journalist.
-Track journalists based on:
-ACCURACY
-SPECIALIZATION
-SPEED
-ACCESS
-CONSISTENCY
-Create a spreadsheet:
-Journalist
-Area
-Platform
-Reliability
-Notes
-Journalist A
-Arsenal
-X
-9/10
-Excellent club sources
-Journalist B
-Transfers
-X
-8/10
-Strong transfer reporting
-Journalist C
-Nigerian football
-X
-9/10
-Excellent local contacts
-Over time, you'll know:
-“When this person reports something, I should investigate immediately.”
+   Sports journalism is heavily driven by specialist reporters.
+   You should identify journalists who consistently cover:
+   Premier League
+   Transfers
+   Arsenal
+   Chelsea
+   Liverpool
+   Manchester United
+   African football
+   Nigerian football
+   Don't simply follow the most popular journalist.
+   Track journalists based on:
+   ACCURACY
+   SPECIALIZATION
+   SPEED
+   ACCESS
+   CONSISTENCY
+   Create a spreadsheet:
+   Journalist
+   Area
+   Platform
+   Reliability
+   Notes
+   Journalist A
+   Arsenal
+   X
+   9/10
+   Excellent club sources
+   Journalist B
+   Transfers
+   X
+   8/10
+   Strong transfer reporting
+   Journalist C
+   Nigerian football
+   X
+   9/10
+   Excellent local contacts
+   Over time, you'll know:
+   “When this person reports something, I should investigate immediately.”
 5. LEVEL 3 — SPECIALIST SPORTS PUBLICATIONS
-These can be excellent discovery sources.
-Examples:
-[ESPN](https://www.espn.com/?utm_source=chatgpt.com)
-[BBC Sport](https://www.bbc.com/sport?utm_source=chatgpt.com)
-[Sky Sports](https://www.skysports.com/?utm_source=chatgpt.com)
-[The Athletic](https://www.nytimes.com/athletic/?utm_source=chatgpt.com)
-[Goal](https://www.goal.com/?utm_source=chatgpt.com)
-[Transfermarkt](https://www.transfermarkt.com/?utm_source=chatgpt.com)
-Use these for:
-Story discovery
-Background research
-Statistics
-Context
-Quotes
-Historical information
-But don't automatically assume:
-“A big website published it, therefore it is true.”
-You still need to understand what the publication is actually reporting and what its underlying source is.
+   These can be excellent discovery sources.
+   Examples:
+   [ESPN](https://www.espn.com/?utm_source=chatgpt.com)
+   [BBC Sport](https://www.bbc.com/sport?utm_source=chatgpt.com)
+   [Sky Sports](https://www.skysports.com/?utm_source=chatgpt.com)
+   [The Athletic](https://www.nytimes.com/athletic/?utm_source=chatgpt.com)
+   [Goal](https://www.goal.com/?utm_source=chatgpt.com)
+   [Transfermarkt](https://www.transfermarkt.com/?utm_source=chatgpt.com)
+   Use these for:
+   Story discovery
+   Background research
+   Statistics
+   Context
+   Quotes
+   Historical information
+   But don't automatically assume:
+   “A big website published it, therefore it is true.”
+   You still need to understand what the publication is actually reporting and what its underlying source is.
 6. LEVEL 4 — SOCIAL MEDIA
-Social media is extremely important for modern sports journalism.
-Especially:
-X
-Instagram
-Facebook
-YouTube
-TikTok
-Threads
-But social media should initially be treated as a lead-generation system, not a truth machine.
-For example:
-POST:
-"Osimhen has agreed to join Club X."
-Do not immediately publish:
-Osimhen joins Club X.
-Instead:
-SOCIAL POST
-↓
-WHO POSTED IT?
-↓
-WHAT IS THEIR SOURCE?
-↓
-IS THE ACCOUNT AUTHENTIC?
-↓
-ARE OTHER RELIABLE SOURCES REPORTING IT?
-↓
-IS THERE OFFICIAL CONFIRMATION?
+   Social media is extremely important for modern sports journalism.
+   Especially:
+   X
+   Instagram
+   Facebook
+   YouTube
+   TikTok
+   Threads
+   But social media should initially be treated as a lead-generation system, not a truth machine.
+   For example:
+   POST:
+   "Osimhen has agreed to join Club X."
+   Do not immediately publish:
+   Osimhen joins Club X.
+   Instead:
+   SOCIAL POST
+   ↓
+   WHO POSTED IT?
+   ↓
+   WHAT IS THEIR SOURCE?
+   ↓
+   IS THE ACCOUNT AUTHENTIC?
+   ↓
+   ARE OTHER RELIABLE SOURCES REPORTING IT?
+   ↓
+   IS THERE OFFICIAL CONFIRMATION?
 7. LEVEL 5 — FAN ACCOUNTS
-Fan accounts are useful for discovering:
-Potential stories
-Team news
-Local information
-Injury reports
-Videos
-Atmosphere
-Interesting statistics
-But they should generally be treated as tips.
-For example:
-Fan Account:
-"Player X is missing from training."
-Your newsroom should respond:
-Interesting lead.
-Investigate.
-Not:
-Confirmed!
+   Fan accounts are useful for discovering:
+   Potential stories
+   Team news
+   Local information
+   Injury reports
+   Videos
+   Atmosphere
+   Interesting statistics
+   But they should generally be treated as tips.
+   For example:
+   Fan Account:
+   "Player X is missing from training."
+   Your newsroom should respond:
+   Interesting lead.
+   Investigate.
+   Not:
+   Confirmed!
 8. BUILD A DAILY NEWS MONITORING SYSTEM
-You should have a daily dashboard.
-For example:
-┌────────────────────────────────────┐
-│ SPORTS NEWSROOM DASHBOARD │
-├────────────────────────────────────┤
-│ 🔴 BREAKING │
-│ 🟡 DEVELOPING │
-│ 🟢 CONFIRMED │
-│ │
-│ Premier League │
-│ Champions League │
-│ Nigerian Football │
-│ African Football │
-│ Transfers │
-│ │
-│ Trending Searches │
-│ Trending Social Posts │
-│ Journalist Reports │
-│ Official Announcements │
-└────────────────────────────────────┘
-You can build this manually initially.
-Later, automate it.
+   You should have a daily dashboard.
+   For example:
+   ┌────────────────────────────────────┐
+   │ SPORTS NEWSROOM DASHBOARD │
+   ├────────────────────────────────────┤
+   │ 🔴 BREAKING │
+   │ 🟡 DEVELOPING │
+   │ 🟢 CONFIRMED │
+   │ │
+   │ Premier League │
+   │ Champions League │
+   │ Nigerian Football │
+   │ African Football │
+   │ Transfers │
+   │ │
+   │ Trending Searches │
+   │ Trending Social Posts │
+   │ Journalist Reports │
+   │ Official Announcements │
+   └────────────────────────────────────┘
+   You can build this manually initially.
+   Later, automate it.
 9. USE GOOGLE TRENDS
-[Google Trends](https://trends.google.com/trends/?utm_source=chatgpt.com) is one of your most useful free research tools.
-Google explains that Trends lets you explore popular searches, compare terms, analyze regions, and find related searches. ([Google Help](https://support.google.com/trends/answer/6248105?hl=en&utm_source=chatgpt.com))
-For a sports blog, search:
-Victor Osimhen
-Arsenal
-Chelsea
-Liverpool
-Premier League
-Champions League
-AFCON
-Super Eagles
-You can compare:
-Osimhen
-vs
-Lookman
-vs
-Iwobi
-You can also look at regional interest.
-Google Trends provides geographic breakdowns showing where a search term is relatively more popular. ([Google Help](https://support.google.com/trends/answer/4355212?hl=en&utm_source=chatgpt.com))
+   [Google Trends](https://trends.google.com/trends/?utm_source=chatgpt.com) is one of your most useful free research tools.
+   Google explains that Trends lets you explore popular searches, compare terms, analyze regions, and find related searches. ([Google Help](https://support.google.com/trends/answer/6248105?hl=en&utm_source=chatgpt.com))
+   For a sports blog, search:
+   Victor Osimhen
+   Arsenal
+   Chelsea
+   Liverpool
+   Premier League
+   Champions League
+   AFCON
+   Super Eagles
+   You can compare:
+   Osimhen
+   vs
+   Lookman
+   vs
+   Iwobi
+   You can also look at regional interest.
+   Google Trends provides geographic breakdowns showing where a search term is relatively more popular. ([Google Help](https://support.google.com/trends/answer/4355212?hl=en&utm_source=chatgpt.com))
 10. DON'T JUST SEARCH KEYWORDS — SEARCH TOPICS
-This is an important Google Trends lesson.
-Google distinguishes between:
-Search term
-The exact phrase users type.
-Example:
-"Osimhen Arsenal"
-Topic
-A broader concept/entity that can include related searches.
-Google recommends using a topic when available if you want a broader picture of interest in a person, organization, or concept. ([Google Help](https://support.google.com/trends/answer/17309543?utm_source=chatgpt.com))
-So when researching:
-Victor Osimhen
-look for the appropriate topic rather than relying exclusively on one exact spelling.
+    This is an important Google Trends lesson.
+    Google distinguishes between:
+    Search term
+    The exact phrase users type.
+    Example:
+    "Osimhen Arsenal"
+    Topic
+    A broader concept/entity that can include related searches.
+    Google recommends using a topic when available if you want a broader picture of interest in a person, organization, or concept. ([Google Help](https://support.google.com/trends/answer/17309543?utm_source=chatgpt.com))
+    So when researching:
+    Victor Osimhen
+    look for the appropriate topic rather than relying exclusively on one exact spelling.
 11. USE GOOGLE TRENDS TO FIND CONTENT OPPORTUNITIES
-Suppose you see:
-"Osimhen transfer"
-rising rapidly.
-Don't simply write:
-Osimhen Transfer News.
-Investigate related searches.
-You may discover:
-Osimhen Arsenal
-Osimhen Chelsea
-Osimhen latest news
-Osimhen contract
-Osimhen transfer fee
-Now you have several possible articles.
-TREND
-↓
-RELATED SEARCHES
-↓
-CONTENT IDEAS
-↓
-ARTICLES
-↓
-SOCIAL POSTS
-↓
-VIDEO
-Google Trends also has a Trending Now feature that surfaces queries experiencing recent surges related to news stories. ([Google Help](https://support.google.com/trends/answer/3076011?hl=en-IN&utm_source=chatgpt.com))
+    Suppose you see:
+    "Osimhen transfer"
+    rising rapidly.
+    Don't simply write:
+    Osimhen Transfer News.
+    Investigate related searches.
+    You may discover:
+    Osimhen Arsenal
+    Osimhen Chelsea
+    Osimhen latest news
+    Osimhen contract
+    Osimhen transfer fee
+    Now you have several possible articles.
+    TREND
+    ↓
+    RELATED SEARCHES
+    ↓
+    CONTENT IDEAS
+    ↓
+    ARTICLES
+    ↓
+    SOCIAL POSTS
+    ↓
+    VIDEO
+    Google Trends also has a Trending Now feature that surfaces queries experiencing recent surges related to news stories. ([Google Help](https://support.google.com/trends/answer/3076011?hl=en-IN&utm_source=chatgpt.com))
 12. GOOGLE NEWS
-[Google News](https://news.google.com/?utm_source=chatgpt.com) can be used as another discovery layer.
-Search for:
-Premier League
-Arsenal
-Chelsea
-Liverpool
-Nigerian football
-Victor Osimhen
-African football
-Your objective isn't to copy what others are doing.
-Your objective is to understand:
-WHAT IS HAPPENING?
-WHO IS COVERING IT?
-WHAT ANGLES EXIST?
-WHAT INFORMATION IS MISSING?
+    [Google News](https://news.google.com/?utm_source=chatgpt.com) can be used as another discovery layer.
+    Search for:
+    Premier League
+    Arsenal
+    Chelsea
+    Liverpool
+    Nigerian football
+    Victor Osimhen
+    African football
+    Your objective isn't to copy what others are doing.
+    Your objective is to understand:
+    WHAT IS HAPPENING?
+    WHO IS COVERING IT?
+    WHAT ANGLES EXIST?
+    WHAT INFORMATION IS MISSING?
 13. GOOGLE SEARCH OPERATORS
-Search operators can dramatically improve your research.
-Search one site
-site:arsenal.com Osimhen
-Search a domain
-site:uefa.com Arsenal
-Search an exact phrase
-"Victor Osimhen"
-Combine terms
-"Victor Osimhen" Arsenal transfer
-Find recent information
-Google search tools can be used to restrict results by recency.
-For example, search:
-Arsenal transfer news
-then use Google's date/filter options.
+    Search operators can dramatically improve your research.
+    Search one site
+    site:arsenal.com Osimhen
+    Search a domain
+    site:uefa.com Arsenal
+    Search an exact phrase
+    "Victor Osimhen"
+    Combine terms
+    "Victor Osimhen" Arsenal transfer
+    Find recent information
+    Google search tools can be used to restrict results by recency.
+    For example, search:
+    Arsenal transfer news
+    then use Google's date/filter options.
 14. RSS FEEDS
-RSS can become extremely powerful when you monitor dozens of sources.
-Instead of manually opening:
-Website 1
-Website 2
-Website 3
-Website 4
-Website 5
-an RSS reader can collect new stories into one place.
-One option is:
-[Feedly](https://feedly.com/?utm_source=chatgpt.com)
-Create folders:
-FOOTBALL
-│
-├── Premier League
-├── Champions League
-├── African Football
-├── Nigerian Football
-├── Transfers
-└── General Football
-Then add trusted sources.
-Your morning workflow becomes:
-OPEN FEEDLY
-↓
-SCAN NEW STORIES
-↓
-IDENTIFY IMPORTANT STORIES
-↓
-VERIFY
-↓
-PUBLISH
+    RSS can become extremely powerful when you monitor dozens of sources.
+    Instead of manually opening:
+    Website 1
+    Website 2
+    Website 3
+    Website 4
+    Website 5
+    an RSS reader can collect new stories into one place.
+    One option is:
+    [Feedly](https://feedly.com/?utm_source=chatgpt.com)
+    Create folders:
+    FOOTBALL
+    │
+    ├── Premier League
+    ├── Champions League
+    ├── African Football
+    ├── Nigerian Football
+    ├── Transfers
+    └── General Football
+    Then add trusted sources.
+    Your morning workflow becomes:
+    OPEN FEEDLY
+    ↓
+    SCAN NEW STORIES
+    ↓
+    IDENTIFY IMPORTANT STORIES
+    ↓
+    VERIFY
+    ↓
+    PUBLISH
 15. GOOGLE ALERTS
-You can also use:
-[Google Alerts](https://www.google.com/alerts?utm_source=chatgpt.com)
-Create alerts around important entities.
-For example:
-"Victor Osimhen"
-"Ademola Lookman"
-"Super Eagles"
-"Arsenal transfer"
-"Premier League transfer"
-You can then receive notifications when Google detects new results.
+    You can also use:
+    [Google Alerts](https://www.google.com/alerts?utm_source=chatgpt.com)
+    Create alerts around important entities.
+    For example:
+    "Victor Osimhen"
+    "Ademola Lookman"
+    "Super Eagles"
+    "Arsenal transfer"
+    "Premier League transfer"
+    You can then receive notifications when Google detects new results.
 16. CREATE YOUR MASTER SOURCE LIST
-Build a spreadsheet like this:
-Source
-Type
-Topic
-Priority
-Reliability
-Arsenal official
-Official
-Arsenal
-Critical
-10
-UEFA
-Official
-Champions League
-Critical
-10
-CAF
-Official
-African football
-Critical
-10
-Journalist A
-Journalist
-Transfers
-High
-9
-ESPN
-Media
-Global football
-High
-8
-BBC Sport
-Media
-Football
-High
-9
-Fan account
-Social
-Arsenal
-Medium
-5
-Your source database becomes one of your most valuable newsroom assets.
+    Build a spreadsheet like this:
+    Source
+    Type
+    Topic
+    Priority
+    Reliability
+    Arsenal official
+    Official
+    Arsenal
+    Critical
+    10
+    UEFA
+    Official
+    Champions League
+    Critical
+    10
+    CAF
+    Official
+    African football
+    Critical
+    10
+    Journalist A
+    Journalist
+    Transfers
+    High
+    9
+    ESPN
+    Media
+    Global football
+    High
+    8
+    BBC Sport
+    Media
+    Football
+    High
+    9
+    Fan account
+    Social
+    Arsenal
+    Medium
+    5
+    Your source database becomes one of your most valuable newsroom assets.
 17. THE FIVE QUESTIONS YOU MUST ASK ABOUT EVERY STORY
-Before publishing, ask:
-1. What happened?
-Example:
-Arsenal are reportedly interested in Player X.
-2. Who says it?
-Example:
-Journalist X reported it.
-3. What is the evidence?
-Example:
-The journalist says their sources close to the club provided the information.
-4. Has anyone else independently confirmed it?
-Check:
-Official club
-Second journalist
-Major publication
-Player representative
-League
-Competition
-5. What do I actually know?
-This question is extremely important.
-Suppose your evidence only supports:
-Arsenal are interested.
-Do not write:
-Arsenal have agreed a deal.
-Those are completely different claims.
-18. LEARN THE DIFFERENCE BETWEEN REPORTING AND FACT
-Consider these statements:
-Statement A
-Arsenal signed Player X.
-This is presented as a fact.
-You need strong evidence.
-Statement B
-Arsenal are reportedly interested in Player X.
-This is attributed reporting.
-Statement C
-Journalist X reports that Arsenal have opened talks.
-Again, attribution.
-Statement D
-Arsenal could sign Player X this summer.
-This is speculation.
-You must clearly distinguish them.
-Your language should match your evidence.
-19. THE ATTRIBUTION RULE
-Instead of:
-Arsenal will sign Player X.
-Write:
-According to [source], Arsenal are exploring a move for Player X.
-Or:
-[Journalist] reports that Arsenal have made contact with the player's representatives.
-This tells the reader:
-This is what the source says, not necessarily an independently confirmed fact.
-That distinction is critical for credibility.
-20. THE TWO-SOURCE RULE
-For significant claims, develop a newsroom policy:
-ONE SOURCE
-↓
-LEAD
-TWO RELIABLE INDEPENDENT SOURCES
-↓
-STRONGER REPORT
-OFFICIAL CONFIRMATION
-↓
-CONFIRMED
-This is not an absolute rule for every story.
-For example:
-A club officially announces a signing.
-One official source is enough because it is the primary source.
-But:
-Anonymous source says player has agreed a transfer.
-You should seek corroboration.
-21. BREAKING NEWS WORKFLOW
-Suppose you see:
-🚨 BREAKING: Player X has agreed to join Manchester United.
-Do this:
-STEP 1
-Save the original post.
-↓
-STEP 2
-Check the account.
-↓
-STEP 3
-Find the journalist's original report.
-↓
-STEP 4
-Check other reliable journalists.
-↓
-STEP 5
-Check official club/player sources.
-↓
-STEP 6
-Determine exactly what is confirmed.
-↓
-STEP 7
-Write with attribution.
-↓
-STEP 8
-Continue monitoring.
-↓
-STEP 9
-Update when new information arrives.
-Do not rush simply because everyone else is posting.
-Being 30 seconds late is better than publishing false information.
-22. BREAKING NEWS HAS LEVELS
-Create internal labels.
-🔴 UNVERIFIED
-Someone is reporting it.
-🟠 DEVELOPING
-Multiple credible sources are reporting it.
-🟡 REPORTED
-Strong source but not officially confirmed.
-🟢 CONFIRMED
-Official confirmation.
-Your CMS can even have these states.
-StoryStatus:
-UNVERIFIED
-DEVELOPING
-REPORTED
-CONFIRMED
-UPDATED
-CORRECTED
-That is useful when you eventually build your own publishing platform.
-23. HOW TO HANDLE TRANSFER RUMOURS
-Transfers are one of the easiest areas to damage your reputation.
-A bad sports blog publishes:
-PLAYER X TO ARSENAL — DONE DEAL!
-Then:
-PLAYER X WILL SIGN TOMORROW!
-Then:
-MEDICAL COMPLETED!
-Then:
-AGREEMENT COLLAPSES.
-This creates a credibility problem.
-Instead, classify transfer stories.
-RUMOUR
-INTEREST
-CONTACT
-NEGOTIATION
-BID
-AGREEMENT
-MEDICAL
-SIGNED
-OFFICIAL
-Your headline should reflect the actual stage.
-24. EXAMPLE OF GOOD TRANSFER REPORTING
-Source says:
-Arsenal have asked about Player X.
-Bad headline:
-Arsenal Sign Player X.
-Good headline:
-Arsenal Make Enquiry About Player X, Report Says
-Even better:
-Arsenal Make Enquiry About Player X as Transfer Interest Emerges
-Then explain:
-WHAT WE KNOW
-WHAT WE DON'T KNOW
-SOURCE
-BACKGROUND
-WHAT HAPPENS NEXT
-This is responsible reporting.
-25. DON'T COPY OTHER SPORTS WEBSITES
-This is extremely important for SEO and credibility.
-Suppose Website A publishes:
-Liverpool are interested in Player X.
-You rewrite it:
-Liverpool are keen on Player X.
-That is not meaningful original journalism.
-Google's Google News policies specifically address scraped/recast content, including material substantially reproduced with synonyms or word substitutions without substantial added value. ([Google Help](https://support.google.com/news/publisher-center/answer/9520026?hl=en&utm_source=chatgpt.com))
-Your goal should be:
-SOURCE
-↓
-RESEARCH
-↓
-VERIFY
-↓
-ADD CONTEXT
-↓
-ADD ORIGINAL ANALYSIS
-↓
-PUBLISH
-Not:
-OTHER WEBSITE
-↓
-CHANGE WORDS
-↓
-PUBLISH
-26. TURN ONE SOURCE INTO ORIGINAL VALUE
-Suppose a journalist reports:
-Chelsea are interested in a striker.
-Your article can add:
-WHO IS THE PLAYER?
-WHAT POSITION DOES HE PLAY?
-WHAT ARE HIS STATISTICS?
-WHY DOES CHELSEA NEED HIM?
-WHAT WOULD THE TRANSFER COST?
-WHO ARE THE COMPETITORS?
-WHAT HAS THE CLUB DONE PREVIOUSLY?
-WHAT ARE THE NEXT STEPS?
-Now you're providing something more useful.
-27. THE 5-LAYER RESEARCH MODEL
-For every important story:
-LAYER 1
-BREAKING INFORMATION
-↓
-LAYER 2
-PRIMARY SOURCE
-↓
-LAYER 3
-SECONDARY CONFIRMATION
-↓
-LAYER 4
-BACKGROUND
-↓
-LAYER 5
-ORIGINAL ANALYSIS
-Example:
-Layer 1
-Player has been linked to Chelsea.
-Layer 2
-Journalist report.
-Layer 3
-Another credible journalist confirms interest.
-Layer 4
-Player statistics and contract situation.
-Layer 5
-Your analysis of whether the transfer makes sense.
-That is how you transform a simple news lead into a valuable article.
-28. CREATE A STORY RESEARCH SHEET
-Before writing, create:
-STORY TITLE:
-____________________
+    Before publishing, ask:
+18. What happened?
+    Example:
+    Arsenal are reportedly interested in Player X.
+19. Who says it?
+    Example:
+    Journalist X reported it.
+20. What is the evidence?
+    Example:
+    The journalist says their sources close to the club provided the information.
+21. Has anyone else independently confirmed it?
+    Check:
+    Official club
+    Second journalist
+    Major publication
+    Player representative
+    League
+    Competition
+22. What do I actually know?
+    This question is extremely important.
+    Suppose your evidence only supports:
+    Arsenal are interested.
+    Do not write:
+    Arsenal have agreed a deal.
+    Those are completely different claims.
+23. LEARN THE DIFFERENCE BETWEEN REPORTING AND FACT
+    Consider these statements:
+    Statement A
+    Arsenal signed Player X.
+    This is presented as a fact.
+    You need strong evidence.
+    Statement B
+    Arsenal are reportedly interested in Player X.
+    This is attributed reporting.
+    Statement C
+    Journalist X reports that Arsenal have opened talks.
+    Again, attribution.
+    Statement D
+    Arsenal could sign Player X this summer.
+    This is speculation.
+    You must clearly distinguish them.
+    Your language should match your evidence.
+24. THE ATTRIBUTION RULE
+    Instead of:
+    Arsenal will sign Player X.
+    Write:
+    According to [source], Arsenal are exploring a move for Player X.
+    Or:
+    [Journalist] reports that Arsenal have made contact with the player's representatives.
+    This tells the reader:
+    This is what the source says, not necessarily an independently confirmed fact.
+    That distinction is critical for credibility.
+25. THE TWO-SOURCE RULE
+    For significant claims, develop a newsroom policy:
+    ONE SOURCE
+    ↓
+    LEAD
+    TWO RELIABLE INDEPENDENT SOURCES
+    ↓
+    STRONGER REPORT
+    OFFICIAL CONFIRMATION
+    ↓
+    CONFIRMED
+    This is not an absolute rule for every story.
+    For example:
+    A club officially announces a signing.
+    One official source is enough because it is the primary source.
+    But:
+    Anonymous source says player has agreed a transfer.
+    You should seek corroboration.
+26. BREAKING NEWS WORKFLOW
+    Suppose you see:
+    🚨 BREAKING: Player X has agreed to join Manchester United.
+    Do this:
+    STEP 1
+    Save the original post.
+    ↓
+    STEP 2
+    Check the account.
+    ↓
+    STEP 3
+    Find the journalist's original report.
+    ↓
+    STEP 4
+    Check other reliable journalists.
+    ↓
+    STEP 5
+    Check official club/player sources.
+    ↓
+    STEP 6
+    Determine exactly what is confirmed.
+    ↓
+    STEP 7
+    Write with attribution.
+    ↓
+    STEP 8
+    Continue monitoring.
+    ↓
+    STEP 9
+    Update when new information arrives.
+    Do not rush simply because everyone else is posting.
+    Being 30 seconds late is better than publishing false information.
+27. BREAKING NEWS HAS LEVELS
+    Create internal labels.
+    🔴 UNVERIFIED
+    Someone is reporting it.
+    🟠 DEVELOPING
+    Multiple credible sources are reporting it.
+    🟡 REPORTED
+    Strong source but not officially confirmed.
+    🟢 CONFIRMED
+    Official confirmation.
+    Your CMS can even have these states.
+    StoryStatus:
+    UNVERIFIED
+    DEVELOPING
+    REPORTED
+    CONFIRMED
+    UPDATED
+    CORRECTED
+    That is useful when you eventually build your own publishing platform.
+28. HOW TO HANDLE TRANSFER RUMOURS
+    Transfers are one of the easiest areas to damage your reputation.
+    A bad sports blog publishes:
+    PLAYER X TO ARSENAL — DONE DEAL!
+    Then:
+    PLAYER X WILL SIGN TOMORROW!
+    Then:
+    MEDICAL COMPLETED!
+    Then:
+    AGREEMENT COLLAPSES.
+    This creates a credibility problem.
+    Instead, classify transfer stories.
+    RUMOUR
+    INTEREST
+    CONTACT
+    NEGOTIATION
+    BID
+    AGREEMENT
+    MEDICAL
+    SIGNED
+    OFFICIAL
+    Your headline should reflect the actual stage.
+29. EXAMPLE OF GOOD TRANSFER REPORTING
+    Source says:
+    Arsenal have asked about Player X.
+    Bad headline:
+    Arsenal Sign Player X.
+    Good headline:
+    Arsenal Make Enquiry About Player X, Report Says
+    Even better:
+    Arsenal Make Enquiry About Player X as Transfer Interest Emerges
+    Then explain:
+    WHAT WE KNOW
+    WHAT WE DON'T KNOW
+    SOURCE
+    BACKGROUND
+    WHAT HAPPENS NEXT
+    This is responsible reporting.
+30. DON'T COPY OTHER SPORTS WEBSITES
+    This is extremely important for SEO and credibility.
+    Suppose Website A publishes:
+    Liverpool are interested in Player X.
+    You rewrite it:
+    Liverpool are keen on Player X.
+    That is not meaningful original journalism.
+    Google's Google News policies specifically address scraped/recast content, including material substantially reproduced with synonyms or word substitutions without substantial added value. ([Google Help](https://support.google.com/news/publisher-center/answer/9520026?hl=en&utm_source=chatgpt.com))
+    Your goal should be:
+    SOURCE
+    ↓
+    RESEARCH
+    ↓
+    VERIFY
+    ↓
+    ADD CONTEXT
+    ↓
+    ADD ORIGINAL ANALYSIS
+    ↓
+    PUBLISH
+    Not:
+    OTHER WEBSITE
+    ↓
+    CHANGE WORDS
+    ↓
+    PUBLISH
+31. TURN ONE SOURCE INTO ORIGINAL VALUE
+    Suppose a journalist reports:
+    Chelsea are interested in a striker.
+    Your article can add:
+    WHO IS THE PLAYER?
+    WHAT POSITION DOES HE PLAY?
+    WHAT ARE HIS STATISTICS?
+    WHY DOES CHELSEA NEED HIM?
+    WHAT WOULD THE TRANSFER COST?
+    WHO ARE THE COMPETITORS?
+    WHAT HAS THE CLUB DONE PREVIOUSLY?
+    WHAT ARE THE NEXT STEPS?
+    Now you're providing something more useful.
+32. THE 5-LAYER RESEARCH MODEL
+    For every important story:
+    LAYER 1
+    BREAKING INFORMATION
+    ↓
+    LAYER 2
+    PRIMARY SOURCE
+    ↓
+    LAYER 3
+    SECONDARY CONFIRMATION
+    ↓
+    LAYER 4
+    BACKGROUND
+    ↓
+    LAYER 5
+    ORIGINAL ANALYSIS
+    Example:
+    Layer 1
+    Player has been linked to Chelsea.
+    Layer 2
+    Journalist report.
+    Layer 3
+    Another credible journalist confirms interest.
+    Layer 4
+    Player statistics and contract situation.
+    Layer 5
+    Your analysis of whether the transfer makes sense.
+    That is how you transform a simple news lead into a valuable article.
+33. CREATE A STORY RESEARCH SHEET
+    Before writing, create:
+    STORY TITLE:
+
+---
+
 DATE:
-____________________
+
+---
+
 SPORT:
-____________________
+
+---
+
 COMPETITION:
-____________________
+
+---
+
 PRIMARY SUBJECT:
-____________________
+
+---
+
 WHAT HAPPENED?
-____________________
+
+---
+
 PRIMARY SOURCE:
-____________________
+
+---
+
 SECOND SOURCE:
-____________________
+
+---
+
 OFFICIAL SOURCE:
-____________________
+
+---
+
 WHAT IS CONFIRMED?
-____________________
+
+---
+
 WHAT IS NOT CONFIRMED?
-____________________
+
+---
+
 BACKGROUND:
-____________________
+
+---
+
 STATISTICS:
-____________________
+
+---
+
 QUOTES:
-____________________
+
+---
+
 ORIGINAL ANGLE:
-____________________
+
+---
+
 RELATED STORIES:
-____________________
-This can eventually become a feature inside your CMS.
-29. CREATE A NEWSROOM STORY PIPELINE
+
+---
+
+This can eventually become a feature inside your CMS. 29. CREATE A NEWSROOM STORY PIPELINE
 Your system should have a pipeline:
 STORY PIPELINE
 ┌───────────────┐
@@ -3287,8 +3306,7 @@ STORY PIPELINE
 ┌───────────────┐
 │ UPDATED │
 └───────────────┘
-This is the workflow I would recommend building into your sports CMS.
-30. PRIORITIZE STORIES
+This is the workflow I would recommend building into your sports CMS. 30. PRIORITIZE STORIES
 You cannot publish everything.
 Score every story.
 Use:
@@ -3332,8 +3350,7 @@ Old statistic
 5
 2
 🟢
-You can later automate this.
-31. THE "WHY SHOULD WE PUBLISH THIS?" TEST
+You can later automate this. 31. THE "WHY SHOULD WE PUBLISH THIS?" TEST
 Before writing, ask:
 Why should our reader care?
 If the answer is:
@@ -3345,8 +3362,7 @@ Or:
 Because this could affect Nigeria's next international match.
 Or:
 Because this result changes the Premier League title race.
-Your article needs a reason to exist.
-32. NEWS VS EVERGREEN CONTENT
+Your article needs a reason to exist. 32. NEWS VS EVERGREEN CONTENT
 You need both.
 NEWS
 Short lifespan:
@@ -3377,8 +3393,7 @@ LOW
 STEADY
 ↓
 GROWS
-Your content strategy should combine both.
-33. THE 70/20/10 CONTENT MODEL
+Your content strategy should combine both. 33. THE 70/20/10 CONTENT MODEL
 A useful starting framework:
 70%
 CURRENT NEWS
@@ -3397,8 +3412,7 @@ Data visualization
 Opinion
 Unique investigation
 Fan debate
-Quiz
-34. BUILD A DAILY SPORTS CALENDAR
+Quiz 34. BUILD A DAILY SPORTS CALENDAR
 Your newsroom should know what is coming.
 Create a calendar containing:
 MATCHES
@@ -3432,8 +3446,7 @@ Match report
 ↓
 LATER
 Analysis
-This gives you a repeatable publishing engine.
-35. MATCHDAY RESEARCH SYSTEM
+This gives you a repeatable publishing engine. 35. MATCHDAY RESEARCH SYSTEM
 For every major match, collect:
 TEAM FORM
 HEAD-TO-HEAD
@@ -3446,23 +3459,15 @@ TOP SCORERS
 TACTICAL INFORMATION
 MANAGER COMMENTS
 Then create content:
-MATCH PREVIEW
-+
-PREDICTION
-+
-LINEUP
-+
-LIVE COVERAGE
-+
-MATCH REPORT
-+
-PLAYER RATINGS
-+
-TACTICAL ANALYSIS
-+
+MATCH PREVIEW +
+PREDICTION +
+LINEUP +
+LIVE COVERAGE +
+MATCH REPORT +
+PLAYER RATINGS +
+TACTICAL ANALYSIS +
 SOCIAL CONTENT
-One match can therefore become a content engine.
-36. USE SPORTS DATA, BUT DON'T CONFUSE DATA WITH JOURNALISM
+One match can therefore become a content engine. 36. USE SPORTS DATA, BUT DON'T CONFUSE DATA WITH JOURNALISM
 Sports APIs can give you:
 Scores
 Fixtures
@@ -3480,19 +3485,14 @@ What happened behind the scenes
 What the tactical implications are
 That's where journalism comes in.
 Your architecture should be:
-SPORTS API
-+
-NEWS SOURCES
-+
-OFFICIAL SOURCES
-+
-JOURNALISTS
-+
+SPORTS API +
+NEWS SOURCES +
+OFFICIAL SOURCES +
+JOURNALISTS +
 YOUR REPORTING
 ↓
 SPORTS CONTENT
-This is particularly relevant to the sports platform you are building because your existing API/data work can handle the structured sports information while your editorial system handles the human-readable story.
-37. USE AI AS AN ASSISTANT — NOT AS YOUR SOURCE
+This is particularly relevant to the sports platform you are building because your existing API/data work can handle the structured sports information while your editorial system handles the human-readable story. 37. USE AI AS AN ASSISTANT — NOT AS YOUR SOURCE
 AI can help you:
 Summarize research
 Generate headline options
@@ -3513,8 +3513,7 @@ Primary document
 Reliable data provider
 Direct interview
 Verified observation
-AI should help you process information, not invent it.
-38. CREATE A SOURCE DATABASE IN YOUR CMS
+AI should help you process information, not invent it. 38. CREATE A SOURCE DATABASE IN YOUR CMS
 Eventually your admin dashboard could have:
 NEWSROOM
 │
@@ -3533,6 +3532,7 @@ NEWSROOM
 A source record:
 Source
 ------
+
 Name:
 John Reporter
 Type:
@@ -3546,20 +3546,14 @@ Reliability:
 Primary Sources:
 Yes
 Notes:
-Strong club contacts
-39. AUTOMATE STORY DISCOVERY
+Strong club contacts 39. AUTOMATE STORY DISCOVERY
 When your platform grows, don't manually check 100 websites.
 Build:
-RSS
-+
-News APIs
-+
-Sports APIs
-+
-Google Trends
-+
-Social monitoring
-+
+RSS +
+News APIs +
+Sports APIs +
+Google Trends +
+Social monitoring +
 Official feeds
 Then:
 SOURCES
@@ -3582,8 +3576,7 @@ EDITOR DASHBOARD
 The system could tell you:
 Potential story: 7 sources discussing Arsenal and Player X in the last 20 minutes.
 Then your editor investigates it.
-This is much better than AI automatically publishing the story.
-40. STORY CLUSTERING
+This is much better than AI automatically publishing the story. 40. STORY CLUSTERING
 Suppose 15 websites report:
 Player X to Arsenal.
 Your system shouldn't create:
@@ -3610,17 +3603,12 @@ Confidence:
 High
 Status:
 Developing
-This is an advanced feature worth eventually building.
-41. TREND DETECTION
+This is an advanced feature worth eventually building. 41. TREND DETECTION
 Your system can calculate:
-Mentions
-+
-Search interest
-+
-Social engagement
-+
-Number of sources
-+
+Mentions +
+Search interest +
+Social engagement +
+Number of sources +
 Speed of growth
 Example:
 Player X
@@ -3636,8 +3624,7 @@ TREND SCORE:
 94/100
 Your editor sees:
 🔥 HIGH PRIORITY STORY
-This is the beginning of a professional sports intelligence newsroom.
-42. YOUR DAILY WORKFLOW
+This is the beginning of a professional sports intelligence newsroom. 42. YOUR DAILY WORKFLOW
 If you're starting alone, use this.
 6:00–7:00 AM
 Check:
@@ -3679,8 +3666,7 @@ Publish:
 Match reports
 Analysis
 Player ratings
-Roundups
-43. YOUR STORY BOARD
+Roundups 43. YOUR STORY BOARD
 Use something like:
 BACKLOG
 ↓
@@ -3703,8 +3689,7 @@ YOU = REPORTER
 YOU = EDITOR
 YOU = SEO
 YOU = SOCIAL MANAGER
-Later, separate these roles.
-44. YOUR EDITORIAL CHECKLIST
+Later, separate these roles. 44. YOUR EDITORIAL CHECKLIST
 Before clicking Publish, check:
 Accuracy
 Names correct
@@ -3738,8 +3723,7 @@ Contact information available
 Corrections process
 About page
 No misleading headline
-Google's current Google News guidance specifically emphasizes clear dates and bylines, author/publisher information, contact information, and transparent editorial presentation. ([Google Help](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com))
-45. GOOGLE NEWS: IMPORTANT 2026 UNDERSTANDING
+Google's current Google News guidance specifically emphasizes clear dates and bylines, author/publisher information, contact information, and transparent editorial presentation. ([Google Help](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com)) 45. GOOGLE NEWS: IMPORTANT 2026 UNDERSTANDING
 There is an important misconception to avoid.
 You don't simply:
 Submit my website to Google News and automatically get traffic.
@@ -3750,8 +3734,7 @@ NOT:
 "How do I trick Google News?"
 BUT:
 "How do I build a trustworthy sports publication
-that Google can easily crawl, understand and surface?"
-46. YOUR WEBSITE MUST BE CRAWLABLE
+that Google can easily crawl, understand and surface?" 46. YOUR WEBSITE MUST BE CRAWLABLE
 This connects directly to Part 3.
 Google's technical guidance says news section URLs should be permanent, article URLs should be unique and permanent, and article links should be accessible as HTML links. It also recommends that article headline/anchor text correspond to the article title. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en&utm_source=chatgpt.com))
 Therefore:
@@ -3766,16 +3749,14 @@ JavaScript buttons
 Images without links
 Temporary URLs
 Infinite scrolling with no crawlable links
-You can still build a modern Next.js interface, but the important content should have proper crawlable HTML links.
-47. ARTICLE DATES
+You can still build a modern Next.js interface, but the important content should have proper crawlable HTML links. 47. ARTICLE DATES
 Don't manipulate dates simply to make old stories appear new.
 Google News guidance says publishers should show a clear date/time and should not artificially freshen stories without substantial changes or a compelling reason. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en&utm_source=chatgpt.com))
 Instead:
 ORIGINAL ARTICLE
 Published Aug 27, 2026 — 10:30 AM
 Updated Aug 27, 2026 — 2:15 PM
-And explain meaningful changes where appropriate.
-48. WHEN A STORY CHANGES
+And explain meaningful changes where appropriate. 48. WHEN A STORY CHANGES
 Sports stories evolve rapidly.
 Example:
 10:00 AM
@@ -3793,8 +3774,7 @@ Use your editorial judgment.
 For major developments, you might:
 UPDATE EXISTING ARTICLE
 and create a new article only when there is a sufficiently distinct angle.
-This keeps your site organized.
-49. CORRECTIONS SYSTEM
+This keeps your site organized. 49. CORRECTIONS SYSTEM
 Every serious sports publication needs a corrections process.
 If you publish:
 Player X scored twice.
@@ -3810,8 +3790,7 @@ Original version
 Updated version
 Correction note
 Editor
-Timestamp
-50. BUILD YOUR SPORTS NEWSROOM LIKE A SOFTWARE SYSTEM
+Timestamp 50. BUILD YOUR SPORTS NEWSROOM LIKE A SOFTWARE SYSTEM
 This is where your developer background becomes a major advantage.
 Instead of simply building:
 BLOG
@@ -3855,8 +3834,7 @@ WEBSITE SOCIAL VIDEO
 ANALYTICS
 ↓
 CONTENT INSIGHTS
-This is much closer to the platform you ultimately want.
-51. YOUR FIRST VERSION DOES NOT NEED AI
+This is much closer to the platform you ultimately want. 51. YOUR FIRST VERSION DOES NOT NEED AI
 Start simple.
 Version 1
 Google News
@@ -3888,16 +3866,14 @@ Automatic story clustering
 Content recommendation
 AI research assistant
 Automated social packaging
-Multi-sport intelligence
-52. THE GOLDEN RULE OF YOUR NEWSROOM
+Multi-sport intelligence 52. THE GOLDEN RULE OF YOUR NEWSROOM
 Remember this:
 Speed gets attention. Accuracy builds the brand. Originality builds authority. Consistency builds traffic.
 Never sacrifice all four just to be first.
 Your goal isn't:
 "We published it first."
 Your goal is:
-"We are the sports platform people trust when something happens."
-53. YOUR PART 4 IMPLEMENTATION CHECKLIST
+"We are the sports platform people trust when something happens." 53. YOUR PART 4 IMPLEMENTATION CHECKLIST
 Before moving to Part 5, build these:
 Research
 Google News workflow
@@ -3991,27 +3967,22 @@ Essential references
 [Google News content discovery guide](https://support.google.com/news/publisher-center/answer/9606634?utm_source=chatgpt.com) — how Google discovers news content. ([Google Help](https://support.google.com/news/publisher-center/answer/9606634?hl=en&utm_source=chatgpt.com))
 [Google Search Central](https://developers.google.com/search/?utm_source=chatgpt.com) — your main technical SEO reference.
 Part 5 should now move from “finding the story” to actually creating it: Sports Article Writing — from headline → research → introduction → body → quotes → statistics → analysis → SEO → images → conclusion → editing → publishing. That is where we'll go deeply into how to write a professional sports article from a blank page, including several complete article templates you can reuse.
+
 # PART 5 — HOW TO WRITE PROFESSIONAL SPORTS ARTICLES FROM SCRATCH
+
 This is one of the most important parts of the entire sports-blogging system.
 In Part 4, we learned how to find, research and verify stories.
 Now we move to:
 How do you turn verified information into an article that people actually want to read, share and find through Google?
 The goal is not simply to write grammatically correct English.
 A successful sports article needs to combine:
-NEWS
-+
-ACCURACY
-+
-STORYTELLING
-+
-ANALYSIS
-+
-SEO
-+
-READABILITY
-+
-VISUALS
-+
+NEWS +
+ACCURACY +
+STORYTELLING +
+ANALYSIS +
+SEO +
+READABILITY +
+VISUALS +
 DISTRIBUTION
 Your ultimate workflow should look like this:
 STORY
@@ -4045,243 +4016,241 @@ PUBLISH
 SOCIAL DISTRIBUTION
 ↓
 UPDATE
+
 1. FIRST: UNDERSTAND WHAT A SPORTS ARTICLE ACTUALLY IS
-A sports article is not just a collection of facts.
-Compare these two approaches.
-Weak approach
-Arsenal won the match 3-1. Saka scored. Martinelli scored. Arsenal had 60% possession. The match was played at the Emirates Stadium.
-Technically, this may be accurate.
-But it isn't particularly interesting.
-Strong approach
-Arsenal recovered from an early setback to beat Chelsea 3-1, with Bukayo Saka once again proving decisive in the final third. The victory keeps Mikel Arteta's side firmly in the title race while exposing Chelsea's problems defending transitions.
-Now the reader immediately understands:
-what happened
-why it matters
-who mattered
-what the result means
-That's journalism.
+   A sports article is not just a collection of facts.
+   Compare these two approaches.
+   Weak approach
+   Arsenal won the match 3-1. Saka scored. Martinelli scored. Arsenal had 60% possession. The match was played at the Emirates Stadium.
+   Technically, this may be accurate.
+   But it isn't particularly interesting.
+   Strong approach
+   Arsenal recovered from an early setback to beat Chelsea 3-1, with Bukayo Saka once again proving decisive in the final third. The victory keeps Mikel Arteta's side firmly in the title race while exposing Chelsea's problems defending transitions.
+   Now the reader immediately understands:
+   what happened
+   why it matters
+   who mattered
+   what the result means
+   That's journalism.
 2. EVERY ARTICLE NEEDS AN ANGLE
-Before writing, ask:
-What is the most interesting thing about this story?
-This is your angle.
-Suppose Arsenal wins 3-1.
-You could write:
-Angle 1 — Match report
-Arsenal beat Chelsea 3-1.
-Angle 2 — Player
-Bukayo Saka inspires Arsenal victory.
-Angle 3 — Tactical
-Arsenal's pressing exposed Chelsea's midfield.
-Angle 4 — Title race
-Arsenal's victory strengthens their title challenge.
-Angle 5 — Chelsea
-Chelsea's defensive problems continue after another damaging defeat.
-Angle 6 — Statistics
-Arsenal's dominant second-half numbers explain their victory.
-Same match.
-Six different articles.
+   Before writing, ask:
+   What is the most interesting thing about this story?
+   This is your angle.
+   Suppose Arsenal wins 3-1.
+   You could write:
+   Angle 1 — Match report
+   Arsenal beat Chelsea 3-1.
+   Angle 2 — Player
+   Bukayo Saka inspires Arsenal victory.
+   Angle 3 — Tactical
+   Arsenal's pressing exposed Chelsea's midfield.
+   Angle 4 — Title race
+   Arsenal's victory strengthens their title challenge.
+   Angle 5 — Chelsea
+   Chelsea's defensive problems continue after another damaging defeat.
+   Angle 6 — Statistics
+   Arsenal's dominant second-half numbers explain their victory.
+   Same match.
+   Six different articles.
 3. THE ANGLE FORMULA
-Before opening your Word document or CMS, complete this:
-EVENT:
-What happened?
-SIGNIFICANCE:
-Why does it matter?
-PEOPLE:
-Who matters most?
-CONSEQUENCE:
-What happens next?
-UNIQUE VALUE:
-What can I tell readers that a basic result doesn't?
-Example:
-EVENT:
-Arsenal beat Chelsea 3-1.
-SIGNIFICANCE:
-The result keeps Arsenal in the title race.
-PEOPLE:
-Saka and the Arsenal midfield.
-CONSEQUENCE:
-Chelsea face increased pressure.
-UNIQUE VALUE:
-Explain how Arsenal's tactical adjustments changed the game.
-Now you have an article.
+   Before opening your Word document or CMS, complete this:
+   EVENT:
+   What happened?
+   SIGNIFICANCE:
+   Why does it matter?
+   PEOPLE:
+   Who matters most?
+   CONSEQUENCE:
+   What happens next?
+   UNIQUE VALUE:
+   What can I tell readers that a basic result doesn't?
+   Example:
+   EVENT:
+   Arsenal beat Chelsea 3-1.
+   SIGNIFICANCE:
+   The result keeps Arsenal in the title race.
+   PEOPLE:
+   Saka and the Arsenal midfield.
+   CONSEQUENCE:
+   Chelsea face increased pressure.
+   UNIQUE VALUE:
+   Explain how Arsenal's tactical adjustments changed the game.
+   Now you have an article.
 4. THE FIVE Ws + H
-Every sports reporter should master:
-WHO?
-WHAT?
-WHEN?
-WHERE?
-WHY?
-HOW?
-Example:
-WHO?
-Arsenal and Chelsea.
-WHAT?
-Arsenal won 3-1.
-WHEN?
-Saturday evening.
-WHERE?
-Emirates Stadium.
-WHY?
-Arsenal were more effective in key moments.
-HOW?
-Through pressing, transitions and better finishing.
-These six questions form the skeleton of your article.
+   Every sports reporter should master:
+   WHO?
+   WHAT?
+   WHEN?
+   WHERE?
+   WHY?
+   HOW?
+   Example:
+   WHO?
+   Arsenal and Chelsea.
+   WHAT?
+   Arsenal won 3-1.
+   WHEN?
+   Saturday evening.
+   WHERE?
+   Emirates Stadium.
+   WHY?
+   Arsenal were more effective in key moments.
+   HOW?
+   Through pressing, transitions and better finishing.
+   These six questions form the skeleton of your article.
 5. THE INVERTED PYRAMID
-Traditional news writing often uses the inverted pyramid.
-The structure is:
-MOST IMPORTANT INFORMATION
-↓
-IMPORTANT DETAILS
-↓
-CONTEXT
-↓
-BACKGROUND
-↓
-LESS IMPORTANT INFORMATION
-This is particularly useful for:
-breaking news
-transfer news
-injury news
-match results
-club announcements
-Why?
-Because many readers don't read the entire article.
-You need to deliver the essential information quickly.
+   Traditional news writing often uses the inverted pyramid.
+   The structure is:
+   MOST IMPORTANT INFORMATION
+   ↓
+   IMPORTANT DETAILS
+   ↓
+   CONTEXT
+   ↓
+   BACKGROUND
+   ↓
+   LESS IMPORTANT INFORMATION
+   This is particularly useful for:
+   breaking news
+   transfer news
+   injury news
+   match results
+   club announcements
+   Why?
+   Because many readers don't read the entire article.
+   You need to deliver the essential information quickly.
 6. THE SPORTS ARTICLE STRUCTURE
-A strong basic sports article can look like:
-HEADLINE
-SUBHEADING / DECK
-IMAGE
-BYLINE
-DATE/TIME
-INTRODUCTION
-KEY INFORMATION
-CONTEXT
-DETAILS
-QUOTES
-STATISTICS
-ANALYSIS
-WHAT HAPPENS NEXT?
-RELATED STORIES
-For example:
-Arsenal Beat Chelsea 3-1 to Strengthen Premier League Title Push
-Arsenal produced a second-half comeback...
-By John Doe
-August 27, 2026 — 8:45 PM
-[IMAGE]
-INTRODUCTION
-BODY
-KEY MOMENTS
-TACTICAL ANALYSIS
-PLAYER PERFORMANCE
-WHAT IT MEANS
-WHAT HAPPENS NEXT
-Google's current News guidance recommends clear headlines, visible publication date/time, article structured data and identifiable authors. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
+   A strong basic sports article can look like:
+   HEADLINE
+   SUBHEADING / DECK
+   IMAGE
+   BYLINE
+   DATE/TIME
+   INTRODUCTION
+   KEY INFORMATION
+   CONTEXT
+   DETAILS
+   QUOTES
+   STATISTICS
+   ANALYSIS
+   WHAT HAPPENS NEXT?
+   RELATED STORIES
+   For example:
+   Arsenal Beat Chelsea 3-1 to Strengthen Premier League Title Push
+   Arsenal produced a second-half comeback...
+   By John Doe
+   August 27, 2026 — 8:45 PM
+   [IMAGE]
+   INTRODUCTION
+   BODY
+   KEY MOMENTS
+   TACTICAL ANALYSIS
+   PLAYER PERFORMANCE
+   WHAT IT MEANS
+   WHAT HAPPENS NEXT
+   Google's current News guidance recommends clear headlines, visible publication date/time, article structured data and identifiable authors. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
 7. HOW TO WRITE THE HEADLINE
-Your headline is extremely important.
-It has three jobs:
-1. Tell the reader what happened.
-2. Create interest.
-3. Accurately represent the article.
-Never sacrifice #3 for clicks.
-8. BAD SPORTS HEADLINES
-Avoid headlines such as:
-YOU WON'T BELIEVE WHAT HAPPENED NEXT!
-SHOCKING!!!
-FOOTBALL WORLD IN DISBELIEF!
-THIS CHANGES EVERYTHING!
-These are vague.
-The reader doesn't know what happened.
-9. BETTER SPORTS HEADLINES
-Instead:
-Arsenal Beat Chelsea 3-1 to Keep Premier League Title Challenge Alive
-Or:
-Arsenal Overcome Chelsea as Saka Inspires 3-1 Victory
-Or:
-Arsenal's Second-Half Surge Sinks Chelsea at Emirates
-Each communicates something specific.
-10. HEADLINE FORMULAS
-Here are reusable formulas.
-Breaking news
-[Club] Confirm [Major Event]
-Example:
-Arsenal Confirm New Manager
-Transfer
-[Club] Make Move for [Player] as Transfer Talks Develop
-Match result
-[Team] Beat [Team] [Score] as [Player/Event] Proves Decisive
-Injury
-[Player] Injury Update: [Club] Provide Latest News
-Analysis
-Why [Team/Player] [Succeeded/Failed] Against [Opponent]
-Tactical
-How [Manager] Changed the Game Against [Opponent]
-List
-5 Things We Learned From [Match/Event]
-11. DON'T WRITE THE HEADLINE FIRST EVERY TIME
-This is an advanced technique.
-Sometimes you don't fully understand the article until you've written it.
-So use:
-WORKING HEADLINE
-↓
-WRITE ARTICLE
-↓
-DISCOVER STRONGEST ANGLE
-↓
-REWRITE HEADLINE
-Your final headline should reflect the actual article.
-Google recommends that the article headline be prominent, consistent with the page title, and not misleading. Google News currently recommends headlines between 2 and 22 words and no more than 110 characters in its article-page guidance. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
-12. YOUR INTRODUCTION
-The first paragraph is critical.
-Your introduction should answer the basic question:
-What happened and why should I care?
-Don't begin with unnecessary history.
-Weak:
-Football is a game loved by millions around the world. Arsenal and Chelsea have a long history...
-Waste of time.
-Better:
-Arsenal moved closer to the top of the Premier League after beating Chelsea 3-1 at the Emirates Stadium on Saturday, with Bukayo Saka playing a central role in the victory.
-Immediately:
-WHO
-WHAT
-WHERE
-WHY IT MATTERS
-13. THE 3-SENTENCE INTRODUCTION FORMULA
-A very useful beginner formula:
-Sentence 1
-What happened?
-Sentence 2
-What was the key factor?
-Sentence 3
-Why does it matter?
-Example:
-Arsenal defeated Chelsea 3-1 at the Emirates Stadium on Saturday. Bukayo Saka and Martin Ødegaard helped the hosts take control after a competitive first half. The victory strengthens Arsenal's position in the Premier League title race while increasing pressure on Chelsea.
-That's a strong opening.
-14. THE "HOOK"
-Your opening doesn't always have to be a simple result.
-You can use a strong observation.
-Example:
-Arsenal didn't win this game because they dominated from the first whistle. They won it because they adapted better when the match became chaotic.
-Now the reader wants to know:
-How?
-That's a hook.
-15. MATCH REPORT INTRODUCTIONS
-For a match report, use:
-RESULT
-+
-KEY PLAYER
-+
+   Your headline is extremely important.
+   It has three jobs:
+8. Tell the reader what happened.
+9. Create interest.
+10. Accurately represent the article.
+    Never sacrifice #3 for clicks.
+11. BAD SPORTS HEADLINES
+    Avoid headlines such as:
+    YOU WON'T BELIEVE WHAT HAPPENED NEXT!
+    SHOCKING!!!
+    FOOTBALL WORLD IN DISBELIEF!
+    THIS CHANGES EVERYTHING!
+    These are vague.
+    The reader doesn't know what happened.
+12. BETTER SPORTS HEADLINES
+    Instead:
+    Arsenal Beat Chelsea 3-1 to Keep Premier League Title Challenge Alive
+    Or:
+    Arsenal Overcome Chelsea as Saka Inspires 3-1 Victory
+    Or:
+    Arsenal's Second-Half Surge Sinks Chelsea at Emirates
+    Each communicates something specific.
+13. HEADLINE FORMULAS
+    Here are reusable formulas.
+    Breaking news
+    [Club] Confirm [Major Event]
+    Example:
+    Arsenal Confirm New Manager
+    Transfer
+    [Club] Make Move for [Player] as Transfer Talks Develop
+    Match result
+    [Team] Beat [Team] [Score] as [Player/Event] Proves Decisive
+    Injury
+    [Player] Injury Update: [Club] Provide Latest News
+    Analysis
+    Why [Team/Player] [Succeeded/Failed] Against [Opponent]
+    Tactical
+    How [Manager] Changed the Game Against [Opponent]
+    List
+    5 Things We Learned From [Match/Event]
+14. DON'T WRITE THE HEADLINE FIRST EVERY TIME
+    This is an advanced technique.
+    Sometimes you don't fully understand the article until you've written it.
+    So use:
+    WORKING HEADLINE
+    ↓
+    WRITE ARTICLE
+    ↓
+    DISCOVER STRONGEST ANGLE
+    ↓
+    REWRITE HEADLINE
+    Your final headline should reflect the actual article.
+    Google recommends that the article headline be prominent, consistent with the page title, and not misleading. Google News currently recommends headlines between 2 and 22 words and no more than 110 characters in its article-page guidance. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
+15. YOUR INTRODUCTION
+    The first paragraph is critical.
+    Your introduction should answer the basic question:
+    What happened and why should I care?
+    Don't begin with unnecessary history.
+    Weak:
+    Football is a game loved by millions around the world. Arsenal and Chelsea have a long history...
+    Waste of time.
+    Better:
+    Arsenal moved closer to the top of the Premier League after beating Chelsea 3-1 at the Emirates Stadium on Saturday, with Bukayo Saka playing a central role in the victory.
+    Immediately:
+    WHO
+    WHAT
+    WHERE
+    WHY IT MATTERS
+16. THE 3-SENTENCE INTRODUCTION FORMULA
+    A very useful beginner formula:
+    Sentence 1
+    What happened?
+    Sentence 2
+    What was the key factor?
+    Sentence 3
+    Why does it matter?
+    Example:
+    Arsenal defeated Chelsea 3-1 at the Emirates Stadium on Saturday. Bukayo Saka and Martin Ødegaard helped the hosts take control after a competitive first half. The victory strengthens Arsenal's position in the Premier League title race while increasing pressure on Chelsea.
+    That's a strong opening.
+17. THE "HOOK"
+    Your opening doesn't always have to be a simple result.
+    You can use a strong observation.
+    Example:
+    Arsenal didn't win this game because they dominated from the first whistle. They won it because they adapted better when the match became chaotic.
+    Now the reader wants to know:
+    How?
+    That's a hook.
+18. MATCH REPORT INTRODUCTIONS
+    For a match report, use:
+    RESULT
+
+-
+
+KEY PLAYER +
 SIGNIFICANCE
 Example:
-Liverpool defeated Manchester United 2-0 at Anfield, with Mohamed Salah's second-half performance proving decisive. The victory extends Liverpool's unbeaten run and leaves United facing renewed questions over their defensive organization.
-16. TRANSFER ARTICLE INTRODUCTIONS
+Liverpool defeated Manchester United 2-0 at Anfield, with Mohamed Salah's second-half performance proving decisive. The victory extends Liverpool's unbeaten run and leaves United facing renewed questions over their defensive organization. 16. TRANSFER ARTICLE INTRODUCTIONS
 Use:
-PLAYER
-+
-CLUB
-+
-CURRENT STATUS
-+
+PLAYER +
+CLUB +
+CURRENT STATUS +
 SOURCE
 Example:
 Arsenal have made an enquiry about Nigerian striker Victor Example, according to reports, as the club continues to explore attacking options. The London side have yet to make a formal offer, meaning the transfer remains at an early stage.
@@ -4289,19 +4258,14 @@ Notice the language:
 according to reports
 and:
 yet to make a formal offer
-This protects accuracy.
-17. BREAKING NEWS INTRODUCTIONS
+This protects accuracy. 17. BREAKING NEWS INTRODUCTIONS
 For breaking news:
-WHAT HAPPENED
-+
-WHEN
-+
-SOURCE
-+
+WHAT HAPPENED +
+WHEN +
+SOURCE +
 WHAT HAPPENS NEXT
 Example:
-Chelsea have confirmed that their manager will leave the club with immediate effect. The announcement was made on Thursday morning, with the club expected to provide further details about the next appointment.
-18. DON'T BURY THE NEWS
+Chelsea have confirmed that their manager will leave the club with immediate effect. The announcement was made on Thursday morning, with the club expected to provide further details about the next appointment. 18. DON'T BURY THE NEWS
 Suppose the important fact is:
 Player X has signed for Arsenal.
 Don't write six paragraphs about the player's childhood before telling readers.
@@ -4325,8 +4289,7 @@ PLAYER
 CAREER
 ↓
 WHY ARSENAL SIGNED HIM
-Give readers what they came for.
-19. PARAGRAPH LENGTH
+Give readers what they came for. 19. PARAGRAPH LENGTH
 Online readers generally prefer shorter paragraphs.
 Instead of:
 Arsenal dominated possession throughout the first half and created several chances but struggled to find the final pass, while Chelsea remained dangerous on the counterattack and nearly took the lead after a defensive mistake before the home side eventually found their rhythm...
@@ -4334,8 +4297,7 @@ Break it up.
 Arsenal dominated possession during the opening half but struggled to find the final pass.
 Chelsea remained dangerous on the counterattack and nearly took the lead after a defensive mistake.
 The hosts eventually found their rhythm after the break.
-Much easier to read.
-20. THE ONE-IDEA-PER-PARAGRAPH RULE
+Much easier to read. 20. THE ONE-IDEA-PER-PARAGRAPH RULE
 A useful beginner rule:
 One paragraph = one main idea.
 For example:
@@ -4351,8 +4313,7 @@ Paragraph 5
 Second goal.
 Paragraph 6
 Player performance.
-This creates rhythm.
-21. USE SUBHEADINGS
+This creates rhythm. 21. USE SUBHEADINGS
 Long articles should be divided.
 Example:
 Arsenal Take Control After the Break
@@ -4360,8 +4321,7 @@ Saka Makes the Difference
 Chelsea Struggle to Contain Arsenal's Press
 What the Result Means for the Title Race
 Subheadings make the article easier to scan.
-They also help search engines understand page structure when used naturally.
-22. THE BODY OF THE ARTICLE
+They also help search engines understand page structure when used naturally. 22. THE BODY OF THE ARTICLE
 A good body usually follows:
 FACT
 ↓
@@ -4381,8 +4341,7 @@ Arsenal recovered possession 11 times in the attacking third.
 Then analysis:
 That pressure prevented Chelsea from building sustained attacks and allowed Arsenal to maintain territory.
 That's much stronger than simply saying:
-Arsenal played well.
-23. FACTS VS ANALYSIS
+Arsenal played well. 23. FACTS VS ANALYSIS
 You need to clearly understand the difference.
 FACT
 Arsenal had 62% possession.
@@ -4391,8 +4350,7 @@ Arsenal's high possession allowed them to keep Chelsea pinned inside their own h
 OPINION
 Arsenal's midfield is the best in Europe.
 These are different.
-Don't present opinions as facts.
-24. HOW TO WRITE ANALYSIS
+Don't present opinions as facts. 24. HOW TO WRITE ANALYSIS
 Analysis answers:
 SO WHAT?
 For every major fact, ask:
@@ -4408,8 +4366,7 @@ WHY?
 They controlled possession.
 SO WHAT?
 Chelsea spent long periods defending without the ball and struggled to create sustained attacking sequences.
-That's analysis.
-25. USE STATISTICS PROPERLY
+That's analysis. 25. USE STATISTICS PROPERLY
 Statistics can make sports writing much stronger.
 But don't throw numbers everywhere.
 Bad:
@@ -4417,8 +4374,7 @@ Arsenal had 62% possession, 17 shots, 7 shots on target, 6 corners, 92% passing 
 The reader gets overwhelmed.
 Instead:
 Arsenal's control was reflected in their 62% possession and seven shots on target, allowing them to maintain pressure for much of the second half.
-Now the statistics support the story.
-26. STATISTICS SHOULD ANSWER A QUESTION
+Now the statistics support the story. 26. STATISTICS SHOULD ANSWER A QUESTION
 Don't ask:
 What statistics can I include?
 Ask:
@@ -4438,8 +4394,7 @@ Assists
 Shots
 Key passes
 Progressive carries
-Chances created
-27. DATA SOURCES
+Chances created 27. DATA SOURCES
 For football research, depending on your use case, you can explore:
 [FBref](https://fbref.com/?utm_source=chatgpt.com)
 [Stathead](https://stathead.com/?utm_source=chatgpt.com)
@@ -4452,8 +4407,7 @@ For official competition information, prefer primary sources such as:
 [Premier League](https://www.premierleague.com/?utm_source=chatgpt.com)
 [UEFA](https://www.uefa.com/?utm_source=chatgpt.com)
 [FIFA](https://www.fifa.com/?utm_source=chatgpt.com)
-[CAF](https://www.cafonline.com/?utm_source=chatgpt.com)
-28. QUOTES
+[CAF](https://www.cafonline.com/?utm_source=chatgpt.com) 28. QUOTES
 Quotes add authority and personality.
 You may use quotes from:
 Managers
@@ -4469,15 +4423,13 @@ If someone says:
 "We need to improve."
 Don't turn that into:
 "We need to improve immediately because our season is in danger."
-unless they actually said that.
-29. INTRODUCE QUOTES PROPERLY
+unless they actually said that. 29. INTRODUCE QUOTES PROPERLY
 Weak:
 "We played well," he said.
 Better:
 The manager was pleased with his team's response after halftime. "We played with more intensity," he said.
 Then explain:
-His comments reflected the tactical adjustment that changed the game after the break.
-30. DON'T OVERQUOTE
+His comments reflected the tactical adjustment that changed the game after the break. 30. DON'T OVERQUOTE
 Your article shouldn't become:
 QUOTE
 QUOTE
@@ -4494,15 +4446,13 @@ YOUR ANALYSIS
 QUOTE
 ↓
 CONTEXT
-Your voice should remain dominant.
-31. QUOTE ATTRIBUTION
+Your voice should remain dominant. 31. QUOTE ATTRIBUTION
 Use clear attribution:
 Arsenal manager Mikel Arteta said...
 According to the club's statement...
 The Premier League said...
 UEFA confirmed...
-Don't make readers guess who is speaking.
-32. THE "QUOTE SANDWICH"
+Don't make readers guess who is speaking. 32. THE "QUOTE SANDWICH"
 A powerful technique:
 CONTEXT
 ↓
@@ -4510,8 +4460,7 @@ QUOTE
 ↓
 EXPLANATION
 Example:
-Arsenal struggled to break Chelsea's defensive block during the opening half. Arteta said his players needed to "move the ball faster." The adjustment was visible after the interval, when Arsenal increased the tempo and created more space between Chelsea's defensive lines.
-33. MATCH REPORT STRUCTURE
+Arsenal struggled to break Chelsea's defensive block during the opening half. Arteta said his players needed to "move the ball faster." The adjustment was visible after the interval, when Arsenal increased the tempo and created more space between Chelsea's defensive lines. 33. MATCH REPORT STRUCTURE
 Here is your first major reusable template.
 HEADLINE
 INTRODUCTION
@@ -4538,8 +4487,7 @@ Arsenal's higher press...
 What the Result Means
 The victory...
 What's Next?
-Arsenal face...
-34. POST-MATCH ARTICLE
+Arsenal face... 34. POST-MATCH ARTICLE
 A post-match article should answer:
 What happened?
 Who performed?
@@ -4547,8 +4495,7 @@ Why did it happen?
 What changed?
 What does it mean?
 What's next?
-This is much better than simply rewriting the match commentary.
-35. PLAYER PERFORMANCE ARTICLE
+This is much better than simply rewriting the match commentary. 35. PLAYER PERFORMANCE ARTICLE
 Structure:
 HEADLINE
 INTRODUCTION
@@ -4563,6 +4510,7 @@ WHAT IT MEANS GOING FORWARD
 Example:
 How Bukayo Saka Changed Arsenal's Attack Against Chelsea
 Then:
+
 1. Starting position
 2. Ball progression
 3. Chance creation
@@ -4570,213 +4518,209 @@ Then:
 5. Key statistics
 6. Tactical impact
 7. Future implications
-36. TRANSFER ARTICLE TEMPLATE
-Use:
-HEADLINE
-WHAT WE KNOW
-SOURCE OF REPORT
-CURRENT TRANSFER STATUS
-PLAYER PROFILE
-CLUB'S INTEREST
-POTENTIAL FEE
-CONTRACT SITUATION
-COMPETITION FROM OTHER CLUBS
-WHAT HAPPENS NEXT
-Never turn:
-"Club interested"
-into:
-"Deal completed."
-37. INJURY ARTICLE TEMPLATE
-PLAYER
-INJURY
-WHEN IT HAPPENED
-CLUB STATEMENT
-EXPECTED ABSENCE
-NEXT MEDICAL ASSESSMENT
-MATCHES AT RISK
-MANAGER COMMENT
-WHAT IT MEANS FOR TEAM
-Be extremely careful with medical claims.
-Don't diagnose athletes.
-Use information supplied by appropriate official or credible sources.
-38. "5 THINGS WE LEARNED" ARTICLE
-This format is excellent for analysis.
-5 Things We Learned From Arsenal vs Chelsea
-Then:
-1. Arsenal's midfield control matters
-Analysis.
-2. Saka remains central to their attack
-Analysis.
-3. Chelsea struggled against the press
-Analysis.
-4. Arsenal's bench changed the game
-Analysis.
-5. The result changes the title picture
-Analysis.
-This format is highly reusable.
-39. OPINION ARTICLES
-Opinion is different from news.
-Make that clear.
-Example:
-OPINION: Arsenal Should Make Saka the Center of Their Attack
-Now the reader knows:
-This is analysis/opinion.
-Don't write an opinion piece in a way that makes your conclusion appear to be an objective fact.
-40. EXPLAINER ARTICLES
-Explainers can generate long-term search traffic.
-Examples:
-What Is the UEFA Champions League Format?
-How Does the Premier League Points System Work?
-What Is Offside in Football?
-How Does the Champions League Qualification System Work?
-These are evergreen opportunities.
-41. LIST ARTICLES
-Examples:
-10 Best Nigerian Footballers of the Modern Era
-7 Things to Know About Victor Osimhen
-5 Players Who Could Replace [Player]
-But don't create lists simply for page views.
-Each item should contain useful information.
-42. SEO KEYWORDS — DON'T STUFF THEM
-Suppose your target phrase is:
-Arsenal transfer news
-Don't write:
-Arsenal transfer news is the latest Arsenal transfer news because Arsenal transfer news...
-That's terrible.
-Instead, naturally write:
-Arsenal's latest transfer activity has intensified as the club continues to assess options in attack.
-Then perhaps later:
-For more Arsenal transfer news, follow our transfer coverage...
-The topic is clear without unnatural repetition.
-43. SEARCH INTENT
-Before writing, determine what the user wants.
-Search:
-Arsenal transfer news
-Intent:
-News
-Search:
-Arsenal vs Chelsea result
-Intent:
-Immediate result
-Search:
-Arsenal vs Chelsea player ratings
-Intent:
-Analysis
-Search:
-Arsenal squad 2026
-Intent:
-Information
-Search:
-How many Premier League titles has Arsenal won?
-Intent:
-Fact
-Your article must satisfy the actual intent.
-44. PRIMARY KEYWORD
-Choose one primary topic.
-Example:
-Primary:
-Arsenal vs Chelsea
-Secondary:
-Arsenal Chelsea result
-Arsenal Chelsea score
-Arsenal match report
-Saka Arsenal
-But don't force every phrase into the article.
-45. SEO TITLE VS ARTICLE HEADLINE
-For many articles, these can be nearly identical.
-Example:
-Article headline
-Arsenal Beat Chelsea 3-1 as Saka Inspires Crucial Victory
-SEO title
-Arsenal 3-1 Chelsea: Saka Inspires Crucial Victory
-Don't create two completely different titles.
-Google's News guidance specifically recommends consistency between the page title and the visible article headline. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
-46. URL STRUCTURE
-Good:
-/football/premier-league/arsenal-beat-chelsea-3-1
-Or:
-/arsenal-chelsea-3-1-match-report
-Avoid:
-/article?id=839292
-or constantly changing URLs.
-Google's News technical guidance recommends unique, permanent article URLs. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
-47. META DESCRIPTION
-Example:
-Arsenal defeated Chelsea 3-1 at the Emirates Stadium. Read the full match report, key moments, player performances and what the result means for the Premier League title race.
-This gives searchers a reason to click.
-48. INTERNAL LINKS
-Suppose you're writing:
-Arsenal defeated Chelsea...
-You could link naturally to:
-Arsenal squad
-Arsenal fixtures
-Premier League table
-Previous Arsenal match
-Saka profile
-Chelsea match report
-Your website becomes a connected knowledge network.
-Instead of:
-ARTICLE A
-you want:
-ARTICLE A
-↙ ↓ ↘
-B C D
-↘ ↓ ↙
-E
-This helps readers discover more of your content.
-Google's News technical guidance emphasizes crawlable HTML links between sections and articles. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
-49. IMAGE SELECTION
-Every major article should have a relevant lead image when appropriate.
-Good:
-Player celebrating
-Match action
-Manager
-Team
-Stadium
-Relevant event
-Bad:
-Generic football ball
-Random stadium
-Unrelated player
-Copyrighted image you don't have permission to use
-Google's News article guidance recommends relevant images, appropriate image markup and captions. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
-50. COPYRIGHT — VERY IMPORTANT
-Don't simply download:
-Getty Images
-Reuters
-AP
-Sky Sports
-ESPN
-Club photographers
-and upload them to your site.
-You need appropriate rights or a legitimate license/permission.
-For your sports blog, develop an image system based on:
-YOUR OWN PHOTOS
-+
-LICENSED STOCK
-+
-OFFICIAL MEDIA WITH PERMISSION
-+
-CREATIVE COMMONS WHERE LICENSE ALLOWS
-+
+8. TRANSFER ARTICLE TEMPLATE
+   Use:
+   HEADLINE
+   WHAT WE KNOW
+   SOURCE OF REPORT
+   CURRENT TRANSFER STATUS
+   PLAYER PROFILE
+   CLUB'S INTEREST
+   POTENTIAL FEE
+   CONTRACT SITUATION
+   COMPETITION FROM OTHER CLUBS
+   WHAT HAPPENS NEXT
+   Never turn:
+   "Club interested"
+   into:
+   "Deal completed."
+9. INJURY ARTICLE TEMPLATE
+   PLAYER
+   INJURY
+   WHEN IT HAPPENED
+   CLUB STATEMENT
+   EXPECTED ABSENCE
+   NEXT MEDICAL ASSESSMENT
+   MATCHES AT RISK
+   MANAGER COMMENT
+   WHAT IT MEANS FOR TEAM
+   Be extremely careful with medical claims.
+   Don't diagnose athletes.
+   Use information supplied by appropriate official or credible sources.
+10. "5 THINGS WE LEARNED" ARTICLE
+    This format is excellent for analysis.
+    5 Things We Learned From Arsenal vs Chelsea
+    Then:
+11. Arsenal's midfield control matters
+    Analysis.
+12. Saka remains central to their attack
+    Analysis.
+13. Chelsea struggled against the press
+    Analysis.
+14. Arsenal's bench changed the game
+    Analysis.
+15. The result changes the title picture
+    Analysis.
+    This format is highly reusable.
+16. OPINION ARTICLES
+    Opinion is different from news.
+    Make that clear.
+    Example:
+    OPINION: Arsenal Should Make Saka the Center of Their Attack
+    Now the reader knows:
+    This is analysis/opinion.
+    Don't write an opinion piece in a way that makes your conclusion appear to be an objective fact.
+17. EXPLAINER ARTICLES
+    Explainers can generate long-term search traffic.
+    Examples:
+    What Is the UEFA Champions League Format?
+    How Does the Premier League Points System Work?
+    What Is Offside in Football?
+    How Does the Champions League Qualification System Work?
+    These are evergreen opportunities.
+18. LIST ARTICLES
+    Examples:
+    10 Best Nigerian Footballers of the Modern Era
+    7 Things to Know About Victor Osimhen
+    5 Players Who Could Replace [Player]
+    But don't create lists simply for page views.
+    Each item should contain useful information.
+19. SEO KEYWORDS — DON'T STUFF THEM
+    Suppose your target phrase is:
+    Arsenal transfer news
+    Don't write:
+    Arsenal transfer news is the latest Arsenal transfer news because Arsenal transfer news...
+    That's terrible.
+    Instead, naturally write:
+    Arsenal's latest transfer activity has intensified as the club continues to assess options in attack.
+    Then perhaps later:
+    For more Arsenal transfer news, follow our transfer coverage...
+    The topic is clear without unnatural repetition.
+20. SEARCH INTENT
+    Before writing, determine what the user wants.
+    Search:
+    Arsenal transfer news
+    Intent:
+    News
+    Search:
+    Arsenal vs Chelsea result
+    Intent:
+    Immediate result
+    Search:
+    Arsenal vs Chelsea player ratings
+    Intent:
+    Analysis
+    Search:
+    Arsenal squad 2026
+    Intent:
+    Information
+    Search:
+    How many Premier League titles has Arsenal won?
+    Intent:
+    Fact
+    Your article must satisfy the actual intent.
+21. PRIMARY KEYWORD
+    Choose one primary topic.
+    Example:
+    Primary:
+    Arsenal vs Chelsea
+    Secondary:
+    Arsenal Chelsea result
+    Arsenal Chelsea score
+    Arsenal match report
+    Saka Arsenal
+    But don't force every phrase into the article.
+22. SEO TITLE VS ARTICLE HEADLINE
+    For many articles, these can be nearly identical.
+    Example:
+    Article headline
+    Arsenal Beat Chelsea 3-1 as Saka Inspires Crucial Victory
+    SEO title
+    Arsenal 3-1 Chelsea: Saka Inspires Crucial Victory
+    Don't create two completely different titles.
+    Google's News guidance specifically recommends consistency between the page title and the visible article headline. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
+23. URL STRUCTURE
+    Good:
+    /football/premier-league/arsenal-beat-chelsea-3-1
+    Or:
+    /arsenal-chelsea-3-1-match-report
+    Avoid:
+    /article?id=839292
+    or constantly changing URLs.
+    Google's News technical guidance recommends unique, permanent article URLs. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
+24. META DESCRIPTION
+    Example:
+    Arsenal defeated Chelsea 3-1 at the Emirates Stadium. Read the full match report, key moments, player performances and what the result means for the Premier League title race.
+    This gives searchers a reason to click.
+25. INTERNAL LINKS
+    Suppose you're writing:
+    Arsenal defeated Chelsea...
+    You could link naturally to:
+    Arsenal squad
+    Arsenal fixtures
+    Premier League table
+    Previous Arsenal match
+    Saka profile
+    Chelsea match report
+    Your website becomes a connected knowledge network.
+    Instead of:
+    ARTICLE A
+    you want:
+    ARTICLE A
+    ↙ ↓ ↘
+    B C D
+    ↘ ↓ ↙
+    E
+    This helps readers discover more of your content.
+    Google's News technical guidance emphasizes crawlable HTML links between sections and articles. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
+26. IMAGE SELECTION
+    Every major article should have a relevant lead image when appropriate.
+    Good:
+    Player celebrating
+    Match action
+    Manager
+    Team
+    Stadium
+    Relevant event
+    Bad:
+    Generic football ball
+    Random stadium
+    Unrelated player
+    Copyrighted image you don't have permission to use
+    Google's News article guidance recommends relevant images, appropriate image markup and captions. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
+27. COPYRIGHT — VERY IMPORTANT
+    Don't simply download:
+    Getty Images
+    Reuters
+    AP
+    Sky Sports
+    ESPN
+    Club photographers
+    and upload them to your site.
+    You need appropriate rights or a legitimate license/permission.
+    For your sports blog, develop an image system based on:
+    YOUR OWN PHOTOS
+
+-
+
+LICENSED STOCK +
+OFFICIAL MEDIA WITH PERMISSION +
+CREATIVE COMMONS WHERE LICENSE ALLOWS +
 PARTNER CONTENT WITH PERMISSION
 If you don't have rights, don't use it just because:
-"Everyone else is using it."
-51. CAPTIONS
+"Everyone else is using it." 51. CAPTIONS
 Don't waste the caption.
 Weak:
 Arsenal player.
 Better:
 Bukayo Saka celebrates after scoring Arsenal's second goal against Chelsea at Emirates Stadium.
-The caption adds context.
-52. ALT TEXT
+The caption adds context. 52. ALT TEXT
 Alt text should describe the image.
 Bad:
 football arsenal chelsea premier league football news arsenal news
 Good:
 Bukayo Saka celebrates after scoring for Arsenal against Chelsea
-Don't use alt text as a keyword dumping area.
-53. ARTICLE LENGTH
+Don't use alt text as a keyword dumping area. 53. ARTICLE LENGTH
 Don't think:
 Every article must be 2,000 words.
 That's incorrect.
@@ -4791,8 +4735,7 @@ An evergreen guide:
 The correct length is:
 As long as necessary to completely satisfy the reader.
 Not:
-As long as possible.
-54. DON'T PAD ARTICLES
+As long as possible. 54. DON'T PAD ARTICLES
 Avoid meaningless paragraphs like:
 Football is a beautiful game that brings people together...
 when the reader wants:
@@ -4800,8 +4743,7 @@ What happened to the player?
 Every paragraph should earn its place.
 Ask:
 If I delete this paragraph, does the article become worse?
-If not, remove it.
-55. THE "SO WHAT?" TEST
+If not, remove it. 55. THE "SO WHAT?" TEST
 After every important section:
 So what?
 Example:
@@ -4810,14 +4752,12 @@ So what?
 They controlled the game.
 So what?
 Chelsea struggled to create sustained attacking sequences.
-Now you've turned a statistic into analysis.
-56. THE "WHAT NEXT?" SECTION
+Now you've turned a statistic into analysis. 56. THE "WHAT NEXT?" SECTION
 A professional sports article should often end with what happens next.
 Example:
 Arsenal now turn their attention to Sunday's away fixture against Tottenham, while Chelsea face a midweek cup tie that could provide an opportunity to respond.
 This keeps readers connected to future content.
-It also creates an internal-link opportunity.
-57. THE PERFECT ARTICLE FORMULA
+It also creates an internal-link opportunity. 57. THE PERFECT ARTICLE FORMULA
 For many of your articles, use:
 HEADLINE
 ↓
@@ -4839,8 +4779,7 @@ STATISTICS
 ↓
 WHAT IT MEANS
 ↓
-WHAT HAPPENS NEXT
-58. COMPLETE EXAMPLE
+WHAT HAPPENS NEXT 58. COMPLETE EXAMPLE
 Let's create a fictional example.
 Headline:
 Arsenal Beat Chelsea 3-1 as Saka Inspires Second-Half Comeback
@@ -4872,8 +4811,7 @@ DATA
 SIGNIFICANCE
 ↓
 NEXT EVENT
-That's a professional structure.
-59. YOUR ARTICLE EDITING PROCESS
+That's a professional structure. 59. YOUR ARTICLE EDITING PROCESS
 Never write:
 WRITE
 ↓
@@ -4891,15 +4829,13 @@ SEO CHECK
 ↓
 READ ALOUD
 ↓
-PUBLISH
-60. FIRST EDIT — CONTENT
+PUBLISH 60. FIRST EDIT — CONTENT
 Ask:
 Did I answer what happened?
 Is the angle clear?
 Did I include unnecessary information?
 Is the story logically ordered?
-Did I explain why it matters?
-61. SECOND EDIT — FACT CHECK
+Did I explain why it matters? 61. SECOND EDIT — FACT CHECK
 Check:
 Names
 Scores
@@ -4913,8 +4849,7 @@ Quotes
 Transfer status
 Manager names
 Venue
-One wrong fact can damage reader trust.
-62. THIRD EDIT — LANGUAGE
+One wrong fact can damage reader trust. 62. THIRD EDIT — LANGUAGE
 Look for:
 Long sentences
 Repeated words
@@ -4928,12 +4863,10 @@ Arsenal were very extremely dominant throughout the entire match.
 Write:
 Arsenal dominated the second half.
 Shorter.
-Stronger.
-63. FOURTH EDIT — HEADLINE
+Stronger. 63. FOURTH EDIT — HEADLINE
 After the article is finished, ask:
 Does the headline accurately describe the strongest part of the article?
-If not, rewrite it.
-64. FIFTH EDIT — SEO
+If not, rewrite it. 64. FIFTH EDIT — SEO
 Check:
 Primary topic
 Headline
@@ -4946,8 +4879,7 @@ Image
 Alt text
 Structured data
 Author
-Date
-65. STRUCTURED DATA
+Date 65. STRUCTURED DATA
 For your website, implement appropriate article structured data.
 Google's News guidance specifically identifies fields such as:
 datePublished
@@ -4967,8 +4899,7 @@ Article
 ├── author
 ├── publisher
 └── mainEntityOfPage
-Use Google's current structured-data documentation when implementing this rather than copying an old schema tutorial.
-66. AUTHOR PAGES
+Use Google's current structured-data documentation when implementing this rather than copying an old schema tutorial. 66. AUTHOR PAGES
 Don't publish every article under:
 Admin
 or:
@@ -4983,14 +4914,13 @@ Biography
 Specialization
 Articles
 Social links
-Google's News policies emphasize clear bylines and information about authors, publishers and the organization behind the publication. ([Google Help](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com))
-67. BUILD AN ARTICLE CMS FORM
+Google's News policies emphasize clear bylines and information about authors, publishers and the organization behind the publication. ([Google Help](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com)) 67. BUILD AN ARTICLE CMS FORM
 Since you're a developer, I'd recommend eventually making your CMS article editor look like:
 ARTICLE CREATOR
 Title
-[____________________________]
+[****************************]
 Slug
-[____________________________]
+[****************************]
 Category
 [Football ▼]
 Competition
@@ -5002,29 +4932,28 @@ Author
 Status
 [Draft ▼]
 Primary Topic
-[____________________________]
+[****************************]
 Featured Image
 [Upload]
 Excerpt
-[____________________________]
+[****************************]
 Article Body
 [Rich Editor]
 Sources
 [+ Add Source]
 Tags
-[____________________________]
+[****************************]
 SEO Title
-[____________________________]
+[****************************]
 Meta Description
-[____________________________]
+[****************************]
 Publish Date
-[____________________________]
+[****************************]
 Social Headline
-[____________________________]
+[****************************]
 Social Caption
-[____________________________]
-This will eventually make your newsroom much faster.
-68. ARTICLE TYPES YOU SHOULD SUPPORT
+[****************************]
+This will eventually make your newsroom much faster. 68. ARTICLE TYPES YOU SHOULD SUPPORT
 Your CMS should eventually have:
 Breaking News
 News
@@ -5043,8 +4972,7 @@ Ranking
 Statistics
 Feature
 Editorial
-Each type can have its own template.
-69. AUTOMATIC ARTICLE TEMPLATES
+Each type can have its own template. 69. AUTOMATIC ARTICLE TEMPLATES
 For example:
 Match report
 Automatically create:
@@ -5073,8 +5001,7 @@ Club Statement
 Expected Return
 Matches at Risk
 Manager Comments
-This is how you turn your website into a real publishing system.
-70. THE ARTICLE → SOCIAL MEDIA PIPELINE
+This is how you turn your website into a real publishing system. 70. THE ARTICLE → SOCIAL MEDIA PIPELINE
 Once the article is published, don't stop.
 One article should generate:
 1 WEBSITE ARTICLE
@@ -5094,8 +5021,7 @@ One article should generate:
 1 PUSH NOTIFICATION
 ↓
 1 WHATSAPP UPDATE
-This is where Part 6 will connect to the social-media management system.
-71. YOUR CONTENT REPURPOSING SYSTEM
+This is where Part 6 will connect to the social-media management system. 71. YOUR CONTENT REPURPOSING SYSTEM
 Suppose you write:
 Arsenal Beat Chelsea 3-1.
 From the article you can extract:
@@ -5110,29 +5036,19 @@ TikTok/Reels
 "3 things we learned from Arsenal's victory..."
 YouTube
 Arsenal vs Chelsea: Full Tactical Breakdown
-One piece of journalism becomes a content package.
-72. TRAFFIC DOESN'T COME FROM WRITING ALONE
+One piece of journalism becomes a content package. 72. TRAFFIC DOESN'T COME FROM WRITING ALONE
 This is a very important lesson.
 Your traffic system is:
-GOOD ARTICLE
-+
-SEO
-+
-GOOGLE
-+
-SOCIAL MEDIA
-+
-DIRECT AUDIENCE
-+
-PUSH NOTIFICATIONS
-+
-EMAIL
-+
-INTERNAL LINKS
-+
+GOOD ARTICLE +
+SEO +
+GOOGLE +
+SOCIAL MEDIA +
+DIRECT AUDIENCE +
+PUSH NOTIFICATIONS +
+EMAIL +
+INTERNAL LINKS +
 CONSISTENCY
-Writing is only the center of the system.
-73. THE THREE TYPES OF SPORTS ARTICLES YOU NEED
+Writing is only the center of the system. 73. THE THREE TYPES OF SPORTS ARTICLES YOU NEED
 Your publishing strategy should contain:
 A. FAST CONTENT
 Breaking news
@@ -5159,20 +5075,17 @@ Tactical breakdowns
 Original reporting
 Purpose:
 Build your brand.
-You need all three.
-74. YOUR IDEAL DAILY OUTPUT AS A BEGINNER
+You need all three. 74. YOUR IDEAL DAILY OUTPUT AS A BEGINNER
 Don't try to publish 50 articles alone.
 Start with:
-3–5 QUALITY NEWS ARTICLES
-+
-1 ANALYSIS
-+
+3–5 QUALITY NEWS ARTICLES +
+1 ANALYSIS +
 1 EVERGREEN ARTICLE
 That's already six or seven pieces.
 Then distribute each across social platforms.
-Quality and consistency matter more than flooding your website with thin articles.
-75. THE 10-MINUTE ARTICLE PLANNING SYSTEM
+Quality and consistency matter more than flooding your website with thin articles. 75. THE 10-MINUTE ARTICLE PLANNING SYSTEM
 Before writing an article, spend approximately 10 minutes answering:
+
 1. What happened?
 2. What is confirmed?
 3. What is my angle?
@@ -5183,178 +5096,180 @@ Before writing an article, spend approximately 10 minutes answering:
 8. What happens next?
 9. What keyword/topic am I targeting?
 10. What related articles should I link?
-If you can answer these, writing becomes dramatically easier.
-76. YOUR MASTER ARTICLE TEMPLATE
-Save this somewhere.
-TITLE:
-[Clear, specific headline]
-ARTICLE TYPE:
-[News / Match Report / Transfer / Analysis / etc.]
-PRIMARY TOPIC:
-[Main subject]
-ANGLE:
-[Why this story matters]
-SOURCE:
-[Primary source]
-SECONDARY SOURCE:
-[Confirmation]
-INTRODUCTION:
-What happened + why it matters.
-SECTION 1:
-Most important detail.
-SECTION 2:
-Context/background.
-SECTION 3:
-Evidence/statistics.
-SECTION 4:
-Quotes/reactions.
-SECTION 5:
-Analysis.
-SECTION 6:
-What it means.
-SECTION 7:
-What's next.
-CONCLUSION:
-Short final takeaway.
-SEO TITLE:
-[Search-friendly title]
-META DESCRIPTION:
-[150-ish character description]
-SLUG:
-[/article-url]
-INTERNAL LINKS:
-[3–5 relevant links]
-IMAGE:
-[Licensed/owned image]
-CAPTION:
-[Description]
-ALT TEXT:
-[Descriptive alt text]
-AUTHOR:
-[Human author]
-PUBLISHED:
-[Date/time]
-UPDATED:
-[Date/time if applicable]
-77. YOUR FINAL PUBLISHING CHECKLIST
-Before pressing Publish:
-Journalism
-Is the story true?
-Have I verified important claims?
-Are sources properly attributed?
-Have I separated fact from opinion?
-Have I avoided misleading claims?
-Are quotes accurate?
-Writing
-Is the first paragraph strong?
-Is the angle obvious?
-Are paragraphs short?
-Are subheadings useful?
-Is the article easy to scan?
-Did I remove unnecessary words?
-SEO
-Strong title
-Clear URL
-Primary topic naturally covered
-Meta description
-Internal links
-Relevant image
-Alt text
-Structured data
-Author
-Date/time
-Technical
-Article has a unique permanent URL
-Article is accessible through HTML links
-H1 matches the article headline
-Article body is available in HTML
-Image isn't blocked from crawling
-Mobile layout works
-Page loads quickly
-Google's current News technical documentation specifically recommends unique permanent article URLs, HTML article links, identifiable headlines/publication times, and article pages whose body isn't dependent on JavaScript rendering for crawling. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
-78. THE MOST IMPORTANT RULES TO REMEMBER
-If you remember nothing else from Part 5, remember these:
-Rule 1
-Don't start writing until you know your angle.
-Rule 2
-Put the important information near the beginning.
-Rule 3
-Never present a rumour as a fact.
-Rule 4
-Use statistics to support your argument, not decorate it.
-Rule 5
-Use quotes to add authority and personality.
-Rule 6
-Don't copy other sports websites. Add original value.
-Rule 7
-Write for humans first and optimize naturally for search.
-Rule 8
-Every article should answer "Why does this matter?"
-Rule 9
-Every important story should answer "What's next?"
-Rule 10
-Accuracy is more valuable than being 30 seconds ahead of everyone.
-79. THE COMPLETE SPORTS ARTICLE MACHINE
-Eventually, your workflow should look like this:
-NEWS SOURCES
-↓
-STORY DISCOVERY
-↓
-VERIFICATION
-↓
-STORY ANGLE
-↓
-RESEARCH
-↓
-ARTICLE BRIEF
-↓
-WRITING
-↓
-EDITING
-↓
-FACT CHECK
-↓
-SEO CHECK
-↓
-IMAGE/COVER
-↓
-PUBLISH
-↓
-┌────────────┼────────────┐
-↓ ↓ ↓
-GOOGLE SOCIAL APP
-↓ ↓ ↓
-└────────────┼────────────┘
-↓
-TRAFFIC
-↓
-ANALYTICS
-↓
-CONTENT INSIGHT
-↓
-BETTER ARTICLES
-This is the system you should build your sports blog around.
-Essential resources for Part 5
-Google / SEO / Google News
-[Google Search Central](https://developers.google.com/search/?utm_source=chatgpt.com) — Google's main technical SEO documentation.
-[Google News Publisher Help](https://support.google.com/news/publisher-center/?utm_source=chatgpt.com) — official Google News publishing guidance.
-[Google News article-page best practices](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com) — dates, headlines, structured data, images and article-page requirements. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
-[Google News technical guidelines](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com) — crawlability, HTML links, permanent URLs and article structure. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
-[Google News policies](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com) — transparency, bylines, misleading content and editorial requirements. ([Google Help](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com))
-Sports research / data
-[FBref](https://fbref.com/?utm_source=chatgpt.com)
-[Transfermarkt](https://www.transfermarkt.com/?utm_source=chatgpt.com)
-[Sofascore](https://www.sofascore.com/?utm_source=chatgpt.com)
-[WhoScored](https://www.whoscored.com/?utm_source=chatgpt.com)
-[Understat](https://understat.com/?utm_source=chatgpt.com)
-[Premier League official site](https://www.premierleague.com/?utm_source=chatgpt.com)
-[UEFA official site](https://www.uefa.com/?utm_source=chatgpt.com)
-[FIFA official site](https://www.fifa.com/?utm_source=chatgpt.com)
-[CAF official site](https://www.cafonline.com/?utm_source=chatgpt.com)
-What comes next
-Part 6 — Sports Social Media Publishing & Management
-We will go from the finished article to actually getting people to see it: how to create Facebook/X/Instagram/TikTok/YouTube posts from one article, posting frequency, captions, hashtags, hooks, engagement, scheduling, breaking-news posting, social-media graphics, community management, analytics, follower growth, and how to turn 1 sports article into 20–30 pieces of social content.
+    If you can answer these, writing becomes dramatically easier.
+11. YOUR MASTER ARTICLE TEMPLATE
+    Save this somewhere.
+    TITLE:
+    [Clear, specific headline]
+    ARTICLE TYPE:
+    [News / Match Report / Transfer / Analysis / etc.]
+    PRIMARY TOPIC:
+    [Main subject]
+    ANGLE:
+    [Why this story matters]
+    SOURCE:
+    [Primary source]
+    SECONDARY SOURCE:
+    [Confirmation]
+    INTRODUCTION:
+    What happened + why it matters.
+    SECTION 1:
+    Most important detail.
+    SECTION 2:
+    Context/background.
+    SECTION 3:
+    Evidence/statistics.
+    SECTION 4:
+    Quotes/reactions.
+    SECTION 5:
+    Analysis.
+    SECTION 6:
+    What it means.
+    SECTION 7:
+    What's next.
+    CONCLUSION:
+    Short final takeaway.
+    SEO TITLE:
+    [Search-friendly title]
+    META DESCRIPTION:
+    [150-ish character description]
+    SLUG:
+    [/article-url]
+    INTERNAL LINKS:
+    [3–5 relevant links]
+    IMAGE:
+    [Licensed/owned image]
+    CAPTION:
+    [Description]
+    ALT TEXT:
+    [Descriptive alt text]
+    AUTHOR:
+    [Human author]
+    PUBLISHED:
+    [Date/time]
+    UPDATED:
+    [Date/time if applicable]
+12. YOUR FINAL PUBLISHING CHECKLIST
+    Before pressing Publish:
+    Journalism
+    Is the story true?
+    Have I verified important claims?
+    Are sources properly attributed?
+    Have I separated fact from opinion?
+    Have I avoided misleading claims?
+    Are quotes accurate?
+    Writing
+    Is the first paragraph strong?
+    Is the angle obvious?
+    Are paragraphs short?
+    Are subheadings useful?
+    Is the article easy to scan?
+    Did I remove unnecessary words?
+    SEO
+    Strong title
+    Clear URL
+    Primary topic naturally covered
+    Meta description
+    Internal links
+    Relevant image
+    Alt text
+    Structured data
+    Author
+    Date/time
+    Technical
+    Article has a unique permanent URL
+    Article is accessible through HTML links
+    H1 matches the article headline
+    Article body is available in HTML
+    Image isn't blocked from crawling
+    Mobile layout works
+    Page loads quickly
+    Google's current News technical documentation specifically recommends unique permanent article URLs, HTML article links, identifiable headlines/publication times, and article pages whose body isn't dependent on JavaScript rendering for crawling. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
+13. THE MOST IMPORTANT RULES TO REMEMBER
+    If you remember nothing else from Part 5, remember these:
+    Rule 1
+    Don't start writing until you know your angle.
+    Rule 2
+    Put the important information near the beginning.
+    Rule 3
+    Never present a rumour as a fact.
+    Rule 4
+    Use statistics to support your argument, not decorate it.
+    Rule 5
+    Use quotes to add authority and personality.
+    Rule 6
+    Don't copy other sports websites. Add original value.
+    Rule 7
+    Write for humans first and optimize naturally for search.
+    Rule 8
+    Every article should answer "Why does this matter?"
+    Rule 9
+    Every important story should answer "What's next?"
+    Rule 10
+    Accuracy is more valuable than being 30 seconds ahead of everyone.
+14. THE COMPLETE SPORTS ARTICLE MACHINE
+    Eventually, your workflow should look like this:
+    NEWS SOURCES
+    ↓
+    STORY DISCOVERY
+    ↓
+    VERIFICATION
+    ↓
+    STORY ANGLE
+    ↓
+    RESEARCH
+    ↓
+    ARTICLE BRIEF
+    ↓
+    WRITING
+    ↓
+    EDITING
+    ↓
+    FACT CHECK
+    ↓
+    SEO CHECK
+    ↓
+    IMAGE/COVER
+    ↓
+    PUBLISH
+    ↓
+    ┌────────────┼────────────┐
+    ↓ ↓ ↓
+    GOOGLE SOCIAL APP
+    ↓ ↓ ↓
+    └────────────┼────────────┘
+    ↓
+    TRAFFIC
+    ↓
+    ANALYTICS
+    ↓
+    CONTENT INSIGHT
+    ↓
+    BETTER ARTICLES
+    This is the system you should build your sports blog around.
+    Essential resources for Part 5
+    Google / SEO / Google News
+    [Google Search Central](https://developers.google.com/search/?utm_source=chatgpt.com) — Google's main technical SEO documentation.
+    [Google News Publisher Help](https://support.google.com/news/publisher-center/?utm_source=chatgpt.com) — official Google News publishing guidance.
+    [Google News article-page best practices](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com) — dates, headlines, structured data, images and article-page requirements. ([Google Help](https://support.google.com/news/publisher-center/answer/9607104?hl=en-GB&utm_source=chatgpt.com))
+    [Google News technical guidelines](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com) — crawlability, HTML links, permanent URLs and article structure. ([Google Help](https://support.google.com/news/publisher-center/answer/9606708?hl=en-GB&utm_source=chatgpt.com))
+    [Google News policies](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com) — transparency, bylines, misleading content and editorial requirements. ([Google Help](https://support.google.com/news/publisher-center/answer/6204050?hl=en&utm_source=chatgpt.com))
+    Sports research / data
+    [FBref](https://fbref.com/?utm_source=chatgpt.com)
+    [Transfermarkt](https://www.transfermarkt.com/?utm_source=chatgpt.com)
+    [Sofascore](https://www.sofascore.com/?utm_source=chatgpt.com)
+    [WhoScored](https://www.whoscored.com/?utm_source=chatgpt.com)
+    [Understat](https://understat.com/?utm_source=chatgpt.com)
+    [Premier League official site](https://www.premierleague.com/?utm_source=chatgpt.com)
+    [UEFA official site](https://www.uefa.com/?utm_source=chatgpt.com)
+    [FIFA official site](https://www.fifa.com/?utm_source=chatgpt.com)
+    [CAF official site](https://www.cafonline.com/?utm_source=chatgpt.com)
+    What comes next
+    Part 6 — Sports Social Media Publishing & Management
+    We will go from the finished article to actually getting people to see it: how to create Facebook/X/Instagram/TikTok/YouTube posts from one article, posting frequency, captions, hashtags, hooks, engagement, scheduling, breaking-news posting, social-media graphics, community management, analytics, follower growth, and how to turn 1 sports article into 20–30 pieces of social content.
+
 # PART 6 — SPORTS SOCIAL MEDIA POSTING & MANAGEMENT
+
 This is where your sports blog changes from a website that publishes articles into a media brand that continuously attracts traffic.
 Your goal should not be:
 "Post my article on Facebook."
@@ -5378,117 +5293,119 @@ WEBSITE
 RETURN VISIT
 ↓
 LOYAL FAN
+
 1. UNDERSTAND THE JOB OF SOCIAL MEDIA
-Your social accounts have five different jobs.
+   Your social accounts have five different jobs.
 1. Discovery
-Someone who has never heard of your website discovers your content.
-2. Engagement
-They:
-like
-comment
-share
-save
-reply
-watch
-3. Distribution
-Your existing audience sees your latest story.
-4. Traffic
-People click through to your website/app.
-5. Community
-People begin identifying your platform as:
-"That sports page I always follow."
-This last one is extremely important.
-You aren't trying to build followers only.
-You're trying to build habit.
-2. DON'T TREAT EVERY PLATFORM THE SAME
-One of the biggest mistakes beginners make is:
-Write one caption → copy → paste everywhere.
-Don't.
-Each platform has a different user behavior.
-Your strategy should be:
-Platform
-Main purpose
-Facebook
-News + community + traffic
-X
-Breaking news + conversation
-Instagram
-Visual storytelling + brand
-TikTok
-Discovery + short-form video
-YouTube
-Video + search + authority
-WhatsApp
-Direct audience
-Website
-Owned traffic + monetization
-The same story can therefore have seven different executions.
-3. YOUR SPORTS MEDIA CONTENT PYRAMID
-I recommend this structure:
-ORIGINAL REPORTING
-▲
-│
-LONG-FORM ANALYSIS
-│
-MATCH REPORTS
-│
-NEWS ARTICLES
-│
-SOCIAL MEDIA POSTS
-│
-SHORT-FORM VIDEOS
-│
-GRAPHICS / MEMES
-Your website remains the content headquarters.
-Social media becomes the distribution network.
-4. BUILD YOUR BRAND BEFORE YOU START POSTING
-Your accounts should look like they belong to the same company.
-For example:
-Brand:
-GOALMILLS
-Website:
-goalmills.com
-Facebook:
-GoalMills
-Instagram:
-@goalmills
-X:
-@goalmills
-TikTok:
-@goalmills
-YouTube:
-GoalMills
-WhatsApp:
-GoalMills
-Use the same:
-logo
-colors
-username
-description
-tone
-visual style
-5. CREATE YOUR BRAND VOICE
-Your sports page needs a personality.
-For example:
-Professional
-Arsenal have confirmed the signing of...
-Energetic
-ARSENAL HAVE DONE IT! 🔴🔥
-Analytical
-Arsenal's biggest improvement wasn't their possession. It was how quickly they recovered the ball after losing it.
-Nigerian sports media style
-Super Eagles fans, we need to talk about this one. 🇳🇬
-You can combine:
-Professional journalism
-+
-Energetic sports personality
-+
+   Someone who has never heard of your website discovers your content.
+1. Engagement
+   They:
+   like
+   comment
+   share
+   save
+   reply
+   watch
+1. Distribution
+   Your existing audience sees your latest story.
+1. Traffic
+   People click through to your website/app.
+1. Community
+   People begin identifying your platform as:
+   "That sports page I always follow."
+   This last one is extremely important.
+   You aren't trying to build followers only.
+   You're trying to build habit.
+1. DON'T TREAT EVERY PLATFORM THE SAME
+   One of the biggest mistakes beginners make is:
+   Write one caption → copy → paste everywhere.
+   Don't.
+   Each platform has a different user behavior.
+   Your strategy should be:
+   Platform
+   Main purpose
+   Facebook
+   News + community + traffic
+   X
+   Breaking news + conversation
+   Instagram
+   Visual storytelling + brand
+   TikTok
+   Discovery + short-form video
+   YouTube
+   Video + search + authority
+   WhatsApp
+   Direct audience
+   Website
+   Owned traffic + monetization
+   The same story can therefore have seven different executions.
+1. YOUR SPORTS MEDIA CONTENT PYRAMID
+   I recommend this structure:
+   ORIGINAL REPORTING
+   ▲
+   │
+   LONG-FORM ANALYSIS
+   │
+   MATCH REPORTS
+   │
+   NEWS ARTICLES
+   │
+   SOCIAL MEDIA POSTS
+   │
+   SHORT-FORM VIDEOS
+   │
+   GRAPHICS / MEMES
+   Your website remains the content headquarters.
+   Social media becomes the distribution network.
+1. BUILD YOUR BRAND BEFORE YOU START POSTING
+   Your accounts should look like they belong to the same company.
+   For example:
+   Brand:
+   GOALMILLS
+   Website:
+   goalmills.com
+   Facebook:
+   GoalMills
+   Instagram:
+   @goalmills
+   X:
+   @goalmills
+   TikTok:
+   @goalmills
+   YouTube:
+   GoalMills
+   WhatsApp:
+   GoalMills
+   Use the same:
+   logo
+   colors
+   username
+   description
+   tone
+   visual style
+1. CREATE YOUR BRAND VOICE
+   Your sports page needs a personality.
+   For example:
+   Professional
+   Arsenal have confirmed the signing of...
+   Energetic
+   ARSENAL HAVE DONE IT! 🔴🔥
+   Analytical
+   Arsenal's biggest improvement wasn't their possession. It was how quickly they recovered the ball after losing it.
+   Nigerian sports media style
+   Super Eagles fans, we need to talk about this one. 🇳🇬
+   You can combine:
+   Professional journalism
+
+-
+
+Energetic sports personality +
 Strong analysis
-That's a powerful combination.
-6. DEFINE YOUR CONTENT PILLARS
+That's a powerful combination. 6. DEFINE YOUR CONTENT PILLARS
 Don't randomly post whatever appears on your timeline.
 Create categories.
 For a football-focused site:
+
 1. BREAKING NEWS
 2. TRANSFERS
 3. MATCH RESULTS
@@ -5504,86 +5421,84 @@ For a football-focused site:
 13. MEMES
 14. VIDEO
 15. FAN DISCUSSION
-These become your content pillars.
-7. THE 70/20/10 CONTENT RULE
-A simple starting framework:
-70%
-Core sports content.
-News
-Matches
-Transfers
-Analysis
-Players
-20%
-Community content.
-Polls
-Questions
-Debates
-Quizzes
-Fan opinions
-10%
-Experimental/promotional content.
-Website promotion
-Sponsored posts
-New products
-Experiments
-You can adjust this based on your analytics.
-8. BREAKING NEWS CONTENT
-Breaking news requires speed.
-Your workflow:
-NEWS ALERT
-↓
-VERIFY
-↓
-PUBLISH SHORT ARTICLE
-↓
-X
-↓
-FACEBOOK
-↓
-INSTAGRAM STORY
-↓
-PUSH NOTIFICATION
-↓
-WHATSAPP
-Don't wait two hours to create a beautiful graphic.
-For breaking news:
-Speed + accuracy > design perfection
-9. BREAKING NEWS X POST
-Suppose:
-Arsenal sign Player X.
-Don't write:
-Arsenal have signed Player X. Click here to read more.
-Too boring.
-Instead:
-🚨 BREAKING: Arsenal have reached an agreement to sign Player X, according to [source].
-Medical expected next.
-More details: [article]
-Short.
-Clear.
-Immediate.
-10. FACEBOOK POST
-Facebook allows you to provide more context.
-Example:
-🔴 BREAKING: Arsenal reach agreement for Player X
-Arsenal have reached an agreement to sign Player X, according to [source].
-The player is expected to undergo his medical before completing the move.
-💰 Reported fee: €XXm
-📄 Contract: X years
-Full story 👇
-[ARTICLE LINK]
-What do you think of the signing?
-You have:
-NEWS
-+
-CONTEXT
-+
-DETAIL
-+
-CTA
-+
-DISCUSSION
-11. INSTAGRAM POST
+    These become your content pillars.
+16. THE 70/20/10 CONTENT RULE
+    A simple starting framework:
+    70%
+    Core sports content.
+    News
+    Matches
+    Transfers
+    Analysis
+    Players
+    20%
+    Community content.
+    Polls
+    Questions
+    Debates
+    Quizzes
+    Fan opinions
+    10%
+    Experimental/promotional content.
+    Website promotion
+    Sponsored posts
+    New products
+    Experiments
+    You can adjust this based on your analytics.
+17. BREAKING NEWS CONTENT
+    Breaking news requires speed.
+    Your workflow:
+    NEWS ALERT
+    ↓
+    VERIFY
+    ↓
+    PUBLISH SHORT ARTICLE
+    ↓
+    X
+    ↓
+    FACEBOOK
+    ↓
+    INSTAGRAM STORY
+    ↓
+    PUSH NOTIFICATION
+    ↓
+    WHATSAPP
+    Don't wait two hours to create a beautiful graphic.
+    For breaking news:
+    Speed + accuracy > design perfection
+18. BREAKING NEWS X POST
+    Suppose:
+    Arsenal sign Player X.
+    Don't write:
+    Arsenal have signed Player X. Click here to read more.
+    Too boring.
+    Instead:
+    🚨 BREAKING: Arsenal have reached an agreement to sign Player X, according to [source].
+    Medical expected next.
+    More details: [article]
+    Short.
+    Clear.
+    Immediate.
+19. FACEBOOK POST
+    Facebook allows you to provide more context.
+    Example:
+    🔴 BREAKING: Arsenal reach agreement for Player X
+    Arsenal have reached an agreement to sign Player X, according to [source].
+    The player is expected to undergo his medical before completing the move.
+    💰 Reported fee: €XXm
+    📄 Contract: X years
+    Full story 👇
+    [ARTICLE LINK]
+    What do you think of the signing?
+    You have:
+    NEWS
+
+-
+
+CONTEXT +
+DETAIL +
+CTA +
+DISCUSSION 11. INSTAGRAM POST
 Instagram is much more visual.
 Your graphic might say:
 ARSENAL
@@ -5595,8 +5510,7 @@ Arsenal have reached an agreement to sign Player X 🔴
 The player is expected to complete his medical before the move is finalized.
 How would you rate this signing?
 ⭐ 1–10
-Full story via the link in our bio.
-12. INSTAGRAM STORIES
+Full story via the link in our bio. 12. INSTAGRAM STORIES
 Stories are excellent for sports.
 Create a sequence:
 Story 1
@@ -5610,8 +5524,7 @@ What do you think?
 YES / NO
 Story 5
 Full story 👇
-This creates interaction instead of simply broadcasting news.
-13. INSTAGRAM POLLS
+This creates interaction instead of simply broadcasting news. 13. INSTAGRAM POLLS
 Sports are naturally suited to polls.
 Examples:
 Who was Arsenal's best player?
@@ -5627,8 +5540,7 @@ Or:
 Rate the transfer:
 🔥🔥🔥🔥🔥
 Polls give you something extremely valuable:
-Audience information.
-14. X / TWITTER STRATEGY
+Audience information. 14. X / TWITTER STRATEGY
 X is particularly useful for live sports conversation.
 Your account should become a real-time sports newsroom.
 Content:
@@ -5642,8 +5554,7 @@ Statistics
 Quotes
 Transfers
 Live reactions
-Threads
-15. MATCHDAY X STRATEGY
+Threads 15. MATCHDAY X STRATEGY
 Example:
 Before kickoff
 🚨 TEAM NEWS
@@ -5670,8 +5581,7 @@ Full-time
 Arsenal 3-1 Chelsea.
 Saka ⭐
 Arsenal take another huge step in the title race.
-Full report 👇
-16. LIVE BLOGGING
+Full report 👇 16. LIVE BLOGGING
 For major matches, consider creating a dedicated live blog.
 Structure:
 19:00 — Kickoff
@@ -5682,8 +5592,7 @@ Structure:
 20:21 — Chelsea equalize
 20:39 — Arsenal regain lead
 20:56 — FULL TIME
-Then link social posts back to the live page.
-17. THREADS
+Then link social posts back to the live page. 17. THREADS
 Threads are useful for analysis.
 Example:
 Arsenal's 3-1 win wasn't just about Saka.
@@ -5702,14 +5611,12 @@ The result was...
 Final:
 Full tactical breakdown:
 [LINK]
-This positions your account as more than a news aggregator.
-18. TIKTOK STRATEGY
+This positions your account as more than a news aggregator. 18. TIKTOK STRATEGY
 TikTok should not simply be:
 "Here is our article."
 Instead:
 Turn the article into a story.
-TikTok itself provides creator education through its Creator Academy, covering creation, content strategy, analytics, safety and monetization. ([TikTok Newsroom](https://newsroom.tiktok.com/for-creators-future-format-summit?lang=en&utm_source=chatgpt.com))
-19. THE TIKTOK HOOK
+TikTok itself provides creator education through its Creator Academy, covering creation, content strategy, analytics, safety and monetization. ([TikTok Newsroom](https://newsroom.tiktok.com/for-creators-future-format-summit?lang=en&utm_source=chatgpt.com)) 19. THE TIKTOK HOOK
 The first seconds matter enormously.
 Don't start:
 Hello everyone, welcome back to GoalMills...
@@ -5719,8 +5626,7 @@ Or:
 "Nobody is talking about what Saka did in this match."
 Or:
 "This one tactical change completely changed Arsenal's game."
-Then explain.
-20. 30-SECOND SPORTS VIDEO
+Then explain. 20. 30-SECOND SPORTS VIDEO
 Use:
 0–3 sec
 HOOK
@@ -5738,8 +5644,7 @@ Example:
 "Arteta pushed..."
 "That created..."
 "That's why Arsenal turned a 1-0 deficit into a 3-1 win."
-"Follow GoalMills for more football analysis."
-21. TIKTOK CONTENT TYPES
+"Follow GoalMills for more football analysis." 21. TIKTOK CONTENT TYPES
 Create:
 Breaking news
 "BREAKING: Arsenal..."
@@ -5757,8 +5662,7 @@ Trivia
 "Can you name these five players?"
 Match analysis
 "3 things we learned..."
-TikTok's official educational materials emphasize value and variety in content strategy rather than relying on a single type of content. ([TikTok](https://www.tiktok.com/business/library/TikTok_CreativeIsEasy_May2023.pdf?utm_source=chatgpt.com))
-22. YOUTUBE STRATEGY
+TikTok's official educational materials emphasize value and variety in content strategy rather than relying on a single type of content. ([TikTok](https://www.tiktok.com/business/library/TikTok_CreativeIsEasy_May2023.pdf?utm_source=chatgpt.com)) 22. YOUTUBE STRATEGY
 YouTube should become your long-form authority platform.
 Content:
 Match analysis
@@ -5768,8 +5672,7 @@ Football documentaries
 Interviews
 Top 10 videos
 News updates
-Shorts
-23. YOUTUBE SHORTS
+Shorts 23. YOUTUBE SHORTS
 Turn your article into:
 "3 Things We Learned From Arsenal vs Chelsea"
 Length:
@@ -5783,8 +5686,7 @@ POINT 2
 ↓
 POINT 3
 ↓
-CTA
-24. LONG-FORM YOUTUBE
+CTA 24. LONG-FORM YOUTUBE
 Example:
 Arsenal vs Chelsea Tactical Analysis: How Arsenal Changed the Game
 Structure:
@@ -5797,8 +5699,7 @@ Structure:
 16:00 Key statistics
 19:00 Final conclusion
 YouTube Analytics gives you metrics including impressions, click-through rate, watch time, average view duration, audience retention and traffic sources. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com))
-This is extremely useful because you can identify where viewers leave your videos.
-25. FACEBOOK STRATEGY
+This is extremely useful because you can identify where viewers leave your videos. 25. FACEBOOK STRATEGY
 Facebook is especially useful for sports communities.
 Create:
 News
@@ -5820,8 +5721,7 @@ Arsenal's midfield completely changed after halftime.
 Here's what Arteta changed...
 Do you agree?
 Full analysis: [link]
-Give value inside the post.
-26. WHATSAPP STRATEGY
+Give value inside the post. 26. WHATSAPP STRATEGY
 This is particularly interesting for an African sports media business.
 Create a:
 GoalMills WhatsApp Channel
@@ -5835,8 +5735,7 @@ Content:
 🔥 MATCH REACTION
 Keep messages concise.
 Don't spam.
-Your WhatsApp audience is a direct distribution asset.
-27. DON'T POST TOO MANY LINKS
+Your WhatsApp audience is a direct distribution asset. 27. DON'T POST TOO MANY LINKS
 This is an important mindset.
 Your social content should not always say:
 READ MORE HERE.
@@ -5844,8 +5743,7 @@ Instead:
 80% VALUE
 20% TRAFFIC
 Give users useful information directly.
-Then use the article link when the story requires more detail.
-28. THE SOCIAL CTA
+Then use the article link when the story requires more detail. 28. THE SOCIAL CTA
 Your CTA should tell the audience what to do.
 Examples:
 Engagement
@@ -5859,16 +5757,14 @@ Read the full tactical breakdown 👇
 Follow
 Follow GoalMills for daily football news.
 Share
-Send this to an Arsenal fan.
-29. DON'T ALWAYS SAY "LIKE AND FOLLOW"
+Send this to an Arsenal fan. 29. DON'T ALWAYS SAY "LIKE AND FOLLOW"
 If every post says:
 Like, comment, share and follow!
 it becomes noise.
 Instead, make the CTA relevant.
 For example:
 Would you start him in the next match?
-That's much more natural.
-30. COMMENT MANAGEMENT
+That's much more natural. 30. COMMENT MANAGEMENT
 Posting isn't enough.
 You need to manage conversations.
 Suppose someone comments:
@@ -5877,8 +5773,7 @@ Don't automatically reply:
 Thanks for your comment.
 Instead:
 What do you think he needs to improve?
-Now you've created a conversation.
-31. NEGATIVE COMMENTS
+Now you've created a conversation. 31. NEGATIVE COMMENTS
 Sports audiences argue.
 That's normal.
 Separate:
@@ -5892,8 +5787,7 @@ Hate/abuse
 Moderate according to platform rules.
 Spam
 Remove/block as appropriate.
-Your page should feel energetic without becoming toxic.
-32. COMMUNITY MANAGEMENT ROUTINE
+Your page should feel energetic without becoming toxic. 32. COMMUNITY MANAGEMENT ROUTINE
 Every day:
 MORNING
 ↓
@@ -5915,8 +5809,7 @@ Reply
 ↓
 Review performance
 ↓
-Prepare tomorrow
-33. CONTENT CALENDAR
+Prepare tomorrow 33. CONTENT CALENDAR
 Never wake up every morning asking:
 What should I post today?
 Build a calendar.
@@ -5943,8 +5836,7 @@ Result
 Match report
 Next morning
 Analysis
-Adjust these times based on your actual audience data rather than assuming one universal schedule.
-34. WEEKLY CONTENT CALENDAR
+Adjust these times based on your actual audience data rather than assuming one universal schedule. 34. WEEKLY CONTENT CALENDAR
 Example:
 Monday
 Weekend recap
@@ -5971,8 +5863,7 @@ LIVE MATCHDAY
 Sunday
 Matchday
 Results
-Player ratings
-35. CONTENT BATCHING
+Player ratings 35. CONTENT BATCHING
 Don't create everything individually.
 For example, Monday morning:
 Create:
@@ -5982,8 +5873,7 @@ Create:
 5 Facebook templates
 5 Instagram templates
 Then customize them as stories appear.
-This saves enormous amounts of time.
-36. CREATE CONTENT TEMPLATES
+This saves enormous amounts of time. 36. CREATE CONTENT TEMPLATES
 Your graphics should have reusable templates.
 Example:
 BREAKING NEWS TEMPLATE
@@ -6002,8 +5892,7 @@ Player
 Club
 Headline
 Image
-Date
-37. SOCIAL MEDIA GRAPHICS
+Date 37. SOCIAL MEDIA GRAPHICS
 Your graphic system should contain:
 Breaking News
 Match Result
@@ -6020,8 +5909,7 @@ League Table
 Fixture
 Birthday
 Poll
-This becomes your visual language.
-38. CANVA WORKFLOW
+This becomes your visual language. 38. CANVA WORKFLOW
 For your graphics, create a Canva brand kit.
 Use:
 Logo
@@ -6039,8 +5927,7 @@ Green
 Alert:
 Red
 Don't use 15 different colors.
-Consistency creates recognition.
-39. SOCIAL GRAPHIC SIZES
+Consistency creates recognition. 39. SOCIAL GRAPHIC SIZES
 Create platform-specific versions.
 Common starting dimensions include:
 Instagram portrait
@@ -6052,8 +5939,7 @@ Stories/Reels
 YouTube thumbnail
 1280 × 720
 Facebook
-Create platform-appropriate versions rather than blindly resizing everything.
-40. GRAPHIC DESIGN RULE
+Create platform-appropriate versions rather than blindly resizing everything. 40. GRAPHIC DESIGN RULE
 A sports graphic should usually communicate the story in:
 2–3 seconds.
 Someone scrolling should immediately see:
@@ -6064,8 +5950,7 @@ Example:
 OSIMHEN
 JOINS GALATASARAY
 €75M DEAL
-That's better than a paragraph.
-41. DON'T PUT THE ENTIRE ARTICLE ON A GRAPHIC
+That's better than a paragraph. 41. DON'T PUT THE ENTIRE ARTICLE ON A GRAPHIC
 Bad:
 150 words of text over a football player's face.
 Good:
@@ -6073,8 +5958,7 @@ ARSENAL 3–1 CHELSEA
 SAKA ⭐
 TITLE RACE HEATS UP
 The article contains the details.
-The graphic creates interest.
-42. SOCIAL VIDEO GRAPHICS
+The graphic creates interest. 42. SOCIAL VIDEO GRAPHICS
 Your videos should have:
 Brand logo
 Headline
@@ -6088,8 +5972,7 @@ For example:
 Saka has...
 [VIDEO]
 FULL STORY
-GOALMILLS
-43. SUBTITLES
+GOALMILLS 43. SUBTITLES
 Always consider subtitles for short-form videos.
 Many users consume social content without sound.
 Your subtitles should be:
@@ -6098,8 +5981,7 @@ Readable
 High contrast
 Short
 Synchronized
-Don't put an entire paragraph on screen.
-44. THE ONE ARTICLE → 20 CONTENT PIECES SYSTEM
+Don't put an entire paragraph on screen. 44. THE ONE ARTICLE → 20 CONTENT PIECES SYSTEM
 This is one of the most important systems I want you to build.
 Suppose you publish:
 Arsenal 3-1 Chelsea.
@@ -6132,8 +6014,7 @@ WhatsApp
 Result update
 Analysis link
 One story.
-Twenty pieces.
-45. YOUR CONTENT FACTORY
+Twenty pieces. 45. YOUR CONTENT FACTORY
 Eventually build:
 ARTICLE
 ↓
@@ -6151,8 +6032,7 @@ AI/EDITORIAL CONTENT ENGINE
 │ Push notification │
 └─────────────────────────┘
 But AI should assist rather than invent facts.
-The source article remains the factual source.
-46. AUTOMATE REPETITIVE WORK
+The source article remains the factual source. 46. AUTOMATE REPETITIVE WORK
 Since you're building your own sports platform, eventually automate:
 ARTICLE PUBLISHED
 ↓
@@ -6168,8 +6048,7 @@ COLLECT ANALYTICS
 Don't initially automate everything blindly.
 Use:
 AI → draft → human approval → publish
-especially for breaking sports news.
-47. SOCIAL MEDIA MANAGEMENT TOOLS
+especially for breaking sports news. 47. SOCIAL MEDIA MANAGEMENT TOOLS
 Depending on your stage, you can use native tools or third-party scheduling platforms.
 For Meta properties, start with:
 [Meta Business Suite](https://business.facebook.com/?utm_source=chatgpt.com)
@@ -6178,8 +6057,7 @@ For TikTok education and marketing resources:
 TikTok describes Academy as its official learning destination for marketers and agencies, with courses covering creative, advertising and measurement. ([TikTok For Business](https://ads.tiktok.com/business/en-GB/academy?utm_source=chatgpt.com))
 For YouTube:
 [YouTube Studio](https://studio.youtube.com/?utm_source=chatgpt.com)
-YouTube Analytics lets you examine reach, engagement, audience behavior and trends, which you should use to decide what to produce next. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com))
-48. DON'T BUY FOLLOWERS
+YouTube Analytics lets you examine reach, engagement, audience behavior and trends, which you should use to decide what to produce next. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com)) 48. DON'T BUY FOLLOWERS
 Avoid:
 10,000 followers for ₦20,000.
 You may get numbers.
@@ -6191,8 +6069,7 @@ Real customers
 You want:
 1,000 REAL SPORTS FANS
 rather than:
-100,000 FAKE FOLLOWERS
-49. DON'T CHASE EVERY TREND
+100,000 FAKE FOLLOWERS 49. DON'T CHASE EVERY TREND
 A trend is useful when it fits your audience.
 For example:
 Football meme trend
@@ -6200,8 +6077,7 @@ Good.
 Random:
 Beauty trend
 Probably irrelevant.
-TikTok's own educational material emphasizes adapting trends to the relevant community rather than forcing trends into content where they don't naturally fit. ([TikTok](https://www.tiktok.com/business/library/TikTokCreatorMarketplace_Making_Creator_Marketing_Easy.pdf?utm_source=chatgpt.com))
-50. THE SPORTS VIRALITY FORMULA
+TikTok's own educational material emphasizes adapting trends to the relevant community rather than forcing trends into content where they don't naturally fit. ([TikTok](https://www.tiktok.com/business/library/TikTokCreatorMarketplace_Making_Creator_Marketing_Easy.pdf?utm_source=chatgpt.com)) 50. THE SPORTS VIRALITY FORMULA
 A useful mental model:
 RELEVANCE
 ×
@@ -6220,8 +6096,7 @@ Emotion ██████████
 Curiosity ███████
 Timing ██████████
 Shareability ██████████
-That's a story you should distribute aggressively.
-51. EMOTIONS THAT WORK IN SPORTS
+That's a story you should distribute aggressively. 51. EMOTIONS THAT WORK IN SPORTS
 Sports naturally generate:
 Excitement
 Anger
@@ -6234,8 +6109,7 @@ Hope
 Disappointment
 Curiosity
 Use these naturally.
-Don't manufacture fake outrage.
-52. CURIOSITY
+Don't manufacture fake outrage. 52. CURIOSITY
 Example:
 Weak:
 Arsenal won.
@@ -6244,8 +6118,7 @@ Arsenal won 3-1.
 Stronger:
 Arsenal changed one thing after halftime — and it completely changed the game.
 Now the audience wants to know:
-What changed?
-53. DEBATE CONTENT
+What changed? 53. DEBATE CONTENT
 Football fans love arguments.
 Use:
 Saka or Salah?
@@ -6254,8 +6127,7 @@ Should Nigeria play with two strikers?
 Is this manager good enough?
 But moderate the discussion.
 The goal is:
-Conversation, not abuse.
-54. FAN CONTENT
+Conversation, not abuse. 54. FAN CONTENT
 Eventually allow your audience to participate.
 Examples:
 Send us your starting XI.
@@ -6267,8 +6139,7 @@ Then repost selected user contributions with appropriate permission and attribut
 This transforms:
 AUDIENCE
 into:
-COMMUNITY
-55. SOCIAL MEDIA ANALYTICS
+COMMUNITY 55. SOCIAL MEDIA ANALYTICS
 Never judge your account only by followers.
 Track:
 Reach
@@ -6285,627 +6156,629 @@ Average watch time
 Completion rate
 Followers gained
 Website sessions
-For YouTube specifically, Analytics exposes reach, engagement, audience and trends reports. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com))
-56. THE MOST IMPORTANT SOCIAL METRICS
+For YouTube specifically, Analytics exposes reach, engagement, audience and trends reports. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com)) 56. THE MOST IMPORTANT SOCIAL METRICS
 For a sports publisher, I'd prioritize:
+
 1. Shares
-This means:
-"I think someone else should see this."
-Very valuable.
+   This means:
+   "I think someone else should see this."
+   Very valuable.
 2. Watch time
-For video.
+   For video.
 3. Comments
-Shows conversation.
+   Shows conversation.
 4. Link clicks
-Important for website traffic.
+   Important for website traffic.
 5. Returning audience
-Shows loyalty.
+   Shows loyalty.
 6. Follower growth
-Useful, but not the final objective.
-57. DON'T CELEBRATE VIRALITY TOO EARLY
-Suppose:
-Post A
-100,000 views
-20 website visits
-and:
-Post B
-10,000 views
-1,500 website visits
-Which is better for your sports business?
-Probably:
-Post B.
-Because your objective is not simply:
-views.
-You're building a media company.
-58. CREATE A TRAFFIC FUNNEL
-Your system should be:
-SOCIAL IMPRESSION
-↓
-SOCIAL ENGAGEMENT
-↓
-PROFILE VISIT
-↓
-WEBSITE CLICK
-↓
-ARTICLE
-↓
-ANOTHER ARTICLE
-↓
-EMAIL/PUSH/APP
-↓
-RETURN VISIT
-The ultimate goal is:
-Owned audience.
-59. BUILD YOUR EMAIL AUDIENCE
-Eventually create:
-GoalMills Daily Football Newsletter
-Example:
-Morning
-⚽ GOALMILLS MORNING BRIEF
-5 biggest football stories
-Transfer news
-Nigerian football
-Today's fixtures
-Today's matches
-Now social-media algorithms don't completely control your audience.
-60. PUSH NOTIFICATIONS
-Your website/mobile app can notify users:
-🚨 BREAKING: Arsenal complete signing of Player X.
-But don't send:
-"New article!"
-for everything.
-Notifications should have real value.
-61. WHATSAPP + PUSH + EMAIL
-These are your owned distribution channels.
-Think:
-Social Media
-↓
-Discovery
-Website
-↓
-Conversion
-Email
-Push
-WhatsApp
-↓
-Retention
-That is a much stronger business model than depending exclusively on Facebook or TikTok.
-62. YOUR DAILY SOCIAL MEDIA OPERATING SYSTEM
-Here's a practical routine.
-6:00–8:00 AM
-Check:
-Transfer news
-Overnight results
-Injuries
-Club announcements
-Nigerian players
-International news
-Publish morning roundup.
-9:00–12:00
-Publish:
-News
-Transfer
-Player graphic
-Evergreen article
-12:00–15:00
-Create:
-Short video
-Poll
-Quiz
-Discussion
-15:00–18:00
-Prepare:
-Match previews
-Lineups
-Graphics
-Video scripts
-Matchday
-Switch into:
-LIVE MODE
-Lineup
-Kickoff
-Goal
-Cards
-Half-time
-Substitutions
-Goal
-Full-time
-Reaction
-Match report
-Analysis
-After match
-Repurpose:
-Result
-Player graphic
-Stats
-Quote
-Tactical analysis
-Short video
-Article
-63. WEEKLY ANALYTICS MEETING
-Every Sunday, examine:
-Top 10 posts
-Top 10 articles
-Top videos
-Most shared story
-Most commented story
-Highest CTR
-Best-performing platform
-Worst-performing platform
-New followers
-Website traffic
-Then ask:
-What did the audience teach us this week?
-64. BUILD A CONTENT SCORECARD
-Create a spreadsheet:
-Content
-Platform
-Reach
-Likes
-Shares
-Comments
-Clicks
-Followers
-Arsenal news
-X
-50k
-2k
-400
-180
-900
-120
-Saka graphic
-IG
-80k
-7k
-1.5k
-400
-200
-300
-Match video
-TikTok
-300k
-20k
-5k
-900
-—
-2k
-After 30 days you'll start seeing patterns.
-65. FIND YOUR WINNING FORMATS
-Maybe you discover:
-TRANSFER NEWS
-⭐⭐⭐⭐⭐
-MATCH ANALYSIS
-⭐⭐⭐⭐⭐
-GENERIC QUOTES
-⭐⭐
-RANDOM MEMES
-⭐⭐⭐
-PLAYER GRAPHICS
-⭐⭐⭐⭐
-Then produce more of:
-⭐⭐⭐⭐⭐
-and less of:
-⭐⭐
-That's how you grow systematically.
-66. YOUR FIRST 30 DAYS
-Don't attempt everything immediately.
-Week 1
-Set up:
-Website
-Facebook
-Instagram
-X
-TikTok
-YouTube
-WhatsApp
-Create branding.
-Week 2
-Create:
-10 Canva templates
-20 social templates
-Article templates
-Video templates
-Caption templates
-Week 3
-Start publishing:
-3–5 articles/day
-5–10 social posts/day
-1 short video/day
-Adjust according to your capacity.
-Week 4
-Analyze:
-What generated traffic?
-What generated shares?
-What generated followers?
-What generated comments?
-What generated returning users?
-Then optimize.
-67. THE BIGGEST BEGINNER MISTAKES
-Avoid:
-❌ Buying followers
-❌ Copying competitors
-❌ Posting without verifying
-❌ Using copyrighted images/videos without permission
-❌ Posting only links
-❌ Ignoring comments
-❌ Posting identical content everywhere
-❌ Ignoring analytics
-❌ Chasing every trend
-❌ Using clickbait that doesn't deliver
-❌ Publishing 30 low-quality articles
-❌ Depending entirely on one platform
-68. THE SYSTEM I WOULD BUILD FOR GOALMILLS
-Since you're building a sports platform, I'd eventually make the architecture:
-GOALMILLS CMS
-│
-▼
-ARTICLE CREATED
-│
-┌───────┴───────┐
-▼ ▼
-EDITOR AI ENGINE
-│ │
-└───────┬───────┘
-▼
-CONTENT PACKAGE
-│
-┌───────────────┼────────────────┐
-▼ ▼ ▼
-SOCIAL VIDEO GRAPHICS
-│ │ │
-▼ ▼ ▼
-X/FB TikTok/YT IG/FB/X
-│ │ │
-└───────────────┼────────────────┘
-▼
-ANALYTICS
-│
-▼
-DASHBOARD
-│
-▼
-CONTENT OPTIMIZATION
-That is the foundation of a real digital sports newsroom, rather than just a blog.
-69. THE MOST IMPORTANT PRINCIPLE
-Your entire social strategy can be reduced to:
-Don't ask "What should I post?"
-Ask:
-"What can I create today that a sports fan would genuinely want to see, discuss, share or save?"
-Then:
-CREATE
-↓
-DISTRIBUTE
-↓
-ENGAGE
-↓
-MEASURE
-↓
-LEARN
-↓
-IMPROVE
-↓
-REPEAT
-That's the growth loop.
-70. OFFICIAL LEARNING RESOURCES
-Keep these bookmarked as you build.
-Meta
-[Meta Business Suite](https://business.facebook.com/?utm_source=chatgpt.com) — useful for managing Facebook/Instagram publishing and business activity.
-Instagram
-[Instagram for Creators](https://creators.instagram.com/?utm_source=chatgpt.com) — creator-focused resources and guidance.
-TikTok
-[TikTok Academy](https://ads.tiktok.com/business/en-GB/academy?utm_source=chatgpt.com) — official TikTok learning platform for marketers and agencies. ([TikTok For Business](https://ads.tiktok.com/business/en-GB/academy?utm_source=chatgpt.com))
-[TikTok Creator Academy resources](https://www.tiktok.com/creators/creator-portal/en-us/?utm_source=chatgpt.com) — TikTok's creator education resources covering creation, strategy and community. TikTok has described the Creator Academy as an education hub with courses, articles, videos and insights. ([TikTok Newsroom](https://newsroom.tiktok.com/for-creators-future-format-summit?lang=en&utm_source=chatgpt.com))
-YouTube
-[YouTube Studio](https://studio.youtube.com/?utm_source=chatgpt.com) — publishing, channel management and analytics.
-[YouTube Analytics learning guide](https://creatoracademy.youtube.com/page/lesson/using-analytics?utm_source=chatgpt.com) — official guidance on reach, engagement, audience and trends. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com))
-SEO
-[Google Search Central](https://developers.google.com/search/?utm_source=chatgpt.com) — official Google documentation for search optimization.
-What Part 7 should cover
-The next part should be CANVA + SPORTS GRAPHIC DESIGN FROM ZERO.
-We'll go much deeper into:
-CANVA ACCOUNT SETUP
-↓
-BRAND KIT
-↓
-COLORS
-↓
-FONTS
-↓
-LOGO
-↓
-SPORTS GRAPHIC PRINCIPLES
-↓
-BREAKING NEWS TEMPLATE
-↓
-MATCHDAY TEMPLATE
-↓
-STARTING XI
-↓
-SCOREBOARD
-↓
-GOAL GRAPHIC
-↓
-PLAYER RATING
-↓
-TRANSFER GRAPHIC
-↓
-STATISTICS GRAPHIC
-↓
-INSTAGRAM CAROUSEL
-↓
-STORY/REELS
-↓
-YOUTUBE THUMBNAILS
-↓
-CANVA ANIMATION
-↓
-VIDEO GRAPHICS
-↓
-EXPORT SETTINGS
-↓
-CONTENT BATCHING
-↓
-30+ REUSABLE GOALMILLS TEMPLATES
-And importantly, we'll build the actual design system—not just explain where to click in Canva—so your sports brand can have a consistent professional look across your website, Facebook, Instagram, X, TikTok and YouTube.
+   Useful, but not the final objective.
+7. DON'T CELEBRATE VIRALITY TOO EARLY
+   Suppose:
+   Post A
+   100,000 views
+   20 website visits
+   and:
+   Post B
+   10,000 views
+   1,500 website visits
+   Which is better for your sports business?
+   Probably:
+   Post B.
+   Because your objective is not simply:
+   views.
+   You're building a media company.
+8. CREATE A TRAFFIC FUNNEL
+   Your system should be:
+   SOCIAL IMPRESSION
+   ↓
+   SOCIAL ENGAGEMENT
+   ↓
+   PROFILE VISIT
+   ↓
+   WEBSITE CLICK
+   ↓
+   ARTICLE
+   ↓
+   ANOTHER ARTICLE
+   ↓
+   EMAIL/PUSH/APP
+   ↓
+   RETURN VISIT
+   The ultimate goal is:
+   Owned audience.
+9. BUILD YOUR EMAIL AUDIENCE
+   Eventually create:
+   GoalMills Daily Football Newsletter
+   Example:
+   Morning
+   ⚽ GOALMILLS MORNING BRIEF
+   5 biggest football stories
+   Transfer news
+   Nigerian football
+   Today's fixtures
+   Today's matches
+   Now social-media algorithms don't completely control your audience.
+10. PUSH NOTIFICATIONS
+    Your website/mobile app can notify users:
+    🚨 BREAKING: Arsenal complete signing of Player X.
+    But don't send:
+    "New article!"
+    for everything.
+    Notifications should have real value.
+11. WHATSAPP + PUSH + EMAIL
+    These are your owned distribution channels.
+    Think:
+    Social Media
+    ↓
+    Discovery
+    Website
+    ↓
+    Conversion
+    Email
+    Push
+    WhatsApp
+    ↓
+    Retention
+    That is a much stronger business model than depending exclusively on Facebook or TikTok.
+12. YOUR DAILY SOCIAL MEDIA OPERATING SYSTEM
+    Here's a practical routine.
+    6:00–8:00 AM
+    Check:
+    Transfer news
+    Overnight results
+    Injuries
+    Club announcements
+    Nigerian players
+    International news
+    Publish morning roundup.
+    9:00–12:00
+    Publish:
+    News
+    Transfer
+    Player graphic
+    Evergreen article
+    12:00–15:00
+    Create:
+    Short video
+    Poll
+    Quiz
+    Discussion
+    15:00–18:00
+    Prepare:
+    Match previews
+    Lineups
+    Graphics
+    Video scripts
+    Matchday
+    Switch into:
+    LIVE MODE
+    Lineup
+    Kickoff
+    Goal
+    Cards
+    Half-time
+    Substitutions
+    Goal
+    Full-time
+    Reaction
+    Match report
+    Analysis
+    After match
+    Repurpose:
+    Result
+    Player graphic
+    Stats
+    Quote
+    Tactical analysis
+    Short video
+    Article
+13. WEEKLY ANALYTICS MEETING
+    Every Sunday, examine:
+    Top 10 posts
+    Top 10 articles
+    Top videos
+    Most shared story
+    Most commented story
+    Highest CTR
+    Best-performing platform
+    Worst-performing platform
+    New followers
+    Website traffic
+    Then ask:
+    What did the audience teach us this week?
+14. BUILD A CONTENT SCORECARD
+    Create a spreadsheet:
+    Content
+    Platform
+    Reach
+    Likes
+    Shares
+    Comments
+    Clicks
+    Followers
+    Arsenal news
+    X
+    50k
+    2k
+    400
+    180
+    900
+    120
+    Saka graphic
+    IG
+    80k
+    7k
+    1.5k
+    400
+    200
+    300
+    Match video
+    TikTok
+    300k
+    20k
+    5k
+    900
+    —
+    2k
+    After 30 days you'll start seeing patterns.
+15. FIND YOUR WINNING FORMATS
+    Maybe you discover:
+    TRANSFER NEWS
+    ⭐⭐⭐⭐⭐
+    MATCH ANALYSIS
+    ⭐⭐⭐⭐⭐
+    GENERIC QUOTES
+    ⭐⭐
+    RANDOM MEMES
+    ⭐⭐⭐
+    PLAYER GRAPHICS
+    ⭐⭐⭐⭐
+    Then produce more of:
+    ⭐⭐⭐⭐⭐
+    and less of:
+    ⭐⭐
+    That's how you grow systematically.
+16. YOUR FIRST 30 DAYS
+    Don't attempt everything immediately.
+    Week 1
+    Set up:
+    Website
+    Facebook
+    Instagram
+    X
+    TikTok
+    YouTube
+    WhatsApp
+    Create branding.
+    Week 2
+    Create:
+    10 Canva templates
+    20 social templates
+    Article templates
+    Video templates
+    Caption templates
+    Week 3
+    Start publishing:
+    3–5 articles/day
+    5–10 social posts/day
+    1 short video/day
+    Adjust according to your capacity.
+    Week 4
+    Analyze:
+    What generated traffic?
+    What generated shares?
+    What generated followers?
+    What generated comments?
+    What generated returning users?
+    Then optimize.
+17. THE BIGGEST BEGINNER MISTAKES
+    Avoid:
+    ❌ Buying followers
+    ❌ Copying competitors
+    ❌ Posting without verifying
+    ❌ Using copyrighted images/videos without permission
+    ❌ Posting only links
+    ❌ Ignoring comments
+    ❌ Posting identical content everywhere
+    ❌ Ignoring analytics
+    ❌ Chasing every trend
+    ❌ Using clickbait that doesn't deliver
+    ❌ Publishing 30 low-quality articles
+    ❌ Depending entirely on one platform
+18. THE SYSTEM I WOULD BUILD FOR GOALMILLS
+    Since you're building a sports platform, I'd eventually make the architecture:
+    GOALMILLS CMS
+    │
+    ▼
+    ARTICLE CREATED
+    │
+    ┌───────┴───────┐
+    ▼ ▼
+    EDITOR AI ENGINE
+    │ │
+    └───────┬───────┘
+    ▼
+    CONTENT PACKAGE
+    │
+    ┌───────────────┼────────────────┐
+    ▼ ▼ ▼
+    SOCIAL VIDEO GRAPHICS
+    │ │ │
+    ▼ ▼ ▼
+    X/FB TikTok/YT IG/FB/X
+    │ │ │
+    └───────────────┼────────────────┘
+    ▼
+    ANALYTICS
+    │
+    ▼
+    DASHBOARD
+    │
+    ▼
+    CONTENT OPTIMIZATION
+    That is the foundation of a real digital sports newsroom, rather than just a blog.
+19. THE MOST IMPORTANT PRINCIPLE
+    Your entire social strategy can be reduced to:
+    Don't ask "What should I post?"
+    Ask:
+    "What can I create today that a sports fan would genuinely want to see, discuss, share or save?"
+    Then:
+    CREATE
+    ↓
+    DISTRIBUTE
+    ↓
+    ENGAGE
+    ↓
+    MEASURE
+    ↓
+    LEARN
+    ↓
+    IMPROVE
+    ↓
+    REPEAT
+    That's the growth loop.
+20. OFFICIAL LEARNING RESOURCES
+    Keep these bookmarked as you build.
+    Meta
+    [Meta Business Suite](https://business.facebook.com/?utm_source=chatgpt.com) — useful for managing Facebook/Instagram publishing and business activity.
+    Instagram
+    [Instagram for Creators](https://creators.instagram.com/?utm_source=chatgpt.com) — creator-focused resources and guidance.
+    TikTok
+    [TikTok Academy](https://ads.tiktok.com/business/en-GB/academy?utm_source=chatgpt.com) — official TikTok learning platform for marketers and agencies. ([TikTok For Business](https://ads.tiktok.com/business/en-GB/academy?utm_source=chatgpt.com))
+    [TikTok Creator Academy resources](https://www.tiktok.com/creators/creator-portal/en-us/?utm_source=chatgpt.com) — TikTok's creator education resources covering creation, strategy and community. TikTok has described the Creator Academy as an education hub with courses, articles, videos and insights. ([TikTok Newsroom](https://newsroom.tiktok.com/for-creators-future-format-summit?lang=en&utm_source=chatgpt.com))
+    YouTube
+    [YouTube Studio](https://studio.youtube.com/?utm_source=chatgpt.com) — publishing, channel management and analytics.
+    [YouTube Analytics learning guide](https://creatoracademy.youtube.com/page/lesson/using-analytics?utm_source=chatgpt.com) — official guidance on reach, engagement, audience and trends. ([YouTube](https://creatoracademy.youtube.com/page/lesson/using-analytics?cid=viewership-bootcamp&hl=ja&success=true&utm_source=chatgpt.com))
+    SEO
+    [Google Search Central](https://developers.google.com/search/?utm_source=chatgpt.com) — official Google documentation for search optimization.
+    What Part 7 should cover
+    The next part should be CANVA + SPORTS GRAPHIC DESIGN FROM ZERO.
+    We'll go much deeper into:
+    CANVA ACCOUNT SETUP
+    ↓
+    BRAND KIT
+    ↓
+    COLORS
+    ↓
+    FONTS
+    ↓
+    LOGO
+    ↓
+    SPORTS GRAPHIC PRINCIPLES
+    ↓
+    BREAKING NEWS TEMPLATE
+    ↓
+    MATCHDAY TEMPLATE
+    ↓
+    STARTING XI
+    ↓
+    SCOREBOARD
+    ↓
+    GOAL GRAPHIC
+    ↓
+    PLAYER RATING
+    ↓
+    TRANSFER GRAPHIC
+    ↓
+    STATISTICS GRAPHIC
+    ↓
+    INSTAGRAM CAROUSEL
+    ↓
+    STORY/REELS
+    ↓
+    YOUTUBE THUMBNAILS
+    ↓
+    CANVA ANIMATION
+    ↓
+    VIDEO GRAPHICS
+    ↓
+    EXPORT SETTINGS
+    ↓
+    CONTENT BATCHING
+    ↓
+    30+ REUSABLE GOALMILLS TEMPLATES
+    And importantly, we'll build the actual design system—not just explain where to click in Canva—so your sports brand can have a consistent professional look across your website, Facebook, Instagram, X, TikTok and YouTube.
+
 # PART 7 — CANVA SPORTS GRAPHIC DESIGN FROM ZERO
+
 This part will teach you how to go from "I don't know how to design" to having a reusable professional graphics system for your sports blog.
 The objective is not simply to learn Canva buttons.
 The objective is to build a sports media visual identity that people can recognize while scrolling.
 Canva already provides a large collection of sports templates that can be customized for match-day graphics, sports posts, videos and other content. ([Canva](https://www.canva.com/templates/s/sports/?utm_source=chatgpt.com))
+
 1. WHAT YOU ARE ACTUALLY LEARNING
-By the end of this part, you should be able to create:
-SPORTS MEDIA DESIGN
-│
-┌──────────────────┼──────────────────┐
-↓ ↓ ↓
-GRAPHICS VIDEO BRAND
-│ │ │
-Matchday Reels Logo
-Breaking TikTok Colors
-Transfers Shorts Fonts
-Results YouTube Templates
-Lineups Stories Guidelines
-Statistics
-Player ratings
-Quotes
-Tables
-Fixtures
-You will also learn how to turn one design into 10+ pieces of content.
+   By the end of this part, you should be able to create:
+   SPORTS MEDIA DESIGN
+   │
+   ┌──────────────────┼──────────────────┐
+   ↓ ↓ ↓
+   GRAPHICS VIDEO BRAND
+   │ │ │
+   Matchday Reels Logo
+   Breaking TikTok Colors
+   Transfers Shorts Fonts
+   Results YouTube Templates
+   Lineups Stories Guidelines
+   Statistics
+   Player ratings
+   Quotes
+   Tables
+   Fixtures
+   You will also learn how to turn one design into 10+ pieces of content.
 2. FIRST: UNDERSTAND WHAT MAKES A GOOD SPORTS GRAPHIC
-A professional sports graphic has five major components:
-1. VISUAL
-2. HEADLINE
-3. INFORMATION
-4. BRANDING
-5. HIERARCHY
-For example:
-┌─────────────────────────────────────┐
-│ GOALMILLS │
-│ │
-│ 🔴 TRANSFER NEWS │
-│ │
-│ VICTOR OSIMHEN │
-│ │
-│ JOINS GALATASARAY │
-│ │
-│ [PLAYER] │
-│ │
-│ DEAL AGREED │
-│ │
-└─────────────────────────────────────┘
-Someone should understand the main message before reading the small details.
-3. CREATE YOUR CANVA ACCOUNT
-Go to:
-[Canva](https://www.canva.com/?utm_source=chatgpt.com)
-Create your account.
-If you're building a serious sports media company, I recommend using a dedicated company email rather than a personal email.
-For example:
-media@yourdomain.com
-or:
-design@yourdomain.com
-4. CREATE YOUR GOALMILLS DESIGN FOLDER
-Inside Canva, organize your projects.
-I recommend:
-GOALMILLS
-│
-├── 00 BRAND
-│
-├── 01 BREAKING NEWS
-│
-├── 02 MATCHDAY
-│
-├── 03 TRANSFERS
-│
-├── 04 PLAYER
-│
-├── 05 STATISTICS
-│
-├── 06 INSTAGRAM
-│
-├── 07 FACEBOOK
-│
-├── 08 X
-│
-├── 09 TIKTOK
-│
-├── 10 YOUTUBE
-│
-├── 11 THUMBNAILS
-│
-├── 12 STORIES
-│
-├── 13 ADS
-│
-└── 14 ARCHIVE
-This becomes extremely important when you have hundreds or thousands of designs.
-5. CREATE YOUR BRAND KIT
-If you're using Canva's Brand Kit features, you can store your logos, fonts, colors, graphics and other brand assets so they're accessible while designing. Canva says Brand Kit is designed specifically to help maintain consistency across designs. ([Canva](https://www.canva.com/pro/brand-kit/?utm_source=chatgpt.com))
-[Canva Brand Kit](https://www.canva.com/pro/brand-kit/?utm_source=chatgpt.com)
-Your Brand Kit should contain:
-LOGO
-↓
-COLORS
-↓
-FONTS
-↓
-ICONS
-↓
-GRAPHICS
-↓
-PHOTOGRAPHY STYLE
-↓
-TEMPLATES
-6. BUILD YOUR COLOR SYSTEM
-Don't randomly choose colors every time you create a graphic.
-Create a fixed palette.
-For a modern sports-news brand, you could use:
-PRIMARY
-#0B1220
-SECONDARY
-#FFFFFF
-ACCENT
-#10B981
-DARK ACCENT
-#064E3B
-ALERT
-#EF4444
-LIGHT BACKGROUND
-#F3F4F6
-You don't have to use these exact colors.
-The important thing is consistency.
-7. USE COLORS WITH PURPOSE
-Don't use:
-RED
-BLUE
-GREEN
-YELLOW
-PURPLE
-ORANGE
-PINK
-all on one graphic.
-Instead:
-Normal news
-Navy + White + Green
-Breaking news
-Navy + White + Red
-Nigeria
-Green + White
-Transfer
-Navy + White + Accent
-Matchday
-Dark background + Team colors
-This creates a visual language.
-8. YOUR FONT SYSTEM
-Use two or three fonts maximum.
-For example:
-Headline
-Bebas Neue
-Body
-Inter
-Small labels
-Montserrat
-Your system becomes:
-HEADLINE
-BEBAS NEUE
-SUBHEAD
-MONTSERRAT
-BODY
-INTER
-The exact fonts can change, but don't keep switching fonts.
-9. FONT HIERARCHY
-Suppose your graphic says:
-Arsenal complete signing of Player X.
-Don't make every word the same size.
-Instead:
-ARSENAL
-← huge
-COMPLETE SIGNING
-← medium
-OF PLAYER X
-← large
-FULL STORY AT GOALMILLS
-← small
-The viewer's eye should move:
-1 → 2 → 3 → 4
-10. THE 3-SECOND TEST
-After designing a graphic:
-Look at it for three seconds.
-Then ask:
-What did I see?
-If the answer is:
-"I don't know."
-Your design failed.
-If the answer is:
-"Arsenal signed a player."
-Good.
-11. VISUAL HIERARCHY
-Think of every graphic like this:
-MOST IMPORTANT
-↓
-BIG HEADLINE
-↓
-MAIN IMAGE
-↓
-SUPPORTING INFO
-↓
-BRAND
-↓
-SMALLEST TEXT
-Don't make your logo the biggest thing.
-Your story should be the hero.
-12. CREATE YOUR FIRST TEMPLATE
-Go to Canva.
-Search:
-Instagram Post
-Then choose:
-Create blank design
-Alternatively, start from Canva's sports templates and customize the structure rather than simply copying the entire design. ([Canva](https://www.canva.com/templates/s/sports/?utm_source=chatgpt.com))
-13. YOUR BREAKING NEWS TEMPLATE
-Use:
-1080 × 1350
-Structure:
-┌───────────────────────────┐
-│ GOALMILLS │
-│ │
-│ 🔴 BREAKING │
-│ │
-│ │
-│ PLAYER IMAGE │
-│ │
-│ │
-│ ARSENAL COMPLETE │
-│ PLAYER X SIGNING │
-│ │
-│ DEAL AGREED │
-│ │
-│ GOALMILLS.COM │
-└───────────────────────────┘
-14. DESIGN THE BACKGROUND
-You have several options.
-Option A
-Solid dark background.
-Option B
-Player image with dark overlay.
-Option C
-Stadium image.
-Option D
-Gradient.
-For sports news, I particularly like:
-PLAYER PHOTO
-+
-DARK OVERLAY
-+
+   A professional sports graphic has five major components:
+3. VISUAL
+4. HEADLINE
+5. INFORMATION
+6. BRANDING
+7. HIERARCHY
+   For example:
+   ┌─────────────────────────────────────┐
+   │ GOALMILLS │
+   │ │
+   │ 🔴 TRANSFER NEWS │
+   │ │
+   │ VICTOR OSIMHEN │
+   │ │
+   │ JOINS GALATASARAY │
+   │ │
+   │ [PLAYER] │
+   │ │
+   │ DEAL AGREED │
+   │ │
+   └─────────────────────────────────────┘
+   Someone should understand the main message before reading the small details.
+8. CREATE YOUR CANVA ACCOUNT
+   Go to:
+   [Canva](https://www.canva.com/?utm_source=chatgpt.com)
+   Create your account.
+   If you're building a serious sports media company, I recommend using a dedicated company email rather than a personal email.
+   For example:
+   media@yourdomain.com
+   or:
+   design@yourdomain.com
+9. CREATE YOUR GOALMILLS DESIGN FOLDER
+   Inside Canva, organize your projects.
+   I recommend:
+   GOALMILLS
+   │
+   ├── 00 BRAND
+   │
+   ├── 01 BREAKING NEWS
+   │
+   ├── 02 MATCHDAY
+   │
+   ├── 03 TRANSFERS
+   │
+   ├── 04 PLAYER
+   │
+   ├── 05 STATISTICS
+   │
+   ├── 06 INSTAGRAM
+   │
+   ├── 07 FACEBOOK
+   │
+   ├── 08 X
+   │
+   ├── 09 TIKTOK
+   │
+   ├── 10 YOUTUBE
+   │
+   ├── 11 THUMBNAILS
+   │
+   ├── 12 STORIES
+   │
+   ├── 13 ADS
+   │
+   └── 14 ARCHIVE
+   This becomes extremely important when you have hundreds or thousands of designs.
+10. CREATE YOUR BRAND KIT
+    If you're using Canva's Brand Kit features, you can store your logos, fonts, colors, graphics and other brand assets so they're accessible while designing. Canva says Brand Kit is designed specifically to help maintain consistency across designs. ([Canva](https://www.canva.com/pro/brand-kit/?utm_source=chatgpt.com))
+    [Canva Brand Kit](https://www.canva.com/pro/brand-kit/?utm_source=chatgpt.com)
+    Your Brand Kit should contain:
+    LOGO
+    ↓
+    COLORS
+    ↓
+    FONTS
+    ↓
+    ICONS
+    ↓
+    GRAPHICS
+    ↓
+    PHOTOGRAPHY STYLE
+    ↓
+    TEMPLATES
+11. BUILD YOUR COLOR SYSTEM
+    Don't randomly choose colors every time you create a graphic.
+    Create a fixed palette.
+    For a modern sports-news brand, you could use:
+    PRIMARY
+    #0B1220
+    SECONDARY
+    #FFFFFF
+    ACCENT
+    #10B981
+    DARK ACCENT
+    #064E3B
+    ALERT
+    #EF4444
+    LIGHT BACKGROUND
+    #F3F4F6
+    You don't have to use these exact colors.
+    The important thing is consistency.
+12. USE COLORS WITH PURPOSE
+    Don't use:
+    RED
+    BLUE
+    GREEN
+    YELLOW
+    PURPLE
+    ORANGE
+    PINK
+    all on one graphic.
+    Instead:
+    Normal news
+    Navy + White + Green
+    Breaking news
+    Navy + White + Red
+    Nigeria
+    Green + White
+    Transfer
+    Navy + White + Accent
+    Matchday
+    Dark background + Team colors
+    This creates a visual language.
+13. YOUR FONT SYSTEM
+    Use two or three fonts maximum.
+    For example:
+    Headline
+    Bebas Neue
+    Body
+    Inter
+    Small labels
+    Montserrat
+    Your system becomes:
+    HEADLINE
+    BEBAS NEUE
+    SUBHEAD
+    MONTSERRAT
+    BODY
+    INTER
+    The exact fonts can change, but don't keep switching fonts.
+14. FONT HIERARCHY
+    Suppose your graphic says:
+    Arsenal complete signing of Player X.
+    Don't make every word the same size.
+    Instead:
+    ARSENAL
+    ← huge
+    COMPLETE SIGNING
+    ← medium
+    OF PLAYER X
+    ← large
+    FULL STORY AT GOALMILLS
+    ← small
+    The viewer's eye should move:
+    1 → 2 → 3 → 4
+15. THE 3-SECOND TEST
+    After designing a graphic:
+    Look at it for three seconds.
+    Then ask:
+    What did I see?
+    If the answer is:
+    "I don't know."
+    Your design failed.
+    If the answer is:
+    "Arsenal signed a player."
+    Good.
+16. VISUAL HIERARCHY
+    Think of every graphic like this:
+    MOST IMPORTANT
+    ↓
+    BIG HEADLINE
+    ↓
+    MAIN IMAGE
+    ↓
+    SUPPORTING INFO
+    ↓
+    BRAND
+    ↓
+    SMALLEST TEXT
+    Don't make your logo the biggest thing.
+    Your story should be the hero.
+17. CREATE YOUR FIRST TEMPLATE
+    Go to Canva.
+    Search:
+    Instagram Post
+    Then choose:
+    Create blank design
+    Alternatively, start from Canva's sports templates and customize the structure rather than simply copying the entire design. ([Canva](https://www.canva.com/templates/s/sports/?utm_source=chatgpt.com))
+18. YOUR BREAKING NEWS TEMPLATE
+    Use:
+    1080 × 1350
+    Structure:
+    ┌───────────────────────────┐
+    │ GOALMILLS │
+    │ │
+    │ 🔴 BREAKING │
+    │ │
+    │ │
+    │ PLAYER IMAGE │
+    │ │
+    │ │
+    │ ARSENAL COMPLETE │
+    │ PLAYER X SIGNING │
+    │ │
+    │ DEAL AGREED │
+    │ │
+    │ GOALMILLS.COM │
+    └───────────────────────────┘
+19. DESIGN THE BACKGROUND
+    You have several options.
+    Option A
+    Solid dark background.
+    Option B
+    Player image with dark overlay.
+    Option C
+    Stadium image.
+    Option D
+    Gradient.
+    For sports news, I particularly like:
+    PLAYER PHOTO
+
+-
+
+DARK OVERLAY +
 BIG TYPOGRAPHY
-because it gives the headline strong contrast.
-15. FINDING IMAGES
+because it gives the headline strong contrast. 15. FINDING IMAGES
 Be careful here.
 You cannot simply search Google Images and download any footballer's photograph.
 Copyright matters.
 For professional sports publishing, use properly licensed images, your own photography, licensed stock images, approved media assets or images you have permission to use.
 For inspiration, Canva itself provides sports imagery and templates. ([Canva](https://www.canva.com/templates/s/sports/?utm_source=chatgpt.com))
-Don't build a business around stealing photographs.
-16. REMOVE THE BACKGROUND
+Don't build a business around stealing photographs. 16. REMOVE THE BACKGROUND
 Suppose you have a legally usable player image.
 Upload it to Canva.
 Then use background removal where available.
@@ -6919,8 +6792,7 @@ PLAYER
 └─────────┘
 ↓
 HEADLINE
-This makes the player appear integrated into the design.
-17. ADD A DARK OVERLAY
+This makes the player appear integrated into the design. 17. ADD A DARK OVERLAY
 If the photograph is too bright, your headline becomes difficult to read.
 Add a rectangle over the image.
 Then reduce its transparency.
@@ -6931,8 +6803,7 @@ IMAGE
 ████████████████
 Then place:
 BREAKING NEWS
-on top.
-18. DON'T OVERLOAD THE GRAPHIC
+on top. 18. DON'T OVERLOAD THE GRAPHIC
 A beginner might create:
 Arsenal have officially completed the signing of Player X from Club Y after agreeing a five-year contract worth €XX million including add-ons...
 Don't put that entire paragraph on the image.
@@ -6941,8 +6812,7 @@ ARSENAL SIGN PLAYER X
 Then:
 Deal agreed.
 That's enough.
-The article contains the details.
-19. CREATE YOUR MATCHDAY TEMPLATE
+The article contains the details. 19. CREATE YOUR MATCHDAY TEMPLATE
 Create:
 MATCHDAY
 Structure:
@@ -6961,8 +6831,7 @@ Structure:
 │ │
 │ AUGUST 27, 2026 │
 └─────────────────────────────┘
-Use club colors carefully.
-20. STARTING XI GRAPHIC
+Use club colors carefully. 20. STARTING XI GRAPHIC
 This is one of the most useful templates for a football page.
 Create:
 STARTING XI
@@ -6973,8 +6842,7 @@ CM CM
 LB CB CB RB
 GK
 Then place player names or photographs.
-Keep the typography readable.
-21. STARTING XI DESIGN
+Keep the typography readable. 21. STARTING XI DESIGN
 You can create two versions.
 Version 1 — Tactical
 Actual formation.
@@ -6986,8 +6854,7 @@ PLAYER 11 PLAYER 7
 PLAYER 10
 PLAYER 8 PLAYER 6
 PLAYER 3 PLAYER 4 PLAYER 5 PLAYER 2
-PLAYER 1
-22. MATCH RESULT TEMPLATE
+PLAYER 1 22. MATCH RESULT TEMPLATE
 After the match:
 ┌───────────────────────────┐
 │ │
@@ -7006,8 +6873,7 @@ After the match:
 │ MARTINELLI ⚽ │
 │ │
 │ GOALMILLS │
-└───────────────────────────┘
-23. GOAL GRAPHIC
+└───────────────────────────┘ 23. GOAL GRAPHIC
 This should be extremely recognizable.
 Example:
 ⚽ GOAL!
@@ -7015,14 +6881,12 @@ SAKA
 ARSENAL 1–0 CHELSEA
 27'
 Don't make it complicated.
-During a live match, speed is more important than artistic perfection.
-24. HALF-TIME GRAPHIC
+During a live match, speed is more important than artistic perfection. 24. HALF-TIME GRAPHIC
 Use:
 HALF-TIME
 ARSENAL 1–0 CHELSEA
 ⚽ SAKA 32'
-Then post immediately.
-25. PLAYER OF THE MATCH
+Then post immediately. 25. PLAYER OF THE MATCH
 Template:
 PLAYER OF THE MATCH
 [PLAYER]
@@ -7032,8 +6896,7 @@ PLAYER OF THE MATCH
 5 SHOTS
 4 KEY PASSES
 GOALMILLS
-You can reuse this after every major match.
-26. PLAYER STATISTICS
+You can reuse this after every major match. 26. PLAYER STATISTICS
 Sports graphics are perfect for statistics.
 For example:
 PLAYER X
@@ -7047,8 +6910,7 @@ Make the numbers visually dominant.
 2
 GOALS
 is more powerful than:
-Player X scored two goals.
-27. STATISTICS GRAPHICS
+Player X scored two goals. 27. STATISTICS GRAPHICS
 Canva also has sports infographic templates that can be adapted for statistics, tactics, match schedules and other data-driven sports content. ([Canva](https://www.canva.com/infographics/templates/sports/?utm_source=chatgpt.com))
 [Canva Sports Infographics](https://www.canva.com/infographics/templates/sports/?utm_source=chatgpt.com)
 Use:
@@ -7061,8 +6923,7 @@ Example:
 67%
 POSSESSION
 ARSENAL controlled the ball
-for most of the match.
-28. TRANSFER GRAPHIC
+for most of the match. 28. TRANSFER GRAPHIC
 Your transfer design should become one of your strongest brand assets.
 Example:
 TRANSFER NEWS
@@ -7076,8 +6937,7 @@ ARSENAL LOGO
 ↓
 PLAYER
 ↓
-REAL MADRID LOGO
-29. TRANSFER CONFIRMATION LEVEL
+REAL MADRID LOGO 29. TRANSFER CONFIRMATION LEVEL
 Be careful with language.
 These are not the same:
 RUMOUR
@@ -7092,8 +6952,7 @@ Don't write:
 OFFICIAL
 when your source only says:
 Talks ongoing.
-That damages trust.
-30. QUOTE GRAPHIC
+That damages trust. 30. QUOTE GRAPHIC
 Example:
 “WE ARE READY
 FOR THE CHALLENGE.”
@@ -7102,8 +6961,7 @@ Use a strong photograph.
 Keep the quote short.
 Put:
 SOURCE
-where necessary.
-31. PLAYER BIRTHDAY GRAPHIC
+where necessary. 31. PLAYER BIRTHDAY GRAPHIC
 Example:
 HAPPY BIRTHDAY 🎂
 VICTOR OSIMHEN
@@ -7113,8 +6971,7 @@ You can create a reusable template where only:
 PHOTO
 NAME
 AGE
-changes.
-32. FIXTURE GRAPHIC
+changes. 32. FIXTURE GRAPHIC
 Example:
 NEXT MATCH
 ARSENAL
@@ -7123,8 +6980,7 @@ CHELSEA
 SATURDAY
 15:00
 PREMIER LEAGUE
-Make the opponent obvious.
-33. LEAGUE TABLE GRAPHIC
+Make the opponent obvious. 33. LEAGUE TABLE GRAPHIC
 Example:
 PREMIER LEAGUE
 1 Arsenal 75
@@ -7136,153 +6992,153 @@ For social:
 Top 5
 may be better.
 For your website:
-Full table.
-34. INSTAGRAM CAROUSEL
+Full table. 34. INSTAGRAM CAROUSEL
 Carousels are extremely powerful for educational sports content.
 Example:
 Slide 1
 3 THINGS WE LEARNED FROM ARSENAL VS CHELSEA
 Slide 2
+
 1. Arsenal changed their pressing structure
-Slide 3
+   Slide 3
 2. Saka attacked the space behind the full-back
-Slide 4
+   Slide 4
 3. Chelsea struggled to progress the ball
-Slide 5
-FINAL VERDICT
-Slide 6
-Read the full analysis at GoalMills.
-Now one article becomes a six-slide piece.
-35. CAROUSEL DESIGN RULE
-Every slide should feel like part of the same story.
-Don't create:
-Slide 1 = blue
-Slide 2 = red
-Slide 3 = yellow
-Slide 4 = purple
-Instead:
-Same colors
-Same fonts
-Same margins
-Same logo position
-Same visual language
-36. SAFE MARGINS
-Don't put important text right against the edge.
-Use an invisible safe area:
-┌───────────────────────────────┐
-│ │
-│ SAFE AREA │
-│ ┌───────────────────────┐ │
-│ │ │ │
-│ │ CONTENT │ │
-│ │ │ │
-│ └───────────────────────┘ │
-│ │
-└───────────────────────────────┘
-This is especially important for vertical videos where platform UI can cover parts of the screen.
-37. ALIGNMENT
-One of the fastest ways to make a beginner design look professional:
-Align everything.
-Don't place:
-headline here
-logo somewhere else
-player randomly
-stats somewhere else
-Instead:
-LEFT EDGE
-│
-├── headline
-├── subheadline
-├── stats
-└── source
-Your eye will perceive the design as organized.
-38. USE GRIDS
-Imagine invisible columns:
-┌──────┬──────────┬──────┐
-│ │ │ │
-│ TEXT │ IMAGE │ TEXT │
-│ │ │ │
-└──────┴──────────┴──────┘
-Canva's rulers and guides can help you organize elements; Canva specifically recommends guides for aligning sports infographic elements. ([Canva](https://www.canva.com/infographics/templates/sports/?utm_source=chatgpt.com))
-39. WHITE SPACE
-Don't be afraid of empty space.
-Bad design:
-TEXT
-IMAGE
-TEXT
-LOGO
-ICON
-TEXT
-STAT
-ICON
-TEXT
-IMAGE
-Everything is fighting.
-Good design:
-PLAYER
-ARSENAL SIGN
-PLAYER X
-DEAL AGREED
-LOGO
-The empty space makes the important elements stronger.
-40. IMAGE COMPOSITION
-Don't always put the player's face in the center.
-Try:
-PLAYER
-→
-→ HEADLINE
-or:
-HEADLINE
-PLAYER →
-Use the direction the player is facing.
-If the player is looking left:
-HEADLINE ← PLAYER
-If looking right:
-PLAYER → HEADLINE
-This creates visual flow.
-41. DEPTH
-You can create depth using:
-Background
-↓
-Stadium
-↓
-Player
-↓
-Gradient
-↓
-Headline
-↓
-Logo
-This makes a flat design feel more sophisticated.
-42. SHADOWS
-Use shadows carefully.
-A subtle shadow can separate:
-PLAYER
-from:
-BACKGROUND
-But don't turn everything into glowing neon text.
-43. GRADIENTS
-Gradients can work well in sports.
-Example:
-Dark Navy
-↓
-Transparent
-↓
-Black
-Place the player on one side.
-Place your headline on the other.
-44. TEAM COLORS
-Team colors are useful, but don't let them destroy your brand identity.
-If Arsenal plays Chelsea, don't suddenly make the entire GoalMills account:
-RED + BLUE
-Instead:
-GOALMILLS NAVY
-+
-ARSENAL RED
-+
+   Slide 5
+   FINAL VERDICT
+   Slide 6
+   Read the full analysis at GoalMills.
+   Now one article becomes a six-slide piece.
+4. CAROUSEL DESIGN RULE
+   Every slide should feel like part of the same story.
+   Don't create:
+   Slide 1 = blue
+   Slide 2 = red
+   Slide 3 = yellow
+   Slide 4 = purple
+   Instead:
+   Same colors
+   Same fonts
+   Same margins
+   Same logo position
+   Same visual language
+5. SAFE MARGINS
+   Don't put important text right against the edge.
+   Use an invisible safe area:
+   ┌───────────────────────────────┐
+   │ │
+   │ SAFE AREA │
+   │ ┌───────────────────────┐ │
+   │ │ │ │
+   │ │ CONTENT │ │
+   │ │ │ │
+   │ └───────────────────────┘ │
+   │ │
+   └───────────────────────────────┘
+   This is especially important for vertical videos where platform UI can cover parts of the screen.
+6. ALIGNMENT
+   One of the fastest ways to make a beginner design look professional:
+   Align everything.
+   Don't place:
+   headline here
+   logo somewhere else
+   player randomly
+   stats somewhere else
+   Instead:
+   LEFT EDGE
+   │
+   ├── headline
+   ├── subheadline
+   ├── stats
+   └── source
+   Your eye will perceive the design as organized.
+7. USE GRIDS
+   Imagine invisible columns:
+   ┌──────┬──────────┬──────┐
+   │ │ │ │
+   │ TEXT │ IMAGE │ TEXT │
+   │ │ │ │
+   └──────┴──────────┴──────┘
+   Canva's rulers and guides can help you organize elements; Canva specifically recommends guides for aligning sports infographic elements. ([Canva](https://www.canva.com/infographics/templates/sports/?utm_source=chatgpt.com))
+8. WHITE SPACE
+   Don't be afraid of empty space.
+   Bad design:
+   TEXT
+   IMAGE
+   TEXT
+   LOGO
+   ICON
+   TEXT
+   STAT
+   ICON
+   TEXT
+   IMAGE
+   Everything is fighting.
+   Good design:
+   PLAYER
+   ARSENAL SIGN
+   PLAYER X
+   DEAL AGREED
+   LOGO
+   The empty space makes the important elements stronger.
+9. IMAGE COMPOSITION
+   Don't always put the player's face in the center.
+   Try:
+   PLAYER
+   →
+   → HEADLINE
+   or:
+   HEADLINE
+   PLAYER →
+   Use the direction the player is facing.
+   If the player is looking left:
+   HEADLINE ← PLAYER
+   If looking right:
+   PLAYER → HEADLINE
+   This creates visual flow.
+10. DEPTH
+    You can create depth using:
+    Background
+    ↓
+    Stadium
+    ↓
+    Player
+    ↓
+    Gradient
+    ↓
+    Headline
+    ↓
+    Logo
+    This makes a flat design feel more sophisticated.
+11. SHADOWS
+    Use shadows carefully.
+    A subtle shadow can separate:
+    PLAYER
+    from:
+    BACKGROUND
+    But don't turn everything into glowing neon text.
+12. GRADIENTS
+    Gradients can work well in sports.
+    Example:
+    Dark Navy
+    ↓
+    Transparent
+    ↓
+    Black
+    Place the player on one side.
+    Place your headline on the other.
+13. TEAM COLORS
+    Team colors are useful, but don't let them destroy your brand identity.
+    If Arsenal plays Chelsea, don't suddenly make the entire GoalMills account:
+    RED + BLUE
+    Instead:
+    GOALMILLS NAVY
+
+-
+
+ARSENAL RED +
 CHELSEA BLUE
-Your brand remains recognizable.
-45. LOGO PLACEMENT
+Your brand remains recognizable. 45. LOGO PLACEMENT
 Pick one consistent position.
 For example:
 Top-left.
@@ -7292,23 +7148,20 @@ GOALMILLS
 HEADLINE
 IMAGE
 Or bottom-right.
-Don't move it randomly every day.
-46. LOGO SIZE
+Don't move it randomly every day. 46. LOGO SIZE
 Your logo should be:
 visible but not dominant.
 You don't want:
 GOALMILLS GOALMILLS GOALMILLS
 everywhere.
-You want people to recognize it naturally.
-47. CREATE A WATERMARK SYSTEM
+You want people to recognize it naturally. 47. CREATE A WATERMARK SYSTEM
 For your own original graphics, you can add:
 GOALMILLS
 or:
 @GOALMILLS
 in a subtle location.
 This helps attribution when graphics are reposted.
-However, a watermark is not copyright protection by itself.
-48. CREATE YOUR 10 CORE TEMPLATES
+However, a watermark is not copyright protection by itself. 48. CREATE YOUR 10 CORE TEMPLATES
 I recommend creating these first:
 01 Breaking News
 02 Transfer
@@ -7331,8 +7184,7 @@ Then:
 18 Carousel
 19 YouTube Thumbnail
 20 Instagram Story
-Now you have a proper system.
-49. CREATE A TEMPLATE MASTER
+Now you have a proper system. 49. CREATE A TEMPLATE MASTER
 Don't edit your original template every time.
 Make:
 MASTER — BREAKING NEWS
@@ -7340,8 +7192,7 @@ Then duplicate it:
 BREAKING — 001
 BREAKING — 002
 BREAKING — 003
-This protects your master.
-50. NAMING SYSTEM
+This protects your master. 50. NAMING SYSTEM
 Use:
 GM_BreakingNews_001
 GM_Transfer_001
@@ -7349,8 +7200,7 @@ GM_Matchday_001
 GM_FullTime_001
 GM_PlayerStats_001
 GM_YouTubeThumbnail_001
-Later, when you have thousands of files, you'll thank yourself.
-51. CANVA MAGIC SWITCH / RESIZING
+Later, when you have thousands of files, you'll thank yourself. 51. CANVA MAGIC SWITCH / RESIZING
 Canva offers tools for adapting designs to different formats; its current business tools describe Magic Switch as a way to format designs for platforms such as Instagram, TikTok and Facebook. ([Canva](https://www.canva.com/business/features/brand/?utm_source=chatgpt.com))
 Canva also provides an image-resizing tool that lets you enter dimensions or select presets and then download/share the result. ([Canva](https://www.canva.com/features/image-resizer/?utm_source=chatgpt.com))
 This is useful when turning:
@@ -7360,8 +7210,7 @@ Instagram Story
 TikTok
 Facebook
 But always inspect the resized version manually.
-Automatic resizing can move text or crop important parts of an image.
-52. CREATE A VERTICAL VIDEO TEMPLATE
+Automatic resizing can move text or crop important parts of an image. 52. CREATE A VERTICAL VIDEO TEMPLATE
 Use:
 1080 × 1920
 Structure:
@@ -7381,16 +7230,14 @@ Structure:
 │ 🔗 FULL STORY │
 │ │
 └─────────────────────┘
-This can become your TikTok/Reels/Shorts template.
-53. VIDEO TEXT
+This can become your TikTok/Reels/Shorts template. 53. VIDEO TEXT
 Don't write:
 Arsenal Football Club have officially completed the signing of...
 Instead:
 ARSENAL
 SIGN
 PLAYER X
-Then your voiceover provides the detail.
-54. ANIMATIONS
+Then your voiceover provides the detail. 54. ANIMATIONS
 Don't animate everything.
 Use animation for:
 Headline
@@ -7406,8 +7253,7 @@ PLAYER NAME
 ↓
 SCORE
 Keep the animation fast.
-Sports content should feel energetic.
-55. YOUTUBE THUMBNAIL DESIGN
+Sports content should feel energetic. 55. YOUTUBE THUMBNAIL DESIGN
 This is another major skill.
 Your thumbnail should communicate:
 WHO?
@@ -7422,8 +7268,7 @@ Example:
 │ BIGGEST PROBLEM? │
 │ │
 └─────────────────────────────┘
-Don't write the entire YouTube title on the thumbnail.
-56. THUMBNAIL TITLE VS VIDEO TITLE
+Don't write the entire YouTube title on the thumbnail. 56. THUMBNAIL TITLE VS VIDEO TITLE
 Thumbnail:
 BIG PROBLEM!
 Video title:
@@ -7432,8 +7277,7 @@ Two different jobs.
 Thumbnail:
 Stop the scroll.
 Title:
-Explain what the video is about.
-57. GRAPHICS FOR SEO
+Explain what the video is about. 57. GRAPHICS FOR SEO
 Graphics themselves don't replace SEO.
 But they improve:
 Social CTR
@@ -7450,8 +7294,7 @@ Structured data
 Images
 Alt text
 Fast loading
-We'll cover that more deeply in the SEO section.
-58. GRAPHICS + ARTICLE TRAFFIC
+We'll cover that more deeply in the SEO section. 58. GRAPHICS + ARTICLE TRAFFIC
 Example:
 Website
 Arsenal complete Player X signing — full details
@@ -7472,8 +7315,7 @@ WhatsApp
 Arsenal complete Player X signing.
 Full story: [link]
 One story.
-Multiple distribution channels.
-59. CANVA EXPORTS
+Multiple distribution channels. 59. CANVA EXPORTS
 For normal social graphics, PNG or JPG are common choices.
 Canva's sports infographic guidance says designs can be downloaded in formats including PDF, PNG and JPG and can also be shared to social platforms. ([Canva](https://www.canva.com/infographics/templates/sports/?utm_source=chatgpt.com))
 General rule:
@@ -7484,8 +7326,7 @@ TRANSPARENT LOGO
 VIDEO
 → MP4
 PRINT
-→ PDF
-60. PNG VS JPG
+→ PDF 60. PNG VS JPG
 PNG
 Good for:
 Graphics
@@ -7497,8 +7338,7 @@ Good for:
 Photographic images
 Smaller files
 General social images
-Don't obsess over this at the beginning.
-61. QUALITY CONTROL BEFORE POSTING
+Don't obsess over this at the beginning. 61. QUALITY CONTROL BEFORE POSTING
 Before publishing, check:
 Spelling
 Arsenal
@@ -7520,8 +7360,7 @@ Logo
 Correct.
 URL
 Correct.
-This is particularly important in sports journalism because a beautiful graphic with the wrong score still damages your credibility.
-62. THE 10-SECOND DESIGN CHECKLIST
+This is particularly important in sports journalism because a beautiful graphic with the wrong score still damages your credibility. 62. THE 10-SECOND DESIGN CHECKLIST
 Before export:
 □ Is the headline readable?
 □ Is the main subject obvious?
@@ -7532,8 +7371,7 @@ Before export:
 □ Is the design aligned?
 □ Is there enough white space?
 □ Is anything unnecessarily crowded?
-□ Is the image legally usable?
-63. YOUR FIRST CANVA PRACTICE PROJECT
+□ Is the image legally usable? 63. YOUR FIRST CANVA PRACTICE PROJECT
 Don't just read this tutorial.
 Open Canva and create these five graphics today:
 Project 1
@@ -7546,8 +7384,7 @@ Project 4
 Arsenal Sign Player X — Transfer
 Project 5
 3 Things We Learned From Arsenal vs Chelsea
-Don't use real claims for Project 4 unless you have a verified story; use a fictional player if you're only practicing.
-64. SECOND PRACTICE PROJECT
+Don't use real claims for Project 4 unless you have a verified story; use a fictional player if you're only practicing. 64. SECOND PRACTICE PROJECT
 Create a fictional match:
 GOALMILLS FC 3–1 SPORTS UNITED
 Then make:
@@ -7561,8 +7398,7 @@ Then make:
 08 Statistics
 09 Quote
 10 Instagram Story
-Now you've created an entire visual match package.
-65. YOUR PROFESSIONAL GOALMILLS DESIGN SYSTEM
+Now you've created an entire visual match package. 65. YOUR PROFESSIONAL GOALMILLS DESIGN SYSTEM
 Eventually I would structure your Canva workspace like:
 GOALMILLS DESIGN SYSTEM
 BRAND
@@ -7604,8 +7440,7 @@ CAMPAIGNS
 ├── World Cup
 ├── EPL
 ├── Champions League
-└── Transfer Window
-66. DESIGN FOR SCALE
+└── Transfer Window 66. DESIGN FOR SCALE
 This is where your sports blog can become much more professional.
 Don't think:
 "I need to design a graphic."
@@ -7623,8 +7458,7 @@ Status
 Image
 ↓
 NEW GRAPHIC
-Instead of spending 30 minutes every time, you could eventually produce a polished graphic in a few minutes.
-67. CANVA + AI
+Instead of spending 30 minutes every time, you could eventually produce a polished graphic in a few minutes. 67. CANVA + AI
 You can eventually combine your sports CMS with AI.
 For example:
 ARTICLE PUBLISHED
@@ -7646,8 +7480,7 @@ EDITOR APPROVAL
 PUBLISH
 But don't allow AI to automatically publish factual sports information without a verification step.
 A typo in an ordinary graphic is bad.
-A false transfer report can damage your brand.
-68. YOUR ULTIMATE GRAPHICS PIPELINE
+A false transfer report can damage your brand. 68. YOUR ULTIMATE GRAPHICS PIPELINE
 Your mature system should look like:
 SPORTS STORY
 ↓
@@ -7667,8 +7500,7 @@ WEBSITE FACEBOOK TIKTOK
 INSTAGRAM YOUTUBE
 X
 WHATSAPP
-That is how you start moving from blogging toward a proper digital sports newsroom.
-69. CANVA RESOURCES TO BOOKMARK
+That is how you start moving from blogging toward a proper digital sports newsroom. 69. CANVA RESOURCES TO BOOKMARK
 Canva
 [Canva official website](https://www.canva.com/?utm_source=chatgpt.com)
 Canva Sports Templates
@@ -7685,10 +7517,11 @@ Canva Image Resizer
 Useful when adapting visual assets to different dimensions. ([Canva](https://www.canva.com/features/image-resizer/?utm_source=chatgpt.com))
 Canva Sports Flyers
 [Canva Sports Flyer Templates](https://www.canva.com/flyers/templates/sports/?utm_source=chatgpt.com)
-Useful for events, campaigns and promotional sports graphics. ([Canva](https://www.canva.com/flyers/templates/sports/?utm_source=chatgpt.com))
-70. YOUR PART 7 ASSIGNMENT
+Useful for events, campaigns and promotional sports graphics. ([Canva](https://www.canva.com/flyers/templates/sports/?utm_source=chatgpt.com)) 70. YOUR PART 7 ASSIGNMENT
 Before moving to Part 8, build these 20 templates:
+
 #
+
 Template
 1
 Breaking News
@@ -7778,327 +7611,329 @@ Google Search Console
 ↓
 SEO analytics
 That part is especially important because social media can give you traffic today, while SEO can build an increasingly valuable search traffic engine over time.
+
 # PART 8 — SEO FOR SPORTS BLOGGING FROM ZERO
+
 This is one of the most important parts of building GoalMills.
 Your goal is not simply:
 "Write football articles."
 Your goal is:
 Write articles that Google can understand, that users actually want, and that can consistently bring qualified traffic to your website.
 A sports website can get traffic from several Google surfaces, including Search, Google News and Discover. Search Console provides separate performance data for these surfaces when enough data is available. ([Google Support](https://support.google.com/webmasters/answer/10268906?hl=en&utm_source=chatgpt.com))
+
 1. THE SPORTS SEO MACHINE
-Think about SEO like this:
-SPORTS TOPIC
-↓
-KEYWORD RESEARCH
-↓
-SEARCH INTENT
-↓
-CONTENT PLAN
-↓
-QUALITY ARTICLE
-↓
-ON-PAGE SEO
-↓
-INTERNAL LINKS
-↓
-TECHNICAL SEO
-↓
-INDEXING
-↓
-GOOGLE SEARCH
-↓
-┌──────────┼──────────┐
-↓ ↓ ↓
-SEARCH NEWS DISCOVER
-↓ ↓ ↓
-└──────────┼──────────┘
-↓
-TRAFFIC
-↓
-AUDIENCE
-↓
-REVENUE
-The important thing is that SEO starts before you write the article, not after.
+   Think about SEO like this:
+   SPORTS TOPIC
+   ↓
+   KEYWORD RESEARCH
+   ↓
+   SEARCH INTENT
+   ↓
+   CONTENT PLAN
+   ↓
+   QUALITY ARTICLE
+   ↓
+   ON-PAGE SEO
+   ↓
+   INTERNAL LINKS
+   ↓
+   TECHNICAL SEO
+   ↓
+   INDEXING
+   ↓
+   GOOGLE SEARCH
+   ↓
+   ┌──────────┼──────────┐
+   ↓ ↓ ↓
+   SEARCH NEWS DISCOVER
+   ↓ ↓ ↓
+   └──────────┼──────────┘
+   ↓
+   TRAFFIC
+   ↓
+   AUDIENCE
+   ↓
+   REVENUE
+   The important thing is that SEO starts before you write the article, not after.
 2. WHAT IS SEO?
-SEO means:
-Search Engine Optimization
-It is the process of making your website and content easier for search engines and users to understand and discover.
-For example, someone searches:
-Arsenal transfer news today
-Google needs to determine which pages are useful for that search.
-Your job is to make your page:
-Relevant
-Useful
-Accurate
-Readable
-Fast
-Trustworthy
-Easy to understand
+   SEO means:
+   Search Engine Optimization
+   It is the process of making your website and content easier for search engines and users to understand and discover.
+   For example, someone searches:
+   Arsenal transfer news today
+   Google needs to determine which pages are useful for that search.
+   Your job is to make your page:
+   Relevant
+   Useful
+   Accurate
+   Readable
+   Fast
+   Trustworthy
+   Easy to understand
 3. SEO IS NOT JUST KEYWORDS
-One of the biggest beginner mistakes is thinking:
-"If I put 'Arsenal transfer news' 50 times in my article, I'll rank."
-No.
-Modern SEO is much broader.
-Think:
-SEO
-│
-├── Search intent
-├── Content quality
-├── Topic coverage
-├── Accuracy
-├── Titles
-├── Headings
-├── URLs
-├── Internal links
-├── Images
-├── Technical performance
-├── Mobile experience
-├── Structured data
-├── Crawlability
-├── Indexing
-├── Authority
-└── User satisfaction
+   One of the biggest beginner mistakes is thinking:
+   "If I put 'Arsenal transfer news' 50 times in my article, I'll rank."
+   No.
+   Modern SEO is much broader.
+   Think:
+   SEO
+   │
+   ├── Search intent
+   ├── Content quality
+   ├── Topic coverage
+   ├── Accuracy
+   ├── Titles
+   ├── Headings
+   ├── URLs
+   ├── Internal links
+   ├── Images
+   ├── Technical performance
+   ├── Mobile experience
+   ├── Structured data
+   ├── Crawlability
+   ├── Indexing
+   ├── Authority
+   └── User satisfaction
 4. THE MOST IMPORTANT CONCEPT: SEARCH INTENT
-Before writing anything, ask:
-What does the person actually want?
-Suppose someone searches:
-Arsenal vs Chelsea
-They might want:
-fixture date
-kickoff time
-result
-lineup
-live score
-highlights
-statistics
-match report
-tickets
-previous meetings
-The keyword alone doesn't tell you enough.
+   Before writing anything, ask:
+   What does the person actually want?
+   Suppose someone searches:
+   Arsenal vs Chelsea
+   They might want:
+   fixture date
+   kickoff time
+   result
+   lineup
+   live score
+   highlights
+   statistics
+   match report
+   tickets
+   previous meetings
+   The keyword alone doesn't tell you enough.
 5. FOUR MAJOR SEARCH INTENTS
-1. Informational
-User wants information.
-Example:
-Who is Arsenal's new signing?
-2. Navigational
-User wants a specific website/page.
-Example:
-GoalMills Arsenal news
-3. Transactional
-User wants to perform an action.
-Example:
-buy Arsenal jersey
-4. Fresh/current information
-Extremely important for sports.
-Examples:
-Arsenal transfer news today
-Liverpool injury news
-Chelsea lineup today
-Man United latest news
-Sports SEO has a huge advantage here:
-Sports creates enormous amounts of fresh search demand.
-6. YOUR FIRST KEYWORD SYSTEM
-Don't start with 100,000 keywords.
-Create categories.
-For GoalMills:
-FOOTBALL
-│
-├── Premier League
-├── Champions League
-├── Europa League
-├── FA Cup
-├── La Liga
-├── Serie A
-├── Bundesliga
-├── Ligue 1
-├── Nigerian Football
-├── International Football
-└── Women's Football
-Then teams:
-ARSENAL
-LIVERPOOL
-CHELSEA
-MAN CITY
-MAN UNITED
-TOTTENHAM
-REAL MADRID
-BARCELONA
-PSG
-BAYERN
-Then content types:
-News
-Transfers
-Fixtures
-Results
-Lineups
-Injuries
-Rumours
-Match reports
-Analysis
-Player profiles
-Statistics
-Now you have a content universe.
-7. KEYWORD TYPES
-You should understand:
-Head keywords
-football news
-Premier League
-Arsenal
-Chelsea
-football transfer news
-Very competitive.
-Medium-tail
-Arsenal transfer news
-Premier League fixtures
-Chelsea injury news
-Liverpool latest news
-More specific.
-Long-tail
-Arsenal transfer news today
-Arsenal predicted lineup against Chelsea
-Chelsea injury news before Liverpool match
-Much more specific.
-8. DON'T ONLY CHASE HUGE KEYWORDS
-Imagine:
-"football"
-has enormous search volume.
-But ranking for it may be extremely difficult.
-Instead:
-"Arsenal transfer news today"
-might be much more achievable for a newer site.
-You want to build authority gradually.
-9. KEYWORD RESEARCH PROCESS
-Your workflow:
-TOPIC
-↓
-SEARCH GOOGLE
-↓
-LOOK AT RELATED SEARCHES
-↓
-LOOK AT AUTOCOMPLETE
-↓
-CHECK COMPETITORS
-↓
-IDENTIFY QUESTIONS
-↓
-GROUP KEYWORDS
-↓
-CHOOSE PRIMARY KEYWORD
-↓
-CHOOSE SECONDARY KEYWORDS
-Don't blindly copy competitor keywords.
-Understand why people are searching.
-10. GOOGLE AUTOCOMPLETE
-Go to Google.
-Start typing:
-arsenal transfer
-You might see suggestions such as:
-arsenal transfer news
-arsenal transfer news today
-arsenal transfer news live
-arsenal transfer rumours
-arsenal transfer latest
-These suggestions can give you ideas about real search behavior.
-11. RELATED SEARCHES
-At the bottom of Google results, look for:
-Related searches
-These can reveal additional variations.
-For example:
-Arsenal transfer news
-↓
-Arsenal latest transfers
-Arsenal transfer rumours
-Arsenal new signings
-Arsenal transfer targets
-These can become separate articles or sections depending on search intent.
-12. PEOPLE ALSO ASK
-Search:
-Arsenal transfer news
-Google may show questions such as:
-Who is Arsenal trying to sign?
-Who has Arsenal signed?
-Who is Arsenal selling?
-How much has Arsenal spent?
-These questions can become:
-FAQ sections
-article sections
-separate articles
-But don't create thin pages just to target every question.
-13. YOUR KEYWORD DATABASE
-Create a spreadsheet:
-Keyword
-Topic
-Intent
-Difficulty
-Priority
-Article
-Arsenal news
-Arsenal
-News
-High
-High
-Yes
-Arsenal transfer news
-Transfers
-News
-High
-High
-Yes
-Arsenal transfer news today
-Transfers
-Fresh
-Medium
-Very High
-Yes
-Arsenal predicted lineup
-Match
-Informational
-Medium
-High
-Yes
-Eventually you could have thousands of rows.
-14. ONE PRIMARY KEYWORD
-Every major article should have a primary topic.
-Example:
-Arsenal transfer news today: latest updates
-Primary:
-Arsenal transfer news today
-Secondary:
-Arsenal transfers
-Arsenal transfer rumours
-Arsenal latest transfer news
-Arsenal new signings
-Don't force every variation into every paragraph.
-15. WRITE FOR THE TOPIC, NOT KEYWORD DENSITY
-Bad:
-Arsenal transfer news today includes Arsenal transfer news about Arsenal transfers and the latest Arsenal transfer news...
-This looks spammy.
-Good:
-Arsenal are continuing to work on several transfer targets as the club looks to strengthen the squad before the window closes.
-Natural language.
-16. TITLE SEO
-Your title is extremely important.
-Bad:
-Arsenal
-Too vague.
-Better:
-Arsenal Transfer News Today
-Better still:
-Arsenal Transfer News Today: Latest Signings, Rumours and Updates
-Your title should communicate:
-TOPIC
-+
-VALUE
-+
+6. Informational
+   User wants information.
+   Example:
+   Who is Arsenal's new signing?
+7. Navigational
+   User wants a specific website/page.
+   Example:
+   GoalMills Arsenal news
+8. Transactional
+   User wants to perform an action.
+   Example:
+   buy Arsenal jersey
+9. Fresh/current information
+   Extremely important for sports.
+   Examples:
+   Arsenal transfer news today
+   Liverpool injury news
+   Chelsea lineup today
+   Man United latest news
+   Sports SEO has a huge advantage here:
+   Sports creates enormous amounts of fresh search demand.
+10. YOUR FIRST KEYWORD SYSTEM
+    Don't start with 100,000 keywords.
+    Create categories.
+    For GoalMills:
+    FOOTBALL
+    │
+    ├── Premier League
+    ├── Champions League
+    ├── Europa League
+    ├── FA Cup
+    ├── La Liga
+    ├── Serie A
+    ├── Bundesliga
+    ├── Ligue 1
+    ├── Nigerian Football
+    ├── International Football
+    └── Women's Football
+    Then teams:
+    ARSENAL
+    LIVERPOOL
+    CHELSEA
+    MAN CITY
+    MAN UNITED
+    TOTTENHAM
+    REAL MADRID
+    BARCELONA
+    PSG
+    BAYERN
+    Then content types:
+    News
+    Transfers
+    Fixtures
+    Results
+    Lineups
+    Injuries
+    Rumours
+    Match reports
+    Analysis
+    Player profiles
+    Statistics
+    Now you have a content universe.
+11. KEYWORD TYPES
+    You should understand:
+    Head keywords
+    football news
+    Premier League
+    Arsenal
+    Chelsea
+    football transfer news
+    Very competitive.
+    Medium-tail
+    Arsenal transfer news
+    Premier League fixtures
+    Chelsea injury news
+    Liverpool latest news
+    More specific.
+    Long-tail
+    Arsenal transfer news today
+    Arsenal predicted lineup against Chelsea
+    Chelsea injury news before Liverpool match
+    Much more specific.
+12. DON'T ONLY CHASE HUGE KEYWORDS
+    Imagine:
+    "football"
+    has enormous search volume.
+    But ranking for it may be extremely difficult.
+    Instead:
+    "Arsenal transfer news today"
+    might be much more achievable for a newer site.
+    You want to build authority gradually.
+13. KEYWORD RESEARCH PROCESS
+    Your workflow:
+    TOPIC
+    ↓
+    SEARCH GOOGLE
+    ↓
+    LOOK AT RELATED SEARCHES
+    ↓
+    LOOK AT AUTOCOMPLETE
+    ↓
+    CHECK COMPETITORS
+    ↓
+    IDENTIFY QUESTIONS
+    ↓
+    GROUP KEYWORDS
+    ↓
+    CHOOSE PRIMARY KEYWORD
+    ↓
+    CHOOSE SECONDARY KEYWORDS
+    Don't blindly copy competitor keywords.
+    Understand why people are searching.
+14. GOOGLE AUTOCOMPLETE
+    Go to Google.
+    Start typing:
+    arsenal transfer
+    You might see suggestions such as:
+    arsenal transfer news
+    arsenal transfer news today
+    arsenal transfer news live
+    arsenal transfer rumours
+    arsenal transfer latest
+    These suggestions can give you ideas about real search behavior.
+15. RELATED SEARCHES
+    At the bottom of Google results, look for:
+    Related searches
+    These can reveal additional variations.
+    For example:
+    Arsenal transfer news
+    ↓
+    Arsenal latest transfers
+    Arsenal transfer rumours
+    Arsenal new signings
+    Arsenal transfer targets
+    These can become separate articles or sections depending on search intent.
+16. PEOPLE ALSO ASK
+    Search:
+    Arsenal transfer news
+    Google may show questions such as:
+    Who is Arsenal trying to sign?
+    Who has Arsenal signed?
+    Who is Arsenal selling?
+    How much has Arsenal spent?
+    These questions can become:
+    FAQ sections
+    article sections
+    separate articles
+    But don't create thin pages just to target every question.
+17. YOUR KEYWORD DATABASE
+    Create a spreadsheet:
+    Keyword
+    Topic
+    Intent
+    Difficulty
+    Priority
+    Article
+    Arsenal news
+    Arsenal
+    News
+    High
+    High
+    Yes
+    Arsenal transfer news
+    Transfers
+    News
+    High
+    High
+    Yes
+    Arsenal transfer news today
+    Transfers
+    Fresh
+    Medium
+    Very High
+    Yes
+    Arsenal predicted lineup
+    Match
+    Informational
+    Medium
+    High
+    Yes
+    Eventually you could have thousands of rows.
+18. ONE PRIMARY KEYWORD
+    Every major article should have a primary topic.
+    Example:
+    Arsenal transfer news today: latest updates
+    Primary:
+    Arsenal transfer news today
+    Secondary:
+    Arsenal transfers
+    Arsenal transfer rumours
+    Arsenal latest transfer news
+    Arsenal new signings
+    Don't force every variation into every paragraph.
+19. WRITE FOR THE TOPIC, NOT KEYWORD DENSITY
+    Bad:
+    Arsenal transfer news today includes Arsenal transfer news about Arsenal transfers and the latest Arsenal transfer news...
+    This looks spammy.
+    Good:
+    Arsenal are continuing to work on several transfer targets as the club looks to strengthen the squad before the window closes.
+    Natural language.
+20. TITLE SEO
+    Your title is extremely important.
+    Bad:
+    Arsenal
+    Too vague.
+    Better:
+    Arsenal Transfer News Today
+    Better still:
+    Arsenal Transfer News Today: Latest Signings, Rumours and Updates
+    Your title should communicate:
+    TOPIC
+
+-
+
+VALUE +
 FRESHNESS
-when appropriate.
-17. DON'T CLICKBAIT
+when appropriate. 17. DON'T CLICKBAIT
 Bad:
 YOU WON'T BELIEVE WHAT ARSENAL JUST DID!!!
 Better:
 Arsenal complete new signing as transfer window enters final week
-The second tells the reader what they are getting.
-18. TITLE FORMULAS
+The second tells the reader what they are getting. 18. TITLE FORMULAS
 Use these as starting points.
 Breaking news
 [Club] complete [signing/deal] as [key detail]
@@ -8111,8 +7946,7 @@ Match report
 Analysis
 Why [Player/Team] changed the game against [Opponent]
 List
-10 things to know about [Player/Event]
-19. URL STRUCTURE
+10 things to know about [Player/Event] 19. URL STRUCTURE
 Keep URLs simple.
 Bad:
 /2026/08/27/football-news/arsenal-transfer-news-latest-player-signing-rumours-update/
@@ -8120,8 +7954,7 @@ Better:
 /arsenal-transfer-news/
 Or for a specific story:
 /arsenal-sign-player-name/
-Avoid changing URLs unnecessarily after a page has been indexed and earning links.
-20. H1
+Avoid changing URLs unnecessarily after a page has been indexed and earning links. 20. H1
 Every article should have a clear primary heading.
 Example:
 H1:
@@ -8134,8 +7967,7 @@ Arsenal's latest signing
 H2:
 Players Arsenal are targeting
 H2:
-What happens next
-21. H2/H3 STRUCTURE
+What happens next 21. H2/H3 STRUCTURE
 Think of headings as the article's skeleton.
 Example:
 H1
@@ -8154,8 +7986,7 @@ H2
 Players linked with Arsenal
 H2
 When does the transfer window close?
-This helps readers scan the article.
-22. INTRODUCTION
+This helps readers scan the article. 22. INTRODUCTION
 Don't write a 500-word introduction.
 Sports readers want information quickly.
 Use:
@@ -8166,8 +7997,7 @@ WHERE
 WHY IT MATTERS
 Example:
 Arsenal have completed the signing of Player X from Club Y, with the midfielder agreeing a long-term contract. The deal strengthens Mikel Arteta's options in midfield ahead of the new Premier League campaign.
-Then continue.
-23. THE INVERTED PYRAMID
+Then continue. 23. THE INVERTED PYRAMID
 Journalism and sports writing often benefit from the inverted pyramid:
 MOST IMPORTANT
 ↓
@@ -8182,8 +8012,9 @@ LEAST IMPORTANT
 Don't bury the most important facts at the bottom of the article. Put the decisive result, score, signing confirmation, or injury diagnosis in the opening 1–2 paragraphs. Online readers scan mobile screens quickly, and search engine crawlers prioritize topical terms appearing early in the DOM structure.
 
 24. INTERNAL LINKING ARCHITECTURE FOR SPORTS SEO
-Internal linking is one of the most powerful and controllable SEO mechanisms.
-Every article should connect into the broader GoalMills network:
+    Internal linking is one of the most powerful and controllable SEO mechanisms.
+    Every article should connect into the broader GoalMills network:
+
 - Link to the relevant Team Hub (e.g. Arsenal FC Hub)
 - Link to the Competition Hub (e.g. Premier League Table & Fixtures)
 - Link to Player Profiles (e.g. Victor Osimhen Profile & Stats)
@@ -8193,13 +8024,15 @@ Every article should connect into the broader GoalMills network:
 Internal links distribute page authority across your domain and help search engines understand the topical relationships between entities.
 
 25. ANCHOR TEXT BEST PRACTICES
-Never use generic anchor text like:
+    Never use generic anchor text like:
+
 - "Click here"
 - "Read more"
 - "This link"
 - "Source"
 
 Instead, use natural, descriptive anchor text that explains exactly what the linked page contains:
+
 - Good: "According to our latest [Arsenal transfer analysis](/football/premier-league/arsenal/transfers)..."
 - Good: "Check the updated [Premier League standings](/football/premier-league/table)..."
 - Good: "Review [Victor Osimhen's career statistics](/players/victor-osimhen)..."
@@ -8207,19 +8040,20 @@ Instead, use natural, descriptive anchor text that explains exactly what the lin
 Descriptive anchor text provides strong contextual signals to search engines about the target URL's topic.
 
 26. IMAGE OPTIMIZATION AND ALT TEXT
-Search engines cannot watch a football match or view a photo without metadata.
-For every image:
+    Search engines cannot watch a football match or view a photo without metadata.
+    For every image:
 1. File Name: Descriptive before upload (e.g., `bukayo-saka-goal-celebration-chelsea.webp` instead of `IMG_9381.jpg`).
-2. Format: Use modern compressed formats like WebP or optimized JPEG.
-3. Dimensions: Provide appropriate aspect ratios with width and height attributes to prevent Cumulative Layout Shift (CLS).
-4. Alt Text: Descriptive, factual text explaining what the image depicts:
+1. Format: Use modern compressed formats like WebP or optimized JPEG.
+1. Dimensions: Provide appropriate aspect ratios with width and height attributes to prevent Cumulative Layout Shift (CLS).
+1. Alt Text: Descriptive, factual text explaining what the image depicts:
    - Bad: `football match goal arsenal win best team`
    - Good: `Bukayo Saka celebrates scoring Arsenal's second goal against Chelsea at Emirates Stadium`
-5. Captions: Add editorial context and photographer/license credits where appropriate.
+1. Captions: Add editorial context and photographer/license credits where appropriate.
 
-27. STRUCTURED DATA & SCHEMA.ORG
-Structured data helps search engines disambiguate entities and render rich results in search.
-Implement standard Schema.org markup across your site:
+1. STRUCTURED DATA & SCHEMA.ORG
+   Structured data helps search engines disambiguate entities and render rich results in search.
+   Implement standard Schema.org markup across your site:
+
 - `NewsArticle`: Include `headline`, `image`, `datePublished`, `dateModified`, `author` (Person with name and URL), and `publisher` (Organization with name and logo).
 - `SportsEvent`: For match centers, include `homeTeam`, `awayTeam`, `startDate`, `location`, and `eventStatus`.
 - `BreadcrumbList`: For hierarchical navigation (Home > Football > Premier League > Arsenal).
@@ -8228,8 +8062,9 @@ Implement standard Schema.org markup across your site:
 Google emphasizes that structured data must match visible on-page content and be validated using the Rich Results Test before deployment.
 
 28. GOOGLE NEWS PUBLISHING & ELIGIBILITY
-Google News systems automatically discover eligible content without requiring manual submission.
-To maximize eligibility and trust:
+    Google News systems automatically discover eligible content without requiring manual submission.
+    To maximize eligibility and trust:
+
 - High original journalistic value: Provide genuine reporting, on-the-ground context, or unique analytical data—never republish recast articles with synonym substitutions.
 - Clear authorship & bylines: Every news item must feature an identifiable author with a dedicated bio page.
 - Transparent editorial policies: Maintain clear About Us, Contact, Editorial Standards, and Corrections policy pages.
@@ -8237,17 +8072,18 @@ To maximize eligibility and trust:
 - Accurate timestamps: Display visible publication and modification dates; do not artificially freshen dates without substantive updates.
 
 29. OPTIMIZING FOR GOOGLE DISCOVER
-Google Discover drives massive traffic spikes for sports publishers based on user interest graphs.
-To optimize for Discover:
+    Google Discover drives massive traffic spikes for sports publishers based on user interest graphs.
+    To optimize for Discover:
 1. High-Quality Lead Imagery: Use compelling, high-resolution lead images at least 1,200px wide, with the `max-image-preview:large` robots setting enabled.
-2. Compelling, Non-Clickbait Titles: Accurately capture the core curiosity or emotional peak of the sporting event without misleading readers.
-3. Freshness & Momentum: Publish rapidly as major transfer news, derby results, and tournament developments break.
-4. Entity Relevance: Cover popular clubs, stars, and national teams that have massive pre-existing follower affinity in Google's Knowledge Graph.
-5. Exceptional Mobile Experience: Fast load times, clean layouts, and zero intrusive pop-ups that block the viewport.
+1. Compelling, Non-Clickbait Titles: Accurately capture the core curiosity or emotional peak of the sporting event without misleading readers.
+1. Freshness & Momentum: Publish rapidly as major transfer news, derby results, and tournament developments break.
+1. Entity Relevance: Cover popular clubs, stars, and national teams that have massive pre-existing follower affinity in Google's Knowledge Graph.
+1. Exceptional Mobile Experience: Fast load times, clean layouts, and zero intrusive pop-ups that block the viewport.
 
-30. BUILDING TOPICAL AUTHORITY & TOPIC CLUSTERS
-Search engines reward depth over scattered randomness.
-Rather than publishing 1 tennis article, 1 cricket article, and 1 golf article, build deep topic clusters:
+1. BUILDING TOPICAL AUTHORITY & TOPIC CLUSTERS
+   Search engines reward depth over scattered randomness.
+   Rather than publishing 1 tennis article, 1 cricket article, and 1 golf article, build deep topic clusters:
+
 - Pillar Page: "African Footballers in the UEFA Champions League 2026/27"
 - Supporting Article 1: "Victor Osimhen's Champions League Goal Record"
 - Supporting Article 2: "Ademola Lookman Tactical Profile in European Competitions"
@@ -8257,23 +8093,25 @@ Rather than publishing 1 tennis article, 1 cricket article, and 1 golf article, 
 Interlink the supporting cluster articles back to the pillar page. This signals to Google that GoalMills is an authoritative subject-matter hub for African football excellence.
 
 31. EARNING QUALITY BACKLINKS IN SPORTS JOURNALISM
-Backlinks remain a fundamental ranking factor.
-In sports media, the best links are earned organically through authority content:
+    Backlinks remain a fundamental ranking factor.
+    In sports media, the best links are earned organically through authority content:
+
 - Original Data & Infographics: Publish proprietary statistical studies, club spending breakdowns, and tactical diagrams that other journalists cite.
 - Exclusive Sourcing & Scoops: Break verified local football developments and player news before international outlets.
 - Definitive Historical Guides: Create timeless resources like "Complete History of Super Eagles at the AFCON" or "Premier League All-Time African Top Scorers".
 - Authoritative Interviews: Exclusive conversations with players, coaches, analysts, and academy directors.
 
 32. GOOGLE SEARCH CONSOLE MONITORING
-Google Search Console (GSC) is your free primary analytics engine for organic search performance.
-Monitor weekly:
+    Google Search Console (GSC) is your free primary analytics engine for organic search performance.
+    Monitor weekly:
 1. Performance Report: Filter by Search, News, and Discover. Examine Impressions, Clicks, Average CTR, and Average Position.
-2. High-Impression / Low-CTR Queries: Identify keywords where your article ranks on page 1 but has a low click rate; rewrite your title and meta description to improve appeal.
-3. Page Indexing: Ensure all published articles are successfully indexed and resolve any 404s or crawl anomalies.
-4. Core Web Vitals: Verify good status for LCP, INP, and CLS on mobile devices.
+1. High-Impression / Low-CTR Queries: Identify keywords where your article ranks on page 1 but has a low click rate; rewrite your title and meta description to improve appeal.
+1. Page Indexing: Ensure all published articles are successfully indexed and resolve any 404s or crawl anomalies.
+1. Core Web Vitals: Verify good status for LCP, INP, and CLS on mobile devices.
 
-33. UPDATING DEVELOPING STORIES VS CREATING DUPLICATE ARTICLES
-When a major transfer or match event is unfolding:
+1. UPDATING DEVELOPING STORIES VS CREATING DUPLICATE ARTICLES
+   When a major transfer or match event is unfolding:
+
 - Avoid publishing 6 near-identical 300-word articles that compete against each other for the same search queries (keyword cannibalization).
 - Instead, maintain a central, authoritative article URL (e.g., `/football/transfers/victor-osimhen-latest-updates`).
 - Update the body with chronological timestamped developments:
@@ -8283,8 +8121,9 @@ When a major transfer or match event is unfolding:
 - This compounds social shares, internal links, and search authority onto a single high-ranking URL.
 
 34. TECHNICAL SEO & MOBILE PERFORMANCE
-Sports fans consume content on mobile devices while traveling, watching matches, or checking scores on cellular networks.
-Core Technical Requirements:
+    Sports fans consume content on mobile devices while traveling, watching matches, or checking scores on cellular networks.
+    Core Technical Requirements:
+
 - Mobile-First Responsive Design: High contrast typography, tap targets at least 48px, readable without zooming.
 - Core Web Vitals:
   - Largest Contentful Paint (LCP): < 2.5 seconds.
@@ -8295,7 +8134,8 @@ Core Technical Requirements:
 - XML Sitemaps: Maintain updated dynamic News Sitemaps and standard Sitemaps.
 
 35. PART 8 IMPLEMENTATION CHECKLIST
-Before publishing or marking any sports section complete:
+    Before publishing or marking any sports section complete:
+
 - [ ] Primary search topic and user search intent clearly identified
 - [ ] Title accurately reflects content, includes primary keyword, and stays under 60 characters
 - [ ] Meta description written (140–160 characters) with clear value proposition
@@ -8310,6 +8150,7 @@ Before publishing or marking any sports section complete:
 - [ ] Page tested and verified for fast mobile loading and responsive rendering
 
 36. ESSENTIAL SEO REFERENCES & OFFICIAL GUIDELINES
+
 - [Google Search Central Documentation](https://developers.google.com/search/docs) — Core technical SEO, indexing, and ranking guidance.
 - [Google News Publisher Guidelines](https://support.google.com/news/publisher-center/answer/6204050) — Policies on transparency, bylines, and original reporting.
 - [Google URL Structure Best Practices](https://developers.google.com/search/docs/crawling-indexing/url-structure) — Official URL conventions and crawlability rules.

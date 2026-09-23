@@ -7,7 +7,8 @@ describe('Sports Normalization Engine', () => {
         const s = (status || '').toLowerCase();
         if (s === 'ft' || s === 'finished' || s === 'aet' || s === 'pen') return 'finished';
         if (s === 'ht' || s === 'half time' || s === 'halftime') return 'halftime';
-        if (s.includes('live') || s.includes('1st') || s.includes('2nd') || s === 'in progress') return 'live';
+        if (s.includes('live') || s.includes('1st') || s.includes('2nd') || s === 'in progress')
+          return 'live';
         if (s === 'postponed') return 'postponed';
         if (s === 'cancelled') return 'cancelled';
         return 'scheduled';
@@ -40,7 +41,11 @@ describe('Sports Normalization Engine', () => {
 
   describe('Cricket Innings & Scorecard Normalization', () => {
     it('should normalize cricket match format with runs, wickets, and overs', () => {
-      const normalizeCricketInning = (teamScore?: { runs?: number; wickets?: number; overs?: number }) => {
+      const normalizeCricketInning = (teamScore?: {
+        runs?: number;
+        wickets?: number;
+        overs?: number;
+      }) => {
         return {
           runs: teamScore?.runs ?? 0,
           wickets: teamScore?.wickets ?? 0,

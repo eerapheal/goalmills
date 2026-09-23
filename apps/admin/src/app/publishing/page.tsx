@@ -95,7 +95,9 @@ export default function PublishingDashboardPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // Filters & Pagination State
-  const [activeTab, setActiveTab] = useState<'pending_approval' | 'draft' | 'published' | 'rejected' | 'all'>('pending_approval');
+  const [activeTab, setActiveTab] = useState<
+    'pending_approval' | 'draft' | 'published' | 'rejected' | 'all'
+  >('pending_approval');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSport, setSelectedSport] = useState('all');
   const [selectedSort, setSelectedSort] = useState('latest');
@@ -312,9 +314,8 @@ export default function PublishingDashboardPage() {
             item._id === id
               ? {
                   ...item,
-                  [flag === 'breaking' ? 'isBreaking' : 'isFeatured']: data[
-                    flag === 'breaking' ? 'isBreaking' : 'isFeatured'
-                  ],
+                  [flag === 'breaking' ? 'isBreaking' : 'isFeatured']:
+                    data[flag === 'breaking' ? 'isBreaking' : 'isFeatured'],
                 }
               : item
           )
@@ -329,7 +330,8 @@ export default function PublishingDashboardPage() {
 
   // Delete Article
   const handleDelete = async (id: string) => {
-    if (!confirm('Permanently delete this article from the database? This cannot be undone.')) return;
+    if (!confirm('Permanently delete this article from the database? This cannot be undone.'))
+      return;
     setActionLoading(`delete-${id}`);
     try {
       const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
@@ -351,7 +353,8 @@ export default function PublishingDashboardPage() {
   // Batch Approve
   const handleBatchApprove = async () => {
     if (selectedIds.length === 0) return;
-    if (!confirm(`Approve and publish ${selectedIds.length} selected articles immediately?`)) return;
+    if (!confirm(`Approve and publish ${selectedIds.length} selected articles immediately?`))
+      return;
     setActionLoading('batch');
     try {
       const res = await fetch('/api/news/pipeline', {
@@ -449,7 +452,8 @@ export default function PublishingDashboardPage() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Review submitted stories, enforce editorial quality, and approve breaking news for production.
+                Review submitted stories, enforce editorial quality, and approve breaking news for
+                production.
               </p>
             </div>
           </div>
@@ -609,7 +613,9 @@ export default function PublishingDashboardPage() {
             <span>Pending Review</span>
             <span
               className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                activeTab === 'pending_approval' ? 'bg-slate-950/20 text-slate-950' : 'bg-amber-500/20 text-amber-300'
+                activeTab === 'pending_approval'
+                  ? 'bg-slate-950/20 text-slate-950'
+                  : 'bg-amber-500/20 text-amber-300'
               }`}
             >
               {metrics.pending}
@@ -628,7 +634,9 @@ export default function PublishingDashboardPage() {
             <span>Drafts</span>
             <span
               className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                activeTab === 'draft' ? 'bg-slate-950/20 text-slate-950' : 'bg-white/10 text-slate-300'
+                activeTab === 'draft'
+                  ? 'bg-slate-950/20 text-slate-950'
+                  : 'bg-white/10 text-slate-300'
               }`}
             >
               {metrics.draft}
@@ -647,7 +655,9 @@ export default function PublishingDashboardPage() {
             <span>Published Live</span>
             <span
               className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                activeTab === 'published' ? 'bg-slate-950/20 text-slate-950' : 'bg-emerald-500/20 text-emerald-300'
+                activeTab === 'published'
+                  ? 'bg-slate-950/20 text-slate-950'
+                  : 'bg-emerald-500/20 text-emerald-300'
               }`}
             >
               {metrics.published}
@@ -852,7 +862,8 @@ export default function PublishingDashboardPage() {
               </span>
             </div>
             <div>
-              Stage: <span className="text-white uppercase font-black">{activeTab.replace('_', ' ')}</span>
+              Stage:{' '}
+              <span className="text-white uppercase font-black">{activeTab.replace('_', ' ')}</span>
             </div>
           </div>
 
@@ -918,7 +929,8 @@ export default function PublishingDashboardPage() {
                       {/* Content Info */}
                       <div className="space-y-1 flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-white font-bold text-sm sm:text-base line-clamp-1 break-all hover:text-purple-400 transition cursor-pointer"
+                          <h3
+                            className="text-white font-bold text-sm sm:text-base line-clamp-1 break-all hover:text-purple-400 transition cursor-pointer"
                             onClick={() => setPreviewArticle(article)}
                           >
                             {article.title}
@@ -964,11 +976,15 @@ export default function PublishingDashboardPage() {
                             {article.author || 'Staff'}
                           </span>
                           <span>•</span>
-                          <span className="text-blue-400 font-semibold">{article.category || 'General'}</span>
+                          <span className="text-blue-400 font-semibold">
+                            {article.category || 'General'}
+                          </span>
                           {article.sport && (
                             <>
                               <span>•</span>
-                              <span className="text-emerald-400 font-semibold capitalize">{article.sport}</span>
+                              <span className="text-emerald-400 font-semibold capitalize">
+                                {article.sport}
+                              </span>
                             </>
                           )}
                           <span>•</span>
@@ -1034,7 +1050,11 @@ export default function PublishingDashboardPage() {
                           className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5 disabled:opacity-50"
                         >
                           <FiCheck className="w-3.5 h-3.5" />
-                          <span>{actionLoading === `approve-${article._id}` ? 'Publishing...' : 'Approve & Publish'}</span>
+                          <span>
+                            {actionLoading === `approve-${article._id}`
+                              ? 'Publishing...'
+                              : 'Approve & Publish'}
+                          </span>
                         </button>
                       )}
 
@@ -1056,7 +1076,11 @@ export default function PublishingDashboardPage() {
                           className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md shadow-purple-500/20 transition flex items-center gap-1.5 disabled:opacity-50"
                         >
                           <FiSend className="w-3.5 h-3.5" />
-                          <span>{actionLoading === `submit-${article._id}` ? 'Submitting...' : 'Submit for Review'}</span>
+                          <span>
+                            {actionLoading === `submit-${article._id}`
+                              ? 'Submitting...'
+                              : 'Submit for Review'}
+                          </span>
                         </button>
                       )}
 
@@ -1074,7 +1098,8 @@ export default function PublishingDashboardPage() {
                       )}
 
                       {/* Delete */}
-                      {(canDeleteAny || (isDraft && article.authorId === (session?.user as any)?.id)) && (
+                      {(canDeleteAny ||
+                        (isDraft && article.authorId === (session?.user as any)?.id)) && (
                         <button
                           onClick={() => handleDelete(article._id)}
                           disabled={actionLoading === `delete-${article._id}`}
@@ -1279,7 +1304,9 @@ export default function PublishingDashboardPage() {
             </div>
 
             <p className="text-xs text-slate-400">
-              Provide feedback for <strong className="text-white">{rejectModalArticle.author}</strong> on why this story requires revisions before approval.
+              Provide feedback for{' '}
+              <strong className="text-white">{rejectModalArticle.author}</strong> on why this story
+              requires revisions before approval.
             </p>
 
             <form onSubmit={handleRejectSubmit} className="space-y-4">
@@ -1336,7 +1363,8 @@ export default function PublishingDashboardPage() {
             </div>
 
             <p className="text-xs text-slate-400">
-              Apply revision request to all <strong className="text-white">{selectedIds.length}</strong> selected articles.
+              Apply revision request to all{' '}
+              <strong className="text-white">{selectedIds.length}</strong> selected articles.
             </p>
 
             <form onSubmit={handleBatchRejectSubmit} className="space-y-4">

@@ -289,7 +289,12 @@ export default function BasketballScreen() {
                   </Text>
                   <Text style={styles.tableStat}>{stRow.games?.win?.total ?? 0}W</Text>
                   <Text style={styles.tableStat}>{stRow.games?.lose?.total ?? 0}L</Text>
-                  <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 6 }} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={14}
+                    color="#64748B"
+                    style={{ marginLeft: 6 }}
+                  />
                 </Pressable>
               ))
             )}
@@ -330,18 +335,29 @@ export default function BasketballScreen() {
               }}
             >
               {section.logo ? (
-                <Image source={{ uri: section.logo }} style={styles.sectionLogo} resizeMode="contain" />
+                <Image
+                  source={{ uri: section.logo }}
+                  style={styles.sectionLogo}
+                  resizeMode="contain"
+                />
               ) : (
                 <Ionicons name="basketball-outline" size={16} color="#3B82F6" />
               )}
               <Text style={styles.sectionTitle} numberOfLines={1}>
                 {section.title}
               </Text>
-              <Ionicons name="chevron-forward" size={14} color="#64748B" style={{ marginLeft: 'auto' }} />
+              <Ionicons
+                name="chevron-forward"
+                size={14}
+                color="#64748B"
+                style={{ marginLeft: 'auto' }}
+              />
             </Pressable>
           )}
           renderItem={({ item }) => <BasketballMatchCard match={item} hideLeague />}
-          ListFooterComponent={<RecommendedFeed sportSlug="basketball" title="Recommended Basketball Intel" />}
+          ListFooterComponent={
+            <RecommendedFeed sportSlug="basketball" title="Recommended Basketball Intel" />
+          }
         />
       )}
     </View>

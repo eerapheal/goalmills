@@ -86,7 +86,7 @@ export default function NewsScreen() {
   };
 
   const handlePress = (item: BlogPost | string) => {
-    const target = typeof item === 'string' ? item : (item.slug || slugify(item.title) || item._id);
+    const target = typeof item === 'string' ? item : item.slug || slugify(item.title) || item._id;
     router.push(`/news/${target}`);
   };
 

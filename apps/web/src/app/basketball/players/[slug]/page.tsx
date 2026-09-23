@@ -32,14 +32,13 @@ export default function BasketballPlayerSlugPage() {
       if (!playerId && !slug) return;
       setLoading(true);
       try {
-        const res = await basketballApi.getPlayers(
-          playerId ? { playerId } : {}
-        );
+        const res = await basketballApi.getPlayers(playerId ? { playerId } : {});
         const list = Array.isArray(res?.result) ? res.result : [];
         if (list.length > 0) {
           const found =
-            list.find((p) => Number(p.player_key) === playerId || slugify(p.player_name) === slug) ||
-            list[0];
+            list.find(
+              (p) => Number(p.player_key) === playerId || slugify(p.player_name) === slug
+            ) || list[0];
           setPlayer(found);
         }
       } catch (err) {
@@ -52,7 +51,8 @@ export default function BasketballPlayerSlugPage() {
     loadPlayerData();
   }, [playerId, slug]);
 
-  const playerName = player?.player_name || (playerId ? `Player #${playerId}` : 'Basketball Athlete');
+  const playerName =
+    player?.player_name || (playerId ? `Player #${playerId}` : 'Basketball Athlete');
 
   // JSON-LD structured data for Person
   const jsonLd = useMemo(() => {
@@ -170,28 +170,36 @@ export default function BasketballPlayerSlugPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 space-y-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-4 rounded-3xl bg-[#08142A]/90 border border-blue-500/20 shadow-xl text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Points / Game</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">
+              Points / Game
+            </span>
             <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">
               {player.player_points_per_game || player.player_goals || '-'}
             </span>
           </div>
 
           <div className="p-4 rounded-3xl bg-[#08142A]/90 border border-blue-500/20 shadow-xl text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Rebounds / Game</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">
+              Rebounds / Game
+            </span>
             <span className="text-2xl font-black text-sky-400 font-mono mt-1 block">
               {player.player_rebounds_per_game || player.player_rebounds || '-'}
             </span>
           </div>
 
           <div className="p-4 rounded-3xl bg-[#08142A]/90 border border-blue-500/20 shadow-xl text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Assists / Game</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">
+              Assists / Game
+            </span>
             <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
               {player.player_assists_per_game || player.player_assists || '-'}
             </span>
           </div>
 
           <div className="p-4 rounded-3xl bg-[#08142A]/90 border border-blue-500/20 shadow-xl text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Games Played</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">
+              Games Played
+            </span>
             <span className="text-2xl font-black text-purple-400 font-mono mt-1 block">
               {player.player_match_played || '-'}
             </span>

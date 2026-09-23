@@ -115,10 +115,7 @@ export class BillingService {
       }
     }
 
-    const mrr =
-      counts.fan_pass * 4.99 +
-      counts.vip_pass * 9.99 +
-      counts.sponsor_pro * 49.99;
+    const mrr = counts.fan_pass * 4.99 + counts.vip_pass * 9.99 + counts.sponsor_pro * 49.99;
 
     return {
       mrr: Math.round(mrr * 100) / 100,

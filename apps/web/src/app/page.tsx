@@ -51,16 +51,40 @@ interface VideoItem {
 function getCompetitionRank(leagueName: string, sport: string): number {
   if (sport !== 'Football') return 50;
   const l = (leagueName || '').toLowerCase();
-  if (l.includes('premier league') || l.includes('epl') || (l.includes('premier') && l.includes('england'))) return 1;
+  if (
+    l.includes('premier league') ||
+    l.includes('epl') ||
+    (l.includes('premier') && l.includes('england'))
+  )
+    return 1;
   if (l.includes('la liga') || l.includes('laliga') || l.includes('primera division')) return 2;
   if (l.includes('champions league') || l.includes('ucl') || l.includes('uefa champions')) return 3;
   if (l.includes('serie a') || l.includes('italy')) return 4;
   if (l.includes('bundesliga') || l.includes('germany')) return 5;
   if (l.includes('ligue 1') || l.includes('france')) return 6;
-  if (l.includes('afcon') || l.includes('africa cup of nations') || l.includes('caf champions') || l.includes('caf confed')) return 7;
-  if (l.includes('npfl') || l.includes('psl') || l.includes('betway premiership') || l.includes('botola') || l.includes('egyptian')) return 8;
+  if (
+    l.includes('afcon') ||
+    l.includes('africa cup of nations') ||
+    l.includes('caf champions') ||
+    l.includes('caf confed')
+  )
+    return 7;
+  if (
+    l.includes('npfl') ||
+    l.includes('psl') ||
+    l.includes('betway premiership') ||
+    l.includes('botola') ||
+    l.includes('egyptian')
+  )
+    return 8;
   if (l.includes('europa league') || l.includes('conference league') || l.includes('uel')) return 9;
-  if (l.includes('eredivisie') || l.includes('liga portugal') || l.includes('saudi') || l.includes('mls')) return 10;
+  if (
+    l.includes('eredivisie') ||
+    l.includes('liga portugal') ||
+    l.includes('saudi') ||
+    l.includes('mls')
+  )
+    return 10;
   return 20;
 }
 
@@ -82,7 +106,8 @@ function getLeagueFlag(leagueName: string, sport: string): string {
   if (l.includes('serie a') || l.includes('italy')) return '🇮🇹';
   if (l.includes('bundesliga') || l.includes('germany')) return '🇩🇪';
   if (l.includes('ligue 1') || l.includes('france')) return '🇫🇷';
-  if (l.includes('afcon') || l.includes('caf') || l.includes('nigeria') || l.includes('africa')) return '🌍';
+  if (l.includes('afcon') || l.includes('caf') || l.includes('nigeria') || l.includes('africa'))
+    return '🌍';
   if (l.includes('champions league') || l.includes('ucl')) return '⭐';
   if (l.includes('europa')) return '🏆';
   return '⚽';
@@ -102,11 +127,14 @@ function formatRelativeTime(dateStr?: string | Date): string {
 
 function MatchCard({ m }: { m: MatchItem }) {
   const matchIdStr = String(m?.id ?? '');
-  const matchHref = m.sport === 'Football'
-    ? (matchIdStr.includes('-') ? `/football/matches/${matchIdStr}` : `/matches/${matchIdStr}`)
-    : m.sport === 'Cricket'
-      ? `/cricket`
-      : `/basketball`;
+  const matchHref =
+    m.sport === 'Football'
+      ? matchIdStr.includes('-')
+        ? `/football/matches/${matchIdStr}`
+        : `/matches/${matchIdStr}`
+      : m.sport === 'Cricket'
+        ? `/cricket`
+        : `/basketball`;
 
   return (
     <Link
@@ -141,7 +169,9 @@ function MatchCard({ m }: { m: MatchItem }) {
                 src={m.homeLogo}
                 alt=""
                 className="w-4 h-4 object-contain rounded flex-shrink-0"
-                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
               />
             ) : null}
             <span className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors truncate">
@@ -163,7 +193,9 @@ function MatchCard({ m }: { m: MatchItem }) {
                 src={m.awayLogo}
                 alt=""
                 className="w-4 h-4 object-contain rounded flex-shrink-0"
-                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
               />
             ) : null}
             <span className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors truncate">
@@ -218,7 +250,10 @@ function NewsSkeleton() {
       </div>
       <div className="lg:col-span-3 space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="flex gap-4 items-start p-3 bg-[#0f172a] rounded-xl border border-[#1e293b]">
+          <div
+            key={i}
+            className="flex gap-4 items-start p-3 bg-[#0f172a] rounded-xl border border-[#1e293b]"
+          >
             <div className="w-20 h-20 rounded-lg bg-slate-800 flex-shrink-0" />
             <div className="flex-1 space-y-2 py-1">
               <div className="h-3 w-24 bg-slate-800 rounded" />
@@ -246,7 +281,9 @@ function VideoCardSkeleton() {
 }
 
 export default function HomePage() {
-  const [activeFilter, setActiveFilter] = useState<'All' | 'Football' | 'Cricket' | 'Basketball'>('All');
+  const [activeFilter, setActiveFilter] = useState<'All' | 'Football' | 'Cricket' | 'Basketball'>(
+    'All'
+  );
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -273,9 +310,15 @@ export default function HomePage() {
     try {
       const timestamp = Date.now();
       const [footRes, cricRes, bballRes] = await Promise.all([
-        fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
-        fetch(`/api/cricket?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
-        fetch(`/api/basketball?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null),
+        fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(
+          () => null
+        ),
+        fetch(`/api/cricket?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(
+          () => null
+        ),
+        fetch(`/api/basketball?met=Livescore&_t=${timestamp}`, { cache: 'no-store' }).catch(
+          () => null
+        ),
       ]);
 
       const parsedMatches: MatchItem[] = [];
@@ -283,11 +326,14 @@ export default function HomePage() {
       // Process Football Matches
       if (footRes && footRes.ok) {
         const footData = await footRes.json();
-        let fList = footData?.result || footData?.response || (Array.isArray(footData) ? footData : []);
+        let fList =
+          footData?.result || footData?.response || (Array.isArray(footData) ? footData : []);
 
         // If no live matches, fetch upcoming/recent fixtures
         if (!Array.isArray(fList) || fList.length === 0) {
-          const fixRes = await fetch(`/api/football?met=Fixtures&_t=${timestamp}`, { cache: 'no-store' }).catch(() => null);
+          const fixRes = await fetch(`/api/football?met=Fixtures&_t=${timestamp}`, {
+            cache: 'no-store',
+          }).catch(() => null);
           if (fixRes && fixRes.ok) {
             const fixData = await fixRes.json();
             fList = fixData?.result || fixData?.response || (Array.isArray(fixData) ? fixData : []);
@@ -302,7 +348,16 @@ export default function HomePage() {
             const isLive =
               m.event_live === '1' ||
               (Boolean(rawStatus) &&
-                !['Finished', 'FT', 'Postponed', 'Cancelled', 'Not Started', 'NS', 'TBA', 'Postp.'].includes(rawStatus) &&
+                ![
+                  'Finished',
+                  'FT',
+                  'Postponed',
+                  'Cancelled',
+                  'Not Started',
+                  'NS',
+                  'TBA',
+                  'Postp.',
+                ].includes(rawStatus) &&
                 !rawStatus.includes(':'));
             const isFT = rawStatus === 'Finished' || rawStatus === 'FT';
 
@@ -351,8 +406,10 @@ export default function HomePage() {
             const home = c.event_home_team || 'Team 1';
             const away = c.event_away_team || 'Team 2';
             const rawStatus = (c.event_status || '').trim();
-            const isLive = rawStatus.toLowerCase().includes('live') || rawStatus.toLowerCase().includes('inn');
-            const isFT = rawStatus.toLowerCase().includes('won') || rawStatus.toLowerCase().includes('ended');
+            const isLive =
+              rawStatus.toLowerCase().includes('live') || rawStatus.toLowerCase().includes('inn');
+            const isFT =
+              rawStatus.toLowerCase().includes('won') || rawStatus.toLowerCase().includes('ended');
 
             let status: 'LIVE' | 'FT' | 'UPCOMING' = 'UPCOMING';
             if (isLive) status = 'LIVE';
@@ -397,8 +454,12 @@ export default function HomePage() {
               flag: '🏀',
               home,
               away,
-              hScore: b.event_final_result ? b.event_final_result.split('-')[0]?.trim() : (b.event_home_final_result ?? 0),
-              aScore: b.event_final_result ? b.event_final_result.split('-')[1]?.trim() : (b.event_away_final_result ?? 0),
+              hScore: b.event_final_result
+                ? b.event_final_result.split('-')[0]?.trim()
+                : (b.event_home_final_result ?? 0),
+              aScore: b.event_final_result
+                ? b.event_final_result.split('-')[1]?.trim()
+                : (b.event_away_final_result ?? 0),
               minute: rawStatus || 'LIVE',
               status,
             });
@@ -441,7 +502,7 @@ export default function HomePage() {
           const mapped: NewsItem[] = items.slice(0, 5).map((item: any, idx: number) => {
             const category = item.category || item.sport || 'Football';
             const isBreaking = Boolean(item.isBreaking || idx === 0);
-            const tag = isBreaking ? 'BREAKING' : (item.articleType?.toUpperCase() || 'ANALYSIS');
+            const tag = isBreaking ? 'BREAKING' : item.articleType?.toUpperCase() || 'ANALYSIS';
             const tagColor = isBreaking
               ? 'bg-red-500'
               : tag === 'ANALYSIS'
@@ -481,13 +542,13 @@ export default function HomePage() {
         if (Array.isArray(items) && items.length > 0) {
           setVideos(items.slice(0, 3));
         } else {
-          setVideos(DEFAULT_VIDEOS);
+          setVideos([]);
         }
       } else {
-        setVideos(DEFAULT_VIDEOS);
+        setVideos([]);
       }
     } catch {
-      setVideos(DEFAULT_VIDEOS);
+      setVideos([]);
     } finally {
       setIsLoadingVideos(false);
     }
@@ -520,7 +581,11 @@ export default function HomePage() {
       const football = matches.filter((m) => m.sport === 'Football');
       const cricket = matches.filter((m) => m.sport === 'Cricket').slice(0, 3);
       const basketball = matches.filter((m) => m.sport === 'Basketball').slice(0, 3);
-      const mixed = [...football.slice(0, 18 - cricket.length - basketball.length), ...cricket, ...basketball];
+      const mixed = [
+        ...football.slice(0, 18 - cricket.length - basketball.length),
+        ...cricket,
+        ...basketball,
+      ];
       return mixed.slice(0, 18);
     }
     return matches.filter((m) => m.sport === activeFilter);
@@ -575,7 +640,10 @@ export default function HomePage() {
             {filters.map((f) => (
               <button
                 key={f}
-                onClick={() => { setActiveFilter(f); setIsAllExpanded(false); }}
+                onClick={() => {
+                  setActiveFilter(f);
+                  setIsAllExpanded(false);
+                }}
                 className={`flex-shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
                   activeFilter === f
                     ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
@@ -595,7 +663,9 @@ export default function HomePage() {
             displayedMatches.map((m) => <MatchCard key={`${m.sport}-${m.id}`} m={m} />)
           ) : (
             <div className="col-span-full text-center py-12 bg-[#0f172a] border border-[#1e293b] rounded-xl">
-              <p className="text-slate-400 text-sm">No live or scheduled matches found for {activeFilter}.</p>
+              <p className="text-slate-400 text-sm">
+                No live or scheduled matches found for {activeFilter}.
+              </p>
               <button
                 onClick={() => setActiveFilter('All')}
                 className="mt-3 text-xs text-blue-400 hover:underline font-semibold"
@@ -614,7 +684,11 @@ export default function HomePage() {
               className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-blue-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group cursor-pointer"
             >
               <span>{isAllExpanded ? 'Show Less' : 'View All Fixtures & Live Match Center'}</span>
-              <span className={`text-blue-400 transition-transform ${isAllExpanded ? 'rotate-180' : ''}`}>▼</span>
+              <span
+                className={`text-blue-400 transition-transform ${isAllExpanded ? 'rotate-180' : ''}`}
+              >
+                ▼
+              </span>
             </button>
           ) : activeFilter === 'Football' ? (
             <Link
@@ -622,7 +696,9 @@ export default function HomePage() {
               className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-blue-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
             >
               <span>View All Football Fixtures & Live Match Center</span>
-              <span className="text-blue-400 group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-blue-400 group-hover:translate-x-1 transition-transform">
+                →
+              </span>
             </Link>
           ) : activeFilter === 'Cricket' ? (
             <Link
@@ -630,7 +706,9 @@ export default function HomePage() {
               className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-emerald-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
             >
               <span>Explore All Cricket Matches & Series</span>
-              <span className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-emerald-400 group-hover:translate-x-1 transition-transform">
+                →
+              </span>
             </Link>
           ) : (
             <Link
@@ -638,7 +716,9 @@ export default function HomePage() {
               className="inline-flex items-center gap-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-slate-200 hover:text-white border border-[#1e293b] hover:border-orange-500/50 text-xs sm:text-sm font-bold px-6 py-3 rounded-xl transition-all shadow-md group"
             >
               <span>Explore All Basketball & NBA Games</span>
-              <span className="text-orange-400 group-hover:translate-x-1 transition-transform">→</span>
+              <span className="text-orange-400 group-hover:translate-x-1 transition-transform">
+                →
+              </span>
             </Link>
           )}
         </div>
@@ -667,7 +747,11 @@ export default function HomePage() {
             <div className="lg:col-span-2">
               {news[0] && (
                 <Link
-                  href={getNewsUrl({ slug: news[0].slug, id: String(news[0].id), title: news[0].title })}
+                  href={getNewsUrl({
+                    slug: news[0].slug,
+                    id: String(news[0].id),
+                    title: news[0].title,
+                  })}
                   className="block relative overflow-hidden rounded-2xl bg-[#0f172a] border border-[#1e293b] hover:border-[#334155] transition-all group h-full"
                 >
                   <div className="relative h-52 sm:h-64 overflow-hidden bg-slate-800">
@@ -752,9 +836,13 @@ export default function HomePage() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-red-400 uppercase">Video Match Center</span>
+              <span className="text-[10px] font-black tracking-widest text-red-400 uppercase">
+                Video Match Center
+              </span>
             </div>
-            <h2 className="text-xl font-black text-white tracking-tight">Match Highlights & Videos</h2>
+            <h2 className="text-xl font-black text-white tracking-tight">
+              Match Highlights & Videos
+            </h2>
           </div>
           <Link
             href="/highlights"
@@ -765,67 +853,71 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {isLoadingVideos ? (
-            Array.from({ length: 3 }).map((_, i) => <VideoCardSkeleton key={i} />)
-          ) : videos.length === 0 ? null : videos.map((v) => (
-            <Link
-              key={v._id}
-              href={`/highlights/${v._id}`}
-              className="group block bg-[#0f172a] border border-[#1e293b] hover:border-blue-500/40 rounded-2xl overflow-hidden transition-all duration-300 shadow-md hover:shadow-blue-500/10 flex flex-col"
-            >
-              {/* Thumbnail Container */}
-              <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
-                {v.video_thumbnail ? (
-                  <Image
-                    src={v.video_thumbnail}
-                    alt={v.video_title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
+          {isLoadingVideos
+            ? Array.from({ length: 3 }).map((_, i) => <VideoCardSkeleton key={i} />)
+            : videos.length === 0
+              ? null
+              : videos.map((v) => (
+                  <Link
+                    key={v._id}
+                    href={`/highlights/${v._id}`}
+                    className="group block bg-[#0f172a] border border-[#1e293b] hover:border-blue-500/40 rounded-2xl overflow-hidden transition-all duration-300 shadow-md hover:shadow-blue-500/10 flex flex-col"
+                  >
+                    {/* Thumbnail Container */}
+                    <div className="relative aspect-video w-full overflow-hidden bg-slate-800">
+                      {v.video_thumbnail ? (
+                        <Image
+                          src={v.video_thumbnail}
+                          alt={v.video_title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#0E203C] via-[#091529] to-[#070E1A]" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-80" />
 
-                {/* Top Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className="bg-red-600/90 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow">
-                    {v.category || v.league || 'HIGHLIGHTS'}
-                  </span>
-                </div>
+                      {/* Top Badge */}
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-red-600/90 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow">
+                          {v.category || v.league || 'HIGHLIGHTS'}
+                        </span>
+                      </div>
 
-                {/* Duration Badge */}
-                {v.duration && (
-                  <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-slate-200 text-[10px] font-mono font-bold px-2 py-0.5 rounded">
-                    {v.duration}
-                  </div>
-                )}
+                      {/* Duration Badge */}
+                      {v.duration && (
+                        <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-slate-200 text-[10px] font-mono font-bold px-2 py-0.5 rounded">
+                          {v.duration}
+                        </div>
+                      )}
 
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-12 h-12 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-red-600 transition-all duration-300">
-                    <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-12 h-12 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-red-600 transition-all duration-300">
+                          <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Meta Info */}
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <h3 className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
-                  {v.video_title}
-                </h3>
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
-                  <span className="font-semibold text-slate-400">{v.league || 'GoalMills Replays'}</span>
-                  <span className="text-blue-400 font-bold group-hover:translate-x-1 transition-transform">
-                    Watch →
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
+                    {/* Meta Info */}
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <h3 className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                        {v.video_title}
+                      </h3>
+                      <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+                        <span className="font-semibold text-slate-400">
+                          {v.league || 'GoalMills Replays'}
+                        </span>
+                        <span className="text-blue-400 font-bold group-hover:translate-x-1 transition-transform">
+                          Watch →
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
         </div>
       </section>
 
@@ -867,7 +959,8 @@ export default function HomePage() {
                 </span>
               </h2>
               <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-7">
-                Lineup data, xG breakdowns, AFCON updates, and transfer rumours — delivered every morning to 45,000+ fans.
+                Lineup data, xG breakdowns, AFCON updates, and transfer rumours — delivered every
+                morning to 45,000+ fans.
               </p>
 
               {subscribed ? (
@@ -875,7 +968,10 @@ export default function HomePage() {
                   ✓ You&apos;re in! Check your inbox at 10 AM WAT.
                 </div>
               ) : (
-                <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <form
+                  onSubmit={handleSubscribe}
+                  className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+                >
                   <input
                     type="email"
                     required

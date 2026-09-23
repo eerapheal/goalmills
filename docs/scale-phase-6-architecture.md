@@ -1,4 +1,5 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 6 ARCHITECTURE
+
 ## Scalable Multi-Entity Search Infrastructure
 
 ```text
@@ -43,6 +44,7 @@
 ### 1. Weighted Full-Text Scoring Matrix
 
 Searches compute relevance based on weighted multi-field criteria:
+
 - **Title Matches**: `Weight: 10`
 - **Team Names Overlap**: `Weight: 8`
 - **Competition Equality**: `Weight: 6`
@@ -54,6 +56,7 @@ Searches compute relevance based on weighted multi-field criteria:
 ### 2. Multi-Facet Filtering Engine
 
 Facets are dynamically tallied during candidate evaluation across:
+
 1. **Sports**: `football`, `cricket`, `basketball`, `tennis`, `baseball`, `hockey`.
 2. **Entity Types**: `article`, `video`, `match`, `team`, `player`, `newsletter`.
 3. **Date Ranges**: `today` (24h), `week` (7d), `month` (30d), `year` (365d), `all`.

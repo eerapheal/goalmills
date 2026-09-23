@@ -142,16 +142,19 @@ export default function CoachDetailPage() {
 
         // Determine current club & metadata
         const coachName = curated?.name || apiCoach?.coache || 'Head Coach';
-        const clubSlug = curated?.currentClubSlug || (apiCoach?.team_name ? slugify(apiCoach.team_name) : 'manchester-city');
+        const clubSlug =
+          curated?.currentClubSlug ||
+          (apiCoach?.team_name ? slugify(apiCoach.team_name) : 'manchester-city');
         const club: ClubMeta | undefined = CLUBS_REGISTRY[clubSlug];
-        const teamName = curated?.currentClubName || apiCoach?.team_name || club?.name || 'Top Flight Club';
+        const teamName =
+          curated?.currentClubName || apiCoach?.team_name || club?.name || 'Top Flight Club';
         const teamKey = club ? String(club.id) : undefined;
 
         // Record numbers
         const totalMatches = curated?.matchesManaged || 320;
         const winPercentage = curated?.winPercentage || 68;
         const drawPercentage = curated?.drawPercentage || 18;
-        const lossPercentage = curated?.lossPercentage || (100 - winPercentage - drawPercentage);
+        const lossPercentage = curated?.lossPercentage || 100 - winPercentage - drawPercentage;
 
         const w = Math.round(totalMatches * (winPercentage / 100));
         const d = Math.round(totalMatches * (drawPercentage / 100));
@@ -163,7 +166,10 @@ export default function CoachDetailPage() {
           trophiesList = curated.majorHonours.map((h, i) => {
             // e.g. "3x UEFA Champions League" or "1x FA Cup (2020)"
             const yearMatch = h.match(/\((20\d\d)\)/);
-            const cleanTitle = h.replace(/^\d+x\s+/, '').replace(/\s*\(\d+\)/, '').trim();
+            const cleanTitle = h
+              .replace(/^\d+x\s+/, '')
+              .replace(/\s*\(\d+\)/, '')
+              .trim();
             return {
               name: cleanTitle,
               club: teamName,
@@ -390,10 +396,7 @@ export default function CoachDetailPage() {
   const lossPct = Math.max(0, 100 - winPct - drawPct);
 
   // Extract formation parts (e.g. "4-3-3" or "3-2-4-1")
-  const formationParts = coachData.preferredFormation
-    .split(' ')[0]
-    .split('-')
-    .filter(Boolean);
+  const formationParts = coachData.preferredFormation.split(' ')[0].split('-').filter(Boolean);
 
   return (
     <div className="min-h-screen bg-[#070a1a] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
@@ -454,7 +457,10 @@ export default function CoachDetailPage() {
                 <span>Age {coachData.age}</span>
                 <span>·</span>
                 <Link
-                  href={footballRoutes.teamFromName(coachData.currentTeam, coachData.currentTeamKey)}
+                  href={footballRoutes.teamFromName(
+                    coachData.currentTeam,
+                    coachData.currentTeamKey
+                  )}
                   className="hover:text-white transition-colors font-semibold"
                 >
                   {coachData.currentTeam}
@@ -600,9 +606,7 @@ export default function CoachDetailPage() {
                     i % 2 === 1 ? 'sm:border-l sm:border-[#1e293b]' : ''
                   } border-b border-[#1e293b] last:border-b-0`}
                 >
-                  <span className="text-2xl flex-shrink-0">
-                    {TROPHY_ICONS[t.name] || '🏆'}
-                  </span>
+                  <span className="text-2xl flex-shrink-0">{TROPHY_ICONS[t.name] || '🏆'}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-slate-100 truncate">{t.name}</p>
                     <p className="text-xs text-slate-400 truncate">
@@ -694,8 +698,8 @@ export default function CoachDetailPage() {
                     m.result === 'W'
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : m.result === 'D'
-                      ? 'bg-slate-600/20 text-slate-300 border border-slate-600/30'
-                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        ? 'bg-slate-600/20 text-slate-300 border border-slate-600/30'
+                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
                   }`}
                 >
                   {m.result}

@@ -130,13 +130,7 @@ export async function PATCH(req: NextRequest) {
 
     await dbConnect();
     const body = await req.json();
-    const {
-      reportId,
-      reviewStatus,
-      scorecard,
-      editorFeedback,
-      reviewedBy,
-    } = body;
+    const { reportId, reviewStatus, scorecard, editorFeedback, reviewedBy } = body;
 
     if (!reportId) {
       return NextResponse.json({ success: false, error: 'Report ID is required' }, { status: 400 });
@@ -223,9 +217,7 @@ export async function PATCH(req: NextRequest) {
         }
 
         // Upsert daily record
-        const existingRecordIdx = progress.dailyRecords?.findIndex(
-          (r: any) => r.day === day
-        );
+        const existingRecordIdx = progress.dailyRecords?.findIndex((r: any) => r.day === day);
         const dailyRecord = {
           day,
           reportId: updated._id,
@@ -243,16 +235,12 @@ export async function PATCH(req: NextRequest) {
 
         // Recalculate progress
         progress.completedDaysCount = progress.completedDays.length;
-        progress.overallProgressPercent = Math.round(
-          (progress.completedDays.length / 30) * 100
-        );
+        progress.overallProgressPercent = Math.round((progress.completedDays.length / 30) * 100);
 
         // Check for 30-day certification
         if (progress.completedDays.length >= 30 && !progress.isCertified) {
           // Calculate average score across all graded days
-          const gradedRecords = progress.dailyRecords.filter(
-            (r: any) => r.score !== undefined
-          );
+          const gradedRecords = progress.dailyRecords.filter((r: any) => r.score !== undefined);
           const avgScore =
             gradedRecords.length > 0
               ? Math.round(
@@ -267,9 +255,7 @@ export async function PATCH(req: NextRequest) {
           progress.certificationDate = new Date().toISOString();
 
           // Determine certification tier
-          const tier = CERTIFICATION_TIERS.find(
-            (t) => avgScore >= t.min && avgScore <= t.max
-          );
+          const tier = CERTIFICATION_TIERS.find((t) => avgScore >= t.min && avgScore <= t.max);
           progress.certificationTier =
             tier?.title || 'GoalMills Certified Sports Media Professional';
 
@@ -290,9 +276,7 @@ export async function PATCH(req: NextRequest) {
     if (updated.trainingDay && scorecard && totalScore > 0) {
       try {
         const emp = await Employee.findById(updated.employeeId);
-        const dayData = GOALMILLS_30_DAY_CURRICULUM.find(
-          (d) => d.day === updated.trainingDay
-        );
+        const dayData = GOALMILLS_30_DAY_CURRICULUM.find((d) => d.day === updated.trainingDay);
 
         await notifyStaffGradedAssignment({
           employeeId: updated.employeeId.toString(),

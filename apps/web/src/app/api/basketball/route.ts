@@ -54,7 +54,13 @@ function normalizeMethodAndParams(
 
   // Copy existing query params
   searchParams.forEach((value, key) => {
-    if (key !== 'met' && key !== 'APIkey' && value !== undefined && value !== null && value !== '') {
+    if (
+      key !== 'met' &&
+      key !== 'APIkey' &&
+      value !== undefined &&
+      value !== null &&
+      value !== ''
+    ) {
       params[key] = value;
     }
   });
@@ -336,7 +342,9 @@ export async function GET(request: NextRequest) {
 
       if (!response || !response.ok) {
         const status = response ? response.status : 502;
-        console.warn(`Basketball API status ${status} for ${normalizedMethod}, returning graceful fallback.`);
+        console.warn(
+          `Basketball API status ${status} for ${normalizedMethod}, returning graceful fallback.`
+        );
 
         consecutiveFailures++;
         if (consecutiveFailures >= 5) {
@@ -393,8 +401,10 @@ export async function GET(request: NextRequest) {
           if (match.event_key || match.id) {
             const finalScoreParts = (match.event_final_result || '').split('-');
             broadcastLiveScore('basketball', String(match.event_key || match.id), {
-              homeScore: finalScoreParts[0]?.trim() || match.scores?.['4thQuarter']?.[0]?.score_home || '0',
-              awayScore: finalScoreParts[1]?.trim() || match.scores?.['4thQuarter']?.[0]?.score_away || '0',
+              homeScore:
+                finalScoreParts[0]?.trim() || match.scores?.['4thQuarter']?.[0]?.score_home || '0',
+              awayScore:
+                finalScoreParts[1]?.trim() || match.scores?.['4thQuarter']?.[0]?.score_away || '0',
               status: match.event_status || match.event_quarter || 'LIVE',
               time: match.event_time,
             });

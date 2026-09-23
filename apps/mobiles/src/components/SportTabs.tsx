@@ -40,20 +40,20 @@ function SportTab({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
-        style={[
-          styles.tab,
-          isSelected && styles.activeTab,
-          sport.isComingSoon && styles.soonTab,
-        ]}
+        style={[styles.tab, isSelected && styles.activeTab, sport.isComingSoon && styles.soonTab]}
         onPress={sport.isComingSoon ? undefined : onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         pointerEvents={sport.isComingSoon ? 'none' : 'auto'}
       >
-        <Text style={[styles.emoji, sport.isComingSoon && styles.soonEmoji]}>
-          {sport.emoji}
-        </Text>
-        <Text style={[styles.tabText, isSelected && styles.activeTabText, sport.isComingSoon && styles.soonTabText]}>
+        <Text style={[styles.emoji, sport.isComingSoon && styles.soonEmoji]}>{sport.emoji}</Text>
+        <Text
+          style={[
+            styles.tabText,
+            isSelected && styles.activeTabText,
+            sport.isComingSoon && styles.soonTabText,
+          ]}
+        >
           {sport.name}
         </Text>
         {sport.isComingSoon && (

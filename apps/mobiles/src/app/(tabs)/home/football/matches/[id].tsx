@@ -207,40 +207,55 @@ export default function MatchCenterScreen() {
           <Text style={styles.cardTitle}>Win Probabilities</Text>
           <View style={styles.probLabels}>
             <Text style={[styles.probTeam, { color: '#60A5FA' }]}>
-              {fixture.event_home_team}{'\n'}{probability.event_HW}%
+              {fixture.event_home_team}
+              {'\n'}
+              {probability.event_HW}%
             </Text>
             <Text style={[styles.probTeam, { color: '#94A3B8', textAlign: 'center' }]}>
-              Draw{'\n'}{probability.event_D}%
+              Draw{'\n'}
+              {probability.event_D}%
             </Text>
             <Text style={[styles.probTeam, { color: '#FBBF24', textAlign: 'right' }]}>
-              {fixture.event_away_team}{'\n'}{probability.event_AW}%
+              {fixture.event_away_team}
+              {'\n'}
+              {probability.event_AW}%
             </Text>
           </View>
           <View style={styles.probBar}>
             <View
-              style={[styles.probBarSegment, { flex: Number(probability.event_HW) || 1, backgroundColor: '#2563EB' }]}
+              style={[
+                styles.probBarSegment,
+                { flex: Number(probability.event_HW) || 1, backgroundColor: '#2563EB' },
+              ]}
             />
             <View
-              style={[styles.probBarSegment, { flex: Number(probability.event_D) || 1, backgroundColor: '#475569' }]}
+              style={[
+                styles.probBarSegment,
+                { flex: Number(probability.event_D) || 1, backgroundColor: '#475569' },
+              ]}
             />
             <View
-              style={[styles.probBarSegment, { flex: Number(probability.event_AW) || 1, backgroundColor: '#D97706' }]}
+              style={[
+                styles.probBarSegment,
+                { flex: Number(probability.event_AW) || 1, backgroundColor: '#D97706' },
+              ]}
             />
           </View>
           <View style={styles.extraRow}>
             <View style={styles.extraChip}>
               <Text style={styles.extraChipLabel}>Over 2.5</Text>
-              <Text style={[styles.extraChipValue, { color: '#34D399' }]}>{probability.event_O}%</Text>
+              <Text style={[styles.extraChipValue, { color: '#34D399' }]}>
+                {probability.event_O}%
+              </Text>
             </View>
             <View style={styles.extraChip}>
               <Text style={styles.extraChipLabel}>BTS</Text>
-              <Text style={[styles.extraChipValue, { color: '#FBBF24' }]}>{probability.event_bts}%</Text>
+              <Text style={[styles.extraChipValue, { color: '#FBBF24' }]}>
+                {probability.event_bts}%
+              </Text>
             </View>
           </View>
-          <Pressable
-            style={styles.viewMoreBtn}
-            onPress={() => setActiveTab('probabilities')}
-          >
+          <Pressable style={styles.viewMoreBtn} onPress={() => setActiveTab('probabilities')}>
             <Text style={styles.viewMoreText}>Full AI Analysis →</Text>
           </Pressable>
         </View>
@@ -282,10 +297,7 @@ export default function MatchCenterScreen() {
             <View key={`c-${i}`} style={[styles.eventRow, styles.eventCard]}>
               <Text style={styles.eventMin}>{c.time}&apos;</Text>
               <View
-                style={[
-                  styles.cardRect,
-                  { backgroundColor: isYellow ? '#FBBF24' : '#EF4444' },
-                ]}
+                style={[styles.cardRect, { backgroundColor: isYellow ? '#FBBF24' : '#EF4444' }]}
               />
               <Text style={[styles.eventPlayer, { flex: 1, marginLeft: 10 }]}>
                 {c.home_fault || c.away_fault}
@@ -343,7 +355,9 @@ export default function MatchCenterScreen() {
           <Text style={styles.cardTitle}>Substitutes Bench</Text>
           <View style={styles.benchGrid}>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.benchTeam, { color: '#60A5FA' }]}>{fixture.event_home_team}</Text>
+              <Text style={[styles.benchTeam, { color: '#60A5FA' }]}>
+                {fixture.event_home_team}
+              </Text>
               {fixture.lineups?.home_team?.substitutes?.map((s, i) => (
                 <Text key={i} style={styles.benchPlayer}>
                   #{s.player_number || i + 1} {s.player}
@@ -352,7 +366,9 @@ export default function MatchCenterScreen() {
             </View>
             <View style={styles.benchDivider} />
             <View style={{ flex: 1, paddingLeft: 10 }}>
-              <Text style={[styles.benchTeam, { color: '#FBBF24' }]}>{fixture.event_away_team}</Text>
+              <Text style={[styles.benchTeam, { color: '#FBBF24' }]}>
+                {fixture.event_away_team}
+              </Text>
               {fixture.lineups?.away_team?.substitutes?.map((s, i) => (
                 <Text key={i} style={styles.benchPlayer}>
                   #{s.player_number || i + 1} {s.player}
@@ -371,14 +387,21 @@ export default function MatchCenterScreen() {
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>📊</Text>
           <Text style={styles.emptyTitle}>Stats Unavailable</Text>
-          <Text style={styles.emptyText}>In-match statistics will update live during gameplay.</Text>
+          <Text style={styles.emptyText}>
+            In-match statistics will update live during gameplay.
+          </Text>
         </View>
       );
     }
 
     return (
       <View style={styles.tabContent}>
-        <View style={[styles.card, { flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 4 }]}>
+        <View
+          style={[
+            styles.card,
+            { flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 4 },
+          ]}
+        >
           <Text style={[styles.statsTeam, { color: '#60A5FA' }]}>{fixture.event_home_team}</Text>
           <Text style={[styles.statsTeam, { color: '#FBBF24' }]}>{fixture.event_away_team}</Text>
         </View>
@@ -392,7 +415,9 @@ export default function MatchCenterScreen() {
               <View key={i} style={styles.statRow}>
                 <Text style={[styles.statValue, { color: '#60A5FA' }]}>{st.home}</Text>
                 <View style={{ flex: 1, paddingHorizontal: 8 }}>
-                  <Text style={styles.statLabel} numberOfLines={1}>{st.type}</Text>
+                  <Text style={styles.statLabel} numberOfLines={1}>
+                    {st.type}
+                  </Text>
                   <View style={styles.statBar}>
                     <View style={[styles.statBarHome, { width: `${homePct}%` }]} />
                     <View style={[styles.statBarAway, { width: `${100 - homePct}%` }]} />
@@ -474,7 +499,9 @@ export default function MatchCenterScreen() {
           </View>
           {liveOdds.slice(0, 6).map((lo, i) => (
             <View key={i} style={styles.liveOddsRow}>
-              <Text style={styles.liveOddsName} numberOfLines={1}>{lo.odd_name}</Text>
+              <Text style={styles.liveOddsName} numberOfLines={1}>
+                {lo.odd_name}
+              </Text>
               <Text style={styles.liveOddsType}>{lo.odd_type}</Text>
               <Text style={styles.liveOddsValue}>{lo.odd_value}</Text>
             </View>
@@ -507,35 +534,36 @@ export default function MatchCenterScreen() {
               <Text style={[styles.oddsTableCell, { color: '#FBBF24', fontWeight: '900' }]}>
                 {o.odd_2 || '-'}
               </Text>
-              <Text style={[styles.oddsTableCell, { color: '#34D399' }]}>
-                {o['o+2.5'] || '-'}
-              </Text>
-              <Text style={[styles.oddsTableCell, { color: '#F87171' }]}>
-                {o['u+2.5'] || '-'}
-              </Text>
+              <Text style={[styles.oddsTableCell, { color: '#34D399' }]}>{o['o+2.5'] || '-'}</Text>
+              <Text style={[styles.oddsTableCell, { color: '#F87171' }]}>{o['u+2.5'] || '-'}</Text>
             </View>
           ))}
         </View>
       )}
 
       {/* Full Odds Markets */}
-      {fullOdds && Object.entries(fullOdds).map(([market, marketData]) => (
-        <View key={market} style={styles.card}>
-          <Text style={styles.cardTitle}>{market}</Text>
-          <View style={styles.fullOddsGrid}>
-            {Object.entries(marketData).slice(0, 8).map(([outcome, bookies]) => {
-              const bk = Object.keys(bookies)[0];
-              const val = bookies[bk];
-              return (
-                <View key={outcome} style={styles.fullOddsChip}>
-                  <Text style={styles.fullOddsOutcome} numberOfLines={1}>{outcome}</Text>
-                  <Text style={styles.fullOddsVal}>{val}</Text>
-                </View>
-              );
-            })}
+      {fullOdds &&
+        Object.entries(fullOdds).map(([market, marketData]) => (
+          <View key={market} style={styles.card}>
+            <Text style={styles.cardTitle}>{market}</Text>
+            <View style={styles.fullOddsGrid}>
+              {Object.entries(marketData)
+                .slice(0, 8)
+                .map(([outcome, bookies]) => {
+                  const bk = Object.keys(bookies)[0];
+                  const val = bookies[bk];
+                  return (
+                    <View key={outcome} style={styles.fullOddsChip}>
+                      <Text style={styles.fullOddsOutcome} numberOfLines={1}>
+                        {outcome}
+                      </Text>
+                      <Text style={styles.fullOddsVal}>{val}</Text>
+                    </View>
+                  );
+                })}
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
 
       {!liveOdds.length && !odds.length && !fullOdds && (
         <View style={styles.emptyContainer}>
@@ -569,13 +597,18 @@ export default function MatchCenterScreen() {
 
           <View style={styles.probLabels}>
             <Text style={[styles.probTeam, { color: '#60A5FA' }]}>
-              {fixture.event_home_team}{'\n'}{hw}%
+              {fixture.event_home_team}
+              {'\n'}
+              {hw}%
             </Text>
             <Text style={[styles.probTeam, { color: '#94A3B8', textAlign: 'center' }]}>
-              Draw{'\n'}{d}%
+              Draw{'\n'}
+              {d}%
             </Text>
             <Text style={[styles.probTeam, { color: '#FBBF24', textAlign: 'right' }]}>
-              {fixture.event_away_team}{'\n'}{aw}%
+              {fixture.event_away_team}
+              {'\n'}
+              {aw}%
             </Text>
           </View>
 
@@ -668,10 +701,7 @@ export default function MatchCenterScreen() {
               row.standing_team === fixture.event_home_team ||
               row.standing_team === fixture.event_away_team;
             return (
-              <View
-                key={i}
-                style={[styles.tableRow, isCurrent && styles.tableRowHighlight]}
-              >
+              <View key={i} style={[styles.tableRow, isCurrent && styles.tableRowHighlight]}>
                 <Text style={[styles.tableCell, styles.tableRank, { color: '#64748B' }]}>
                   {row.standing_place || i + 1}
                 </Text>
@@ -696,7 +726,13 @@ export default function MatchCenterScreen() {
                   {row.standing_L || 0}
                 </Text>
                 <Text style={[styles.tableCell, styles.tableNum]}>{row.standing_GD || 0}</Text>
-                <Text style={[styles.tableCell, styles.tableNum, { fontWeight: '900', color: '#FBBF24' }]}>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    styles.tableNum,
+                    { fontWeight: '900', color: '#FBBF24' },
+                  ]}
+                >
                   {row.standing_PTS || 0}
                 </Text>
               </View>
@@ -709,16 +745,26 @@ export default function MatchCenterScreen() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'overview': return renderOverview();
-      case 'events': return renderEvents();
-      case 'lineups': return renderLineups();
-      case 'stats': return renderStats();
-      case 'h2h': return renderH2H();
-      case 'odds': return renderOdds();
-      case 'probabilities': return renderProbabilities();
-      case 'highlights': return renderHighlights();
-      case 'standings': return renderStandings();
-      default: return null;
+      case 'overview':
+        return renderOverview();
+      case 'events':
+        return renderEvents();
+      case 'lineups':
+        return renderLineups();
+      case 'stats':
+        return renderStats();
+      case 'h2h':
+        return renderH2H();
+      case 'odds':
+        return renderOdds();
+      case 'probabilities':
+        return renderProbabilities();
+      case 'highlights':
+        return renderHighlights();
+      case 'standings':
+        return renderStandings();
+      default:
+        return null;
     }
   };
 
@@ -726,7 +772,9 @@ export default function MatchCenterScreen() {
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+        }
         showsVerticalScrollIndicator={false}
         stickyHeaderIndices={[1]} // Tab bar sticks
       >
@@ -744,10 +792,10 @@ export default function MatchCenterScreen() {
             ) : (
               <Text style={{ fontSize: 14 }}>🏆</Text>
             )}
-            <Text style={styles.heroLeague} numberOfLines={1}>{fixture.league_name}</Text>
-            {fixture.league_round && (
-              <Text style={styles.heroRound}>• {fixture.league_round}</Text>
-            )}
+            <Text style={styles.heroLeague} numberOfLines={1}>
+              {fixture.league_name}
+            </Text>
+            {fixture.league_round && <Text style={styles.heroRound}>• {fixture.league_round}</Text>}
           </View>
 
           {/* Teams & Score */}
@@ -767,7 +815,9 @@ export default function MatchCenterScreen() {
                   <Text>🛡️</Text>
                 </View>
               )}
-              <Text style={styles.teamName} numberOfLines={2}>{fixture.event_home_team}</Text>
+              <Text style={styles.teamName} numberOfLines={2}>
+                {fixture.event_home_team}
+              </Text>
               <Text style={styles.teamRole}>Home</Text>
             </Pressable>
 
@@ -777,9 +827,7 @@ export default function MatchCenterScreen() {
                 {isLive ? (
                   <View style={styles.liveBadge}>
                     <View style={styles.liveDot} />
-                    <Text style={styles.liveBadgeText}>
-                      {fixture.event_status || 'LIVE'}
-                    </Text>
+                    <Text style={styles.liveBadgeText}>{fixture.event_status || 'LIVE'}</Text>
                   </View>
                 ) : (
                   <Text style={styles.statusText}>{fixture.event_status || 'NS'}</Text>
@@ -789,13 +837,13 @@ export default function MatchCenterScreen() {
               {fixture.event_halftime_result && (
                 <Text style={styles.htText}>HT: {fixture.event_halftime_result}</Text>
               )}
-              {fixture.event_time && (
-                <Text style={styles.kickoffTime}>{fixture.event_time}</Text>
-              )}
+              {fixture.event_time && <Text style={styles.kickoffTime}>{fixture.event_time}</Text>}
               {fixture.event_stadium && (
                 <View style={styles.venueRow}>
                   <Ionicons name="location-outline" size={10} color="#FBBF24" />
-                  <Text style={styles.venueText} numberOfLines={1}>{fixture.event_stadium}</Text>
+                  <Text style={styles.venueText} numberOfLines={1}>
+                    {fixture.event_stadium}
+                  </Text>
                 </View>
               )}
             </View>
@@ -842,11 +890,7 @@ export default function MatchCenterScreen() {
                   style={[styles.tabBtn, active && styles.tabBtnActive]}
                   onPress={() => setActiveTab(tab.id)}
                 >
-                  <Ionicons
-                    name={tab.icon}
-                    size={13}
-                    color={active ? '#0F172A' : '#64748B'}
-                  />
+                  <Ionicons name={tab.icon} size={13} color={active ? '#0F172A' : '#64748B'} />
                   <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
                     {tab.label}
                   </Text>
@@ -937,7 +981,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   teamName: { fontSize: 13, fontWeight: '900', color: '#F8FAFC', marginTop: 6, lineHeight: 17 },
-  teamRole: { fontSize: 10, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', marginTop: 2 },
+  teamRole: {
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    marginTop: 2,
+  },
   scoreCentre: { alignItems: 'center', minWidth: 100 },
   statusBadge: { marginBottom: 4 },
   liveBadge: {
@@ -992,7 +1042,13 @@ const styles = StyleSheet.create({
     maxWidth: 110,
   },
   venueText: { fontSize: 10, color: '#64748B' },
-  heroDate: { textAlign: 'center', color: '#475569', fontSize: 11, marginTop: 10, fontFamily: 'monospace' },
+  heroDate: {
+    textAlign: 'center',
+    color: '#475569',
+    fontSize: 11,
+    marginTop: 10,
+    fontFamily: 'monospace',
+  },
 
   // ─ Tabs ─
   tabBarWrapper: {
@@ -1057,7 +1113,14 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.04)',
   },
   infoLabel: { fontSize: 11, color: '#64748B', fontWeight: '600' },
-  infoValue: { fontSize: 11, color: '#E2E8F0', fontWeight: '800', textAlign: 'right', flex: 1, paddingLeft: 8 },
+  infoValue: {
+    fontSize: 11,
+    color: '#E2E8F0',
+    fontWeight: '800',
+    textAlign: 'right',
+    flex: 1,
+    paddingLeft: 8,
+  },
 
   // ─ Probability ─
   probLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
@@ -1098,9 +1161,21 @@ const styles = StyleSheet.create({
   eventGoal: { backgroundColor: 'rgba(16,185,129,0.08)', borderColor: 'rgba(16,185,129,0.2)' },
   eventCard: { backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)' },
   eventSub: { backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)' },
-  eventMin: { fontSize: 11, fontWeight: '900', color: '#FBBF24', width: 30, fontFamily: 'monospace' },
+  eventMin: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FBBF24',
+    width: 30,
+    fontFamily: 'monospace',
+  },
   eventPlayer: { fontSize: 12, fontWeight: '700', color: '#E2E8F0' },
-  eventScore: { fontSize: 11, color: '#34D399', fontFamily: 'monospace', fontWeight: '900', marginTop: 2 },
+  eventScore: {
+    fontSize: 11,
+    color: '#34D399',
+    fontFamily: 'monospace',
+    fontWeight: '900',
+    marginTop: 2,
+  },
   eventCardLabel: { fontSize: 10, color: '#94A3B8', marginLeft: 4 },
   cardRect: { width: 12, height: 16, borderRadius: 2, marginHorizontal: 8 },
 
@@ -1113,9 +1188,27 @@ const styles = StyleSheet.create({
   // ─ Stats ─
   statsTeam: { fontSize: 11, fontWeight: '900', textTransform: 'uppercase' },
   statRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  statValue: { fontSize: 12, fontWeight: '900', width: 36, fontFamily: 'monospace', textAlign: 'center' },
-  statLabel: { fontSize: 10, color: '#64748B', textAlign: 'center', textTransform: 'uppercase', marginBottom: 3 },
-  statBar: { flexDirection: 'row', height: 6, borderRadius: 3, overflow: 'hidden', backgroundColor: '#1E293B' },
+  statValue: {
+    fontSize: 12,
+    fontWeight: '900',
+    width: 36,
+    fontFamily: 'monospace',
+    textAlign: 'center',
+  },
+  statLabel: {
+    fontSize: 10,
+    color: '#64748B',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    marginBottom: 3,
+  },
+  statBar: {
+    flexDirection: 'row',
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+    backgroundColor: '#1E293B',
+  },
   statBarHome: { backgroundColor: '#2563EB', height: '100%' },
   statBarAway: { backgroundColor: '#D97706', height: '100%' },
 
@@ -1152,7 +1245,14 @@ const styles = StyleSheet.create({
   },
   liveOddsName: { flex: 2, fontSize: 11, color: '#94A3B8' },
   liveOddsType: { flex: 1, fontSize: 11, color: '#E2E8F0', fontWeight: '700', textAlign: 'center' },
-  liveOddsValue: { flex: 1, fontSize: 16, fontWeight: '900', color: '#34D399', textAlign: 'right', fontFamily: 'monospace' },
+  liveOddsValue: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#34D399',
+    textAlign: 'right',
+    fontFamily: 'monospace',
+  },
   oddsTableHeader: {
     flexDirection: 'row',
     paddingBottom: 6,
@@ -1162,8 +1262,20 @@ const styles = StyleSheet.create({
   },
   oddsTableRow: { flexDirection: 'row', paddingVertical: 7 },
   oddsTableRowAlt: { backgroundColor: 'rgba(255,255,255,0.02)' },
-  oddsTableCell: { flex: 1, textAlign: 'center', fontSize: 11, color: '#94A3B8', fontFamily: 'monospace' },
-  oddsBookieCol: { flex: 2, textAlign: 'left', color: '#CBD5E1', fontWeight: '700', fontFamily: 'System' },
+  oddsTableCell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 11,
+    color: '#94A3B8',
+    fontFamily: 'monospace',
+  },
+  oddsBookieCol: {
+    flex: 2,
+    textAlign: 'left',
+    color: '#CBD5E1',
+    fontWeight: '700',
+    fontFamily: 'System',
+  },
   fullOddsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   fullOddsChip: {
     flexDirection: 'row',
@@ -1192,7 +1304,13 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
   },
-  probMetricLabel: { fontSize: 10, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', textAlign: 'center' },
+  probMetricLabel: {
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+  },
   probMetricValue: { fontSize: 22, fontWeight: '900', marginTop: 4, fontVariant: ['tabular-nums'] },
 
   // ─ Video ─
@@ -1204,7 +1322,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.07)',
     marginBottom: 10,
   },
-  videoTitle: { fontSize: 13, fontWeight: '700', color: '#E2E8F0', marginBottom: 10, lineHeight: 18 },
+  videoTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#E2E8F0',
+    marginBottom: 10,
+    lineHeight: 18,
+  },
   watchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1225,7 +1349,12 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.08)',
     marginBottom: 2,
   },
-  tableRow: { flexDirection: 'row', paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)' },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.03)',
+  },
   tableRowHighlight: { backgroundColor: 'rgba(245,158,11,0.1)' },
   tableCell: { fontSize: 11, color: '#CBD5E1', fontFamily: 'monospace' },
   tableRank: { width: 24, textAlign: 'center' },

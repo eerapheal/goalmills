@@ -1,11 +1,11 @@
 /**
  * GoalMills Brand Color System
- * 
+ *
  * Hierarchy:
  * 1. Blue (Primary) - Brand foundation, headers, primary buttons, active tabs
  * 2. Red (Secondary) - Live matches, in-play pulses, breaking news, alerts
  * 3. Yellow (Tertiary / Accent) - Standings points, golden boot goals, trophies, ratings
- * 
+ *
  * Order Rule: Always Blue -> Red -> Yellow across all gradients, progress bars, and trims.
  */
 
@@ -58,8 +58,10 @@ export const BRAND_TRIO = {
   sequence: ['blue', 'red', 'yellow'] as const,
   gradientClass: 'bg-gradient-to-r from-blue-600 via-red-500 to-yellow-500',
   gradient135Class: 'bg-gradient-to-br from-blue-600 via-red-500 to-yellow-500',
-  gradientTextClass: 'bg-gradient-to-r from-blue-400 via-red-400 to-yellow-400 bg-clip-text text-transparent',
-  borderClass: 'border-transparent bg-origin-border [border-image:linear-gradient(90deg,#2563eb,#ef4444,#eab308)_1]',
+  gradientTextClass:
+    'bg-gradient-to-r from-blue-400 via-red-400 to-yellow-400 bg-clip-text text-transparent',
+  borderClass:
+    'border-transparent bg-origin-border [border-image:linear-gradient(90deg,#2563eb,#ef4444,#eab308)_1]',
 };
 
 // ─────────────────────────────────────────────────────────────────

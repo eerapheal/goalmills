@@ -61,11 +61,21 @@ export default function TeamDetailPage() {
   const [players, setPlayers] = useState<FootballPlayer[]>([]);
   const [allFixtures, setAllFixtures] = useState<FootballEvent[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
-  const [oddsModal, setOddsModal] = useState<{ visible: boolean; matchId: string; home: string; away: string }>({
-    visible: false, matchId: '', home: '', away: '',
+  const [oddsModal, setOddsModal] = useState<{
+    visible: boolean;
+    matchId: string;
+    home: string;
+    away: string;
+  }>({
+    visible: false,
+    matchId: '',
+    home: '',
+    away: '',
   });
 
-  useEffect(() => { loadTeamData(); }, [id]);
+  useEffect(() => {
+    loadTeamData();
+  }, [id]);
 
   const loadTeamData = async () => {
     try {
@@ -107,7 +117,10 @@ export default function TeamDetailPage() {
     }
   };
 
-  const onRefresh = () => { setRefreshing(true); loadTeamData(); };
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadTeamData();
+  };
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
@@ -117,17 +130,33 @@ export default function TeamDetailPage() {
   // Compute derived fixtures
   const now = new Date().toISOString().split('T')[0];
   const results = useMemo(
-    () => allFixtures.filter(f => f.event_status === 'FT' || f.event_status === 'Finished' || f.event_status === 'AET').slice(-10).reverse(),
+    () =>
+      allFixtures
+        .filter(
+          (f) =>
+            f.event_status === 'FT' || f.event_status === 'Finished' || f.event_status === 'AET'
+        )
+        .slice(-10)
+        .reverse(),
     [allFixtures]
   );
   const upcoming = useMemo(
-    () => allFixtures.filter(f => f.event_date >= now && (f.event_status === 'NS' || f.event_status === 'Not Started' || f.event_status === 'TBA')).slice(0, 10),
+    () =>
+      allFixtures
+        .filter(
+          (f) =>
+            f.event_date >= now &&
+            (f.event_status === 'NS' ||
+              f.event_status === 'Not Started' ||
+              f.event_status === 'TBA')
+        )
+        .slice(0, 10),
     [allFixtures, now]
   );
 
   // Form (last 5 from results)
   const formBadges = useMemo(() => {
-    return results.slice(0, 5).map(f => {
+    return results.slice(0, 5).map((f) => {
       const teamId = String(id);
       const homeId = String(f.home_team_key);
       const awayId = String(f.away_team_key);
@@ -135,8 +164,10 @@ export default function TeamDetailPage() {
       const homeGoals = parseInt(scoreParts[0] || '0', 10);
       const awayGoals = parseInt(scoreParts[1] || '0', 10);
       let outcome: 'W' | 'D' | 'L' = 'D';
-      if (teamId === homeId) outcome = homeGoals > awayGoals ? 'W' : homeGoals < awayGoals ? 'L' : 'D';
-      else if (teamId === awayId) outcome = awayGoals > homeGoals ? 'W' : awayGoals < homeGoals ? 'L' : 'D';
+      if (teamId === homeId)
+        outcome = homeGoals > awayGoals ? 'W' : homeGoals < awayGoals ? 'L' : 'D';
+      else if (teamId === awayId)
+        outcome = awayGoals > homeGoals ? 'W' : awayGoals < homeGoals ? 'L' : 'D';
       return outcome;
     });
   }, [results, id]);
@@ -144,7 +175,7 @@ export default function TeamDetailPage() {
   // Group players by position
   const groupedPlayers = useMemo(() => {
     const groups: { [k: string]: FootballPlayer[] } = {};
-    players.forEach(p => {
+    players.forEach((p) => {
       const pos = normalisePosition(p.player_type);
       if (!groups[pos]) groups[pos] = [];
       groups[pos].push(p);
@@ -153,7 +184,7 @@ export default function TeamDetailPage() {
   }, [players]);
 
   // Current team standing
-  const myStanding = standings.find(s => String(s.team_key) === String(id));
+  const myStanding = standings.find((s) => String(s.team_key) === String(id));
 
   if (loading && !refreshing) {
     return (
@@ -228,20 +259,28 @@ export default function TeamDetailPage() {
             </View>
             <View style={styles.standingDivider} />
             <View style={styles.standingItem}>
-              <Text style={[styles.standingValue, { color: '#34D399' }]}>{myStanding.standing_W || 0}</Text>
+              <Text style={[styles.standingValue, { color: '#34D399' }]}>
+                {myStanding.standing_W || 0}
+              </Text>
               <Text style={styles.standingKey}>W</Text>
             </View>
             <View style={styles.standingItem}>
-              <Text style={[styles.standingValue, { color: '#94A3B8' }]}>{myStanding.standing_D || 0}</Text>
+              <Text style={[styles.standingValue, { color: '#94A3B8' }]}>
+                {myStanding.standing_D || 0}
+              </Text>
               <Text style={styles.standingKey}>D</Text>
             </View>
             <View style={styles.standingItem}>
-              <Text style={[styles.standingValue, { color: '#F87171' }]}>{myStanding.standing_L || 0}</Text>
+              <Text style={[styles.standingValue, { color: '#F87171' }]}>
+                {myStanding.standing_L || 0}
+              </Text>
               <Text style={styles.standingKey}>L</Text>
             </View>
             <View style={styles.standingDivider} />
             <View style={styles.standingItem}>
-              <Text style={[styles.standingValue, { color: '#FBBF24' }]}>{myStanding.standing_PTS || 0}</Text>
+              <Text style={[styles.standingValue, { color: '#FBBF24' }]}>
+                {myStanding.standing_PTS || 0}
+              </Text>
               <Text style={styles.standingKey}>PTS</Text>
             </View>
           </View>
@@ -255,7 +294,7 @@ export default function TeamDetailPage() {
         style={styles.tabBar}
         contentContainerStyle={styles.tabBarContent}
       >
-        {TABS.map(tab => {
+        {TABS.map((tab) => {
           const active = activeTab === tab.id;
           return (
             <Pressable
@@ -272,7 +311,9 @@ export default function TeamDetailPage() {
 
       {/* ── CONTENT ── */}
       <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+        }
         contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 10 }}
         showsVerticalScrollIndicator={false}
       >
@@ -285,14 +326,17 @@ export default function TeamDetailPage() {
                 <Text style={styles.emptyTitle}>Squad Unavailable</Text>
               </View>
             ) : (
-              POSITION_ORDER.filter(pos => groupedPlayers[pos]?.length > 0).map(pos => (
+              POSITION_ORDER.filter((pos) => groupedPlayers[pos]?.length > 0).map((pos) => (
                 <View key={pos} style={styles.positionGroup}>
                   <Text style={styles.positionTitle}>{pos}</Text>
                   {groupedPlayers[pos].map((p, i) => (
                     <Pressable
                       key={i}
                       style={styles.playerRow}
-                      onPress={() => p.player_key && router.push(`/(tabs)/home/football/players/${p.player_key}` as any)}
+                      onPress={() =>
+                        p.player_key &&
+                        router.push(`/(tabs)/home/football/players/${p.player_key}` as any)
+                      }
                     >
                       {p.player_image ? (
                         <Image source={{ uri: p.player_image }} style={styles.playerThumb} />
@@ -310,7 +354,9 @@ export default function TeamDetailPage() {
                       <View style={styles.playerStats}>
                         <Text style={styles.playerGoals}>{p.player_goals || 0} ⚽</Text>
                         {p.player_rating && (
-                          <Text style={styles.playerRating}>★ {Number(p.player_rating).toFixed(1)}</Text>
+                          <Text style={styles.playerRating}>
+                            ★ {Number(p.player_rating).toFixed(1)}
+                          </Text>
                         )}
                       </View>
                       <Text style={styles.playerNumber}>#{p.player_number || '?'}</Text>
@@ -331,9 +377,7 @@ export default function TeamDetailPage() {
                 <Text style={styles.emptyTitle}>No Upcoming Fixtures</Text>
               </View>
             ) : (
-              upcoming.map(f => (
-                <FootballMatchCard key={f.event_key} event={toUnified(f)} />
-              ))
+              upcoming.map((f) => <FootballMatchCard key={f.event_key} event={toUnified(f)} />)
             )}
           </>
         )}
@@ -347,9 +391,7 @@ export default function TeamDetailPage() {
                 <Text style={styles.emptyTitle}>No Results Yet</Text>
               </View>
             ) : (
-              results.map(f => (
-                <FootballMatchCard key={f.event_key} event={toUnified(f)} />
-              ))
+              results.map((f) => <FootballMatchCard key={f.event_key} event={toUnified(f)} />)
             )}
           </>
         )}
@@ -372,28 +414,54 @@ export default function TeamDetailPage() {
                   <Text style={[styles.tableCell, styles.numCol, { color: '#FBBF24' }]}>PTS</Text>
                 </View>
                 {standings.map((row, i) => {
-                  const isMe = String(row.team_key) === String(id) || row.standing_team === team.team_name;
+                  const isMe =
+                    String(row.team_key) === String(id) || row.standing_team === team.team_name;
                   return (
                     <Pressable
                       key={i}
                       style={[styles.tableRow, isMe && styles.tableRowHighlight]}
-                      onPress={() => row.team_key && router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)}
+                      onPress={() =>
+                        row.team_key &&
+                        router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)
+                      }
                     >
                       <Text style={[styles.tableCell, styles.rankCol, { color: '#64748B' }]}>
                         {row.standing_place || i + 1}
                       </Text>
                       <Text
-                        style={[styles.tableCell, { flex: 2.5, textAlign: 'left', fontWeight: '700', color: isMe ? '#FBBF24' : '#F1F5F9' }]}
+                        style={[
+                          styles.tableCell,
+                          {
+                            flex: 2.5,
+                            textAlign: 'left',
+                            fontWeight: '700',
+                            color: isMe ? '#FBBF24' : '#F1F5F9',
+                          },
+                        ]}
                         numberOfLines={1}
                       >
                         {row.standing_team}
                       </Text>
                       <Text style={[styles.tableCell, styles.numCol]}>{row.standing_P || 0}</Text>
-                      <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>{row.standing_W || 0}</Text>
-                      <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>{row.standing_D || 0}</Text>
-                      <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>{row.standing_L || 0}</Text>
+                      <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>
+                        {row.standing_W || 0}
+                      </Text>
+                      <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>
+                        {row.standing_D || 0}
+                      </Text>
+                      <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>
+                        {row.standing_L || 0}
+                      </Text>
                       <Text style={[styles.tableCell, styles.numCol]}>{row.standing_GD || 0}</Text>
-                      <Text style={[styles.tableCell, styles.numCol, { fontWeight: '900', color: '#FBBF24' }]}>{row.standing_PTS || 0}</Text>
+                      <Text
+                        style={[
+                          styles.tableCell,
+                          styles.numCol,
+                          { fontWeight: '900', color: '#FBBF24' },
+                        ]}
+                      >
+                        {row.standing_PTS || 0}
+                      </Text>
                     </Pressable>
                   );
                 })}
@@ -413,7 +481,7 @@ export default function TeamDetailPage() {
                 <Text style={styles.emptyText}>Odds are available for future matches.</Text>
               </View>
             ) : (
-              upcoming.map(f => (
+              upcoming.map((f) => (
                 <Pressable
                   key={f.event_key}
                   style={styles.oddsFixtureRow}
@@ -427,11 +495,16 @@ export default function TeamDetailPage() {
                   }
                 >
                   <View style={styles.oddsFixtureInfo}>
-                    <Text style={styles.oddsFixtureDate}>{f.event_date} · {f.event_time || 'TBA'}</Text>
-                    <Text style={styles.oddsFixtureTeams}>
-                      {f.event_home_team} <Text style={{ color: '#475569' }}>vs</Text> {f.event_away_team}
+                    <Text style={styles.oddsFixtureDate}>
+                      {f.event_date} · {f.event_time || 'TBA'}
                     </Text>
-                    <Text style={styles.oddsFixtureLeague} numberOfLines={1}>{f.league_name}</Text>
+                    <Text style={styles.oddsFixtureTeams}>
+                      {f.event_home_team} <Text style={{ color: '#475569' }}>vs</Text>{' '}
+                      {f.event_away_team}
+                    </Text>
+                    <Text style={styles.oddsFixtureLeague} numberOfLines={1}>
+                      {f.league_name}
+                    </Text>
                   </View>
                   <Ionicons name="analytics-outline" size={20} color="#F59E0B" />
                 </Pressable>
@@ -447,7 +520,7 @@ export default function TeamDetailPage() {
         matchId={oddsModal.matchId}
         homeTeam={oddsModal.home}
         awayTeam={oddsModal.away}
-        onClose={() => setOddsModal(prev => ({ ...prev, visible: false }))}
+        onClose={() => setOddsModal((prev) => ({ ...prev, visible: false }))}
       />
     </View>
   );
@@ -455,10 +528,23 @@ export default function TeamDetailPage() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#080E18' },
-  center: { flex: 1, backgroundColor: '#080E18', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
+  center: {
+    flex: 1,
+    backgroundColor: '#080E18',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    padding: 24,
+  },
   loadingText: { color: '#94A3B8', fontSize: 13, fontWeight: '600' },
   errorTitle: { fontSize: 18, fontWeight: '900', color: '#F8FAFC', marginTop: 8 },
-  backBtn: { marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#F59E0B', borderRadius: 12 },
+  backBtn: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#F59E0B',
+    borderRadius: 12,
+  },
   backBtnText: { color: '#0F172A', fontWeight: '900', fontSize: 13 },
 
   // Hero
@@ -471,16 +557,25 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(59,130,246,0.25)',
   },
   heroBack: {
-    position: 'absolute', top: 52, left: 16, zIndex: 10,
-    width: 36, height: 36, borderRadius: 18,
+    position: 'absolute',
+    top: 52,
+    left: 16,
+    zIndex: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heroContent: { flexDirection: 'row', gap: 14, alignItems: 'center', paddingLeft: 44 },
   teamLogo: { width: 72, height: 72, resizeMode: 'contain', borderRadius: 8 },
   teamLogoPlaceholder: {
-    backgroundColor: '#1E293B', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#1E293B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   heroInfo: { flex: 1 },
   teamName: { fontSize: 20, fontWeight: '900', color: '#F8FAFC' },
@@ -488,32 +583,54 @@ const styles = StyleSheet.create({
   formRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
   formLabel: { fontSize: 10, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
   formDot: {
-    width: 22, height: 22, borderRadius: 11,
-    alignItems: 'center', justifyContent: 'center',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   formLetter: { fontSize: 10, fontWeight: '900', color: '#0F172A' },
 
   standingCard: {
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 14, borderWidth: 1,
+    borderRadius: 14,
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    padding: 12, marginTop: 14,
+    padding: 12,
+    marginTop: 14,
     justifyContent: 'space-around',
   },
   standingItem: { alignItems: 'center' },
-  standingValue: { fontSize: 20, fontWeight: '900', color: '#F8FAFC', fontVariant: ['tabular-nums'] },
-  standingKey: { fontSize: 9, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', marginTop: 2 },
+  standingValue: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#F8FAFC',
+    fontVariant: ['tabular-nums'],
+  },
+  standingKey: {
+    fontSize: 9,
+    color: '#64748B',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    marginTop: 2,
+  },
   standingDivider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.1)' },
 
   // Tabs
   tabBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   tabBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
   tabBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
     backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   tabBtnActive: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
   tabLabel: { fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
@@ -521,45 +638,78 @@ const styles = StyleSheet.create({
 
   // Squad
   positionGroup: {
-    backgroundColor: '#0B1526', borderRadius: 16, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: '#0B1526',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   positionTitle: {
-    fontSize: 10, fontWeight: '900', color: '#60A5FA',
-    textTransform: 'uppercase', letterSpacing: 0.8,
-    paddingHorizontal: 14, paddingVertical: 8,
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#60A5FA',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     backgroundColor: 'rgba(37,99,235,0.1)',
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   playerRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 14, paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.04)',
   },
   playerThumb: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1E293B' },
-  playerThumbPlaceholder: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  playerThumbPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
   playerInfo: { flex: 1 },
   playerName: { fontSize: 12, fontWeight: '800', color: '#F1F5F9' },
   playerMeta: { fontSize: 10, color: '#64748B', marginTop: 1 },
   playerStats: { alignItems: 'flex-end', gap: 2 },
   playerGoals: { fontSize: 11, fontWeight: '700', color: '#34D399' },
   playerRating: { fontSize: 10, color: '#FBBF24', fontWeight: '700' },
-  playerNumber: { fontSize: 11, fontWeight: '900', color: '#475569', width: 28, textAlign: 'right', fontFamily: 'monospace' },
+  playerNumber: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#475569',
+    width: 28,
+    textAlign: 'right',
+    fontFamily: 'monospace',
+  },
 
   // Table
   tableCard: {
-    backgroundColor: '#0B1526', borderRadius: 16, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: '#0B1526',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   tableHeader: {
-    flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 8,
+    flexDirection: 'row',
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     backgroundColor: 'rgba(255,255,255,0.04)',
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
   },
   tableRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 9, paddingHorizontal: 8,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 9,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.03)',
   },
   tableRowHighlight: { backgroundColor: 'rgba(245,158,11,0.1)' },
   tableCell: { fontSize: 11, color: '#94A3B8', fontFamily: 'monospace', textAlign: 'center' },
@@ -568,17 +718,31 @@ const styles = StyleSheet.create({
 
   // Odds
   oddsTitle: {
-    fontSize: 11, color: '#64748B', fontWeight: '700',
-    textTransform: 'uppercase', textAlign: 'center',
-    paddingBottom: 4, letterSpacing: 0.5,
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    paddingBottom: 4,
+    letterSpacing: 0.5,
   },
   oddsFixtureRow: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#0B1526', borderRadius: 14, padding: 14,
-    borderWidth: 1, borderColor: 'rgba(245,158,11,0.2)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0B1526',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(245,158,11,0.2)',
   },
   oddsFixtureInfo: { flex: 1 },
-  oddsFixtureDate: { fontSize: 10, color: '#FBBF24', fontFamily: 'monospace', fontWeight: '700', marginBottom: 4 },
+  oddsFixtureDate: {
+    fontSize: 10,
+    color: '#FBBF24',
+    fontFamily: 'monospace',
+    fontWeight: '700',
+    marginBottom: 4,
+  },
   oddsFixtureTeams: { fontSize: 13, fontWeight: '800', color: '#F1F5F9', marginBottom: 3 },
   oddsFixtureLeague: { fontSize: 10, color: '#64748B' },
 

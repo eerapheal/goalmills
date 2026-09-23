@@ -13,11 +13,7 @@ interface PlayerComparisonModalProps {
   onClose: () => void;
 }
 
-export function PlayerComparisonModal({
-  playerA,
-  playerB,
-  onClose,
-}: PlayerComparisonModalProps) {
+export function PlayerComparisonModal({ playerA, playerB, onClose }: PlayerComparisonModalProps) {
   // Close on Escape
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -144,12 +140,8 @@ export function PlayerComparisonModal({
               <h4 className="font-extrabold text-sm sm:text-base text-white line-clamp-1">
                 {playerA.name}
               </h4>
-              <p className="text-[11px] text-blue-400 font-bold truncate">
-                {playerA.position}
-              </p>
-              <p className="text-[10px] text-slate-400 truncate">
-                {playerA.clubName}
-              </p>
+              <p className="text-[11px] text-blue-400 font-bold truncate">{playerA.position}</p>
+              <p className="text-[10px] text-slate-400 truncate">{playerA.clubName}</p>
             </div>
             <Link
               href={`/football/players/${playerA.slug}`}
@@ -173,12 +165,8 @@ export function PlayerComparisonModal({
               <h4 className="font-extrabold text-sm sm:text-base text-white line-clamp-1">
                 {playerB.name}
               </h4>
-              <p className="text-[11px] text-blue-400 font-bold truncate">
-                {playerB.position}
-              </p>
-              <p className="text-[10px] text-slate-400 truncate">
-                {playerB.clubName}
-              </p>
+              <p className="text-[11px] text-blue-400 font-bold truncate">{playerB.position}</p>
+              <p className="text-[10px] text-slate-400 truncate">{playerB.clubName}</p>
             </div>
             <Link
               href={`/football/players/${playerB.slug}`}
@@ -205,9 +193,7 @@ export function PlayerComparisonModal({
               <div key={m.label} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span
-                    className={`${
-                      isWinnerA ? 'text-yellow-400 font-black' : 'text-slate-300'
-                    }`}
+                    className={`${isWinnerA ? 'text-yellow-400 font-black' : 'text-slate-300'}`}
                   >
                     {m.valA} {isWinnerA && '★'}
                   </span>
@@ -215,9 +201,7 @@ export function PlayerComparisonModal({
                     {m.label}
                   </span>
                   <span
-                    className={`${
-                      isWinnerB ? 'text-yellow-400 font-black' : 'text-slate-300'
-                    }`}
+                    className={`${isWinnerB ? 'text-yellow-400 font-black' : 'text-slate-300'}`}
                   >
                     {isWinnerB && '★ '}
                     {m.valB}
@@ -229,9 +213,7 @@ export function PlayerComparisonModal({
                   <div
                     style={{ width: `${isTie ? 50 : pctA}%` }}
                     className={`h-full transition-all duration-500 ${
-                      isWinnerA
-                        ? 'bg-gradient-to-r from-blue-600 to-yellow-400'
-                        : 'bg-blue-600/40'
+                      isWinnerA ? 'bg-gradient-to-r from-blue-600 to-yellow-400' : 'bg-blue-600/40'
                     }`}
                   />
                   <div

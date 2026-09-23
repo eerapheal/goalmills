@@ -10,7 +10,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'GoalMills | Enterprise Admin & Editorial Suite',
-  description: 'Enterprise Content Management, Staff EMS, and Analytics Suite for GoalMills Sports Media.',
+  description:
+    'Enterprise Content Management, Staff EMS, and Analytics Suite for GoalMills Sports Media.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

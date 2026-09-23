@@ -53,8 +53,8 @@ export function generateGradedEmailHTML(params: GradedReportNotificationParams):
     reviewStatus === 'approved'
       ? '✓ Approved'
       : reviewStatus === 'revision'
-      ? '⚠️ Needs Revision'
-      : '❌ Remedial Training';
+        ? '⚠️ Needs Revision'
+        : '❌ Remedial Training';
 
   return `
 <!DOCTYPE html>
@@ -239,8 +239,8 @@ export async function notifyStaffGradedAssignment(params: GradedReportNotificati
     reviewStatus === 'approved'
       ? 'Approved'
       : reviewStatus === 'revision'
-      ? 'Revision Required'
-      : 'Retraining';
+        ? 'Revision Required'
+        : 'Retraining';
 
   const title = `📝 Day ${trainingDay} Graded: ${totalScore}/100 (${statusLabel})`;
   const body = `Your Day ${trainingDay} submission scored ${totalScore}/100 (${performanceRating}). Feedback: ${

@@ -46,7 +46,10 @@ export const OfficialImage: React.FC<OfficialImageProps> = ({
       {countryFlag && (
         <div
           className="absolute -bottom-1 -right-1 rounded-full overflow-hidden border-2 border-slate-950 shadow-md bg-slate-900"
-          style={{ width: Math.max(16, Math.round(size * 0.35)), height: Math.max(16, Math.round(size * 0.35)) }}
+          style={{
+            width: Math.max(16, Math.round(size * 0.35)),
+            height: Math.max(16, Math.round(size * 0.35)),
+          }}
           title="Association Flag"
         >
           <Image

@@ -14,7 +14,10 @@ export const NEWSROOM_DAILY_TIMETABLE = [
   { time: '10:00 – 12:00', activity: 'Content production (article drafting & fact-checking)' },
   { time: '12:00 – 13:00', activity: 'First publishing window (website cms & initial reviews)' },
   { time: '13:00 – 14:00', activity: 'Break & lunch' },
-  { time: '14:00 – 16:00', activity: 'Second production & social distribution (graphics/video/reels)' },
+  {
+    time: '14:00 – 16:00',
+    activity: 'Second production & social distribution (graphics/video/reels)',
+  },
   { time: '16:00 – 16:45', activity: 'Quality control, link testing & analytics check' },
   { time: '16:45 – 17:00', activity: 'Daily report submission & link logging' },
   { time: '17:00 – 17:30', activity: 'Google Meet Newsroom Stand-Up (5:00 PM – 5:30 PM WAT)' },
@@ -29,11 +32,13 @@ export const NEWSROOM_STANDUP_PROTOCOL = {
     { segment: '5:00 – 5:05', title: 'Attendance check & agenda briefing' },
     {
       segment: '5:05 – 5:15',
-      title: 'Staff reports (What did I study? What did I create? What did I publish? What was my biggest challenge?)',
+      title:
+        'Staff reports (What did I study? What did I create? What did I publish? What was my biggest challenge?)',
     },
     {
       segment: '5:15 – 5:25',
-      title: 'Admin/Editor feedback (Best article, headline, graphic, post, video, biggest mistake & improvement)',
+      title:
+        'Admin/Editor feedback (Best article, headline, graphic, post, video, biggest mistake & improvement)',
     },
     { segment: '5:25 – 5:30', title: 'Tomorrow’s assignments & matchday editorial priorities' },
   ],
@@ -46,32 +51,113 @@ export const NEWSROOM_STANDUP_PROTOCOL = {
 };
 
 export const DAILY_SCORECARD_RUBRICS = [
-  { key: 'research', name: 'Sports Research & Verification', maxScore: 15, description: 'Primary and secondary source verification' },
-  { key: 'accuracy', name: 'Factual Accuracy & Integrity', maxScore: 15, description: 'Zero factual errors, correct dates, names & stats' },
-  { key: 'writing', name: 'Article Writing Quality', maxScore: 15, description: 'Structure, inverted pyramid, tone, and grammar' },
-  { key: 'seo', name: 'Search Engine Optimization (SEO)', maxScore: 10, description: 'Keywords, metadata, H1/H2 structure, and internal links' },
-  { key: 'socialMedia', name: 'Social Media Packaging', maxScore: 10, description: 'Platform tailoring (X, FB, IG, TikTok, YouTube)' },
-  { key: 'graphicDesign', name: 'Canva Graphic & Visuals', maxScore: 10, description: 'GoalMills brand palette, clean typography & layout' },
-  { key: 'creativity', name: 'Editorial Creativity & Hooks', maxScore: 10, description: 'Engaging headlines, angles, and audience hooks' },
-  { key: 'publishingDiscipline', name: 'Publishing Discipline & Speed', maxScore: 5, description: 'Meeting publishing windows and submission deadlines' },
-  { key: 'analyticsLearning', name: 'Analytics & Learning Awareness', maxScore: 5, description: 'Tracking performance and reflection quality' },
-  { key: 'teamworkReporting', name: 'Teamwork & Standup Reporting', maxScore: 5, description: 'Clear daily reporting and stand-up participation' },
+  {
+    key: 'research',
+    name: 'Sports Research & Verification',
+    maxScore: 15,
+    description: 'Primary and secondary source verification',
+  },
+  {
+    key: 'accuracy',
+    name: 'Factual Accuracy & Integrity',
+    maxScore: 15,
+    description: 'Zero factual errors, correct dates, names & stats',
+  },
+  {
+    key: 'writing',
+    name: 'Article Writing Quality',
+    maxScore: 15,
+    description: 'Structure, inverted pyramid, tone, and grammar',
+  },
+  {
+    key: 'seo',
+    name: 'Search Engine Optimization (SEO)',
+    maxScore: 10,
+    description: 'Keywords, metadata, H1/H2 structure, and internal links',
+  },
+  {
+    key: 'socialMedia',
+    name: 'Social Media Packaging',
+    maxScore: 10,
+    description: 'Platform tailoring (X, FB, IG, TikTok, YouTube)',
+  },
+  {
+    key: 'graphicDesign',
+    name: 'Canva Graphic & Visuals',
+    maxScore: 10,
+    description: 'GoalMills brand palette, clean typography & layout',
+  },
+  {
+    key: 'creativity',
+    name: 'Editorial Creativity & Hooks',
+    maxScore: 10,
+    description: 'Engaging headlines, angles, and audience hooks',
+  },
+  {
+    key: 'publishingDiscipline',
+    name: 'Publishing Discipline & Speed',
+    maxScore: 5,
+    description: 'Meeting publishing windows and submission deadlines',
+  },
+  {
+    key: 'analyticsLearning',
+    name: 'Analytics & Learning Awareness',
+    maxScore: 5,
+    description: 'Tracking performance and reflection quality',
+  },
+  {
+    key: 'teamworkReporting',
+    name: 'Teamwork & Standup Reporting',
+    maxScore: 5,
+    description: 'Clear daily reporting and stand-up participation',
+  },
 ];
 
 export const PERFORMANCE_RATINGS = [
   { min: 90, max: 100, label: 'Excellent', color: 'emerald', badge: '🏆 Outstanding' },
   { min: 80, max: 89, label: 'Very Good', color: 'blue', badge: '🌟 Very Good' },
   { min: 70, max: 79, label: 'Good', color: 'amber', badge: '👍 Good' },
-  { min: 60, max: 69, label: 'Improvement Required', color: 'orange', badge: '⚠️ Needs Improvement' },
+  {
+    min: 60,
+    max: 69,
+    label: 'Improvement Required',
+    color: 'orange',
+    badge: '⚠️ Needs Improvement',
+  },
   { min: 0, max: 59, label: 'Remedial Training', color: 'red', badge: '❌ Remedial Training' },
 ];
 
 export const CERTIFICATION_TIERS = [
-  { min: 90, max: 100, title: 'GoalMills Certified Sports Media Professional — Advanced', summary: 'Can operate completely independently in the newsroom.' },
-  { min: 80, max: 89, title: 'GoalMills Certified Sports Media Professional', summary: 'Can operate with limited editorial supervision.' },
-  { min: 70, max: 79, title: 'GoalMills Certified Junior Sports Media Professional', summary: 'Can perform routine assignments with standard review.' },
-  { min: 60, max: 69, title: 'Training Extension Required', summary: 'Requires an extra 1-2 weeks of focused training.' },
-  { min: 0, max: 59, title: 'Not Ready for Independent Publishing', summary: 'Requires comprehensive retraining.' },
+  {
+    min: 90,
+    max: 100,
+    title: 'GoalMills Certified Sports Media Professional — Advanced',
+    summary: 'Can operate completely independently in the newsroom.',
+  },
+  {
+    min: 80,
+    max: 89,
+    title: 'GoalMills Certified Sports Media Professional',
+    summary: 'Can operate with limited editorial supervision.',
+  },
+  {
+    min: 70,
+    max: 79,
+    title: 'GoalMills Certified Junior Sports Media Professional',
+    summary: 'Can perform routine assignments with standard review.',
+  },
+  {
+    min: 60,
+    max: 69,
+    title: 'Training Extension Required',
+    summary: 'Requires an extra 1-2 weeks of focused training.',
+  },
+  {
+    min: 0,
+    max: 59,
+    title: 'Not Ready for Independent Publishing',
+    summary: 'Requires comprehensive retraining.',
+  },
 ];
 
 export const EDITORIAL_POLICIES = {
@@ -141,9 +227,7 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Brainstorm 10 sports story ideas (3 breaking news, 3 match stories, 2 evergreen, 2 tactical analysis)',
       'Select 1 real story and obtain editorial sign-off',
     ],
-    production: [
-      'Write 1 × 500–700 word sports news article with strong lead paragraph',
-    ],
+    production: ['Write 1 × 500–700 word sports news article with strong lead paragraph'],
     social: [
       'Create 1 × X (Twitter) post with engaging hook',
       'Create 1 × Facebook post with conversation question',
@@ -187,17 +271,12 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Verify every claim using at least two independent Tier-1 sources',
       'Create a source record: Claim, Source, Date, Verification link',
     ],
-    production: [
-      'Produce 1 × 700-word verified sports article with explicit attributions',
-    ],
+    production: ['Produce 1 × 700-word verified sports article with explicit attributions'],
     social: [
       'Create 1 × X post linking the verified story',
       'Create 1 × Facebook post with source credit',
     ],
-    publish: [
-      'Publish to website with proper source citations',
-      'Distribute to social accounts',
-    ],
+    publish: ['Publish to website with proper source citations', 'Distribute to social accounts'],
     submissionChecklist: [
       'Article URL',
       'Social post links',
@@ -229,15 +308,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Draft 5 alternative headlines',
       'Draft 3 social headlines and 1 article executive summary',
     ],
-    production: [
-      '800-word sports news feature with 3 distinct subheadings',
-    ],
-    social: [
-      'Publish best alternative headline on X and evaluate CTR',
-    ],
-    publish: [
-      'Publish best article version on GoalMills',
-    ],
+    production: ['800-word sports news feature with 3 distinct subheadings'],
+    social: ['Publish best alternative headline on X and evaluate CTR'],
+    publish: ['Publish best article version on GoalMills'],
     submissionChecklist: [
       'Published article link',
       'List of 5 alternative headlines',
@@ -261,27 +334,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Avoid deceitful clickbait while maximizing organic CTR',
       'Format headlines for mobile notifications and search snippets',
     ],
-    study: [
-      'Study Part 13: The Anatomy of a High-CTR Sports Headline',
-    ],
+    study: ['Study Part 13: The Anatomy of a High-CTR Sports Headline'],
     assignment: [
       'Write 20 headlines for 5 different sports stories (4 headlines per story)',
       'Select the single strongest headline based on urgency, clarity, and keyword placement',
     ],
-    production: [
-      'Write 1 sports article utilizing your strongest tested headline',
-    ],
-    social: [
-      'Post 2 headline variations on X to test reader engagement',
-    ],
-    publish: [
-      'Publish article to GoalMills',
-    ],
-    submissionChecklist: [
-      'Article URL',
-      'Full list of 20 headline exercises',
-      'Social links',
-    ],
+    production: ['Write 1 sports article utilizing your strongest tested headline'],
+    social: ['Post 2 headline variations on X to test reader engagement'],
+    publish: ['Publish article to GoalMills'],
+    submissionChecklist: ['Article URL', 'Full list of 20 headline exercises', 'Social links'],
     adminReviewCriteria: [
       'Headline strength and honesty',
       'No misleading clickbait',
@@ -308,26 +369,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Produce 1 factual news report and 1 opinion/analysis column',
       'Explicitly label opinions and clearly separate claims from verified records',
     ],
-    production: [
-      '1 × News article (500 words)',
-      '1 × Opinion/Analysis article (500 words)',
-    ],
-    social: [
-      'Social debate post on Facebook & X linking the opinion piece',
-    ],
-    publish: [
-      'Publish both pieces with appropriate tags (News vs Opinion)',
-    ],
+    production: ['1 × News article (500 words)', '1 × Opinion/Analysis article (500 words)'],
+    social: ['Social debate post on Facebook & X linking the opinion piece'],
+    publish: ['Publish both pieces with appropriate tags (News vs Opinion)'],
     submissionChecklist: [
       'Both article URLs',
       'Social links',
       'Explanation of how opinion was distinguished from fact',
     ],
-    adminReviewCriteria: [
-      'Ethical compliance',
-      'Clear opinion labeling',
-      'Attribution rigor',
-    ],
+    adminReviewCriteria: ['Ethical compliance', 'Clear opinion labeling', 'Attribution rigor'],
     resources: ['Sports Journalism Legal & Ethics Handbook'],
   },
   {
@@ -341,24 +391,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'SEO title, meta description, clean URL slug, H1/H2 hierarchy',
       'Internal linking and image alt text for Google Discover',
     ],
-    study: [
-      'Read Part 4: Sports SEO Blueprint',
-      'Review Google Search Central SEO Starter Guide',
-    ],
+    study: ['Read Part 4: Sports SEO Blueprint', 'Review Google Search Central SEO Starter Guide'],
     assignment: [
       'Select a high-intent upcoming sports match or trending transfer storyline',
       'Conduct keyword research (Primary keyword, 3 secondary keywords)',
       'Optimize image alt tags, slug, meta description, and 3 internal links',
     ],
-    production: [
-      '1 × SEO-optimized match preview or transfer story (700 words)',
-    ],
-    social: [
-      'Share SEO article on X and Facebook',
-    ],
-    publish: [
-      'Publish to CMS with complete SEO metadata fields filled',
-    ],
+    production: ['1 × SEO-optimized match preview or transfer story (700 words)'],
+    social: ['Share SEO article on X and Facebook'],
+    publish: ['Publish to CMS with complete SEO metadata fields filled'],
     submissionChecklist: [
       'Article URL',
       'Meta title, Meta description, and Keyword target submitted in report',
@@ -381,9 +422,7 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Demonstrate mastery of Week 1 writing, fact-checking, and SEO under deadline',
       'Produce a comprehensive 800–1,000 word sports report with full assets',
     ],
-    study: [
-      'Review feedback from Days 1–6 stand-ups and daily reports',
-    ],
+    study: ['Review feedback from Days 1–6 stand-ups and daily reports'],
     assignment: [
       'Select an urgent current sports story independently',
       'Full production: Article (800–1,000 words), SEO metadata, 2 X posts, 1 FB post, 1 basic graphic',
@@ -392,13 +431,8 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       '1 × 800–1,000 word comprehensive sports report',
       '1 × Match/Story visual graphic',
     ],
-    social: [
-      '2 × X posts',
-      '1 × Facebook post',
-    ],
-    publish: [
-      'Publish article and all social assets before 4:00 PM WAT',
-    ],
+    social: ['2 × X posts', '1 × Facebook post'],
+    publish: ['Publish article and all social assets before 4:00 PM WAT'],
     submissionChecklist: [
       'Article URL',
       'Social URLs',
@@ -427,30 +461,16 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Master the 10-step newsroom pipeline: Assignment → Research → Writing → Editing → Fact-checking → SEO → Design → Publishing → Distribution → Analytics',
       'Understand roles of beat reporters, copy editors, and managing editors',
     ],
-    study: [
-      'Study Part 5: Editorial Workflow SOP',
-    ],
+    study: ['Study Part 5: Editorial Workflow SOP'],
     assignment: [
       'Process 1 sports story through every single stage of the 10-step workflow',
       'Submit documented evidence of each stage',
     ],
-    production: [
-      '1 × News feature (600 words)',
-    ],
-    social: [
-      'Coordinated multi-channel announcement',
-    ],
-    publish: [
-      'CMS publication after editorial gate sign-off',
-    ],
-    submissionChecklist: [
-      'Article URL',
-      'Workflow checkpoint logs',
-    ],
-    adminReviewCriteria: [
-      'Strict adherence to editorial checkpoints',
-      'Proofreading quality',
-    ],
+    production: ['1 × News feature (600 words)'],
+    social: ['Coordinated multi-channel announcement'],
+    publish: ['CMS publication after editorial gate sign-off'],
+    submissionChecklist: ['Article URL', 'Workflow checkpoint logs'],
+    adminReviewCriteria: ['Strict adherence to editorial checkpoints', 'Proofreading quality'],
     resources: ['Editorial Workflow Checksheet'],
   },
   {
@@ -463,32 +483,16 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Distinguish content types: Breaking news, Evergreen, Trending, Search, Social, Engagement',
       'Build a cohesive 7-day sports editorial calendar around fixture schedules',
     ],
-    study: [
-      'Read Part 7: Sports Content Strategy & The Content Pyramid',
-    ],
+    study: ['Read Part 7: Sports Content Strategy & The Content Pyramid'],
     assignment: [
       'Build a 7-day GoalMills content calendar (minimum: 7 article ideas, 7 social ideas, 3 graphics, 2 video concepts)',
       'Produce and publish today’s assigned calendar story',
     ],
-    production: [
-      '1 × Content calendar document',
-      '1 × Published sports story from the calendar',
-    ],
-    social: [
-      '1 × Social teaser for upcoming weekly calendar theme',
-    ],
-    publish: [
-      'Publish calendar story to GoalMills',
-    ],
-    submissionChecklist: [
-      'Calendar link or text',
-      'Published article link',
-      'Social links',
-    ],
-    adminReviewCriteria: [
-      'Feasibility of calendar',
-      'Balance of evergreen and breaking sports',
-    ],
+    production: ['1 × Content calendar document', '1 × Published sports story from the calendar'],
+    social: ['1 × Social teaser for upcoming weekly calendar theme'],
+    publish: ['Publish calendar story to GoalMills'],
+    submissionChecklist: ['Calendar link or text', 'Published article link', 'Social links'],
+    adminReviewCriteria: ['Feasibility of calendar', 'Balance of evergreen and breaking sports'],
     resources: ['7-Day Sports Calendar Template'],
   },
   {
@@ -501,31 +505,20 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Understand traffic channels: Search (Organic/Discover), Social, Direct, Referral, Newsletters',
       'Internal linking webs to maximize reader session duration and pageviews per visit',
     ],
-    study: [
-      'Read Part 6: Sports Audience Growth & Distribution Loops',
-    ],
+    study: ['Read Part 6: Sports Audience Growth & Distribution Loops'],
     assignment: [
       'Write 1 sports article and execute a coordinated distribution plan across X, Facebook, and Instagram',
       'Track referral clicks and engagement metrics',
     ],
-    production: [
-      '1 × Sports article with 4 contextual internal links to GoalMills archives',
-    ],
-    social: [
-      'Tailored posts on X, Facebook, and Instagram',
-    ],
-    publish: [
-      'Publish article and social links',
-    ],
+    production: ['1 × Sports article with 4 contextual internal links to GoalMills archives'],
+    social: ['Tailored posts on X, Facebook, and Instagram'],
+    publish: ['Publish article and social links'],
     submissionChecklist: [
       'Article URL',
       'All 3 social links',
       'Initial impressions and reach count',
     ],
-    adminReviewCriteria: [
-      'Distribution coordination',
-      'Relevance of internal links',
-    ],
+    adminReviewCriteria: ['Distribution coordination', 'Relevance of internal links'],
     resources: ['Distribution Checklist'],
   },
   {
@@ -538,28 +531,14 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Platform differences: X (breaking news/stats), Instagram (visuals/reels), Facebook (discussions/articles), TikTok (short hooks), YouTube (analysis)',
       'Crafting platform-native hooks and media sizing',
     ],
-    study: [
-      'Read Part 14: Cross-Platform Sports Social Strategy',
-    ],
+    study: ['Read Part 14: Cross-Platform Sports Social Strategy'],
     assignment: [
       'Create 1 comprehensive content package from a single sports storyline: 1 article, 2 X posts, 1 Facebook discussion post, 1 Instagram carousel or static image, 1 short video',
     ],
-    production: [
-      '1 × Sports article',
-      '1 × Short vertical video (30-45s)',
-    ],
-    social: [
-      '2 × X posts',
-      '1 × Facebook post',
-      '1 × Instagram post',
-      '1 × TikTok / Reel upload',
-    ],
-    publish: [
-      'Publish across all corresponding GoalMills accounts',
-    ],
-    submissionChecklist: [
-      'Submit all 5 platform links in daily report',
-    ],
+    production: ['1 × Sports article', '1 × Short vertical video (30-45s)'],
+    social: ['2 × X posts', '1 × Facebook post', '1 × Instagram post', '1 × TikTok / Reel upload'],
+    publish: ['Publish across all corresponding GoalMills accounts'],
+    submissionChecklist: ['Submit all 5 platform links in daily report'],
     adminReviewCriteria: [
       'Platform tone appropriateness',
       'Visual quality and correct aspect ratios',
@@ -577,23 +556,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Handling toxic comments, spam, and misinformation safely without brand damage',
       'Turning passive readers into loyal daily community members',
     ],
-    study: [
-      'Read Part 15: Social Community Guidelines & Brand Voice SOP',
-    ],
+    study: ['Read Part 15: Social Community Guidelines & Brand Voice SOP'],
     assignment: [
       'Actively manage assigned GoalMills social account for 2 hours',
       'Reply to at least 10 fan comments, ask 3 follow-up debate questions, and moderate spam',
       'Produce 1 social discussion package',
     ],
-    production: [
-      '1 × Interactive poll or debate thread',
-    ],
-    social: [
-      'Community engagement log (10 replies logged)',
-    ],
-    publish: [
-      'Publish debate thread on X and Facebook',
-    ],
+    production: ['1 × Interactive poll or debate thread'],
+    social: ['Community engagement log (10 replies logged)'],
+    publish: ['Publish debate thread on X and Facebook'],
     submissionChecklist: [
       'Link to debate post',
       'Screenshots or summary of community interactions',
@@ -613,31 +584,16 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
     objectives: [
       'Structured weekly themes: Monday (Roundup), Tuesday (Tactics/Stats), Wednesday (Debate), Thursday (Throwback/Evergreen), Friday (Preview), Saturday/Sunday (Matchday Live)',
     ],
-    study: [
-      'Study sports publishing rhythm and matchday surge dynamics',
-    ],
+    study: ['Study sports publishing rhythm and matchday surge dynamics'],
     assignment: [
       'Design a full week social plan with specific copy, visual briefs, and scheduled posting windows',
       'Produce and publish today’s theme content',
     ],
-    production: [
-      '1 × Sports article matching today’s theme',
-    ],
-    social: [
-      '2 × Social posts following the theme guidelines',
-    ],
-    publish: [
-      'Publish content',
-    ],
-    submissionChecklist: [
-      'Article URL',
-      'Social URLs',
-      'Weekly theme calendar overview',
-    ],
-    adminReviewCriteria: [
-      'Theme consistency',
-      'Audience resonance',
-    ],
+    production: ['1 × Sports article matching today’s theme'],
+    social: ['2 × Social posts following the theme guidelines'],
+    publish: ['Publish content'],
+    submissionChecklist: ['Article URL', 'Social URLs', 'Weekly theme calendar overview'],
+    adminReviewCriteria: ['Theme consistency', 'Audience resonance'],
     resources: ['Social Calendar Template'],
   },
   {
@@ -650,26 +606,14 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Produce a full multi-channel release independently under strict time constraints',
       'Demonstrate strategic planning and cross-platform formatting',
     ],
-    study: [
-      'Review Week 2 feedback and social performance analytics',
-    ],
+    study: ['Review Week 2 feedback and social performance analytics'],
     assignment: [
       'Produce: 1 article, 2 X posts, 1 Facebook post, 1 Instagram post, 1 Instagram Story, 1 Reel/TikTok, 1 Canva graphic',
     ],
-    production: [
-      '1 × 700-word article',
-      '1 × Short-form video (30-60s)',
-      '1 × Canva graphic',
-    ],
-    social: [
-      'Published to X, Facebook, Instagram, TikTok',
-    ],
-    publish: [
-      'Complete all publishing before 4:30 PM WAT',
-    ],
-    submissionChecklist: [
-      'Submit all 6 required URLs in daily report',
-    ],
+    production: ['1 × 700-word article', '1 × Short-form video (30-60s)', '1 × Canva graphic'],
+    social: ['Published to X, Facebook, Instagram, TikTok'],
+    publish: ['Complete all publishing before 4:30 PM WAT'],
+    submissionChecklist: ['Submit all 6 required URLs in daily report'],
     adminReviewCriteria: [
       'Official 10-category 100-point rubric',
       'Hook strength, branding consistency, engagement potential, and platform suitability',
@@ -702,16 +646,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       '2 × Canva sports graphics (1080×1080 and 1080×1350 formats)',
       '1 × Accompanying breaking news story (400 words)',
     ],
-    social: [
-      'Post breaking news graphic on X and Instagram with verified caption',
-    ],
-    publish: [
-      'Embed graphic as featured image on GoalMills CMS',
-    ],
-    submissionChecklist: [
-      'Graphic URLs (Canva view link + published post link)',
-      'Article URL',
-    ],
+    social: ['Post breaking news graphic on X and Instagram with verified caption'],
+    publish: ['Embed graphic as featured image on GoalMills CMS'],
+    submissionChecklist: ['Graphic URLs (Canva view link + published post link)', 'Article URL'],
     adminReviewCriteria: [
       'Adherence to brand kit colors and fonts',
       'Crispness of player cutout',
@@ -728,9 +665,7 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
     objectives: [
       'Build 6 reusable sports templates: 1. Matchday Preview, 2. Full-time Scoreline, 3. Goal Alert, 4. Transfer News, 5. Player Stats, 6. Quote Card',
     ],
-    study: [
-      'Analyze visual graphics from Sky Sports, Fabrizio Romano, and Bleacher Report',
-    ],
+    study: ['Analyze visual graphics from Sky Sports, Fabrizio Romano, and Bleacher Report'],
     assignment: [
       'Create the 6 master templates in Canva',
       'Publish at least 2 templates populated with real match/player data today',
@@ -739,16 +674,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       '6 × Master graphic templates in Canva team workspace',
       '2 × Published sports graphics',
     ],
-    social: [
-      'Post 2 graphics with engaging captions on Instagram and X',
-    ],
-    publish: [
-      'Attach templates to GoalMills asset library',
-    ],
-    submissionChecklist: [
-      'Canva template folder link',
-      '2 published social links',
-    ],
+    social: ['Post 2 graphics with engaging captions on Instagram and X'],
+    publish: ['Attach templates to GoalMills asset library'],
+    submissionChecklist: ['Canva template folder link', '2 published social links'],
     adminReviewCriteria: [
       'Consistency across all 6 templates',
       'Proper spacing and watermark placement',
@@ -766,32 +694,16 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Design team head-to-head statistical graphic',
       'Visualizing data: goals, assists, xG, pass completion, clean sheets',
     ],
-    study: [
-      'Study Opta, FBref, and SofaScore visual presentation of sports data',
-    ],
+    study: ['Study Opta, FBref, and SofaScore visual presentation of sports data'],
     assignment: [
       'Create 1 player comparison graphic and 1 team tactical head-to-head infographic',
       'Accompany with a 600-word tactical breakdown article',
     ],
-    production: [
-      '2 × High-density infographics',
-      '1 × Tactical analysis article',
-    ],
-    social: [
-      'Post infographic carousel on Instagram and debate thread on X',
-    ],
-    publish: [
-      'Publish article featuring both infographics',
-    ],
-    submissionChecklist: [
-      'Article URL',
-      'Infographic links',
-      'Data sources used (Opta/FBref)',
-    ],
-    adminReviewCriteria: [
-      'Statistical accuracy',
-      'Visual clarity and legibility of small numbers',
-    ],
+    production: ['2 × High-density infographics', '1 × Tactical analysis article'],
+    social: ['Post infographic carousel on Instagram and debate thread on X'],
+    publish: ['Publish article featuring both infographics'],
+    submissionChecklist: ['Article URL', 'Infographic links', 'Data sources used (Opta/FBref)'],
+    adminReviewCriteria: ['Statistical accuracy', 'Visual clarity and legibility of small numbers'],
     resources: ['Sports Data Visualization Guide'],
   },
   {
@@ -811,15 +723,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
     assignment: [
       'Script, voice, edit, and export a 30–60 second vertical sports video on a trending football story',
     ],
-    production: [
-      '1 × 30–60s vertical video (9:16 format, 1080×1920)',
-    ],
-    social: [
-      'Publish to TikTok, Instagram Reels, and YouTube Shorts',
-    ],
-    publish: [
-      'Embed video inside corresponding GoalMills website article',
-    ],
+    production: ['1 × 30–60s vertical video (9:16 format, 1080×1920)'],
+    social: ['Publish to TikTok, Instagram Reels, and YouTube Shorts'],
+    publish: ['Embed video inside corresponding GoalMills website article'],
     submissionChecklist: [
       'TikTok URL',
       'Instagram Reel URL',
@@ -843,28 +749,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'YouTube title formulas, high-CTR thumbnails, descriptive chapters, tags, and description SEO',
       'Understanding YouTube analytics: CTR, average view duration (AVD), retention curves',
     ],
-    study: [
-      'Study YouTube Creators Guide and YouTube Analytics Help documentation',
-    ],
+    study: ['Study YouTube Creators Guide and YouTube Analytics Help documentation'],
     assignment: [
       'Create a 3–5 minute sports analysis or match preview video',
       'Design a custom YouTube thumbnail with high contrast and emotional cutout',
     ],
-    production: [
-      '1 × 3–5 min landscape video (16:9)',
-      '1 × Custom YouTube thumbnail (1280×720)',
-    ],
-    social: [
-      'Promote YouTube link with teaser clips on X and Instagram Stories',
-    ],
-    publish: [
-      'Publish to GoalMills YouTube channel with chapters and description',
-    ],
-    submissionChecklist: [
-      'YouTube video URL',
-      'Thumbnail image file/link',
-      'Promotion links',
-    ],
+    production: ['1 × 3–5 min landscape video (16:9)', '1 × Custom YouTube thumbnail (1280×720)'],
+    social: ['Promote YouTube link with teaser clips on X and Instagram Stories'],
+    publish: ['Publish to GoalMills YouTube channel with chapters and description'],
+    submissionChecklist: ['YouTube video URL', 'Thumbnail image file/link', 'Promotion links'],
     adminReviewCriteria: [
       'Thumbnail CTR potential',
       'Narrative structure and retention',
@@ -881,29 +774,14 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
     objectives: [
       'The core GoalMills skill: turning 1 single sports story into 1 long-form article, 1 YouTube video, 3 Shorts, 2 Reels/TikToks, 3 X posts, 1 Facebook post, 1 Instagram post, and 1 Canva graphic',
     ],
-    study: [
-      'Study the GoalMills Content Multiplier Engine',
-    ],
+    study: ['Study the GoalMills Content Multiplier Engine'],
     assignment: [
       'Take 1 major sports story and execute the complete multi-format syndication pipeline',
     ],
-    production: [
-      '1 × In-depth website article',
-      '1 × Canva graphic',
-      '2 × Short vertical clips',
-    ],
-    social: [
-      '3 × X posts',
-      '1 × Facebook post',
-      '1 × Instagram post',
-      'TikTok and Reels uploads',
-    ],
-    publish: [
-      'Publish all assets across web and social channels',
-    ],
-    submissionChecklist: [
-      'Submit all 8+ asset links in the daily report',
-    ],
+    production: ['1 × In-depth website article', '1 × Canva graphic', '2 × Short vertical clips'],
+    social: ['3 × X posts', '1 × Facebook post', '1 × Instagram post', 'TikTok and Reels uploads'],
+    publish: ['Publish all assets across web and social channels'],
+    submissionChecklist: ['Submit all 8+ asset links in the daily report'],
     adminReviewCriteria: [
       'Message synergy across platforms',
       'Format-native adaptations',
@@ -926,9 +804,7 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Rapid verification, initial 5-minute bulletin, followed by comprehensive story update',
       'Speed evaluated strictly after accuracy',
     ],
-    study: [
-      'Review Part 12: Breaking News Fast-Response Protocol',
-    ],
+    study: ['Review Part 12: Breaking News Fast-Response Protocol'],
     assignment: [
       'Complete the breaking news simulation within the 45-minute deadline',
       'Publish breaking alert → Full article → Social flash → Quote graphic',
@@ -937,17 +813,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       '1 × Rapid breaking article (400 words) updated with quotes to 700 words',
       '1 × Breaking news graphic',
     ],
-    social: [
-      'X breaking alert and Instagram story update',
-    ],
-    publish: [
-      'Publish immediately to GoalMills breaking news feed',
-    ],
-    submissionChecklist: [
-      'Article URL (with timestamp log)',
-      'Social links',
-      'Graphic URL',
-    ],
+    social: ['X breaking alert and Instagram story update'],
+    publish: ['Publish immediately to GoalMills breaking news feed'],
+    submissionChecklist: ['Article URL (with timestamp log)', 'Social links', 'Graphic URL'],
     adminReviewCriteria: [
       'Speed of first publish',
       'Factual accuracy and source attribution',
@@ -966,27 +834,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'During match: Half-time tactical update, major event social posts',
       'After match: Instant match report, player ratings, manager quotes, statistical recap',
     ],
-    study: [
-      'Study Live Matchday Coverage Playbook and Player Ratings Scale',
-    ],
-    assignment: [
-      'Cover 1 live football match from kickoff to post-match analysis',
-    ],
+    study: ['Study Live Matchday Coverage Playbook and Player Ratings Scale'],
+    assignment: ['Cover 1 live football match from kickoff to post-match analysis'],
     production: [
       '1 × Pre-match preview article',
       '1 × Full-time match report with player ratings (within 20 mins of final whistle)',
     ],
-    social: [
-      'Starting XI post, Halftime score post, Full-time result graphic',
-    ],
-    publish: [
-      'Publish preview and post-match report on GoalMills',
-    ],
-    submissionChecklist: [
-      'Match report URL',
-      'Player ratings link',
-      'Social matchday links',
-    ],
+    social: ['Starting XI post, Halftime score post, Full-time result graphic'],
+    publish: ['Publish preview and post-match report on GoalMills'],
+    submissionChecklist: ['Match report URL', 'Player ratings link', 'Social matchday links'],
     adminReviewCriteria: [
       'Turnaround speed after final whistle',
       'Fairness and accuracy of player ratings',
@@ -1003,27 +859,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Audience personas: Casual fans, tactical purists, fantasy sports players, transfer tracking fans',
       'Building returning visitors via newsletters, push alerts, and community bookmarks',
     ],
-    study: [
-      'Read Part 9: Audience Development & Newsletter Strategy',
-    ],
+    study: ['Read Part 9: Audience Development & Newsletter Strategy'],
     assignment: [
       'Create a detailed GoalMills audience profile document',
       'Draft 1 complete sports newsletter edition with 3 curated stories and 1 editorial note',
     ],
-    production: [
-      '1 × Audience persona profile',
-      '1 × Curated sports newsletter digest',
-    ],
-    social: [
-      'Newsletter signup promo post on X and Facebook',
-    ],
-    publish: [
-      'Send/Publish newsletter draft in GoalMills newsletter module',
-    ],
-    submissionChecklist: [
-      'Newsletter draft ID / link',
-      'Audience profile notes',
-    ],
+    production: ['1 × Audience persona profile', '1 × Curated sports newsletter digest'],
+    social: ['Newsletter signup promo post on X and Facebook'],
+    publish: ['Send/Publish newsletter draft in GoalMills newsletter module'],
+    submissionChecklist: ['Newsletter draft ID / link', 'Audience profile notes'],
     adminReviewCriteria: [
       'Editorial tone and curation quality',
       'Clarity of value proposition for subscribers',
@@ -1040,26 +884,15 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Analyze Google Analytics, website metrics (views, bounce rate, reading time), and social engagement metrics (CTR, impressions, shares)',
       'Conduct a performance audit of employee’s own work during Days 1–23',
     ],
-    study: [
-      'Read Part 19: Sports Analytics & Performance Measurement',
-    ],
+    study: ['Read Part 19: Sports Analytics & Performance Measurement'],
     assignment: [
       'Identify employee’s best and worst: article, headline, social post, graphic, and video',
       'Write a 500-word data-backed analysis explaining why each performed as it did',
     ],
-    production: [
-      '1 × Personal Content Performance Audit Report',
-    ],
-    social: [
-      'Apply lessons learned to today’s daily article and social posts',
-    ],
-    publish: [
-      'Publish 1 new sports article incorporating analytics learnings',
-    ],
-    submissionChecklist: [
-      'Audit report text in daily submission',
-      'Today’s published article URL',
-    ],
+    production: ['1 × Personal Content Performance Audit Report'],
+    social: ['Apply lessons learned to today’s daily article and social posts'],
+    publish: ['Publish 1 new sports article incorporating analytics learnings'],
+    submissionChecklist: ['Audit report text in daily submission', 'Today’s published article URL'],
     adminReviewCriteria: [
       'Self-awareness and objectivity',
       'Understanding of data metrics vs vanity metrics',
@@ -1076,9 +909,7 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Take 1 underperforming piece of content from the archives and optimize: Headline, Thumbnail, Hook, Caption, SEO tags, Internal links, CTA',
       'Document: Before, After, Why I changed it, Expected outcome',
     ],
-    study: [
-      'Study headline iteration and click-through optimization cases',
-    ],
+    study: ['Study headline iteration and click-through optimization cases'],
     assignment: [
       'Select 1 underperforming GoalMills article and execute a complete editorial overhaul',
     ],
@@ -1086,16 +917,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       '1 × Fully overhauled and re-published article',
       '1 × New improved graphic thumbnail',
     ],
-    social: [
-      'Re-distribute optimized piece with fresh hook',
-    ],
-    publish: [
-      'Update article in CMS with version history note',
-    ],
-    submissionChecklist: [
-      'Updated article URL',
-      'Before vs After comparison notes in report',
-    ],
+    social: ['Re-distribute optimized piece with fresh hook'],
+    publish: ['Update article in CMS with version history note'],
+    submissionChecklist: ['Updated article URL', 'Before vs After comparison notes in report'],
     adminReviewCriteria: [
       'Noticeable improvement in clarity and hook',
       'SEO title and meta improvements',
@@ -1111,27 +935,16 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
     objectives: [
       'Running a newsroom independently: assignment desk, deadline management, editorial calendar management, publishing queue, peer approval, corrections, and social syndication',
     ],
-    study: [
-      'Read Part 21: GoalMills Newsroom Operations',
-    ],
+    study: ['Read Part 21: GoalMills Newsroom Operations'],
     assignment: [
       'Act as newsroom desk lead for the morning session',
       'Coordinate news monitoring, pitch 3 priority stories, and assign editorial tags',
       'Produce 1 featured story',
     ],
-    production: [
-      '1 × 800-word featured sports story',
-    ],
-    social: [
-      'Oversee scheduled social posts for the afternoon window',
-    ],
-    publish: [
-      'Publish story to GoalMills',
-    ],
-    submissionChecklist: [
-      'Article URL',
-      'Newsroom coordination report',
-    ],
+    production: ['1 × 800-word featured sports story'],
+    social: ['Oversee scheduled social posts for the afternoon window'],
+    publish: ['Publish story to GoalMills'],
+    submissionChecklist: ['Article URL', 'Newsroom coordination report'],
     adminReviewCriteria: [
       'Leadership and time management',
       'News judgment and editorial selection',
@@ -1148,9 +961,7 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Admin provides only: "Find and cover an important sports story today."',
       'Employee must independently: Find → Research → Verify → Write → SEO → Design → Publish → Distribute → Report with zero hand-holding',
     ],
-    study: [
-      'Self-directed research and wire verification',
-    ],
+    study: ['Self-directed research and wire verification'],
     assignment: [
       'Deliver a complete, publication-ready sports content package independently before 4:00 PM WAT',
     ],
@@ -1159,15 +970,9 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       '1 × Canva visual graphic',
       '1 × Short vertical video',
     ],
-    social: [
-      'X posts, Facebook post, Instagram carousel',
-    ],
-    publish: [
-      'Direct publish to GoalMills and social channels',
-    ],
-    submissionChecklist: [
-      'Submit all links and self-evaluation score in daily report',
-    ],
+    social: ['X posts, Facebook post, Instagram carousel'],
+    publish: ['Direct publish to GoalMills and social channels'],
+    submissionChecklist: ['Submit all links and self-evaluation score in daily report'],
     adminReviewCriteria: [
       'Autonomy and problem-solving capability',
       'Editorial maturity and error-free copy',
@@ -1183,30 +988,17 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
     objectives: [
       'Execute a complete campaign around 1 major story: 1 long-form article, 1 short update, 1 infographic, 1 social quote card, 1 YouTube video, 2 Shorts, 2 Reels/TikToks, 3 X posts, 1 Facebook post, 1 Instagram post',
     ],
-    study: [
-      'Review campaign packaging and cross-platform storytelling',
-    ],
-    assignment: [
-      'Produce all 14 campaign deliverables across the day',
-    ],
+    study: ['Review campaign packaging and cross-platform storytelling'],
+    assignment: ['Produce all 14 campaign deliverables across the day'],
     production: [
       '2 × Articles (long-form & rapid update)',
       '2 × Graphics (infographic & quote card)',
       '3 × Video assets (YouTube & vertical shorts)',
     ],
-    social: [
-      'Multi-channel distribution across all handles',
-    ],
-    publish: [
-      'Full campaign rollout',
-    ],
-    submissionChecklist: [
-      'Submit comprehensive campaign link portfolio',
-    ],
-    adminReviewCriteria: [
-      'Cohesion of the campaign',
-      'High volume without sacrificing quality',
-    ],
+    social: ['Multi-channel distribution across all handles'],
+    publish: ['Full campaign rollout'],
+    submissionChecklist: ['Submit comprehensive campaign link portfolio'],
+    adminReviewCriteria: ['Cohesion of the campaign', 'High volume without sacrificing quality'],
     resources: ['360 Campaign Matrix'],
   },
   {
@@ -1219,24 +1011,12 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Simulate a high-stakes breaking sports story (e.g. blockbuster transfer, managerial departure, major tournament disqualification)',
       'Produce under strict deadline: Breaking article, Headline variations, SEO metadata, Graphic, X post, FB post, Instagram post, Short video, and Thumbnail',
     ],
-    study: [
-      'Crisis management and breaking news speed protocols',
-    ],
-    assignment: [
-      'Receive scenario at 10:00 AM WAT and deliver full package before 1:00 PM WAT',
-    ],
-    production: [
-      'Complete multimedia package delivered under time pressure',
-    ],
-    social: [
-      'Real-time live blogging and social updates',
-    ],
-    publish: [
-      'Published to test/live environment',
-    ],
-    submissionChecklist: [
-      'Time-stamped URLs of all deliverables',
-    ],
+    study: ['Crisis management and breaking news speed protocols'],
+    assignment: ['Receive scenario at 10:00 AM WAT and deliver full package before 1:00 PM WAT'],
+    production: ['Complete multimedia package delivered under time pressure'],
+    social: ['Real-time live blogging and social updates'],
+    publish: ['Published to test/live environment'],
+    submissionChecklist: ['Time-stamped URLs of all deliverables'],
     adminReviewCriteria: [
       'Judged on Accuracy, Speed, Editorial Judgment, Writing, SEO, Design, Social, and Video',
     ],
@@ -1253,22 +1033,14 @@ export const GOALMILLS_30_DAY_CURRICULUM: CurriculumDayItem[] = [
       'Portfolio requirements: Best news article, Best analysis, Best SEO article, Best headline, Best graphic, Best social campaign, Best short video, Best YouTube video, Analytics report, Personal improvement report',
       'Final comprehensive assessment and award of official certification tier',
     ],
-    study: [
-      'Compile 30-day portfolio and self-evaluation presentation',
-    ],
+    study: ['Compile 30-day portfolio and self-evaluation presentation'],
     assignment: [
       'Present portfolio in the final 5:00 PM stand-up meeting',
       'Receive final assessment score out of 100 across 10 core competencies',
     ],
-    production: [
-      'Final 30-Day Master Portfolio Document & Presentation',
-    ],
-    social: [
-      'Graduation reflection post on professional profiles (LinkedIn/X)',
-    ],
-    publish: [
-      'Portfolio archived in GoalMills Best Work Library',
-    ],
+    production: ['Final 30-Day Master Portfolio Document & Presentation'],
+    social: ['Graduation reflection post on professional profiles (LinkedIn/X)'],
+    publish: ['Portfolio archived in GoalMills Best Work Library'],
     submissionChecklist: [
       'Master portfolio link with all 10 curated pieces',
       'Personal improvement reflection report',
@@ -1288,7 +1060,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'sports_writing',
     title: 'Sports Article Writing & Match Storytelling',
     category: 'Writing & Journalism',
-    description: 'Learn GoalMills house style for writing high-impact match previews, reports, player spotlights, and sports features.',
+    description:
+      'Learn GoalMills house style for writing high-impact match previews, reports, player spotlights, and sports features.',
     weightPercent: 15,
     checklist: [
       'Master the inverted pyramid structure for breaking sports news',
@@ -1303,7 +1076,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'sports_research_factcheck',
     title: 'Sports Research, Verification & Fact-Checking',
     category: 'Writing & Journalism',
-    description: 'Develop rigorous verification standards for transfer rumours, injury updates, manager quotes, and statistical records.',
+    description:
+      'Develop rigorous verification standards for transfer rumours, injury updates, manager quotes, and statistical records.',
     weightPercent: 15,
     checklist: [
       'Learn Tier-1, Tier-2, and Tier-3 source hierarchy in sports journalism',
@@ -1318,7 +1092,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'journalism_editorial_standards',
     title: 'Journalism & Editorial Standards',
     category: 'Writing & Journalism',
-    description: 'Master grammar, legal compliance, defamation avoidance, objective reporting, and editor proofreading workflows.',
+    description:
+      'Master grammar, legal compliance, defamation avoidance, objective reporting, and editor proofreading workflows.',
     weightPercent: 15,
     checklist: [
       'Understand copyright laws and safe media embedding procedures',
@@ -1327,13 +1102,17 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
       'Master the 12-point pre-publishing proofreading checklist',
       'Conduct peer reviews and handle editorial feedback constructively',
     ],
-    resources: ['Sports Journalism Legal & Ethics Handbook', 'Pre-Publishing Quality Control Guide'],
+    resources: [
+      'Sports Journalism Legal & Ethics Handbook',
+      'Pre-Publishing Quality Control Guide',
+    ],
   },
   {
     id: 'seo_optimization',
     title: 'Sports Search Engine Optimization (SEO)',
     category: 'Writing & Journalism',
-    description: 'Optimize sports articles for Google Search, News, and Discover with keywords, metadata, and structured headings.',
+    description:
+      'Optimize sports articles for Google Search, News, and Discover with keywords, metadata, and structured headings.',
     weightPercent: 10,
     checklist: [
       'Conduct keyword research for trending fixtures and transfer storylines',
@@ -1348,7 +1127,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'content_planning_breaking',
     title: 'Content Planning & Breaking News Operations',
     category: 'Writing & Journalism',
-    description: 'Manage daily sports calendar workflows and coordinate rapid coverage for urgent breaking developments.',
+    description:
+      'Manage daily sports calendar workflows and coordinate rapid coverage for urgent breaking developments.',
     weightPercent: 10,
     checklist: [
       'Build a weekly sports editorial calendar based on upcoming match schedules',
@@ -1363,7 +1143,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'matchday_coverage',
     title: 'Live Matchday Coverage & Live Text Commentary',
     category: 'Writing & Journalism',
-    description: 'Deliver real-time minute-by-minute text commentary, halftime updates, live scores, and immediate reaction pieces.',
+    description:
+      'Deliver real-time minute-by-minute text commentary, halftime updates, live scores, and immediate reaction pieces.',
     weightPercent: 10,
     checklist: [
       'Set up live text commentary 30 minutes before kickoff with confirmed XIs',
@@ -1378,7 +1159,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'social_community_management',
     title: 'Social Media & Community Engagement',
     category: 'Growth & Operations',
-    description: 'Grow and engage GoalMills audience across X, Facebook, Instagram, TikTok, and YouTube with interactive content.',
+    description:
+      'Grow and engage GoalMills audience across X, Facebook, Instagram, TikTok, and YouTube with interactive content.',
     weightPercent: 10,
     checklist: [
       'Write platform-tailored social headlines and hooks that drive conversation',
@@ -1393,7 +1175,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'canva_graphic_design',
     title: 'Canva Sports Graphic Design & Visual Branding',
     category: 'Design & Video',
-    description: 'Design high-converting sports graphics following GoalMills brand colors (Navy #001f3f, Gold #ffd700), typography, and templates.',
+    description:
+      'Design high-converting sports graphics following GoalMills brand colors (Navy #001f3f, Gold #ffd700), typography, and templates.',
     weightPercent: 10,
     checklist: [
       'Master GoalMills brand palette, fonts, badges, and watermark placement in Canva',
@@ -1408,7 +1191,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'short_form_video',
     title: 'Short-Form Video Production (Reels, TikTok, Shorts)',
     category: 'Design & Video',
-    description: 'Script, voice, edit, caption, and publish viral vertical sports videos for Instagram Reels, TikTok, and YouTube Shorts.',
+    description:
+      'Script, voice, edit, caption, and publish viral vertical sports videos for Instagram Reels, TikTok, and YouTube Shorts.',
     weightPercent: 10,
     checklist: [
       'Write 30-to-60 second high-hook vertical video scripts for trending sports stories',
@@ -1423,7 +1207,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'audience_growth_analytics',
     title: 'Audience Growth, Traffic Analysis & Performance Insights',
     category: 'Growth & Operations',
-    description: 'Track pageviews, session duration, click-through rates, social impressions, follower growth, and video retention.',
+    description:
+      'Track pageviews, session duration, click-through rates, social impressions, follower growth, and video retention.',
     weightPercent: 5,
     checklist: [
       'Understand key web metrics: Pageviews, Unique Visitors, Bounce Rate, Time on Page',
@@ -1438,7 +1223,8 @@ export const GOALMILLS_TRAINING_MODULES: TrainingModuleItem[] = [
     id: 'repurposing_newsroom_ops',
     title: 'Content Repurposing & Newsroom Operations',
     category: 'Growth & Operations',
-    description: 'Master the Learn → Create → Publish → Submit → Review → Improve workflow, daily 5:00 PM stand-ups, and multi-channel content syndication.',
+    description:
+      'Master the Learn → Create → Publish → Submit → Review → Improve workflow, daily 5:00 PM stand-ups, and multi-channel content syndication.',
     weightPercent: 5,
     checklist: [
       'Execute the multi-format syndication pipeline (Article → Graphic → Reel → Tweet)',

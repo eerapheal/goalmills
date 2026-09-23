@@ -140,7 +140,9 @@ export default function BasketballLeagueSlugPage() {
                 <span className="text-sm font-black text-white">{standings.length || '-'}</span>
               </div>
               <div className="px-4 py-2 rounded-2xl bg-[#091529] border border-white/10 text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">Fixtures</span>
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                  Fixtures
+                </span>
                 <span className="text-sm font-black text-amber-400">{matches.length || '-'}</span>
               </div>
             </div>
@@ -206,7 +208,10 @@ export default function BasketballLeagueSlugPage() {
                   </thead>
                   <tbody className="divide-y divide-white/5 font-medium">
                     {standings.map((team, idx) => (
-                      <tr key={team.team_key || idx} className="hover:bg-white/5 transition-colors group">
+                      <tr
+                        key={team.team_key || idx}
+                        className="hover:bg-white/5 transition-colors group"
+                      >
                         <td className="py-3 px-2 font-mono font-bold text-slate-400 group-hover:text-amber-400">
                           {team.standing_place || idx + 1}
                         </td>

@@ -59,7 +59,7 @@ describe('Admin Sponsorships API (/api/sponsorships)', () => {
       },
     ];
 
-    const { mockLean } = await import('@/models/Sponsorship') as any;
+    const { mockLean } = (await import('@/models/Sponsorship')) as any;
     mockLean.mockResolvedValue(mockSponsorships);
 
     const req = new NextRequest('http://localhost:3000/api/sponsorships');
@@ -84,7 +84,7 @@ describe('Admin Sponsorships API (/api/sponsorships)', () => {
       priority: 10,
     };
 
-    const { mockCreate } = await import('@/models/Sponsorship') as any;
+    const { mockCreate } = (await import('@/models/Sponsorship')) as any;
     mockCreate.mockResolvedValue(newCamp);
 
     const req = new NextRequest('http://localhost:3000/api/sponsorships', {

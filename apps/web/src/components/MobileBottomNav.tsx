@@ -48,9 +48,7 @@ export function MobileBottomNav() {
       <div className="max-w-md mx-auto pointer-events-auto">
         <div className="grid grid-cols-6 items-center p-1.5 rounded-2xl bg-[#091529]/95 border border-amber-500/30 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(245,158,11,0.15)]">
           {navItems.map((item) => {
-            const isActive = item.exact
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
+            const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
             return (
               <Link

@@ -93,7 +93,8 @@ export default function HighlightsFeedClient({ initialHighlights }: HighlightsFe
             </span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
-            Decisive goals, buzzer beaters, tactical breakdowns, and HD game replays with instant autoplay.
+            Decisive goals, buzzer beaters, tactical breakdowns, and HD game replays with instant
+            autoplay.
           </p>
         </div>
 

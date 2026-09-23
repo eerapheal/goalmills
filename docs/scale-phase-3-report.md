@@ -1,7 +1,9 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 3 REPORT
+
 ## Newsletter Platform SaaS & Enterprise Deliverability
 
 ### 1. IMPLEMENTED
+
 - **Multi-Tenant Lists & Dynamic Segments**: Created `NewsletterList` and `NewsletterSegment` MongoDB schemas, CRUD APIs in `apps/admin`, and audience selection in `apps/admin/src/app/newsletter/page.tsx`.
 - **Structured Template Designer**: Implemented `NewsletterTemplate` with 5 pre-configured responsive layout engines (Daily Digest, Breaking Flash Alert, Weekend Preview, Tactical Debrief, Transfer Radar).
 - **Batch SendJob Lifecycle Controls**: Implemented `NewsletterSendJob` with pause, resume, and retry API endpoints for delivery resilience.
@@ -13,6 +15,7 @@
 ---
 
 ### 2. DATABASE CHANGES
+
 - Added Mongoose models in `apps/web/src/models` and `apps/admin/src/models`:
   - `NewsletterList.ts` (compound index on `{ tenantSlug: 1, slug: 1 }`).
   - `NewsletterSegment.ts` (compound index on `{ tenantSlug: 1, slug: 1 }`).
@@ -23,6 +26,7 @@
 ---
 
 ### 3. API CHANGES
+
 - **Admin**:
   - `GET / POST /api/admin/newsletter/lists`
   - `GET / POST /api/admin/newsletter/segments`
@@ -38,6 +42,7 @@
 ---
 
 ### 4. ADMIN CHANGES
+
 - Enhanced `/admin/newsletters` (and alias `/admin/newsletter`):
   - Added **Lists & Segments** management tab.
   - Added **Templates** library tab with quick "Use Template" action.
@@ -47,28 +52,33 @@
 ---
 
 ### 5. WEB CHANGES
+
 - Created `/newsletter/preferences` page with interactive category toggles and vacation hold.
 - Created `/newsletter/archive` public page with preview reader modal.
 
 ---
 
 ### 6. MOBILE CHANGES
+
 - Created `NewsletterPreferencesScreen.tsx` with email load, sports chips, schedule selectors, and breaking alert switches.
 - Extended `goalmillsApi.ts` with `getNewsletterPreferences` and `updateNewsletterPreferences`.
 
 ---
 
 ### 7. MAILER CHANGES
+
 - Mailer Go service priority queue consumes test preview broadcasts and scheduled campaign jobs without altering existing SMTP contracts.
 
 ---
 
 ### 8. REDIS CHANGES
+
 - Tenant-scoped caching for public archive queries and rate-limiting on preferences updates.
 
 ---
 
 ### 9. SECURITY & REPUTATION
+
 - Token-authenticated preference updates.
 - Double opt-in confirmation with SHA-256 tokens and expiration.
 - RFC 8058 compliant `List-Unsubscribe` headers.
@@ -77,4 +87,5 @@
 ---
 
 ### 10. REMAINING RISKS & NEXT PHASE
+
 - **Next Phase**: **PHASE 4 — AUDIENCE ANALYTICS** (First-party privacy-conscious event collection, user event profiles, content performance metrics).

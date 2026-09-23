@@ -208,12 +208,36 @@ export default function SearchDiagnosticsPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
-            { label: 'Articles', count: stats?.totalIndexedDocuments?.articles || 0, color: '#F59E0B' },
-            { label: 'Video Highlights', count: stats?.totalIndexedDocuments?.videos || 0, color: '#EF4444' },
-            { label: 'Newsletters', count: stats?.totalIndexedDocuments?.newsletters || 0, color: '#3B82F6' },
-            { label: 'Teams & Clubs', count: stats?.totalIndexedDocuments?.teams || 450, color: '#10B981' },
-            { label: 'Competitions', count: stats?.totalIndexedDocuments?.competitions || 38, color: '#8B5CF6' },
-            { label: 'Players', count: stats?.totalIndexedDocuments?.players || 1250, color: '#EC4899' },
+            {
+              label: 'Articles',
+              count: stats?.totalIndexedDocuments?.articles || 0,
+              color: '#F59E0B',
+            },
+            {
+              label: 'Video Highlights',
+              count: stats?.totalIndexedDocuments?.videos || 0,
+              color: '#EF4444',
+            },
+            {
+              label: 'Newsletters',
+              count: stats?.totalIndexedDocuments?.newsletters || 0,
+              color: '#3B82F6',
+            },
+            {
+              label: 'Teams & Clubs',
+              count: stats?.totalIndexedDocuments?.teams || 450,
+              color: '#10B981',
+            },
+            {
+              label: 'Competitions',
+              count: stats?.totalIndexedDocuments?.competitions || 38,
+              color: '#8B5CF6',
+            },
+            {
+              label: 'Players',
+              count: stats?.totalIndexedDocuments?.players || 1250,
+              color: '#EC4899',
+            },
           ].map((item) => (
             <div
               key={item.label}

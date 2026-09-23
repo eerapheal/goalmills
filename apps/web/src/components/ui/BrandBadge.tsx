@@ -5,7 +5,7 @@ import React from 'react';
 export type BrandColorVariant = 'blue' | 'red' | 'yellow';
 
 export interface BrandBadgeProps {
-  /** 
+  /**
    * Semantic brand variant:
    * - 'blue' (1st: Primary navigation, tabs, links, category tag)
    * - 'red' (2nd: Live indicator, in-play match, breaking alert)
@@ -21,7 +21,7 @@ export interface BrandBadgeProps {
 
 /**
  * BrandBadge
- * 
+ *
  * Standardized badge component adhering to Blue (1st), Red (2nd), Yellow (3rd).
  */
 export function BrandBadge({
@@ -53,11 +53,7 @@ export function BrandBadge({
       {pulse && (
         <span
           className={`w-1.5 h-1.5 rounded-full ${
-            variant === 'blue'
-              ? 'bg-blue-400'
-              : variant === 'red'
-                ? 'bg-red-400'
-                : 'bg-yellow-400'
+            variant === 'blue' ? 'bg-blue-400' : variant === 'red' ? 'bg-red-400' : 'bg-yellow-400'
           }`}
         />
       )}

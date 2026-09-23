@@ -9,10 +9,7 @@ export class MediaOptimizer {
   /**
    * Generates a CDN-optimized URL with format, width, and quality parameters
    */
-  public static getOptimizedImageUrl(
-    rawSrc: string,
-    options: ImageTransformOptions = {}
-  ): string {
+  public static getOptimizedImageUrl(rawSrc: string, options: ImageTransformOptions = {}): string {
     if (!rawSrc) return '';
 
     const width = options.width || 800;
@@ -81,17 +78,17 @@ export class MediaOptimizer {
       case 'immutable_asset':
         return {
           'Cache-Control': 'public, max-age=31536000, immutable',
-          'Vary': 'Accept, Accept-Encoding',
+          Vary: 'Accept, Accept-Encoding',
         };
       case 'sports_live_api':
         return {
           'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
-          'Vary': 'Accept-Encoding, x-tenant-slug',
+          Vary: 'Accept-Encoding, x-tenant-slug',
         };
       case 'syndication_feed':
         return {
           'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
-          'Vary': 'Accept-Encoding, x-tenant-slug',
+          Vary: 'Accept-Encoding, x-tenant-slug',
         };
     }
   }

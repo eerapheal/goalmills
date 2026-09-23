@@ -51,8 +51,14 @@ export function CompetitionHubTabs({
       const d = new Date();
       d.setDate(today.getDate() + i);
       const iso = d.toISOString().split('T')[0];
-      const dayName = i === 0 ? 'Today' : i === -1 ? 'Yesterday' : i === 1 ? 'Tomorrow'
-        : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayName =
+        i === 0
+          ? 'Today'
+          : i === -1
+            ? 'Yesterday'
+            : i === 1
+              ? 'Tomorrow'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       dates.push({ iso, dayName, dayNumber: d.getDate() });
     }
     return dates;
@@ -65,7 +71,8 @@ export function CompetitionHubTabs({
         const res = await advancedFootballApi.getStandings(competitionId);
         if (res?.result) {
           const resObj = res.result as any;
-          const table = resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
+          const table =
+            resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
           setStandings(Array.isArray(table) ? table : []);
         } else {
           setStandings([]);
@@ -110,19 +117,33 @@ export function CompetitionHubTabs({
   const filteredFixtures = useMemo(() => {
     let list = fixtures;
     if (activeTab === 'live') {
-      list = list.filter(f =>
-        String(f.event_live) === '1' ||
-        (f.event_status && !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(f.event_status as string))
+      list = list.filter(
+        (f) =>
+          String(f.event_live) === '1' ||
+          (f.event_status &&
+            !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
+              f.event_status as string
+            ))
       );
     } else if (activeTab === 'fixtures') {
-      list = list.filter(f =>
-        f.event_status === 'Not Started' || f.event_status === 'NS' || f.event_status === 'TBA' ||
-        (String(f.event_live) !== '1' && f.event_status !== 'FT' && f.event_status !== 'Finished' && !f.event_final_result)
+      list = list.filter(
+        (f) =>
+          f.event_status === 'Not Started' ||
+          f.event_status === 'NS' ||
+          f.event_status === 'TBA' ||
+          (String(f.event_live) !== '1' &&
+            f.event_status !== 'FT' &&
+            f.event_status !== 'Finished' &&
+            !f.event_final_result)
       );
     } else if (activeTab === 'results') {
-      list = list.filter(f =>
-        f.event_status === 'FT' || f.event_status === 'Finished' || f.event_status === 'AET' || f.event_status === 'AP' ||
-        Boolean(f.event_final_result && f.event_final_result !== '-')
+      list = list.filter(
+        (f) =>
+          f.event_status === 'FT' ||
+          f.event_status === 'Finished' ||
+          f.event_status === 'AET' ||
+          f.event_status === 'AP' ||
+          Boolean(f.event_final_result && f.event_final_result !== '-')
       );
     }
     return list;
@@ -154,7 +175,7 @@ export function CompetitionHubTabs({
     <div className="space-y-4">
       {/* Tab Navigation */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -167,7 +188,9 @@ export function CompetitionHubTabs({
             <span>{tab.icon}</span>
             <span>{tab.label}</span>
             {tab.badge && activeTab === tab.id && (
-              <span className="px-1.5 py-0.5 bg-red-500/30 text-red-300 text-[9px] font-bold rounded-full">{tab.badge}</span>
+              <span className="px-1.5 py-0.5 bg-red-500/30 text-red-300 text-[9px] font-bold rounded-full">
+                {tab.badge}
+              </span>
             )}
           </button>
         ))}
@@ -176,7 +199,7 @@ export function CompetitionHubTabs({
       {/* Date Strip (for fixtures/results tabs) */}
       {(activeTab === 'fixtures' || activeTab === 'results') && (
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {dateStrip.map(d => (
+          {dateStrip.map((d) => (
             <button
               key={d.iso}
               onClick={() => setSelectedDate(d.iso)}
@@ -220,9 +243,14 @@ export function CompetitionHubTabs({
                         ) : (
                           <>
                             <div className="text-[10px] text-slate-500">
-                              {new Date(match.event_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                              {new Date(match.event_date).toLocaleDateString(undefined, {
+                                month: 'short',
+                                day: 'numeric',
+                              })}
                             </div>
-                            <div className="text-[10px] text-amber-400 font-bold">{match.event_time}</div>
+                            <div className="text-[10px] text-amber-400 font-bold">
+                              {match.event_time}
+                            </div>
                           </>
                         )}
                       </div>
@@ -230,19 +258,43 @@ export function CompetitionHubTabs({
                       {/* Teams */}
                       <div className="flex-1 space-y-1.5">
                         <div className="flex items-center gap-2">
-                          {match.home_team_logo && <img src={match.home_team_logo} className="w-5 h-5 object-contain" alt="" />}
+                          {match.home_team_logo && (
+                            <img
+                              src={match.home_team_logo}
+                              className="w-5 h-5 object-contain"
+                              alt=""
+                            />
+                          )}
                           <span
                             className="text-xs font-bold text-white hover:text-blue-400 transition-colors cursor-pointer"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = footballRoutes.teamFromName(match.event_home_team || ''); }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.location.href = footballRoutes.teamFromName(
+                                match.event_home_team || ''
+                              );
+                            }}
                           >
                             {match.event_home_team}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          {match.away_team_logo && <img src={match.away_team_logo} className="w-5 h-5 object-contain" alt="" />}
+                          {match.away_team_logo && (
+                            <img
+                              src={match.away_team_logo}
+                              className="w-5 h-5 object-contain"
+                              alt=""
+                            />
+                          )}
                           <span
                             className="text-xs font-bold text-white hover:text-blue-400 transition-colors cursor-pointer"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = footballRoutes.teamFromName(match.event_away_team || ''); }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.location.href = footballRoutes.teamFromName(
+                                match.event_away_team || ''
+                              );
+                            }}
                           >
                             {match.event_away_team}
                           </span>
@@ -260,7 +312,9 @@ export function CompetitionHubTabs({
                 ))
               ) : (
                 <div className="text-center text-slate-400 py-12 text-sm">
-                  {activeTab === 'live' ? 'No live matches right now.' : `No ${activeTab} found for this date.`}
+                  {activeTab === 'live'
+                    ? 'No live matches right now.'
+                    : `No ${activeTab} found for this date.`}
                 </div>
               )}
             </div>
@@ -271,7 +325,7 @@ export function CompetitionHubTabs({
             <div className="space-y-6">
               {/* View Selector */}
               <div className="flex items-center gap-2">
-                {(['total', 'home', 'away'] as const).map(view => (
+                {(['total', 'home', 'away'] as const).map((view) => (
                   <button
                     key={view}
                     onClick={() => setStandingView(view)}
@@ -289,19 +343,30 @@ export function CompetitionHubTabs({
               {standingsByGroup ? (
                 // Group Stage Tables
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {Object.entries(standingsByGroup).sort().map(([groupName, groupStandings]) => (
-                    <div key={groupName} className="rounded-2xl border border-white/10 bg-[#0B1526]/50 overflow-hidden">
-                      <div className="px-4 py-2 bg-blue-600/10 border-b border-white/5">
-                        <h4 className="text-xs font-black text-white uppercase">{groupName}</h4>
+                  {Object.entries(standingsByGroup)
+                    .sort()
+                    .map(([groupName, groupStandings]) => (
+                      <div
+                        key={groupName}
+                        className="rounded-2xl border border-white/10 bg-[#0B1526]/50 overflow-hidden"
+                      >
+                        <div className="px-4 py-2 bg-blue-600/10 border-b border-white/5">
+                          <h4 className="text-xs font-black text-white uppercase">{groupName}</h4>
+                        </div>
+                        <FootballStandingsTable
+                          standings={groupStandings}
+                          leagueId={competitionId}
+                          compact
+                        />
                       </div>
-                      <FootballStandingsTable standings={groupStandings} leagueId={competitionId} compact />
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : standings.length > 0 ? (
                 <FootballStandingsTable standings={standings} leagueId={competitionId} />
               ) : (
-                <div className="text-center text-slate-400 py-12 text-sm">No standings data available.</div>
+                <div className="text-center text-slate-400 py-12 text-sm">
+                  No standings data available.
+                </div>
               )}
             </div>
           )}
@@ -312,7 +377,9 @@ export function CompetitionHubTabs({
               {topscorers.length > 0 ? (
                 <FootballTopScorers scorers={topscorers} />
               ) : (
-                <div className="text-center text-slate-400 py-12 text-sm">No top scorer data available.</div>
+                <div className="text-center text-slate-400 py-12 text-sm">
+                  No top scorer data available.
+                </div>
               )}
             </div>
           )}
@@ -326,7 +393,7 @@ export function CompetitionHubTabs({
             <span>🏟️</span> All {competitionName} Teams ({teams.length})
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {teams.map(t => (
+            {teams.map((t) => (
               <Link
                 key={t.team_key}
                 href={footballRoutes.teamFromName(t.team_name)}
@@ -334,7 +401,11 @@ export function CompetitionHubTabs({
               >
                 <div className="w-8 h-8 rounded-lg bg-white/5 p-1 flex items-center justify-center shrink-0">
                   {t.team_logo ? (
-                    <img src={t.team_logo} alt={t.team_name} className="w-full h-full object-contain" />
+                    <img
+                      src={t.team_logo}
+                      alt={t.team_name}
+                      className="w-full h-full object-contain"
+                    />
                   ) : (
                     <span className="text-xs font-bold text-white">{t.team_name[0]}</span>
                   )}

@@ -116,7 +116,9 @@ export async function GET(request: NextRequest) {
     // Sport filter
     if (sportParam && sportParam !== 'all') {
       const sRegex = new RegExp(sportParam, 'i');
-      conditions.push({ $or: [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }] });
+      conditions.push({
+        $or: [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }],
+      });
     }
 
     // Competition filter
@@ -134,10 +136,7 @@ export async function GET(request: NextRequest) {
     if (categoryParam && categoryParam !== 'all' && categoryParam !== 'All') {
       const catRegex = new RegExp(`^${categoryParam.replace(/-/g, ' ')}`, 'i');
       conditions.push({
-        $or: [
-          { category: { $regex: catRegex } },
-          { categorySlug: categoryParam.toLowerCase() },
-        ],
+        $or: [{ category: { $regex: catRegex } }, { categorySlug: categoryParam.toLowerCase() }],
       });
     }
 
@@ -176,7 +175,9 @@ export async function GET(request: NextRequest) {
     // Author filter
     if (authorParam) {
       const aRegex = new RegExp(authorParam.replace(/-/g, ' '), 'i');
-      conditions.push({ $or: [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: aRegex } }] });
+      conditions.push({
+        $or: [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: aRegex } }],
+      });
     }
 
     // Keyword Search
@@ -323,9 +324,7 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-');
 
     const effectiveTenantId =
-      tenantContext.isSuperAdmin && customTenantId
-        ? customTenantId
-        : tenantContext.tenantId;
+      tenantContext.isSuperAdmin && customTenantId ? customTenantId : tenantContext.tenantId;
 
     const generatedSlug = (title || '')
       .toString()

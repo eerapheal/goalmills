@@ -194,7 +194,7 @@ NewsSchema.pre('save', function () {
 // Automatically filter out non-published articles on all public web queries.
 // Only articles with status 'published' (or legacy documents without a status
 // field) are served. This prevents staff drafts and pending_approval articles
-// from leaking to the consumer site. 
+// from leaking to the consumer site.
 // To bypass in admin or scripts, use .setOptions({ includeAllStatuses: true }).
 function applyPublishedFilter(this: any) {
   if (!this.getOptions().includeAllStatuses) {
@@ -216,4 +216,3 @@ NewsSchema.pre('findOne', applyPublishedFilter);
 NewsSchema.pre('countDocuments', applyPublishedFilter);
 
 export default mongoose.models.News || mongoose.model('News', NewsSchema);
-

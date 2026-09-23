@@ -217,7 +217,6 @@ export function FootballScreen() {
           </View>
         );
 
-
       case 'news':
         return (
           <View style={styles.content}>

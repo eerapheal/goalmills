@@ -13,7 +13,8 @@ export default function CreateArticlePage() {
             <span>✍️</span> Compose New Article
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Publish sports coverage, transfer news, tactical breakdowns, and player features with 4-level ecosystem mapping.
+            Publish sports coverage, transfer news, tactical breakdowns, and player features with
+            4-level ecosystem mapping.
           </p>
         </div>
 

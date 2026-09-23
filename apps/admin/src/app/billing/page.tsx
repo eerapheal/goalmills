@@ -52,7 +52,8 @@ export default function BillingStudio() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Stripe recurring billing, fan pass tier distribution, churn telemetry, and revenue expansion.
+                Stripe recurring billing, fan pass tier distribution, churn telemetry, and revenue
+                expansion.
               </p>
             </div>
           </div>
@@ -71,7 +72,9 @@ export default function BillingStudio() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Monthly Recurring (MRR)</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Monthly Recurring (MRR)
+            </span>
             <FiTrendingUp className="text-emerald-400" />
           </div>
           <div className="text-3xl font-black text-emerald-400">

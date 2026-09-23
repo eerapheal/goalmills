@@ -25,9 +25,12 @@ describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
   });
 
   it('should reject invalid MongoDB ObjectIds with 400', async () => {
-    const req = new NextRequest('http://localhost:3000/api/sponsorships/invalid-id/track?type=click', {
-      method: 'POST',
-    });
+    const req = new NextRequest(
+      'http://localhost:3000/api/sponsorships/invalid-id/track?type=click',
+      {
+        method: 'POST',
+      }
+    );
     const params = Promise.resolve({ id: 'invalid-id' });
 
     const res = await POST(req, { params });
@@ -39,9 +42,12 @@ describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
 
   it('should reject invalid event types with 400', async () => {
     const validId = '507f1f77bcf86cd799439011';
-    const req = new NextRequest(`http://localhost:3000/api/sponsorships/${validId}/track?type=malicious_event`, {
-      method: 'POST',
-    });
+    const req = new NextRequest(
+      `http://localhost:3000/api/sponsorships/${validId}/track?type=malicious_event`,
+      {
+        method: 'POST',
+      }
+    );
     const params = Promise.resolve({ id: validId });
 
     const res = await POST(req, { params });
@@ -70,9 +76,12 @@ describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
       status: 'active',
     });
 
-    const req = new NextRequest(`http://localhost:3000/api/sponsorships/${validId}/track?type=click`, {
-      method: 'POST',
-    });
+    const req = new NextRequest(
+      `http://localhost:3000/api/sponsorships/${validId}/track?type=click`,
+      {
+        method: 'POST',
+      }
+    );
     const params = Promise.resolve({ id: validId });
 
     const res = await POST(req, { params });
@@ -103,9 +112,12 @@ describe('Sponsorship Telemetry API (/api/sponsorships/[id]/track)', () => {
       status: 'paused',
     });
 
-    const req = new NextRequest(`http://localhost:3000/api/sponsorships/${validId}/track?type=impression`, {
-      method: 'POST',
-    });
+    const req = new NextRequest(
+      `http://localhost:3000/api/sponsorships/${validId}/track?type=impression`,
+      {
+        method: 'POST',
+      }
+    );
     const params = Promise.resolve({ id: validId });
 
     const res = await POST(req, { params });

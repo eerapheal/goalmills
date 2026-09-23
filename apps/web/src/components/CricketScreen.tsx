@@ -50,9 +50,21 @@ export function CricketScreen() {
       .then((res) => {
         if (Array.isArray(res?.result)) {
           const activeLeagues = res.result;
-          const priorityKeywords = ['Premier League', 'Super League', 'Big Bash', 'World Cup', 'T20', 'Hundred', 'Championship'];
+          const priorityKeywords = [
+            'Premier League',
+            'Super League',
+            'Big Bash',
+            'World Cup',
+            'T20',
+            'Hundred',
+            'Championship',
+          ];
           const matched = activeLeagues
-            .filter((l) => priorityKeywords.some((k) => (l.league_name || '').toLowerCase().includes(k.toLowerCase())))
+            .filter((l) =>
+              priorityKeywords.some((k) =>
+                (l.league_name || '').toLowerCase().includes(k.toLowerCase())
+              )
+            )
             .slice(0, 8)
             .map((l) => ({
               id: String(l.league_key),
@@ -94,40 +106,54 @@ export function CricketScreen() {
     return dates;
   }, []);
 
-  const loadData = useCallback(async (isBackground = false) => {
-    if (!isBackground) setLoading(true);
-    try {
-      if (activeTab === 'standings') {
-        const leagueId = selectedLeague === 'all' || isNaN(Number(selectedLeague)) ? 732 : Number(selectedLeague);
-        const res = await cricketApi.getStandings({ leagueId });
-        let list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
-        if (list.length === 0 && selectedLeague === 'all') {
-          const altRes = await cricketApi.getStandings({ leagueId: 745 });
-          list = altRes?.result?.total || (Array.isArray(altRes?.result) ? altRes.result : []);
+  const loadData = useCallback(
+    async (isBackground = false) => {
+      if (!isBackground) setLoading(true);
+      try {
+        if (activeTab === 'standings') {
+          const leagueId =
+            selectedLeague === 'all' || isNaN(Number(selectedLeague))
+              ? 732
+              : Number(selectedLeague);
+          const res = await cricketApi.getStandings({ leagueId });
+          let list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
+          if (list.length === 0 && selectedLeague === 'all') {
+            const altRes = await cricketApi.getStandings({ leagueId: 745 });
+            list = altRes?.result?.total || (Array.isArray(altRes?.result) ? altRes.result : []);
+          }
+          setStandings(list);
+        } else if (activeTab === 'live') {
+          const leagueIdParam =
+            selectedLeague !== 'all' && !isNaN(Number(selectedLeague))
+              ? Number(selectedLeague)
+              : undefined;
+          const res = await cricketApi.getLivescore(
+            leagueIdParam ? { leagueId: leagueIdParam } : {}
+          );
+          const list = Array.isArray(res?.result) ? res.result : [];
+          setMatches(list);
+        } else {
+          // Upcoming or Results
+          const leagueIdParam =
+            selectedLeague !== 'all' && !isNaN(Number(selectedLeague))
+              ? Number(selectedLeague)
+              : undefined;
+          const res = await cricketApi.getFixtures({
+            from: selectedDate,
+            to: selectedDate,
+            ...(leagueIdParam ? { leagueId: leagueIdParam } : {}),
+          });
+          const list = Array.isArray(res?.result) ? res.result : [];
+          setMatches(list);
         }
-        setStandings(list);
-      } else if (activeTab === 'live') {
-        const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
-        const res = await cricketApi.getLivescore(leagueIdParam ? { leagueId: leagueIdParam } : {});
-        const list = Array.isArray(res?.result) ? res.result : [];
-        setMatches(list);
-      } else {
-        // Upcoming or Results
-        const leagueIdParam = selectedLeague !== 'all' && !isNaN(Number(selectedLeague)) ? Number(selectedLeague) : undefined;
-        const res = await cricketApi.getFixtures({
-          from: selectedDate,
-          to: selectedDate,
-          ...(leagueIdParam ? { leagueId: leagueIdParam } : {}),
-        });
-        const list = Array.isArray(res?.result) ? res.result : [];
-        setMatches(list);
+      } catch (err) {
+        console.error('[CricketScreen] Error loading data:', err);
+      } finally {
+        if (!isBackground) setLoading(false);
       }
-    } catch (err) {
-      console.error('[CricketScreen] Error loading data:', err);
-    } finally {
-      if (!isBackground) setLoading(false);
-    }
-  }, [activeTab, selectedLeague, selectedDate]);
+    },
+    [activeTab, selectedLeague, selectedDate]
+  );
 
   useEffect(() => {
     loadData();
@@ -243,7 +269,12 @@ export function CricketScreen() {
               { id: 'live', label: 'Live Matches', icon: FiActivity, color: 'text-red-500' },
               { id: 'upcoming', label: 'Upcoming', icon: FiCalendar, color: 'text-sky-400' },
               { id: 'results', label: 'Results', icon: FiAward, color: 'text-yellow-400' },
-              { id: 'standings', label: 'Points Table', icon: FiTrendingUp, color: 'text-yellow-400' },
+              {
+                id: 'standings',
+                label: 'Points Table',
+                icon: FiTrendingUp,
+                color: 'text-yellow-400',
+              },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -297,7 +328,9 @@ export function CricketScreen() {
                       : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                   }`}
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-wider">{item.dayName}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                    {item.dayName}
+                  </span>
                   <span className="text-sm font-mono font-black">{item.dayNumber}</span>
                 </button>
               );
@@ -365,7 +398,8 @@ export function CricketScreen() {
 
           {standings.length === 0 ? (
             <div className="py-12 text-center text-slate-400 text-sm">
-              No standings currently available for this tournament. Select another competition from the filter ribbon.
+              No standings currently available for this tournament. Select another competition from
+              the filter ribbon.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -385,10 +419,7 @@ export function CricketScreen() {
                 </thead>
                 <tbody className="divide-y divide-white/5 font-medium">
                   {standings.map((team, idx) => {
-                    const teamSlug = cricketRoutes.teamFromName(
-                      team.standing_team,
-                      team.team_key
-                    );
+                    const teamSlug = cricketRoutes.teamFromName(team.standing_team, team.team_key);
                     return (
                       <tr
                         key={team.team_key || idx}
@@ -405,7 +436,9 @@ export function CricketScreen() {
                             <span>{team.standing_team}</span>
                           </Link>
                         </td>
-                        <td className="py-3 px-2 text-center font-mono">{team.standing_MP || '0'}</td>
+                        <td className="py-3 px-2 text-center font-mono">
+                          {team.standing_MP || '0'}
+                        </td>
                         <td className="py-3 px-2 text-center font-mono text-red-400 font-bold">
                           {team.standing_W || '0'}
                         </td>

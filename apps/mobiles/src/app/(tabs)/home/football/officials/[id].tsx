@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  StatusBar,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { EntityService, OfficialMeta } from '../../../../../lib/entityService';
@@ -39,13 +32,29 @@ export default function OfficialDetailScreen() {
       case 'High-Card Index':
         return { bg: 'rgba(239, 68, 68, 0.15)', text: '#F87171', border: 'rgba(239, 68, 68, 0.3)' };
       case 'Strict':
-        return { bg: 'rgba(245, 158, 11, 0.15)', text: '#FBBF24', border: 'rgba(245, 158, 11, 0.3)' };
+        return {
+          bg: 'rgba(245, 158, 11, 0.15)',
+          text: '#FBBF24',
+          border: 'rgba(245, 158, 11, 0.3)',
+        };
       case 'Balanced':
-        return { bg: 'rgba(16, 185, 129, 0.15)', text: '#34D399', border: 'rgba(16, 185, 129, 0.3)' };
+        return {
+          bg: 'rgba(16, 185, 129, 0.15)',
+          text: '#34D399',
+          border: 'rgba(16, 185, 129, 0.3)',
+        };
       case 'Permissive':
-        return { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA', border: 'rgba(59, 130, 246, 0.3)' };
+        return {
+          bg: 'rgba(59, 130, 246, 0.15)',
+          text: '#60A5FA',
+          border: 'rgba(59, 130, 246, 0.3)',
+        };
       default:
-        return { bg: 'rgba(100, 116, 139, 0.15)', text: '#94A3B8', border: 'rgba(100, 116, 139, 0.3)' };
+        return {
+          bg: 'rgba(100, 116, 139, 0.15)',
+          text: '#94A3B8',
+          border: 'rgba(100, 116, 139, 0.3)',
+        };
     }
   };
 

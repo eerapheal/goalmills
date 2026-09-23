@@ -50,12 +50,7 @@ export default async function FootballPlayersHubPage() {
         { name: 'Football', url: '/football' },
         { name: 'Players Hub', url: '/football/players' },
       ]}
-      header={
-        <LiveNewsFlashTicker
-          sport="football"
-          badgeText="PLAYER INTEL"
-        />
-      }
+      header={<LiveNewsFlashTicker sport="football" badgeText="PLAYER INTEL" />}
       sidebar={
         <div className="space-y-6">
           {/* Trending Transfers Desk */}
@@ -86,9 +81,7 @@ export default async function FootballPlayersHubPage() {
                 <FiShield className="text-blue-400" />
                 <span>Featured Club Hubs</span>
               </h3>
-              <span className="text-[10px] text-blue-300 uppercase font-bold font-mono">
-                Clubs
-              </span>
+              <span className="text-[10px] text-blue-300 uppercase font-bold font-mono">Clubs</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {featuredClubs.map((club) => (
@@ -146,7 +139,8 @@ export default async function FootballPlayersHubPage() {
             Football Superstars & Players Directory
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Official 2026/2027 performance ratings, season goals, assist metrics, market values, and head-to-head scouting comparison across top leagues.
+            Official 2026/2027 performance ratings, season goals, assist metrics, market values, and
+            head-to-head scouting comparison across top leagues.
           </p>
         </div>
 

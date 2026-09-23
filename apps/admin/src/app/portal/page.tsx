@@ -89,7 +89,9 @@ export default function StaffPortalPage() {
   // Additional dynamic rows
   const [articles, setArticles] = useState<{ title: string; url: string; category: string }[]>([]);
   const [socialPosts, setSocialPosts] = useState<{ platform: string; url: string }[]>([]);
-  const [mediaAssets, setMediaAssets] = useState<{ type: string; title: string; link: string }[]>([]);
+  const [mediaAssets, setMediaAssets] = useState<{ type: string; title: string; link: string }[]>(
+    []
+  );
   const [submittingReport, setSubmittingReport] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -209,7 +211,9 @@ export default function StaffPortalPage() {
       setSubmitSuccess(false);
 
       const validArticles = [
-        ...(articleUrl ? [{ title: `Day ${trainingDay} Primary Article`, url: articleUrl, category: 'Football' }] : []),
+        ...(articleUrl
+          ? [{ title: `Day ${trainingDay} Primary Article`, url: articleUrl, category: 'Football' }]
+          : []),
         ...articles.filter((a) => a.title && a.url),
       ];
 
@@ -223,7 +227,9 @@ export default function StaffPortalPage() {
       ];
 
       const validMedia = [
-        ...(graphicUrl ? [{ type: 'canva_graphic', title: `Day ${trainingDay} Canva Graphic`, link: graphicUrl }] : []),
+        ...(graphicUrl
+          ? [{ type: 'canva_graphic', title: `Day ${trainingDay} Canva Graphic`, link: graphicUrl }]
+          : []),
         ...mediaAssets.filter((m) => m.link),
       ];
 
@@ -294,8 +300,10 @@ export default function StaffPortalPage() {
   }
 
   const completedDaysCount = training?.completedDays?.length || 0;
-  const isCertified = training?.isCertified || (completedDaysCount >= 30 && currentEmployee?.status !== 'training');
-  const progressPercent = training?.overallProgressPercent || Math.round((completedDaysCount / 30) * 100);
+  const isCertified =
+    training?.isCertified || (completedDaysCount >= 30 && currentEmployee?.status !== 'training');
+  const progressPercent =
+    training?.overallProgressPercent || Math.round((completedDaysCount / 30) * 100);
 
   return (
     <div className="space-y-5 sm:space-y-6 text-white">
@@ -408,8 +416,12 @@ export default function StaffPortalPage() {
                   <FiAlertCircle size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">Action Required: Official Appointment Letter Unsigned</p>
-                  <p className="text-[11px] text-slate-300">Please review and digitally sign your official employment & training contract.</p>
+                  <p className="text-xs font-bold text-white">
+                    Action Required: Official Appointment Letter Unsigned
+                  </p>
+                  <p className="text-[11px] text-slate-300">
+                    Please review and digitally sign your official employment & training contract.
+                  </p>
                 </div>
               </div>
               <Link
@@ -543,7 +555,8 @@ export default function StaffPortalPage() {
                 <FiCheckSquare className="text-blue-400" /> End-of-Day Content Production Submission
               </h2>
               <p className="text-xs text-text-muted mt-0.5">
-                Submit your daily articles, graphics, social links, video clips, and source trail for Managing Editor grading
+                Submit your daily articles, graphics, social links, video clips, and source trail
+                for Managing Editor grading
               </p>
             </div>
 
@@ -557,7 +570,8 @@ export default function StaffPortalPage() {
             <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-bold flex items-center gap-2 animate-fade-in">
               <FiCheckCircle size={18} />
               <span>
-                Daily report submitted successfully to database! Managing Editor Raphael will score your submission across the 10-category rubric.
+                Daily report submitted successfully to database! Managing Editor Raphael will score
+                your submission across the 10-category rubric.
               </span>
             </div>
           )}
@@ -566,9 +580,7 @@ export default function StaffPortalPage() {
             {/* Top Config Row: Report Date & Training Day Selector */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Report Date *
-                </label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Report Date *</label>
                 <input
                   type="date"
                   required
@@ -607,7 +619,9 @@ export default function StaffPortalPage() {
                   <span className="text-xs font-black text-amber-400 uppercase">
                     Day {selectedDayCurriculum.day} Curriculum Assignment:
                   </span>
-                  <span className="text-[11px] text-text-muted">Week {selectedDayCurriculum.week}</span>
+                  <span className="text-[11px] text-text-muted">
+                    Week {selectedDayCurriculum.week}
+                  </span>
                 </div>
                 <h4 className="text-sm font-bold text-white">{selectedDayCurriculum.title}</h4>
                 <p className="text-xs text-slate-300">
@@ -732,7 +746,8 @@ export default function StaffPortalPage() {
                   Mandatory Source Verification Trail (Min 2 Verified Sources)
                 </span>
                 <p className="text-[11px] text-text-muted mt-0.5">
-                  Tier-1: Club statements, official press conferences. Tier-2: Fabrizio Romano, Ornstein, BBC, Reuters.
+                  Tier-1: Club statements, official press conferences. Tier-2: Fabrizio Romano,
+                  Ornstein, BBC, Reuters.
                 </p>
               </div>
 
@@ -867,7 +882,9 @@ export default function StaffPortalPage() {
                 disabled={submittingReport}
                 className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-blue-500/20 disabled:opacity-50 transition-all"
               >
-                {submittingReport ? 'Submitting to Database...' : `Submit Day ${trainingDay} Assignment`}
+                {submittingReport
+                  ? 'Submitting to Database...'
+                  : `Submit Day ${trainingDay} Assignment`}
               </button>
             </div>
           </form>
@@ -885,7 +902,8 @@ export default function StaffPortalPage() {
                 <FiBarChart2 className="text-emerald-400" /> Graded Daily Assignments & Scorecards
               </h2>
               <p className="text-xs text-text-muted mt-0.5">
-                Review your 100-point rubric breakdown and Managing Editor feedback for each submitted training day
+                Review your 100-point rubric breakdown and Managing Editor feedback for each
+                submitted training day
               </p>
             </div>
           </div>
@@ -924,37 +942,43 @@ export default function StaffPortalPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {hasScore && (() => {
-                          const total = rep.totalScore || 0;
-                          const ratingConfig = PERFORMANCE_RATINGS.find(
-                            (p) => total >= p.min && total <= p.max
-                          );
-                          const ratingBadge = ratingConfig?.badge || rep.performanceRating || 'Graded';
-                          const ratingClass =
-                            ratingConfig?.color === 'emerald'
-                              ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                              : ratingConfig?.color === 'blue'
-                              ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
-                              : ratingConfig?.color === 'amber'
-                              ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                              : ratingConfig?.color === 'orange'
-                              ? 'bg-orange-500/15 text-orange-400 border-orange-500/30'
-                              : 'bg-red-500/15 text-red-400 border-red-500/30';
+                        {hasScore &&
+                          (() => {
+                            const total = rep.totalScore || 0;
+                            const ratingConfig = PERFORMANCE_RATINGS.find(
+                              (p) => total >= p.min && total <= p.max
+                            );
+                            const ratingBadge =
+                              ratingConfig?.badge || rep.performanceRating || 'Graded';
+                            const ratingClass =
+                              ratingConfig?.color === 'emerald'
+                                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                : ratingConfig?.color === 'blue'
+                                  ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+                                  : ratingConfig?.color === 'amber'
+                                    ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                                    : ratingConfig?.color === 'orange'
+                                      ? 'bg-orange-500/15 text-orange-400 border-orange-500/30'
+                                      : 'bg-red-500/15 text-red-400 border-red-500/30';
 
-                          return (
-                            <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${ratingClass}`}>
-                              {ratingBadge} • {total}/100
-                            </span>
-                          );
-                        })()}
+                            return (
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${ratingClass}`}
+                              >
+                                {ratingBadge} • {total}/100
+                              </span>
+                            );
+                          })()}
 
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          isApproved
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : isPending
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                        }`}>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            isApproved
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : isPending
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                          }`}
+                        >
                           {rep.reviewStatus}
                         </span>
                       </div>
@@ -970,9 +994,19 @@ export default function StaffPortalPage() {
                           {DAILY_SCORECARD_RUBRICS.map((rubric) => {
                             const val = (rep.scorecard as any)?.[rubric.key] || 0;
                             return (
-                              <div key={rubric.key} className="text-center p-2 rounded-lg bg-slate-900 border border-white/5">
-                                <span className="text-[10px] text-text-muted block truncate">{rubric.name.split(' ')[0]}</span>
-                                <span className="text-sm font-black text-amber-400">{val}<span className="text-[10px] text-slate-500">/{rubric.maxScore}</span></span>
+                              <div
+                                key={rubric.key}
+                                className="text-center p-2 rounded-lg bg-slate-900 border border-white/5"
+                              >
+                                <span className="text-[10px] text-text-muted block truncate">
+                                  {rubric.name.split(' ')[0]}
+                                </span>
+                                <span className="text-sm font-black text-amber-400">
+                                  {val}
+                                  <span className="text-[10px] text-slate-500">
+                                    /{rubric.maxScore}
+                                  </span>
+                                </span>
                               </div>
                             );
                           })}
@@ -986,39 +1020,71 @@ export default function StaffPortalPage() {
                         <p className="font-bold text-emerald-400 flex items-center gap-1">
                           <FiMessageSquare size={12} /> Managing Editor Feedback (Raphael Ekpenisi):
                         </p>
-                        <p className="text-slate-300 italic whitespace-pre-line">{rep.editorFeedback}</p>
+                        <p className="text-slate-300 italic whitespace-pre-line">
+                          {rep.editorFeedback}
+                        </p>
                       </div>
                     )}
 
                     {/* Submitted Links Chips */}
                     <div className="flex flex-wrap gap-2 pt-1">
                       {rep.articleUrl && (
-                        <a href={rep.articleUrl} target="_blank" rel="noreferrer" className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-bold hover:bg-blue-500/20 flex items-center gap-1">
+                        <a
+                          href={rep.articleUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-bold hover:bg-blue-500/20 flex items-center gap-1"
+                        >
                           📰 Article <FiExternalLink size={10} />
                         </a>
                       )}
                       {rep.graphicUrl && (
-                        <a href={rep.graphicUrl} target="_blank" rel="noreferrer" className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-bold hover:bg-amber-500/20 flex items-center gap-1">
+                        <a
+                          href={rep.graphicUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-bold hover:bg-amber-500/20 flex items-center gap-1"
+                        >
                           🎨 Canva <FiExternalLink size={10} />
                         </a>
                       )}
                       {rep.xUrl && (
-                        <a href={rep.xUrl} target="_blank" rel="noreferrer" className="px-2.5 py-1 rounded-lg bg-slate-500/10 text-slate-300 border border-slate-500/20 text-[11px] font-bold hover:bg-slate-500/20 flex items-center gap-1">
+                        <a
+                          href={rep.xUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-slate-500/10 text-slate-300 border border-slate-500/20 text-[11px] font-bold hover:bg-slate-500/20 flex items-center gap-1"
+                        >
                           𝕏 Post <FiExternalLink size={10} />
                         </a>
                       )}
                       {rep.instagramUrl && (
-                        <a href={rep.instagramUrl} target="_blank" rel="noreferrer" className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[11px] font-bold hover:bg-purple-500/20 flex items-center gap-1">
+                        <a
+                          href={rep.instagramUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 text-[11px] font-bold hover:bg-purple-500/20 flex items-center gap-1"
+                        >
                           Instagram <FiExternalLink size={10} />
                         </a>
                       )}
                       {rep.tiktokUrl && (
-                        <a href={rep.tiktokUrl} target="_blank" rel="noreferrer" className="px-2.5 py-1 rounded-lg bg-pink-500/10 text-pink-400 border border-pink-500/20 text-[11px] font-bold hover:bg-pink-500/20 flex items-center gap-1">
+                        <a
+                          href={rep.tiktokUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-pink-500/10 text-pink-400 border border-pink-500/20 text-[11px] font-bold hover:bg-pink-500/20 flex items-center gap-1"
+                        >
                           TikTok <FiExternalLink size={10} />
                         </a>
                       )}
                       {rep.youtubeUrl && (
-                        <a href={rep.youtubeUrl} target="_blank" rel="noreferrer" className="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[11px] font-bold hover:bg-red-500/20 flex items-center gap-1">
+                        <a
+                          href={rep.youtubeUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[11px] font-bold hover:bg-red-500/20 flex items-center gap-1"
+                        >
                           YouTube <FiExternalLink size={10} />
                         </a>
                       )}
@@ -1048,7 +1114,8 @@ export default function StaffPortalPage() {
               </h3>
               <p className="text-xs text-slate-300 max-w-2xl">
                 First Edition 2026 by Ekpenisi Erue Raphael. Access complete SOPs for sports
-                journalism, verification, Canva design, video creation, SEO, and social distribution.
+                journalism, verification, Canva design, video creation, SEO, and social
+                distribution.
               </p>
             </div>
 
@@ -1238,10 +1305,7 @@ export default function StaffPortalPage() {
             ) : (
               <div className="divide-y divide-white/5">
                 {payroll.map((p) => (
-                  <div
-                    key={p._id}
-                    className="p-4 flex items-center justify-between gap-3 text-xs"
-                  >
+                  <div key={p._id} className="p-4 flex items-center justify-between gap-3 text-xs">
                     <div>
                       <span className="font-bold text-white text-sm block">{p.period}</span>
                       <span className="text-text-muted">
@@ -1269,7 +1333,7 @@ export default function StaffPortalPage() {
           </div>
         </div>
       )}
-      
+
       {/* ========================================================================= */}
       {/* TAB: EDITORIAL POLICIES & STANDARDS */}
       {/* ========================================================================= */}
@@ -1286,7 +1350,9 @@ export default function StaffPortalPage() {
                   GoalMills Editorial Policies & Publishing Guidelines
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
-                  Mandatory guidelines for all sports journalists, creators, and editors. Adherence to these standards protects GoalMills credibility and ensures journalistic excellence.
+                  Mandatory guidelines for all sports journalists, creators, and editors. Adherence
+                  to these standards protects GoalMills credibility and ensures journalistic
+                  excellence.
                 </p>
               </div>
               <div className="flex-shrink-0">
@@ -1305,7 +1371,10 @@ export default function StaffPortalPage() {
               </h3>
               <div className="space-y-3">
                 {EDITORIAL_POLICIES.approvalPolicy.map((item, idx) => (
-                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/5 flex items-start gap-3">
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/5 flex items-start gap-3"
+                  >
                     <span className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                       {idx + 1}
                     </span>
@@ -1322,7 +1391,10 @@ export default function StaffPortalPage() {
               </h3>
               <div className="space-y-3">
                 {EDITORIAL_POLICIES.copyrightRule.map((rule, idx) => (
-                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-red-500/10 flex items-start gap-3">
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-slate-950/70 border border-red-500/10 flex items-start gap-3"
+                  >
                     <span className="w-6 h-6 rounded-lg bg-red-500/20 text-red-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                       ✕
                     </span>
@@ -1339,7 +1411,10 @@ export default function StaffPortalPage() {
               </h3>
               <div className="space-y-3">
                 {EDITORIAL_POLICIES.sourcePolicy.map((item, idx) => (
-                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-blue-500/10 flex items-start gap-3">
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-slate-950/70 border border-blue-500/10 flex items-start gap-3"
+                  >
                     <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                       T{idx + 1}
                     </span>
@@ -1356,7 +1431,10 @@ export default function StaffPortalPage() {
               </h3>
               <div className="space-y-3">
                 {EDITORIAL_POLICIES.correctionPolicy.map((step, idx) => (
-                  <div key={idx} className="p-3.5 rounded-2xl bg-slate-950/70 border border-emerald-500/10 flex items-start gap-3">
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-slate-950/70 border border-emerald-500/10 flex items-start gap-3"
+                  >
                     <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                       {idx + 1}
                     </span>
@@ -1372,10 +1450,12 @@ export default function StaffPortalPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                  <FiAlertCircle className="text-amber-400" /> Monitored Editorial Mistake Categories
+                  <FiAlertCircle className="text-amber-400" /> Monitored Editorial Mistake
+                  Categories
                 </h3>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Submissions and published articles are audited against these 16 error classifications.
+                  Submissions and published articles are audited against these 16 error
+                  classifications.
                 </p>
               </div>
               <span className="text-xs font-bold text-slate-400 bg-white/5 px-3 py-1 rounded-xl w-fit">

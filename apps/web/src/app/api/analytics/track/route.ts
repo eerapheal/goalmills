@@ -22,7 +22,8 @@ function generateDailySessionHash(req: NextRequest): string {
   const ip = forwarded.split(',')[0].trim() || req.headers.get('x-real-ip') || '127.0.0.1';
   const ua = req.headers.get('user-agent') || 'unknown-client';
   const today = new Date().toISOString().slice(0, 10);
-  const secretSalt = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'goalmills-analytics-salt';
+  const secretSalt =
+    process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'goalmills-analytics-salt';
 
   return crypto
     .createHash('sha256')
@@ -46,7 +47,10 @@ export async function POST(req: NextRequest) {
       try {
         rawBody = JSON.parse(text);
       } catch {
-        return NextResponse.json({ success: false, message: 'Invalid JSON payload' }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: 'Invalid JSON payload' },
+          { status: 400 }
+        );
       }
     } else {
       rawBody = await req.json().catch(() => null);
@@ -70,18 +74,21 @@ export async function POST(req: NextRequest) {
     const todayStr = new Date().toISOString().slice(0, 10);
 
     const documentsToInsert = [];
-    const articleUpdates: Map<string, {
-      pageViews: number;
-      uniqueReaders: Set<string>;
-      readDurationMs: number;
-      p25: number;
-      p50: number;
-      p75: number;
-      p100: number;
-      shares: number;
-      videoPlays: number;
-      metadata: AnalyticsEventMetadata;
-    }> = new Map();
+    const articleUpdates: Map<
+      string,
+      {
+        pageViews: number;
+        uniqueReaders: Set<string>;
+        readDurationMs: number;
+        p25: number;
+        p50: number;
+        p75: number;
+        p100: number;
+        shares: number;
+        videoPlays: number;
+        metadata: AnalyticsEventMetadata;
+      }
+    > = new Map();
 
     for (const evt of eventsList) {
       if (!evt.eventType) continue;
@@ -95,7 +102,11 @@ export async function POST(req: NextRequest) {
         sessionHash,
         metadata: {
           ...evt.metadata,
-          device: evt.metadata?.device || (/mobile|android|iphone|ipad/i.test(req.headers.get('user-agent') || '') ? 'mobile' : 'desktop'),
+          device:
+            evt.metadata?.device ||
+            (/mobile|android|iphone|ipad/i.test(req.headers.get('user-agent') || '')
+              ? 'mobile'
+              : 'desktop'),
         },
         timestamp: evt.timestamp ? new Date(evt.timestamp) : new Date(),
       };
@@ -125,7 +136,9 @@ export async function POST(req: NextRequest) {
           metrics.pageViews += 1;
           metrics.uniqueReaders.add(sessionHash);
         } else if (evt.eventType === 'article_read') {
-          metrics.readDurationMs += Number(evt.metadata?.durationMs || evt.metadata?.readTimeMs || 0);
+          metrics.readDurationMs += Number(
+            evt.metadata?.durationMs || evt.metadata?.readTimeMs || 0
+          );
           metrics.uniqueReaders.add(sessionHash);
         } else if (evt.eventType === 'scroll_depth') {
           const depth = Number(evt.metadata?.scrollPercentage || 0);

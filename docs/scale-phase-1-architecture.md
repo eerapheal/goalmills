@@ -36,14 +36,14 @@
 
 ### Data Boundary Matrix
 
-| Domain / Model | Isolation Scope | Tenant Query Pattern |
-| :--- | :--- | :--- |
-| **Ecosystem Entities** | `GLOBAL` | Universal across all tenants |
-| **Live Sports Feeds** | `GLOBAL` | Shared Redis cache & normalizer |
-| **News & Articles** | `TENANT-SCOPED` | `{ $or: [{ tenantId }, { tenantId: 'default' }, { tenantId: { $exists: false } }] }` |
-| **Sponsorships & Ads** | `TENANT-SCOPED` | Filtered by campaign `tenantId` |
-| **Newsletter Subscribers**| `TENANT-SCOPED` | Partitioned per organization |
-| **Staff & Payroll** | `TENANT-SCOPED` | Isolated to organization |
+| Domain / Model             | Isolation Scope | Tenant Query Pattern                                                                 |
+| :------------------------- | :-------------- | :----------------------------------------------------------------------------------- |
+| **Ecosystem Entities**     | `GLOBAL`        | Universal across all tenants                                                         |
+| **Live Sports Feeds**      | `GLOBAL`        | Shared Redis cache & normalizer                                                      |
+| **News & Articles**        | `TENANT-SCOPED` | `{ $or: [{ tenantId }, { tenantId: 'default' }, { tenantId: { $exists: false } }] }` |
+| **Sponsorships & Ads**     | `TENANT-SCOPED` | Filtered by campaign `tenantId`                                                      |
+| **Newsletter Subscribers** | `TENANT-SCOPED` | Partitioned per organization                                                         |
+| **Staff & Payroll**        | `TENANT-SCOPED` | Isolated to organization                                                             |
 
 ---
 

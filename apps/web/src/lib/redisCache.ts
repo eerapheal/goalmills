@@ -501,4 +501,3 @@ export function getSeoCacheHeaders(
     'Vercel-CDN-Cache-Control': `public, s-maxage=${sMaxAgeSeconds}`,
   };
 }
-

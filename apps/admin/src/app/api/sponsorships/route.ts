@@ -4,7 +4,12 @@ import Sponsorship from '@/models/Sponsorship';
 import { requirePermission } from '@/lib/serverAuth';
 import { sanitizeObject } from '@/lib/security';
 import { logAdminAction } from '@/lib/auditLog';
-import { resolveTenantContext, buildTenantFilter, DEFAULT_TENANT_ID, DEFAULT_TENANT_SLUG } from '@/lib/tenantContext';
+import {
+  resolveTenantContext,
+  buildTenantFilter,
+  DEFAULT_TENANT_ID,
+  DEFAULT_TENANT_SLUG,
+} from '@/lib/tenantContext';
 
 export async function GET(request: NextRequest) {
   try {
@@ -75,9 +80,13 @@ export async function POST(request: NextRequest) {
     }
 
     const assignedTenantId =
-      tenantContext.isSuperAdmin && body.tenantId ? body.tenantId : tenantContext.tenantId || DEFAULT_TENANT_ID;
+      tenantContext.isSuperAdmin && body.tenantId
+        ? body.tenantId
+        : tenantContext.tenantId || DEFAULT_TENANT_ID;
     const assignedTenantSlug =
-      tenantContext.isSuperAdmin && body.tenantSlug ? body.tenantSlug : tenantContext.tenantSlug || DEFAULT_TENANT_SLUG;
+      tenantContext.isSuperAdmin && body.tenantSlug
+        ? body.tenantSlug
+        : tenantContext.tenantSlug || DEFAULT_TENANT_SLUG;
 
     const newSponsorship = await Sponsorship.create({
       title: body.title,
@@ -124,6 +133,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, sponsorship: newSponsorship }, { status: 201 });
   } catch (error: any) {
     console.error('[Admin Sponsorships POST] Error:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create sponsorship' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to create sponsorship' },
+      { status: 500 }
+    );
   }
 }

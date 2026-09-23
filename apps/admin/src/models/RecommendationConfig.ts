@@ -42,12 +42,22 @@ const RecommendationConfigSchema = new Schema<IRecommendationConfigDocument>(
       categoryMatchWeight: { type: Number, default: DEFAULT_WEIGHTS.categoryMatchWeight },
       recencyDecayHours: { type: Number, default: DEFAULT_WEIGHTS.recencyDecayHours },
       trendingPopularityWeight: { type: Number, default: DEFAULT_WEIGHTS.trendingPopularityWeight },
-      personalizationAffinityWeight: { type: Number, default: DEFAULT_WEIGHTS.personalizationAffinityWeight },
+      personalizationAffinityWeight: {
+        type: Number,
+        default: DEFAULT_WEIGHTS.personalizationAffinityWeight,
+      },
       diversityPenalty: { type: Number, default: DEFAULT_WEIGHTS.diversityPenalty },
     },
     enabledContexts: {
       type: [String],
-      default: ['homepage', 'article_detail', 'match_detail', 'sports_hub', 'mobile_feed', 'newsletter'],
+      default: [
+        'homepage',
+        'article_detail',
+        'match_detail',
+        'sports_hub',
+        'mobile_feed',
+        'newsletter',
+      ],
     },
     excludedCategorySlugs: {
       type: [String],

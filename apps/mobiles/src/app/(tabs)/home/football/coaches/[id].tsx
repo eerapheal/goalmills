@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  StatusBar,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { EntityService, CLUBS_REGISTRY } from '../../../../../lib/entityService';
@@ -183,12 +176,7 @@ export default function CoachDetailScreen() {
               onPress={() => router.push(`/home/football/coaches/${c.slug}` as any)}
               style={styles.relatedCard}
             >
-              <CoachImage
-                src={c.photo}
-                name={c.name}
-                countryFlag={c.countryFlag}
-                size={44}
-              />
+              <CoachImage src={c.photo} name={c.name} countryFlag={c.countryFlag} size={44} />
               <Text style={styles.relatedName} numberOfLines={1}>
                 {c.name}
               </Text>

@@ -189,7 +189,9 @@ export default function FootballPlayerPage() {
             const nameRes = await advancedFootballApi.getPlayers({ playerName: searchName });
             if (nameRes?.result && nameRes.result.length > 0) {
               const exact = nameRes.result.find(
-                (p) => slugify(p.player_name) === resolvedSlug || (curated && p.player_name === curated.name)
+                (p) =>
+                  slugify(p.player_name) === resolvedSlug ||
+                  (curated && p.player_name === curated.name)
               );
               apiPlayer = exact || nameRes.result[0];
             }
@@ -205,7 +207,8 @@ export default function FootballPlayerPage() {
         }
 
         // Determine Team & Club details
-        const clubSlug = curated?.clubSlug || (apiPlayer?.team_name ? slugify(apiPlayer.team_name) : 'arsenal');
+        const clubSlug =
+          curated?.clubSlug || (apiPlayer?.team_name ? slugify(apiPlayer.team_name) : 'arsenal');
         const club: ClubMeta | undefined = CLUBS_REGISTRY[clubSlug];
         const teamName = curated?.clubName || apiPlayer?.team_name || club?.name || 'Football Club';
         const teamKey = apiPlayer?.team_key || (club ? String(club.id) : undefined);
@@ -213,27 +216,27 @@ export default function FootballPlayerPage() {
         // Calculate unified stats
         const goals = apiPlayer
           ? parseInt(apiPlayer.player_goals || '0', 10)
-          : curated?.seasonStats?.goals ?? 14;
+          : (curated?.seasonStats?.goals ?? 14);
         const assists = apiPlayer
           ? parseInt(apiPlayer.player_assists || '0', 10)
-          : curated?.seasonStats?.assists ?? 8;
+          : (curated?.seasonStats?.assists ?? 8);
         const appearances = apiPlayer
           ? parseInt(apiPlayer.player_match_played || '0', 10) || 22
-          : curated?.seasonStats?.appearances ?? 24;
+          : (curated?.seasonStats?.appearances ?? 24);
         const yellowCards = apiPlayer
           ? parseInt(apiPlayer.player_yellow_cards || '0', 10)
-          : curated?.seasonStats?.yellowCards ?? 2;
+          : (curated?.seasonStats?.yellowCards ?? 2);
         const redCards = apiPlayer ? parseInt(apiPlayer.player_red_cards || '0', 10) : 0;
         const rawRating = apiPlayer?.player_rating
           ? parseFloat(apiPlayer.player_rating)
-          : curated?.seasonStats?.rating ?? 7.8;
+          : (curated?.seasonStats?.rating ?? 7.8);
         const rating = Number((rawRating || 7.8).toFixed(1));
 
         const passAccuracy = curated?.seasonStats?.passAccuracy
           ? parseInt(curated.seasonStats.passAccuracy.replace(/[^0-9]/g, ''), 10) || 88
           : (apiPlayer as any)?.player_passes_accuracy
-          ? parseInt((apiPlayer as any).player_passes_accuracy, 10) || 87
-          : 89;
+            ? parseInt((apiPlayer as any).player_passes_accuracy, 10) || 87
+            : 89;
 
         const minutesPlayed = apiPlayer?.player_minutes
           ? parseInt(apiPlayer.player_minutes, 10)
@@ -244,11 +247,9 @@ export default function FootballPlayerPage() {
         const dribbles = (apiPlayer as any)?.player_dribble_attempts
           ? parseInt((apiPlayer as any).player_dribble_attempts, 10)
           : 45;
-        const tacklesWon = apiPlayer?.player_tackles
-          ? parseInt(apiPlayer.player_tackles, 10)
-          : 28;
+        const tacklesWon = apiPlayer?.player_tackles ? parseInt(apiPlayer.player_tackles, 10) : 28;
 
-        const xG = Number((goals * 0.82 + (appearances * 0.08)).toFixed(1));
+        const xG = Number((goals * 0.82 + appearances * 0.08).toFixed(1));
         const xA = Number((assists * 0.78 + 1.2).toFixed(1));
 
         // Career history
@@ -324,7 +325,9 @@ export default function FootballPlayerPage() {
           },
         ];
 
-        const rawNumber = curated?.number ? String(curated.number) : apiPlayer?.player_number || '9';
+        const rawNumber = curated?.number
+          ? String(curated.number)
+          : apiPlayer?.player_number || '9';
         const posRaw = curated?.position || apiPlayer?.player_type || 'Forward';
         const photoUrl =
           curated?.photo ||
@@ -371,9 +374,7 @@ export default function FootballPlayerPage() {
 
         // Fetch related articles
         try {
-          const res = await fetch(
-            `/api/news?tag=${encodeURIComponent(playerName)}&limit=4`
-          );
+          const res = await fetch(`/api/news?tag=${encodeURIComponent(playerName)}&limit=4`);
           if (res.ok) {
             const json = await res.json();
             if (json.posts && isMounted) {
@@ -558,11 +559,26 @@ export default function FootballPlayerPage() {
             </h3>
             <div className="space-y-4">
               {[
-                { label: 'Goals', value: s.goals, max: Math.max(35, s.goals * 1.5), color: 'bg-yellow-500' },
-                { label: 'Assists', value: s.assists, max: Math.max(20, s.assists * 1.5), color: 'bg-blue-500' },
+                {
+                  label: 'Goals',
+                  value: s.goals,
+                  max: Math.max(35, s.goals * 1.5),
+                  color: 'bg-yellow-500',
+                },
+                {
+                  label: 'Assists',
+                  value: s.assists,
+                  max: Math.max(20, s.assists * 1.5),
+                  color: 'bg-blue-500',
+                },
                 { label: 'xG', value: s.xG, max: 35, color: 'bg-purple-500' },
                 { label: 'xA', value: s.xA, max: 20, color: 'bg-cyan-500' },
-                { label: 'Shots on Target', value: s.shotsOnTarget, max: 80, color: 'bg-orange-500' },
+                {
+                  label: 'Shots on Target',
+                  value: s.shotsOnTarget,
+                  max: 80,
+                  color: 'bg-orange-500',
+                },
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="flex items-center justify-between mb-1 text-xs">
@@ -666,8 +682,8 @@ export default function FootballPlayerPage() {
                           m.result === 'W'
                             ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                             : m.result === 'D'
-                            ? 'bg-slate-600/20 text-slate-300 border border-slate-600/30'
-                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                              ? 'bg-slate-600/20 text-slate-300 border border-slate-600/30'
+                              : 'bg-red-500/20 text-red-400 border border-red-500/30'
                         }`}
                       >
                         {m.result}
@@ -688,8 +704,8 @@ export default function FootballPlayerPage() {
                           m.rating >= 8.5
                             ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                             : m.rating >= 7.5
-                            ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                            : 'bg-slate-600/20 text-slate-300 border border-slate-600/30'
+                              ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                              : 'bg-slate-600/20 text-slate-300 border border-slate-600/30'
                         }`}
                       >
                         {m.rating}
@@ -735,10 +751,12 @@ export default function FootballPlayerPage() {
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-sm font-black text-white tabular-nums">
-                            {c.apps} <span className="font-normal text-slate-400 text-xs">apps</span>
+                            {c.apps}{' '}
+                            <span className="font-normal text-slate-400 text-xs">apps</span>
                           </p>
                           <p className="text-sm font-black text-yellow-400 tabular-nums">
-                            {c.goals} <span className="font-normal text-slate-400 text-xs">goals</span>
+                            {c.goals}{' '}
+                            <span className="font-normal text-slate-400 text-xs">goals</span>
                           </p>
                         </div>
                       </div>

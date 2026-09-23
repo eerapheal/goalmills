@@ -28,25 +28,50 @@ export function GoalmillsFootballDashboard() {
   const [pulseNews, setPulseNews] = useState<
     { id?: string; _id?: string; tag: string; title: string; time: string }[]
   >([
-    { id: 'football-1', tag: 'TRANSFER', title: 'Victor Osimhen signs landmark deal with €75M release clause', time: '10m ago' },
-    { id: 'football-2', tag: 'UCL', title: 'Champions League Quarterfinal Draw announced: Blockbuster ties set', time: '25m ago' },
-    { id: 'football-3', tag: 'EPL', title: 'Arsenal narrow gap at top of table after dramatic North London Derby', time: '1h ago' },
-    { id: 'football-4', tag: 'EL CLÁSICO', title: 'Real Madrid vs Barcelona: Tactical team news and predicted lineups', time: '2h ago' },
-    { id: 'football-5', tag: 'AFCON', title: 'CAF confirms host venues and official tournament schedule for 2025/26', time: '3h ago' },
+    {
+      id: 'football-1',
+      tag: 'TRANSFER',
+      title: 'Victor Osimhen signs landmark deal with €75M release clause',
+      time: '10m ago',
+    },
+    {
+      id: 'football-2',
+      tag: 'UCL',
+      title: 'Champions League Quarterfinal Draw announced: Blockbuster ties set',
+      time: '25m ago',
+    },
+    {
+      id: 'football-3',
+      tag: 'EPL',
+      title: 'Arsenal narrow gap at top of table after dramatic North London Derby',
+      time: '1h ago',
+    },
+    {
+      id: 'football-4',
+      tag: 'EL CLÁSICO',
+      title: 'Real Madrid vs Barcelona: Tactical team news and predicted lineups',
+      time: '2h ago',
+    },
+    {
+      id: 'football-5',
+      tag: 'AFCON',
+      title: 'CAF confirms host venues and official tournament schedule for 2025/26',
+      time: '3h ago',
+    },
   ]);
 
   const [liveMatches, setLiveMatches] = useState<any[]>([
     {
       id: 'm-1',
       league: 'Premier League • Matchday 28',
-      status: '78\'',
+      status: "78'",
       isLive: true,
       homeTeam: 'Man United',
       homeCode: 'MU',
-      homeGoalScorer: 'B. Fernandes (60\')',
+      homeGoalScorer: "B. Fernandes (60')",
       awayTeam: 'Arsenal',
       awayCode: 'ARS',
-      awayGoalScorer: 'B. Saka (76\')',
+      awayGoalScorer: "B. Saka (76')",
       score: '1 - 2',
       homePossession: 44,
       awayPossession: 56,
@@ -60,10 +85,10 @@ export function GoalmillsFootballDashboard() {
       isLive: true,
       homeTeam: 'Real Madrid',
       homeCode: 'RMA',
-      homeGoalScorer: 'Vinicius Jr (32\')',
+      homeGoalScorer: "Vinicius Jr (32')",
       awayTeam: 'Barcelona',
       awayCode: 'FCB',
-      awayGoalScorer: 'Lamine Yamal (18\')',
+      awayGoalScorer: "Lamine Yamal (18')",
       score: '1 - 1',
       homePossession: 49,
       awayPossession: 51,
@@ -134,9 +159,16 @@ export function GoalmillsFootballDashboard() {
               id: item._id || item.id,
               _id: item._id || item.id,
               slug: item.slug || slugify(item.title) || item._id,
-              tag: (item.competition || item.category || item.tags?.[0] || 'FOOTBALL').toUpperCase(),
+              tag: (
+                item.competition ||
+                item.category ||
+                item.tags?.[0] ||
+                'FOOTBALL'
+              ).toUpperCase(),
               title: item.title,
-              time: item.createdAt ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago` : 'Recent',
+              time: item.createdAt
+                ? `${Math.max(1, Math.floor((Date.now() - new Date(item.createdAt).getTime()) / 3600000))}h ago`
+                : 'Recent',
             }));
             setPulseNews(formatted);
           }
@@ -160,54 +192,58 @@ export function GoalmillsFootballDashboard() {
           const mappedMatches = matches.slice(0, 2).map((m: any, idx: number) => {
             const home = m.event_home_team || m.homeTeam || 'Team A';
             const away = m.event_away_team || m.awayTeam || 'Team B';
-            const score = m.event_final_result || m.event_ft_result || `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
-            const isLive = m.event_live === '1' || m.event_status === 'LIVE' || !isNaN(Number(m.event_status));
+            const score =
+              m.event_final_result ||
+              m.event_ft_result ||
+              `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+            const isLive =
+              m.event_live === '1' || m.event_status === 'LIVE' || !isNaN(Number(m.event_status));
 
-              return {
-                id: m.event_key || `live-m-${idx}`,
-                league: m.league_name || 'Premier League',
-                status: m.event_status ? `${m.event_status}'` : 'LIVE',
-                isLive,
-                homeTeam: home,
-                homeCode: home.substring(0, 3).toUpperCase(),
-                home_team_key: m.home_team_key,
-                home_team_logo: m.home_team_logo,
-                homeGoalScorer: m.event_scorer || '',
-                awayTeam: away,
-                awayCode: away.substring(0, 3).toUpperCase(),
-                away_team_key: m.away_team_key,
-                away_team_logo: m.away_team_logo,
-                awayGoalScorer: '',
-                score,
-                homePossession: 52,
-                awayPossession: 48,
-                homeXg: '1.45',
-                awayXg: '1.20',
-              };
-            });
-            setLiveMatches(mappedMatches);
+            return {
+              id: m.event_key || `live-m-${idx}`,
+              league: m.league_name || 'Premier League',
+              status: m.event_status ? `${m.event_status}'` : 'LIVE',
+              isLive,
+              homeTeam: home,
+              homeCode: home.substring(0, 3).toUpperCase(),
+              home_team_key: m.home_team_key,
+              home_team_logo: m.home_team_logo,
+              homeGoalScorer: m.event_scorer || '',
+              awayTeam: away,
+              awayCode: away.substring(0, 3).toUpperCase(),
+              away_team_key: m.away_team_key,
+              away_team_logo: m.away_team_logo,
+              awayGoalScorer: '',
+              score,
+              homePossession: 52,
+              awayPossession: 48,
+              homeXg: '1.45',
+              awayXg: '1.20',
+            };
+          });
+          setLiveMatches(mappedMatches);
 
-            // Update marquee match
-            const topM = matches[0];
-            const topHome = topM.event_home_team || 'Man City';
-            const topAway = topM.event_away_team || 'Real Madrid';
-            setMarqueeMatch({
-              id: topM.event_key,
-              league: topM.league_name || 'UEFA Champions League',
-              stage: topM.league_round || 'Matchday Fixture',
-              homeTeam: topHome,
-              homeCode: topHome.substring(0, 4).toUpperCase(),
-              home_team_key: topM.home_team_key,
-              home_team_logo: topM.home_team_logo,
-              awayTeam: topAway,
-              awayCode: topAway.substring(0, 3).toUpperCase(),
-              away_team_key: topM.away_team_key,
-              away_team_logo: topM.away_team_logo,
-              kickoff: topM.event_time || '20:00 GMT',
-              venue: topM.event_stadium || 'Official Stadium',
-              probability: `Win Probability: ${topHome.substring(0, 4)} 45% • Draw 25% • ${topAway.substring(0, 3)} 30%`,
-            });
-          }
+          // Update marquee match
+          const topM = matches[0];
+          const topHome = topM.event_home_team || 'Man City';
+          const topAway = topM.event_away_team || 'Real Madrid';
+          setMarqueeMatch({
+            id: topM.event_key,
+            league: topM.league_name || 'UEFA Champions League',
+            stage: topM.league_round || 'Matchday Fixture',
+            homeTeam: topHome,
+            homeCode: topHome.substring(0, 4).toUpperCase(),
+            home_team_key: topM.home_team_key,
+            home_team_logo: topM.home_team_logo,
+            awayTeam: topAway,
+            awayCode: topAway.substring(0, 3).toUpperCase(),
+            away_team_key: topM.away_team_key,
+            away_team_logo: topM.away_team_logo,
+            kickoff: topM.event_time || '20:00 GMT',
+            venue: topM.event_stadium || 'Official Stadium',
+            probability: `Win Probability: ${topHome.substring(0, 4)} 45% • Draw 25% • ${topAway.substring(0, 3)} 30%`,
+          });
+        }
 
         if (transferRes && transferRes.ok) {
           const tData = await transferRes.json();
@@ -218,9 +254,10 @@ export function GoalmillsFootballDashboard() {
               player: item.title.split(/signs|joins|talks|deal/i)[0]?.trim() || item.title,
               summary: item.summary || item.excerpt || item.title,
               tag: idx === 0 ? 'DONE DEAL' : 'HOT RUMOR',
-              tagColor: idx === 0
-                ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                : 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              tagColor:
+                idx === 0
+                  ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/30',
             }));
             setTransfers(mappedTransfers);
           }
@@ -252,7 +289,6 @@ export function GoalmillsFootballDashboard() {
       <div className="rounded-xl bg-[#0B172B]/90 border border-blue-500/25 p-2 sm:p-2.5 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md shadow-lg">
         <div className="hidden md:flex items-center gap-2.5 min-w-0 flex-1">
           <div className="min-w-0 flex-col md:flex-row flex items-center gap-2 text-xs">
-           
             <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold uppercase text-[9px]">
               FOOTBALL PULSE
             </span>
@@ -261,7 +297,7 @@ export function GoalmillsFootballDashboard() {
               href={newsLink}
               className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
             >
-              {currentItem?.title}    
+              {currentItem?.title}
             </Link>
 
             <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
@@ -378,9 +414,13 @@ export function GoalmillsFootballDashboard() {
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.homeTeam}</div>
+                              <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">
+                                {m.homeTeam}
+                              </div>
                               {m.homeGoalScorer && (
-                                <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">{m.homeGoalScorer}</div>
+                                <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate">
+                                  {m.homeGoalScorer}
+                                </div>
                               )}
                             </div>
                           </Link>
@@ -391,7 +431,9 @@ export function GoalmillsFootballDashboard() {
                           <span className="text-xs sm:text-lg font-black text-amber-400 tracking-tight leading-none">
                             {m.score}
                           </span>
-                          <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">{m.status}</span>
+                          <span className="text-[8px] sm:text-[10px] font-bold text-slate-300">
+                            {m.status}
+                          </span>
                         </div>
 
                         {/* Away Team */}
@@ -407,9 +449,13 @@ export function GoalmillsFootballDashboard() {
                             className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                           >
                             <div className="min-w-0 flex-1 text-right">
-                              <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">{m.awayTeam}</div>
+                              <div className="font-bold text-[11px] sm:text-sm text-white truncate hover:text-amber-300 transition-colors">
+                                {m.awayTeam}
+                              </div>
                               {m.awayGoalScorer && (
-                                <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">{m.awayGoalScorer}</div>
+                                <div className="hidden sm:block text-[9px] sm:text-[10px] text-slate-300 truncate text-right">
+                                  {m.awayGoalScorer}
+                                </div>
                               )}
                             </div>
                             <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center shadow flex-shrink-0 transition-colors hover:border-blue-400/40">
@@ -435,12 +481,22 @@ export function GoalmillsFootballDashboard() {
                       {/* Possession & xG Progress Bar - Hidden on mobile viewports */}
                       <div className="hidden sm:block mt-3 pt-2.5 border-t border-white/5 space-y-1.5">
                         <div className="flex justify-between text-[10px] text-slate-300 font-semibold">
-                          <span>Possession {m.homePossession}% • xG {m.homeXg}</span>
-                          <span>{m.awayPossession}% • xG {m.awayXg}</span>
+                          <span>
+                            Possession {m.homePossession}% • xG {m.homeXg}
+                          </span>
+                          <span>
+                            {m.awayPossession}% • xG {m.awayXg}
+                          </span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex">
-                          <div className="bg-gradient-to-r from-blue-500 to-sky-400 h-full" style={{ width: `${m.homePossession}%` }} />
-                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full" style={{ width: `${m.awayPossession}%` }} />
+                          <div
+                            className="bg-gradient-to-r from-blue-500 to-sky-400 h-full"
+                            style={{ width: `${m.homePossession}%` }}
+                          />
+                          <div
+                            className="bg-gradient-to-r from-amber-500 to-orange-500 h-full"
+                            style={{ width: `${m.awayPossession}%` }}
+                          />
                         </div>
                       </div>
                     </div>
@@ -475,18 +531,14 @@ export function GoalmillsFootballDashboard() {
 
                 {/* Metric 2: High Press Turnover Efficiency */}
                 <div className="p-3.5 rounded-2xl bg-[#0E1F38] border border-blue-500/15 flex flex-col items-center justify-center text-center shadow-inner">
-                  <span className="text-2xl sm:text-3xl font-black text-amber-400">
-                    14
-                  </span>
+                  <span className="text-2xl sm:text-3xl font-black text-amber-400">14</span>
                   <span className="text-xs font-bold text-white mt-1">High Turnovers</span>
                   <span className="text-[10px] text-slate-400 mt-0.5">Final Third Ball Wins</span>
                 </div>
 
                 {/* Metric 3: xG Difference */}
                 <div className="p-3.5 rounded-2xl bg-[#0E1F38] border border-blue-500/15 flex flex-col items-center justify-center text-center shadow-inner">
-                  <span className="text-2xl sm:text-3xl font-black text-yellow-400">
-                    +0.84
-                  </span>
+                  <span className="text-2xl sm:text-3xl font-black text-yellow-400">+0.84</span>
                   <span className="text-xs font-bold text-white mt-1">xG Delta</span>
                   <span className="text-[10px] text-slate-400 mt-0.5">Expected Threat Index</span>
                 </div>
@@ -508,7 +560,16 @@ export function GoalmillsFootballDashboard() {
               </div>
 
               <Link
-                href={marqueeMatch.id ? footballRoutes.matchFromEvent({ event_home_team: marqueeMatch.homeTeam, event_away_team: marqueeMatch.awayTeam, event_date: new Date().toISOString().split('T')[0], event_key: marqueeMatch.id }) : '#'}
+                href={
+                  marqueeMatch.id
+                    ? footballRoutes.matchFromEvent({
+                        event_home_team: marqueeMatch.homeTeam,
+                        event_away_team: marqueeMatch.awayTeam,
+                        event_date: new Date().toISOString().split('T')[0],
+                        event_key: marqueeMatch.id,
+                      })
+                    : '#'
+                }
                 className="block text-center py-2 space-y-2 hover:opacity-95 transition-opacity"
               >
                 <div className="flex items-center justify-around">
@@ -534,10 +595,14 @@ export function GoalmillsFootballDashboard() {
                             }}
                           />
                         ) : (
-                          <span className="text-xs font-black text-blue-400">{marqueeMatch.homeCode}</span>
+                          <span className="text-xs font-black text-blue-400">
+                            {marqueeMatch.homeCode}
+                          </span>
                         )}
                       </div>
-                      <span className="text-xs font-bold text-white truncate max-w-[90px] group-hover/team:text-blue-300 transition-colors">{marqueeMatch.homeTeam}</span>
+                      <span className="text-xs font-bold text-white truncate max-w-[90px] group-hover/team:text-blue-300 transition-colors">
+                        {marqueeMatch.homeTeam}
+                      </span>
                     </Link>
                   </span>
 
@@ -545,7 +610,9 @@ export function GoalmillsFootballDashboard() {
                     <span className="text-xs font-black text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-xl">
                       {marqueeMatch.kickoff}
                     </span>
-                    <span className="text-[10px] text-slate-400 mt-1 font-semibold">{marqueeMatch.venue}</span>
+                    <span className="text-[10px] text-slate-400 mt-1 font-semibold">
+                      {marqueeMatch.venue}
+                    </span>
                   </div>
 
                   <span
@@ -570,10 +637,14 @@ export function GoalmillsFootballDashboard() {
                             }}
                           />
                         ) : (
-                          <span className="text-xs font-black text-amber-400">{marqueeMatch.awayCode}</span>
+                          <span className="text-xs font-black text-amber-400">
+                            {marqueeMatch.awayCode}
+                          </span>
                         )}
                       </div>
-                      <span className="text-xs font-bold text-white truncate max-w-[90px] group-hover/team:text-blue-300 transition-colors">{marqueeMatch.awayTeam}</span>
+                      <span className="text-xs font-bold text-white truncate max-w-[90px] group-hover/team:text-blue-300 transition-colors">
+                        {marqueeMatch.awayTeam}
+                      </span>
                     </Link>
                   </span>
                 </div>
@@ -591,7 +662,10 @@ export function GoalmillsFootballDashboard() {
                   <FiTrendingUp className="text-amber-400" />
                   <span>Transfer News</span>
                 </h3>
-                <Link href="/transfers" className="text-xs font-bold text-amber-400 hover:underline">
+                <Link
+                  href="/transfers"
+                  className="text-xs font-bold text-amber-400 hover:underline"
+                >
                   View All →
                 </Link>
               </div>
@@ -606,7 +680,9 @@ export function GoalmillsFootballDashboard() {
                       <h4 className="text-xs font-bold text-white">{t.player}</h4>
                       <p className="text-[10px] text-slate-400">{t.summary}</p>
                     </div>
-                    <span className={`hidden md:block px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black border ${t.tagColor}`}>
+                    <span
+                      className={`hidden md:block px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-black border ${t.tagColor}`}
+                    >
                       {t.tag}
                     </span>
                   </div>
@@ -621,7 +697,6 @@ export function GoalmillsFootballDashboard() {
                   <FiShield className="text-blue-400" />
                   <span>Football Competitions</span>
                 </h3>
-              
               </div>
 
               <div className="grid grid-cols-2 gap-2">

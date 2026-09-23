@@ -1,13 +1,5 @@
 import { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Pressable,
-  TextInput,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Pressable, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
@@ -28,16 +20,16 @@ export default function FootballLeaguesPage() {
 
     const query = searchQuery.toLowerCase();
     return competitionGroups
-      .map(group => ({
+      .map((group) => ({
         ...group,
         competitions: group.competitions.filter(
-          c =>
+          (c) =>
             c.name.toLowerCase().includes(query) ||
             c.country.toLowerCase().includes(query) ||
             c.slug.toLowerCase().includes(query)
         ),
       }))
-      .filter(g => g.competitions.length > 0);
+      .filter((g) => g.competitions.length > 0);
   }, [competitionGroups, searchQuery]);
 
   const totalCount = ALL_COMPETITIONS.length;
@@ -51,7 +43,9 @@ export default function FootballLeaguesPage() {
         </Pressable>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>All Competitions</Text>
-          <Text style={styles.headerSubtitle}>{totalCount} Major Football Leagues & Tournaments</Text>
+          <Text style={styles.headerSubtitle}>
+            {totalCount} Major Football Leagues & Tournaments
+          </Text>
         </View>
       </View>
 
@@ -74,7 +68,7 @@ export default function FootballLeaguesPage() {
       </View>
 
       {/* Competition Groups */}
-      {filteredGroups.map(group => (
+      {filteredGroups.map((group) => (
         <View key={group.category} style={styles.categorySection}>
           <View style={styles.categoryHeader}>
             <Text style={styles.categoryIcon}>{group.icon}</Text>
@@ -85,7 +79,7 @@ export default function FootballLeaguesPage() {
           </View>
 
           <View style={styles.competitionGrid}>
-            {group.competitions.map(comp => (
+            {group.competitions.map((comp) => (
               <Pressable
                 key={comp.slug}
                 onPress={() => router.push(`/home/football/leagues/${comp.id}` as any)}
@@ -109,9 +103,7 @@ export default function FootballLeaguesPage() {
                     {comp.flag} {comp.country}
                   </Text>
                 </View>
-                {comp.featured && (
-                  <View style={styles.featuredDot} />
-                )}
+                {comp.featured && <View style={styles.featuredDot} />}
               </Pressable>
             ))}
           </View>

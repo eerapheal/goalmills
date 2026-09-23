@@ -32,26 +32,108 @@ export interface FeaturedTeamItem {
 
 // Verified AllSportsAPI v2 Cricket Tournament IDs as rock-solid initial state
 export const INITIAL_MAJOR_TOURNAMENTS: MajorTournamentItem[] = [
-  { name: 'Indian Premier League', key: 745, slug: 'indian-premier-league-745', type: 'Franchise T20', flag: '🇮🇳' },
-  { name: 'Pakistan Super League', key: 729, slug: 'pakistan-super-league-729', type: 'Franchise T20', flag: '🇵🇰' },
-  { name: 'Big Bash League', key: 13464, slug: 'big-bash-league-13464', type: 'Franchise T20', flag: '🇦🇺' },
-  { name: 'Caribbean Premier League', key: 7735, slug: 'caribbean-premier-league-7735', type: 'Franchise T20', flag: '🌴' },
-  { name: 'The Hundred (Men)', key: 9897, slug: 'the-hundred-mens-competition-9897', type: '100-Ball', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  {
+    name: 'Indian Premier League',
+    key: 745,
+    slug: 'indian-premier-league-745',
+    type: 'Franchise T20',
+    flag: '🇮🇳',
+  },
+  {
+    name: 'Pakistan Super League',
+    key: 729,
+    slug: 'pakistan-super-league-729',
+    type: 'Franchise T20',
+    flag: '🇵🇰',
+  },
+  {
+    name: 'Big Bash League',
+    key: 13464,
+    slug: 'big-bash-league-13464',
+    type: 'Franchise T20',
+    flag: '🇦🇺',
+  },
+  {
+    name: 'Caribbean Premier League',
+    key: 7735,
+    slug: 'caribbean-premier-league-7735',
+    type: 'Franchise T20',
+    flag: '🌴',
+  },
+  {
+    name: 'The Hundred (Men)',
+    key: 9897,
+    slug: 'the-hundred-mens-competition-9897',
+    type: '100-Ball',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  },
   { name: 'SA20 League', key: 8459, slug: 'sa20-8459', type: 'Franchise T20', flag: '🇿🇦' },
-  { name: 'Bangladesh Premier League', key: 8453, slug: 'bangladesh-premier-league-8453', type: 'Franchise T20', flag: '🇧🇩' },
-  { name: 'CSA T20 Challenge', key: 732, slug: 'csa-t20-challenge-732', type: 'Domestic T20', flag: '🇿🇦' },
+  {
+    name: 'Bangladesh Premier League',
+    key: 8453,
+    slug: 'bangladesh-premier-league-8453',
+    type: 'Franchise T20',
+    flag: '🇧🇩',
+  },
+  {
+    name: 'CSA T20 Challenge',
+    key: 732,
+    slug: 'csa-t20-challenge-732',
+    type: 'Domestic T20',
+    flag: '🇿🇦',
+  },
 ];
 
 // Verified AllSportsAPI v2 Cricket Team IDs as rock-solid initial state
 export const INITIAL_FEATURED_TEAMS: FeaturedTeamItem[] = [
-  { name: 'Chennai Super Kings', key: 141, role: '5x IPL Champions', logo: 'https://apiv2.allsportsapi.com/logo-cricket/141_chennai-super-kings.png' },
-  { name: 'Mumbai Indians', key: 144, role: '5x IPL Champions', logo: 'https://apiv2.allsportsapi.com/logo-cricket/144_mumbai-indians.png' },
-  { name: 'Kolkata Knight Riders', key: 142, role: 'IPL Champions', logo: 'https://apiv2.allsportsapi.com/logo-cricket/142_kolkata-knight-riders.png' },
-  { name: 'Royal Challengers Bangalore', key: 146, role: 'IPL Contenders', logo: 'https://apiv2.allsportsapi.com/logo-cricket/146_royal-challengers-bangalore.png' },
-  { name: 'Gujarat Titans', key: 147, role: '2022 Champions', logo: 'https://apiv2.allsportsapi.com/logo-cricket/147_gujarat-titans.png' },
-  { name: 'Rajasthan Royals', key: 150, role: 'Inaugural Champions', logo: 'https://apiv2.allsportsapi.com/logo-cricket/150_rajasthan-royals.png' },
-  { name: 'India', key: 139, role: 'ICC Top Ranked', logo: 'https://apiv2.allsportsapi.com/logo-cricket/139_india.png' },
-  { name: 'Delhi Capitals', key: 143, role: 'IPL Franchise', logo: 'https://apiv2.allsportsapi.com/logo-cricket/143_delhi-capitals.png' },
+  {
+    name: 'Chennai Super Kings',
+    key: 141,
+    role: '5x IPL Champions',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/141_chennai-super-kings.png',
+  },
+  {
+    name: 'Mumbai Indians',
+    key: 144,
+    role: '5x IPL Champions',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/144_mumbai-indians.png',
+  },
+  {
+    name: 'Kolkata Knight Riders',
+    key: 142,
+    role: 'IPL Champions',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/142_kolkata-knight-riders.png',
+  },
+  {
+    name: 'Royal Challengers Bangalore',
+    key: 146,
+    role: 'IPL Contenders',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/146_royal-challengers-bangalore.png',
+  },
+  {
+    name: 'Gujarat Titans',
+    key: 147,
+    role: '2022 Champions',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/147_gujarat-titans.png',
+  },
+  {
+    name: 'Rajasthan Royals',
+    key: 150,
+    role: 'Inaugural Champions',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/150_rajasthan-royals.png',
+  },
+  {
+    name: 'India',
+    key: 139,
+    role: 'ICC Top Ranked',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/139_india.png',
+  },
+  {
+    name: 'Delhi Capitals',
+    key: 143,
+    role: 'IPL Franchise',
+    logo: 'https://apiv2.allsportsapi.com/logo-cricket/143_delhi-capitals.png',
+  },
 ];
 
 export function CricketSidebar() {
@@ -103,7 +185,9 @@ export function CricketSidebar() {
             const dynamicTourns: MajorTournamentItem[] = filtered.slice(0, 8).map((l) => ({
               name: l.league_name,
               key: l.league_key,
-              slug: cricketRoutes.leagueFromName(l.league_name, l.league_key).replace('/cricket/leagues/', ''),
+              slug: cricketRoutes
+                .leagueFromName(l.league_name, l.league_key)
+                .replace('/cricket/leagues/', ''),
               type: l.league_year ? `Season ${l.league_year}` : 'Premier League',
               flag: '🏏',
             }));
@@ -229,9 +313,7 @@ export function CricketSidebar() {
             <FiUsers className="text-red-400" />
             <span>Featured Franchises</span>
           </h3>
-          <span className="text-[10px] text-red-300 uppercase font-bold font-mono">
-            Rosters
-          </span>
+          <span className="text-[10px] text-red-300 uppercase font-bold font-mono">Rosters</span>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {teams.map((team) => (
@@ -242,11 +324,7 @@ export function CricketSidebar() {
             >
               <div className="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 p-1 mb-2 flex items-center justify-center font-black text-red-400 text-sm group-hover:scale-105 transition-transform overflow-hidden">
                 {team.logo ? (
-                  <img
-                    src={team.logo}
-                    alt={team.name}
-                    className="w-full h-full object-contain"
-                  />
+                  <img src={team.logo} alt={team.name} className="w-full h-full object-contain" />
                 ) : (
                   <span>{team.name.charAt(0)}</span>
                 )}
@@ -303,8 +381,12 @@ export function CricketSidebar() {
                       </Link>
                     </td>
                     <td className="py-2 px-2 text-center text-slate-300">{s.standing_MP || '0'}</td>
-                    <td className="py-2 px-2 text-center text-red-400 font-bold">{s.standing_W || '0'}</td>
-                    <td className="py-2 px-2 text-center font-black text-yellow-400">{s.standing_Pts || '0'}</td>
+                    <td className="py-2 px-2 text-center text-red-400 font-bold">
+                      {s.standing_W || '0'}
+                    </td>
+                    <td className="py-2 px-2 text-center font-black text-yellow-400">
+                      {s.standing_Pts || '0'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -319,9 +401,7 @@ export function CricketSidebar() {
           <FiMail className="w-4 h-4" />
           <span>Cricket Daily Brief</span>
         </div>
-        <h4 className="text-sm font-black text-white">
-          Get Daily Match Previews & Toss Flashes
-        </h4>
+        <h4 className="text-sm font-black text-white">Get Daily Match Previews & Toss Flashes</h4>
         <p className="text-xs text-slate-300">
           Tournament predictions, pitch reports, and squad lineups delivered before toss.
         </p>

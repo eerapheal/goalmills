@@ -65,36 +65,39 @@ export function BasketballScreen() {
     return dates;
   }, []);
 
-  const loadData = useCallback(async (isBackground = false) => {
-    if (!isBackground) setLoading(true);
-    try {
-      if (activeTab === 'standings') {
-        const leagueId = selectedLeague === 'all' ? 766 : Number(selectedLeague);
-        const res = await basketballApi.getStandings({ leagueId });
-        const list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
-        setStandings(list);
-      } else if (activeTab === 'live') {
-        const res = await basketballApi.getLivescore(
-          selectedLeague !== 'all' ? { leagueId: Number(selectedLeague) } : {}
-        );
-        const list = Array.isArray(res?.result) ? res.result : [];
-        setGames(list);
-      } else {
-        // Upcoming or Results
-        const res = await basketballApi.getFixtures({
-          from: selectedDate,
-          to: selectedDate,
-          ...(selectedLeague !== 'all' ? { leagueId: Number(selectedLeague) } : {}),
-        });
-        const list = Array.isArray(res?.result) ? res.result : [];
-        setGames(list);
+  const loadData = useCallback(
+    async (isBackground = false) => {
+      if (!isBackground) setLoading(true);
+      try {
+        if (activeTab === 'standings') {
+          const leagueId = selectedLeague === 'all' ? 766 : Number(selectedLeague);
+          const res = await basketballApi.getStandings({ leagueId });
+          const list = res?.result?.total || (Array.isArray(res?.result) ? res.result : []);
+          setStandings(list);
+        } else if (activeTab === 'live') {
+          const res = await basketballApi.getLivescore(
+            selectedLeague !== 'all' ? { leagueId: Number(selectedLeague) } : {}
+          );
+          const list = Array.isArray(res?.result) ? res.result : [];
+          setGames(list);
+        } else {
+          // Upcoming or Results
+          const res = await basketballApi.getFixtures({
+            from: selectedDate,
+            to: selectedDate,
+            ...(selectedLeague !== 'all' ? { leagueId: Number(selectedLeague) } : {}),
+          });
+          const list = Array.isArray(res?.result) ? res.result : [];
+          setGames(list);
+        }
+      } catch (err) {
+        console.error('[BasketballScreen] Error loading data:', err);
+      } finally {
+        if (!isBackground) setLoading(false);
       }
-    } catch (err) {
-      console.error('[BasketballScreen] Error loading data:', err);
-    } finally {
-      if (!isBackground) setLoading(false);
-    }
-  }, [activeTab, selectedLeague, selectedDate]);
+    },
+    [activeTab, selectedLeague, selectedDate]
+  );
 
   useEffect(() => {
     loadData();
@@ -135,12 +138,7 @@ export function BasketballScreen() {
     } else if (activeTab === 'upcoming') {
       list = list.filter((g) => {
         const status = g.event_status?.toLowerCase() || '';
-        return (
-          status !== 'finished' &&
-          status !== 'ft' &&
-          status !== 'aot' &&
-          g.event_live !== '1'
-        );
+        return status !== 'finished' && status !== 'ft' && status !== 'aot' && g.event_live !== '1';
       });
     } else if (activeTab === 'results') {
       list = list.filter((g) => {
@@ -240,7 +238,9 @@ export function BasketballScreen() {
                       : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200'
                   }`}
                 >
-                  <span className="text-[10px] uppercase font-bold tracking-wider">{item.dayName}</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                    {item.dayName}
+                  </span>
                   <span className="text-sm font-mono font-black">{item.dayNumber}</span>
                 </button>
               );

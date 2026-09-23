@@ -1,4 +1,5 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 3 ARCHITECTURE
+
 ## Newsletter SaaS Architecture & Deliverability Specification
 
 ```text

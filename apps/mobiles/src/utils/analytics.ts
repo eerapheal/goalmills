@@ -1,7 +1,14 @@
 import goalmillsApi from '../services/goalmillsApi';
 
 export interface MobileAnalyticsEvent {
-  eventType: 'page_view' | 'article_read' | 'scroll_depth' | 'video_play' | 'share' | 'search' | 'notification_click';
+  eventType:
+    | 'page_view'
+    | 'article_read'
+    | 'scroll_depth'
+    | 'video_play'
+    | 'share'
+    | 'search'
+    | 'notification_click';
   entityType?: 'article' | 'category' | 'video' | 'newsletter' | 'sponsorship' | 'page' | 'search';
   entityId?: string;
   metadata?: {
@@ -113,25 +120,29 @@ export const mobileAnalytics = {
    * Tracks sports live match moment or goal alert
    */
   trackLiveMatchMoment: (matchId: string, sport: string, eventType: string, headline: string) => {
-    goalmillsApi.trackSportsTelemetry('live_match_moment', {
-      matchId,
-      sport,
-      eventType,
-      headline,
-      timestamp: new Date().toISOString(),
-    }).catch(() => {});
+    goalmillsApi
+      .trackSportsTelemetry('live_match_moment', {
+        matchId,
+        sport,
+        eventType,
+        headline,
+        timestamp: new Date().toISOString(),
+      })
+      .catch(() => {});
   },
 
   /**
    * Tracks sponsorship viewability
    */
   trackSponsorshipImpression: (campaignId: string, sponsorName: string, placement: string) => {
-    goalmillsApi.trackSportsTelemetry('ad_impression', {
-      campaignId,
-      sponsorName,
-      placement,
-      timestamp: new Date().toISOString(),
-    }).catch(() => {});
+    goalmillsApi
+      .trackSportsTelemetry('ad_impression', {
+        campaignId,
+        sponsorName,
+        placement,
+        timestamp: new Date().toISOString(),
+      })
+      .catch(() => {});
   },
 
   /**
@@ -166,7 +177,7 @@ export const mobileAnalytics = {
           evt.metadata
         )
         .catch(() => {});
-      
+
       // Also produce stream telemetry
       goalmillsApi
         .trackSportsTelemetry(evt.eventType, {
@@ -182,4 +193,3 @@ export const mobileAnalytics = {
 };
 
 export default mobileAnalytics;
-

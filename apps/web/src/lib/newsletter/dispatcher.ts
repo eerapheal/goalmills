@@ -301,7 +301,10 @@ export async function sendConfirmationEmail(
       }
     }
   } catch (err) {
-    console.warn('[Confirmation Dispatch] Go mailer service not reachable, attempting direct SMTP fallback:', err);
+    console.warn(
+      '[Confirmation Dispatch] Go mailer service not reachable, attempting direct SMTP fallback:',
+      err
+    );
   }
 
   // 4. Robust fallback: Dispatch directly via SMTP if Go mailer is offline/unreachable
@@ -418,4 +421,3 @@ export async function sendNewsletterBroadcast(params: SendNewsletterBroadcastPar
     recipientCount: params.recipients.length,
   };
 }
-

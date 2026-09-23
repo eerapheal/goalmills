@@ -7,10 +7,7 @@ import { cacheGet, cacheSet } from '@/lib/redisCache';
 const RATE_LIMIT_WINDOW_SECS = 60;
 const MAX_TRACKS_PER_WINDOW = 20;
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     if (!isValidObjectId(id)) {
@@ -57,10 +54,14 @@ export async function POST(
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Sponsorship campaign inactive or not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Sponsorship campaign inactive or not found' },
+        { status: 404 }
+      );
     }
 
-    const newImpressions = eventType === 'impression' ? (existing.impressions || 0) + 1 : existing.impressions || 0;
+    const newImpressions =
+      eventType === 'impression' ? (existing.impressions || 0) + 1 : existing.impressions || 0;
     const newClicks = eventType === 'click' ? (existing.clicks || 0) + 1 : existing.clicks || 0;
     const newCtr = newImpressions > 0 ? Number(((newClicks / newImpressions) * 100).toFixed(2)) : 0;
 
@@ -76,7 +77,8 @@ export async function POST(
     // Check if cap reached
     let newStatus = existing.status;
     if (
-      (existing.budgetControls?.maxImpressions && newImpressions >= existing.budgetControls.maxImpressions) ||
+      (existing.budgetControls?.maxImpressions &&
+        newImpressions >= existing.budgetControls.maxImpressions) ||
       (existing.budgetControls?.maxClicks && newClicks >= existing.budgetControls.maxClicks) ||
       (existing.budget && newSpent >= existing.budget)
     ) {

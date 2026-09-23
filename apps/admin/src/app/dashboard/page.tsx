@@ -71,12 +71,61 @@ const ACTION_GROUPS: ActionGroup[] = [
     icon: FiFileText,
     color: 'blue',
     actions: [
-      { id: 'dashboard',   label: 'News & Media',        desc: 'Manage articles & videos',       href: '/admin/dashboard',        icon: FiHome,       color: 'from-blue-600 to-blue-700',    requiredPermission: 'articles:draft' },
-      { id: 'create',      label: 'Create Article',      desc: 'Write a new sports story',       href: '/admin/news/new',         icon: FiPlusCircle, color: 'from-blue-500 to-indigo-600',  requiredPermission: 'articles:draft', badge: 'New' },
-      { id: 'publishing',  label: 'Publishing Queue',    desc: 'Review & schedule content',      href: '/admin/publishing',       icon: FiSend,       color: 'from-violet-600 to-purple-700', requiredPermission: 'articles:draft' },
-      { id: 'ecosystem',   label: 'Ecosystem',           desc: 'Competitions, clubs & tags',     href: '/admin/ecosystem',        icon: FiCompass,    color: 'from-cyan-600 to-teal-700',    requiredPermission: 'articles:draft' },
-      { id: 'categories',  label: 'Categories',          desc: 'Manage leagues & topics',        href: '/admin/categories',       icon: FiLayers,     color: 'from-rose-600 to-pink-700',    requiredPermission: 'categories:manage' },
-      { id: 'newsletter',  label: 'Newsletter',          desc: 'Email campaigns & roundups',     href: '/admin/newsletter',       icon: FiMail,       color: 'from-purple-600 to-violet-700', requiredPermission: 'articles:draft' },
+      {
+        id: 'dashboard',
+        label: 'News & Media',
+        desc: 'Manage articles & videos',
+        href: '/admin/dashboard',
+        icon: FiHome,
+        color: 'from-blue-600 to-blue-700',
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'create',
+        label: 'Create Article',
+        desc: 'Write a new sports story',
+        href: '/admin/news/new',
+        icon: FiPlusCircle,
+        color: 'from-blue-500 to-indigo-600',
+        requiredPermission: 'articles:draft',
+        badge: 'New',
+      },
+      {
+        id: 'publishing',
+        label: 'Publishing Queue',
+        desc: 'Review & schedule content',
+        href: '/admin/publishing',
+        icon: FiSend,
+        color: 'from-violet-600 to-purple-700',
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'ecosystem',
+        label: 'Ecosystem',
+        desc: 'Competitions, clubs & tags',
+        href: '/admin/ecosystem',
+        icon: FiCompass,
+        color: 'from-cyan-600 to-teal-700',
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'categories',
+        label: 'Categories',
+        desc: 'Manage leagues & topics',
+        href: '/admin/categories',
+        icon: FiLayers,
+        color: 'from-rose-600 to-pink-700',
+        requiredPermission: 'categories:manage',
+      },
+      {
+        id: 'newsletter',
+        label: 'Newsletter',
+        desc: 'Email campaigns & roundups',
+        href: '/admin/newsletter',
+        icon: FiMail,
+        color: 'from-purple-600 to-violet-700',
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   {
@@ -85,10 +134,44 @@ const ACTION_GROUPS: ActionGroup[] = [
     icon: FiTrendingUp,
     color: 'amber',
     actions: [
-      { id: 'analytics',    label: 'Audience Analytics', desc: 'Performance KPIs & telemetry',   href: '/admin/analytics',        icon: FiActivity,   color: 'from-amber-500 to-orange-600',  requiredPermission: 'articles:draft', badge: 'Pulse' },
-      { id: 'billing',      label: 'Fan Pass Billing',   desc: 'Stripe MRR & subscriptions',     href: '/admin/billing',          icon: FiDollarSign, color: 'from-emerald-600 to-green-700', requiredPermission: 'articles:draft', badge: 'MRR' },
-      { id: 'advertisers',  label: 'Advertiser Reports', desc: 'PoP & viewability audits',        href: '/admin/advertisers',      icon: FiAward,      color: 'from-amber-600 to-yellow-700',  requiredPermission: 'articles:draft' },
-      { id: 'sponsorships', label: 'Sponsorships',       desc: 'Brand deals & ad campaigns',     href: '/admin/sponsorships',     icon: FiShield,     color: 'from-emerald-500 to-teal-600',  requiredPermission: 'articles:draft' },
+      {
+        id: 'analytics',
+        label: 'Audience Analytics',
+        desc: 'Performance KPIs & telemetry',
+        href: '/admin/analytics',
+        icon: FiActivity,
+        color: 'from-amber-500 to-orange-600',
+        requiredPermission: 'articles:draft',
+        badge: 'Pulse',
+      },
+      {
+        id: 'billing',
+        label: 'Fan Pass Billing',
+        desc: 'Stripe MRR & subscriptions',
+        href: '/admin/billing',
+        icon: FiDollarSign,
+        color: 'from-emerald-600 to-green-700',
+        requiredPermission: 'articles:draft',
+        badge: 'MRR',
+      },
+      {
+        id: 'advertisers',
+        label: 'Advertiser Reports',
+        desc: 'PoP & viewability audits',
+        href: '/admin/advertisers',
+        icon: FiAward,
+        color: 'from-amber-600 to-yellow-700',
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'sponsorships',
+        label: 'Sponsorships',
+        desc: 'Brand deals & ad campaigns',
+        href: '/admin/sponsorships',
+        icon: FiShield,
+        color: 'from-emerald-500 to-teal-600',
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   {
@@ -97,11 +180,53 @@ const ACTION_GROUPS: ActionGroup[] = [
     icon: FiGrid,
     color: 'purple',
     actions: [
-      { id: 'recommendations', label: 'AI Recommendations', desc: 'Algorithm weights & testing', href: '/admin/recommendations', icon: FiSliders,  color: 'from-purple-600 to-violet-700', requiredPermission: 'articles:draft', badge: 'AI' },
-      { id: 'distribution',    label: 'Distribution Hub',   desc: 'Social syndication & RSS',    href: '/admin/distribution',    icon: FiShare2,   color: 'from-purple-500 to-indigo-600', requiredPermission: 'articles:draft' },
-      { id: 'search',          label: 'Search Diagnostics', desc: 'Full-text index health',      href: '/admin/search',          icon: FiSearch,   color: 'from-cyan-600 to-blue-700',     requiredPermission: 'articles:draft' },
-      { id: 'events',          label: 'Stream & Telemetry', desc: 'Live match event broker',     href: '/admin/events',          icon: FiZap,      color: 'from-amber-500 to-orange-600',  requiredPermission: 'articles:draft', badge: 'Live' },
-      { id: 'warehouse',       label: 'Sports Warehouse',   desc: 'Historical match data',       href: '/admin/warehouse',       icon: FiDatabase, color: 'from-blue-600 to-cyan-700',     requiredPermission: 'articles:draft' },
+      {
+        id: 'recommendations',
+        label: 'AI Recommendations',
+        desc: 'Algorithm weights & testing',
+        href: '/admin/recommendations',
+        icon: FiSliders,
+        color: 'from-purple-600 to-violet-700',
+        requiredPermission: 'articles:draft',
+        badge: 'AI',
+      },
+      {
+        id: 'distribution',
+        label: 'Distribution Hub',
+        desc: 'Social syndication & RSS',
+        href: '/admin/distribution',
+        icon: FiShare2,
+        color: 'from-purple-500 to-indigo-600',
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'search',
+        label: 'Search Diagnostics',
+        desc: 'Full-text index health',
+        href: '/admin/search',
+        icon: FiSearch,
+        color: 'from-cyan-600 to-blue-700',
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'events',
+        label: 'Stream & Telemetry',
+        desc: 'Live match event broker',
+        href: '/admin/events',
+        icon: FiZap,
+        color: 'from-amber-500 to-orange-600',
+        requiredPermission: 'articles:draft',
+        badge: 'Live',
+      },
+      {
+        id: 'warehouse',
+        label: 'Sports Warehouse',
+        desc: 'Historical match data',
+        href: '/admin/warehouse',
+        icon: FiDatabase,
+        color: 'from-blue-600 to-cyan-700',
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   {
@@ -110,13 +235,71 @@ const ACTION_GROUPS: ActionGroup[] = [
     icon: FiUsers,
     color: 'emerald',
     actions: [
-      { id: 'portal',      label: 'Staff Portal',       desc: 'Daily hub for all staff',        href: '/admin/portal',       icon: FiLayout,      color: 'from-emerald-600 to-teal-700',  requiredPermission: 'articles:read', badge: 'Hub' },
-      { id: 'employees',   label: 'Employees',          desc: 'Directory & onboarding',         href: '/admin/employees',    icon: FiUsers,       color: 'from-blue-600 to-indigo-700',   requiredPermission: 'employees:read' },
-      { id: 'reports',     label: 'Daily Reports',      desc: 'EOD deliverables & tracking',    href: '/admin/reports',      icon: FiCheckSquare, color: 'from-blue-500 to-blue-700',     requiredPermission: 'reports:read_own' },
-      { id: 'standup',     label: '5 PM Stand-up',      desc: 'Newsroom video syncs',           href: '/admin/standup',      icon: FiCalendar,    color: 'from-purple-600 to-violet-700', requiredPermission: 'standup:attend' },
-      { id: 'handbook',    label: 'Handbook & SOPs',    desc: 'Journalism curriculum guide',    href: '/admin/handbook',     icon: FiBookOpen,    color: 'from-amber-500 to-yellow-600',  requiredPermission: 'handbook:read' },
-      { id: 'evaluations', label: 'Evaluations',        desc: '30-day trainee assessments',     href: '/admin/evaluations',  icon: FiAward,       color: 'from-amber-600 to-orange-700',  requiredPermission: 'evaluations:read', badge: 'KPIs' },
-      { id: 'payroll',     label: 'Payroll',            desc: 'Stipends & salary slips',        href: '/admin/payroll',      icon: FiDollarSign,  color: 'from-emerald-600 to-green-700', requiredPermission: 'payroll:read' },
+      {
+        id: 'portal',
+        label: 'Staff Portal',
+        desc: 'Daily hub for all staff',
+        href: '/admin/portal',
+        icon: FiLayout,
+        color: 'from-emerald-600 to-teal-700',
+        requiredPermission: 'articles:read',
+        badge: 'Hub',
+      },
+      {
+        id: 'employees',
+        label: 'Employees',
+        desc: 'Directory & onboarding',
+        href: '/admin/employees',
+        icon: FiUsers,
+        color: 'from-blue-600 to-indigo-700',
+        requiredPermission: 'employees:read',
+      },
+      {
+        id: 'reports',
+        label: 'Daily Reports',
+        desc: 'EOD deliverables & tracking',
+        href: '/admin/reports',
+        icon: FiCheckSquare,
+        color: 'from-blue-500 to-blue-700',
+        requiredPermission: 'reports:read_own',
+      },
+      {
+        id: 'standup',
+        label: '5 PM Stand-up',
+        desc: 'Newsroom video syncs',
+        href: '/admin/standup',
+        icon: FiCalendar,
+        color: 'from-purple-600 to-violet-700',
+        requiredPermission: 'standup:attend',
+      },
+      {
+        id: 'handbook',
+        label: 'Handbook & SOPs',
+        desc: 'Journalism curriculum guide',
+        href: '/admin/handbook',
+        icon: FiBookOpen,
+        color: 'from-amber-500 to-yellow-600',
+        requiredPermission: 'handbook:read',
+      },
+      {
+        id: 'evaluations',
+        label: 'Evaluations',
+        desc: '30-day trainee assessments',
+        href: '/admin/evaluations',
+        icon: FiAward,
+        color: 'from-amber-600 to-orange-700',
+        requiredPermission: 'evaluations:read',
+        badge: 'KPIs',
+      },
+      {
+        id: 'payroll',
+        label: 'Payroll',
+        desc: 'Stipends & salary slips',
+        href: '/admin/payroll',
+        icon: FiDollarSign,
+        color: 'from-emerald-600 to-green-700',
+        requiredPermission: 'payroll:read',
+      },
     ],
   },
   {
@@ -125,20 +308,64 @@ const ACTION_GROUPS: ActionGroup[] = [
     icon: FiSettings,
     color: 'slate',
     actions: [
-      { id: 'users',    label: 'User Management',    desc: 'Accounts & role assignment',  href: '/admin/users',    icon: FiUserCheck, color: 'from-slate-600 to-slate-700',   requiredPermission: 'users:manage' },
-      { id: 'system',   label: 'System',             desc: 'Config & diagnostics',        href: '/admin/system',   icon: FiSettings,  color: 'from-slate-500 to-slate-700',   requiredPermission: 'system:settings' },
-      { id: 'deletion', label: 'Trash & Deletions',  desc: 'Deleted content recovery',    href: '/admin/deletion', icon: FiTrash2,    color: 'from-red-700 to-rose-800',      requiredPermission: 'articles:delete' },
+      {
+        id: 'users',
+        label: 'User Management',
+        desc: 'Accounts & role assignment',
+        href: '/admin/users',
+        icon: FiUserCheck,
+        color: 'from-slate-600 to-slate-700',
+        requiredPermission: 'users:manage',
+      },
+      {
+        id: 'system',
+        label: 'System',
+        desc: 'Config & diagnostics',
+        href: '/admin/system',
+        icon: FiSettings,
+        color: 'from-slate-500 to-slate-700',
+        requiredPermission: 'system:settings',
+      },
+      {
+        id: 'deletion',
+        label: 'Trash & Deletions',
+        desc: 'Deleted content recovery',
+        href: '/admin/deletion',
+        icon: FiTrash2,
+        color: 'from-red-700 to-rose-800',
+        requiredPermission: 'articles:delete',
+      },
     ],
   },
 ];
 
 // Color themes per group
 const GROUP_THEME: Record<string, { header: string; dot: string; groupBg: string }> = {
-  blue:    { header: 'text-blue-400',    dot: 'bg-blue-500',    groupBg: 'bg-blue-500/10 border-blue-500/20' },
-  amber:   { header: 'text-amber-400',   dot: 'bg-amber-500',   groupBg: 'bg-amber-500/10 border-amber-500/20' },
-  purple:  { header: 'text-purple-400',  dot: 'bg-purple-500',  groupBg: 'bg-purple-500/10 border-purple-500/20' },
-  emerald: { header: 'text-emerald-400', dot: 'bg-emerald-500', groupBg: 'bg-emerald-500/10 border-emerald-500/20' },
-  slate:   { header: 'text-slate-400',   dot: 'bg-slate-500',   groupBg: 'bg-slate-500/10 border-slate-500/20' },
+  blue: {
+    header: 'text-blue-400',
+    dot: 'bg-blue-500',
+    groupBg: 'bg-blue-500/10 border-blue-500/20',
+  },
+  amber: {
+    header: 'text-amber-400',
+    dot: 'bg-amber-500',
+    groupBg: 'bg-amber-500/10 border-amber-500/20',
+  },
+  purple: {
+    header: 'text-purple-400',
+    dot: 'bg-purple-500',
+    groupBg: 'bg-purple-500/10 border-purple-500/20',
+  },
+  emerald: {
+    header: 'text-emerald-400',
+    dot: 'bg-emerald-500',
+    groupBg: 'bg-emerald-500/10 border-emerald-500/20',
+  },
+  slate: {
+    header: 'text-slate-400',
+    dot: 'bg-slate-500',
+    groupBg: 'bg-slate-500/10 border-slate-500/20',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -155,11 +382,15 @@ interface StatCardProps {
 function StatCard({ label, value, sub, icon: Icon, color }: StatCardProps) {
   return (
     <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 flex items-center gap-3 sm:gap-4">
-      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${color} flex items-center justify-center flex-shrink-0`}>
+      <div
+        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl ${color} flex items-center justify-center flex-shrink-0`}
+      >
         <Icon size={20} className="text-white" />
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider truncate">{label}</p>
+        <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-bold tracking-wider truncate">
+          {label}
+        </p>
         <p className="text-xl sm:text-2xl font-black text-white mt-0.5">{value}</p>
         <p className="text-[11px] text-slate-500 mt-0.5 truncate">{sub}</p>
       </div>
@@ -255,9 +486,7 @@ function PendingReportsWidget() {
 // Action Group Section
 // ---------------------------------------------------------------------------
 function ActionGroupSection({ group, userRole }: { group: ActionGroup; userRole?: UserRole }) {
-  const visibleActions = group.actions.filter(
-    (a) => hasPermission(userRole, a.requiredPermission)
-  );
+  const visibleActions = group.actions.filter((a) => hasPermission(userRole, a.requiredPermission));
   if (visibleActions.length === 0) return null;
 
   const theme = GROUP_THEME[group.color] || GROUP_THEME.slate;
@@ -288,20 +517,26 @@ function ActionGroupSection({ group, userRole }: { group: ActionGroup; userRole?
               className="group relative flex flex-col gap-2.5 p-3.5 sm:p-4 rounded-2xl bg-slate-900/60 border border-white/[0.07] hover:border-white/20 hover:bg-slate-800/60 transition-all duration-200 active:scale-[0.97] overflow-hidden"
             >
               {/* Gradient icon bg */}
-              <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
+              <div
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center shadow-lg flex-shrink-0`}
+              >
                 <Icon size={17} className="text-white" />
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[13px] sm:text-sm font-bold text-white leading-tight">{action.label}</span>
+                  <span className="text-[13px] sm:text-sm font-bold text-white leading-tight">
+                    {action.label}
+                  </span>
                   {action.badge && (
                     <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 uppercase">
                       {action.badge}
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5 leading-tight line-clamp-2">{action.desc}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 leading-tight line-clamp-2">
+                  {action.desc}
+                </p>
               </div>
 
               {/* Hover arrow */}
@@ -311,7 +546,9 @@ function ActionGroupSection({ group, userRole }: { group: ActionGroup; userRole?
               />
 
               {/* Subtle hover glow */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-[0.04] transition-opacity rounded-2xl pointer-events-none`} />
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-[0.04] transition-opacity rounded-2xl pointer-events-none`}
+              />
             </Link>
           );
         })}
@@ -325,10 +562,34 @@ function ActionGroupSection({ group, userRole }: { group: ActionGroup; userRole?
 // ---------------------------------------------------------------------------
 function StaffWorkspacePanel({ userRole }: { userRole?: UserRole }) {
   const items = [
-    { label: 'Submit Daily Report',  href: '/admin/portal',   icon: FiCheckSquare, color: 'bg-blue-500/20 text-blue-400 border-blue-500/20',    permission: 'reports:submit' as const },
-    { label: 'Join 5 PM Stand-up',   href: '/admin/standup',  icon: FiCalendar,    color: 'bg-purple-500/20 text-purple-400 border-purple-500/20', permission: 'standup:attend' as const },
-    { label: 'Read Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen,    color: 'bg-amber-500/20 text-amber-400 border-amber-500/20',  permission: 'handbook:read' as const },
-    { label: 'Staff Portal Hub',     href: '/admin/portal',   icon: FiLayout,      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20', permission: 'articles:read' as const },
+    {
+      label: 'Submit Daily Report',
+      href: '/admin/portal',
+      icon: FiCheckSquare,
+      color: 'bg-blue-500/20 text-blue-400 border-blue-500/20',
+      permission: 'reports:submit' as const,
+    },
+    {
+      label: 'Join 5 PM Stand-up',
+      href: '/admin/standup',
+      icon: FiCalendar,
+      color: 'bg-purple-500/20 text-purple-400 border-purple-500/20',
+      permission: 'standup:attend' as const,
+    },
+    {
+      label: 'Read Handbook & SOPs',
+      href: '/admin/handbook',
+      icon: FiBookOpen,
+      color: 'bg-amber-500/20 text-amber-400 border-amber-500/20',
+      permission: 'handbook:read' as const,
+    },
+    {
+      label: 'Staff Portal Hub',
+      href: '/admin/portal',
+      icon: FiLayout,
+      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20',
+      permission: 'articles:read' as const,
+    },
   ].filter((i) => hasPermission(userRole, i.permission));
 
   return (
@@ -371,35 +632,45 @@ export default function AdminDashboard() {
 
   const isAdminOrManager = hasPermission(userRole, 'employees:read');
   const canSeeReports = hasPermission(userRole, 'reports:read_all');
-  const isStaffOnly = !hasPermission(userRole, 'articles:draft') && hasPermission(userRole, 'articles:read');
+  const isStaffOnly =
+    !hasPermission(userRole, 'articles:draft') && hasPermission(userRole, 'articles:read');
 
   // Filter accessible groups
-  const visibleGroups = useMemo(() =>
-    ACTION_GROUPS.map((group) => ({
-      ...group,
-      actions: group.actions.filter((a) => hasPermission(userRole, a.requiredPermission)),
-    })).filter((g) => g.actions.length > 0),
+  const visibleGroups = useMemo(
+    () =>
+      ACTION_GROUPS.map((group) => ({
+        ...group,
+        actions: group.actions.filter((a) => hasPermission(userRole, a.requiredPermission)),
+      })).filter((g) => g.actions.length > 0),
     [userRole]
   );
 
   // Fetch top-level stats for admin/manager
   useEffect(() => {
-    if (!isAdminOrManager) { setStatsLoading(false); return; }
+    if (!isAdminOrManager) {
+      setStatsLoading(false);
+      return;
+    }
     Promise.all([
-      fetch('/api/admin/employees').then((r) => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/reports/daily?status=pending').then((r) => r.json()).catch(() => ({ data: [] })),
-    ]).then(([empJson, repJson]) => {
-      setStats({
-        employees: empJson.data?.length || 0,
-        pendingReports: repJson.data?.length || 0,
-        publishedToday: 0,
-      });
-    }).finally(() => setStatsLoading(false));
+      fetch('/api/admin/employees')
+        .then((r) => r.json())
+        .catch(() => ({ data: [] })),
+      fetch('/api/reports/daily?status=pending')
+        .then((r) => r.json())
+        .catch(() => ({ data: [] })),
+    ])
+      .then(([empJson, repJson]) => {
+        setStats({
+          employees: empJson.data?.length || 0,
+          pendingReports: repJson.data?.length || 0,
+          publishedToday: 0,
+        });
+      })
+      .finally(() => setStatsLoading(false));
   }, [isAdminOrManager]);
 
   return (
     <div className="space-y-5 sm:space-y-6 text-white">
-
       {/* ── Welcome Banner ────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -407,7 +678,13 @@ export default function AdminDashboard() {
             Welcome back, {session?.user?.name?.split(' ')[0] || 'Admin'} 👋
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            GoalMills Admin Hub — {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            GoalMills Admin Hub —{' '}
+            {new Date().toLocaleDateString('en-GB', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -437,16 +714,39 @@ export default function AdminDashboard() {
       {/* ── Stats Strip (admin/manager only) ─────────── */}
       {isAdminOrManager && !statsLoading && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
-          <StatCard label="Total Staff"       value={stats.employees}      sub="Active roster"              icon={FiUsers}       color="bg-blue-500/20" />
-          <StatCard label="Pending Reports"   value={stats.pendingReports} sub="Awaiting editorial review"  icon={FiCheckSquare} color={stats.pendingReports > 0 ? 'bg-amber-500/20' : 'bg-emerald-500/20'} />
-          <StatCard label="Published Today"   value={stats.publishedToday} sub="Articles live"              icon={FiFileText}    color="bg-purple-500/20" />
-          <StatCard label="Platform Status"   value="Live"                 sub="All systems operational"    icon={FiActivity}    color="bg-emerald-500/20" />
+          <StatCard
+            label="Total Staff"
+            value={stats.employees}
+            sub="Active roster"
+            icon={FiUsers}
+            color="bg-blue-500/20"
+          />
+          <StatCard
+            label="Pending Reports"
+            value={stats.pendingReports}
+            sub="Awaiting editorial review"
+            icon={FiCheckSquare}
+            color={stats.pendingReports > 0 ? 'bg-amber-500/20' : 'bg-emerald-500/20'}
+          />
+          <StatCard
+            label="Published Today"
+            value={stats.publishedToday}
+            sub="Articles live"
+            icon={FiFileText}
+            color="bg-purple-500/20"
+          />
+          <StatCard
+            label="Platform Status"
+            value="Live"
+            sub="All systems operational"
+            icon={FiActivity}
+            color="bg-emerald-500/20"
+          />
         </div>
       )}
 
       {/* ── Main Grid ────────────────────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5 sm:gap-6">
-
         {/* Left column — grouped action cards */}
         <div className="space-y-6 sm:space-y-8">
           {isStaffOnly && (
@@ -464,14 +764,10 @@ export default function AdminDashboard() {
         {/* Right sidebar — only visible on xl, role-aware widgets */}
         <div className="space-y-4">
           {/* Staff workspace for editors+ on side */}
-          {!isStaffOnly && (
-            <StaffWorkspacePanel userRole={userRole} />
-          )}
+          {!isStaffOnly && <StaffWorkspacePanel userRole={userRole} />}
 
           {/* Pending reports widget for admin/manager */}
-          {canSeeReports && (
-            <PendingReportsWidget />
-          )}
+          {canSeeReports && <PendingReportsWidget />}
 
           {/* Staff access their own recent reports widget */}
           {!canSeeReports && hasPermission(userRole, 'reports:read_own') && (
@@ -481,14 +777,22 @@ export default function AdminDashboard() {
                   <FiCheckSquare size={14} className="text-blue-400" />
                   <span className="text-sm font-black text-white">My Reports</span>
                 </div>
-                <Link href="/admin/reports" className="text-[11px] font-bold text-blue-400 flex items-center gap-1">
+                <Link
+                  href="/admin/reports"
+                  className="text-[11px] font-bold text-blue-400 flex items-center gap-1"
+                >
                   View All <FiChevronRight size={12} />
                 </Link>
               </div>
               <div className="px-4 py-6 text-center">
                 <FiCheckSquare size={28} className="mx-auto text-blue-400/30 mb-2" />
-                <p className="text-xs font-bold text-slate-500">Go to Daily Reports to view & submit</p>
-                <Link href="/admin/reports" className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">
+                <p className="text-xs font-bold text-slate-500">
+                  Go to Daily Reports to view & submit
+                </p>
+                <Link
+                  href="/admin/reports"
+                  className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold"
+                >
                   Open Reports
                 </Link>
               </div>

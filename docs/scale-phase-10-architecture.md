@@ -1,4 +1,5 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 10 ARCHITECTURE
+
 ## CDN / Media Optimization, Fan Pass Subscriptions & Advertiser Reporting
 
 ```text

@@ -50,8 +50,21 @@ export class SearchService {
 
     // Cache key for search query
     const cacheKey = `search:query:${tenantSlug}:${Buffer.from(
-      JSON.stringify({ cleanQuery, sport, competition, team, category, dateRange, entityTypes, sortBy, page, limit })
-    ).toString('base64').substring(0, 48)}`;
+      JSON.stringify({
+        cleanQuery,
+        sport,
+        competition,
+        team,
+        category,
+        dateRange,
+        entityTypes,
+        sortBy,
+        page,
+        limit,
+      })
+    )
+      .toString('base64')
+      .substring(0, 48)}`;
 
     const cached = await cacheGet<SearchResponse>(cacheKey);
     if (cached) {
@@ -101,13 +114,22 @@ export class SearchService {
 
       if (sport && sport !== 'all') articleQuery.sport = new RegExp(`^${sport}$`, 'i');
       if (category && category !== 'all') articleQuery.category = new RegExp(`^${category}$`, 'i');
-      if (competition && competition !== 'all') articleQuery.competition = new RegExp(`^${competition}$`, 'i');
+      if (competition && competition !== 'all')
+        articleQuery.competition = new RegExp(`^${competition}$`, 'i');
       if (team && team !== 'all') articleQuery['teams.name'] = new RegExp(`^${team}$`, 'i');
       if (dateFilter) articleQuery.createdAt = { $gte: dateFilter };
 
       const articles = await News.find(articleQuery)
-        .select('title slug excerpt image category sport competition teams author createdAt views readTime')
-        .sort(sortBy === 'newest' ? { createdAt: -1 } : sortBy === 'popular' ? { views: -1 } : { createdAt: -1 })
+        .select(
+          'title slug excerpt image category sport competition teams author createdAt views readTime'
+        )
+        .sort(
+          sortBy === 'newest'
+            ? { createdAt: -1 }
+            : sortBy === 'popular'
+              ? { views: -1 }
+              : { createdAt: -1 }
+        )
         .limit(50)
         .lean();
 
@@ -123,7 +145,8 @@ export class SearchService {
         facetCounts.sports[sportKey] = (facetCounts.sports[sportKey] || 0) + 1;
         facetCounts.entityTypes['article'] = (facetCounts.entityTypes['article'] || 0) + 1;
         if (art.competition) {
-          facetCounts.competitions[art.competition] = (facetCounts.competitions[art.competition] || 0) + 1;
+          facetCounts.competitions[art.competition] =
+            (facetCounts.competitions[art.competition] || 0) + 1;
         }
 
         results.push({
@@ -157,7 +180,9 @@ export class SearchService {
       if (dateFilter) videoQuery.createdAt = { $gte: dateFilter };
 
       const videos = await Video.find(videoQuery)
-        .select('title description thumbnailUrl duration sport competition createdAt views videoUrl')
+        .select(
+          'title description thumbnailUrl duration sport competition createdAt views videoUrl'
+        )
         .limit(30)
         .lean();
 
@@ -224,7 +249,9 @@ export class SearchService {
     if (sortBy === 'relevance') {
       results.sort((a, b) => b.score - a.score);
     } else if (sortBy === 'newest') {
-      results.sort((a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime());
+      results.sort(
+        (a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime()
+      );
     }
 
     // Pagination
@@ -253,7 +280,10 @@ export class SearchService {
   /**
    * Fast autocomplete suggestions for search bar dropdown
    */
-  static async getSearchSuggestions(query: string, tenantSlug: string = 'goalmills'): Promise<SearchSuggestionsResponse> {
+  static async getSearchSuggestions(
+    query: string,
+    tenantSlug: string = 'goalmills'
+  ): Promise<SearchSuggestionsResponse> {
     const cleanQuery = query.trim();
     if (!cleanQuery || cleanQuery.length < 2) {
       return { success: true, query: '', suggestions: [] };

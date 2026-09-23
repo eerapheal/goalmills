@@ -20,13 +20,7 @@ interface TacticalPitchProps {
   awayPlayers: PlayerBadgeData[];
 }
 
-function PlayerDot({
-  player,
-  color,
-}: {
-  player: PlayerBadgeData;
-  color: 'blue' | 'amber';
-}) {
+function PlayerDot({ player, color }: { player: PlayerBadgeData; color: 'blue' | 'amber' }) {
   const lastName = player.player?.split(' ').pop() || player.player || '';
   return (
     <View style={styles.playerDotWrapper}>

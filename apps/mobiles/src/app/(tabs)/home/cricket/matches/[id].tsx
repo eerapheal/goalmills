@@ -632,14 +632,21 @@ export default function CricketMatchDetailsScreen() {
               onPress={() => {
                 const seriesId = match.league_key || match.league_name;
                 if (seriesId) {
-                  router.push(`/home/cricket/series/${encodeURIComponent(String(seriesId))}` as any);
+                  router.push(
+                    `/home/cricket/series/${encodeURIComponent(String(seriesId))}` as any
+                  );
                 }
               }}
             >
               <Text style={styles.formatTagText}>
                 {match.event_type || 'ODI'} • {match.league_name || match.league_season}
               </Text>
-              <Ionicons name="chevron-forward" size={12} color="#93c5fd" style={{ marginLeft: 4 }} />
+              <Ionicons
+                name="chevron-forward"
+                size={12}
+                color="#93c5fd"
+                style={{ marginLeft: 4 }}
+              />
             </TouchableOpacity>
             {isLive && (
               <View style={styles.liveTag}>

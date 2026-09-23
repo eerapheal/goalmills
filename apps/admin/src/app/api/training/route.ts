@@ -148,9 +148,7 @@ export async function POST(req: NextRequest) {
     const modulePercent = Math.round(
       (moduleCompletedCount / GOALMILLS_TRAINING_MODULES.length) * 100
     );
-    const dayPercent = Math.round(
-      ((progress.completedDays?.length || 0) / 30) * 100
-    );
+    const dayPercent = Math.round(((progress.completedDays?.length || 0) / 30) * 100);
     // Use the higher of module-based or day-based progress
     progress.overallProgressPercent = Math.max(modulePercent, dayPercent);
 

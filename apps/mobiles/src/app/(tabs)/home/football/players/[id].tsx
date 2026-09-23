@@ -26,7 +26,9 @@ export default function PlayerDetailPage() {
   const [recentMatches, setRecentMatches] = useState<UnifiedMatchEvent[]>([]);
   const [activeSection, setActiveSection] = useState<'stats' | 'matches'>('stats');
 
-  useEffect(() => { loadPlayerData(); }, [id]);
+  useEffect(() => {
+    loadPlayerData();
+  }, [id]);
 
   const loadPlayerData = async () => {
     try {
@@ -50,9 +52,7 @@ export default function PlayerDetailPage() {
         const finished = raw
           .filter(
             (f) =>
-              f.event_status === 'FT' ||
-              f.event_status === 'Finished' ||
-              f.event_status === 'AET'
+              f.event_status === 'FT' || f.event_status === 'Finished' || f.event_status === 'AET'
           )
           .slice(-8)
           .reverse();
@@ -85,7 +85,10 @@ export default function PlayerDetailPage() {
     }
   };
 
-  const onRefresh = () => { setRefreshing(true); loadPlayerData(); };
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadPlayerData();
+  };
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
@@ -125,10 +128,20 @@ export default function PlayerDetailPage() {
   ];
 
   const possessionStats = [
-    { label: 'Pass Accuracy', value: player.player_passes_accuracy ? `${player.player_passes_accuracy}%` : 'N/A', icon: '🎯', color: '#60A5FA' },
+    {
+      label: 'Pass Accuracy',
+      value: player.player_passes_accuracy ? `${player.player_passes_accuracy}%` : 'N/A',
+      icon: '🎯',
+      color: '#60A5FA',
+    },
     { label: 'Total Passes', value: player.player_passes, icon: '↗️', color: '#94A3B8' },
     { label: 'Dribbles Won', value: player.player_dribble_succ, icon: '🏃', color: '#34D399' },
-    { label: 'Dribble Attempts', value: player.player_dribble_attempts, icon: '↪️', color: '#94A3B8' },
+    {
+      label: 'Dribble Attempts',
+      value: player.player_dribble_attempts,
+      icon: '↪️',
+      color: '#94A3B8',
+    },
   ];
 
   const defensiveStats = [
@@ -156,14 +169,14 @@ export default function PlayerDetailPage() {
     stats: { label: string; value: string | number | undefined; icon: string; color: string }[]
   ) => (
     <View style={styles.statGroup}>
-      <Text style={styles.statGroupTitle}>{emoji} {title}</Text>
+      <Text style={styles.statGroupTitle}>
+        {emoji} {title}
+      </Text>
       <View style={styles.statGrid}>
         {stats.map((s, i) => (
           <View key={i} style={styles.statCell}>
             <Text style={styles.statCellIcon}>{s.icon}</Text>
-            <Text style={[styles.statCellValue, { color: s.color }]}>
-              {s.value ?? 'N/A'}
-            </Text>
+            <Text style={[styles.statCellValue, { color: s.color }]}>{s.value ?? 'N/A'}</Text>
             <Text style={styles.statCellLabel}>{s.label}</Text>
           </View>
         ))}
@@ -174,7 +187,9 @@ export default function PlayerDetailPage() {
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+      }
       showsVerticalScrollIndicator={false}
     >
       {/* ── HERO HEADER ── */}
@@ -224,7 +239,10 @@ export default function PlayerDetailPage() {
             {player.team_name && (
               <Pressable
                 style={styles.teamLink}
-                onPress={() => player.team_key && router.push(`/(tabs)/home/football/teams/${player.team_key}` as any)}
+                onPress={() =>
+                  player.team_key &&
+                  router.push(`/(tabs)/home/football/teams/${player.team_key}` as any)
+                }
               >
                 <Text style={styles.teamLinkName}>{player.team_name}</Text>
                 <Ionicons name="chevron-forward" size={12} color="#3B82F6" />
@@ -253,8 +271,17 @@ export default function PlayerDetailPage() {
           style={[styles.sectionTab, activeSection === 'stats' && styles.sectionTabActive]}
           onPress={() => setActiveSection('stats')}
         >
-          <Ionicons name="bar-chart-outline" size={14} color={activeSection === 'stats' ? '#0F172A' : '#64748B'} />
-          <Text style={[styles.sectionTabLabel, activeSection === 'stats' && styles.sectionTabLabelActive]}>
+          <Ionicons
+            name="bar-chart-outline"
+            size={14}
+            color={activeSection === 'stats' ? '#0F172A' : '#64748B'}
+          />
+          <Text
+            style={[
+              styles.sectionTabLabel,
+              activeSection === 'stats' && styles.sectionTabLabelActive,
+            ]}
+          >
             Statistics
           </Text>
         </Pressable>
@@ -262,8 +289,17 @@ export default function PlayerDetailPage() {
           style={[styles.sectionTab, activeSection === 'matches' && styles.sectionTabActive]}
           onPress={() => setActiveSection('matches')}
         >
-          <Ionicons name="calendar-outline" size={14} color={activeSection === 'matches' ? '#0F172A' : '#64748B'} />
-          <Text style={[styles.sectionTabLabel, activeSection === 'matches' && styles.sectionTabLabelActive]}>
+          <Ionicons
+            name="calendar-outline"
+            size={14}
+            color={activeSection === 'matches' ? '#0F172A' : '#64748B'}
+          />
+          <Text
+            style={[
+              styles.sectionTabLabel,
+              activeSection === 'matches' && styles.sectionTabLabelActive,
+            ]}
+          >
             Recent Matches
           </Text>
         </Pressable>
@@ -290,9 +326,7 @@ export default function PlayerDetailPage() {
               <Text style={styles.emptyText}>Match history could not be loaded.</Text>
             </View>
           ) : (
-            recentMatches.map((match) => (
-              <FootballMatchCard key={match.event_key} event={match} />
-            ))
+            recentMatches.map((match) => <FootballMatchCard key={match.event_key} event={match} />)
           )}
         </View>
       )}
@@ -305,13 +339,21 @@ export default function PlayerDetailPage() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#080E18' },
   loadingContainer: {
-    flex: 1, backgroundColor: '#080E18', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24,
+    flex: 1,
+    backgroundColor: '#080E18',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    padding: 24,
   },
   loadingText: { color: '#94A3B8', fontSize: 13, fontWeight: '600' },
   errorTitle: { fontSize: 18, fontWeight: '900', color: '#F8FAFC', marginTop: 8 },
   backBtn: {
-    marginTop: 16, paddingHorizontal: 20, paddingVertical: 10,
-    backgroundColor: '#F59E0B', borderRadius: 12,
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#F59E0B',
+    borderRadius: 12,
   },
   backBtnText: { color: '#0F172A', fontWeight: '900', fontSize: 13 },
 
@@ -351,7 +393,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heroInfo: { flex: 1, paddingTop: 4 },
-  heroNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
+  heroNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+    marginBottom: 8,
+  },
   playerName: { fontSize: 20, fontWeight: '900', color: '#F8FAFC', flex: 1 },
   injuredBadge: {
     backgroundColor: 'rgba(239,68,68,0.2)',
@@ -393,7 +441,13 @@ const styles = StyleSheet.create({
     minWidth: 52,
   },
   ratingValue: { fontSize: 20, fontWeight: '900', color: '#0F172A', fontVariant: ['tabular-nums'] },
-  ratingLabel: { fontSize: 8, fontWeight: '900', color: '#0F172A', textTransform: 'uppercase', letterSpacing: 1 },
+  ratingLabel: {
+    fontSize: 8,
+    fontWeight: '900',
+    color: '#0F172A',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
 
   // ─ Section Tabs ─
   sectionTabs: {
@@ -416,7 +470,12 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.07)',
   },
   sectionTabActive: { backgroundColor: '#F59E0B', borderColor: '#F59E0B' },
-  sectionTabLabel: { fontSize: 12, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
+  sectionTabLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
   sectionTabLabelActive: { color: '#0F172A' },
 
   // ─ Stats ─

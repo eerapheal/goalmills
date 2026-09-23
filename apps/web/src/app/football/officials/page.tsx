@@ -34,13 +34,11 @@ export default function FootballOfficialsHubPage() {
               <FiShield className="w-4 h-4" />
               <span>Officiating Standards</span>
             </div>
-            <h4 className="text-sm font-black text-white">
-              Data-Driven Match Control Analysis
-            </h4>
+            <h4 className="text-sm font-black text-white">Data-Driven Match Control Analysis</h4>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Every fixture outcome is shaped by the disciplinary style of the referee. Our
-              database compiles card volumes, penalty awards, and VAR overturn rates across 15+
-              years of elite competition.
+              Every fixture outcome is shaped by the disciplinary style of the referee. Our database
+              compiles card volumes, penalty awards, and VAR overturn rates across 15+ years of
+              elite competition.
             </p>
           </div>
 
@@ -84,7 +82,8 @@ export default function FootballOfficialsHubPage() {
               </h3>
             </div>
             <p className="text-xs text-slate-300">
-              Cross-reference referee disciplinary records with top footballers and team card accumulators.
+              Cross-reference referee disciplinary records with top footballers and team card
+              accumulators.
             </p>
             <Link
               href="/football/players"

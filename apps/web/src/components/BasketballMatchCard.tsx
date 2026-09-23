@@ -22,9 +22,21 @@ export function BasketballMatchCard({
   const isLive =
     match?.event_live === '1' ||
     match?.event_live === (1 as any) ||
-    ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter', 'Overtime', 'Halftime', 'LIVE', 'Q1', 'Q2', 'Q3', 'Q4', 'OT', 'HT'].includes(
-      match?.event_status || match?.event_quarter || ''
-    );
+    [
+      '1st Quarter',
+      '2nd Quarter',
+      '3rd Quarter',
+      '4th Quarter',
+      'Overtime',
+      'Halftime',
+      'LIVE',
+      'Q1',
+      'Q2',
+      'Q3',
+      'Q4',
+      'OT',
+      'HT',
+    ].includes(match?.event_status || match?.event_quarter || '');
 
   const isFinished =
     match?.event_status?.toLowerCase() === 'finished' ||
@@ -45,7 +57,13 @@ export function BasketballMatchCard({
 
     // Fallback: calculate from scores quarters if final is not yet populated
     if (match?.scores) {
-      const quarters = ['1stQuarter', '2ndQuarter', '3rdQuarter', '4thQuarter', 'Overtime'] as const;
+      const quarters = [
+        '1stQuarter',
+        '2ndQuarter',
+        '3rdQuarter',
+        '4thQuarter',
+        'Overtime',
+      ] as const;
       let hTotal = 0;
       let aTotal = 0;
       let hasScores = false;
@@ -80,7 +98,14 @@ export function BasketballMatchCard({
       return match?.event_status === 'AOT' ? 'FT (OT)' : 'FINAL';
     }
     return match?.event_time?.slice(0, 5) || match?.event_date || 'TBD';
-  }, [isLive, isFinished, match?.event_quarter, match?.event_status, match?.event_time, match?.event_date]);
+  }, [
+    isLive,
+    isFinished,
+    match?.event_quarter,
+    match?.event_status,
+    match?.event_time,
+    match?.event_date,
+  ]);
 
   const matchSlug = useMemo(() => {
     return buildMatchSlug({
@@ -231,7 +256,9 @@ export function BasketballMatchCard({
       {/* Quarter Breakdown Mini-Tally (Shown on hover or live) */}
       {match?.scores && (isLive || isFinished) && (
         <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Quarters</span>
+          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider">
+            Quarters
+          </span>
           <div className="flex items-center gap-2">
             {['1stQuarter', '2ndQuarter', '3rdQuarter', '4thQuarter'].map((q, idx) => {
               const qScore = match.scores?.[q as keyof typeof match.scores]?.[0];
@@ -248,9 +275,7 @@ export function BasketballMatchCard({
 
       {/* Footer Info / SEO Link */}
       <div className="mt-2 flex items-center justify-end text-[10px] text-slate-500 group-hover:text-amber-400 transition-colors">
-        <span className="flex items-center gap-1 font-semibold">
-          Game Center →
-        </span>
+        <span className="flex items-center gap-1 font-semibold">Game Center →</span>
       </div>
     </div>
   );

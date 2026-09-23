@@ -159,7 +159,8 @@ export default function RecommendationsStudioPage() {
                   <span>Recommendation Engine Studio</span>
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-400">
-                  Configure hybrid deterministic scoring, affinity weights & test real-time candidate delivery
+                  Configure hybrid deterministic scoring, affinity weights & test real-time
+                  candidate delivery
                 </p>
               </div>
             </div>
@@ -204,7 +205,9 @@ export default function RecommendationsStudioPage() {
         {saveSuccess && (
           <div className="mt-4 p-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-2">
             <FiCheckCircle size={16} />
-            <span>Algorithm weights updated and deployed across Web, Mobile & Newsletter pipelines!</span>
+            <span>
+              Algorithm weights updated and deployed across Web, Mobile & Newsletter pipelines!
+            </span>
           </div>
         )}
 
@@ -237,7 +240,11 @@ export default function RecommendationsStudioPage() {
 
       {loading ? (
         <div className="flex items-center justify-center p-16">
-          <GoalmillsLoader size="lg" label="Recommendation Studio" sublabel="Syncing algorithm parameters..." />
+          <GoalmillsLoader
+            size="lg"
+            label="Recommendation Studio"
+            sublabel="Syncing algorithm parameters..."
+          />
         </div>
       ) : (
         <>
@@ -254,7 +261,8 @@ export default function RecommendationsStudioPage() {
                     <span>Deterministic Content Similarity</span>
                   </h2>
                   <p className="text-xs text-slate-400 mt-1">
-                    Feature scoring weights applied when calculating similarity to currently viewed article or match.
+                    Feature scoring weights applied when calculating similarity to currently viewed
+                    article or match.
                   </p>
                 </div>
 
@@ -262,14 +270,18 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Sport Match Weight</span>
-                      <span className="text-amber-400 font-mono">+{weights.sportMatchWeight} pts</span>
+                      <span className="text-amber-400 font-mono">
+                        +{weights.sportMatchWeight} pts
+                      </span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={weights.sportMatchWeight}
-                      onChange={(e) => setWeights({ ...weights, sportMatchWeight: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({ ...weights, sportMatchWeight: Number(e.target.value) })
+                      }
                       className="w-full accent-amber-400 bg-slate-800"
                     />
                   </div>
@@ -277,14 +289,18 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Team Entity Overlap Weight</span>
-                      <span className="text-amber-400 font-mono">+{weights.teamOverlapWeight} pts</span>
+                      <span className="text-amber-400 font-mono">
+                        +{weights.teamOverlapWeight} pts
+                      </span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={weights.teamOverlapWeight}
-                      onChange={(e) => setWeights({ ...weights, teamOverlapWeight: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({ ...weights, teamOverlapWeight: Number(e.target.value) })
+                      }
                       className="w-full accent-amber-400 bg-slate-800"
                     />
                   </div>
@@ -292,14 +308,18 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Competition / League Match Weight</span>
-                      <span className="text-amber-400 font-mono">+{weights.competitionMatchWeight} pts</span>
+                      <span className="text-amber-400 font-mono">
+                        +{weights.competitionMatchWeight} pts
+                      </span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={weights.competitionMatchWeight}
-                      onChange={(e) => setWeights({ ...weights, competitionMatchWeight: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({ ...weights, competitionMatchWeight: Number(e.target.value) })
+                      }
                       className="w-full accent-amber-400 bg-slate-800"
                     />
                   </div>
@@ -307,14 +327,18 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Category Taxonomy Match Weight</span>
-                      <span className="text-amber-400 font-mono">+{weights.categoryMatchWeight} pts</span>
+                      <span className="text-amber-400 font-mono">
+                        +{weights.categoryMatchWeight} pts
+                      </span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="50"
                       value={weights.categoryMatchWeight}
-                      onChange={(e) => setWeights({ ...weights, categoryMatchWeight: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({ ...weights, categoryMatchWeight: Number(e.target.value) })
+                      }
                       className="w-full accent-amber-400 bg-slate-800"
                     />
                   </div>
@@ -329,7 +353,8 @@ export default function RecommendationsStudioPage() {
                     <span>Personalization, Popularity & Decay</span>
                   </h2>
                   <p className="text-xs text-slate-400 mt-1">
-                    Fine-tune how user affinity signals and publication age impact final candidate ranking.
+                    Fine-tune how user affinity signals and publication age impact final candidate
+                    ranking.
                   </p>
                 </div>
 
@@ -337,14 +362,21 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Personalization Affinity Boost</span>
-                      <span className="text-emerald-400 font-mono">+{weights.personalizationAffinityWeight} pts</span>
+                      <span className="text-emerald-400 font-mono">
+                        +{weights.personalizationAffinityWeight} pts
+                      </span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={weights.personalizationAffinityWeight}
-                      onChange={(e) => setWeights({ ...weights, personalizationAffinityWeight: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({
+                          ...weights,
+                          personalizationAffinityWeight: Number(e.target.value),
+                        })
+                      }
                       className="w-full accent-emerald-400 bg-slate-800"
                     />
                   </div>
@@ -352,14 +384,18 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Trending Popularity Multiplier</span>
-                      <span className="text-emerald-400 font-mono">+{weights.trendingPopularityWeight} pts</span>
+                      <span className="text-emerald-400 font-mono">
+                        +{weights.trendingPopularityWeight} pts
+                      </span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="50"
                       value={weights.trendingPopularityWeight}
-                      onChange={(e) => setWeights({ ...weights, trendingPopularityWeight: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({ ...weights, trendingPopularityWeight: Number(e.target.value) })
+                      }
                       className="w-full accent-emerald-400 bg-slate-800"
                     />
                   </div>
@@ -367,7 +403,9 @@ export default function RecommendationsStudioPage() {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
                       <span>Recency Half-Life Decay</span>
-                      <span className="text-purple-400 font-mono">{weights.recencyDecayHours} Hours</span>
+                      <span className="text-purple-400 font-mono">
+                        {weights.recencyDecayHours} Hours
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -375,7 +413,9 @@ export default function RecommendationsStudioPage() {
                       max="168"
                       step="6"
                       value={weights.recencyDecayHours}
-                      onChange={(e) => setWeights({ ...weights, recencyDecayHours: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setWeights({ ...weights, recencyDecayHours: Number(e.target.value) })
+                      }
                       className="w-full accent-purple-400 bg-slate-800"
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
@@ -493,7 +533,9 @@ export default function RecommendationsStudioPage() {
                     <FiAward className="text-amber-400" />
                     <span>Ranked Candidates Output ({simCandidates.length})</span>
                   </h3>
-                  <span className="text-xs text-slate-400 font-mono">Sorted by Composite Score</span>
+                  <span className="text-xs text-slate-400 font-mono">
+                    Sorted by Composite Score
+                  </span>
                 </div>
 
                 {simCandidates.length === 0 ? (
@@ -523,7 +565,9 @@ export default function RecommendationsStudioPage() {
                         </div>
 
                         <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                          <span className="uppercase">{cand.sportSlug || 'Sports'} • {cand.type}</span>
+                          <span className="uppercase">
+                            {cand.sportSlug || 'Sports'} • {cand.type}
+                          </span>
                           <span>Algorithm: {cand.algorithm}</span>
                         </div>
                       </div>
@@ -546,7 +590,9 @@ export default function RecommendationsStudioPage() {
                     Recommendation Impressions
                   </span>
                   <div className="text-2xl sm:text-3xl font-black text-white">48,210</div>
-                  <p className="text-[11px] text-emerald-400 font-bold mt-1">↑ 18.4% Discovery Lift</p>
+                  <p className="text-[11px] text-emerald-400 font-bold mt-1">
+                    ↑ 18.4% Discovery Lift
+                  </p>
                 </div>
 
                 <div className="p-5 rounded-2xl bg-slate-950/60 border border-white/10">
@@ -561,7 +607,9 @@ export default function RecommendationsStudioPage() {
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Overall Network CTR
                   </span>
-                  <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">8.7%</div>
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
+                    8.7%
+                  </div>
                   <p className="text-[11px] text-slate-400 mt-1">Benchmark: &gt; 4.5%</p>
                 </div>
 
@@ -583,15 +631,37 @@ export default function RecommendationsStudioPage() {
 
                 <div className="space-y-3 pt-2">
                   {[
-                    { name: 'Article Detail (Related Intel & Stories)', ctr: '11.2%', count: '2,140 clicks', color: 'from-amber-400 to-amber-500' },
-                    { name: 'Mobile Feed Carousel (In-App Discovery)', ctr: '9.4%', count: '1,230 clicks', color: 'from-cyan-400 to-blue-500' },
-                    { name: 'Homepage Personalized "For You"', ctr: '7.8%', count: '610 clicks', color: 'from-purple-400 to-purple-500' },
-                    { name: 'Newsletter Curated Digests', ctr: '6.5%', count: '215 clicks', color: 'from-emerald-400 to-emerald-500' },
+                    {
+                      name: 'Article Detail (Related Intel & Stories)',
+                      ctr: '11.2%',
+                      count: '2,140 clicks',
+                      color: 'from-amber-400 to-amber-500',
+                    },
+                    {
+                      name: 'Mobile Feed Carousel (In-App Discovery)',
+                      ctr: '9.4%',
+                      count: '1,230 clicks',
+                      color: 'from-cyan-400 to-blue-500',
+                    },
+                    {
+                      name: 'Homepage Personalized "For You"',
+                      ctr: '7.8%',
+                      count: '610 clicks',
+                      color: 'from-purple-400 to-purple-500',
+                    },
+                    {
+                      name: 'Newsletter Curated Digests',
+                      ctr: '6.5%',
+                      count: '215 clicks',
+                      color: 'from-emerald-400 to-emerald-500',
+                    },
                   ].map((ctx) => (
                     <div key={ctx.name} className="space-y-1">
                       <div className="flex items-center justify-between text-xs font-bold">
                         <span className="text-slate-300">{ctx.name}</span>
-                        <span className="text-amber-400 font-mono">{ctx.ctr} CTR ({ctx.count})</span>
+                        <span className="text-amber-400 font-mono">
+                          {ctx.ctr} CTR ({ctx.count})
+                        </span>
                       </div>
                       <div className="w-full h-2 rounded-full bg-slate-900 border border-white/5 overflow-hidden">
                         <div

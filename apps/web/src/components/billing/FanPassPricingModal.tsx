@@ -99,7 +99,9 @@ export const FanPassPricingModal: React.FC<FanPassPricingModalProps> = ({
           {FAN_PASS_PLANS.filter((p) => p.tier !== 'sponsor_pro').map((plan) => {
             const isCurrent = currentTier === plan.tier;
             const price =
-              interval === 'monthly' ? plan.priceMonthly : Math.round(plan.priceYearly / 12 * 100) / 100;
+              interval === 'monthly'
+                ? plan.priceMonthly
+                : Math.round((plan.priceYearly / 12) * 100) / 100;
 
             return (
               <div
@@ -123,9 +125,7 @@ export const FanPassPricingModal: React.FC<FanPassPricingModalProps> = ({
                   </div>
 
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl sm:text-4xl font-black text-white">
-                      ${price}
-                    </span>
+                    <span className="text-3xl sm:text-4xl font-black text-white">${price}</span>
                     <span className="text-xs text-slate-400">/ month</span>
                   </div>
 
@@ -161,8 +161,8 @@ export const FanPassPricingModal: React.FC<FanPassPricingModalProps> = ({
                         {loadingTier === plan.tier
                           ? 'Redirecting to Checkout...'
                           : plan.tier === 'free'
-                          ? 'Get Started'
-                          : `Upgrade to ${plan.name}`}
+                            ? 'Get Started'
+                            : `Upgrade to ${plan.name}`}
                       </span>
                     </button>
                   )}

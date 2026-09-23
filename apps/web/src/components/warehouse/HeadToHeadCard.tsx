@@ -45,7 +45,9 @@ export function HeadToHeadCard({
 
   if (loading) {
     return (
-      <div className={`p-6 rounded-3xl bg-slate-950/60 border border-white/10 animate-pulse ${className}`}>
+      <div
+        className={`p-6 rounded-3xl bg-slate-950/60 border border-white/10 animate-pulse ${className}`}
+      >
         <div className="h-6 w-48 bg-white/10 rounded-lg mb-4" />
         <div className="h-28 bg-white/5 rounded-2xl" />
       </div>
@@ -56,12 +58,16 @@ export function HeadToHeadCard({
     return null;
   }
 
-  const winPctA = data.totalMatches > 0 ? Math.round((data.teamAWins / data.totalMatches) * 100) : 0;
-  const winPctB = data.totalMatches > 0 ? Math.round((data.teamBWins / data.totalMatches) * 100) : 0;
+  const winPctA =
+    data.totalMatches > 0 ? Math.round((data.teamAWins / data.totalMatches) * 100) : 0;
+  const winPctB =
+    data.totalMatches > 0 ? Math.round((data.teamBWins / data.totalMatches) * 100) : 0;
   const drawPct = data.totalMatches > 0 ? Math.round((data.draws / data.totalMatches) * 100) : 0;
 
   return (
-    <div className={`glass-card p-6 rounded-3xl border border-white/10 bg-slate-950/80 shadow-2xl space-y-6 ${className}`}>
+    <div
+      className={`glass-card p-6 rounded-3xl border border-white/10 bg-slate-950/80 shadow-2xl space-y-6 ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <div className="flex items-center gap-2.5">
@@ -86,9 +92,13 @@ export function HeadToHeadCard({
       {/* Teams Win Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-white">
-          <span className="text-blue-400">{data.teamA.name} ({data.teamAWins}W)</span>
+          <span className="text-blue-400">
+            {data.teamA.name} ({data.teamAWins}W)
+          </span>
           <span className="text-yellow-400 font-semibold text-xs">{data.draws} Draws</span>
-          <span className="text-red-400">{data.teamB.name} ({data.teamBWins}W)</span>
+          <span className="text-red-400">
+            {data.teamB.name} ({data.teamBWins}W)
+          </span>
         </div>
 
         <div className="h-3 rounded-full bg-slate-900 overflow-hidden flex p-0.5 gap-1 border border-white/10">
@@ -157,7 +167,9 @@ export function HeadToHeadCard({
                     })}
                   </span>
                   <span className="font-bold text-white">
-                    {m.homeTeam.name} <span className="text-amber-400">{m.finalScore.formatted}</span> {m.awayTeam.name}
+                    {m.homeTeam.name}{' '}
+                    <span className="text-amber-400">{m.finalScore.formatted}</span>{' '}
+                    {m.awayTeam.name}
                   </span>
                 </div>
                 <span className="text-[10px] text-slate-400 uppercase font-mono">

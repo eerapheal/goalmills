@@ -19,12 +19,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error: any) {
-    return new NextResponse(
-      `<error>${error?.message || 'Failed to generate RSS feed'}</error>`,
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/xml' },
-      }
-    );
+    return new NextResponse(`<error>${error?.message || 'Failed to generate RSS feed'}</error>`, {
+      status: 500,
+      headers: { 'Content-Type': 'application/xml' },
+    });
   }
 }

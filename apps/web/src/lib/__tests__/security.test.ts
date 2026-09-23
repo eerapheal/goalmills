@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  escapeRegex,
-  isValidObjectId,
-  sanitizeHtml,
-  sanitizeObject,
-} from '../security';
+import { escapeRegex, isValidObjectId, sanitizeHtml, sanitizeObject } from '../security';
 
 describe('Security & Injection Prevention Suite', () => {
   describe('escapeRegex', () => {
@@ -45,7 +40,8 @@ describe('Security & Injection Prevention Suite', () => {
     });
 
     it('should strip inline javascript and event handler attributes', () => {
-      const dirty = '<button onclick="exploit()">Click</button><a href="javascript:void(0)">Link</a>';
+      const dirty =
+        '<button onclick="exploit()">Click</button><a href="javascript:void(0)">Link</a>';
       const clean = sanitizeHtml(dirty);
       expect(clean).not.toContain('onclick=');
       expect(clean).not.toContain('javascript:');

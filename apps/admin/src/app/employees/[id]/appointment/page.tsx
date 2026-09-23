@@ -136,7 +136,11 @@ export default function AppointmentLetterPage({ params }: { params: Promise<{ id
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs border border-white/10 transition-all active:scale-95"
               title="Copy direct contract signing URL to share with employee"
             >
-              {copiedLink ? <FiCheck size={14} className="text-emerald-400" /> : <FiCopy size={14} />}
+              {copiedLink ? (
+                <FiCheck size={14} className="text-emerald-400" />
+              ) : (
+                <FiCopy size={14} />
+              )}
               <span>{copiedLink ? 'Link Copied!' : 'Copy Direct Link'}</span>
             </button>
             <a

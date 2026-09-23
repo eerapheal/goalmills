@@ -192,9 +192,11 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
           >
             {scoreDisplay}
           </span>
-          <span className={`text-[8px] font-bold uppercase sm:mt-0.5 ${
-            isLive ? 'text-blue-300' : 'text-slate-400'
-          }`}>
+          <span
+            className={`text-[8px] font-bold uppercase sm:mt-0.5 ${
+              isLive ? 'text-blue-300' : 'text-slate-400'
+            }`}
+          >
             {statusDisplay}
           </span>
         </div>
@@ -229,4 +231,3 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
     </div>
   );
 }
-

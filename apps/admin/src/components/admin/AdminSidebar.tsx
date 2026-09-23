@@ -70,12 +70,50 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: FiFileText,
     color: 'blue',
     items: [
-      { id: 'dashboard', label: 'News & Media Hub', href: '/admin/dashboard', icon: FiHome, requiredPermission: 'articles:draft' },
-      { id: 'create_article', label: 'Create Article', href: '/admin/news/new', icon: FiPlusCircle, requiredPermission: 'articles:draft', badge: 'New', badgeColor: 'blue' },
-      { id: 'publishing', label: 'Publishing Queue', href: '/admin/publishing', icon: FiSend, requiredPermission: 'articles:draft' },
-      { id: 'ecosystem', label: 'Content Ecosystem', href: '/admin/ecosystem', icon: FiCompass, requiredPermission: 'articles:draft' },
-      { id: 'categories', label: 'Categories & Tags', href: '/admin/categories', icon: FiLayers, requiredPermission: 'categories:manage' },
-      { id: 'newsletter', label: 'Newsletter Hub', href: '/admin/newsletter', icon: FiMail, requiredPermission: 'articles:draft' },
+      {
+        id: 'dashboard',
+        label: 'News & Media Hub',
+        href: '/admin/dashboard',
+        icon: FiHome,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'create_article',
+        label: 'Create Article',
+        href: '/admin/news/new',
+        icon: FiPlusCircle,
+        requiredPermission: 'articles:draft',
+        badge: 'New',
+        badgeColor: 'blue',
+      },
+      {
+        id: 'publishing',
+        label: 'Publishing Queue',
+        href: '/admin/publishing',
+        icon: FiSend,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'ecosystem',
+        label: 'Content Ecosystem',
+        href: '/admin/ecosystem',
+        icon: FiCompass,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'categories',
+        label: 'Categories & Tags',
+        href: '/admin/categories',
+        icon: FiLayers,
+        requiredPermission: 'categories:manage',
+      },
+      {
+        id: 'newsletter',
+        label: 'Newsletter Hub',
+        href: '/admin/newsletter',
+        icon: FiMail,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   // ─── ANALYTICS & REVENUE ──────────────────────────────────────────────────
@@ -85,10 +123,38 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: FiTrendingUp,
     color: 'amber',
     items: [
-      { id: 'analytics', label: 'Audience Analytics', href: '/admin/analytics', icon: FiActivity, requiredPermission: 'articles:draft', badge: 'Pulse', badgeColor: 'amber' },
-      { id: 'billing', label: 'Fan Pass Billing', href: '/admin/billing', icon: FiDollarSign, requiredPermission: 'articles:draft', badge: 'MRR', badgeColor: 'green' },
-      { id: 'advertisers', label: 'Advertiser Reports', href: '/admin/advertisers', icon: FiAward, requiredPermission: 'articles:draft' },
-      { id: 'sponsorships', label: 'Sponsorships', href: '/admin/sponsorships', icon: FiShield, requiredPermission: 'articles:draft' },
+      {
+        id: 'analytics',
+        label: 'Audience Analytics',
+        href: '/admin/analytics',
+        icon: FiActivity,
+        requiredPermission: 'articles:draft',
+        badge: 'Pulse',
+        badgeColor: 'amber',
+      },
+      {
+        id: 'billing',
+        label: 'Fan Pass Billing',
+        href: '/admin/billing',
+        icon: FiDollarSign,
+        requiredPermission: 'articles:draft',
+        badge: 'MRR',
+        badgeColor: 'green',
+      },
+      {
+        id: 'advertisers',
+        label: 'Advertiser Reports',
+        href: '/admin/advertisers',
+        icon: FiAward,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'sponsorships',
+        label: 'Sponsorships',
+        href: '/admin/sponsorships',
+        icon: FiShield,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   // ─── CONTENT OPS ──────────────────────────────────────────────────────────
@@ -98,11 +164,45 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: FiGrid,
     color: 'purple',
     items: [
-      { id: 'recommendations', label: 'Recommendation Studio', href: '/admin/recommendations', icon: FiSliders, requiredPermission: 'articles:draft', badge: 'AI', badgeColor: 'purple' },
-      { id: 'distribution', label: 'Distribution Hub', href: '/admin/distribution', icon: FiShare2, requiredPermission: 'articles:draft' },
-      { id: 'search', label: 'Search Diagnostics', href: '/admin/search', icon: FiSearch, requiredPermission: 'articles:draft' },
-      { id: 'events', label: 'Stream & Telemetry', href: '/admin/events', icon: FiZap, requiredPermission: 'articles:draft', badge: 'Live', badgeColor: 'red' },
-      { id: 'warehouse', label: 'Sports Warehouse', href: '/admin/warehouse', icon: FiDatabase, requiredPermission: 'articles:draft' },
+      {
+        id: 'recommendations',
+        label: 'Recommendation Studio',
+        href: '/admin/recommendations',
+        icon: FiSliders,
+        requiredPermission: 'articles:draft',
+        badge: 'AI',
+        badgeColor: 'purple',
+      },
+      {
+        id: 'distribution',
+        label: 'Distribution Hub',
+        href: '/admin/distribution',
+        icon: FiShare2,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'search',
+        label: 'Search Diagnostics',
+        href: '/admin/search',
+        icon: FiSearch,
+        requiredPermission: 'articles:draft',
+      },
+      {
+        id: 'events',
+        label: 'Stream & Telemetry',
+        href: '/admin/events',
+        icon: FiZap,
+        requiredPermission: 'articles:draft',
+        badge: 'Live',
+        badgeColor: 'red',
+      },
+      {
+        id: 'warehouse',
+        label: 'Sports Warehouse',
+        href: '/admin/warehouse',
+        icon: FiDatabase,
+        requiredPermission: 'articles:draft',
+      },
     ],
   },
   // ─── HR & STAFF ───────────────────────────────────────────────────────────
@@ -112,14 +212,66 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: FiUsers,
     color: 'emerald',
     items: [
-      { id: 'portal', label: 'Staff Portal', href: '/admin/portal', icon: FiLayout, requiredPermission: 'articles:read', badge: 'Hub', badgeColor: 'emerald' },
-      { id: 'employees', label: 'Employees & Staff', href: '/admin/employees', icon: FiUsers, requiredPermission: 'employees:read' },
-      { id: 'contracts', label: 'Contracts & Signing', href: '/admin/employees', icon: FiFileText, requiredPermission: 'employees:manage' },
-      { id: 'reports', label: 'Daily Reports', href: '/admin/reports', icon: FiCheckSquare, requiredPermission: 'reports:read_own' },
-      { id: 'standup', label: '5 PM Stand-up', href: '/admin/standup', icon: FiCalendar, requiredPermission: 'standup:attend' },
-      { id: 'handbook', label: 'Handbook & SOPs', href: '/admin/handbook', icon: FiBookOpen, requiredPermission: 'handbook:read' },
-      { id: 'evaluations', label: 'Evaluations', href: '/admin/evaluations', icon: FiAward, requiredPermission: 'evaluations:read', badge: 'KPIs', badgeColor: 'amber' },
-      { id: 'payroll', label: 'Payroll & Allowances', href: '/admin/payroll', icon: FiDollarSign, requiredPermission: 'payroll:read' },
+      {
+        id: 'portal',
+        label: 'Staff Portal',
+        href: '/admin/portal',
+        icon: FiLayout,
+        requiredPermission: 'articles:read',
+        badge: 'Hub',
+        badgeColor: 'emerald',
+      },
+      {
+        id: 'employees',
+        label: 'Employees & Staff',
+        href: '/admin/employees',
+        icon: FiUsers,
+        requiredPermission: 'employees:read',
+      },
+      {
+        id: 'contracts',
+        label: 'Contracts & Signing',
+        href: '/admin/employees',
+        icon: FiFileText,
+        requiredPermission: 'employees:manage',
+      },
+      {
+        id: 'reports',
+        label: 'Daily Reports',
+        href: '/admin/reports',
+        icon: FiCheckSquare,
+        requiredPermission: 'reports:read_own',
+      },
+      {
+        id: 'standup',
+        label: '5 PM Stand-up',
+        href: '/admin/standup',
+        icon: FiCalendar,
+        requiredPermission: 'standup:attend',
+      },
+      {
+        id: 'handbook',
+        label: 'Handbook & SOPs',
+        href: '/admin/handbook',
+        icon: FiBookOpen,
+        requiredPermission: 'handbook:read',
+      },
+      {
+        id: 'evaluations',
+        label: 'Evaluations',
+        href: '/admin/evaluations',
+        icon: FiAward,
+        requiredPermission: 'evaluations:read',
+        badge: 'KPIs',
+        badgeColor: 'amber',
+      },
+      {
+        id: 'payroll',
+        label: 'Payroll & Allowances',
+        href: '/admin/payroll',
+        icon: FiDollarSign,
+        requiredPermission: 'payroll:read',
+      },
     ],
   },
   // ─── ADMINISTRATION ───────────────────────────────────────────────────────
@@ -130,9 +282,27 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     color: 'slate',
     requiredPermission: 'users:manage',
     items: [
-      { id: 'users', label: 'User Management', href: '/admin/users', icon: FiUserCheck, requiredPermission: 'users:manage' },
-      { id: 'system', label: 'System & Diagnostics', href: '/admin/system', icon: FiSettings, requiredPermission: 'system:settings' },
-      { id: 'deletion', label: 'Trash & Deletions', href: '/admin/deletion', icon: FiTrash2, requiredPermission: 'articles:delete' },
+      {
+        id: 'users',
+        label: 'User Management',
+        href: '/admin/users',
+        icon: FiUserCheck,
+        requiredPermission: 'users:manage',
+      },
+      {
+        id: 'system',
+        label: 'System & Diagnostics',
+        href: '/admin/system',
+        icon: FiSettings,
+        requiredPermission: 'system:settings',
+      },
+      {
+        id: 'deletion',
+        label: 'Trash & Deletions',
+        href: '/admin/deletion',
+        icon: FiTrash2,
+        requiredPermission: 'articles:delete',
+      },
     ],
   },
 ];
@@ -141,22 +311,50 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
 // Color Maps
 // ---------------------------------------------------------------------------
 const BADGE_COLORS: Record<string, string> = {
-  blue:    'bg-blue-500/20 text-blue-400',
-  amber:   'bg-amber-500/20 text-amber-400',
-  green:   'bg-emerald-500/20 text-emerald-400',
-  purple:  'bg-purple-500/20 text-purple-400',
-  red:     'bg-red-500/20 text-red-400',
+  blue: 'bg-blue-500/20 text-blue-400',
+  amber: 'bg-amber-500/20 text-amber-400',
+  green: 'bg-emerald-500/20 text-emerald-400',
+  purple: 'bg-purple-500/20 text-purple-400',
+  red: 'bg-red-500/20 text-red-400',
   emerald: 'bg-emerald-500/20 text-emerald-400',
-  slate:   'bg-slate-500/20 text-slate-400',
+  slate: 'bg-slate-500/20 text-slate-400',
 };
 
 type ColorKey = 'blue' | 'amber' | 'purple' | 'emerald' | 'slate';
-const GROUP_THEME: Record<ColorKey, { groupIcon: string; itemActive: string; itemBorder: string; groupBg: string }> = {
-  blue:    { groupIcon: 'text-blue-400',    itemActive: 'bg-blue-500/15 text-blue-300',    itemBorder: 'border-l-2 border-l-blue-400',    groupBg: 'bg-blue-500/10' },
-  amber:   { groupIcon: 'text-amber-400',   itemActive: 'bg-amber-500/15 text-amber-300',   itemBorder: 'border-l-2 border-l-amber-400',   groupBg: 'bg-amber-500/10' },
-  purple:  { groupIcon: 'text-purple-400',  itemActive: 'bg-purple-500/15 text-purple-300',  itemBorder: 'border-l-2 border-l-purple-400',  groupBg: 'bg-purple-500/10' },
-  emerald: { groupIcon: 'text-emerald-400', itemActive: 'bg-emerald-500/15 text-emerald-300', itemBorder: 'border-l-2 border-l-emerald-400', groupBg: 'bg-emerald-500/10' },
-  slate:   { groupIcon: 'text-slate-400',   itemActive: 'bg-slate-500/15 text-slate-200',   itemBorder: 'border-l-2 border-l-slate-400',   groupBg: 'bg-slate-500/10' },
+const GROUP_THEME: Record<
+  ColorKey,
+  { groupIcon: string; itemActive: string; itemBorder: string; groupBg: string }
+> = {
+  blue: {
+    groupIcon: 'text-blue-400',
+    itemActive: 'bg-blue-500/15 text-blue-300',
+    itemBorder: 'border-l-2 border-l-blue-400',
+    groupBg: 'bg-blue-500/10',
+  },
+  amber: {
+    groupIcon: 'text-amber-400',
+    itemActive: 'bg-amber-500/15 text-amber-300',
+    itemBorder: 'border-l-2 border-l-amber-400',
+    groupBg: 'bg-amber-500/10',
+  },
+  purple: {
+    groupIcon: 'text-purple-400',
+    itemActive: 'bg-purple-500/15 text-purple-300',
+    itemBorder: 'border-l-2 border-l-purple-400',
+    groupBg: 'bg-purple-500/10',
+  },
+  emerald: {
+    groupIcon: 'text-emerald-400',
+    itemActive: 'bg-emerald-500/15 text-emerald-300',
+    itemBorder: 'border-l-2 border-l-emerald-400',
+    groupBg: 'bg-emerald-500/10',
+  },
+  slate: {
+    groupIcon: 'text-slate-400',
+    itemActive: 'bg-slate-500/15 text-slate-200',
+    itemBorder: 'border-l-2 border-l-slate-400',
+    groupBg: 'bg-slate-500/10',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -186,7 +384,15 @@ interface DesktopSidebarProps {
   onToggleGroup: (id: string) => void;
 }
 
-function DesktopSidebar({ collapsed, onToggle, groups, pathname, userRole, expandedGroups, onToggleGroup }: DesktopSidebarProps) {
+function DesktopSidebar({
+  collapsed,
+  onToggle,
+  groups,
+  pathname,
+  userRole,
+  expandedGroups,
+  onToggleGroup,
+}: DesktopSidebarProps) {
   return (
     <aside
       className={`
@@ -197,7 +403,9 @@ function DesktopSidebar({ collapsed, onToggle, groups, pathname, userRole, expan
       `}
     >
       {/* Toggle button */}
-      <div className={`flex items-center border-b border-white/[0.07] px-2 py-3 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+      <div
+        className={`flex items-center border-b border-white/[0.07] px-2 py-3 ${collapsed ? 'justify-center' : 'justify-between'}`}
+      >
         {!collapsed && (
           <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 pl-1">
             Modules
@@ -208,7 +416,11 @@ function DesktopSidebar({ collapsed, onToggle, groups, pathname, userRole, expan
           className="p-1.5 rounded-lg hover:bg-white/10 text-slate-500 hover:text-white transition-colors"
           title={collapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
-          {collapsed ? <FiChevronRight size={15} /> : <FiChevronRight size={15} className="rotate-180" />}
+          {collapsed ? (
+            <FiChevronRight size={15} />
+          ) : (
+            <FiChevronRight size={15} className="rotate-180" />
+          )}
         </button>
       </div>
 
@@ -235,7 +447,9 @@ function DesktopSidebar({ collapsed, onToggle, groups, pathname, userRole, expan
                 <GroupIcon size={15} className={hasActive ? theme.groupIcon : 'text-slate-600'} />
                 {!collapsed && (
                   <>
-                    <span className={`flex-1 text-[11px] font-black uppercase tracking-wide truncate text-left ${hasActive ? 'text-white' : 'text-slate-500'}`}>
+                    <span
+                      className={`flex-1 text-[11px] font-black uppercase tracking-wide truncate text-left ${hasActive ? 'text-white' : 'text-slate-500'}`}
+                    >
                       {group.label}
                     </span>
                     <FiChevronDown
@@ -260,17 +474,23 @@ function DesktopSidebar({ collapsed, onToggle, groups, pathname, userRole, expan
                         className={`
                           flex items-center gap-2 px-2 py-1.5 rounded-lg
                           text-[12px] font-medium transition-all duration-150
-                          ${active
-                            ? `${theme.itemActive} ${theme.itemBorder} font-semibold`
-                            : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.04]'
+                          ${
+                            active
+                              ? `${theme.itemActive} ${theme.itemBorder} font-semibold`
+                              : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.04]'
                           }
                           ${collapsed ? 'justify-center' : ''}
                         `}
                       >
-                        <ItemIcon size={13} className={active ? theme.groupIcon : 'text-slate-600'} />
+                        <ItemIcon
+                          size={13}
+                          className={active ? theme.groupIcon : 'text-slate-600'}
+                        />
                         {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
                         {!collapsed && item.badge && (
-                          <span className={`text-[9px] font-black px-1 py-0.5 rounded uppercase ${BADGE_COLORS[item.badgeColor || 'slate']}`}>
+                          <span
+                            className={`text-[9px] font-black px-1 py-0.5 rounded uppercase ${BADGE_COLORS[item.badgeColor || 'slate']}`}
+                          >
                             {item.badge}
                           </span>
                         )}
@@ -344,10 +564,7 @@ function MobileBottomNav({ groups, pathname, onOpenDrawer }: MobileNavProps) {
               className={`
                 flex-1 flex flex-col items-center justify-center gap-0.5 py-3 px-1
                 transition-all duration-150 min-w-0
-                ${active
-                  ? 'text-amber-400'
-                  : 'text-slate-600 active:text-slate-300'
-                }
+                ${active ? 'text-amber-400' : 'text-slate-600 active:text-slate-300'}
               `}
             >
               <div className={`relative ${active ? 'scale-110' : ''} transition-transform`}>
@@ -356,7 +573,9 @@ function MobileBottomNav({ groups, pathname, onOpenDrawer }: MobileNavProps) {
                   <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500" />
                 )}
               </div>
-              <span className={`text-[10px] font-bold truncate w-full text-center ${active ? 'text-amber-400' : 'text-slate-600'}`}>
+              <span
+                className={`text-[10px] font-bold truncate w-full text-center ${active ? 'text-amber-400' : 'text-slate-600'}`}
+              >
                 {item.label.split(' ')[0]}
               </span>
             </Link>
@@ -389,7 +608,15 @@ interface MobileDrawerProps {
   onToggleGroup: (id: string) => void;
 }
 
-function MobileDrawer({ open, onClose, groups, pathname, userRole, expandedGroups, onToggleGroup }: MobileDrawerProps) {
+function MobileDrawer({
+  open,
+  onClose,
+  groups,
+  pathname,
+  userRole,
+  expandedGroups,
+  onToggleGroup,
+}: MobileDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Lock body scroll when open
@@ -399,7 +626,9 @@ function MobileDrawer({ open, onClose, groups, pathname, userRole, expandedGroup
     } else {
       document.body.style.overflow = '';
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   if (!open) return null;
@@ -407,10 +636,7 @@ function MobileDrawer({ open, onClose, groups, pathname, userRole, expandedGroup
   return (
     <div className="lg:hidden fixed inset-0 z-[60] flex flex-col justify-end">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Drawer Panel */}
       <div
@@ -447,17 +673,24 @@ function MobileDrawer({ open, onClose, groups, pathname, userRole, expandedGroup
             const hasActive = group.items.some((item) => isActive(pathname, item.href));
 
             return (
-              <div key={group.id} className="rounded-2xl overflow-hidden border border-white/[0.06] bg-slate-900/50">
+              <div
+                key={group.id}
+                className="rounded-2xl overflow-hidden border border-white/[0.06] bg-slate-900/50"
+              >
                 {/* Group header */}
                 <button
                   onClick={() => onToggleGroup(group.id)}
                   className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hasActive ? theme.groupBg : ''}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-7 h-7 rounded-xl ${theme.groupBg} flex items-center justify-center`}>
+                    <div
+                      className={`w-7 h-7 rounded-xl ${theme.groupBg} flex items-center justify-center`}
+                    >
                       <GroupIcon size={14} className={theme.groupIcon} />
                     </div>
-                    <span className={`text-sm font-black ${hasActive ? 'text-white' : 'text-slate-300'}`}>
+                    <span
+                      className={`text-sm font-black ${hasActive ? 'text-white' : 'text-slate-300'}`}
+                    >
                       {group.label}
                     </span>
                   </div>
@@ -481,16 +714,22 @@ function MobileDrawer({ open, onClose, groups, pathname, userRole, expandedGroup
                           className={`
                             flex items-center gap-3 px-3 py-2.5 rounded-xl
                             text-sm font-medium transition-all duration-150
-                            ${active
-                              ? `${theme.itemActive} ${theme.itemBorder} font-semibold`
-                              : 'text-slate-400 active:bg-white/5'
+                            ${
+                              active
+                                ? `${theme.itemActive} ${theme.itemBorder} font-semibold`
+                                : 'text-slate-400 active:bg-white/5'
                             }
                           `}
                         >
-                          <ItemIcon size={16} className={active ? theme.groupIcon : 'text-slate-600'} />
+                          <ItemIcon
+                            size={16}
+                            className={active ? theme.groupIcon : 'text-slate-600'}
+                          />
                           <span className="flex-1">{item.label}</span>
                           {item.badge && (
-                            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase ${BADGE_COLORS[item.badgeColor || 'slate']}`}>
+                            <span
+                              className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase ${BADGE_COLORS[item.badgeColor || 'slate']}`}
+                            >
                               {item.badge}
                             </span>
                           )}
@@ -553,8 +792,7 @@ export default function AdminSidebar({
     });
   }, [pathname]);
 
-  const toggleGroup = (id: string) =>
-    setExpandedGroups((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleGroup = (id: string) => setExpandedGroups((prev) => ({ ...prev, [id]: !prev[id] }));
 
   // Filter groups & items by role
   const accessibleGroups = SIDEBAR_GROUPS.map((group) => {

@@ -234,7 +234,10 @@ export function CricketScreen() {
 
   // Group by league for SectionList
   const sections = useMemo(() => {
-    const map = new Map<string, { title: string; league_key?: string | number; data: CricketEvent[] }>();
+    const map = new Map<
+      string,
+      { title: string; league_key?: string | number; data: CricketEvent[] }
+    >();
 
     currentMatchesList.forEach((match) => {
       const key = match.league_name || 'Cricket Fixtures';
@@ -543,7 +546,9 @@ export function CricketScreen() {
           </Pressable>
         )}
         contentContainerStyle={styles.listContent}
-        ListFooterComponent={<RecommendedFeed sportSlug="cricket" title="Recommended Cricket Intel" />}
+        ListFooterComponent={
+          <RecommendedFeed sportSlug="cricket" title="Recommended Cricket Intel" />
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
         }

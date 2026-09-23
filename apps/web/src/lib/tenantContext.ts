@@ -56,10 +56,17 @@ export async function resolveTenantContext(
         if (sub && sub !== 'www' && sub !== 'admin' && sub !== 'api') {
           tenantSlug = sub;
         }
-      } else if (cleanHost !== 'goalmills.com' && cleanHost !== 'localhost' && cleanHost !== '127.0.0.1') {
+      } else if (
+        cleanHost !== 'goalmills.com' &&
+        cleanHost !== 'localhost' &&
+        cleanHost !== '127.0.0.1'
+      ) {
         try {
           await dbConnect();
-          const foundTenant = await Tenant.findOne({ customDomain: cleanHost, status: 'active' }).lean();
+          const foundTenant = await Tenant.findOne({
+            customDomain: cleanHost,
+            status: 'active',
+          }).lean();
           if (foundTenant) {
             return {
               tenantId: foundTenant._id.toString(),

@@ -63,7 +63,9 @@ export function buildMatchSlug(match: {
 }): string {
   const home = slugify(match.event_home_team || 'home');
   const away = slugify(match.event_away_team || 'away');
-  const year = match.event_date ? match.event_date.split('-')[0] : new Date().getFullYear().toString();
+  const year = match.event_date
+    ? match.event_date.split('-')[0]
+    : new Date().getFullYear().toString();
   const key = match.event_key;
   return key ? `${home}-vs-${away}-${year}-${key}` : `${home}-vs-${away}-${year}`;
 }
@@ -85,12 +87,24 @@ export interface ParsedMatchSlug {
  */
 export function parseMatchSlug(slug: string): ParsedMatchSlug {
   if (!slug) {
-    return { rawSlug: '', eventKey: '', homeSlug: '', awaySlug: '', year: new Date().getFullYear().toString() };
+    return {
+      rawSlug: '',
+      eventKey: '',
+      homeSlug: '',
+      awaySlug: '',
+      year: new Date().getFullYear().toString(),
+    };
   }
 
   // Pure numeric ID: e.g. "1869244"
   if (/^\d+$/.test(slug)) {
-    return { rawSlug: slug, eventKey: slug, homeSlug: '', awaySlug: '', year: new Date().getFullYear().toString() };
+    return {
+      rawSlug: slug,
+      eventKey: slug,
+      homeSlug: '',
+      awaySlug: '',
+      year: new Date().getFullYear().toString(),
+    };
   }
 
   // Legacy format: {home}-vs-{away}-YYYY-MM-DD-{key}

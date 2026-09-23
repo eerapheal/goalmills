@@ -12,11 +12,7 @@ interface CricketMatchCardProps {
   hideLeague?: boolean;
 }
 
-export function CricketMatchCard({
-  match,
-  onPress,
-  hideLeague = false,
-}: CricketMatchCardProps) {
+export function CricketMatchCard({ match, onPress, hideLeague = false }: CricketMatchCardProps) {
   const router = useRouter();
   const [homeImgError, setHomeImgError] = useState(false);
   const [awayImgError, setAwayImgError] = useState(false);
@@ -44,7 +40,12 @@ export function CricketMatchCard({
   const formattedTime = useMemo(() => {
     if (match?.event_time) return match.event_time.slice(0, 5);
     return match?.event_date_start || match?.event_date_stop || (match as any)?.event_date || 'TBD';
-  }, [match?.event_time, match?.event_date_start, match?.event_date_stop, (match as any)?.event_date]);
+  }, [
+    match?.event_time,
+    match?.event_date_start,
+    match?.event_date_stop,
+    (match as any)?.event_date,
+  ]);
 
   const statusDisplay = useMemo(() => {
     if (isLive) return 'LIVE';
@@ -56,7 +57,11 @@ export function CricketMatchCard({
     return buildMatchSlug({
       event_home_team: match?.event_home_team,
       event_away_team: match?.event_away_team,
-      event_date: match?.event_date_start || match?.event_date_stop || (match as any)?.event_date || undefined,
+      event_date:
+        match?.event_date_start ||
+        match?.event_date_stop ||
+        (match as any)?.event_date ||
+        undefined,
       event_key: match?.event_key,
     });
   }, [match]);
@@ -172,11 +177,7 @@ export function CricketMatchCard({
           <div className="flex items-baseline space-x-1.5 pl-2">
             <span
               className={`font-mono font-black text-xs sm:text-sm tabular-nums ${
-                isLive
-                  ? 'text-red-400'
-                  : isFinished
-                    ? 'text-white'
-                    : 'text-slate-500'
+                isLive ? 'text-red-400' : isFinished ? 'text-white' : 'text-slate-500'
               }`}
             >
               {match?.event_home_final_result || (isUpcoming ? '-' : '0')}
@@ -216,11 +217,7 @@ export function CricketMatchCard({
           <div className="flex items-baseline space-x-1.5 pl-2">
             <span
               className={`font-mono font-black text-xs sm:text-sm tabular-nums ${
-                isLive
-                  ? 'text-red-400'
-                  : isFinished
-                    ? 'text-white'
-                    : 'text-slate-500'
+                isLive ? 'text-red-400' : isFinished ? 'text-white' : 'text-slate-500'
               }`}
             >
               {match?.event_away_final_result || (isUpcoming ? '-' : '0')}
@@ -250,9 +247,7 @@ export function CricketMatchCard({
 
       {/* Footer Info / SEO Link */}
       <div className="mt-2 flex items-center justify-end text-[10px] text-slate-500 group-hover:text-red-400 transition-colors">
-        <span className="flex items-center gap-1 font-semibold">
-          Match Center →
-        </span>
+        <span className="flex items-center gap-1 font-semibold">Match Center →</span>
       </div>
     </div>
   );

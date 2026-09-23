@@ -112,7 +112,14 @@ export interface StatLeader {
 export interface CompGroup {
   region: string;
   icon: string;
-  comps: { name: string; flag: string; tier: string; season: string; country: string; href?: string }[];
+  comps: {
+    name: string;
+    flag: string;
+    tier: string;
+    season: string;
+    country: string;
+    href?: string;
+  }[];
 }
 
 export interface TeamHub {
@@ -219,55 +226,102 @@ export function getBasketballTeamLogo(teamName: string): string {
   const t = teamName.toLowerCase().trim();
 
   // NBA Franchises (Official high-res ESPN CDN vectors)
-  if (t.includes('celtic') || t.includes('boston')) return 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png';
-  if (t.includes('heat') || t.includes('miami')) return 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png';
-  if (t.includes('laker') || t.includes('los angeles lakers') || t === 'la lakers') return 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png';
-  if (t.includes('warrior') || t.includes('golden state')) return 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png';
-  if (t.includes('nugget') || t.includes('denver')) return 'https://a.espncdn.com/i/teamlogos/nba/500/den.png';
-  if (t.includes('sun') || t.includes('phoenix')) return 'https://a.espncdn.com/i/teamlogos/nba/500/phx.png';
-  if (t.includes('buck') || t.includes('milwaukee')) return 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png';
-  if (t.includes('76er') || t.includes('sixer') || t.includes('philadelphia')) return 'https://a.espncdn.com/i/teamlogos/nba/500/phi.png';
-  if (t.includes('maverick') || t.includes('dallas')) return 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png';
-  if (t.includes('thunder') || t.includes('okc') || t.includes('oklahoma')) return 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png';
-  if (t.includes('knick') || t.includes('ny knicks') || t.includes('new york')) return 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png';
-  if (t.includes('bull') || t.includes('chicago')) return 'https://a.espncdn.com/i/teamlogos/nba/500/chi.png';
-  if (t.includes('cavalier') || t.includes('cleveland')) return 'https://a.espncdn.com/i/teamlogos/nba/500/cle.png';
-  if (t.includes('pacer') || t.includes('indiana')) return 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png';
-  if (t.includes('magic') || t.includes('orlando')) return 'https://a.espncdn.com/i/teamlogos/nba/500/orl.png';
-  if (t.includes('timberwol') || t.includes('minnesota')) return 'https://a.espncdn.com/i/teamlogos/nba/500/min.png';
-  if (t.includes('clipper') || t.includes('la clippers')) return 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png';
-  if (t.includes('grizzlie') || t.includes('memphis')) return 'https://a.espncdn.com/i/teamlogos/nba/500/mem.png';
-  if (t.includes('pelican') || t.includes('new orleans')) return 'https://a.espncdn.com/i/teamlogos/nba/500/nop.png';
-  if (t.includes('rocket') || t.includes('houston')) return 'https://a.espncdn.com/i/teamlogos/nba/500/hou.png';
-  if (t.includes('spur') || t.includes('san antonio')) return 'https://a.espncdn.com/i/teamlogos/nba/500/sas.png';
-  if (t.includes('raptor') || t.includes('toronto')) return 'https://a.espncdn.com/i/teamlogos/nba/500/tor.png';
-  if (t.includes('net') || t.includes('brooklyn')) return 'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png';
-  if (t.includes('hawk') || t.includes('atlanta')) return 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png';
-  if (t.includes('hornets') || t.includes('charlotte')) return 'https://a.espncdn.com/i/teamlogos/nba/500/cha.png';
-  if (t.includes('piston') || t.includes('detroit')) return 'https://a.espncdn.com/i/teamlogos/nba/500/det.png';
-  if (t.includes('wizard') || t.includes('washington')) return 'https://a.espncdn.com/i/teamlogos/nba/500/was.png';
-  if (t.includes('blazer') || t.includes('portland')) return 'https://a.espncdn.com/i/teamlogos/nba/500/por.png';
-  if (t.includes('jazz') || t.includes('utah')) return 'https://a.espncdn.com/i/teamlogos/nba/500/uta.png';
-  if (t.includes('king') && !t.includes('sydney')) return 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png';
+  if (t.includes('celtic') || t.includes('boston'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png';
+  if (t.includes('heat') || t.includes('miami'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png';
+  if (t.includes('laker') || t.includes('los angeles lakers') || t === 'la lakers')
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png';
+  if (t.includes('warrior') || t.includes('golden state'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png';
+  if (t.includes('nugget') || t.includes('denver'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/den.png';
+  if (t.includes('sun') || t.includes('phoenix'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/phx.png';
+  if (t.includes('buck') || t.includes('milwaukee'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png';
+  if (t.includes('76er') || t.includes('sixer') || t.includes('philadelphia'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/phi.png';
+  if (t.includes('maverick') || t.includes('dallas'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png';
+  if (t.includes('thunder') || t.includes('okc') || t.includes('oklahoma'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png';
+  if (t.includes('knick') || t.includes('ny knicks') || t.includes('new york'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png';
+  if (t.includes('bull') || t.includes('chicago'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/chi.png';
+  if (t.includes('cavalier') || t.includes('cleveland'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/cle.png';
+  if (t.includes('pacer') || t.includes('indiana'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png';
+  if (t.includes('magic') || t.includes('orlando'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/orl.png';
+  if (t.includes('timberwol') || t.includes('minnesota'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/min.png';
+  if (t.includes('clipper') || t.includes('la clippers'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png';
+  if (t.includes('grizzlie') || t.includes('memphis'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/mem.png';
+  if (t.includes('pelican') || t.includes('new orleans'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/nop.png';
+  if (t.includes('rocket') || t.includes('houston'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/hou.png';
+  if (t.includes('spur') || t.includes('san antonio'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/sas.png';
+  if (t.includes('raptor') || t.includes('toronto'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/tor.png';
+  if (t.includes('net') || t.includes('brooklyn'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png';
+  if (t.includes('hawk') || t.includes('atlanta'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png';
+  if (t.includes('hornets') || t.includes('charlotte'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/cha.png';
+  if (t.includes('piston') || t.includes('detroit'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/det.png';
+  if (t.includes('wizard') || t.includes('washington'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/was.png';
+  if (t.includes('blazer') || t.includes('portland'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/por.png';
+  if (t.includes('jazz') || t.includes('utah'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/uta.png';
+  if (t.includes('king') && !t.includes('sydney'))
+    return 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png';
 
   // EuroLeague / Global / BAL Clubs
-  if (t.includes('sydney kings')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/nbl/500/1004.png';
-  if (t.includes('melbourne united')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/nbl/500/1001.png';
-  if (t.includes('real madrid')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/104.png';
-  if (t.includes('cska')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/102.png';
-  if (t.includes('fenerbah')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/103.png';
-  if (t.includes('efes') || t.includes('anadolu')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/101.png';
-  if (t.includes('barcelona')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/100.png';
-  if (t.includes('olympiak')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/109.png';
-  if (t.includes('panathinaikos')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/108.png';
-  if (t.includes('monaco')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/115.png';
-  if (t.includes('maccabi')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/106.png';
-  if (t.includes('baskonia')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/107.png';
-  if (t.includes('virtus')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/110.png';
-  if (t.includes('unicaja')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/112.png';
-  if (t.includes('valencia')) return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/114.png';
-  if (t.includes('petro') || t.includes('luanda')) return `https://ui-avatars.com/api/?name=Petro+Luanda&background=cc0000&color=ffffff&bold=true&size=128`;
-  if (t.includes('monastir')) return `https://ui-avatars.com/api/?name=US+Monastir&background=003366&color=ffffff&bold=true&size=128`;
+  if (t.includes('sydney kings'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/nbl/500/1004.png';
+  if (t.includes('melbourne united'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/nbl/500/1001.png';
+  if (t.includes('real madrid'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/104.png';
+  if (t.includes('cska'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/102.png';
+  if (t.includes('fenerbah'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/103.png';
+  if (t.includes('efes') || t.includes('anadolu'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/101.png';
+  if (t.includes('barcelona'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/100.png';
+  if (t.includes('olympiak'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/109.png';
+  if (t.includes('panathinaikos'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/108.png';
+  if (t.includes('monaco'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/115.png';
+  if (t.includes('maccabi'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/106.png';
+  if (t.includes('baskonia'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/107.png';
+  if (t.includes('virtus'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/110.png';
+  if (t.includes('unicaja'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/112.png';
+  if (t.includes('valencia'))
+    return 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/114.png';
+  if (t.includes('petro') || t.includes('luanda'))
+    return `https://ui-avatars.com/api/?name=Petro+Luanda&background=cc0000&color=ffffff&bold=true&size=128`;
+  if (t.includes('monastir'))
+    return `https://ui-avatars.com/api/?name=US+Monastir&background=003366&color=ffffff&bold=true&size=128`;
   if (t.includes('nigeria') || t.includes('patriot')) return 'https://flagcdn.com/w80/ng.png';
   if (t.includes('rwanda')) return 'https://flagcdn.com/w80/rw.png';
   if (t.includes('angola')) return 'https://flagcdn.com/w80/ao.png';
@@ -297,16 +351,24 @@ export function DynamicTeamLogo({
   }, [name, logoUrl]);
 
   return (
-    <div className={`relative flex items-center justify-center rounded-lg overflow-hidden bg-slate-900/60 border border-slate-700/50 flex-shrink-0 ${className}`}>
+    <div
+      className={`relative flex items-center justify-center rounded-lg overflow-hidden bg-slate-900/60 border border-slate-700/50 flex-shrink-0 ${className}`}
+    >
       <img
-        src={hasError ? `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'B')}&background=0f172a&color=f97316&bold=true&size=128` : imgSrc}
+        src={
+          hasError
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'B')}&background=0f172a&color=f97316&bold=true&size=128`
+            : imgSrc
+        }
         alt={name}
         loading="lazy"
         className="w-full h-full object-contain p-0.5"
         onError={() => {
           if (!hasError) {
             setHasError(true);
-            setImgSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'B')}&background=0f172a&color=f97316&bold=true&size=128`);
+            setImgSrc(
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'B')}&background=0f172a&color=f97316&bold=true&size=128`
+            );
           }
         }}
       />
@@ -331,7 +393,9 @@ export function DynamicPlayerAvatar({
   }, [photo, name, fallback]);
 
   return (
-    <div className={`relative rounded-full overflow-hidden bg-slate-800 border border-slate-700 flex-shrink-0 ${className}`}>
+    <div
+      className={`relative rounded-full overflow-hidden bg-slate-800 border border-slate-700 flex-shrink-0 ${className}`}
+    >
       <img
         src={src}
         alt={name}
@@ -441,8 +505,8 @@ function GameCard({
                 isLive
                   ? 'text-white bg-orange-500/20 border border-orange-500/40'
                   : isFT
-                  ? 'text-slate-200 bg-slate-800/50'
-                  : 'text-slate-500'
+                    ? 'text-slate-200 bg-slate-800/50'
+                    : 'text-slate-500'
               }`}
             >
               {g.hScore !== null ? g.hScore : '—'}
@@ -462,8 +526,8 @@ function GameCard({
                 isLive
                   ? 'text-white bg-orange-500/20 border border-orange-500/40'
                   : isFT
-                  ? 'text-slate-200 bg-slate-800/50'
-                  : 'text-slate-500'
+                    ? 'text-slate-200 bg-slate-800/50'
+                    : 'text-slate-500'
               }`}
             >
               {g.aScore !== null ? g.aScore : '—'}
@@ -506,13 +570,7 @@ function GameCard({
   );
 }
 
-export function QuarterBoxScoreModal({
-  game,
-  onClose,
-}: {
-  game: GameItem;
-  onClose: () => void;
-}) {
+export function QuarterBoxScoreModal({ game, onClose }: { game: GameItem; onClose: () => void }) {
   const isLive = game.status === 'LIVE' || game.status === 'HT' || game.status === 'OT';
   const isFT = game.status === 'FT';
   const quarters = getGameQuarters(game);
@@ -572,7 +630,11 @@ export function QuarterBoxScoreModal({
           <div className="grid grid-cols-3 items-center text-center p-4 bg-[#050b14] rounded-2xl border border-slate-800/80">
             {/* Home */}
             <div className="flex flex-col items-center">
-              <DynamicTeamLogo name={game.home} logoUrl={game.homeLogo} className="w-14 h-14 mb-2 shadow-md" />
+              <DynamicTeamLogo
+                name={game.home}
+                logoUrl={game.homeLogo}
+                className="w-14 h-14 mb-2 shadow-md"
+              />
               <span className="text-sm font-black text-white">{game.home}</span>
               <span className="text-2xl sm:text-3xl font-black text-orange-400 mt-1 tabular-nums">
                 {game.hScore !== null ? game.hScore : '—'}
@@ -589,7 +651,11 @@ export function QuarterBoxScoreModal({
             </div>
             {/* Away */}
             <div className="flex flex-col items-center">
-              <DynamicTeamLogo name={game.away} logoUrl={game.awayLogo} className="w-14 h-14 mb-2 shadow-md" />
+              <DynamicTeamLogo
+                name={game.away}
+                logoUrl={game.awayLogo}
+                className="w-14 h-14 mb-2 shadow-md"
+              />
               <span className="text-sm font-black text-white">{game.away}</span>
               <span className="text-2xl sm:text-3xl font-black text-orange-400 mt-1 tabular-nums">
                 {game.aScore !== null ? game.aScore : '—'}
@@ -618,27 +684,43 @@ export function QuarterBoxScoreModal({
                 <tbody className="divide-y divide-slate-800/60 font-mono">
                   <tr>
                     <td className="py-2.5 px-3 text-left font-sans font-bold text-slate-200 flex items-center gap-2">
-                      <DynamicTeamLogo name={game.home} logoUrl={game.homeLogo} className="w-4 h-4" />
+                      <DynamicTeamLogo
+                        name={game.home}
+                        logoUrl={game.homeLogo}
+                        className="w-4 h-4"
+                      />
                       <span className="truncate">{game.home}</span>
                     </td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q1H}</td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q2H}</td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q3H}</td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q4H}</td>
-                    {quarters.otH !== undefined && <td className="py-2.5 px-2 text-amber-400">{quarters.otH}</td>}
-                    <td className="py-2.5 px-3 text-right font-bold text-orange-400 text-sm">{game.hScore ?? quarters.q1H + quarters.q2H + quarters.q3H + quarters.q4H}</td>
+                    {quarters.otH !== undefined && (
+                      <td className="py-2.5 px-2 text-amber-400">{quarters.otH}</td>
+                    )}
+                    <td className="py-2.5 px-3 text-right font-bold text-orange-400 text-sm">
+                      {game.hScore ?? quarters.q1H + quarters.q2H + quarters.q3H + quarters.q4H}
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-2.5 px-3 text-left font-sans font-bold text-slate-200 flex items-center gap-2">
-                      <DynamicTeamLogo name={game.away} logoUrl={game.awayLogo} className="w-4 h-4" />
+                      <DynamicTeamLogo
+                        name={game.away}
+                        logoUrl={game.awayLogo}
+                        className="w-4 h-4"
+                      />
                       <span className="truncate">{game.away}</span>
                     </td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q1A}</td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q2A}</td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q3A}</td>
                     <td className="py-2.5 px-2 text-slate-300">{quarters.q4A}</td>
-                    {quarters.otA !== undefined && <td className="py-2.5 px-2 text-amber-400">{quarters.otA}</td>}
-                    <td className="py-2.5 px-3 text-right font-bold text-orange-400 text-sm">{game.aScore ?? quarters.q1A + quarters.q2A + quarters.q3A + quarters.q4A}</td>
+                    {quarters.otA !== undefined && (
+                      <td className="py-2.5 px-2 text-amber-400">{quarters.otA}</td>
+                    )}
+                    <td className="py-2.5 px-3 text-right font-bold text-orange-400 text-sm">
+                      {game.aScore ?? quarters.q1A + quarters.q2A + quarters.q3A + quarters.q4A}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -652,21 +734,59 @@ export function QuarterBoxScoreModal({
             </h4>
             <div className="space-y-3 bg-[#060c18] border border-slate-800 rounded-2xl p-4">
               {[
-                { label: 'Field Goal %', hVal: stats.fgH, aVal: stats.fgA, hPercent: parseFloat(stats.fgH), aPercent: parseFloat(stats.fgA) },
-                { label: '3-Point %', hVal: stats.threePtH, aVal: stats.threePtA, hPercent: parseFloat(stats.threePtH), aPercent: parseFloat(stats.threePtA) },
-                { label: 'Total Rebounds', hVal: String(stats.rebH), aVal: String(stats.rebA), hPercent: (stats.rebH / (stats.rebH + stats.rebA)) * 100, aPercent: (stats.rebA / (stats.rebH + stats.rebA)) * 100 },
-                { label: 'Turnovers', hVal: String(stats.toH), aVal: String(stats.toA), hPercent: (stats.toH / (stats.toH + stats.toA)) * 100, aPercent: (stats.toA / (stats.toH + stats.toA)) * 100 },
-                { label: 'Fast Break Points', hVal: String(stats.fastBreakH), aVal: String(stats.fastBreakA), hPercent: (stats.fastBreakH / (stats.fastBreakH + stats.fastBreakA)) * 100, aPercent: (stats.fastBreakA / (stats.fastBreakH + stats.fastBreakA)) * 100 },
+                {
+                  label: 'Field Goal %',
+                  hVal: stats.fgH,
+                  aVal: stats.fgA,
+                  hPercent: parseFloat(stats.fgH),
+                  aPercent: parseFloat(stats.fgA),
+                },
+                {
+                  label: '3-Point %',
+                  hVal: stats.threePtH,
+                  aVal: stats.threePtA,
+                  hPercent: parseFloat(stats.threePtH),
+                  aPercent: parseFloat(stats.threePtA),
+                },
+                {
+                  label: 'Total Rebounds',
+                  hVal: String(stats.rebH),
+                  aVal: String(stats.rebA),
+                  hPercent: (stats.rebH / (stats.rebH + stats.rebA)) * 100,
+                  aPercent: (stats.rebA / (stats.rebH + stats.rebA)) * 100,
+                },
+                {
+                  label: 'Turnovers',
+                  hVal: String(stats.toH),
+                  aVal: String(stats.toA),
+                  hPercent: (stats.toH / (stats.toH + stats.toA)) * 100,
+                  aPercent: (stats.toA / (stats.toH + stats.toA)) * 100,
+                },
+                {
+                  label: 'Fast Break Points',
+                  hVal: String(stats.fastBreakH),
+                  aVal: String(stats.fastBreakA),
+                  hPercent: (stats.fastBreakH / (stats.fastBreakH + stats.fastBreakA)) * 100,
+                  aPercent: (stats.fastBreakA / (stats.fastBreakH + stats.fastBreakA)) * 100,
+                },
               ].map((item) => (
                 <div key={item.label} className="space-y-1">
                   <div className="flex justify-between text-[11px] font-bold">
                     <span className="text-orange-400 font-mono">{item.hVal}</span>
-                    <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">{item.label}</span>
+                    <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+                      {item.label}
+                    </span>
                     <span className="text-amber-400 font-mono">{item.aVal}</span>
                   </div>
                   <div className="flex h-1.5 rounded-full overflow-hidden bg-slate-800 gap-0.5">
-                    <div className="bg-orange-500 rounded-l-full" style={{ width: `${item.hPercent}%` }} />
-                    <div className="bg-amber-500 rounded-r-full" style={{ width: `${item.aPercent}%` }} />
+                    <div
+                      className="bg-orange-500 rounded-l-full"
+                      style={{ width: `${item.hPercent}%` }}
+                    />
+                    <div
+                      className="bg-amber-500 rounded-r-full"
+                      style={{ width: `${item.aPercent}%` }}
+                    />
                   </div>
                 </div>
               ))}
@@ -725,13 +845,15 @@ export function OddsBetSlipCalculator({
           Interactive Bet Slip & Payout Simulator
         </h4>
         <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
-          Click any point spread, moneyline, or over/under line in the odds board to simulate payouts and track consensus movement.
+          Click any point spread, moneyline, or over/under line in the odds board to simulate
+          payouts and track consensus movement.
         </p>
       </div>
     );
   }
 
-  const oddsDisplay = oddsFormat === 'decimal' ? selectedPick.oddsDecimal.toFixed(2) : selectedPick.oddsAmerican;
+  const oddsDisplay =
+    oddsFormat === 'decimal' ? selectedPick.oddsDecimal.toFixed(2) : selectedPick.oddsAmerican;
   const potentialReturn = (stake * selectedPick.oddsDecimal).toFixed(2);
   const potentialProfit = (stake * (selectedPick.oddsDecimal - 1)).toFixed(2);
 
@@ -803,19 +925,29 @@ export function OddsBetSlipCalculator({
       {/* Output Return & Profit */}
       <div className="grid grid-cols-2 gap-2 p-3 bg-[#060c18] rounded-xl border border-slate-800 text-center">
         <div>
-          <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Total Payout</span>
+          <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">
+            Total Payout
+          </span>
           <p className="text-sm font-mono font-black text-white mt-0.5">${potentialReturn}</p>
         </div>
         <div>
-          <span className="text-[9px] uppercase tracking-wider text-emerald-400 font-bold">Est. Profit</span>
-          <p className="text-sm font-mono font-black text-emerald-400 mt-0.5">+${potentialProfit}</p>
+          <span className="text-[9px] uppercase tracking-wider text-emerald-400 font-bold">
+            Est. Profit
+          </span>
+          <p className="text-sm font-mono font-black text-emerald-400 mt-0.5">
+            +${potentialProfit}
+          </p>
         </div>
       </div>
 
       {/* Action Button */}
       <button
         type="button"
-        onClick={() => onToast(`Tracked ${selectedPick.team} (${selectedPick.line}) @ ${oddsDisplay}! Real-time line alerts configured.`)}
+        onClick={() =>
+          onToast(
+            `Tracked ${selectedPick.team} (${selectedPick.line}) @ ${oddsDisplay}! Real-time line alerts configured.`
+          )
+        }
         className="w-full py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white text-xs font-black uppercase tracking-widest shadow-md shadow-orange-600/20 transition-all cursor-pointer"
       >
         Track Consensus Line Alerts
@@ -1116,101 +1248,1037 @@ const RESULTS_BASELINE: GameItem[] = [
 ];
 
 const NBA_EAST_STANDINGS: StandingsRow[] = [
-  { pos: 1, team: 'Boston Celtics', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png', w: 64, l: 18, pct: '.780', gb: '—', ppg: 120.6, oppg: 109.2, form: ['W', 'W', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'NBA' },
-  { pos: 2, team: 'New York Knicks', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png', w: 50, l: 32, pct: '.610', gb: '14.0', ppg: 112.8, oppg: 108.2, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'NBA' },
-  { pos: 3, team: 'Milwaukee Bucks', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png', w: 49, l: 33, pct: '.598', gb: '15.0', ppg: 119.0, oppg: 116.4, form: ['L', 'W', 'W', 'L', 'L'], zone: 'playoffs', conf: 'East', league: 'NBA' },
-  { pos: 4, team: 'Cleveland Cavaliers', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/cle.png', w: 48, l: 34, pct: '.585', gb: '16.0', ppg: 112.6, oppg: 110.2, form: ['W', 'L', 'W', 'W', 'L'], zone: 'playoffs', conf: 'East', league: 'NBA' },
-  { pos: 5, team: 'Orlando Magic', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/orl.png', w: 47, l: 35, pct: '.573', gb: '17.0', ppg: 110.4, oppg: 108.4, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'NBA' },
-  { pos: 6, team: 'Indiana Pacers', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png', w: 47, l: 35, pct: '.573', gb: '17.0', ppg: 123.3, oppg: 120.2, form: ['W', 'W', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'NBA' },
-  { pos: 7, team: 'Philadelphia 76ers', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/phi.png', w: 47, l: 35, pct: '.573', gb: '17.0', ppg: 114.6, oppg: 111.5, form: ['W', 'W', 'W', 'W', 'W'], zone: 'playin', conf: 'East', league: 'NBA' },
-  { pos: 8, team: 'Miami Heat', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png', w: 46, l: 36, pct: '.561', gb: '18.0', ppg: 110.1, oppg: 108.4, form: ['W', 'L', 'W', 'L', 'W'], zone: 'playin', conf: 'East', league: 'NBA' },
-  { pos: 9, team: 'Chicago Bulls', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/chi.png', w: 39, l: 43, pct: '.476', gb: '25.0', ppg: 112.3, oppg: 113.7, form: ['L', 'W', 'L', 'W', 'L'], zone: 'playin', conf: 'East', league: 'NBA' },
-  { pos: 10, team: 'Atlanta Hawks', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png', w: 36, l: 46, pct: '.439', gb: '28.0', ppg: 118.3, oppg: 120.5, form: ['L', 'L', 'L', 'L', 'L'], zone: 'playin', conf: 'East', league: 'NBA' },
-  { pos: 11, team: 'Brooklyn Nets', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png', w: 32, l: 50, pct: '.390', gb: '32.0', ppg: 110.4, oppg: 113.3, form: ['L', 'W', 'L', 'L', 'W'], zone: 'lottery', conf: 'East', league: 'NBA' },
-  { pos: 12, team: 'Toronto Raptors', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/tor.png', w: 25, l: 57, pct: '.305', gb: '39.0', ppg: 112.4, oppg: 118.8, form: ['L', 'L', 'L', 'W', 'L'], zone: 'lottery', conf: 'East', league: 'NBA' },
-  { pos: 13, team: 'Charlotte Hornets', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/cha.png', w: 21, l: 61, pct: '.256', gb: '43.0', ppg: 106.6, oppg: 116.8, form: ['W', 'L', 'L', 'L', 'L'], zone: 'lottery', conf: 'East', league: 'NBA' },
-  { pos: 14, team: 'Washington Wizards', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/was.png', w: 15, l: 67, pct: '.183', gb: '49.0', ppg: 112.8, oppg: 123.0, form: ['L', 'L', 'L', 'L', 'L'], zone: 'lottery', conf: 'East', league: 'NBA' },
-  { pos: 15, team: 'Detroit Pistons', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/det.png', w: 14, l: 68, pct: '.171', gb: '50.0', ppg: 109.9, oppg: 119.0, form: ['L', 'L', 'L', 'L', 'L'], zone: 'lottery', conf: 'East', league: 'NBA' },
+  {
+    pos: 1,
+    team: 'Boston Celtics',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
+    w: 64,
+    l: 18,
+    pct: '.780',
+    gb: '—',
+    ppg: 120.6,
+    oppg: 109.2,
+    form: ['W', 'W', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 2,
+    team: 'New York Knicks',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png',
+    w: 50,
+    l: 32,
+    pct: '.610',
+    gb: '14.0',
+    ppg: 112.8,
+    oppg: 108.2,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 3,
+    team: 'Milwaukee Bucks',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
+    w: 49,
+    l: 33,
+    pct: '.598',
+    gb: '15.0',
+    ppg: 119.0,
+    oppg: 116.4,
+    form: ['L', 'W', 'W', 'L', 'L'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 4,
+    team: 'Cleveland Cavaliers',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/cle.png',
+    w: 48,
+    l: 34,
+    pct: '.585',
+    gb: '16.0',
+    ppg: 112.6,
+    oppg: 110.2,
+    form: ['W', 'L', 'W', 'W', 'L'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 5,
+    team: 'Orlando Magic',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/orl.png',
+    w: 47,
+    l: 35,
+    pct: '.573',
+    gb: '17.0',
+    ppg: 110.4,
+    oppg: 108.4,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 6,
+    team: 'Indiana Pacers',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png',
+    w: 47,
+    l: 35,
+    pct: '.573',
+    gb: '17.0',
+    ppg: 123.3,
+    oppg: 120.2,
+    form: ['W', 'W', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 7,
+    team: 'Philadelphia 76ers',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/phi.png',
+    w: 47,
+    l: 35,
+    pct: '.573',
+    gb: '17.0',
+    ppg: 114.6,
+    oppg: 111.5,
+    form: ['W', 'W', 'W', 'W', 'W'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 8,
+    team: 'Miami Heat',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png',
+    w: 46,
+    l: 36,
+    pct: '.561',
+    gb: '18.0',
+    ppg: 110.1,
+    oppg: 108.4,
+    form: ['W', 'L', 'W', 'L', 'W'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 9,
+    team: 'Chicago Bulls',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/chi.png',
+    w: 39,
+    l: 43,
+    pct: '.476',
+    gb: '25.0',
+    ppg: 112.3,
+    oppg: 113.7,
+    form: ['L', 'W', 'L', 'W', 'L'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 10,
+    team: 'Atlanta Hawks',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
+    w: 36,
+    l: 46,
+    pct: '.439',
+    gb: '28.0',
+    ppg: 118.3,
+    oppg: 120.5,
+    form: ['L', 'L', 'L', 'L', 'L'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 11,
+    team: 'Brooklyn Nets',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png',
+    w: 32,
+    l: 50,
+    pct: '.390',
+    gb: '32.0',
+    ppg: 110.4,
+    oppg: 113.3,
+    form: ['L', 'W', 'L', 'L', 'W'],
+    zone: 'lottery',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 12,
+    team: 'Toronto Raptors',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/tor.png',
+    w: 25,
+    l: 57,
+    pct: '.305',
+    gb: '39.0',
+    ppg: 112.4,
+    oppg: 118.8,
+    form: ['L', 'L', 'L', 'W', 'L'],
+    zone: 'lottery',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 13,
+    team: 'Charlotte Hornets',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/cha.png',
+    w: 21,
+    l: 61,
+    pct: '.256',
+    gb: '43.0',
+    ppg: 106.6,
+    oppg: 116.8,
+    form: ['W', 'L', 'L', 'L', 'L'],
+    zone: 'lottery',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 14,
+    team: 'Washington Wizards',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/was.png',
+    w: 15,
+    l: 67,
+    pct: '.183',
+    gb: '49.0',
+    ppg: 112.8,
+    oppg: 123.0,
+    form: ['L', 'L', 'L', 'L', 'L'],
+    zone: 'lottery',
+    conf: 'East',
+    league: 'NBA',
+  },
+  {
+    pos: 15,
+    team: 'Detroit Pistons',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/det.png',
+    w: 14,
+    l: 68,
+    pct: '.171',
+    gb: '50.0',
+    ppg: 109.9,
+    oppg: 119.0,
+    form: ['L', 'L', 'L', 'L', 'L'],
+    zone: 'lottery',
+    conf: 'East',
+    league: 'NBA',
+  },
 ];
 
 const NBA_WEST_STANDINGS: StandingsRow[] = [
-  { pos: 1, team: 'OKC Thunder', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png', w: 57, l: 25, pct: '.695', gb: '—', ppg: 120.1, oppg: 112.7, form: ['W', 'W', 'W', 'W', 'W'], zone: 'playoffs', conf: 'West', league: 'NBA' },
-  { pos: 2, team: 'Denver Nuggets', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png', w: 57, l: 25, pct: '.695', gb: '—', ppg: 114.9, oppg: 109.6, form: ['W', 'L', 'W', 'W', 'L'], zone: 'playoffs', conf: 'West', league: 'NBA' },
-  { pos: 3, team: 'Minnesota Timberwolves', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png', w: 56, l: 26, pct: '.683', gb: '1.0', ppg: 113.0, oppg: 106.5, form: ['L', 'W', 'W', 'L', 'W'], zone: 'playoffs', conf: 'West', league: 'NBA' },
-  { pos: 4, team: 'LA Clippers', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png', w: 51, l: 31, pct: '.622', gb: '6.0', ppg: 115.6, oppg: 112.3, form: ['L', 'L', 'W', 'W', 'W'], zone: 'playoffs', conf: 'West', league: 'NBA' },
-  { pos: 5, team: 'Dallas Mavericks', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png', w: 50, l: 32, pct: '.610', gb: '7.0', ppg: 117.9, oppg: 115.6, form: ['L', 'L', 'W', 'W', 'W'], zone: 'playoffs', conf: 'West', league: 'NBA' },
-  { pos: 6, team: 'Phoenix Suns', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/phx.png', w: 49, l: 33, pct: '.598', gb: '8.0', ppg: 116.2, oppg: 113.2, form: ['W', 'W', 'W', 'L', 'W'], zone: 'playoffs', conf: 'West', league: 'NBA' },
-  { pos: 7, team: 'New Orleans Pelicans', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/nop.png', w: 49, l: 33, pct: '.598', gb: '8.0', ppg: 115.1, oppg: 110.7, form: ['L', 'W', 'W', 'W', 'W'], zone: 'playin', conf: 'West', league: 'NBA' },
-  { pos: 8, team: 'LA Lakers', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png', w: 47, l: 35, pct: '.573', gb: '10.0', ppg: 118.0, oppg: 117.4, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playin', conf: 'West', league: 'NBA' },
-  { pos: 9, team: 'Sacramento Kings', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png', w: 46, l: 36, pct: '.561', gb: '11.0', ppg: 116.6, oppg: 114.8, form: ['W', 'L', 'L', 'L', 'W'], zone: 'playin', conf: 'West', league: 'NBA' },
-  { pos: 10, team: 'Golden State Warriors', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png', w: 46, l: 36, pct: '.561', gb: '11.0', ppg: 117.8, oppg: 115.2, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playin', conf: 'West', league: 'NBA' },
-  { pos: 11, team: 'Houston Rockets', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/hou.png', w: 41, l: 41, pct: '.500', gb: '16.0', ppg: 114.3, oppg: 113.2, form: ['W', 'W', 'L', 'W', 'L'], zone: 'lottery', conf: 'West', league: 'NBA' },
-  { pos: 12, team: 'Utah Jazz', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/uta.png', w: 31, l: 51, pct: '.378', gb: '26.0', ppg: 115.7, oppg: 120.5, form: ['L', 'W', 'W', 'L', 'L'], zone: 'lottery', conf: 'West', league: 'NBA' },
-  { pos: 13, team: 'Memphis Grizzlies', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mem.png', w: 27, l: 55, pct: '.329', gb: '30.0', ppg: 105.8, oppg: 112.8, form: ['L', 'L', 'L', 'L', 'L'], zone: 'lottery', conf: 'West', league: 'NBA' },
-  { pos: 14, team: 'San Antonio Spurs', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/sas.png', w: 22, l: 60, pct: '.268', gb: '35.0', ppg: 112.1, oppg: 118.6, form: ['W', 'W', 'L', 'W', 'L'], zone: 'lottery', conf: 'West', league: 'NBA' },
-  { pos: 15, team: 'Portland Trail Blazers', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/por.png', w: 21, l: 61, pct: '.256', gb: '36.0', ppg: 106.4, oppg: 115.4, form: ['L', 'L', 'L', 'L', 'L'], zone: 'lottery', conf: 'West', league: 'NBA' },
+  {
+    pos: 1,
+    team: 'OKC Thunder',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png',
+    w: 57,
+    l: 25,
+    pct: '.695',
+    gb: '—',
+    ppg: 120.1,
+    oppg: 112.7,
+    form: ['W', 'W', 'W', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 2,
+    team: 'Denver Nuggets',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
+    w: 57,
+    l: 25,
+    pct: '.695',
+    gb: '—',
+    ppg: 114.9,
+    oppg: 109.6,
+    form: ['W', 'L', 'W', 'W', 'L'],
+    zone: 'playoffs',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 3,
+    team: 'Minnesota Timberwolves',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
+    w: 56,
+    l: 26,
+    pct: '.683',
+    gb: '1.0',
+    ppg: 113.0,
+    oppg: 106.5,
+    form: ['L', 'W', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 4,
+    team: 'LA Clippers',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png',
+    w: 51,
+    l: 31,
+    pct: '.622',
+    gb: '6.0',
+    ppg: 115.6,
+    oppg: 112.3,
+    form: ['L', 'L', 'W', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 5,
+    team: 'Dallas Mavericks',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
+    w: 50,
+    l: 32,
+    pct: '.610',
+    gb: '7.0',
+    ppg: 117.9,
+    oppg: 115.6,
+    form: ['L', 'L', 'W', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 6,
+    team: 'Phoenix Suns',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/phx.png',
+    w: 49,
+    l: 33,
+    pct: '.598',
+    gb: '8.0',
+    ppg: 116.2,
+    oppg: 113.2,
+    form: ['W', 'W', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 7,
+    team: 'New Orleans Pelicans',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/nop.png',
+    w: 49,
+    l: 33,
+    pct: '.598',
+    gb: '8.0',
+    ppg: 115.1,
+    oppg: 110.7,
+    form: ['L', 'W', 'W', 'W', 'W'],
+    zone: 'playin',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 8,
+    team: 'LA Lakers',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
+    w: 47,
+    l: 35,
+    pct: '.573',
+    gb: '10.0',
+    ppg: 118.0,
+    oppg: 117.4,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playin',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 9,
+    team: 'Sacramento Kings',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png',
+    w: 46,
+    l: 36,
+    pct: '.561',
+    gb: '11.0',
+    ppg: 116.6,
+    oppg: 114.8,
+    form: ['W', 'L', 'L', 'L', 'W'],
+    zone: 'playin',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 10,
+    team: 'Golden State Warriors',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png',
+    w: 46,
+    l: 36,
+    pct: '.561',
+    gb: '11.0',
+    ppg: 117.8,
+    oppg: 115.2,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playin',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 11,
+    team: 'Houston Rockets',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/hou.png',
+    w: 41,
+    l: 41,
+    pct: '.500',
+    gb: '16.0',
+    ppg: 114.3,
+    oppg: 113.2,
+    form: ['W', 'W', 'L', 'W', 'L'],
+    zone: 'lottery',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 12,
+    team: 'Utah Jazz',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/uta.png',
+    w: 31,
+    l: 51,
+    pct: '.378',
+    gb: '26.0',
+    ppg: 115.7,
+    oppg: 120.5,
+    form: ['L', 'W', 'W', 'L', 'L'],
+    zone: 'lottery',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 13,
+    team: 'Memphis Grizzlies',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mem.png',
+    w: 27,
+    l: 55,
+    pct: '.329',
+    gb: '30.0',
+    ppg: 105.8,
+    oppg: 112.8,
+    form: ['L', 'L', 'L', 'L', 'L'],
+    zone: 'lottery',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 14,
+    team: 'San Antonio Spurs',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/sas.png',
+    w: 22,
+    l: 60,
+    pct: '.268',
+    gb: '35.0',
+    ppg: 112.1,
+    oppg: 118.6,
+    form: ['W', 'W', 'L', 'W', 'L'],
+    zone: 'lottery',
+    conf: 'West',
+    league: 'NBA',
+  },
+  {
+    pos: 15,
+    team: 'Portland Trail Blazers',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/por.png',
+    w: 21,
+    l: 61,
+    pct: '.256',
+    gb: '36.0',
+    ppg: 106.4,
+    oppg: 115.4,
+    form: ['L', 'L', 'L', 'L', 'L'],
+    zone: 'lottery',
+    conf: 'West',
+    league: 'NBA',
+  },
 ];
 
 const EUROLEAGUE_STANDINGS: StandingsRow[] = [
-  { pos: 1, team: 'Real Madrid', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/104.png', w: 27, l: 7, pct: '.794', gb: '—', ppg: 88.5, oppg: 80.2, form: ['W', 'W', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'EuroLeague' },
-  { pos: 2, team: 'Panathinaikos AKTOR', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/108.png', w: 23, l: 11, pct: '.676', gb: '4.0', ppg: 84.1, oppg: 78.9, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'EuroLeague' },
-  { pos: 3, team: 'AS Monaco', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/115.png', w: 23, l: 11, pct: '.676', gb: '4.0', ppg: 82.9, oppg: 79.5, form: ['W', 'L', 'W', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'EuroLeague' },
-  { pos: 4, team: 'FC Barcelona', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/100.png', w: 22, l: 12, pct: '.647', gb: '5.0', ppg: 83.7, oppg: 80.8, form: ['L', 'W', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'EuroLeague' },
-  { pos: 5, team: 'Olympiacos Piraeus', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/109.png', w: 22, l: 12, pct: '.647', gb: '5.0', ppg: 79.8, oppg: 75.3, form: ['W', 'W', 'W', 'W', 'L'], zone: 'playoffs', conf: 'East', league: 'EuroLeague' },
-  { pos: 6, team: 'Fenerbahçe Beko', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/103.png', w: 20, l: 14, pct: '.588', gb: '7.0', ppg: 85.0, oppg: 81.2, form: ['W', 'L', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'EuroLeague' },
-  { pos: 7, team: 'Maccabi Playtika Tel Aviv', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/106.png', w: 20, l: 14, pct: '.588', gb: '7.0', ppg: 87.4, oppg: 86.1, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playin', conf: 'East', league: 'EuroLeague' },
-  { pos: 8, team: 'Baskonia Vitoria', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/107.png', w: 18, l: 16, pct: '.529', gb: '9.0', ppg: 83.2, oppg: 84.0, form: ['L', 'W', 'L', 'W', 'L'], zone: 'playin', conf: 'East', league: 'EuroLeague' },
-  { pos: 9, team: 'Virtus Segafredo Bologna', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/110.png', w: 17, l: 17, pct: '.500', gb: '10.0', ppg: 80.5, oppg: 82.1, form: ['L', 'L', 'L', 'W', 'L'], zone: 'playin', conf: 'East', league: 'EuroLeague' },
-  { pos: 10, team: 'Anadolu Efes', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/101.png', w: 17, l: 17, pct: '.500', gb: '10.0', ppg: 86.3, oppg: 85.9, form: ['W', 'W', 'W', 'W', 'W'], zone: 'playin', conf: 'East', league: 'EuroLeague' },
+  {
+    pos: 1,
+    team: 'Real Madrid',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/104.png',
+    w: 27,
+    l: 7,
+    pct: '.794',
+    gb: '—',
+    ppg: 88.5,
+    oppg: 80.2,
+    form: ['W', 'W', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 2,
+    team: 'Panathinaikos AKTOR',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/108.png',
+    w: 23,
+    l: 11,
+    pct: '.676',
+    gb: '4.0',
+    ppg: 84.1,
+    oppg: 78.9,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 3,
+    team: 'AS Monaco',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/115.png',
+    w: 23,
+    l: 11,
+    pct: '.676',
+    gb: '4.0',
+    ppg: 82.9,
+    oppg: 79.5,
+    form: ['W', 'L', 'W', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 4,
+    team: 'FC Barcelona',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/100.png',
+    w: 22,
+    l: 12,
+    pct: '.647',
+    gb: '5.0',
+    ppg: 83.7,
+    oppg: 80.8,
+    form: ['L', 'W', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 5,
+    team: 'Olympiacos Piraeus',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/109.png',
+    w: 22,
+    l: 12,
+    pct: '.647',
+    gb: '5.0',
+    ppg: 79.8,
+    oppg: 75.3,
+    form: ['W', 'W', 'W', 'W', 'L'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 6,
+    team: 'Fenerbahçe Beko',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/103.png',
+    w: 20,
+    l: 14,
+    pct: '.588',
+    gb: '7.0',
+    ppg: 85.0,
+    oppg: 81.2,
+    form: ['W', 'L', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 7,
+    team: 'Maccabi Playtika Tel Aviv',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/106.png',
+    w: 20,
+    l: 14,
+    pct: '.588',
+    gb: '7.0',
+    ppg: 87.4,
+    oppg: 86.1,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 8,
+    team: 'Baskonia Vitoria',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/107.png',
+    w: 18,
+    l: 16,
+    pct: '.529',
+    gb: '9.0',
+    ppg: 83.2,
+    oppg: 84.0,
+    form: ['L', 'W', 'L', 'W', 'L'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 9,
+    team: 'Virtus Segafredo Bologna',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/110.png',
+    w: 17,
+    l: 17,
+    pct: '.500',
+    gb: '10.0',
+    ppg: 80.5,
+    oppg: 82.1,
+    form: ['L', 'L', 'L', 'W', 'L'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
+  {
+    pos: 10,
+    team: 'Anadolu Efes',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/101.png',
+    w: 17,
+    l: 17,
+    pct: '.500',
+    gb: '10.0',
+    ppg: 86.3,
+    oppg: 85.9,
+    form: ['W', 'W', 'W', 'W', 'W'],
+    zone: 'playin',
+    conf: 'East',
+    league: 'EuroLeague',
+  },
 ];
 
 const LIGA_ACB_STANDINGS: StandingsRow[] = [
-  { pos: 1, team: 'Real Madrid', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/104.png', w: 28, l: 6, pct: '.824', gb: '—', ppg: 89.4, oppg: 79.1, form: ['W', 'W', 'W', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 2, team: 'Unicaja Málaga', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/112.png', w: 28, l: 6, pct: '.824', gb: '—', ppg: 87.8, oppg: 78.4, form: ['W', 'W', 'W', 'W', 'L'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 3, team: 'FC Barcelona', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/100.png', w: 23, l: 11, pct: '.676', gb: '5.0', ppg: 86.2, oppg: 81.5, form: ['W', 'L', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 4, team: 'Valencia Basket', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/114.png', w: 21, l: 13, pct: '.618', gb: '7.0', ppg: 82.5, oppg: 80.3, form: ['L', 'W', 'W', 'W', 'L'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 5, team: 'UCAM Murcia', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/116.png', w: 21, l: 13, pct: '.618', gb: '7.0', ppg: 81.7, oppg: 79.8, form: ['W', 'W', 'L', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 6, team: 'Lenovo Tenerife', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/117.png', w: 21, l: 13, pct: '.618', gb: '7.0', ppg: 83.1, oppg: 81.2, form: ['W', 'L', 'W', 'W', 'W'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 7, team: 'Dreamland Gran Canaria', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/118.png', w: 20, l: 14, pct: '.588', gb: '8.0', ppg: 82.0, oppg: 80.9, form: ['L', 'W', 'L', 'W', 'L'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
-  { pos: 8, team: 'BAXI Manresa', logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/119.png', w: 19, l: 15, pct: '.559', gb: '9.0', ppg: 84.6, oppg: 84.1, form: ['W', 'L', 'W', 'L', 'W'], zone: 'playoffs', conf: 'East', league: 'Liga ACB' },
+  {
+    pos: 1,
+    team: 'Real Madrid',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/104.png',
+    w: 28,
+    l: 6,
+    pct: '.824',
+    gb: '—',
+    ppg: 89.4,
+    oppg: 79.1,
+    form: ['W', 'W', 'W', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 2,
+    team: 'Unicaja Málaga',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/112.png',
+    w: 28,
+    l: 6,
+    pct: '.824',
+    gb: '—',
+    ppg: 87.8,
+    oppg: 78.4,
+    form: ['W', 'W', 'W', 'W', 'L'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 3,
+    team: 'FC Barcelona',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/100.png',
+    w: 23,
+    l: 11,
+    pct: '.676',
+    gb: '5.0',
+    ppg: 86.2,
+    oppg: 81.5,
+    form: ['W', 'L', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 4,
+    team: 'Valencia Basket',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/114.png',
+    w: 21,
+    l: 13,
+    pct: '.618',
+    gb: '7.0',
+    ppg: 82.5,
+    oppg: 80.3,
+    form: ['L', 'W', 'W', 'W', 'L'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 5,
+    team: 'UCAM Murcia',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/116.png',
+    w: 21,
+    l: 13,
+    pct: '.618',
+    gb: '7.0',
+    ppg: 81.7,
+    oppg: 79.8,
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 6,
+    team: 'Lenovo Tenerife',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/117.png',
+    w: 21,
+    l: 13,
+    pct: '.618',
+    gb: '7.0',
+    ppg: 83.1,
+    oppg: 81.2,
+    form: ['W', 'L', 'W', 'W', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 7,
+    team: 'Dreamland Gran Canaria',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/118.png',
+    w: 20,
+    l: 14,
+    pct: '.588',
+    gb: '8.0',
+    ppg: 82.0,
+    oppg: 80.9,
+    form: ['L', 'W', 'L', 'W', 'L'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
+  {
+    pos: 8,
+    team: 'BAXI Manresa',
+    logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/119.png',
+    w: 19,
+    l: 15,
+    pct: '.559',
+    gb: '9.0',
+    ppg: 84.6,
+    oppg: 84.1,
+    form: ['W', 'L', 'W', 'L', 'W'],
+    zone: 'playoffs',
+    conf: 'East',
+    league: 'Liga ACB',
+  },
 ];
 
 const ALL_STAT_LEADERS: StatLeader[] = [
   // PPG
-  { rank: 1, name: 'Luka Dončić', team: 'Dallas Mavericks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png', flag: '🇸🇮', stat: 33.9, statLabel: 'PPG', extra: '9.2 RPG · 9.8 APG · 48.7% FG', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png', category: 'PPG' },
-  { rank: 2, name: 'Giannis Antetokounmpo', team: 'Milwaukee Bucks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png', flag: '🇬🇷', stat: 30.4, statLabel: 'PPG', extra: '11.5 RPG · 6.5 APG · 61.1% FG', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png', category: 'PPG' },
-  { rank: 3, name: 'Shai Gilgeous-Alexander', team: 'OKC Thunder', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png', flag: '🇨🇦', stat: 30.1, statLabel: 'PPG', extra: '5.5 RPG · 6.2 APG · 53.5% FG', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1628983.png', category: 'PPG' },
-  { rank: 4, name: 'Jalen Brunson', team: 'NY Knicks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png', flag: '🇺🇸', stat: 28.7, statLabel: 'PPG', extra: '3.6 RPG · 6.7 APG · 40.1% 3P', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1628973.png', category: 'PPG' },
+  {
+    rank: 1,
+    name: 'Luka Dončić',
+    team: 'Dallas Mavericks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
+    flag: '🇸🇮',
+    stat: 33.9,
+    statLabel: 'PPG',
+    extra: '9.2 RPG · 9.8 APG · 48.7% FG',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png',
+    category: 'PPG',
+  },
+  {
+    rank: 2,
+    name: 'Giannis Antetokounmpo',
+    team: 'Milwaukee Bucks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
+    flag: '🇬🇷',
+    stat: 30.4,
+    statLabel: 'PPG',
+    extra: '11.5 RPG · 6.5 APG · 61.1% FG',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png',
+    category: 'PPG',
+  },
+  {
+    rank: 3,
+    name: 'Shai Gilgeous-Alexander',
+    team: 'OKC Thunder',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png',
+    flag: '🇨🇦',
+    stat: 30.1,
+    statLabel: 'PPG',
+    extra: '5.5 RPG · 6.2 APG · 53.5% FG',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1628983.png',
+    category: 'PPG',
+  },
+  {
+    rank: 4,
+    name: 'Jalen Brunson',
+    team: 'NY Knicks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png',
+    flag: '🇺🇸',
+    stat: 28.7,
+    statLabel: 'PPG',
+    extra: '3.6 RPG · 6.7 APG · 40.1% 3P',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1628973.png',
+    category: 'PPG',
+  },
 
   // RPG
-  { rank: 1, name: 'Domantas Sabonis', team: 'Sacramento Kings', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png', flag: '🇱🇹', stat: 13.7, statLabel: 'RPG', extra: '19.4 PPG · 8.2 APG · 77 Double-Doubles', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1627734.png', category: 'RPG' },
-  { rank: 2, name: 'Rudy Gobert', team: 'Minnesota Timberwolves', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png', flag: '🇫🇷', stat: 12.9, statLabel: 'RPG', extra: '14.0 PPG · 2.1 BPG · DPOY', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203497.png', category: 'RPG' },
-  { rank: 3, name: 'Anthony Davis', team: 'LA Lakers', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png', flag: '🇺🇸', stat: 12.6, statLabel: 'RPG', extra: '24.7 PPG · 2.3 BPG · 55.6% FG', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png', category: 'RPG' },
-  { rank: 4, name: 'Nikola Jokić', team: 'Denver Nuggets', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png', flag: '🇷🇸', stat: 12.4, statLabel: 'RPG', extra: '26.4 PPG · 9.0 APG · 58.3% FG', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png', category: 'RPG' },
+  {
+    rank: 1,
+    name: 'Domantas Sabonis',
+    team: 'Sacramento Kings',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/sac.png',
+    flag: '🇱🇹',
+    stat: 13.7,
+    statLabel: 'RPG',
+    extra: '19.4 PPG · 8.2 APG · 77 Double-Doubles',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1627734.png',
+    category: 'RPG',
+  },
+  {
+    rank: 2,
+    name: 'Rudy Gobert',
+    team: 'Minnesota Timberwolves',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
+    flag: '🇫🇷',
+    stat: 12.9,
+    statLabel: 'RPG',
+    extra: '14.0 PPG · 2.1 BPG · DPOY',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203497.png',
+    category: 'RPG',
+  },
+  {
+    rank: 3,
+    name: 'Anthony Davis',
+    team: 'LA Lakers',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
+    flag: '🇺🇸',
+    stat: 12.6,
+    statLabel: 'RPG',
+    extra: '24.7 PPG · 2.3 BPG · 55.6% FG',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png',
+    category: 'RPG',
+  },
+  {
+    rank: 4,
+    name: 'Nikola Jokić',
+    team: 'Denver Nuggets',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
+    flag: '🇷🇸',
+    stat: 12.4,
+    statLabel: 'RPG',
+    extra: '26.4 PPG · 9.0 APG · 58.3% FG',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png',
+    category: 'RPG',
+  },
 
   // APG
-  { rank: 1, name: 'Tyrese Haliburton', team: 'Indiana Pacers', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png', flag: '🇺🇸', stat: 10.9, statLabel: 'APG', extra: '20.1 PPG · 3.9 RPG · 4.4 AST/TO', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1630169.png', category: 'APG' },
-  { rank: 2, name: 'Luka Dončić', team: 'Dallas Mavericks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png', flag: '🇸🇮', stat: 9.8, statLabel: 'APG', extra: '33.9 PPG · 9.2 RPG · 21 Triple-Doubles', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png', category: 'APG' },
-  { rank: 3, name: 'Nikola Jokić', team: 'Denver Nuggets', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png', flag: '🇷🇸', stat: 9.0, statLabel: 'APG', extra: '26.4 PPG · 12.4 RPG · 3x MVP', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png', category: 'APG' },
-  { rank: 4, name: 'James Harden', team: 'LA Clippers', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png', flag: '🇺🇸', stat: 8.5, statLabel: 'APG', extra: '16.6 PPG · 5.1 RPG · 87.8% FT', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/201935.png', category: 'APG' },
+  {
+    rank: 1,
+    name: 'Tyrese Haliburton',
+    team: 'Indiana Pacers',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png',
+    flag: '🇺🇸',
+    stat: 10.9,
+    statLabel: 'APG',
+    extra: '20.1 PPG · 3.9 RPG · 4.4 AST/TO',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1630169.png',
+    category: 'APG',
+  },
+  {
+    rank: 2,
+    name: 'Luka Dončić',
+    team: 'Dallas Mavericks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
+    flag: '🇸🇮',
+    stat: 9.8,
+    statLabel: 'APG',
+    extra: '33.9 PPG · 9.2 RPG · 21 Triple-Doubles',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png',
+    category: 'APG',
+  },
+  {
+    rank: 3,
+    name: 'Nikola Jokić',
+    team: 'Denver Nuggets',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
+    flag: '🇷🇸',
+    stat: 9.0,
+    statLabel: 'APG',
+    extra: '26.4 PPG · 12.4 RPG · 3x MVP',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png',
+    category: 'APG',
+  },
+  {
+    rank: 4,
+    name: 'James Harden',
+    team: 'LA Clippers',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/lac.png',
+    flag: '🇺🇸',
+    stat: 8.5,
+    statLabel: 'APG',
+    extra: '16.6 PPG · 5.1 RPG · 87.8% FT',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/201935.png',
+    category: 'APG',
+  },
 
   // BPG
-  { rank: 1, name: 'Victor Wembanyama', team: 'San Antonio Spurs', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/sas.png', flag: '🇫🇷', stat: 3.6, statLabel: 'BPG', extra: '21.4 PPG · 10.6 RPG · ROY', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1641705.png', category: 'BPG' },
-  { rank: 2, name: 'Walker Kessler', team: 'Utah Jazz', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/uta.png', flag: '🇺🇸', stat: 2.4, statLabel: 'BPG', extra: '8.1 PPG · 7.5 RPG · 65.4% FG', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1631117.png', category: 'BPG' },
-  { rank: 3, name: 'Anthony Davis', team: 'LA Lakers', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png', flag: '🇺🇸', stat: 2.3, statLabel: 'BPG', extra: '24.7 PPG · 12.6 RPG · Paint Wall', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png', category: 'BPG' },
-  { rank: 4, name: 'Chet Holmgren', team: 'OKC Thunder', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png', flag: '🇺🇸', stat: 2.3, statLabel: 'BPG', extra: '16.5 PPG · 7.9 RPG · 37.0% 3P', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1631096.png', category: 'BPG' },
+  {
+    rank: 1,
+    name: 'Victor Wembanyama',
+    team: 'San Antonio Spurs',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/sas.png',
+    flag: '🇫🇷',
+    stat: 3.6,
+    statLabel: 'BPG',
+    extra: '21.4 PPG · 10.6 RPG · ROY',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1641705.png',
+    category: 'BPG',
+  },
+  {
+    rank: 2,
+    name: 'Walker Kessler',
+    team: 'Utah Jazz',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/uta.png',
+    flag: '🇺🇸',
+    stat: 2.4,
+    statLabel: 'BPG',
+    extra: '8.1 PPG · 7.5 RPG · 65.4% FG',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1631117.png',
+    category: 'BPG',
+  },
+  {
+    rank: 3,
+    name: 'Anthony Davis',
+    team: 'LA Lakers',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
+    flag: '🇺🇸',
+    stat: 2.3,
+    statLabel: 'BPG',
+    extra: '24.7 PPG · 12.6 RPG · Paint Wall',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203076.png',
+    category: 'BPG',
+  },
+  {
+    rank: 4,
+    name: 'Chet Holmgren',
+    team: 'OKC Thunder',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/okc.png',
+    flag: '🇺🇸',
+    stat: 2.3,
+    statLabel: 'BPG',
+    extra: '16.5 PPG · 7.9 RPG · 37.0% 3P',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1631096.png',
+    category: 'BPG',
+  },
 
   // 3PM
-  { rank: 1, name: 'Stephen Curry', team: 'Golden State Warriors', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png', flag: '🇺🇸', stat: 4.8, statLabel: '3PM', extra: '40.8% 3PT · 26.4 PPG · All-Time Record', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png', category: '3PM' },
-  { rank: 2, name: 'Luka Dončić', team: 'Dallas Mavericks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png', flag: '🇸🇮', stat: 4.1, statLabel: '3PM', extra: '38.2% 3PT · 33.9 PPG · Step-back Maestro', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png', category: '3PM' },
-  { rank: 3, name: 'Damian Lillard', team: 'Milwaukee Bucks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png', flag: '🇺🇸', stat: 3.2, statLabel: '3PM', extra: '35.4% 3PT · 24.3 PPG · Deep Range', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203081.png', category: '3PM' },
-  { rank: 4, name: 'Anthony Edwards', team: 'Minnesota Timberwolves', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png', flag: '🇺🇸', stat: 3.1, statLabel: '3PM', extra: '36.8% 3PT · 25.9 PPG · Clutch Scorer', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1630162.png', category: '3PM' },
+  {
+    rank: 1,
+    name: 'Stephen Curry',
+    team: 'Golden State Warriors',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png',
+    flag: '🇺🇸',
+    stat: 4.8,
+    statLabel: '3PM',
+    extra: '40.8% 3PT · 26.4 PPG · All-Time Record',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png',
+    category: '3PM',
+  },
+  {
+    rank: 2,
+    name: 'Luka Dončić',
+    team: 'Dallas Mavericks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
+    flag: '🇸🇮',
+    stat: 4.1,
+    statLabel: '3PM',
+    extra: '38.2% 3PT · 33.9 PPG · Step-back Maestro',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629029.png',
+    category: '3PM',
+  },
+  {
+    rank: 3,
+    name: 'Damian Lillard',
+    team: 'Milwaukee Bucks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
+    flag: '🇺🇸',
+    stat: 3.2,
+    statLabel: '3PM',
+    extra: '35.4% 3PT · 24.3 PPG · Deep Range',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203081.png',
+    category: '3PM',
+  },
+  {
+    rank: 4,
+    name: 'Anthony Edwards',
+    team: 'Minnesota Timberwolves',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
+    flag: '🇺🇸',
+    stat: 3.1,
+    statLabel: '3PM',
+    extra: '36.8% 3PT · 25.9 PPG · Clutch Scorer',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1630162.png',
+    category: '3PM',
+  },
 
   // FG%
-  { rank: 1, name: 'Daniel Gafford', team: 'Dallas Mavericks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png', flag: '🇺🇸', stat: 72.5, statLabel: 'FG%', extra: '11.0 PPG · 7.6 RPG · Lob Threat', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629655.png', category: 'FG%' },
-  { rank: 2, name: 'Rudy Gobert', team: 'Minnesota Timberwolves', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png', flag: '🇫🇷', stat: 66.1, statLabel: 'FG%', extra: '14.0 PPG · 12.9 RPG · Rim Finisher', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203497.png', category: 'FG%' },
-  { rank: 3, name: 'Giannis Antetokounmpo', team: 'Milwaukee Bucks', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png', flag: '🇬🇷', stat: 61.1, statLabel: 'FG%', extra: '30.4 PPG · Paint Dominance', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png', category: 'FG%' },
-  { rank: 4, name: 'Nikola Jokić', team: 'Denver Nuggets', teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png', flag: '🇷🇸', stat: 58.3, statLabel: 'FG%', extra: '26.4 PPG · Sombor Shuffle Precision', photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png', category: 'FG%' },
+  {
+    rank: 1,
+    name: 'Daniel Gafford',
+    team: 'Dallas Mavericks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
+    flag: '🇺🇸',
+    stat: 72.5,
+    statLabel: 'FG%',
+    extra: '11.0 PPG · 7.6 RPG · Lob Threat',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/1629655.png',
+    category: 'FG%',
+  },
+  {
+    rank: 2,
+    name: 'Rudy Gobert',
+    team: 'Minnesota Timberwolves',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
+    flag: '🇫🇷',
+    stat: 66.1,
+    statLabel: 'FG%',
+    extra: '14.0 PPG · 12.9 RPG · Rim Finisher',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203497.png',
+    category: 'FG%',
+  },
+  {
+    rank: 3,
+    name: 'Giannis Antetokounmpo',
+    team: 'Milwaukee Bucks',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
+    flag: '🇬🇷',
+    stat: 61.1,
+    statLabel: 'FG%',
+    extra: '30.4 PPG · Paint Dominance',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203507.png',
+    category: 'FG%',
+  },
+  {
+    rank: 4,
+    name: 'Nikola Jokić',
+    team: 'Denver Nuggets',
+    teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
+    flag: '🇷🇸',
+    stat: 58.3,
+    statLabel: 'FG%',
+    extra: '26.4 PPG · Sombor Shuffle Precision',
+    photo: 'https://cdn.nba.com/headshots/nba/latest/1040x760/203999.png',
+    category: 'FG%',
+  },
 ];
 
 const BASKETBALL_ODDS_MATCHES: BasketballOddsItem[] = [
@@ -1298,7 +2366,7 @@ const BASKETBALL_ODDS_MATCHES: BasketballOddsItem[] = [
       homeAmerican: '-265',
       awayAmerican: '+220',
       homeDecimal: 1.38,
-      awayDecimal: 3.20,
+      awayDecimal: 3.2,
     },
     total: {
       points: 227.0,
@@ -1330,7 +2398,7 @@ const BASKETBALL_ODDS_MATCHES: BasketballOddsItem[] = [
       homeAmerican: '-180',
       awayAmerican: '+150',
       homeDecimal: 1.55,
-      awayDecimal: 2.50,
+      awayDecimal: 2.5,
     },
     total: {
       points: 164.5,
@@ -1349,60 +2417,223 @@ const COMP_GROUPS: CompGroup[] = [
     region: 'North America',
     icon: '🇺🇸',
     comps: [
-      { name: 'NBA', flag: '🇺🇸', tier: 'T1', season: '2025/26', country: 'USA', href: '/basketball/leagues/nba-766' },
-      { name: 'NBA G League', flag: '🇺🇸', tier: 'T2', season: '2025/26', country: 'USA', href: '/basketball/leagues/nba-g-league' },
-      { name: 'NBL — Canada', flag: '🇨🇦', tier: 'T1', season: '2025/26', country: 'Canada', href: '/basketball/leagues/nbl-canada' },
-      { name: 'NCAA Division I', flag: '🇺🇸', tier: 'COL', season: '2025/26', country: 'USA', href: '/basketball/leagues/ncaa-812' },
+      {
+        name: 'NBA',
+        flag: '🇺🇸',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'USA',
+        href: '/basketball/leagues/nba-766',
+      },
+      {
+        name: 'NBA G League',
+        flag: '🇺🇸',
+        tier: 'T2',
+        season: '2025/26',
+        country: 'USA',
+        href: '/basketball/leagues/nba-g-league',
+      },
+      {
+        name: 'NBL — Canada',
+        flag: '🇨🇦',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Canada',
+        href: '/basketball/leagues/nbl-canada',
+      },
+      {
+        name: 'NCAA Division I',
+        flag: '🇺🇸',
+        tier: 'COL',
+        season: '2025/26',
+        country: 'USA',
+        href: '/basketball/leagues/ncaa-812',
+      },
     ],
   },
   {
     region: 'Africa (BAL)',
     icon: '🌍',
     comps: [
-      { name: 'Basketball Africa League (BAL)', flag: '🌍', tier: 'T1', season: '2026', country: 'Pan-Africa', href: '/basketball/leagues/bal' },
-      { name: 'FIBA AfroBasket', flag: '🏆', tier: 'INT', season: '2025', country: 'Africa Zone', href: '/basketball/leagues/afrobasket' },
-      { name: 'Nigerian Premier League', flag: '🇳🇬', tier: 'T1', season: '2025/26', country: 'Nigeria', href: '/basketball/leagues/npl-nigeria' },
-      { name: 'FIBA WC Qualifiers Africa', flag: '🌍', tier: 'INT', season: '2025/26', country: 'Africa', href: '/basketball/leagues/fiba-wc-africa' },
+      {
+        name: 'Basketball Africa League (BAL)',
+        flag: '🌍',
+        tier: 'T1',
+        season: '2026',
+        country: 'Pan-Africa',
+        href: '/basketball/leagues/bal',
+      },
+      {
+        name: 'FIBA AfroBasket',
+        flag: '🏆',
+        tier: 'INT',
+        season: '2025',
+        country: 'Africa Zone',
+        href: '/basketball/leagues/afrobasket',
+      },
+      {
+        name: 'Nigerian Premier League',
+        flag: '🇳🇬',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Nigeria',
+        href: '/basketball/leagues/npl-nigeria',
+      },
+      {
+        name: 'FIBA WC Qualifiers Africa',
+        flag: '🌍',
+        tier: 'INT',
+        season: '2025/26',
+        country: 'Africa',
+        href: '/basketball/leagues/fiba-wc-africa',
+      },
     ],
   },
   {
     region: 'Europe',
     icon: '🇪🇺',
     comps: [
-      { name: 'EuroLeague', flag: '🇪🇺', tier: 'T1', season: '2025/26', country: 'Europe', href: '/basketball/leagues/euroleague-787' },
-      { name: 'EuroCup', flag: '🇪🇺', tier: 'T2', season: '2025/26', country: 'Europe', href: '/basketball/leagues/eurocup-788' },
-      { name: 'Spanish Liga ACB', flag: '🇪🇸', tier: 'T1', season: '2025/26', country: 'Spain', href: '/basketball/leagues/liga-acb-782' },
-      { name: 'Turkish BSL', flag: '🇹🇷', tier: 'T1', season: '2025/26', country: 'Turkey', href: '/basketball/leagues/turkish-bsl' },
-      { name: 'Italian Lega Basket Serie A', flag: '🇮🇹', tier: 'T1', season: '2025/26', country: 'Italy', href: '/basketball/leagues/serie-a-772' },
-      { name: 'German BBL', flag: '🇩🇪', tier: 'T1', season: '2025/26', country: 'Germany', href: '/basketball/leagues/bbl-779' },
+      {
+        name: 'EuroLeague',
+        flag: '🇪🇺',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Europe',
+        href: '/basketball/leagues/euroleague-787',
+      },
+      {
+        name: 'EuroCup',
+        flag: '🇪🇺',
+        tier: 'T2',
+        season: '2025/26',
+        country: 'Europe',
+        href: '/basketball/leagues/eurocup-788',
+      },
+      {
+        name: 'Spanish Liga ACB',
+        flag: '🇪🇸',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Spain',
+        href: '/basketball/leagues/liga-acb-782',
+      },
+      {
+        name: 'Turkish BSL',
+        flag: '🇹🇷',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Turkey',
+        href: '/basketball/leagues/turkish-bsl',
+      },
+      {
+        name: 'Italian Lega Basket Serie A',
+        flag: '🇮🇹',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Italy',
+        href: '/basketball/leagues/serie-a-772',
+      },
+      {
+        name: 'German BBL',
+        flag: '🇩🇪',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Germany',
+        href: '/basketball/leagues/bbl-779',
+      },
     ],
   },
   {
     region: 'International & Oceania',
     icon: '🌐',
     comps: [
-      { name: 'FIBA Basketball World Cup', flag: '🌐', tier: 'INT', season: '2027', country: 'Global', href: '/basketball/leagues/fiba-world-cup' },
-      { name: 'Olympic Basketball Tourney', flag: '🥇', tier: 'INT', season: '2028', country: 'Global', href: '/basketball/leagues/olympics-basketball' },
-      { name: 'Australian NBL', flag: '🇦🇺', tier: 'T1', season: '2025/26', country: 'Australia', href: '/basketball/leagues/nbl-australia' },
-      { name: 'FIBA Asia Cup', flag: '🌏', tier: 'INT', season: '2025', country: 'Asia-Pacific', href: '/basketball/leagues/fiba-asia' },
+      {
+        name: 'FIBA Basketball World Cup',
+        flag: '🌐',
+        tier: 'INT',
+        season: '2027',
+        country: 'Global',
+        href: '/basketball/leagues/fiba-world-cup',
+      },
+      {
+        name: 'Olympic Basketball Tourney',
+        flag: '🥇',
+        tier: 'INT',
+        season: '2028',
+        country: 'Global',
+        href: '/basketball/leagues/olympics-basketball',
+      },
+      {
+        name: 'Australian NBL',
+        flag: '🇦🇺',
+        tier: 'T1',
+        season: '2025/26',
+        country: 'Australia',
+        href: '/basketball/leagues/nbl-australia',
+      },
+      {
+        name: 'FIBA Asia Cup',
+        flag: '🌏',
+        tier: 'INT',
+        season: '2025',
+        country: 'Asia-Pacific',
+        href: '/basketball/leagues/fiba-asia',
+      },
     ],
   },
 ];
 
 const TEAM_HUBS: TeamHub[] = [
-  { name: 'Boston Celtics', conf: 'East · #1', record: '64-18', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png', slug: 'boston-celtics' },
-  { name: 'Denver Nuggets', conf: 'West · #2', record: '57-25', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png', slug: 'denver-nuggets' },
-  { name: 'LA Lakers', conf: 'West · #8', record: '47-35', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png', slug: 'los-angeles-lakers' },
-  { name: 'Golden State', conf: 'West · #10', record: '46-36', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png', slug: 'golden-state-warriors' },
-  { name: 'Miami Heat', conf: 'East · #8', record: '46-36', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png', slug: 'miami-heat' },
-  { name: 'Milwaukee Bucks', conf: 'East · #3', record: '49-33', logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png', slug: 'milwaukee-bucks' },
+  {
+    name: 'Boston Celtics',
+    conf: 'East · #1',
+    record: '64-18',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
+    slug: 'boston-celtics',
+  },
+  {
+    name: 'Denver Nuggets',
+    conf: 'West · #2',
+    record: '57-25',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
+    slug: 'denver-nuggets',
+  },
+  {
+    name: 'LA Lakers',
+    conf: 'West · #8',
+    record: '47-35',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
+    slug: 'los-angeles-lakers',
+  },
+  {
+    name: 'Golden State',
+    conf: 'West · #10',
+    record: '46-36',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/gsw.png',
+    slug: 'golden-state-warriors',
+  },
+  {
+    name: 'Miami Heat',
+    conf: 'East · #8',
+    record: '46-36',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png',
+    slug: 'miami-heat',
+  },
+  {
+    name: 'Milwaukee Bucks',
+    conf: 'East · #3',
+    record: '49-33',
+    logo: 'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
+    slug: 'milwaukee-bucks',
+  },
 ];
 
 const ANALYSIS_ARTICLES: AnalysisArticle[] = [
   {
     tag: 'SCOUTING',
     tagColor: 'bg-orange-500',
-    title: 'How Victor Wembanyama altered shot selection patterns across all 30 NBA teams in Year 2',
+    title:
+      'How Victor Wembanyama altered shot selection patterns across all 30 NBA teams in Year 2',
     time: '2 hr ago',
     comp: 'NBA Telemetry',
     img: '',
@@ -1410,7 +2641,8 @@ const ANALYSIS_ARTICLES: AnalysisArticle[] = [
   {
     tag: 'TACTICS',
     tagColor: 'bg-emerald-500',
-    title: 'The EuroLeague pick-and-roll revolution: Why European spacing is punishing NBA drop coverage',
+    title:
+      'The EuroLeague pick-and-roll revolution: Why European spacing is punishing NBA drop coverage',
     time: '3 hr ago',
     comp: 'EuroLeague',
     img: '',
@@ -1546,7 +2778,8 @@ const BASKETBALL_OFFICIALS: BasketballOfficial[] = [
     number: '#48',
     seasons: '30th Season',
     role: 'Lead Crew Chief',
-    photo: 'https://ui-avatars.com/api/?name=Scott+Foster&background=0f172a&color=f97316&bold=true&size=128',
+    photo:
+      'https://ui-avatars.com/api/?name=Scott+Foster&background=0f172a&color=f97316&bold=true&size=128',
     reviewAcc: '94.2%',
     overturnPct: '28.1%',
     avgReviewSec: '48.2s',
@@ -1559,7 +2792,8 @@ const BASKETBALL_OFFICIALS: BasketballOfficial[] = [
     number: '#15',
     seasons: '21st Season',
     role: 'Crew Chief',
-    photo: 'https://ui-avatars.com/api/?name=Zach+Zarba&background=0f172a&color=3b82f6&bold=true&size=128',
+    photo:
+      'https://ui-avatars.com/api/?name=Zach+Zarba&background=0f172a&color=3b82f6&bold=true&size=128',
     reviewAcc: '96.5%',
     overturnPct: '34.6%',
     avgReviewSec: '41.0s',
@@ -1572,7 +2806,8 @@ const BASKETBALL_OFFICIALS: BasketballOfficial[] = [
     number: '#19',
     seasons: '29th Season',
     role: 'Crew Chief',
-    photo: 'https://ui-avatars.com/api/?name=James+Capers&background=0f172a&color=10b981&bold=true&size=128',
+    photo:
+      'https://ui-avatars.com/api/?name=James+Capers&background=0f172a&color=10b981&bold=true&size=128',
     reviewAcc: '93.8%',
     overturnPct: '31.2%',
     avgReviewSec: '52.4s',
@@ -1587,7 +2822,8 @@ const BASKETBALL_COACHES: BasketballCoach[] = [
     name: 'Joe Mazzulla',
     team: 'Boston Celtics',
     teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
-    photo: 'https://ui-avatars.com/api/?name=Joe+Mazzulla&background=0f172a&color=10b981&bold=true&size=128',
+    photo:
+      'https://ui-avatars.com/api/?name=Joe+Mazzulla&background=0f172a&color=10b981&bold=true&size=128',
     winPct: '73.2%',
     rings: 1,
     offensiveRtg: '122.2 (#1 NBA)',
@@ -1599,7 +2835,8 @@ const BASKETBALL_COACHES: BasketballCoach[] = [
     name: 'Erik Spoelstra',
     team: 'Miami Heat',
     teamLogo: 'https://a.espncdn.com/i/teamlogos/nba/500/mia.png',
-    photo: 'https://ui-avatars.com/api/?name=Erik+Spoelstra&background=0f172a&color=ef4444&bold=true&size=128',
+    photo:
+      'https://ui-avatars.com/api/?name=Erik+Spoelstra&background=0f172a&color=ef4444&bold=true&size=128',
     winPct: '59.8%',
     rings: 2,
     offensiveRtg: 'Clutch Top 5',
@@ -1611,7 +2848,8 @@ const BASKETBALL_COACHES: BasketballCoach[] = [
     name: 'Sarunas Jasikevicius',
     team: 'Fenerbahçe',
     teamLogo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/basketball/euro/500/103.png',
-    photo: 'https://ui-avatars.com/api/?name=Sarunas+Jasikevicius&background=0f172a&color=3b82f6&bold=true&size=128',
+    photo:
+      'https://ui-avatars.com/api/?name=Sarunas+Jasikevicius&background=0f172a&color=3b82f6&bold=true&size=128',
     winPct: '68.1%',
     rings: 0,
     offensiveRtg: 'EuroLeague Top 3',
@@ -1627,9 +2865,13 @@ export function BasketballPageClient() {
   const [mainTab, setMainTab] = useState<MainTab>('live');
   const [compFilter, setCompFilter] = useState('All');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [selectedStandingsLeague, setSelectedStandingsLeague] = useState<'NBA' | 'EuroLeague' | 'Liga ACB'>('NBA');
+  const [selectedStandingsLeague, setSelectedStandingsLeague] = useState<
+    'NBA' | 'EuroLeague' | 'Liga ACB'
+  >('NBA');
   const [standingsConf, setStandingsConf] = useState<'East' | 'West'>('East');
-  const [standingsSortKey, setStandingsSortKey] = useState<'pos' | 'w' | 'pct' | 'ppg' | 'oppg'>('pos');
+  const [standingsSortKey, setStandingsSortKey] = useState<'pos' | 'w' | 'pct' | 'ppg' | 'oppg'>(
+    'pos'
+  );
   const [standingsSortAsc, setStandingsSortAsc] = useState(true);
   const [expandedComp, setExpandedComp] = useState<string | null>('North America');
   const [statCat, setStatCat] = useState<StatCategory>('PPG');
@@ -1655,10 +2897,16 @@ export function BasketballPageClient() {
   } | null>(null);
 
   // Special section filter states
-  const [superstarFilter, setSuperstarFilter] = useState<'All' | 'Guards' | 'Forwards' | 'Centers'>('All');
+  const [superstarFilter, setSuperstarFilter] = useState<'All' | 'Guards' | 'Forwards' | 'Centers'>(
+    'All'
+  );
   const [superstarSearch, setSuperstarSearch] = useState('');
-  const [officialFilter, setOfficialFilter] = useState<'All' | 'Lead Crew' | 'Veteran' | 'High Accuracy'>('All');
-  const [coachFilter, setCoachFilter] = useState<'All' | '5-Out' | 'Horns' | 'Pick-and-Roll'>('All');
+  const [officialFilter, setOfficialFilter] = useState<
+    'All' | 'Lead Crew' | 'Veteran' | 'High Accuracy'
+  >('All');
+  const [coachFilter, setCoachFilter] = useState<'All' | '5-Out' | 'Horns' | 'Pick-and-Roll'>(
+    'All'
+  );
   const [showReplayInfo, setShowReplayInfo] = useState(false);
 
   // Matches dynamic state
@@ -1699,10 +2947,10 @@ export function BasketballPageClient() {
         offset === 0
           ? 'Today'
           : offset === -1
-          ? 'Yesterday'
-          : offset === 1
-          ? 'Tomorrow'
-          : d.toLocaleDateString('en-US', { weekday: 'short' });
+            ? 'Yesterday'
+            : offset === 1
+              ? 'Tomorrow'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayMonth = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       dates.push({ iso, label, dayMonth, offset });
     }
@@ -1747,7 +2995,9 @@ export function BasketballPageClient() {
           setLiveGames(mapped);
         }
       }
-      setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setLastSyncTime(
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      );
       if (manual) triggerToast('Telemetry synced with live courtside data!');
     } catch {
       console.warn('[Basketball] Upstream live API unavailable, using verified baseline.');
@@ -1759,7 +3009,9 @@ export function BasketballPageClient() {
   // Fetch fixtures by selected date
   const fetchFixtures = useCallback(async (dateStr: string) => {
     try {
-      const res = await fetch(`/api/basketball?met=Fixtures&from=${dateStr}&to=${dateStr}`, { cache: 'no-store' });
+      const res = await fetch(`/api/basketball?met=Fixtures&from=${dateStr}&to=${dateStr}`, {
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
         const list = Array.isArray(data?.result) ? data.result : [];
@@ -1862,7 +3114,8 @@ export function BasketballPageClient() {
   };
 
   const liveCount = useMemo(
-    () => liveGames.filter((g) => g.status === 'LIVE' || g.status === 'HT' || g.status === 'OT').length,
+    () =>
+      liveGames.filter((g) => g.status === 'LIVE' || g.status === 'HT' || g.status === 'OT').length,
     [liveGames]
   );
 
@@ -1881,15 +3134,12 @@ export function BasketballPageClient() {
     const list = tabGames[mainTab] ?? [];
     return list.filter((g) => {
       const matchComp =
-        compFilter === 'All'
-          ? true
-          : g.comp.toLowerCase().includes(compFilter.toLowerCase());
-      const matchSearch =
-        !searchQuery.trim()
-          ? true
-          : g.home.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            g.away.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            g.comp.toLowerCase().includes(searchQuery.toLowerCase());
+        compFilter === 'All' ? true : g.comp.toLowerCase().includes(compFilter.toLowerCase());
+      const matchSearch = !searchQuery.trim()
+        ? true
+        : g.home.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          g.away.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          g.comp.toLowerCase().includes(searchQuery.toLowerCase());
       return matchComp && matchSearch;
     });
   }, [tabGames, mainTab, compFilter, searchQuery]);
@@ -1916,7 +3166,10 @@ export function BasketballPageClient() {
     return list.sort((a, b) => {
       if (standingsSortKey === 'pos') return standingsSortAsc ? a.pos - b.pos : b.pos - a.pos;
       if (standingsSortKey === 'w') return standingsSortAsc ? a.w - b.w : b.w - a.w;
-      if (standingsSortKey === 'pct') return standingsSortAsc ? parseFloat(a.pct) - parseFloat(b.pct) : parseFloat(b.pct) - parseFloat(a.pct);
+      if (standingsSortKey === 'pct')
+        return standingsSortAsc
+          ? parseFloat(a.pct) - parseFloat(b.pct)
+          : parseFloat(b.pct) - parseFloat(a.pct);
       if (standingsSortKey === 'ppg') return standingsSortAsc ? a.ppg - b.ppg : b.ppg - a.ppg;
       if (standingsSortKey === 'oppg') return standingsSortAsc ? a.oppg - b.oppg : b.oppg - a.oppg;
       return 0;
@@ -1936,11 +3189,10 @@ export function BasketballPageClient() {
   const activeLeaders = useMemo(() => {
     return ALL_STAT_LEADERS.filter((l) => {
       const matchCat = l.category === statCat;
-      const matchSearch =
-        !leaderSearch.trim()
-          ? true
-          : l.name.toLowerCase().includes(leaderSearch.toLowerCase()) ||
-            l.team.toLowerCase().includes(leaderSearch.toLowerCase());
+      const matchSearch = !leaderSearch.trim()
+        ? true
+        : l.name.toLowerCase().includes(leaderSearch.toLowerCase()) ||
+          l.team.toLowerCase().includes(leaderSearch.toLowerCase());
       return matchCat && matchSearch;
     });
   }, [statCat, leaderSearch]);
@@ -1949,12 +3201,11 @@ export function BasketballPageClient() {
   const filteredSuperstars = useMemo(() => {
     return BASKETBALL_SUPERSTARS.filter((p) => {
       const matchCat = superstarFilter === 'All' ? true : p.posCategory === superstarFilter;
-      const matchSearch =
-        !superstarSearch.trim()
-          ? true
-          : p.name.toLowerCase().includes(superstarSearch.toLowerCase()) ||
-            p.team.toLowerCase().includes(superstarSearch.toLowerCase()) ||
-            p.nationality.toLowerCase().includes(superstarSearch.toLowerCase());
+      const matchSearch = !superstarSearch.trim()
+        ? true
+        : p.name.toLowerCase().includes(superstarSearch.toLowerCase()) ||
+          p.team.toLowerCase().includes(superstarSearch.toLowerCase()) ||
+          p.nationality.toLowerCase().includes(superstarSearch.toLowerCase());
       return matchCat && matchSearch;
     });
   }, [superstarFilter, superstarSearch]);
@@ -2031,7 +3282,8 @@ export function BasketballPageClient() {
                 Basketball Live Game Centre & Telemetry
               </h1>
               <p className="text-slate-400 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
-                Real-time quarter box scores, multi-league conference standings, consensus betting lines, and Secaucus Replay telemetry across 30+ elite basketball leagues worldwide.
+                Real-time quarter box scores, multi-league conference standings, consensus betting
+                lines, and Secaucus Replay telemetry across 30+ elite basketball leagues worldwide.
               </p>
             </div>
 
@@ -2059,15 +3311,16 @@ export function BasketballPageClient() {
       ════════════════════════════════════════ */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_290px] gap-6 items-start">
-
           {/* ── LEFT SIDEBAR ── */}
           <aside className="hidden lg:block space-y-4 lg:sticky lg:top-24">
-
             {/* Basketball Analysis Section */}
             <SideSection
               title="Basketball Analysis"
               action={
-                <Link href="/basketball" className="text-[10px] text-orange-400 hover:text-orange-300 font-bold uppercase tracking-wider">
+                <Link
+                  href="/basketball"
+                  className="text-[10px] text-orange-400 hover:text-orange-300 font-bold uppercase tracking-wider"
+                >
                   All →
                 </Link>
               }
@@ -2084,7 +3337,9 @@ export function BasketballPageClient() {
                         alt=""
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80"
                       />
-                      <span className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}>
+                      <span
+                        className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}
+                      >
                         {a.tag}
                       </span>
                     </div>
@@ -2106,13 +3361,19 @@ export function BasketballPageClient() {
             <SideSection
               title="Competition Directory"
               defaultOpen={true}
-              action={<span className="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 rounded bg-slate-800">25+</span>}
+              action={
+                <span className="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 rounded bg-slate-800">
+                  25+
+                </span>
+              }
             >
               <div className="divide-y divide-[#1e293b]">
                 {COMP_GROUPS.map((group) => (
                   <div key={group.region}>
                     <button
-                      onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                      onClick={() =>
+                        setExpandedComp(expandedComp === group.region ? null : group.region)
+                      }
                       className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors text-left cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
@@ -2148,8 +3409,8 @@ export function BasketballPageClient() {
                                 c.tier === 'T1'
                                   ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                                   : c.tier === 'T2'
-                                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                  : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                    : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                               }`}
                             >
                               {c.tier}
@@ -2168,7 +3429,10 @@ export function BasketballPageClient() {
               title="Featured Team Hubs"
               defaultOpen={false}
               action={
-                <Link href="/basketball" className="text-[10px] text-orange-400 hover:text-orange-300 font-bold uppercase tracking-wider">
+                <Link
+                  href="/basketball"
+                  className="text-[10px] text-orange-400 hover:text-orange-300 font-bold uppercase tracking-wider"
+                >
                   All →
                 </Link>
               }
@@ -2192,7 +3456,6 @@ export function BasketballPageClient() {
                 ))}
               </div>
             </SideSection>
-
           </aside>
 
           {/* ── MAIN CONTENT ── */}
@@ -2210,7 +3473,9 @@ export function BasketballPageClient() {
                   </span>
                   <div className="text-left">
                     <p className="text-xs font-black text-white">Basketball Hubs</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Analysis · Team Hubs · 25+ Competitions</p>
+                    <p className="text-[10px] text-slate-400 font-normal">
+                      Analysis · Team Hubs · 25+ Competitions
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -2232,23 +3497,39 @@ export function BasketballPageClient() {
                     title="Basketball Analysis"
                     defaultOpen={true}
                     action={
-                      <Link href="/basketball" className="text-[10px] text-orange-400 hover:text-orange-300 font-bold">
+                      <Link
+                        href="/basketball"
+                        className="text-[10px] text-orange-400 hover:text-orange-300 font-bold"
+                      >
                         All →
                       </Link>
                     }
                   >
                     <div className="divide-y divide-[#1e293b]">
                       {ANALYSIS_ARTICLES.slice(0, 4).map((a, i) => (
-                        <div key={i} className="flex gap-3 p-3 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer">
+                        <div
+                          key={i}
+                          className="flex gap-3 p-3 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer"
+                        >
                           <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800 border border-slate-700">
-                            <img src={a.img} alt="" className="w-full h-full object-cover opacity-80" />
-                            <span className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}>
+                            <img
+                              src={a.img}
+                              alt=""
+                              className="w-full h-full object-cover opacity-80"
+                            />
+                            <span
+                              className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}
+                            >
                               {a.tag}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[9px] font-semibold text-orange-400 uppercase tracking-widest mb-0.5">{a.comp}</p>
-                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">{a.title}</h4>
+                            <p className="text-[9px] font-semibold text-orange-400 uppercase tracking-widest mb-0.5">
+                              {a.comp}
+                            </p>
+                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">
+                              {a.title}
+                            </h4>
                             <p className="text-[9px] text-slate-500 mt-1">{a.time}</p>
                           </div>
                         </div>
@@ -2260,18 +3541,26 @@ export function BasketballPageClient() {
                   <SideSection
                     title="Competition Directory"
                     defaultOpen={false}
-                    action={<span className="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 rounded bg-slate-800">25+</span>}
+                    action={
+                      <span className="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 rounded bg-slate-800">
+                        25+
+                      </span>
+                    }
                   >
                     <div className="divide-y divide-[#1e293b]">
                       {COMP_GROUPS.map((group) => (
                         <div key={group.region}>
                           <button
-                            onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                            onClick={() =>
+                              setExpandedComp(expandedComp === group.region ? null : group.region)
+                            }
                             className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#1e293b]/40 transition-colors text-left"
                           >
                             <div className="flex items-center gap-2">
                               <span className="text-sm">{group.icon}</span>
-                              <span className="text-xs font-semibold text-slate-300">{group.region}</span>
+                              <span className="text-xs font-semibold text-slate-300">
+                                {group.region}
+                              </span>
                             </div>
                             <FiChevronDown
                               className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
@@ -2289,7 +3578,9 @@ export function BasketballPageClient() {
                                 >
                                   <span className="text-sm">{c.flag}</span>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] font-semibold text-slate-300 truncate">{c.name}</p>
+                                    <p className="text-[11px] font-semibold text-slate-300 truncate">
+                                      {c.name}
+                                    </p>
                                     <p className="text-[9px] text-slate-500">{c.country}</p>
                                   </div>
                                 </Link>
@@ -2306,7 +3597,10 @@ export function BasketballPageClient() {
                     title="Featured Team Hubs"
                     defaultOpen={false}
                     action={
-                      <Link href="/basketball" className="text-[10px] text-orange-400 hover:text-orange-300 font-bold">
+                      <Link
+                        href="/basketball"
+                        className="text-[10px] text-orange-400 hover:text-orange-300 font-bold"
+                      >
                         All →
                       </Link>
                     }
@@ -2319,7 +3613,9 @@ export function BasketballPageClient() {
                           className="flex flex-col items-center gap-1.5 p-3 bg-[#0f172a] hover:bg-[#131f35] transition-colors text-center"
                         >
                           <DynamicTeamLogo name={t.name} logoUrl={t.logo} className="w-8 h-8" />
-                          <p className="text-[10px] font-bold text-slate-200 leading-tight truncate max-w-full">{t.name}</p>
+                          <p className="text-[10px] font-bold text-slate-200 leading-tight truncate max-w-full">
+                            {t.name}
+                          </p>
                           <span className="text-[9px] text-orange-400 font-semibold">Hub →</span>
                         </Link>
                       ))}
@@ -2384,7 +3680,9 @@ export function BasketballPageClient() {
                           : 'bg-[#0f172a] border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
                       }`}
                     >
-                      <span className="text-[9px] uppercase tracking-wider font-semibold opacity-80">{item.label}</span>
+                      <span className="text-[9px] uppercase tracking-wider font-semibold opacity-80">
+                        {item.label}
+                      </span>
                       <span className="text-[11px] font-black font-mono">{item.dayMonth}</span>
                     </button>
                   ))}
@@ -2433,8 +3731,8 @@ export function BasketballPageClient() {
             </div>
 
             {/* ── Fixture Grid (Live / Upcoming / Results) ── */}
-            {isFixtureTab && (
-              visibleGames.length > 0 ? (
+            {isFixtureTab &&
+              (visibleGames.length > 0 ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {visibleGames.map((g) => (
@@ -2474,7 +3772,8 @@ export function BasketballPageClient() {
                   </div>
                   <h3 className="text-base font-bold text-white">No fixtures found</h3>
                   <p className="text-slate-400 text-xs max-w-sm mx-auto">
-                    No games match the current competition filter or date. Try selecting another date or syncing live telemetry.
+                    No games match the current competition filter or date. Try selecting another
+                    date or syncing live telemetry.
                   </p>
                   <button
                     onClick={() => {
@@ -2487,8 +3786,7 @@ export function BasketballPageClient() {
                     Reset all filters & return to today
                   </button>
                 </div>
-              )
-            )}
+              ))}
 
             {/* ── Standings Tab ── */}
             {mainTab === 'standings' && (
@@ -2537,9 +3835,16 @@ export function BasketballPageClient() {
                 <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
                   <div className="px-5 py-3 border-b border-[#1e293b] bg-[#0c1322] flex items-center justify-between">
                     <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest flex items-center gap-2">
-                      <span>🏀 {selectedStandingsLeague} {selectedStandingsLeague === 'NBA' ? `${standingsConf}ern Conference` : 'Table'}</span>
+                      <span>
+                        🏀 {selectedStandingsLeague}{' '}
+                        {selectedStandingsLeague === 'NBA'
+                          ? `${standingsConf}ern Conference`
+                          : 'Table'}
+                      </span>
                     </h3>
-                    <span className="text-[10px] text-slate-500 font-mono">Real-time Form & Seed Matrix</span>
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      Real-time Form & Seed Matrix
+                    </span>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -2547,15 +3852,30 @@ export function BasketballPageClient() {
                       <thead>
                         <tr className="border-b border-[#1e293b] bg-[#090f1a]">
                           {[
-                            { label: '#', key: 'pos' as const, align: 'left', width: 'w-10 pl-5 pr-2' },
+                            {
+                              label: '#',
+                              key: 'pos' as const,
+                              align: 'left',
+                              width: 'w-10 pl-5 pr-2',
+                            },
                             { label: 'Team', key: null, align: 'left', width: 'px-3' },
                             { label: 'W', key: 'w' as const, align: 'center', width: 'px-2.5' },
                             { label: 'L', key: null, align: 'center', width: 'px-2.5' },
                             { label: 'PCT', key: 'pct' as const, align: 'center', width: 'px-2.5' },
                             { label: 'GB', key: null, align: 'center', width: 'px-2.5' },
                             { label: 'PPG', key: 'ppg' as const, align: 'center', width: 'px-2.5' },
-                            { label: 'OPP', key: 'oppg' as const, align: 'center', width: 'px-2.5' },
-                            { label: 'Form (Last 5)', key: null, align: 'right', width: 'pr-5 pl-2 hidden md:table-cell' },
+                            {
+                              label: 'OPP',
+                              key: 'oppg' as const,
+                              align: 'center',
+                              width: 'px-2.5',
+                            },
+                            {
+                              label: 'Form (Last 5)',
+                              key: null,
+                              align: 'right',
+                              width: 'pr-5 pl-2 hidden md:table-cell',
+                            },
                           ].map((col, idx) => (
                             <th
                               key={idx}
@@ -2586,10 +3906,10 @@ export function BasketballPageClient() {
                               row.zone === 'playoffs'
                                 ? 'border-l-2 border-l-blue-500'
                                 : row.zone === 'playin'
-                                ? 'border-l-2 border-l-orange-500'
-                                : row.zone === 'lottery'
-                                ? 'border-l-2 border-l-rose-500'
-                                : ''
+                                  ? 'border-l-2 border-l-orange-500'
+                                  : row.zone === 'lottery'
+                                    ? 'border-l-2 border-l-rose-500'
+                                    : ''
                             }`}
                           >
                             <td className="pl-5 pr-2 py-3">
@@ -2598,10 +3918,10 @@ export function BasketballPageClient() {
                                   row.zone === 'playoffs'
                                     ? 'text-blue-400'
                                     : row.zone === 'playin'
-                                    ? 'text-orange-400'
-                                    : row.zone === 'lottery'
-                                    ? 'text-rose-400'
-                                    : 'text-slate-400'
+                                      ? 'text-orange-400'
+                                      : row.zone === 'lottery'
+                                        ? 'text-rose-400'
+                                        : 'text-slate-400'
                                 }`}
                               >
                                 {row.pos}
@@ -2609,7 +3929,11 @@ export function BasketballPageClient() {
                             </td>
                             <td className="px-3 py-3">
                               <div className="flex items-center gap-2.5">
-                                <DynamicTeamLogo name={row.team} logoUrl={row.logo} className="w-6 h-6" />
+                                <DynamicTeamLogo
+                                  name={row.team}
+                                  logoUrl={row.logo}
+                                  className="w-6 h-6"
+                                />
                                 <span className="text-sm font-semibold text-slate-100 hover:text-white transition-colors truncate">
                                   {row.team}
                                 </span>
@@ -2745,7 +4069,11 @@ export function BasketballPageClient() {
                             <span className="text-xs">{p.flag}</span>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                            <DynamicTeamLogo name={p.team} logoUrl={p.teamLogo} className="w-4 h-4" />
+                            <DynamicTeamLogo
+                              name={p.team}
+                              logoUrl={p.teamLogo}
+                              className="w-4 h-4"
+                            />
                             <span className="truncate">{p.team}</span>
                           </div>
                           <p className="text-[10px] text-slate-500 mt-0.5 font-mono">{p.extra}</p>
@@ -2776,11 +4104,14 @@ export function BasketballPageClient() {
                       <span>📊 Vegas & Consensus Basketball Odds</span>
                     </h3>
                     <p className="text-xs text-slate-400 mt-1">
-                      Point spreads, moneylines, over/under game totals, and real-time line movement telemetry.
+                      Point spreads, moneylines, over/under game totals, and real-time line movement
+                      telemetry.
                     </p>
                   </div>
                   <div className="flex items-center gap-2 bg-[#060c18] border border-slate-800 p-1 rounded-xl">
-                    <span className="text-[10px] font-black uppercase text-slate-400 px-2">Format:</span>
+                    <span className="text-[10px] font-black uppercase text-slate-400 px-2">
+                      Format:
+                    </span>
                     <button
                       onClick={() => setOddsFormat('decimal')}
                       className={`text-xs font-black px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
@@ -2814,7 +4145,9 @@ export function BasketballPageClient() {
                         className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 space-y-3 hover:border-orange-500/40 transition-all shadow-sm"
                       >
                         <div className="flex items-center justify-between text-[10px]">
-                          <span className="font-bold text-orange-400 uppercase tracking-wider">{item.comp}</span>
+                          <span className="font-bold text-orange-400 uppercase tracking-wider">
+                            {item.comp}
+                          </span>
                           <span className="text-slate-400 font-mono">{item.time}</span>
                         </div>
 
@@ -2823,8 +4156,14 @@ export function BasketballPageClient() {
                           {/* Home */}
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 flex-1 truncate">
-                              <DynamicTeamLogo name={item.home} logoUrl={item.homeLogo} className="w-5 h-5" />
-                              <span className="text-xs font-bold text-white truncate">{item.home}</span>
+                              <DynamicTeamLogo
+                                name={item.home}
+                                logoUrl={item.homeLogo}
+                                className="w-5 h-5"
+                              />
+                              <span className="text-xs font-bold text-white truncate">
+                                {item.home}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               {/* Spread button */}
@@ -2842,7 +4181,11 @@ export function BasketballPageClient() {
                                 className="px-2.5 py-1 bg-slate-800 hover:bg-orange-600 hover:text-white rounded-lg text-xs font-mono font-bold text-slate-200 border border-slate-700 transition-colors cursor-pointer"
                                 title="Select Spread"
                               >
-                                {item.spread.homeLine} ({oddsFormat === 'decimal' ? item.spread.homeDecimal : item.spread.homeAmerican})
+                                {item.spread.homeLine} (
+                                {oddsFormat === 'decimal'
+                                  ? item.spread.homeDecimal
+                                  : item.spread.homeAmerican}
+                                )
                               </button>
                               {/* ML button */}
                               <button
@@ -2859,7 +4202,9 @@ export function BasketballPageClient() {
                                 className="px-2.5 py-1 bg-slate-800 hover:bg-orange-600 hover:text-white rounded-lg text-xs font-mono font-bold text-slate-200 border border-slate-700 transition-colors cursor-pointer"
                                 title="Select Moneyline"
                               >
-                                {oddsFormat === 'decimal' ? item.moneyline.homeDecimal : item.moneyline.homeAmerican}
+                                {oddsFormat === 'decimal'
+                                  ? item.moneyline.homeDecimal
+                                  : item.moneyline.homeAmerican}
                               </button>
                             </div>
                           </div>
@@ -2867,8 +4212,14 @@ export function BasketballPageClient() {
                           {/* Away */}
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 flex-1 truncate">
-                              <DynamicTeamLogo name={item.away} logoUrl={item.awayLogo} className="w-5 h-5" />
-                              <span className="text-xs font-bold text-white truncate">{item.away}</span>
+                              <DynamicTeamLogo
+                                name={item.away}
+                                logoUrl={item.awayLogo}
+                                className="w-5 h-5"
+                              />
+                              <span className="text-xs font-bold text-white truncate">
+                                {item.away}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               {/* Spread button */}
@@ -2886,7 +4237,11 @@ export function BasketballPageClient() {
                                 className="px-2.5 py-1 bg-slate-800 hover:bg-orange-600 hover:text-white rounded-lg text-xs font-mono font-bold text-slate-200 border border-slate-700 transition-colors cursor-pointer"
                                 title="Select Spread"
                               >
-                                {item.spread.awayLine} ({oddsFormat === 'decimal' ? item.spread.awayDecimal : item.spread.awayAmerican})
+                                {item.spread.awayLine} (
+                                {oddsFormat === 'decimal'
+                                  ? item.spread.awayDecimal
+                                  : item.spread.awayAmerican}
+                                )
                               </button>
                               {/* ML button */}
                               <button
@@ -2903,7 +4258,9 @@ export function BasketballPageClient() {
                                 className="px-2.5 py-1 bg-slate-800 hover:bg-orange-600 hover:text-white rounded-lg text-xs font-mono font-bold text-slate-200 border border-slate-700 transition-colors cursor-pointer"
                                 title="Select Moneyline"
                               >
-                                {oddsFormat === 'decimal' ? item.moneyline.awayDecimal : item.moneyline.awayAmerican}
+                                {oddsFormat === 'decimal'
+                                  ? item.moneyline.awayDecimal
+                                  : item.moneyline.awayAmerican}
                               </button>
                             </div>
                           </div>
@@ -2928,7 +4285,11 @@ export function BasketballPageClient() {
                               }
                               className="text-xs font-mono text-emerald-400 hover:underline cursor-pointer"
                             >
-                              Over ({oddsFormat === 'decimal' ? item.total.overDecimal : item.total.overAmerican})
+                              Over (
+                              {oddsFormat === 'decimal'
+                                ? item.total.overDecimal
+                                : item.total.overAmerican}
+                              )
                             </button>
                             <span className="text-slate-600">·</span>
                             <button
@@ -2944,7 +4305,11 @@ export function BasketballPageClient() {
                               }
                               className="text-xs font-mono text-rose-400 hover:underline cursor-pointer"
                             >
-                              Under ({oddsFormat === 'decimal' ? item.total.underDecimal : item.total.underAmerican})
+                              Under (
+                              {oddsFormat === 'decimal'
+                                ? item.total.underDecimal
+                                : item.total.underAmerican}
+                              )
                             </button>
                           </div>
                         </div>
@@ -2970,12 +4335,10 @@ export function BasketballPageClient() {
                 </div>
               </div>
             )}
-
           </div>
 
           {/* ── RIGHT SIDEBAR ── */}
           <aside className="hidden xl:block space-y-4 sticky top-24">
-
             {/* Live Now Ticker Widget */}
             <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
               <div className="px-4 py-3 border-b border-[#1e293b] bg-[#0c1322] flex items-center justify-between">
@@ -3011,7 +4374,11 @@ export function BasketballPageClient() {
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 truncate">
-                            <DynamicTeamLogo name={g.home} logoUrl={g.homeLogo} className="w-4 h-4" />
+                            <DynamicTeamLogo
+                              name={g.home}
+                              logoUrl={g.homeLogo}
+                              className="w-4 h-4"
+                            />
                             <span className="text-xs font-semibold text-slate-200 group-hover:text-white truncate">
                               {g.home}
                             </span>
@@ -3022,7 +4389,11 @@ export function BasketballPageClient() {
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 truncate">
-                            <DynamicTeamLogo name={g.away} logoUrl={g.awayLogo} className="w-4 h-4" />
+                            <DynamicTeamLogo
+                              name={g.away}
+                              logoUrl={g.awayLogo}
+                              className="w-4 h-4"
+                            />
                             <span className="text-xs font-semibold text-slate-200 group-hover:text-white truncate">
                               {g.away}
                             </span>
@@ -3094,32 +4465,32 @@ export function BasketballPageClient() {
                 </button>
               </div>
               <div className="divide-y divide-[#1e293b]">
-                {ALL_STAT_LEADERS.filter((l) => l.category === 'PPG').slice(0, 4).map((p) => (
-                  <div
-                    key={p.rank}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors"
-                  >
-                    <span className="text-xs font-black text-slate-500 w-4 tabular-nums">
-                      {p.rank}
-                    </span>
-                    <DynamicPlayerAvatar name={p.name} photo={p.photo} className="w-7 h-7" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-200 truncate">{p.name}</p>
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                        <DynamicTeamLogo name={p.team} logoUrl={p.teamLogo} className="w-3 h-3" />
-                        <span className="truncate">{p.team}</span>
+                {ALL_STAT_LEADERS.filter((l) => l.category === 'PPG')
+                  .slice(0, 4)
+                  .map((p) => (
+                    <div
+                      key={p.rank}
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors"
+                    >
+                      <span className="text-xs font-black text-slate-500 w-4 tabular-nums">
+                        {p.rank}
+                      </span>
+                      <DynamicPlayerAvatar name={p.name} photo={p.photo} className="w-7 h-7" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-200 truncate">{p.name}</p>
+                        <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                          <DynamicTeamLogo name={p.team} logoUrl={p.teamLogo} className="w-3 h-3" />
+                          <span className="truncate">{p.team}</span>
+                        </div>
                       </div>
+                      <span className="text-sm font-black text-orange-400 tabular-nums">
+                        {p.stat.toFixed(1)}
+                      </span>
                     </div>
-                    <span className="text-sm font-black text-orange-400 tabular-nums">
-                      {p.stat.toFixed(1)}
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
-
           </aside>
-
         </div>
 
         {/* ════════════════════════════════════════
@@ -3138,7 +4509,8 @@ export function BasketballPageClient() {
                 Basketball Icons & Franchise Scorers
               </h2>
               <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                Efficiency ratings (PER), max contracts, triple-double counts, and real-time box score telemetry.
+                Efficiency ratings (PER), max contracts, triple-double counts, and real-time box
+                score telemetry.
               </p>
             </div>
 
@@ -3193,7 +4565,11 @@ export function BasketballPageClient() {
                         <span className="text-xs">{player.countryFlag}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                        <DynamicTeamLogo name={player.team} logoUrl={player.teamLogo} className="w-4 h-4" />
+                        <DynamicTeamLogo
+                          name={player.team}
+                          logoUrl={player.teamLogo}
+                          className="w-4 h-4"
+                        />
                         <span className="truncate font-medium">{player.team}</span>
                       </div>
                       <p className="text-[10px] text-orange-400/90 font-bold mt-0.5 uppercase tracking-wider">
@@ -3204,20 +4580,36 @@ export function BasketballPageClient() {
 
                   <div className="grid grid-cols-4 gap-2 py-2.5 px-3 bg-[#0a1120] rounded-xl border border-[#1e293b] text-center">
                     <div>
-                      <span className="text-xs font-black text-orange-400 tabular-nums">{player.ppg}</span>
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">PPG</p>
+                      <span className="text-xs font-black text-orange-400 tabular-nums">
+                        {player.ppg}
+                      </span>
+                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                        PPG
+                      </p>
                     </div>
                     <div>
-                      <span className="text-xs font-black text-white tabular-nums">{player.rpg}</span>
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">RPG</p>
+                      <span className="text-xs font-black text-white tabular-nums">
+                        {player.rpg}
+                      </span>
+                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                        RPG
+                      </p>
                     </div>
                     <div>
-                      <span className="text-xs font-black text-amber-400 tabular-nums">{player.apg}</span>
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">APG</p>
+                      <span className="text-xs font-black text-amber-400 tabular-nums">
+                        {player.apg}
+                      </span>
+                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                        APG
+                      </p>
                     </div>
                     <div>
-                      <span className="text-xs font-black text-emerald-400 tabular-nums">{player.per}</span>
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">PER</p>
+                      <span className="text-xs font-black text-emerald-400 tabular-nums">
+                        {player.per}
+                      </span>
+                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                        PER
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -3253,7 +4645,8 @@ export function BasketballPageClient() {
                 Officials & Replay Command Desk
               </h2>
               <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                NBA Secaucus Replay Center call tracking, coach challenge overturn percentages, and whistle telemetry.
+                NBA Secaucus Replay Center call tracking, coach challenge overturn percentages, and
+                whistle telemetry.
               </p>
             </div>
 
@@ -3274,7 +4667,10 @@ export function BasketballPageClient() {
                 NBA Secaucus Replay Review Protocols (2025/26)
               </h4>
               <p className="leading-relaxed text-slate-400">
-                Triggered automatically for 2-point vs 3-point buzzer shots, shot clock expirations, and clear path fouls. Coach Challenges require an available timeout; if successful, a second challenge is granted. Overturn accuracy is monitored via multi-angle 120 FPS high-speed cameras synchronized with courtside referees.
+                Triggered automatically for 2-point vs 3-point buzzer shots, shot clock expirations,
+                and clear path fouls. Coach Challenges require an available timeout; if successful,
+                a second challenge is granted. Overturn accuracy is monitored via multi-angle 120
+                FPS high-speed cameras synchronized with courtside referees.
               </p>
             </div>
           )}
@@ -3290,7 +4686,9 @@ export function BasketballPageClient() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h4 className="text-sm font-black text-slate-100 truncate">{o.name}</h4>
-                      <span className="text-[10px] font-mono text-orange-400 font-bold">{o.number}</span>
+                      <span className="text-[10px] font-mono text-orange-400 font-bold">
+                        {o.number}
+                      </span>
                     </div>
                     <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
                       <span>{o.seasons}</span>
@@ -3305,15 +4703,21 @@ export function BasketballPageClient() {
                 <div className="grid grid-cols-3 gap-2 py-2.5 px-3 bg-[#0a1120] rounded-xl border border-[#1e293b] text-center">
                   <div>
                     <span className="text-xs font-black text-white">{o.reviewAcc}</span>
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Accuracy</p>
+                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                      Accuracy
+                    </p>
                   </div>
                   <div>
                     <span className="text-xs font-black text-amber-400">{o.overturnPct}</span>
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Overturn %</p>
+                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                      Overturn %
+                    </p>
                   </div>
                   <div>
                     <span className="text-xs font-black text-emerald-400">{o.avgReviewSec}</span>
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Avg Review</p>
+                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                      Avg Review
+                    </p>
                   </div>
                 </div>
               </div>
@@ -3337,7 +4741,8 @@ export function BasketballPageClient() {
                 Tacticians & Sideline Philosophies
               </h2>
               <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                5-out spacing sets, ATO (after-timeout) play success rates, clutch defensive ratings, and championship rings.
+                5-out spacing sets, ATO (after-timeout) play success rates, clutch defensive
+                ratings, and championship rings.
               </p>
             </div>
 
@@ -3371,7 +4776,11 @@ export function BasketballPageClient() {
                     <div className="min-w-0 flex-1">
                       <h4 className="text-sm font-black text-slate-100 truncate">{c.name}</h4>
                       <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                        <DynamicTeamLogo name={c.team} logoUrl={c.teamLogo} className="w-3.5 h-3.5" />
+                        <DynamicTeamLogo
+                          name={c.team}
+                          logoUrl={c.teamLogo}
+                          className="w-3.5 h-3.5"
+                        />
                         <span className="truncate font-medium">{c.team}</span>
                       </div>
                     </div>
@@ -3395,11 +4804,15 @@ export function BasketballPageClient() {
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1e293b]/70 text-center text-xs">
                   <div>
                     <span className="font-mono font-black text-white">{c.winPct}</span>
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Career Win %</p>
+                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                      Career Win %
+                    </p>
                   </div>
                   <div>
                     <span className="font-mono font-black text-orange-400">{c.offensiveRtg}</span>
-                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Offensive Rating</p>
+                    <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                      Offensive Rating
+                    </p>
                   </div>
                 </div>
               </div>
@@ -3432,7 +4845,9 @@ export function BasketballPageClient() {
                 </h3>
 
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  Start your basketball morning with every NBA box score, fourth-quarter clutch telemetry, EuroLeague upsets, and Basketball Africa League scouting reports delivered straight to your inbox.
+                  Start your basketball morning with every NBA box score, fourth-quarter clutch
+                  telemetry, EuroLeague upsets, and Basketball Africa League scouting reports
+                  delivered straight to your inbox.
                 </p>
 
                 {/* Topic selector pills */}
@@ -3477,7 +4892,8 @@ export function BasketballPageClient() {
                     </div>
                     <h4 className="text-base font-bold text-white">You&apos;re subscribed!</h4>
                     <p className="text-xs text-slate-400">
-                      Tomorrow&apos;s Hoops Daily Morning Shootaround will arrive in your inbox before tipoff.
+                      Tomorrow&apos;s Hoops Daily Morning Shootaround will arrive in your inbox
+                      before tipoff.
                     </p>
                   </div>
                 ) : (
@@ -3487,7 +4903,8 @@ export function BasketballPageClient() {
                         Get the Morning Box Scores
                       </h4>
                       <p className="text-xs text-slate-400 mt-1">
-                        Join 32,000+ basketball fans, scouts, and fantasy managers. Free forever, unsubscribe anytime.
+                        Join 32,000+ basketball fans, scouts, and fantasy managers. Free forever,
+                        unsubscribe anytime.
                       </p>
                     </div>
 
@@ -3528,7 +4945,6 @@ export function BasketballPageClient() {
             </div>
           </div>
         </section>
-
       </div>
     </div>
   );

@@ -72,7 +72,9 @@ export default function SportsWarehouseStudio() {
   async function handleQueryH2H() {
     setLoadingH2H(true);
     try {
-      const res = await fetch(`/api/warehouse/h2h?sport=${sandboxSport}&teamA=${teamA}&teamB=${teamB}`);
+      const res = await fetch(
+        `/api/warehouse/h2h?sport=${sandboxSport}&teamA=${teamA}&teamB=${teamB}`
+      );
       const data = await res.json();
       if (data.success && data.h2h) {
         setH2hResult(data.h2h);
@@ -101,7 +103,8 @@ export default function SportsWarehouseStudio() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Durable historical sports intelligence, Head-to-Head matrix calculations, and provenance auditing.
+                Durable historical sports intelligence, Head-to-Head matrix calculations, and
+                provenance auditing.
               </p>
             </div>
           </div>
@@ -128,7 +131,9 @@ export default function SportsWarehouseStudio() {
           }`}
         >
           <span>{feedback.message}</span>
-          <button onClick={() => setFeedback(null)} className="text-white/60 hover:text-white">✕</button>
+          <button onClick={() => setFeedback(null)} className="text-white/60 hover:text-white">
+            ✕
+          </button>
         </div>
       )}
 
@@ -155,9 +160,7 @@ export default function SportsWarehouseStudio() {
           <div className="text-3xl font-black text-white">
             {stats ? stats.totalHistoricalMatches.cricket : '—'} matches
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Innings, overs, wickets & run rates
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">Innings, overs, wickets & run rates</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10">
@@ -165,9 +168,7 @@ export default function SportsWarehouseStudio() {
             <span className="text-xs font-bold uppercase tracking-wider">Active Teams Stored</span>
             <FiShield className="text-blue-400" />
           </div>
-          <div className="text-3xl font-black text-white">
-            {stats ? stats.totalTeams : '—'}
-          </div>
+          <div className="text-3xl font-black text-white">{stats ? stats.totalTeams : '—'}</div>
           <div className="text-[11px] text-slate-400 mt-1">
             Indexed across {stats?.totalCompetitions || 14} competitions
           </div>
@@ -196,7 +197,10 @@ export default function SportsWarehouseStudio() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {stats?.providerSyncHealth.map((p) => (
-            <div key={p.provider} className="p-4 rounded-xl bg-slate-950/80 border border-white/5 space-y-2">
+            <div
+              key={p.provider}
+              className="p-4 rounded-xl bg-slate-950/80 border border-white/5 space-y-2"
+            >
               <div className="flex items-center justify-between">
                 <span className="font-mono font-bold text-slate-200 uppercase">{p.provider}</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">
@@ -205,7 +209,9 @@ export default function SportsWarehouseStudio() {
               </div>
               <div className="text-xs text-slate-400 flex justify-between">
                 <span>Confidence Rating:</span>
-                <span className="font-bold text-amber-400">{Math.round(p.confidenceAvg * 100)}%</span>
+                <span className="font-bold text-amber-400">
+                  {Math.round(p.confidenceAvg * 100)}%
+                </span>
               </div>
               <div className="text-[10px] text-slate-500 font-mono">
                 Last Ingestion: {new Date(p.lastSync).toLocaleTimeString()}
@@ -231,7 +237,9 @@ export default function SportsWarehouseStudio() {
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Sport</label>
+            <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+              Sport
+            </label>
             <select
               value={sandboxSport}
               onChange={(e) => setSandboxSport(e.target.value)}
@@ -244,7 +252,9 @@ export default function SportsWarehouseStudio() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Team A Slug</label>
+            <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+              Team A Slug
+            </label>
             <input
               type="text"
               value={teamA}
@@ -254,7 +264,9 @@ export default function SportsWarehouseStudio() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Team B Slug</label>
+            <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+              Team B Slug
+            </label>
             <input
               type="text"
               value={teamB}
@@ -279,26 +291,38 @@ export default function SportsWarehouseStudio() {
         {h2hResult && (
           <div className="p-5 rounded-2xl bg-slate-950/80 border border-white/10 space-y-4">
             <div className="flex items-center justify-between text-xs font-bold text-white border-b border-white/10 pb-3">
-              <span>{h2hResult.teamA.name} vs {h2hResult.teamB.name}</span>
-              <span className="text-amber-400">{h2hResult.totalMatches} Historical Fixtures Found</span>
+              <span>
+                {h2hResult.teamA.name} vs {h2hResult.teamB.name}
+              </span>
+              <span className="text-amber-400">
+                {h2hResult.totalMatches} Historical Fixtures Found
+              </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
               <div className="p-3 rounded-xl bg-slate-900/60 border border-white/5">
-                <div className="text-[10px] text-slate-400 uppercase">{h2hResult.teamA.name} Wins</div>
-                <div className="text-lg font-black text-emerald-400 mt-1">{h2hResult.teamAWins}</div>
+                <div className="text-[10px] text-slate-400 uppercase">
+                  {h2hResult.teamA.name} Wins
+                </div>
+                <div className="text-lg font-black text-emerald-400 mt-1">
+                  {h2hResult.teamAWins}
+                </div>
               </div>
               <div className="p-3 rounded-xl bg-slate-900/60 border border-white/5">
                 <div className="text-[10px] text-slate-400 uppercase">Draws</div>
                 <div className="text-lg font-black text-slate-300 mt-1">{h2hResult.draws}</div>
               </div>
               <div className="p-3 rounded-xl bg-slate-900/60 border border-white/5">
-                <div className="text-[10px] text-slate-400 uppercase">{h2hResult.teamB.name} Wins</div>
+                <div className="text-[10px] text-slate-400 uppercase">
+                  {h2hResult.teamB.name} Wins
+                </div>
                 <div className="text-lg font-black text-blue-400 mt-1">{h2hResult.teamBWins}</div>
               </div>
               <div className="p-3 rounded-xl bg-slate-900/60 border border-white/5">
                 <div className="text-[10px] text-slate-400 uppercase">Avg Goals / Match</div>
-                <div className="text-lg font-black text-amber-400 mt-1">{h2hResult.avgGoalsPerMatch}</div>
+                <div className="text-lg font-black text-amber-400 mt-1">
+                  {h2hResult.avgGoalsPerMatch}
+                </div>
               </div>
             </div>
           </div>

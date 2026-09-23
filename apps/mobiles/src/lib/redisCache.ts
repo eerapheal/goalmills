@@ -5,8 +5,7 @@
  */
 
 const UPSTASH_REST_URL =
-  process.env.EXPO_PUBLIC_UPSTASH_REDIS_REST_URL ||
-  'https://close-arachnid-183720.upstash.io';
+  process.env.EXPO_PUBLIC_UPSTASH_REDIS_REST_URL || 'https://close-arachnid-183720.upstash.io';
 
 const UPSTASH_REST_TOKEN =
   process.env.EXPO_PUBLIC_UPSTASH_REDIS_REST_TOKEN ||

@@ -50,11 +50,7 @@ export const FanPassBanner: React.FC<FanPassBannerProps> = ({
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={onUpgradePress}
-        activeOpacity={0.85}
-      >
+      <TouchableOpacity style={styles.button} onPress={onUpgradePress} activeOpacity={0.85}>
         <LinearGradient
           colors={['#F59E0B', '#D97706']}
           start={{ x: 0, y: 0 }}

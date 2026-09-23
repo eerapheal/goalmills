@@ -19,7 +19,7 @@ export interface AuditLogEntry {
 
 export function logAdminAction(entry: AuditLogEntry): void {
   const timestamp = entry.timestamp || new Date().toISOString();
-  
+
   // Strip sensitive keys from metadata if present
   const sanitizedMeta: Record<string, any> = {};
   if (entry.metadata) {

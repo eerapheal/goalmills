@@ -60,12 +60,15 @@ describe('Web Sponsorships API (/api/sponsorships)', () => {
       },
     ];
 
-    const { mockLean } = await import('@/models/Sponsorship') as any;
+    const { mockLean } = (await import('@/models/Sponsorship')) as any;
     mockLean.mockResolvedValue(mockData);
 
-    const req = new NextRequest('http://localhost:3000/api/sponsorships?placement=homepage_hero&sport=football', {
-      headers: { 'x-tenant-slug': 'club-pulse' },
-    });
+    const req = new NextRequest(
+      'http://localhost:3000/api/sponsorships?placement=homepage_hero&sport=football',
+      {
+        headers: { 'x-tenant-slug': 'club-pulse' },
+      }
+    );
 
     const res = await GET(req);
     const json = await res.json();
@@ -93,7 +96,7 @@ describe('Web Sponsorships API (/api/sponsorships)', () => {
       },
     ];
 
-    const { mockLean } = await import('@/models/Sponsorship') as any;
+    const { mockLean } = (await import('@/models/Sponsorship')) as any;
     mockLean.mockResolvedValue(mockData);
 
     const req = new NextRequest('http://localhost:3000/api/sponsorships');

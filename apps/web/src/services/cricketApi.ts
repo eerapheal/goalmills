@@ -121,9 +121,7 @@ export const cricketApi = {
    * 4. H2H (Head to Head) Endpoint
    * Returns historical matches between two teams and their recent results
    */
-  async getH2H(
-    params: Omit<CricketH2HParams, 'met'>
-  ): Promise<CricketH2HResponse> {
+  async getH2H(params: Omit<CricketH2HParams, 'met'>): Promise<CricketH2HResponse> {
     return fetchFromAPI<CricketH2HResponse>('H2H', params);
   },
 
@@ -288,10 +286,4 @@ export const webCricketApiService = cricketApi;
 export default cricketApi;
 
 // Re-export core types
-export type {
-  CricketLeague,
-  CricketEvent,
-  CricketStanding,
-  CricketTeam,
-  CricketMatchOdds,
-};
+export type { CricketLeague, CricketEvent, CricketStanding, CricketTeam, CricketMatchOdds };

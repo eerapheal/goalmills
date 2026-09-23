@@ -18,7 +18,6 @@ vi.mock('next/navigation', () => {
   };
 });
 
-
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

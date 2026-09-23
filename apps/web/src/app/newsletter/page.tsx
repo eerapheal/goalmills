@@ -84,10 +84,7 @@ const FREQUENCIES = [
 
 export default function NewsletterPage() {
   const [email, setEmail] = useState('');
-  const [selectedChannels, setSelectedChannels] = useState<string[]>([
-    'football',
-    'transfers',
-  ]);
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(['football', 'transfers']);
   const [frequency, setFrequency] = useState<string>('daily');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -163,7 +160,8 @@ export default function NewsletterPage() {
           </span>
           <div className="overflow-hidden whitespace-nowrap w-full">
             <p className="text-xs text-slate-300 font-medium inline-block animate-marquee">
-              📬 Delivered to 45,000+ Fans & Writers Daily • Zero Spam • 1-Click Unsubscribe • Real-Time Lineups, Previews & Transfer News
+              📬 Delivered to 45,000+ Fans & Writers Daily • Zero Spam • 1-Click Unsubscribe •
+              Real-Time Lineups, Previews & Transfer News
             </p>
           </div>
         </div>
@@ -191,15 +189,21 @@ export default function NewsletterPage() {
             {/* Social Proof Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
               <div className="p-3.5 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Subscribers</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Subscribers
+                </span>
                 <span className="text-xl font-black text-white">45,000+</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Open Rate</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Open Rate
+                </span>
                 <span className="text-xl font-black text-amber-400">58.4%</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#091529]/80 border border-blue-500/20 backdrop-blur-md col-span-2 sm:col-span-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Delivery Speed</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Delivery Speed
+                </span>
                 <span className="text-xl font-black text-blue-400">&lt; 60 Secs</span>
               </div>
             </div>
@@ -311,10 +315,12 @@ export default function NewsletterPage() {
                     <div className="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center mx-auto text-2xl">
                       <FiCheckCircle />
                     </div>
-                    <h3 className="text-lg font-black text-white">You&apos;re Officially Subscribed!</h3>
+                    <h3 className="text-lg font-black text-white">
+                      You&apos;re Officially Subscribed!
+                    </h3>
                     <p className="text-xs text-slate-300 max-w-md mx-auto">
-                      A welcome confirmation with today&apos;s 2 top Editor&apos;s Picks has been dispatched to{' '}
-                      <span className="font-bold text-amber-300">{email}</span>.
+                      A welcome confirmation with today&apos;s 2 top Editor&apos;s Picks has been
+                      dispatched to <span className="font-bold text-amber-300">{email}</span>.
                     </p>
                     <button
                       onClick={() => {
@@ -345,7 +351,9 @@ export default function NewsletterPage() {
                     {/* Typo Correction Suggestion */}
                     {suggestedCorrection && (
                       <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs flex items-center justify-between text-amber-300">
-                        <span>Did you mean <strong>{suggestedCorrection}</strong>?</span>
+                        <span>
+                          Did you mean <strong>{suggestedCorrection}</strong>?
+                        </span>
                         <button
                           type="button"
                           onClick={() => handleApplySuggestion(suggestedCorrection)}
@@ -365,14 +373,22 @@ export default function NewsletterPage() {
                       disabled={status === 'loading'}
                       className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg shadow-amber-500/25 transition-all duration-300 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      <span>{status === 'loading' ? 'Activating VIP Subscription...' : 'Subscribe To Free VIP Briefing'}</span>
+                      <span>
+                        {status === 'loading'
+                          ? 'Activating VIP Subscription...'
+                          : 'Subscribe To Free VIP Briefing'}
+                      </span>
                       <FiArrowRight />
                     </button>
 
                     <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400 pt-1">
-                      <span className="flex items-center gap-1"><FiShield className="text-blue-400" /> No spam ever</span>
+                      <span className="flex items-center gap-1">
+                        <FiShield className="text-blue-400" /> No spam ever
+                      </span>
                       <span>•</span>
-                      <span className="flex items-center gap-1"><FiClock className="text-blue-400" /> Cancel in 1-click</span>
+                      <span className="flex items-center gap-1">
+                        <FiClock className="text-blue-400" /> Cancel in 1-click
+                      </span>
                     </div>
                   </form>
                 )}
@@ -410,7 +426,8 @@ export default function NewsletterPage() {
                     How Arsenal&apos;s Midfield Overload Decided the London Derby
                   </h4>
                   <p className="text-slate-400 text-[11px] leading-relaxed">
-                    Mikel Arteta shifted his number 8 into the half-space, generating a +1.42 xG advantage against low-block defenses...
+                    Mikel Arteta shifted his number 8 into the half-space, generating a +1.42 xG
+                    advantage against low-block defenses...
                   </p>
                 </div>
 
@@ -439,7 +456,8 @@ export default function NewsletterPage() {
                   <span>The GoalMills Guarantee</span>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">
-                  We never sell or share your contact details. Your subscription is 100% free and you can adjust channels or cancel anytime with one click.
+                  We never sell or share your contact details. Your subscription is 100% free and
+                  you can adjust channels or cancel anytime with one click.
                 </p>
               </div>
             </div>

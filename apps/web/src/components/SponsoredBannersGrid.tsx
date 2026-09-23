@@ -9,10 +9,7 @@ interface SponsoredBannersGridProps {
   className?: string;
 }
 
-export function SponsoredBannersGrid({
-  sport = 'all',
-  className = '',
-}: SponsoredBannersGridProps) {
+export function SponsoredBannersGrid({ sport = 'all', className = '' }: SponsoredBannersGridProps) {
   return (
     <div className={`w-full ${className}`}>
       {/* 

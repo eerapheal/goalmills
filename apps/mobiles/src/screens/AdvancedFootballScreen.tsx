@@ -116,8 +116,13 @@ export function AdvancedFootballScreen() {
       d.setDate(today.getDate() + i);
       const iso = d.toISOString().split('T')[0];
       const dayName =
-        i === 0 ? 'Today' : i === -1 ? 'Yest' : i === 1 ? 'Tmrw' :
-          d.toLocaleDateString('en-US', { weekday: 'short' });
+        i === 0
+          ? 'Today'
+          : i === -1
+            ? 'Yest'
+            : i === 1
+              ? 'Tmrw'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
       dates.push({ iso, dayName, dayNumber: d.getDate() });
     }
     return dates;
@@ -130,7 +135,8 @@ export function AdvancedFootballScreen() {
       if (activeTab === 'standings') {
         const res = await advancedFootballApi.getStandings(numLeague);
         const resObj = res?.result as any;
-        const table = resObj?.[standingView] || resObj?.total || (Array.isArray(resObj) ? resObj : []);
+        const table =
+          resObj?.[standingView] || resObj?.total || (Array.isArray(resObj) ? resObj : []);
         setStandings(table);
       } else if (activeTab === 'topscorers') {
         const res = await advancedFootballApi.getTopscorers(numLeague);
@@ -163,48 +169,77 @@ export function AdvancedFootballScreen() {
     }
   }, [activeTab, selectedLeague, selectedDate, standingView]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const onRefresh = () => { setRefreshing(true); fetchData(); };
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchData();
+  };
 
   const filteredFixtures = useMemo(() => {
     if (!Array.isArray(fixtures)) return [];
     let list = fixtures;
 
     if (activeTab === 'live') {
-      list = list.filter(f =>
-        f.event_live === '1' || f.event_live === 1 ||
-        (Boolean(f.event_status) && !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(f.event_status as string))
+      list = list.filter(
+        (f) =>
+          f.event_live === '1' ||
+          f.event_live === 1 ||
+          (Boolean(f.event_status) &&
+            !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
+              f.event_status as string
+            ))
       );
     } else if (activeTab === 'upcoming') {
-      list = list.filter(f =>
-        f.event_status === 'Not Started' || f.event_status === 'NS' || f.event_status === 'TBA' ||
-        (f.event_live !== '1' && f.event_live !== 1 && f.event_status !== 'FT' && f.event_status !== 'Finished' && !f.event_final_result)
+      list = list.filter(
+        (f) =>
+          f.event_status === 'Not Started' ||
+          f.event_status === 'NS' ||
+          f.event_status === 'TBA' ||
+          (f.event_live !== '1' &&
+            f.event_live !== 1 &&
+            f.event_status !== 'FT' &&
+            f.event_status !== 'Finished' &&
+            !f.event_final_result)
       );
     } else if (activeTab === 'results') {
-      list = list.filter(f =>
-        f.event_status === 'FT' || f.event_status === 'Finished' ||
-        f.event_status === 'AET' || f.event_status === 'AP' ||
-        Boolean(f.event_final_result && f.event_final_result !== '-')
+      list = list.filter(
+        (f) =>
+          f.event_status === 'FT' ||
+          f.event_status === 'Finished' ||
+          f.event_status === 'AET' ||
+          f.event_status === 'AP' ||
+          Boolean(f.event_final_result && f.event_final_result !== '-')
       );
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(f =>
-        f.event_home_team?.toLowerCase().includes(q) ||
-        f.event_away_team?.toLowerCase().includes(q) ||
-        (f.league_name && f.league_name.toLowerCase().includes(q))
+      list = list.filter(
+        (f) =>
+          f.event_home_team?.toLowerCase().includes(q) ||
+          f.event_away_team?.toLowerCase().includes(q) ||
+          (f.league_name && f.league_name.toLowerCase().includes(q))
       );
     }
     return list;
   }, [fixtures, activeTab, searchQuery]);
 
   const sections = useMemo(() => {
-    const groups: { [k: string]: { title: string; logo?: string; league_key?: string | number; data: UnifiedMatchEvent[] } } = {};
-    filteredFixtures.forEach(item => {
+    const groups: {
+      [k: string]: {
+        title: string;
+        logo?: string;
+        league_key?: string | number;
+        data: UnifiedMatchEvent[];
+      };
+    } = {};
+    filteredFixtures.forEach((item) => {
       const key = item.league_name || 'Other';
-      if (!groups[key]) groups[key] = { title: key, logo: item.league_logo, league_key: item.league_key, data: [] };
+      if (!groups[key])
+        groups[key] = { title: key, logo: item.league_logo, league_key: item.league_key, data: [] };
       groups[key].data.push(item);
     });
     return Object.values(groups);
@@ -219,7 +254,8 @@ export function AdvancedFootballScreen() {
     { id: 'predictions', label: 'AI Odds', icon: 'analytics-outline' },
   ];
 
-  const showDatePicker = activeTab === 'upcoming' || activeTab === 'results' || activeTab === 'predictions';
+  const showDatePicker =
+    activeTab === 'upcoming' || activeTab === 'results' || activeTab === 'predictions';
   const showLeaguePicker = activeTab !== 'live';
 
   // Scrollable header: ticker + league chips + search/refresh + date strip + standings toggle
@@ -268,7 +304,7 @@ export function AdvancedFootballScreen() {
           contentContainerStyle={styles.leagueBarContent}
           nestedScrollEnabled
         >
-          {MAJOR_LEAGUES.map(lg => {
+          {MAJOR_LEAGUES.map((lg) => {
             const selected = selectedLeague === lg.id;
             return (
               <Pressable
@@ -298,7 +334,13 @@ export function AdvancedFootballScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-        <Pressable style={styles.refreshBtn} onPress={() => { setRefreshing(true); fetchData(); }}>
+        <Pressable
+          style={styles.refreshBtn}
+          onPress={() => {
+            setRefreshing(true);
+            fetchData();
+          }}
+        >
           <Ionicons name="refresh-outline" size={16} color="#F8FAFC" />
         </Pressable>
       </View>
@@ -312,12 +354,20 @@ export function AdvancedFootballScreen() {
           contentContainerStyle={styles.dateBarContent}
           nestedScrollEnabled
         >
-          {dateStrip.map(item => {
+          {dateStrip.map((item) => {
             const sel = selectedDate === item.iso;
             return (
-              <Pressable key={item.iso} style={[styles.datePill, sel && styles.datePillActive]} onPress={() => setSelectedDate(item.iso)}>
-                <Text style={[styles.datePillDay, sel && { color: '#93C5FD' }]}>{item.dayName}</Text>
-                <Text style={[styles.datePillNum, sel && { color: '#F8FAFC' }]}>{item.dayNumber}</Text>
+              <Pressable
+                key={item.iso}
+                style={[styles.datePill, sel && styles.datePillActive]}
+                onPress={() => setSelectedDate(item.iso)}
+              >
+                <Text style={[styles.datePillDay, sel && { color: '#93C5FD' }]}>
+                  {item.dayName}
+                </Text>
+                <Text style={[styles.datePillNum, sel && { color: '#F8FAFC' }]}>
+                  {item.dayNumber}
+                </Text>
               </Pressable>
             );
           })}
@@ -327,13 +377,18 @@ export function AdvancedFootballScreen() {
       {/* Standings toggle (only shown in header when inside standings ScrollView) */}
       {activeTab === 'standings' && (
         <View style={styles.standingToggleRow}>
-          {(['total', 'home', 'away'] as const).map(v => (
+          {(['total', 'home', 'away'] as const).map((v) => (
             <Pressable
               key={v}
-              style={[styles.standingToggleBtn, standingView === v && styles.standingToggleBtnActive]}
+              style={[
+                styles.standingToggleBtn,
+                standingView === v && styles.standingToggleBtnActive,
+              ]}
               onPress={() => setStandingView(v)}
             >
-              <Text style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}>
+              <Text
+                style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}
+              >
                 {v.charAt(0).toUpperCase() + v.slice(1)}
               </Text>
             </Pressable>
@@ -352,7 +407,7 @@ export function AdvancedFootballScreen() {
         style={styles.tabBar}
         contentContainerStyle={styles.tabBarContent}
       >
-        {tabs.map(tab => {
+        {tabs.map((tab) => {
           const active = activeTab === tab.id;
           return (
             <Pressable
@@ -387,7 +442,9 @@ export function AdvancedFootballScreen() {
               style={{ flex: 1 }}
               sections={sections}
               keyExtractor={(item, index) => `${item.event_key}-${index}`}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+              }
               ListHeaderComponent={renderScrollableHeader}
               renderSectionHeader={({ section }) => (
                 <View style={styles.sectionHeader}>
@@ -396,10 +453,14 @@ export function AdvancedFootballScreen() {
                   ) : (
                     <Text style={{ fontSize: 14 }}>🏆</Text>
                   )}
-                  <Text style={styles.sectionTitle} numberOfLines={1}>{section.title}</Text>
+                  <Text style={styles.sectionTitle} numberOfLines={1}>
+                    {section.title}
+                  </Text>
                   {section.league_key && (
                     <Pressable
-                      onPress={() => router.push(`/(tabs)/home/football/leagues/${section.league_key}` as any)}
+                      onPress={() =>
+                        router.push(`/(tabs)/home/football/leagues/${section.league_key}` as any)
+                      }
                       style={styles.sectionLink}
                     >
                       <Text style={styles.sectionLinkText}>Table</Text>
@@ -429,7 +490,9 @@ export function AdvancedFootballScreen() {
           {activeTab === 'standings' && (
             <ScrollView
               style={{ flex: 1 }}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+              }
               contentContainerStyle={{ paddingBottom: 100 }}
             >
               {renderScrollableHeader()}
@@ -449,7 +512,9 @@ export function AdvancedFootballScreen() {
                   <View style={styles.emptyContainer}>
                     <Text style={{ fontSize: 36 }}>🏆</Text>
                     <Text style={styles.emptyTitle}>No Data</Text>
-                    <Text style={styles.emptyText}>No standings available for this competition.</Text>
+                    <Text style={styles.emptyText}>
+                      No standings available for this competition.
+                    </Text>
                   </View>
                 ) : (
                   standings.map((row, i) => {
@@ -461,25 +526,55 @@ export function AdvancedFootballScreen() {
                       <Pressable
                         key={i}
                         style={styles.tableRow}
-                        onPress={() => row.team_key && router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)}
+                        onPress={() =>
+                          row.team_key &&
+                          router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)
+                        }
                       >
-                        <View style={[styles.rankCell, isUCL && styles.rankUCL, isUEL && styles.rankUEL, isRel && styles.rankRel]}>
+                        <View
+                          style={[
+                            styles.rankCell,
+                            isUCL && styles.rankUCL,
+                            isUEL && styles.rankUEL,
+                            isRel && styles.rankRel,
+                          ]}
+                        >
                           <Text style={styles.rankText}>{row.standing_place || i + 1}</Text>
                         </View>
                         <View style={styles.teamColContainer}>
                           {(row as any).team_logo ? (
-                            <Image source={{ uri: (row as any).team_logo }} style={styles.tableTeamLogo} resizeMode="contain" />
+                            <Image
+                              source={{ uri: (row as any).team_logo }}
+                              style={styles.tableTeamLogo}
+                              resizeMode="contain"
+                            />
                           ) : null}
                           <Text style={styles.teamNameText} numberOfLines={1}>
                             {row.standing_team}
                           </Text>
                         </View>
                         <Text style={[styles.tableCell, styles.numCol]}>{row.standing_P || 0}</Text>
-                        <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>{row.standing_W || 0}</Text>
-                        <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>{row.standing_D || 0}</Text>
-                        <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>{row.standing_L || 0}</Text>
-                        <Text style={[styles.tableCell, styles.numCol]}>{row.standing_GD || 0}</Text>
-                        <Text style={[styles.tableCell, styles.ptsCol, { fontWeight: '900', color: '#FBBF24' }]}>{row.standing_PTS || 0}</Text>
+                        <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>
+                          {row.standing_W || 0}
+                        </Text>
+                        <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>
+                          {row.standing_D || 0}
+                        </Text>
+                        <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>
+                          {row.standing_L || 0}
+                        </Text>
+                        <Text style={[styles.tableCell, styles.numCol]}>
+                          {row.standing_GD || 0}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.tableCell,
+                            styles.ptsCol,
+                            { fontWeight: '900', color: '#FBBF24' },
+                          ]}
+                        >
+                          {row.standing_PTS || 0}
+                        </Text>
                       </Pressable>
                     );
                   })
@@ -494,20 +589,27 @@ export function AdvancedFootballScreen() {
               style={{ flex: 1 }}
               data={topscorers}
               keyExtractor={(_, i) => String(i)}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+              }
               ListHeaderComponent={renderScrollableHeader}
               contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 8 }}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
                   <Text style={{ fontSize: 36 }}>👟</Text>
                   <Text style={styles.emptyTitle}>No Scorer Data</Text>
-                  <Text style={styles.emptyText}>Top scorer stats not available for this competition.</Text>
+                  <Text style={styles.emptyText}>
+                    Top scorer stats not available for this competition.
+                  </Text>
                 </View>
               }
               renderItem={({ item, index }) => (
                 <Pressable
                   style={styles.scorerCard}
-                  onPress={() => item.player_key && router.push(`/(tabs)/home/football/players/${item.player_key}` as any)}
+                  onPress={() =>
+                    item.player_key &&
+                    router.push(`/(tabs)/home/football/players/${item.player_key}` as any)
+                  }
                 >
                   <Text style={styles.scorerRank}>#{item.player_place || index + 1}</Text>
                   {item.player_image ? (
@@ -538,14 +640,18 @@ export function AdvancedFootballScreen() {
               style={{ flex: 1 }}
               data={probabilities}
               keyExtractor={(_, i) => String(i)}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+              }
               ListHeaderComponent={renderScrollableHeader}
               contentContainerStyle={{ padding: 12, paddingBottom: 100, gap: 10 }}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
                   <Text style={{ fontSize: 36 }}>🤖</Text>
                   <Text style={styles.emptyTitle}>No Predictions</Text>
-                  <Text style={styles.emptyText}>No probability forecasts available for the selected date.</Text>
+                  <Text style={styles.emptyText}>
+                    No probability forecasts available for the selected date.
+                  </Text>
                 </View>
               }
               renderItem={({ item }) => {
@@ -555,16 +661,25 @@ export function AdvancedFootballScreen() {
                 return (
                   <Pressable
                     style={styles.predCard}
-                    onPress={() => item.event_key && router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)}
+                    onPress={() =>
+                      item.event_key &&
+                      router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)
+                    }
                   >
                     <View style={styles.predHeader}>
-                      <Text style={styles.predLeague} numberOfLines={1}>{item.league_name}</Text>
+                      <Text style={styles.predLeague} numberOfLines={1}>
+                        {item.league_name}
+                      </Text>
                       <Text style={styles.predTime}>{item.event_time}</Text>
                     </View>
                     <View style={styles.predTeams}>
-                      <Text style={styles.predTeamHome} numberOfLines={1}>{item.event_home_team}</Text>
+                      <Text style={styles.predTeamHome} numberOfLines={1}>
+                        {item.event_home_team}
+                      </Text>
                       <Text style={styles.predVS}>VS</Text>
-                      <Text style={styles.predTeamAway} numberOfLines={1}>{item.event_away_team}</Text>
+                      <Text style={styles.predTeamAway} numberOfLines={1}>
+                        {item.event_away_team}
+                      </Text>
                     </View>
                     {/* Prob Bar */}
                     <View style={styles.predBarLabels}>
@@ -578,8 +693,12 @@ export function AdvancedFootballScreen() {
                       <View style={{ flex: aw || 1, backgroundColor: '#D97706', height: '100%' }} />
                     </View>
                     <View style={styles.predMetrics}>
-                      <Text style={styles.predMetric}>Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text></Text>
-                      <Text style={styles.predMetric}>BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text></Text>
+                      <Text style={styles.predMetric}>
+                        Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text>
+                      </Text>
+                      <Text style={styles.predMetric}>
+                        BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text>
+                      </Text>
                     </View>
                     <Text style={styles.predCTA}>Tap for Full Odds & Match Center →</Text>
                   </Pressable>
@@ -600,45 +719,78 @@ const styles = StyleSheet.create({
   leagueBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   leagueBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
   leagueChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.07)',
   },
-  leagueChipActive: { backgroundColor: 'rgba(59,130,246,0.18)', borderColor: '#3B82F6', borderWidth: 1.5 },
+  leagueChipActive: {
+    backgroundColor: 'rgba(59,130,246,0.18)',
+    borderColor: '#3B82F6',
+    borderWidth: 1.5,
+  },
   leagueChipFlag: { fontSize: 14 },
   leagueChipLabel: { fontSize: 11, fontWeight: '700', color: '#64748B' },
   leagueChipLabelActive: { color: '#93C5FD', fontWeight: '800' },
 
   // Control bar
   controlBar: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 12, paddingVertical: 8,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   searchBox: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#0B1526', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#0B1526',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   searchInput: { flex: 1, color: '#F8FAFC', fontSize: 12 },
   refreshBtn: {
-    width: 34, height: 34, borderRadius: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     backgroundColor: 'rgba(59,130,246,0.15)',
-    borderWidth: 1, borderColor: 'rgba(59,130,246,0.3)',
-    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Tab bar
   tabBar: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' },
   tabBarContent: { paddingHorizontal: 10, paddingVertical: 8, gap: 6 },
   tabBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.07)',
   },
-  tabBtnActive: { backgroundColor: 'rgba(59,130,246,0.18)', borderColor: '#3B82F6', borderWidth: 1.5 },
+  tabBtnActive: {
+    backgroundColor: 'rgba(59,130,246,0.18)',
+    borderColor: '#3B82F6',
+    borderWidth: 1.5,
+  },
   tabLabel: { fontSize: 11, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
   tabLabelActive: { color: '#93C5FD', fontWeight: '800' },
   liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981', marginLeft: 1 },
@@ -647,65 +799,126 @@ const styles = StyleSheet.create({
   dateBar: { flexGrow: 0 },
   dateBarContent: { paddingHorizontal: 10, paddingBottom: 8, gap: 6 },
   datePill: {
-    alignItems: 'center', minWidth: 52, paddingVertical: 6, paddingHorizontal: 8,
-    borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    alignItems: 'center',
+    minWidth: 52,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
-  datePillActive: { borderColor: '#3B82F6', borderWidth: 1.5, backgroundColor: 'rgba(59,130,246,0.13)' },
+  datePillActive: {
+    borderColor: '#3B82F6',
+    borderWidth: 1.5,
+    backgroundColor: 'rgba(59,130,246,0.13)',
+  },
   datePillDay: { fontSize: 9, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
   datePillNum: { fontSize: 14, fontWeight: '900', color: '#94A3B8' },
 
   // Standing toggle
   standingToggleRow: {
-    flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingBottom: 8,
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingBottom: 8,
   },
   standingToggleBtn: {
-    flex: 1, paddingVertical: 7, alignItems: 'center', borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    flex: 1,
+    paddingVertical: 7,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
-  standingToggleBtnActive: { backgroundColor: 'rgba(59,130,246,0.18)', borderColor: '#3B82F6', borderWidth: 1.5 },
-  standingToggleLabel: { fontSize: 11, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
+  standingToggleBtnActive: {
+    backgroundColor: 'rgba(59,130,246,0.18)',
+    borderColor: '#3B82F6',
+    borderWidth: 1.5,
+  },
+  standingToggleLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
 
   loaderContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
   // Section Headers — left accent bar, full-width (no horizontal padding override)
   sectionHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#080E18', paddingHorizontal: 4, paddingVertical: 9,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
-    borderLeftWidth: 3, borderLeftColor: '#1D4ED8',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#080E18',
+    paddingHorizontal: 4,
+    paddingVertical: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#1D4ED8',
     marginTop: 8,
     paddingLeft: 10,
   },
   sectionLogo: { width: 18, height: 18, resizeMode: 'contain' },
-  sectionTitle: { flex: 1, fontSize: 11, fontWeight: '900', color: '#E2E8F0', textTransform: 'uppercase', letterSpacing: 0.6 },
+  sectionTitle: {
+    flex: 1,
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#E2E8F0',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
   sectionLink: { flexDirection: 'row', alignItems: 'center', gap: 2 },
   sectionLinkText: { fontSize: 11, fontWeight: '700', color: '#60A5FA' },
 
   // Standings Table
   tableCard: {
-    margin: 12, backgroundColor: '#0B1526', borderRadius: 16, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    margin: 12,
+    backgroundColor: '#0B1526',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   tableHeaderRow: {
-    flexDirection: 'row', paddingVertical: 9, paddingHorizontal: 8,
+    flexDirection: 'row',
+    paddingVertical: 9,
+    paddingHorizontal: 8,
     backgroundColor: 'rgba(255,255,255,0.03)',
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.07)',
   },
   tableRow: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 8,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.03)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 9,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.03)',
   },
   tableCell: { fontSize: 10.5, color: '#94A3B8', fontWeight: '500', textAlign: 'center' },
   rankCol: { width: 22, textAlign: 'center' },
   teamCol: { flex: 1, textAlign: 'left', paddingLeft: 4 },
-  teamColContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 4, paddingRight: 4 },
+  teamColContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 4,
+    paddingRight: 4,
+  },
   tableTeamLogo: { width: 16, height: 16, marginRight: 5 },
   teamNameText: { flex: 1, fontSize: 12, fontWeight: '700', color: '#F1F5F9' },
   numCol: { width: 23, textAlign: 'center' },
   ptsCol: { width: 28, textAlign: 'center', fontSize: 11 },
   rankCell: {
-    width: 20, height: 20, borderRadius: 5, alignItems: 'center', justifyContent: 'center', marginRight: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
   },
   rankUCL: { backgroundColor: 'rgba(59,130,246,0.22)' },
   rankUEL: { backgroundColor: 'rgba(245,158,11,0.22)' },
@@ -714,13 +927,22 @@ const styles = StyleSheet.create({
 
   // Scorers
   scorerCard: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#0B1526', borderRadius: 14, padding: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0B1526',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   scorerRank: { width: 26, fontSize: 12, fontWeight: '900', color: '#FBBF24' },
   scorerPhoto: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1E293B' },
-  scorerPhotoPlaceholder: { alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  scorerPhotoPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
   scorerName: { fontSize: 13, fontWeight: '800', color: '#F1F5F9' },
   scorerTeam: { fontSize: 11, color: '#64748B', marginTop: 1 },
   scorerGoals: { fontSize: 18, fontWeight: '900', color: '#34D399' },
@@ -728,21 +950,39 @@ const styles = StyleSheet.create({
 
   // Predictions
   predCard: {
-    backgroundColor: '#0B1526', borderRadius: 16, padding: 14,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: '#0B1526',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
   predHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  predLeague: { fontSize: 10, color: '#64748B', fontWeight: '700', textTransform: 'uppercase', flex: 1 },
+  predLeague: {
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    flex: 1,
+  },
   predTime: { fontSize: 10, color: '#94A3B8', fontWeight: '700' },
-  predTeams: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  predTeams: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
   predTeamHome: { flex: 1, fontSize: 12, fontWeight: '800', color: '#60A5FA' },
   predVS: { fontSize: 10, color: '#475569', marginHorizontal: 8, fontWeight: '700' },
   predTeamAway: { flex: 1, fontSize: 12, fontWeight: '800', color: '#F8FAFC', textAlign: 'right' },
   predBarLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   predBarLabel: { fontSize: 10, fontWeight: '800' },
   predBar: {
-    flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden',
-    backgroundColor: '#1E293B', marginBottom: 10,
+    flexDirection: 'row',
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+    backgroundColor: '#1E293B',
+    marginBottom: 10,
   },
   predMetrics: { flexDirection: 'row', gap: 16, marginBottom: 8 },
   predMetric: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },

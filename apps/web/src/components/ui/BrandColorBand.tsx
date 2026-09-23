@@ -15,7 +15,7 @@ export interface BrandColorBandProps {
 
 /**
  * BrandColorBand
- * 
+ *
  * Visual signature component enforcing the GoalMills color hierarchy:
  * Blue (1st) -> Red (2nd) -> Yellow (3rd / Last)
  */

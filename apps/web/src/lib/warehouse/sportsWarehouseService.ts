@@ -53,10 +53,9 @@ export class SportsWarehouseService {
     // Invalidate cached H2H
     const h2hCacheKeyA = `warehouse:h2h:${record.sport}:${record.homeTeam.slug}:${record.awayTeam.slug}`;
     const h2hCacheKeyB = `warehouse:h2h:${record.sport}:${record.awayTeam.slug}:${record.homeTeam.slug}`;
-    await Promise.all([
-      cacheSet(h2hCacheKeyA, null, 1),
-      cacheSet(h2hCacheKeyB, null, 1),
-    ]).catch(() => { });
+    await Promise.all([cacheSet(h2hCacheKeyA, null, 1), cacheSet(h2hCacheKeyB, null, 1)]).catch(
+      () => {}
+    );
 
     return updated as unknown as HistoricalMatchRecord;
   }
@@ -153,7 +152,8 @@ export class SportsWarehouseService {
         draws,
         teamAGoals,
         teamBGoals,
-        avgGoalsPerMatch: totalMatches > 0 ? parseFloat(((teamAGoals + teamBGoals) / totalMatches).toFixed(2)) : 0,
+        avgGoalsPerMatch:
+          totalMatches > 0 ? parseFloat(((teamAGoals + teamBGoals) / totalMatches).toFixed(2)) : 0,
         mostCommonScoreline,
         cleanSheetsTeamA,
         cleanSheetsTeamB,
@@ -217,7 +217,8 @@ export class SportsWarehouseService {
         if (Array.isArray(m.events)) {
           for (const evt of m.events) {
             if (evt.type === 'goal' && (!evt.teamSlug || evt.teamSlug === teamSlug)) {
-              const min = typeof evt.minute === 'number' ? evt.minute : parseInt(String(evt.minute), 10) || 0;
+              const min =
+                typeof evt.minute === 'number' ? evt.minute : parseInt(String(evt.minute), 10) || 0;
               if (min <= 30) earlyGoals++;
               else if (min <= 60) midGoals++;
               else lateGoals++;
@@ -357,7 +358,13 @@ export class SportsWarehouseService {
           halftime: { home: 1, away: 0 },
         },
         events: [
-          { minute: 22, type: 'goal', teamSlug: 'arsenal', player: 'Bukayo Saka', assist: 'Martin Odegaard' },
+          {
+            minute: 22,
+            type: 'goal',
+            teamSlug: 'arsenal',
+            player: 'Bukayo Saka',
+            assist: 'Martin Odegaard',
+          },
           { minute: 54, type: 'goal', teamSlug: 'arsenal', player: 'Kai Havertz' },
           { minute: 71, type: 'goal', teamSlug: 'chelsea', player: 'Cole Palmer' },
           { minute: 88, type: 'goal', teamSlug: 'arsenal', player: 'Declan Rice' },
@@ -454,7 +461,12 @@ export class SportsWarehouseService {
         },
         events: [
           { minute: '12 ov', type: 'wicket', player: 'Travis Head', detail: 'Bowled Bumrah' },
-          { minute: '18 ov', type: 'boundary', player: 'Suryakumar Yadav', detail: 'Six over deep mid-wicket' },
+          {
+            minute: '18 ov',
+            type: 'boundary',
+            player: 'Suryakumar Yadav',
+            detail: 'Six over deep mid-wicket',
+          },
         ],
         venue: 'Wankhede Stadium, Mumbai',
         provenance: {

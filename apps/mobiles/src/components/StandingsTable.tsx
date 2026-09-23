@@ -49,7 +49,13 @@ export function StandingsTable({ standings }: StandingsTableProps) {
         >
           {/* Rank */}
           <View style={[styles.rankCell, styles.rankContainer]}>
-            <Text style={[styles.rank, standing.rank <= 4 && styles.champRank, standing.rank === 5 && styles.europaRank]}>
+            <Text
+              style={[
+                styles.rank,
+                standing.rank <= 4 && styles.champRank,
+                standing.rank === 5 && styles.europaRank,
+              ]}
+            >
               {standing.rank}
             </Text>
           </View>
@@ -81,9 +87,15 @@ export function StandingsTable({ standings }: StandingsTableProps) {
 
           {/* Form */}
           <View style={styles.formCell}>
-            {standing.form?.split('').slice(-5).map((result, i) => (
-              <View key={i} style={[styles.matchDot, { backgroundColor: getFormColor(result) }]} />
-            ))}
+            {standing.form
+              ?.split('')
+              .slice(-5)
+              .map((result, i) => (
+                <View
+                  key={i}
+                  style={[styles.matchDot, { backgroundColor: getFormColor(result) }]}
+                />
+              ))}
           </View>
 
           <Text style={[styles.pointsCell, styles.points]}>{standing.points}</Text>
@@ -105,9 +117,9 @@ export function StandingsTable({ standings }: StandingsTableProps) {
         <View style={styles.formLegend}>
           <Text style={styles.legendTitle}>Form: </Text>
           <View style={[styles.formDot, { backgroundColor: COLORS.success }]} />
-          <Text style={styles.legendText}>W  </Text>
+          <Text style={styles.legendText}>W </Text>
           <View style={[styles.formDot, { backgroundColor: '#F59E0B' }]} />
-          <Text style={styles.legendText}>D  </Text>
+          <Text style={styles.legendText}>D </Text>
           <View style={[styles.formDot, { backgroundColor: COLORS.danger }]} />
           <Text style={styles.legendText}>L</Text>
         </View>

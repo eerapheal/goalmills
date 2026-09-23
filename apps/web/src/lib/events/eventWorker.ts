@@ -60,7 +60,9 @@ export class SportsEventWorker {
   /**
    * Main consumer execution route for stream envelopes
    */
-  public async processEvent(envelope: StreamEventEnvelope): Promise<{ success: boolean; duplicate?: boolean; error?: string }> {
+  public async processEvent(
+    envelope: StreamEventEnvelope
+  ): Promise<{ success: boolean; duplicate?: boolean; error?: string }> {
     try {
       // 1. Idempotency Check
       if (this.isDuplicate(envelope.idempotencyKey)) {

@@ -3,10 +3,7 @@ import dbConnect from '@/lib/db';
 import NewsletterSendJob from '@/models/NewsletterSendJob';
 import NewsletterCampaign from '@/models/NewsletterCampaign';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     await dbConnect();

@@ -272,7 +272,11 @@ export const advancedFootballApi = {
    * Endpoint: ?met=Leagues&countryId={id}
    */
   getLeagues: async (
-    paramsOrCountryId?: FootballLeaguesParams | { countryId?: string | number; leagueId?: string | number } | string | number,
+    paramsOrCountryId?:
+      | FootballLeaguesParams
+      | { countryId?: string | number; leagueId?: string | number }
+      | string
+      | number,
     leagueId?: string | number
   ): Promise<FootballLeaguesResponse> => {
     try {
@@ -319,7 +323,11 @@ export const advancedFootballApi = {
    * Endpoint: ?met=H2H&firstTeamId={id}&secondTeamId={id}
    */
   getH2H: async (
-    firstTeamIdOrParams: FootballH2HParams | { firstTeamId: string | number; secondTeamId: string | number; timezone?: string } | string | number,
+    firstTeamIdOrParams:
+      | FootballH2HParams
+      | { firstTeamId: string | number; secondTeamId: string | number; timezone?: string }
+      | string
+      | number,
     secondTeamId?: string | number,
     timezone?: string
   ): Promise<FootballH2HResponse> => {
@@ -463,7 +471,9 @@ export const advancedFootballApi = {
    * Get match probabilities
    * Endpoint: ?met=Probabilities&from={date}&to={date}&leagueId={id}&matchId={id}&countryId={id}
    */
-  getProbabilities: async (params?: FootballProbabilitiesParams): Promise<FootballProbabilitiesResponse> => {
+  getProbabilities: async (
+    params?: FootballProbabilitiesParams
+  ): Promise<FootballProbabilitiesResponse> => {
     try {
       const apiParams: Record<string, any> = params || {};
       const response = await fetchFromAPI<FootballProbabilitiesResponse>(
@@ -626,9 +636,12 @@ export const advancedFootballApi = {
    */
   getAfricanFootballHubData: async (section: string = 'all', season: string = '2026/2027') => {
     try {
-      const res = await fetch(`/api/football/africa?section=${encodeURIComponent(section)}&season=${encodeURIComponent(season)}`, {
-        next: { revalidate: 60 },
-      });
+      const res = await fetch(
+        `/api/football/africa?section=${encodeURIComponent(section)}&season=${encodeURIComponent(season)}`,
+        {
+          next: { revalidate: 60 },
+        }
+      );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (error) {

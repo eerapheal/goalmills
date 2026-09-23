@@ -145,8 +145,10 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
 
   // Matches live / upcoming / recent / list
   if (ep === 'matches/live' || ep === 'livescore' || ep === 'live') return '/matches/v1/live';
-  if (ep === 'matches/upcoming' || ep === 'fixtures' || ep === 'upcoming') return '/matches/v1/upcoming';
-  if (ep === 'matches/recent' || ep === 'recent' || ep === 'matches/list') return '/matches/v1/recent';
+  if (ep === 'matches/upcoming' || ep === 'fixtures' || ep === 'upcoming')
+    return '/matches/v1/upcoming';
+  if (ep === 'matches/recent' || ep === 'recent' || ep === 'matches/list')
+    return '/matches/v1/recent';
 
   // Schedules
   if (ep === 'schedules/list' || ep === 'schedules') {
@@ -155,7 +157,12 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   }
 
   // Series
-  if (ep === 'series/list' || ep === 'leagues' || ep === 'series' || ep === 'series/v1/international') {
+  if (
+    ep === 'series/list' ||
+    ep === 'leagues' ||
+    ep === 'series' ||
+    ep === 'series/v1/international'
+  ) {
     const sType = params.type || 'international';
     return `/series/v1/${sType}`;
   }
@@ -261,18 +268,24 @@ function mapCricbuzzPath(method: string, params: Record<string, any> = {}): stri
   if (ep === 'news/list' || ep === 'news') return '/news/v1/index';
   if (ep === 'news/detail') return `/news/v1/detail/${params.newsId || params.id || '1'}`;
   if (ep === 'news/get-categories' || ep === 'news/categories') return '/news/v1/categories';
-  if (ep === 'news/list-by-category' || ep === 'news/category') return `/news/v1/cat/${params.categoryId || '1'}`;
+  if (ep === 'news/list-by-category' || ep === 'news/category')
+    return `/news/v1/cat/${params.categoryId || '1'}`;
   if (ep === 'news/get-topics' || ep === 'news/topics') return '/news/v1/topics';
-  if (ep === 'news/list-by-topic' || ep === 'news/topic') return `/news/v1/topic/${params.topicId || '1'}`;
+  if (ep === 'news/list-by-topic' || ep === 'news/topic')
+    return `/news/v1/topic/${params.topicId || '1'}`;
 
   // Photos
   if (ep === 'photos/list' || ep === 'photos') return '/photos/v1/index';
-  if (ep === 'photos/get-gallery' || ep === 'photos/gallery') return `/photos/v1/detail/${params.galleryId || params.id || '1'}`;
-  if (ep === 'get-image' || ep === 'photos/image') return `/img/v1/i1/c${params.imageId || '776162'}/i.jpg`;
+  if (ep === 'photos/get-gallery' || ep === 'photos/gallery')
+    return `/photos/v1/detail/${params.galleryId || params.id || '1'}`;
+  if (ep === 'get-image' || ep === 'photos/image')
+    return `/img/v1/i1/c${params.imageId || '776162'}/i.jpg`;
 
   // Stats & Rankings
-  if (ep === 'stats/get-icc-rankings' || ep === 'rankings') return `/stats/v1/rankings/${params.category || 'teams'}`;
-  if (ep === 'stats/get-icc-standings') return `/stats/v1/icc-standings/${params.matchType || 'test'}`;
+  if (ep === 'stats/get-icc-rankings' || ep === 'rankings')
+    return `/stats/v1/rankings/${params.category || 'teams'}`;
+  if (ep === 'stats/get-icc-standings')
+    return `/stats/v1/icc-standings/${params.matchType || 'test'}`;
   if (ep === 'stats/get-record-filters') return '/stats/v1/records/filters';
   if (ep === 'stats/get-records') return '/stats/v1/records';
 
@@ -2104,7 +2117,10 @@ export const advancedCricketApi = {
 
   getVenueStats: async (venueId: string | number, params: any = {}): Promise<any> => {
     try {
-      const res = await fetchFromAPI<any>('venues/get-stats', { venueId: String(venueId), ...params });
+      const res = await fetchFromAPI<any>('venues/get-stats', {
+        venueId: String(venueId),
+        ...params,
+      });
       return res.venueStats || res.result || res;
     } catch (e) {
       return {
@@ -2143,9 +2159,10 @@ export const advancedCricketApi = {
     } catch (e) {
       console.warn('Error in searchPlayers (mobile):', e);
     }
-    return CRICKET_PLAYERS_DATABASE.filter(p =>
-      p.player_name.toLowerCase().includes(query.toLowerCase()) ||
-      p.player_country?.toLowerCase().includes(query.toLowerCase())
+    return CRICKET_PLAYERS_DATABASE.filter(
+      (p) =>
+        p.player_name.toLowerCase().includes(query.toLowerCase()) ||
+        p.player_country?.toLowerCase().includes(query.toLowerCase())
     );
   },
 
@@ -2158,7 +2175,10 @@ export const advancedCricketApi = {
 
   getNewsDetail: async (newsId: string | number): Promise<any> => {
     try {
-      const res = await fetchFromAPI<any>('news/detail', { newsId: String(newsId), id: String(newsId) });
+      const res = await fetchFromAPI<any>('news/detail', {
+        newsId: String(newsId),
+        id: String(newsId),
+      });
       return res.story || res.news || res;
     } catch (e) {
       return null;
@@ -2168,12 +2188,16 @@ export const advancedCricketApi = {
   getNewsCategories: async (): Promise<any[]> => {
     try {
       const res = await fetchFromAPI<any>('news/get-categories', {});
-      return res.storyType || res.categories || res.result || [
-        { id: 1, name: 'Match Reports' },
-        { id: 2, name: 'Interviews' },
-        { id: 3, name: 'Features' },
-        { id: 4, name: 'Live Blogs' },
-      ];
+      return (
+        res.storyType ||
+        res.categories ||
+        res.result || [
+          { id: 1, name: 'Match Reports' },
+          { id: 2, name: 'Interviews' },
+          { id: 3, name: 'Features' },
+          { id: 4, name: 'Live Blogs' },
+        ]
+      );
     } catch (e) {
       return [
         { id: 1, name: 'Match Reports' },
@@ -2186,7 +2210,10 @@ export const advancedCricketApi = {
 
   getNewsByCategory: async (categoryId: string | number): Promise<CricketNewsItem[]> => {
     try {
-      const res = await fetchFromAPI<any>('news/list-by-category', { categoryId: String(categoryId), catId: String(categoryId) });
+      const res = await fetchFromAPI<any>('news/list-by-category', {
+        categoryId: String(categoryId),
+        catId: String(categoryId),
+      });
       return res.storyList || res.news || res.result || [];
     } catch (e) {
       return advancedCricketApi.getNews();
@@ -2196,11 +2223,14 @@ export const advancedCricketApi = {
   getNewsTopics: async (): Promise<any[]> => {
     try {
       const res = await fetchFromAPI<any>('news/get-topics', {});
-      return res.topics || res.result || [
-        { id: 1, name: 'IPL 2026' },
-        { id: 2, name: 'ICC T20 World Cup' },
-        { id: 3, name: 'World Test Championship' },
-      ];
+      return (
+        res.topics ||
+        res.result || [
+          { id: 1, name: 'IPL 2026' },
+          { id: 2, name: 'ICC T20 World Cup' },
+          { id: 3, name: 'World Test Championship' },
+        ]
+      );
     } catch (e) {
       return [
         { id: 1, name: 'IPL 2026' },
@@ -2233,7 +2263,10 @@ export const advancedCricketApi = {
 
   getPhotoGallery: async (galleryId: string | number): Promise<any> => {
     try {
-      const res = await fetchFromAPI<any>('photos/get-gallery', { galleryId: String(galleryId), id: String(galleryId) });
+      const res = await fetchFromAPI<any>('photos/get-gallery', {
+        galleryId: String(galleryId),
+        id: String(galleryId),
+      });
       return res.gallery || res.photos || res;
     } catch (e) {
       return null;
@@ -2267,14 +2300,18 @@ export const advancedCricketApi = {
   getRecordFilters: async (): Promise<any[]> => {
     try {
       const res = await fetchFromAPI<any>('stats/get-record-filters', {});
-      return res.filters || res.types || res.result || [
-        'Most Runs',
-        'Highest Individual Score',
-        'Most Wickets',
-        'Best Bowling Figures',
-        'Most Centuries',
-        'Most Sixes',
-      ];
+      return (
+        res.filters ||
+        res.types ||
+        res.result || [
+          'Most Runs',
+          'Highest Individual Score',
+          'Most Wickets',
+          'Best Bowling Figures',
+          'Most Centuries',
+          'Most Sixes',
+        ]
+      );
     } catch (e) {
       return [
         'Most Runs',

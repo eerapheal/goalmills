@@ -127,7 +127,8 @@ export class ContentDistributionService {
 
     const tenantSlug = match.tenantSlug || 'goalmills';
     const headline = `FT: ${match.homeTeam} ${match.score} ${match.awayTeam} | ${match.competition}`;
-    const scorersText = match.scorers && match.scorers.length > 0 ? `\n⚽ Scorers: ${match.scorers.join(', ')}` : '';
+    const scorersText =
+      match.scorers && match.scorers.length > 0 ? `\n⚽ Scorers: ${match.scorers.join(', ')}` : '';
     const body = `Full-time whistle in the ${match.competition}! Final score: ${match.homeTeam} ${match.score} ${match.awayTeam}.${scorersText}`;
 
     const channels: DistributionChannelType[] = ['x_twitter', 'telegram', 'whatsapp'];
@@ -322,7 +323,10 @@ export class ContentDistributionService {
     const query: any = { tenantSlug, status: 'published' };
     if (sport && sport !== 'all') query.sport = sport;
 
-    const articles = await News.find(query).sort({ publishedAt: -1, createdAt: -1 }).limit(25).lean();
+    const articles = await News.find(query)
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(25)
+      .lean();
 
     const siteTitle = `GoalMills ${sport ? sport.toUpperCase() : 'Sports'} News Feed`;
     const siteUrl = 'https://goalmills.com';

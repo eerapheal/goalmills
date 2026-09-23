@@ -1836,7 +1836,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee',
     fifaBadgeSince: 2013,
     competitions: ['Premier League', 'UEFA Champions League', 'FIFA World Cup', 'UEFA Euro'],
-    photo: 'https://ui-avatars.com/api/?name=Anthony+Taylor&background=0A162B&color=F59E0B&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Anthony+Taylor&background=0A162B&color=F59E0B&size=256&bold=true',
     age: 46,
     matches: 485,
     foulsPerGame: 21.4,
@@ -1889,7 +1890,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee',
     fifaBadgeSince: 2012,
     competitions: ['Premier League', 'UEFA Champions League', 'FIFA Club World Cup', 'UEFA Euro'],
-    photo: 'https://ui-avatars.com/api/?name=Michael+Oliver&background=0A162B&color=38BDF8&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Michael+Oliver&background=0A162B&color=38BDF8&size=256&bold=true',
     age: 40,
     matches: 462,
     foulsPerGame: 19.8,
@@ -1933,7 +1935,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee (World Cup Final Referee)',
     fifaBadgeSince: 2011,
     competitions: ['UEFA Champions League', 'FIFA World Cup', 'Ekstraklasa', 'UEFA Euro'],
-    photo: 'https://ui-avatars.com/api/?name=Szymon+Marciniak&background=0A162B&color=EF4444&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Szymon+Marciniak&background=0A162B&color=EF4444&size=256&bold=true',
     age: 44,
     matches: 520,
     foulsPerGame: 23.1,
@@ -1976,7 +1979,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee',
     fifaBadgeSince: 2010,
     competitions: ['Ligue 1', 'UEFA Champions League', 'FIFA World Cup', 'UEFA Europa League'],
-    photo: 'https://ui-avatars.com/api/?name=Clement+Turpin&background=0A162B&color=3B82F6&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Clement+Turpin&background=0A162B&color=3B82F6&size=256&bold=true',
     age: 43,
     matches: 440,
     foulsPerGame: 22.8,
@@ -2010,14 +2014,15 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'Senior FIFA Legend Official',
     fifaBadgeSince: 2010,
     competitions: ['Serie A', 'UEFA Champions League', 'FIFA World Cup', 'UEFA Euro'],
-    photo: 'https://ui-avatars.com/api/?name=Daniele+Orsato&background=0A162B&color=10B981&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Daniele+Orsato&background=0A162B&color=10B981&size=256&bold=true',
     age: 49,
     matches: 550,
     foulsPerGame: 24.2,
     yellowCardsTotal: 2540,
     yellowCardsPerGame: 4.62,
     redCardsTotal: 110,
-    redCardsPerGame: 0.20,
+    redCardsPerGame: 0.2,
     penaltiesAwardedTotal: 158,
     penaltiesPerGame: 0.29,
     varAccuracy: '96.8%',
@@ -2044,12 +2049,13 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee (UCL 2024 Final Ref)',
     fifaBadgeSince: 2010,
     competitions: ['UEFA Champions League', 'UEFA Euro', 'PrvaLiga', 'UEFA Europa League'],
-    photo: 'https://ui-avatars.com/api/?name=Slavko+Vincic&background=0A162B&color=6366F1&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Slavko+Vincic&background=0A162B&color=6366F1&size=256&bold=true',
     age: 45,
     matches: 395,
     foulsPerGame: 20.6,
     yellowCardsTotal: 1540,
-    yellowCardsPerGame: 3.90,
+    yellowCardsPerGame: 3.9,
     redCardsTotal: 62,
     redCardsPerGame: 0.16,
     penaltiesAwardedTotal: 112,
@@ -2078,7 +2084,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee',
     fifaBadgeSince: 2011,
     competitions: ['Eredivisie', 'UEFA Champions League', 'FIFA World Cup', 'UEFA Euro'],
-    photo: 'https://ui-avatars.com/api/?name=Danny+Makkelie&background=0A162B&color=F97316&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Danny+Makkelie&background=0A162B&color=F97316&size=256&bold=true',
     age: 42,
     matches: 430,
     foulsPerGame: 19.2,
@@ -2112,7 +2119,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee',
     fifaBadgeSince: 2014,
     competitions: ['La Liga', 'UEFA Champions League', 'Copa del Rey', 'UEFA Nations League'],
-    photo: 'https://ui-avatars.com/api/?name=Jesus+Gil+Manzano&background=0A162B&color=EAB308&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Jesus+Gil+Manzano&background=0A162B&color=EAB308&size=256&bold=true',
     age: 41,
     matches: 380,
     foulsPerGame: 25.5,
@@ -2146,7 +2154,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee',
     fifaBadgeSince: 2012,
     competitions: ['Bundesliga', 'UEFA Champions League', 'UEFA Euro', 'DFB-Pokal'],
-    photo: 'https://ui-avatars.com/api/?name=Felix+Zwayer&background=0A162B&color=14B8A6&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Felix+Zwayer&background=0A162B&color=14B8A6&size=256&bold=true',
     age: 44,
     matches: 410,
     foulsPerGame: 21.0,
@@ -2180,7 +2189,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Historic Referee',
     fifaBadgeSince: 2009,
     competitions: ['Ligue 1', 'UEFA Champions League', 'FIFA World Cup', 'Coupe de France'],
-    photo: 'https://ui-avatars.com/api/?name=Stephanie+Frappart&background=0A162B&color=EC4899&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Stephanie+Frappart&background=0A162B&color=EC4899&size=256&bold=true',
     age: 41,
     matches: 310,
     foulsPerGame: 20.2,
@@ -2214,7 +2224,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA Elite Referee (CONMEBOL)',
     fifaBadgeSince: 2013,
     competitions: ['Copa Libertadores', 'Brasileirão', 'FIFA World Cup', 'Copa América'],
-    photo: 'https://ui-avatars.com/api/?name=Wilton+Sampaio&background=0A162B&color=22C55E&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Wilton+Sampaio&background=0A162B&color=22C55E&size=256&bold=true',
     age: 43,
     matches: 375,
     foulsPerGame: 27.2,
@@ -2247,8 +2258,14 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     countryFlag: 'https://flagcdn.com/w80/ar.png',
     role: 'FIFA Elite Referee (CONMEBOL / UEFA Exchange)',
     fifaBadgeSince: 2019,
-    competitions: ['Argentine Primera División', 'Copa Libertadores', 'UEFA Euro', 'FIFA World Cup'],
-    photo: 'https://ui-avatars.com/api/?name=Facundo+Tello&background=0A162B&color=06B6D4&size=256&bold=true',
+    competitions: [
+      'Argentine Primera División',
+      'Copa Libertadores',
+      'UEFA Euro',
+      'FIFA World Cup',
+    ],
+    photo:
+      'https://ui-avatars.com/api/?name=Facundo+Tello&background=0A162B&color=06B6D4&size=256&bold=true',
     age: 43,
     matches: 295,
     foulsPerGame: 26.8,
@@ -2282,7 +2299,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA International Referee',
     fifaBadgeSince: 2019,
     competitions: ['Premier League', 'UEFA Europa League', 'FA Cup', 'EFL Cup'],
-    photo: 'https://ui-avatars.com/api/?name=Chris+Kavanagh&background=0A162B&color=8B5CF6&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Chris+Kavanagh&background=0A162B&color=8B5CF6&size=256&bold=true',
     age: 39,
     matches: 280,
     foulsPerGame: 20.8,
@@ -2316,7 +2334,8 @@ export const OFFICIALS_REGISTRY: Record<string, OfficialMeta> = {
     role: 'FIFA International & VAR Specialist',
     fifaBadgeSince: 2018,
     competitions: ['Premier League', 'FA Cup Final', 'UEFA Europa Conference League'],
-    photo: 'https://ui-avatars.com/api/?name=Paul+Tierney&background=0A162B&color=64748B&size=256&bold=true',
+    photo:
+      'https://ui-avatars.com/api/?name=Paul+Tierney&background=0A162B&color=64748B&size=256&bold=true',
     age: 44,
     matches: 340,
     foulsPerGame: 22.0,
@@ -2398,9 +2417,7 @@ export const COACHES_REGISTRY: Record<string, CoachMeta> = {
     trophiesCount: 3,
     majorHonours: ['1x FA Cup (2020)', '2x FA Community Shield (2020, 2023)'],
     bio: 'Mikel Arteta has transformed Arsenal into European title contenders through rigorous tactical discipline, elite set-piece engineering under Nicolas Jover, and dynamic youthful pressing.',
-    careerClubs: [
-      { club: 'Arsenal FC', years: '2019 - Present', matches: 275, winRate: '62.5%' },
-    ],
+    careerClubs: [{ club: 'Arsenal FC', years: '2019 - Present', matches: 275, winRate: '62.5%' }],
   },
   'carlo-ancelotti': {
     id: 4,
@@ -3045,9 +3062,23 @@ export class EntityService {
   }
 
   static getAfricanCoaches(): CoachMeta[] {
-    const africanCountries = new Set(['Morocco', 'Senegal', 'South Africa', 'Egypt', 'Nigeria', 'Ghana', 'Cameroon', 'Algeria', 'Tunisia', 'Ivory Coast']);
+    const africanCountries = new Set([
+      'Morocco',
+      'Senegal',
+      'South Africa',
+      'Egypt',
+      'Nigeria',
+      'Ghana',
+      'Cameroon',
+      'Algeria',
+      'Tunisia',
+      'Ivory Coast',
+    ]);
     return Object.values(COACHES_REGISTRY).filter(
-      (c) => africanCountries.has(c.nationality) || c.competitionSlug === 'afcon' || c.competitionSlug === 'caf-champions-league'
+      (c) =>
+        africanCountries.has(c.nationality) ||
+        c.competitionSlug === 'afcon' ||
+        c.competitionSlug === 'caf-champions-league'
     );
   }
 
@@ -3062,4 +3093,3 @@ export class EntityService {
     return result;
   }
 }
-

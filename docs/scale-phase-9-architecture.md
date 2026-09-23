@@ -1,4 +1,5 @@
 # GOALMILLS SCALE & REVENUE PROGRAM — PHASE 9 ARCHITECTURE
+
 ## Automated Content Distribution & Syndication Engine
 
 ```text
@@ -52,6 +53,7 @@
 ### 2. Multi-Channel Adapters & Formatters
 
 Each syndication channel receives platform-optimized content payloads:
+
 - **X / Twitter Adapter**: Compiles 280-character copy with relevant team hashtags (`#ARSCHE #PremierLeague`), match score cards, and article canonical links.
 - **Telegram Channel Adapter**: Emits rich Markdown messages with matchday emoji banners, goal timelines, and instant-view preview links.
 - **WhatsApp Broadcast Adapter**: Formats clean, mobile-friendly matchday updates and news briefs.
@@ -72,6 +74,7 @@ Each syndication channel receives platform-optimized content payloads:
 ### 4. Admin Content Distribution Studio (`/admin/distribution`)
 
 The dedicated studio interface provides:
+
 1. **Channel Connection Manager**: Manage API keys, Bot tokens, and webhook URLs securely per tenant.
 2. **Rules Configuration Engine**: Set up conditional routes (e.g., "Premier League matches $\rightarrow$ Post to X and Telegram").
 3. **Syndication Queue**: Live inspector for queued, pending, and dispatched syndication jobs with retry controls.

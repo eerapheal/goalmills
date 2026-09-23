@@ -190,12 +190,14 @@ export default function EmployeesPage() {
   });
 
   const trainingCount = employees.filter((e) => {
-    const isCert = e.trainingProgress?.isCertified || (e.trainingProgress?.completedDaysCount || 0) >= 30;
+    const isCert =
+      e.trainingProgress?.isCertified || (e.trainingProgress?.completedDaysCount || 0) >= 30;
     return e.status === 'training' || !isCert;
   }).length;
 
   const activeCount = employees.filter((e) => {
-    const isCert = e.trainingProgress?.isCertified || (e.trainingProgress?.completedDaysCount || 0) >= 30;
+    const isCert =
+      e.trainingProgress?.isCertified || (e.trainingProgress?.completedDaysCount || 0) >= 30;
     return isCert && e.status !== 'training';
   }).length;
 
@@ -277,10 +279,11 @@ export default function EmployeesPage() {
         <button
           type="button"
           onClick={() => setActiveTab('roster')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${activeTab === 'roster'
+          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+            activeTab === 'roster'
               ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
-            }`}
+          }`}
         >
           <FiUsers size={15} />
           <span>Staff Roster & Badges</span>
@@ -289,10 +292,11 @@ export default function EmployeesPage() {
         <button
           type="button"
           onClick={() => setActiveTab('curriculum')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${activeTab === 'curriculum'
+          className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${
+            activeTab === 'curriculum'
               ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
-            }`}
+          }`}
         >
           <FiBookOpen size={15} />
           <span>30-Day Academy Curriculum & SOP</span>
@@ -312,7 +316,8 @@ export default function EmployeesPage() {
                   <FiUsers className="text-amber-400" /> Staff Directory & Onboarding
                 </h1>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Manage 30-day curriculum trainees, appointment letters, and full-time content officers
+                  Manage 30-day curriculum trainees, appointment letters, and full-time content
+                  officers
                 </p>
               </div>
 
@@ -411,7 +416,10 @@ export default function EmployeesPage() {
                     const isCert = emp.trainingProgress?.isCertified || completedDays >= 30;
 
                     return (
-                      <div key={emp._id} className="p-4 space-y-3 hover:bg-white/[0.02] transition-colors">
+                      <div
+                        key={emp._id}
+                        className="p-4 space-y-3 hover:bg-white/[0.02] transition-colors"
+                      >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-3">
                             <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm uppercase shadow-md flex-shrink-0">
@@ -568,10 +576,11 @@ export default function EmployeesPage() {
                             <td className="p-4">
                               <Link
                                 href={`/admin/employees/${emp._id}/appointment`}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${emp.appointmentSigned
+                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                                  emp.appointmentSigned
                                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
                                     : 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20'
-                                  }`}
+                                }`}
                               >
                                 <FiFileText size={12} />
                                 <span>
@@ -627,18 +636,24 @@ export default function EmployeesPage() {
                   30-Day Sports Media Employee Training Curriculum
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl">
-                  <strong>Training Model:</strong> Learn &rarr; Create &rarr; Publish &rarr; Submit &rarr; Review &rarr; Improve.
-                  Production-based training to produce sports media professionals who independently research, write, optimize, design, publish, distribute, and analyse content.
+                  <strong>Training Model:</strong> Learn &rarr; Create &rarr; Publish &rarr; Submit
+                  &rarr; Review &rarr; Improve. Production-based training to produce sports media
+                  professionals who independently research, write, optimize, design, publish,
+                  distribute, and analyse content.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <div className="bg-slate-950/80 p-3 rounded-2xl border border-white/10 text-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Duration</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Duration
+                  </span>
                   <span className="text-lg font-black text-amber-400">30 Working Days</span>
                 </div>
                 <div className="bg-slate-950/80 p-3 rounded-2xl border border-white/10 text-center">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Daily Stand-Up</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Daily Stand-Up
+                  </span>
                   <span className="text-sm font-black text-emerald-400">5:00 PM – 5:30 PM WAT</span>
                 </div>
               </div>
@@ -647,7 +662,8 @@ export default function EmployeesPage() {
             {/* Daily Minimum Standards Callout */}
             <div className="bg-slate-950/90 p-4 sm:p-5 rounded-2xl border border-white/10 space-y-3">
               <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                <FiCheckSquare /> Daily Minimum Production Standard (Every Trainee Must Submit Daily)
+                <FiCheckSquare /> Daily Minimum Production Standard (Every Trainee Must Submit
+                Daily)
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
                 <div className="bg-slate-900/80 p-3 rounded-xl border border-white/5 text-center">
@@ -678,7 +694,6 @@ export default function EmployeesPage() {
               </div>
             </div>
           </div>
-
           {/* Week Selector Bar */}
           <div className="glass-card p-3 sm:p-4 rounded-2xl border border-white/10 flex flex-wrap items-center gap-2">
             {[
@@ -694,16 +709,16 @@ export default function EmployeesPage() {
                   setSelectedWeek(wk);
                   setExpandedDay(startDay);
                 }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${selectedWeek === wk
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-all ${
+                  selectedWeek === wk
                     ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
-                  }`}
+                }`}
               >
                 {label}
               </button>
             ))}
           </div>
-
           {/* Days of Selected Week */}
           <div className="space-y-4">
             {weekDays.map((dayItem) => {
@@ -750,12 +765,14 @@ export default function EmployeesPage() {
                           📚 Curriculum Topics to Study (8:30 AM – 10:00 AM WAT)
                         </h4>
                         <ul className="space-y-1.5 text-xs text-slate-200">
-                          {(dayItem.topics || dayItem.study || dayItem.objectives || []).map((t, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                              <span>{t}</span>
-                            </li>
-                          ))}
+                          {(dayItem.topics || dayItem.study || dayItem.objectives || []).map(
+                            (t, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                                <span>{t}</span>
+                              </li>
+                            )
+                          )}
                         </ul>
                       </div>
 
@@ -765,7 +782,12 @@ export default function EmployeesPage() {
                           ⚡ Practical Production Tasks (10:00 AM – 4:00 PM WAT)
                         </h4>
                         <ul className="space-y-1.5 text-xs text-slate-200">
-                          {(dayItem.practicalTasks || dayItem.production || dayItem.assignment || []).map((pt, i) => (
+                          {(
+                            dayItem.practicalTasks ||
+                            dayItem.production ||
+                            dayItem.assignment ||
+                            []
+                          ).map((pt, i) => (
                             <li key={i} className="flex items-start gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
                               <span>{pt}</span>
@@ -803,7 +825,6 @@ export default function EmployeesPage() {
               );
             })}
           </div>
-
           {/* Section: Newsroom Daily Timetable */}
           <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-4">
             <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
@@ -811,24 +832,25 @@ export default function EmployeesPage() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {NEWSROOM_DAILY_TIMETABLE.map((slot, i) => (
-                <div key={i} className="p-3 bg-slate-950/60 rounded-xl border border-white/5 flex items-start gap-3">
+                <div
+                  key={i}
+                  className="p-3 bg-slate-950/60 rounded-xl border border-white/5 flex items-start gap-3"
+                >
                   <span className="px-2 py-1 rounded bg-amber-500/10 text-amber-400 font-mono text-xs font-bold whitespace-nowrap">
                     {slot.time}
                   </span>
-                  <span className="text-xs text-slate-300 font-medium">
-                    {slot.activity}
-                  </span>
+                  <span className="text-xs text-slate-300 font-medium">{slot.activity}</span>
                 </div>
               ))}
             </div>
           </div>
-
           {/* Section: Standup Protocol & 10-Category Scoring Rubric */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Standup Protocol */}
             <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-4">
               <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                <FiVideo className="text-emerald-400" /> Daily Stand-Up Protocol (5:00 PM – 5:30 PM WAT)
+                <FiVideo className="text-emerald-400" /> Daily Stand-Up Protocol (5:00 PM – 5:30 PM
+                WAT)
               </h3>
               <p className="text-xs text-text-muted">
                 Mandatory Google Meet daily review with Managing Editor Raphael Ekpenisi.
@@ -838,7 +860,10 @@ export default function EmployeesPage() {
                   The 4 Mandatory Trainee Questions:
                 </span>
                 {NEWSROOM_STANDUP_PROTOCOL.fourQuestions.map((q, idx) => (
-                  <div key={idx} className="p-2.5 bg-slate-950/80 rounded-xl border border-white/5 text-xs text-slate-200 flex items-center gap-2.5">
+                  <div
+                    key={idx}
+                    className="p-2.5 bg-slate-950/80 rounded-xl border border-white/5 text-xs text-slate-200 flex items-center gap-2.5"
+                  >
                     <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] flex items-center justify-center flex-shrink-0">
                       {idx + 1}
                     </span>
@@ -858,7 +883,10 @@ export default function EmployeesPage() {
               </p>
               <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-1">
                 {DAILY_SCORECARD_RUBRICS.map((r) => (
-                  <div key={r.key} className="p-2.5 bg-slate-950/80 rounded-xl border border-white/5 flex items-center justify-between gap-2 text-xs">
+                  <div
+                    key={r.key}
+                    className="p-2.5 bg-slate-950/80 rounded-xl border border-white/5 flex items-center justify-between gap-2 text-xs"
+                  >
                     <div>
                       <span className="font-bold text-slate-200 block">{r.name}</span>
                       <span className="text-[10px] text-text-muted">{r.description}</span>
@@ -871,11 +899,11 @@ export default function EmployeesPage() {
               </div>
             </div>
           </div>
-
           {/* Section: Certification Tiers */}
           <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-4">
             <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-              <FiAward className="text-emerald-400" /> Post-Curriculum Certification Tiers & Career Progression
+              <FiAward className="text-emerald-400" /> Post-Curriculum Certification Tiers & Career
+              Progression
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -888,28 +916,25 @@ export default function EmployeesPage() {
                     Score: {tier.min}% – {tier.max}%
                   </span>
 
-                  <h4 className="text-xs font-bold text-white">
-                    {tier.title}
-                  </h4>
+                  <h4 className="text-xs font-bold text-white">{tier.title}</h4>
 
-                  <p className="text-[11px] text-slate-300">
-                    {tier.summary}
-                  </p>
+                  <p className="text-[11px] text-slate-300">{tier.summary}</p>
                 </div>
               ))}
             </div>
-          </div> {/* <-- THIS WAS MISSING */}
-
-
+          </div>{' '}
+          {/* <-- THIS WAS MISSING */}
           {/* Section: Newsroom Editorial Policies & Standards */}
           <div className="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
               <div>
                 <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                  <FiCheckSquare className="text-amber-400" /> GoalMills Newsroom Editorial Policies & Publishing Guidelines
+                  <FiCheckSquare className="text-amber-400" /> GoalMills Newsroom Editorial Policies
+                  & Publishing Guidelines
                 </h3>
                 <p className="text-xs text-text-muted mt-0.5">
-                  Core editorial governance rules for verification, copyright, editor sign-offs, and error correction.
+                  Core editorial governance rules for verification, copyright, editor sign-offs, and
+                  error correction.
                 </p>
               </div>
               <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl w-fit">
@@ -1111,9 +1136,7 @@ export default function EmployeesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Job Title *
-                  </label>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Job Title *</label>
                   <input
                     type="text"
                     required
@@ -1138,9 +1161,7 @@ export default function EmployeesPage() {
                     <option value="Social Media & Content Operations">
                       Social Media & Content Operations
                     </option>
-                    <option value="Graphics & Video Production">
-                      Graphics & Video Production
-                    </option>
+                    <option value="Graphics & Video Production">Graphics & Video Production</option>
                   </select>
                 </div>
 
@@ -1230,9 +1251,7 @@ export default function EmployeesPage() {
                 <p className="text-sm font-bold text-white">{createdCredentials.fullName}</p>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">
-                  Login Email
-                </span>
+                <span className="text-[10px] uppercase font-bold text-slate-400">Login Email</span>
                 <p className="text-sm font-mono text-amber-300">{createdCredentials.email}</p>
               </div>
               <div>

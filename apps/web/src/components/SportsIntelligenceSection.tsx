@@ -45,7 +45,9 @@ export function SportsIntelligenceSection() {
           const home = m.event_home_team || m.homeTeam || 'Arsenal';
           const away = m.event_away_team || m.awayTeam || 'Chelsea';
           const league = m.league_name || m.league || 'Premier League';
-          const kickoff = m.event_status ? `Live • ${m.event_status}'` : (m.event_time || 'Today 20:00 GMT');
+          const kickoff = m.event_status
+            ? `Live • ${m.event_status}'`
+            : m.event_time || 'Today 20:00 GMT';
           const id = String(m.event_key || m.id || 'match-1');
 
           setPulseMatch({
@@ -84,7 +86,8 @@ export function SportsIntelligenceSection() {
     });
   };
 
-  const currentVotes = voteCounts[pulseMatch.id] || voteCounts['match-1'] || { home: 54, draw: 18, away: 28 };
+  const currentVotes = voteCounts[pulseMatch.id] ||
+    voteCounts['match-1'] || { home: 54, draw: 18, away: 28 };
   const totalVotes = currentVotes.home + currentVotes.draw + currentVotes.away;
   const homePct = Math.round((currentVotes.home / totalVotes) * 100);
   const drawPct = Math.round((currentVotes.draw / totalVotes) * 100);
@@ -329,10 +332,11 @@ export function SportsIntelligenceSection() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveFeatureTab(tab.id)}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 ${activeFeatureTab === tab.id
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
+                    activeFeatureTab === tab.id
                       ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 scale-105'
                       : 'bg-slate-800/60 text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
+                  }`}
                 >
                   <span>{tab.title}</span>
                 </button>
@@ -433,7 +437,9 @@ export function SportsIntelligenceSection() {
                   <div className="w-10 h-10 mx-auto rounded-full bg-blue-900/60 border border-blue-700/50 flex items-center justify-center font-bold text-white text-sm mb-1.5 shadow-md">
                     {pulseMatch.homeCode}
                   </div>
-                  <p className="text-xs font-bold text-white truncate px-1">{pulseMatch.homeTeam}</p>
+                  <p className="text-xs font-bold text-white truncate px-1">
+                    {pulseMatch.homeTeam}
+                  </p>
                 </div>
                 <div className="px-2">
                   <span className="text-sm font-black text-slate-500">VS</span>
@@ -442,7 +448,9 @@ export function SportsIntelligenceSection() {
                   <div className="w-10 h-10 mx-auto rounded-full bg-red-900/60 border border-red-700/50 flex items-center justify-center font-bold text-white text-sm mb-1.5 shadow-md">
                     {pulseMatch.awayCode}
                   </div>
-                  <p className="text-xs font-bold text-white truncate px-1">{pulseMatch.awayTeam}</p>
+                  <p className="text-xs font-bold text-white truncate px-1">
+                    {pulseMatch.awayTeam}
+                  </p>
                 </div>
               </div>
             </div>
@@ -455,30 +463,33 @@ export function SportsIntelligenceSection() {
             <div className="grid grid-cols-3 gap-2 mb-4">
               <button
                 onClick={() => handleVote(pulseMatch.id, 'home')}
-                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'home'
+                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${
+                  votedMatch === 'home'
                     ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
-                  }`}
+                }`}
               >
                 <span>{pulseMatch.homeCode} Win</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({homePct}%)</div>
               </button>
               <button
                 onClick={() => handleVote(pulseMatch.id, 'draw')}
-                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'draw'
+                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${
+                  votedMatch === 'draw'
                     ? 'bg-amber-600 text-white border-amber-400 shadow-md shadow-amber-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
-                  }`}
+                }`}
               >
                 <span>Draw</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({drawPct}%)</div>
               </button>
               <button
                 onClick={() => handleVote(pulseMatch.id, 'away')}
-                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${votedMatch === 'away'
+                className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border ${
+                  votedMatch === 'away'
                     ? 'bg-cyan-600 text-white border-cyan-400 shadow-md shadow-cyan-500/30'
                     : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border-slate-700/60'
-                  }`}
+                }`}
               >
                 <span>{pulseMatch.awayCode} Win</span>
                 <div className="text-[10px] opacity-80 mt-0.5 font-normal">({awayPct}%)</div>

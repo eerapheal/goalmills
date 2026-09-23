@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-29  
 **Version:** 3.0.0  
-**Status:** AUDITED  
+**Status:** AUDITED
 
 ---
 
@@ -27,6 +27,7 @@ goalmills/
 ## 2. Component & Surface Area Breakdown
 
 ### 2.1 Web Application (`apps/web`)
+
 - **Framework:** Next.js (App Router), TailwindCSS, TypeScript.
 - **Pages & Routes:**
   - `/` (Home, Live sports tabs: Football, Cricket, Basketball, Coming Soon tabs: Tennis, Baseball, Hockey).
@@ -46,6 +47,7 @@ goalmills/
   - `/api/newsletter/*` (Subscription, double opt-in confirmation, deliverability health gates).
 
 ### 2.2 Admin Application (`apps/admin`)
+
 - **Framework:** Next.js (App Router), TailwindCSS, TypeScript, NextAuth/JWT.
 - **7 Primary Navigation Tabs:**
   1. **CMS & Editorial (`/` / `/news` / `/videos`)**: Content creation, rich markdown editing, image uploads.
@@ -60,10 +62,12 @@ goalmills/
   - Server-side RBAC enforced via `requirePermission()` in `@/lib/serverAuth`.
 
 ### 2.3 Mobile Application (`apps/mobiles`)
+
 - **Framework:** Expo / React Native.
 - **Surfaces:** SportTabs (Football, Cricket, Basketball), Live match centers, News feeds, Video highlights, and `SponsoredBannerCard`.
 
 ### 2.4 Go Mailer Microservice (`services/mailer`)
+
 - **Language:** Go (1.23+).
 - **Port:** 8085.
 - **Capabilities:** Priority queue, token bucket rate limiter, DKIM signature verification, bounce handling, suppression lists.
@@ -72,18 +76,18 @@ goalmills/
 
 ## 3. Production Environment & Secrets Matrix
 
-| Environment Variable | Workspace | Purpose | Secret? | Required in Prod? | Audit Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `MONGODB_URI` | `web`, `admin` | MongoDB Atlas Connection String | **YES** | **YES** | Verified via environment injection |
-| `REDIS_URL` / `REDIS_HOST` | `web`, `admin` | Redis URI (`rediss://` TLS supported) | **YES** | **YES** | Verified with fallback to in-memory |
-| `NEXTAUTH_SECRET` | `admin` | NextAuth Session Encryption | **YES** | **YES** | Enforced 32+ char random key |
-| `NEXTAUTH_URL` | `admin` | Admin Canonical URL | NO | **YES** | Configured per deployment domain |
-| `FOOTBALL_API_KEY` | `web`, `admin` | AllSportsAPI Football Key | **YES** | **YES** | Server-side only (never exposed) |
-| `CRICKET_API_KEY` | `web`, `admin` | Cricbuzz / RapidAPI Key | **YES** | **YES** | Server-side only (never exposed) |
-| `BASKETBALL_API_KEY` | `web`, `admin` | AllSportsAPI Basketball Key | **YES** | **YES** | Server-side only (never exposed) |
-| `CLOUDINARY_*` | `web`, `admin` | Cloudinary Media Asset Keys | **YES** | **YES** | Server-side only |
-| `MAILER_SERVICE_URL` | `web`, `admin` | Internal Go Mailer URL | NO | **YES** | Defaults to `http://localhost:8085` |
-| `NEXT_PUBLIC_APP_URL` | `web` | Canonical Base URL for SEO/OG | NO | **YES** | Required for absolute sitemaps/OG |
+| Environment Variable       | Workspace      | Purpose                               | Secret? | Required in Prod? | Audit Status                        |
+| :------------------------- | :------------- | :------------------------------------ | :------ | :---------------- | :---------------------------------- |
+| `MONGODB_URI`              | `web`, `admin` | MongoDB Atlas Connection String       | **YES** | **YES**           | Verified via environment injection  |
+| `REDIS_URL` / `REDIS_HOST` | `web`, `admin` | Redis URI (`rediss://` TLS supported) | **YES** | **YES**           | Verified with fallback to in-memory |
+| `NEXTAUTH_SECRET`          | `admin`        | NextAuth Session Encryption           | **YES** | **YES**           | Enforced 32+ char random key        |
+| `NEXTAUTH_URL`             | `admin`        | Admin Canonical URL                   | NO      | **YES**           | Configured per deployment domain    |
+| `FOOTBALL_API_KEY`         | `web`, `admin` | AllSportsAPI Football Key             | **YES** | **YES**           | Server-side only (never exposed)    |
+| `CRICKET_API_KEY`          | `web`, `admin` | Cricbuzz / RapidAPI Key               | **YES** | **YES**           | Server-side only (never exposed)    |
+| `BASKETBALL_API_KEY`       | `web`, `admin` | AllSportsAPI Basketball Key           | **YES** | **YES**           | Server-side only (never exposed)    |
+| `CLOUDINARY_*`             | `web`, `admin` | Cloudinary Media Asset Keys           | **YES** | **YES**           | Server-side only                    |
+| `MAILER_SERVICE_URL`       | `web`, `admin` | Internal Go Mailer URL                | NO      | **YES**           | Defaults to `http://localhost:8085` |
+| `NEXT_PUBLIC_APP_URL`      | `web`          | Canonical Base URL for SEO/OG         | NO      | **YES**           | Required for absolute sitemaps/OG   |
 
 ---
 

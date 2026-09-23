@@ -45,7 +45,7 @@ export default async function CompetitionHubPage({
   }
 
   // Look up extended competition metadata from ALL_COMPETITIONS
-  const compMeta = ALL_COMPETITIONS.find(c => c.slug === competitionSlug);
+  const compMeta = ALL_COMPETITIONS.find((c) => c.slug === competitionSlug);
   const hasGroups = compMeta?.hasGroups ?? false;
   const hasKnockout = compMeta?.hasKnockout ?? false;
 
@@ -90,9 +90,20 @@ export default async function CompetitionHubPage({
             badges={[
               { label: 'Season', value: comp.season, icon: <FiCalendar /> },
               { label: 'Country / Region', value: comp.country, icon: <FiAward /> },
-              ...(compMeta ? [
-                { label: 'Type', value: compMeta.competitionType === 'knockout' ? '🏆 Knockout' : compMeta.competitionType === 'cup' ? '🥇 Cup' : '📊 League', icon: <FiShield /> },
-              ] : []),
+              ...(compMeta
+                ? [
+                    {
+                      label: 'Type',
+                      value:
+                        compMeta.competitionType === 'knockout'
+                          ? '🏆 Knockout'
+                          : compMeta.competitionType === 'cup'
+                            ? '🥇 Cup'
+                            : '📊 League',
+                      icon: <FiShield />,
+                    },
+                  ]
+                : []),
             ]}
           />
         </div>

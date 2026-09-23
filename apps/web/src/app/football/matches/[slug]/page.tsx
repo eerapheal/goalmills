@@ -88,7 +88,9 @@ export function StatBar({
     <div className={`py-3 ${highlight ? 'bg-white/[0.03] rounded-xl px-3 -mx-3' : ''}`}>
       <div className="flex items-center justify-between mb-1.5 text-xs">
         <span className="font-mono font-black text-white text-sm">{home}</span>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          {label}
+        </span>
         <span className="font-mono font-black text-white text-sm">{away}</span>
       </div>
       <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-white/5">
@@ -127,11 +129,27 @@ function PitchVisual({
       const pos = (p.player_position || '').toString().toLowerCase();
       if (idx === 0 || pos.includes('gk') || pos.includes('goal') || pos === '1') {
         gks.push(p);
-      } else if (pos.includes('def') || pos.includes('cb') || pos.includes('lb') || pos.includes('rb')) {
+      } else if (
+        pos.includes('def') ||
+        pos.includes('cb') ||
+        pos.includes('lb') ||
+        pos.includes('rb')
+      ) {
         defs.push(p);
-      } else if (pos.includes('mid') || pos.includes('cm') || pos.includes('dm') || pos.includes('am')) {
+      } else if (
+        pos.includes('mid') ||
+        pos.includes('cm') ||
+        pos.includes('dm') ||
+        pos.includes('am')
+      ) {
         mids.push(p);
-      } else if (pos.includes('att') || pos.includes('fwd') || pos.includes('st') || pos.includes('rw') || pos.includes('lw')) {
+      } else if (
+        pos.includes('att') ||
+        pos.includes('fwd') ||
+        pos.includes('st') ||
+        pos.includes('rw') ||
+        pos.includes('lw')
+      ) {
         fwds.push(p);
       } else {
         // Fallback distribution by lineup order
@@ -177,7 +195,9 @@ function PitchVisual({
           style={{ top: row.top }}
         >
           {row.list.map((p, pIdx) => {
-            const displayName = p.player ? p.player.split(' ').pop() || p.player : `#${p.player_number || pIdx + 1}`;
+            const displayName = p.player
+              ? p.player.split(' ').pop() || p.player
+              : `#${p.player_number || pIdx + 1}`;
             return (
               <Link
                 key={p.player_key || pIdx}
@@ -233,7 +253,8 @@ function SummaryTab({
     return map;
   }, [match.statistics]);
 
-  const possession = statsMap['ball possession'] || statsMap['possession'] || { home: '50%', away: '50%' };
+  const possession = statsMap['ball possession'] ||
+    statsMap['possession'] || { home: '50%', away: '50%' };
   const onTarget = statsMap['on target'] || statsMap['shots on target'] || { home: '0', away: '0' };
   const attacks = statsMap['dangerous attacks'] || statsMap['attacks'] || { home: '0', away: '0' };
 
@@ -247,7 +268,9 @@ function SummaryTab({
             <span className="text-xs text-slate-500">vs</span>
             <span className="text-xl font-black text-rose-400 font-mono">{possession.away}</span>
           </div>
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Possession</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+            Possession
+          </p>
         </div>
 
         <div className="bg-[#0f172a]/80 backdrop-blur-sm border border-[#1e293b] rounded-2xl p-4 text-center">
@@ -256,7 +279,9 @@ function SummaryTab({
             <span className="text-xs text-slate-500">vs</span>
             <span className="text-xl font-black text-rose-400 font-mono">{onTarget.away}</span>
           </div>
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Shots on Target</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+            Shots on Target
+          </p>
         </div>
 
         <div className="bg-[#0f172a]/80 backdrop-blur-sm border border-[#1e293b] rounded-2xl p-4 text-center">
@@ -265,7 +290,9 @@ function SummaryTab({
             <span className="text-xs text-slate-500">vs</span>
             <span className="text-xl font-black text-rose-400 font-mono">{attacks.away}</span>
           </div>
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Dangerous Attacks</p>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+            Dangerous Attacks
+          </p>
         </div>
       </div>
 
@@ -288,7 +315,9 @@ function SummaryTab({
                     >
                       {g.home_scorer}
                     </Link>
-                    {g.home_assist && <span className="text-slate-400 text-[10px]">({g.home_assist})</span>}
+                    {g.home_assist && (
+                      <span className="text-slate-400 text-[10px]">({g.home_assist})</span>
+                    )}
                   </span>
                   <span className="font-mono text-amber-400 font-bold">{g.time}&apos;</span>
                 </div>
@@ -316,7 +345,9 @@ function SummaryTab({
                     >
                       {g.away_scorer}
                     </Link>
-                    {g.away_assist && <span className="text-slate-400 text-[10px]">({g.away_assist})</span>}
+                    {g.away_assist && (
+                      <span className="text-slate-400 text-[10px]">({g.away_assist})</span>
+                    )}
                   </span>
                   <span className="font-mono text-amber-400 font-bold">{g.time}&apos;</span>
                 </div>
@@ -334,7 +365,9 @@ function SummaryTab({
           <h3 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
             <span>⏱️</span> Match Timeline
           </h3>
-          <span className="text-[10px] text-slate-400 font-semibold">{timelineEvents.length} events</span>
+          <span className="text-[10px] text-slate-400 font-semibold">
+            {timelineEvents.length} events
+          </span>
         </div>
 
         {timelineEvents.length > 0 ? (
@@ -348,7 +381,9 @@ function SummaryTab({
                     isHome ? 'flex-row' : 'flex-row-reverse'
                   }`}
                 >
-                  <div className={`flex items-center gap-2.5 flex-1 ${isHome ? '' : 'flex-row-reverse'}`}>
+                  <div
+                    className={`flex items-center gap-2.5 flex-1 ${isHome ? '' : 'flex-row-reverse'}`}
+                  >
                     <EventIcon type={ev.type} />
                     <div className={isHome ? '' : 'text-right'}>
                       <Link
@@ -371,7 +406,9 @@ function SummaryTab({
                     {ev.score && (
                       <span
                         className={`text-xs font-mono font-black px-2 py-0.5 rounded ${
-                          isHome ? 'text-right block text-blue-400' : 'text-left block text-rose-400'
+                          isHome
+                            ? 'text-right block text-blue-400'
+                            : 'text-left block text-rose-400'
                         }`}
                       >
                         {ev.score}
@@ -383,7 +420,9 @@ function SummaryTab({
             })}
           </div>
         ) : (
-          <div className="p-8 text-center text-slate-500 text-xs">No key match events recorded yet</div>
+          <div className="p-8 text-center text-slate-500 text-xs">
+            No key match events recorded yet
+          </div>
         )}
       </div>
 
@@ -397,12 +436,17 @@ function SummaryTab({
             <span className="text-[10px] text-emerald-400 font-bold animate-pulse">Live Feed</span>
           </div>
           <div className="p-4 space-y-2.5 max-h-60 overflow-y-auto divide-y divide-[#1e293b]/50">
-            {comments.slice(-6).reverse().map((c, i) => (
-              <div key={i} className="pt-2 flex items-start gap-3 text-xs">
-                <span className="font-mono text-amber-400 font-bold min-w-[45px]">{c.comments_time}</span>
-                <span className="text-slate-300">{c.comments_text}</span>
-              </div>
-            ))}
+            {comments
+              .slice(-6)
+              .reverse()
+              .map((c, i) => (
+                <div key={i} className="pt-2 flex items-start gap-3 text-xs">
+                  <span className="font-mono text-amber-400 font-bold min-w-[45px]">
+                    {c.comments_time}
+                  </span>
+                  <span className="text-slate-300">{c.comments_text}</span>
+                </div>
+              ))}
           </div>
         </div>
       )}
@@ -432,18 +476,27 @@ function StatsTab({
   return (
     <div className="bg-[#0f172a] rounded-2xl border border-[#1e293b] overflow-hidden shadow-xl">
       <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
-        <span className="text-xs font-black text-blue-400 uppercase tracking-widest">{homeTeam}</span>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Match Statistics</span>
-        <span className="text-xs font-black text-rose-400 uppercase tracking-widest">{awayTeam}</span>
+        <span className="text-xs font-black text-blue-400 uppercase tracking-widest">
+          {homeTeam}
+        </span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Match Statistics
+        </span>
+        <span className="text-xs font-black text-rose-400 uppercase tracking-widest">
+          {awayTeam}
+        </span>
       </div>
 
       <div className="px-5 py-4 divide-y divide-[#1e293b]/60">
         {stats.map((s, idx) => {
           const homeNum = parseFloat(String(s.home).replace('%', '')) || 0;
           const awayNum = parseFloat(String(s.away).replace('%', '')) || 0;
-          const isHighlight = ['ball possession', 'on target', 'shots on target', 'dangerous attacks'].includes(
-            s.type.toLowerCase()
-          );
+          const isHighlight = [
+            'ball possession',
+            'on target',
+            'shots on target',
+            'dangerous attacks',
+          ].includes(s.type.toLowerCase());
 
           return (
             <StatBar
@@ -536,7 +589,9 @@ function LineupsTab({
       {/* Formation tag */}
       {currentFormation && (
         <div className="text-center">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Formation: </span>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            Formation:{' '}
+          </span>
           <span className="text-xs font-black text-white font-mono uppercase bg-white/5 px-2 py-0.5 rounded border border-white/10">
             {currentFormation}
           </span>
@@ -552,7 +607,9 @@ function LineupsTab({
           <h3 className="text-xs font-black text-white uppercase tracking-widest">
             {view === 'home' ? homeTeam : awayTeam} Starting XI
           </h3>
-          <span className="text-[10px] text-slate-400 font-bold">{startingPlayers.length} Players</span>
+          <span className="text-[10px] text-slate-400 font-bold">
+            {startingPlayers.length} Players
+          </span>
         </div>
 
         <div className="divide-y divide-[#1e293b]">
@@ -584,7 +641,9 @@ function LineupsTab({
       {substitutes.length > 0 && (
         <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden">
           <div className="px-5 py-3 border-b border-[#1e293b]">
-            <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest">Substitutes</h3>
+            <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest">
+              Substitutes
+            </h3>
           </div>
           <div className="divide-y divide-[#1e293b]">
             {substitutes.map((p: any, i: number) => (
@@ -663,16 +722,28 @@ function H2HTab({
 
         <div className="flex items-center gap-4 justify-around">
           <div>
-            <p className="text-3xl sm:text-4xl font-black text-blue-400 font-mono">{stats.homeWins}</p>
-            <p className="text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">{homeTeam} Wins</p>
+            <p className="text-3xl sm:text-4xl font-black text-blue-400 font-mono">
+              {stats.homeWins}
+            </p>
+            <p className="text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">
+              {homeTeam} Wins
+            </p>
           </div>
           <div>
-            <p className="text-3xl sm:text-4xl font-black text-slate-300 font-mono">{stats.draws}</p>
-            <p className="text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">Draws</p>
+            <p className="text-3xl sm:text-4xl font-black text-slate-300 font-mono">
+              {stats.draws}
+            </p>
+            <p className="text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">
+              Draws
+            </p>
           </div>
           <div>
-            <p className="text-3xl sm:text-4xl font-black text-rose-400 font-mono">{stats.awayWins}</p>
-            <p className="text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">{awayTeam} Wins</p>
+            <p className="text-3xl sm:text-4xl font-black text-rose-400 font-mono">
+              {stats.awayWins}
+            </p>
+            <p className="text-[11px] text-slate-400 uppercase tracking-wider font-bold mt-1">
+              {awayTeam} Wins
+            </p>
           </div>
         </div>
 
@@ -696,21 +767,34 @@ function H2HTab({
       {/* Previous Encounters */}
       <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-xl">
         <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
-          <h3 className="text-xs font-black text-white uppercase tracking-widest">Previous Encounters</h3>
-          <span className="text-[10px] text-slate-400 font-semibold">{meetings.length} Matches</span>
+          <h3 className="text-xs font-black text-white uppercase tracking-widest">
+            Previous Encounters
+          </h3>
+          <span className="text-[10px] text-slate-400 font-semibold">
+            {meetings.length} Matches
+          </span>
         </div>
 
         {meetings.length > 0 ? (
           <div className="divide-y divide-[#1e293b]">
             {meetings.slice(0, 10).map((m, i) => (
-              <div key={i} className="flex items-center px-5 py-3.5 gap-3 hover:bg-white/[0.03] transition-colors text-xs">
-                <span className="text-slate-500 font-mono text-[11px] w-20 flex-shrink-0">{m.event_date}</span>
+              <div
+                key={i}
+                className="flex items-center px-5 py-3.5 gap-3 hover:bg-white/[0.03] transition-colors text-xs"
+              >
+                <span className="text-slate-500 font-mono text-[11px] w-20 flex-shrink-0">
+                  {m.event_date}
+                </span>
                 <div className="flex-1 flex items-center justify-between gap-2">
-                  <span className="font-bold text-slate-200 text-right flex-1 truncate">{m.event_home_team}</span>
+                  <span className="font-bold text-slate-200 text-right flex-1 truncate">
+                    {m.event_home_team}
+                  </span>
                   <span className="font-mono font-black text-white px-2 py-0.5 rounded bg-white/5 border border-white/5 min-w-[48px] text-center">
                     {m.event_final_result || m.event_ft_result || 'vs'}
                   </span>
-                  <span className="font-bold text-slate-200 text-left flex-1 truncate">{m.event_away_team}</span>
+                  <span className="font-bold text-slate-200 text-left flex-1 truncate">
+                    {m.event_away_team}
+                  </span>
                 </div>
                 <span className="text-[10px] text-slate-400 max-w-[100px] truncate hidden sm:block">
                   {m.league_name}
@@ -719,7 +803,9 @@ function H2HTab({
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center text-slate-500 text-xs">No prior meetings found on record</div>
+          <div className="p-8 text-center text-slate-500 text-xs">
+            No prior meetings found on record
+          </div>
         )}
       </div>
     </div>
@@ -776,8 +862,11 @@ function TableTab({
           <tbody className="divide-y divide-[#1e293b]">
             {standings.map((row) => {
               const teamSlug = slugify(row.standing_team);
-              const isMatchTeam = teamSlug.includes(homeSlug) || homeSlug.includes(teamSlug) ||
-                teamSlug.includes(awaySlug) || awaySlug.includes(teamSlug);
+              const isMatchTeam =
+                teamSlug.includes(homeSlug) ||
+                homeSlug.includes(teamSlug) ||
+                teamSlug.includes(awaySlug) ||
+                awaySlug.includes(teamSlug);
 
               const gd = parseInt(row.standing_GD || '0');
 
@@ -788,7 +877,9 @@ function TableTab({
                     isMatchTeam ? 'bg-blue-500/10 border-l-2 border-l-blue-500 font-bold' : ''
                   }`}
                 >
-                  <td className="px-4 py-3 text-center font-mono text-slate-400">{row.standing_place}</td>
+                  <td className="px-4 py-3 text-center font-mono text-slate-400">
+                    {row.standing_place}
+                  </td>
                   <td className="px-3 py-3 font-semibold text-white">
                     <Link
                       href={footballRoutes.teamFromName(row.standing_team)}
@@ -802,16 +893,30 @@ function TableTab({
                       )}
                     </Link>
                   </td>
-                  <td className="px-2 py-3 text-center font-mono text-slate-300">{row.standing_P}</td>
-                  <td className="px-2 py-3 text-center font-mono text-slate-300">{row.standing_W}</td>
-                  <td className="px-2 py-3 text-center font-mono text-slate-300">{row.standing_D}</td>
-                  <td className="px-2 py-3 text-center font-mono text-slate-300">{row.standing_L}</td>
+                  <td className="px-2 py-3 text-center font-mono text-slate-300">
+                    {row.standing_P}
+                  </td>
+                  <td className="px-2 py-3 text-center font-mono text-slate-300">
+                    {row.standing_W}
+                  </td>
+                  <td className="px-2 py-3 text-center font-mono text-slate-300">
+                    {row.standing_D}
+                  </td>
+                  <td className="px-2 py-3 text-center font-mono text-slate-300">
+                    {row.standing_L}
+                  </td>
                   <td className="px-2 py-3 text-center font-mono hidden sm:table-cell">
-                    <span className={gd > 0 ? 'text-emerald-400' : gd < 0 ? 'text-rose-400' : 'text-slate-400'}>
+                    <span
+                      className={
+                        gd > 0 ? 'text-emerald-400' : gd < 0 ? 'text-rose-400' : 'text-slate-400'
+                      }
+                    >
                       {gd > 0 ? `+${gd}` : gd}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-center font-mono font-black text-white">{row.standing_PTS}</td>
+                  <td className="px-3 py-3 text-center font-mono font-black text-white">
+                    {row.standing_PTS}
+                  </td>
                 </tr>
               );
             })}
@@ -866,9 +971,15 @@ function OddsTab({
             {odds.map((o, idx) => (
               <tr key={idx} className="hover:bg-white/[0.03] transition-colors">
                 <td className="px-5 py-3 font-bold text-white">{o.odd_bookmakers}</td>
-                <td className="px-3 py-3 text-center font-mono font-black text-blue-400">{o.odd_1 || '-'}</td>
-                <td className="px-3 py-3 text-center font-mono font-black text-slate-300">{o.odd_x || '-'}</td>
-                <td className="px-3 py-3 text-center font-mono font-black text-rose-400">{o.odd_2 || '-'}</td>
+                <td className="px-3 py-3 text-center font-mono font-black text-blue-400">
+                  {o.odd_1 || '-'}
+                </td>
+                <td className="px-3 py-3 text-center font-mono font-black text-slate-300">
+                  {o.odd_x || '-'}
+                </td>
+                <td className="px-3 py-3 text-center font-mono font-black text-rose-400">
+                  {o.odd_2 || '-'}
+                </td>
                 <td className="px-3 py-3 text-center font-mono hidden sm:table-cell text-slate-300">
                   {o['o+2.5'] || '-'}
                 </td>
@@ -905,14 +1016,20 @@ function CommentaryTab({ comments }: { comments: FootballComment[] }) {
       </div>
 
       <div className="divide-y divide-[#1e293b] max-h-[600px] overflow-y-auto">
-        {comments.slice().reverse().map((c, idx) => (
-          <div key={idx} className="p-4 flex items-start gap-4 hover:bg-white/[0.02] transition-colors">
-            <span className="font-mono text-xs font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
-              {c.comments_time}
-            </span>
-            <p className="text-xs text-slate-200 leading-relaxed flex-1">{c.comments_text}</p>
-          </div>
-        ))}
+        {comments
+          .slice()
+          .reverse()
+          .map((c, idx) => (
+            <div
+              key={idx}
+              className="p-4 flex items-start gap-4 hover:bg-white/[0.02] transition-colors"
+            >
+              <span className="font-mono text-xs font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                {c.comments_time}
+              </span>
+              <p className="text-xs text-slate-200 leading-relaxed flex-1">{c.comments_text}</p>
+            </div>
+          ))}
       </div>
     </div>
   );
@@ -944,7 +1061,11 @@ export default function FootballMatchPage() {
       if (parsedSlug.eventKey) {
         // First check fixtures
         const fixtureRes = await advancedFootballApi.getFixtures({ matchId: parsedSlug.eventKey });
-        if (fixtureRes?.result && Array.isArray(fixtureRes.result) && fixtureRes.result.length > 0) {
+        if (
+          fixtureRes?.result &&
+          Array.isArray(fixtureRes.result) &&
+          fixtureRes.result.length > 0
+        ) {
           foundMatch = fixtureRes.result[0];
         } else {
           // Check livescores if not found in fixtures
@@ -959,20 +1080,8 @@ export default function FootballMatchPage() {
       if (!foundMatch && parsedSlug.homeSlug && parsedSlug.awaySlug) {
         const liveScores = await advancedFootballApi.getLivescore();
         if (liveScores?.result && Array.isArray(liveScores.result)) {
-          foundMatch = liveScores.result.find((m) => {
-            const h = slugify(m.event_home_team);
-            const a = slugify(m.event_away_team);
-            return (
-              (h.includes(parsedSlug.homeSlug) || parsedSlug.homeSlug.includes(h)) &&
-              (a.includes(parsedSlug.awaySlug) || parsedSlug.awaySlug.includes(a))
-            );
-          }) || null;
-        }
-
-        if (!foundMatch) {
-          const fixtures = await advancedFootballApi.getFixtures();
-          if (fixtures?.result && Array.isArray(fixtures.result)) {
-            foundMatch = fixtures.result.find((m) => {
+          foundMatch =
+            liveScores.result.find((m) => {
               const h = slugify(m.event_home_team);
               const a = slugify(m.event_away_team);
               return (
@@ -980,6 +1089,20 @@ export default function FootballMatchPage() {
                 (a.includes(parsedSlug.awaySlug) || parsedSlug.awaySlug.includes(a))
               );
             }) || null;
+        }
+
+        if (!foundMatch) {
+          const fixtures = await advancedFootballApi.getFixtures();
+          if (fixtures?.result && Array.isArray(fixtures.result)) {
+            foundMatch =
+              fixtures.result.find((m) => {
+                const h = slugify(m.event_home_team);
+                const a = slugify(m.event_away_team);
+                return (
+                  (h.includes(parsedSlug.homeSlug) || parsedSlug.homeSlug.includes(h)) &&
+                  (a.includes(parsedSlug.awaySlug) || parsedSlug.awaySlug.includes(a))
+                );
+              }) || null;
           }
         }
       }
@@ -1105,8 +1228,8 @@ export default function FootballMatchPage() {
         detail: g.home_assist
           ? `Assist: ${g.home_assist}`
           : g.away_assist
-          ? `Assist: ${g.away_assist}`
-          : undefined,
+            ? `Assist: ${g.away_assist}`
+            : undefined,
       });
     });
 
@@ -1147,7 +1270,8 @@ export default function FootballMatchPage() {
         </div>
         <h1 className="text-2xl font-black text-white mb-2">Match Not Found</h1>
         <p className="text-slate-400 text-sm max-w-md mb-6">
-          {error || 'The requested football fixture could not be retrieved from the sports network.'}
+          {error ||
+            'The requested football fixture could not be retrieved from the sports network.'}
         </p>
         <div className="flex items-center gap-3">
           <BackButton />
@@ -1252,7 +1376,9 @@ export default function FootballMatchPage() {
             {/* Scores */}
             <div className="flex flex-col items-center gap-1.5">
               {!isLive && !isFinished ? (
-                <div className="text-2xl font-black text-slate-400 font-mono tracking-widest">VS</div>
+                <div className="text-2xl font-black text-slate-400 font-mono tracking-widest">
+                  VS
+                </div>
               ) : (
                 <>
                   <div className="text-4xl sm:text-6xl font-black text-white font-mono tracking-tight flex items-center gap-2">
@@ -1363,11 +1489,7 @@ export default function FootballMatchPage() {
           />
         )}
         {activeTab === 'h2h' && (
-          <H2HTab
-            h2hData={h2h}
-            homeTeam={match.event_home_team}
-            awayTeam={match.event_away_team}
-          />
+          <H2HTab h2hData={h2h} homeTeam={match.event_home_team} awayTeam={match.event_away_team} />
         )}
         {activeTab === 'table' && (
           <TableTab
@@ -1378,11 +1500,7 @@ export default function FootballMatchPage() {
           />
         )}
         {activeTab === 'odds' && (
-          <OddsTab
-            odds={odds}
-            homeTeam={match.event_home_team}
-            awayTeam={match.event_away_team}
-          />
+          <OddsTab odds={odds} homeTeam={match.event_home_team} awayTeam={match.event_away_team} />
         )}
         {activeTab === 'commentary' && <CommentaryTab comments={comments} />}
       </div>

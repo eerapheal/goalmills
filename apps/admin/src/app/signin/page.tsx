@@ -34,13 +34,15 @@ function SignInContent() {
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       const role = session.user.role || 'user';
-      const isStaffOrAdmin = ['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(role);
-      
+      const isStaffOrAdmin = ['super-admin', 'manager', 'editor', 'staff', 'contributor'].includes(
+        role
+      );
+
       let destination = callbackUrl;
       if (!destination || destination === '/signin' || destination === '/login') {
         destination = isStaffOrAdmin ? '/admin/dashboard' : '/';
       }
-      
+
       router.replace(destination);
     }
   }, [status, session, callbackUrl, router]);

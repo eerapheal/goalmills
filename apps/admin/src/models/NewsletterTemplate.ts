@@ -4,7 +4,13 @@ export interface INewsletterTemplateDocument extends Document {
   name: string;
   slug: string;
   description?: string;
-  category: 'daily_digest' | 'breaking_news' | 'weekend_preview' | 'tactical_debrief' | 'transfer_radar' | 'custom';
+  category:
+    | 'daily_digest'
+    | 'breaking_news'
+    | 'weekend_preview'
+    | 'tactical_debrief'
+    | 'transfer_radar'
+    | 'custom';
   subjectFormat: string;
   headerTitle: string;
   headerSubtitle: string;
@@ -43,7 +49,14 @@ const NewsletterTemplateSchema = new Schema<INewsletterTemplateDocument>(
     },
     category: {
       type: String,
-      enum: ['daily_digest', 'breaking_news', 'weekend_preview', 'tactical_debrief', 'transfer_radar', 'custom'],
+      enum: [
+        'daily_digest',
+        'breaking_news',
+        'weekend_preview',
+        'tactical_debrief',
+        'transfer_radar',
+        'custom',
+      ],
       default: 'daily_digest',
       index: true,
     },

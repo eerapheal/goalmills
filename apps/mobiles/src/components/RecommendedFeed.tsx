@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
@@ -111,9 +104,7 @@ export function RecommendedFeed({
               </Text>
 
               <View style={styles.cardFooter}>
-                <Text style={styles.sportText}>
-                  {(item.sportSlug || 'General').toUpperCase()}
-                </Text>
+                <Text style={styles.sportText}>{(item.sportSlug || 'General').toUpperCase()}</Text>
                 <Ionicons name="arrow-forward-circle" size={16} color="#F59E0B" />
               </View>
             </View>

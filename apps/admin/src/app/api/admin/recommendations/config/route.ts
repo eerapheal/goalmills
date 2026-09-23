@@ -41,7 +41,14 @@ export async function GET(req: NextRequest) {
       config: config || {
         tenantSlug: targetSlug,
         weights: DEFAULT_WEIGHTS,
-        enabledContexts: ['homepage', 'article_detail', 'match_detail', 'sports_hub', 'mobile_feed', 'newsletter'],
+        enabledContexts: [
+          'homepage',
+          'article_detail',
+          'match_detail',
+          'sports_hub',
+          'mobile_feed',
+          'newsletter',
+        ],
         excludedCategorySlugs: [],
         maxCandidatesPerSport: 4,
       },
@@ -59,7 +66,8 @@ export async function PUT(req: NextRequest) {
     await dbConnect();
     const tenantContext = await resolveTenantContext(req, session);
     const body = await req.json();
-    const { tenantSlug, weights, enabledContexts, excludedCategorySlugs, maxCandidatesPerSport } = body;
+    const { tenantSlug, weights, enabledContexts, excludedCategorySlugs, maxCandidatesPerSport } =
+      body;
 
     const targetSlug =
       tenantContext.isSuperAdmin && tenantSlug && tenantSlug !== 'all'
@@ -72,7 +80,14 @@ export async function PUT(req: NextRequest) {
         $set: {
           tenantSlug: targetSlug,
           weights: weights || DEFAULT_WEIGHTS,
-          enabledContexts: enabledContexts || ['homepage', 'article_detail', 'match_detail', 'sports_hub', 'mobile_feed', 'newsletter'],
+          enabledContexts: enabledContexts || [
+            'homepage',
+            'article_detail',
+            'match_detail',
+            'sports_hub',
+            'mobile_feed',
+            'newsletter',
+          ],
           excludedCategorySlugs: excludedCategorySlugs || [],
           maxCandidatesPerSport: maxCandidatesPerSport || 4,
           updatedAt: new Date(),

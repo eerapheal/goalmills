@@ -2,7 +2,7 @@
 
 **Version:** 2.0.0  
 **Sports Ingested:** Football, Cricket, Basketball  
-**Coming Soon Isolations:** Tennis, Baseball, Hockey  
+**Coming Soon Isolations:** Tennis, Baseball, Hockey
 
 ---
 
@@ -34,16 +34,19 @@ GoalMills decouples upstream provider formats (AllSportsAPI, API-Football, Cricb
 ## 2. Sports Normalization Contracts
 
 ### 2.1 Football Normalization
+
 - **Status Codes:** `scheduled`, `live`, `halftime`, `finished`, `postponed`, `cancelled`.
 - **Scores:** Parsed from final result strings or discrete home/away scores.
 - **Standings:** Unified `UnifiedWebStandingItem` handling flat structures (`standing_team`, `standing_place`) and nested structures (`team: { name, logo }`).
 
 ### 2.2 Cricket Normalization
+
 - **Innings Representation:** `runs/wickets (overs)` (e.g. `287/6 (50.0 ov)`).
 - **Match State:** In Progress, Complete, Stumps, Rain Interruption.
 - **Cricbuzz Transformation:** Deeply nested RapidAPI formats converted into unified flat scorecards.
 
 ### 2.3 Basketball Normalization
+
 - **Quarter Breakdown:** Array of 4 quarter point totals plus optional overtime periods.
 - **Total Points:** Summed automatically with overtime indicators.
 

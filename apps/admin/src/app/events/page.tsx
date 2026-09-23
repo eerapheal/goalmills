@@ -31,7 +31,9 @@ export default function SportsEventStreamStudio() {
 
   // Simulation form state
   const [simSport, setSimSport] = useState<'football' | 'cricket' | 'basketball'>('football');
-  const [simEventType, setSimEventType] = useState<'goal' | 'red_card' | 'wicket' | 'sixer' | 'dunk'>('goal');
+  const [simEventType, setSimEventType] = useState<
+    'goal' | 'red_card' | 'wicket' | 'sixer' | 'dunk'
+  >('goal');
   const [simHomeTeam, setSimHomeTeam] = useState('Arsenal');
   const [simAwayTeam, setSimAwayTeam] = useState('Chelsea');
   const [simScore, setSimScore] = useState('2 - 1');
@@ -152,7 +154,8 @@ export default function SportsEventStreamStudio() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Real-time sports event broker, non-blocking telemetry ingestion, and Dead-Letter Queue management.
+                Real-time sports event broker, non-blocking telemetry ingestion, and Dead-Letter
+                Queue management.
               </p>
             </div>
           </div>
@@ -230,7 +233,11 @@ export default function SportsEventStreamStudio() {
         <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">DLQ Failed Events</span>
-            <FiAlertTriangle className={stats && stats.unresolvedDeadLetters > 0 ? 'text-rose-400' : 'text-slate-400'} />
+            <FiAlertTriangle
+              className={
+                stats && stats.unresolvedDeadLetters > 0 ? 'text-rose-400' : 'text-slate-400'
+              }
+            />
           </div>
           <div className="text-3xl font-black text-white">
             {stats ? stats.unresolvedDeadLetters : '—'}
@@ -316,12 +323,15 @@ export default function SportsEventStreamStudio() {
           </div>
 
           <p className="text-xs text-slate-400">
-            Inject a live match moment into the stream broker to verify SSE fanout, consumer worker processing, and fan scoreboard updates.
+            Inject a live match moment into the stream broker to verify SSE fanout, consumer worker
+            processing, and fan scoreboard updates.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Sport</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Sport
+              </label>
               <select
                 value={simSport}
                 onChange={(e) => setSimSport(e.target.value as any)}
@@ -334,7 +344,9 @@ export default function SportsEventStreamStudio() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Moment Type</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Moment Type
+              </label>
               <select
                 value={simEventType}
                 onChange={(e) => setSimEventType(e.target.value as any)}
@@ -349,21 +361,24 @@ export default function SportsEventStreamStudio() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Current Score</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Current Score
+              </label>
               <input
                 type="text"
                 value={simScore}
                 onChange={(e) => setSimScore(e.target.value)}
                 placeholder="2 - 1"
                 className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-xs text-white focus:outline-none focus:border-blue-500"
-              >
-              </input>
+              ></input>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Home Team</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Home Team
+              </label>
               <input
                 type="text"
                 value={simHomeTeam}
@@ -372,7 +387,9 @@ export default function SportsEventStreamStudio() {
               />
             </div>
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Away Team</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                Away Team
+              </label>
               <input
                 type="text"
                 value={simAwayTeam}
@@ -388,7 +405,9 @@ export default function SportsEventStreamStudio() {
             className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
           >
             <FiPlay size={14} />
-            <span>{simulating ? 'Broadcasting to Stream...' : 'Broadcast Live Event to Stream'}</span>
+            <span>
+              {simulating ? 'Broadcasting to Stream...' : 'Broadcast Live Event to Stream'}
+            </span>
           </button>
         </div>
       </div>
@@ -447,7 +466,8 @@ export default function SportsEventStreamStudio() {
               <span>Dead-Letter Queue (DLQ) Management</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Failed events quarantined for inspection with 1-click retry into active consumer pipelines.
+              Failed events quarantined for inspection with 1-click retry into active consumer
+              pipelines.
             </p>
           </div>
 
@@ -483,7 +503,9 @@ export default function SportsEventStreamStudio() {
                   <tr key={evt._id} className="hover:bg-white/[0.02]">
                     <td className="py-3">
                       <div className="font-mono font-bold text-slate-200">{evt.eventId}</div>
-                      <div className="text-[10px] text-blue-400 uppercase font-bold">{evt.eventType}</div>
+                      <div className="text-[10px] text-blue-400 uppercase font-bold">
+                        {evt.eventType}
+                      </div>
                     </td>
                     <td className="py-3 text-slate-300 max-w-xs truncate" title={evt.errorMessage}>
                       {evt.errorMessage}
@@ -510,7 +532,10 @@ export default function SportsEventStreamStudio() {
                           disabled={replayingId === evt._id}
                           className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition flex items-center gap-1 ml-auto"
                         >
-                          <FiRefreshCw className={replayingId === evt._id ? 'animate-spin' : ''} size={10} />
+                          <FiRefreshCw
+                            className={replayingId === evt._id ? 'animate-spin' : ''}
+                            size={10}
+                          />
                           <span>Replay</span>
                         </button>
                       )}

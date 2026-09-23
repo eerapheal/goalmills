@@ -140,7 +140,11 @@ export default function FootballTeamsPage() {
               >
                 <View style={styles.logoWrap}>
                   {team.team_logo ? (
-                    <Image source={{ uri: team.team_logo }} style={styles.teamLogo} resizeMode="contain" />
+                    <Image
+                      source={{ uri: team.team_logo }}
+                      style={styles.teamLogo}
+                      resizeMode="contain"
+                    />
                   ) : (
                     <Text style={styles.logoPlaceholder}>{team.team_name.charAt(0)}</Text>
                   )}

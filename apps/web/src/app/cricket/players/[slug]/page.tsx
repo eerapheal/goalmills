@@ -139,10 +139,54 @@ export default function CricketPlayerSlugPage() {
             player_image: foundPlayer.player_image,
             country: foundPlayer.player_country || parentTeam?.team_name || 'International',
             career_stats: foundPlayer.career_stats || {
-              test: { matches: 45, innings: 78, runs: 3420, highestScore: '168', average: 46.2, strikeRate: 54.1, wickets: 12, economy: 3.4, centuries: 9, fifties: 18 },
-              odi: { matches: 120, innings: 114, runs: 5120, highestScore: '142*', average: 48.8, strikeRate: 91.2, wickets: 24, economy: 5.1, centuries: 14, fifties: 28 },
-              t20i: { matches: 78, innings: 72, runs: 2450, highestScore: '112*', average: 37.6, strikeRate: 138.4, wickets: 15, economy: 7.8, centuries: 2, fifties: 16 },
-              ipl: { matches: 135, innings: 128, runs: 4380, highestScore: '109', average: 36.5, strikeRate: 142.1, wickets: 18, economy: 8.1, centuries: 3, fifties: 29 },
+              test: {
+                matches: 45,
+                innings: 78,
+                runs: 3420,
+                highestScore: '168',
+                average: 46.2,
+                strikeRate: 54.1,
+                wickets: 12,
+                economy: 3.4,
+                centuries: 9,
+                fifties: 18,
+              },
+              odi: {
+                matches: 120,
+                innings: 114,
+                runs: 5120,
+                highestScore: '142*',
+                average: 48.8,
+                strikeRate: 91.2,
+                wickets: 24,
+                economy: 5.1,
+                centuries: 14,
+                fifties: 28,
+              },
+              t20i: {
+                matches: 78,
+                innings: 72,
+                runs: 2450,
+                highestScore: '112*',
+                average: 37.6,
+                strikeRate: 138.4,
+                wickets: 15,
+                economy: 7.8,
+                centuries: 2,
+                fifties: 16,
+              },
+              ipl: {
+                matches: 135,
+                innings: 128,
+                runs: 4380,
+                highestScore: '109',
+                average: 36.5,
+                strikeRate: 142.1,
+                wickets: 18,
+                economy: 8.1,
+                centuries: 3,
+                fifties: 29,
+              },
             },
           });
         } else {
@@ -153,10 +197,54 @@ export default function CricketPlayerSlugPage() {
             player_type: 'Professional Cricketer',
             country: 'International',
             career_stats: {
-              test: { matches: 38, innings: 64, runs: 2840, highestScore: '144', average: 45.1, strikeRate: 52.8, wickets: 8, economy: 3.2, centuries: 7, fifties: 14 },
-              odi: { matches: 96, innings: 90, runs: 3950, highestScore: '131*', average: 47.0, strikeRate: 89.6, wickets: 19, economy: 5.2, centuries: 10, fifties: 22 },
-              t20i: { matches: 62, innings: 58, runs: 1890, highestScore: '98*', average: 35.0, strikeRate: 135.2, wickets: 12, economy: 7.6, centuries: 0, fifties: 13 },
-              ipl: { matches: 110, innings: 102, runs: 3410, highestScore: '104', average: 34.8, strikeRate: 139.5, wickets: 14, economy: 8.0, centuries: 2, fifties: 21 },
+              test: {
+                matches: 38,
+                innings: 64,
+                runs: 2840,
+                highestScore: '144',
+                average: 45.1,
+                strikeRate: 52.8,
+                wickets: 8,
+                economy: 3.2,
+                centuries: 7,
+                fifties: 14,
+              },
+              odi: {
+                matches: 96,
+                innings: 90,
+                runs: 3950,
+                highestScore: '131*',
+                average: 47.0,
+                strikeRate: 89.6,
+                wickets: 19,
+                economy: 5.2,
+                centuries: 10,
+                fifties: 22,
+              },
+              t20i: {
+                matches: 62,
+                innings: 58,
+                runs: 1890,
+                highestScore: '98*',
+                average: 35.0,
+                strikeRate: 135.2,
+                wickets: 12,
+                economy: 7.6,
+                centuries: 0,
+                fifties: 13,
+              },
+              ipl: {
+                matches: 110,
+                innings: 102,
+                runs: 3410,
+                highestScore: '104',
+                average: 34.8,
+                strikeRate: 139.5,
+                wickets: 14,
+                economy: 8.0,
+                centuries: 2,
+                fifties: 21,
+              },
             },
           });
         }
@@ -246,9 +334,7 @@ export default function CricketPlayerSlugPage() {
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 ) : (
-                  <span className="text-3xl font-black text-red-400">
-                    {playerName.charAt(0)}
-                  </span>
+                  <span className="text-3xl font-black text-red-400">{playerName.charAt(0)}</span>
                 )}
               </div>
               <div>
@@ -275,13 +361,17 @@ export default function CricketPlayerSlugPage() {
             {/* Quick KPI badges */}
             <div className="flex items-center gap-2">
               <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">Career Runs</span>
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                  Career Runs
+                </span>
                 <span className="text-sm font-black text-yellow-400">
                   {currentStats?.runs || '-'}
                 </span>
               </div>
               <div className="px-4 py-2 rounded-2xl bg-[#170B10] border border-white/10 text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">Average</span>
+                <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                  Average
+                </span>
                 <span className="text-sm font-black text-blue-400">
                   {currentStats?.average || '-'}
                 </span>
@@ -328,49 +418,65 @@ export default function CricketPlayerSlugPage() {
           {currentStats ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Matches</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Matches
+                </span>
                 <span className="text-xl font-mono font-black text-white mt-1 block">
                   {currentStats.matches || '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Innings</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Innings
+                </span>
                 <span className="text-xl font-mono font-black text-white mt-1 block">
                   {currentStats.innings || '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Runs</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Total Runs
+                </span>
                 <span className="text-xl font-mono font-black text-yellow-400 mt-1 block">
                   {currentStats.runs || '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Highest Score</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Highest Score
+                </span>
                 <span className="text-xl font-mono font-black text-amber-300 mt-1 block">
                   {currentStats.highestScore || '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Batting Average</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Batting Average
+                </span>
                 <span className="text-xl font-mono font-black text-blue-400 mt-1 block">
                   {currentStats.average || '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Strike Rate</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Strike Rate
+                </span>
                 <span className="text-xl font-mono font-black text-blue-300 mt-1 block">
                   {currentStats.strikeRate || '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Centuries (100s)</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Centuries (100s)
+                </span>
                 <span className="text-xl font-mono font-black text-yellow-400 mt-1 block">
                   {currentStats.centuries ?? '-'}
                 </span>
               </div>
               <div className="p-4 rounded-2xl bg-[#0D0609]/80 border border-white/5 text-center">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Fifties (50s)</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Fifties (50s)
+                </span>
                 <span className="text-xl font-mono font-black text-red-400 mt-1 block">
                   {currentStats.fifties ?? '-'}
                 </span>
@@ -392,15 +498,25 @@ export default function CricketPlayerSlugPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Role</span>
-              <span className="text-sm font-bold text-white">{player.player_type || 'Top-order Batter'}</span>
+              <span className="text-sm font-bold text-white">
+                {player.player_type || 'Top-order Batter'}
+              </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Country / Representation</span>
-              <span className="text-sm font-bold text-white">{player.country || 'International'}</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                Country / Representation
+              </span>
+              <span className="text-sm font-bold text-white">
+                {player.country || 'International'}
+              </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-[#060D18]/80 border border-white/5">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Affiliated Club</span>
-              <span className="text-sm font-bold text-white">{player.team_name || 'National Squad'}</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                Affiliated Club
+              </span>
+              <span className="text-sm font-bold text-white">
+                {player.team_name || 'National Squad'}
+              </span>
             </div>
           </div>
         </div>

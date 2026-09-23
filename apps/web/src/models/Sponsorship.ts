@@ -23,7 +23,13 @@ export interface ISponsorship {
   title: string;
   sponsorName: string;
   sponsorLogo?: string;
-  type: 'banner' | 'match_card' | 'article_header' | 'affiliate_link' | 'newsletter_sponsor' | 'video_sponsor';
+  type:
+    | 'banner'
+    | 'match_card'
+    | 'article_header'
+    | 'affiliate_link'
+    | 'newsletter_sponsor'
+    | 'video_sponsor';
   placement:
     | 'homepage_hero'
     | 'sports_pulse'
@@ -38,7 +44,8 @@ export interface ISponsorship {
   imageUrl?: string;
   tagline?: string;
   ctaText: string;
-  sportSlug: 'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string;
+  sportSlug:
+    'all' | 'football' | 'cricket' | 'basketball' | 'tennis' | 'baseball' | 'hockey' | string;
   badgeText: string;
   status: 'active' | 'paused' | 'expired' | 'draft' | 'trash';
   startDate: Date;
@@ -67,7 +74,14 @@ const SponsorshipSchema = new mongoose.Schema(
     sponsorLogo: { type: String, required: false },
     type: {
       type: String,
-      enum: ['banner', 'match_card', 'article_header', 'affiliate_link', 'newsletter_sponsor', 'video_sponsor'],
+      enum: [
+        'banner',
+        'match_card',
+        'article_header',
+        'affiliate_link',
+        'newsletter_sponsor',
+        'video_sponsor',
+      ],
       default: 'banner',
       index: true,
     },

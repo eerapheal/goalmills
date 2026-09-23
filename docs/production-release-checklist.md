@@ -1,11 +1,12 @@
 # GoalMills — Master Production Release Checklist
 
 **Target Release:** GoalMills v3.0 Production Deployment  
-**Audited Date:** 2026-08-29  
+**Audited Date:** 2026-08-29
 
 ---
 
 ## 1. Security & Compliance
+
 - [x] Security audit complete and documented in `/docs/security-final-report.md`.
 - [x] Zero P0 critical vulnerabilities identified.
 - [x] Zero hardcoded API keys or database connection strings in source code.
@@ -19,6 +20,7 @@
 - [x] Public sponsorship telemetry protected (20 req/min/IP rate limit, 10s deduplication).
 
 ## 2. Infrastructure, Redis & Reliability
+
 - [x] Centralized Redis connection manager supporting TLS (`rediss://`) and `redis://`.
 - [x] In-memory bounded LRU fallback (5,000 max entries) verified under outage conditions.
 - [x] Single-flight request coalescing verified under concurrent burst loads.
@@ -29,6 +31,7 @@
 - [x] Real-time SSE streaming hub active with duplicate hash suppression.
 
 ## 3. Performance, SEO & Mobile
+
 - [x] Dynamic XML sitemap active (`/sitemap.xml`) streaming published articles and highlights.
 - [x] Search engine crawler directives configured in `/robots.txt`.
 - [x] Schema.org JSON-LD structured data implemented (`NewsArticle`, `VideoObject`, `Organization`).
@@ -38,6 +41,7 @@
 - [x] Branded 404 (`not-found.tsx`) and 500 (`error.tsx`) error pages implemented without stack trace leaks.
 
 ## 4. Build, Microservices & Tests
+
 - [x] Go Enterprise Mailer microservice verified (`go test`, `go vet`, `go build`).
 - [x] TypeScript typechecks passing with 0 errors (`pnpm --filter web typecheck`, `pnpm --filter admin typecheck`).
 - [x] Test suite passing with 0 failures (57 test files, 168 tests).

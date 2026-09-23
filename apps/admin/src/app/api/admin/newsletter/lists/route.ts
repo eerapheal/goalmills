@@ -14,9 +14,7 @@ export async function GET(request: NextRequest) {
       query.tenantSlug = tenant.tenantSlug;
     }
 
-    const lists = await NewsletterList.find(query)
-      .sort({ isDefault: -1, createdAt: -1 })
-      .lean();
+    const lists = await NewsletterList.find(query).sort({ isDefault: -1, createdAt: -1 }).lean();
 
     return NextResponse.json({
       success: true,

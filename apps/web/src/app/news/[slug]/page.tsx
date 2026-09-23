@@ -123,7 +123,11 @@ export async function generateMetadata({
         {
           $or: [
             { slug: decoded },
-            { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+            {
+              title: {
+                $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i'),
+              },
+            },
             { title: { $regex: new RegExp(slugClean, 'i') } },
           ],
         },
@@ -206,7 +210,11 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
         {
           $or: [
             { slug: decoded },
-            { title: { $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } },
+            {
+              title: {
+                $regex: new RegExp(`^${decoded.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i'),
+              },
+            },
             { title: { $regex: new RegExp(slugClean, 'i') } },
           ],
         },

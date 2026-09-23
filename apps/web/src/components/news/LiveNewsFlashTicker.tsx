@@ -106,7 +106,10 @@ export function LiveNewsFlashTicker({
                       {item.title}
                     </span>
                   </Link>
-                  <span className="text-amber-400/60 text-xs font-bold select-none" aria-hidden="true">
+                  <span
+                    className="text-amber-400/60 text-xs font-bold select-none"
+                    aria-hidden="true"
+                  >
                     •
                   </span>
                 </React.Fragment>

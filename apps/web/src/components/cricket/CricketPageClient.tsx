@@ -87,7 +87,14 @@ export interface TopBatter {
 export interface CompGroup {
   region: string;
   icon: string;
-  comps: { name: string; flag: string; format: string; season: string; country: string; href?: string }[];
+  comps: {
+    name: string;
+    flag: string;
+    format: string;
+    season: string;
+    country: string;
+    href?: string;
+  }[];
 }
 
 export interface CricketTeamHub {
@@ -343,22 +350,184 @@ const DEFAULT_RESULTS: CricketMatch[] = [
 ];
 
 const IPL_TABLE: PointsRow[] = [
-  { pos: 1, team: 'Mumbai Indians', slug: 'mumbai-indians-144', badge: '🔵', p: 10, w: 8, l: 2, nr: 0, pts: 16, nrr: '+1.24', form: ['W', 'W', 'L', 'W', 'W'], zone: 'qualification' },
-  { pos: 2, team: 'Royal Challengers Bengaluru', slug: 'royal-challengers-bangalore-146', badge: '🔴', p: 10, w: 7, l: 3, nr: 0, pts: 14, nrr: '+0.87', form: ['L', 'W', 'W', 'W', 'L'], zone: 'qualification' },
-  { pos: 3, team: 'Chennai Super Kings', slug: 'chennai-super-kings-141', badge: '🟡', p: 10, w: 6, l: 4, nr: 0, pts: 12, nrr: '+0.55', form: ['W', 'L', 'W', 'W', 'L'], zone: 'qualification' },
-  { pos: 4, team: 'Kolkata Knight Riders', slug: 'kolkata-knight-riders-142', badge: '🟣', p: 10, w: 6, l: 4, nr: 0, pts: 12, nrr: '+0.31', form: ['W', 'W', 'L', 'L', 'W'], zone: 'qualification' },
-  { pos: 5, team: 'Delhi Capitals', slug: 'delhi-capitals-143', badge: '🔵', p: 10, w: 5, l: 5, nr: 0, pts: 10, nrr: '-0.12', form: ['W', 'L', 'W', 'L', 'W'] },
-  { pos: 6, team: 'Sunrisers Hyderabad', slug: 'sunrisers-hyderabad-148', badge: '🟠', p: 10, w: 5, l: 5, nr: 0, pts: 10, nrr: '-0.34', form: ['L', 'W', 'L', 'W', 'L'] },
-  { pos: 7, team: 'Punjab Kings', slug: 'punjab-kings-145', badge: '🔴', p: 10, w: 3, l: 7, nr: 0, pts: 6, nrr: '-0.78', form: ['L', 'L', 'L', 'W', 'L'], zone: 'elimination' },
-  { pos: 8, team: 'Rajasthan Royals', slug: 'rajasthan-royals-150', badge: '🩷', p: 10, w: 2, l: 8, nr: 0, pts: 4, nrr: '-1.03', form: ['L', 'L', 'L', 'L', 'W'], zone: 'elimination' },
+  {
+    pos: 1,
+    team: 'Mumbai Indians',
+    slug: 'mumbai-indians-144',
+    badge: '🔵',
+    p: 10,
+    w: 8,
+    l: 2,
+    nr: 0,
+    pts: 16,
+    nrr: '+1.24',
+    form: ['W', 'W', 'L', 'W', 'W'],
+    zone: 'qualification',
+  },
+  {
+    pos: 2,
+    team: 'Royal Challengers Bengaluru',
+    slug: 'royal-challengers-bangalore-146',
+    badge: '🔴',
+    p: 10,
+    w: 7,
+    l: 3,
+    nr: 0,
+    pts: 14,
+    nrr: '+0.87',
+    form: ['L', 'W', 'W', 'W', 'L'],
+    zone: 'qualification',
+  },
+  {
+    pos: 3,
+    team: 'Chennai Super Kings',
+    slug: 'chennai-super-kings-141',
+    badge: '🟡',
+    p: 10,
+    w: 6,
+    l: 4,
+    nr: 0,
+    pts: 12,
+    nrr: '+0.55',
+    form: ['W', 'L', 'W', 'W', 'L'],
+    zone: 'qualification',
+  },
+  {
+    pos: 4,
+    team: 'Kolkata Knight Riders',
+    slug: 'kolkata-knight-riders-142',
+    badge: '🟣',
+    p: 10,
+    w: 6,
+    l: 4,
+    nr: 0,
+    pts: 12,
+    nrr: '+0.31',
+    form: ['W', 'W', 'L', 'L', 'W'],
+    zone: 'qualification',
+  },
+  {
+    pos: 5,
+    team: 'Delhi Capitals',
+    slug: 'delhi-capitals-143',
+    badge: '🔵',
+    p: 10,
+    w: 5,
+    l: 5,
+    nr: 0,
+    pts: 10,
+    nrr: '-0.12',
+    form: ['W', 'L', 'W', 'L', 'W'],
+  },
+  {
+    pos: 6,
+    team: 'Sunrisers Hyderabad',
+    slug: 'sunrisers-hyderabad-148',
+    badge: '🟠',
+    p: 10,
+    w: 5,
+    l: 5,
+    nr: 0,
+    pts: 10,
+    nrr: '-0.34',
+    form: ['L', 'W', 'L', 'W', 'L'],
+  },
+  {
+    pos: 7,
+    team: 'Punjab Kings',
+    slug: 'punjab-kings-145',
+    badge: '🔴',
+    p: 10,
+    w: 3,
+    l: 7,
+    nr: 0,
+    pts: 6,
+    nrr: '-0.78',
+    form: ['L', 'L', 'L', 'W', 'L'],
+    zone: 'elimination',
+  },
+  {
+    pos: 8,
+    team: 'Rajasthan Royals',
+    slug: 'rajasthan-royals-150',
+    badge: '🩷',
+    p: 10,
+    w: 2,
+    l: 8,
+    nr: 0,
+    pts: 4,
+    nrr: '-1.03',
+    form: ['L', 'L', 'L', 'L', 'W'],
+    zone: 'elimination',
+  },
 ];
 
 const TOP_BATTERS: TopBatter[] = [
-  { rank: 1, name: 'Virat Kohli', playerId: 'virat-kohli', team: 'RCB', badge: '🔴', flag: '🇮🇳', runs: 742, avg: 61.8, sr: 148.4, hs: 113, photo: '' },
-  { rank: 2, name: 'Ruturaj Gaikwad', playerId: 'ruturaj-gaikwad', team: 'CSK', badge: '🟡', flag: '🇮🇳', runs: 694, avg: 57.8, sr: 152.1, hs: 108, photo: '' },
-  { rank: 3, name: 'Shubman Gill', playerId: 'shubman-gill', team: 'Gujarat Titans', badge: '🔵', flag: '🇮🇳', runs: 671, avg: 55.9, sr: 144.8, hs: 94, photo: '' },
-  { rank: 4, name: 'Heinrich Klaasen', playerId: 'heinrich-klaasen', team: 'Sunrisers', badge: '🟠', flag: '🇿🇦', runs: 648, avg: 54.0, sr: 171.6, hs: 104, photo: '' },
-  { rank: 5, name: 'Nicholas Pooran', playerId: 'nicholas-pooran', team: 'LSG', badge: '🟢', flag: '🌴', runs: 602, avg: 46.3, sr: 178.4, hs: 98, photo: '' },
+  {
+    rank: 1,
+    name: 'Virat Kohli',
+    playerId: 'virat-kohli',
+    team: 'RCB',
+    badge: '🔴',
+    flag: '🇮🇳',
+    runs: 742,
+    avg: 61.8,
+    sr: 148.4,
+    hs: 113,
+    photo: '',
+  },
+  {
+    rank: 2,
+    name: 'Ruturaj Gaikwad',
+    playerId: 'ruturaj-gaikwad',
+    team: 'CSK',
+    badge: '🟡',
+    flag: '🇮🇳',
+    runs: 694,
+    avg: 57.8,
+    sr: 152.1,
+    hs: 108,
+    photo: '',
+  },
+  {
+    rank: 3,
+    name: 'Shubman Gill',
+    playerId: 'shubman-gill',
+    team: 'Gujarat Titans',
+    badge: '🔵',
+    flag: '🇮🇳',
+    runs: 671,
+    avg: 55.9,
+    sr: 144.8,
+    hs: 94,
+    photo: '',
+  },
+  {
+    rank: 4,
+    name: 'Heinrich Klaasen',
+    playerId: 'heinrich-klaasen',
+    team: 'Sunrisers',
+    badge: '🟠',
+    flag: '🇿🇦',
+    runs: 648,
+    avg: 54.0,
+    sr: 171.6,
+    hs: 104,
+    photo: '',
+  },
+  {
+    rank: 5,
+    name: 'Nicholas Pooran',
+    playerId: 'nicholas-pooran',
+    team: 'LSG',
+    badge: '🟢',
+    flag: '🌴',
+    runs: 602,
+    avg: 46.3,
+    sr: 178.4,
+    hs: 98,
+    photo: '',
+  },
 ];
 
 const COMP_GROUPS: CompGroup[] = [
@@ -366,61 +535,217 @@ const COMP_GROUPS: CompGroup[] = [
     region: 'Franchise T20 Leagues',
     icon: '🏏',
     comps: [
-      { name: 'IPL 2026', flag: '🇮🇳', format: 'T20', season: '2026', country: 'India', href: '/cricket' },
-      { name: 'Big Bash League', flag: '🇦🇺', format: 'T20', season: '2025/26', country: 'Australia', href: '/cricket' },
-      { name: 'SA20 League', flag: '🇿🇦', format: 'T20', season: '2026', country: 'South Africa', href: '/cricket' },
-      { name: 'Caribbean Premier League', flag: '🌴', format: 'T20', season: '2026', country: 'West Indies', href: '/cricket' },
-      { name: 'Pakistan Super League', flag: '🇵🇰', format: 'T20', season: '2026', country: 'Pakistan', href: '/cricket' },
-      { name: 'The Hundred (Men)', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', format: '100-Ball', season: '2026', country: 'England', href: '/cricket' },
+      {
+        name: 'IPL 2026',
+        flag: '🇮🇳',
+        format: 'T20',
+        season: '2026',
+        country: 'India',
+        href: '/cricket',
+      },
+      {
+        name: 'Big Bash League',
+        flag: '🇦🇺',
+        format: 'T20',
+        season: '2025/26',
+        country: 'Australia',
+        href: '/cricket',
+      },
+      {
+        name: 'SA20 League',
+        flag: '🇿🇦',
+        format: 'T20',
+        season: '2026',
+        country: 'South Africa',
+        href: '/cricket',
+      },
+      {
+        name: 'Caribbean Premier League',
+        flag: '🌴',
+        format: 'T20',
+        season: '2026',
+        country: 'West Indies',
+        href: '/cricket',
+      },
+      {
+        name: 'Pakistan Super League',
+        flag: '🇵🇰',
+        format: 'T20',
+        season: '2026',
+        country: 'Pakistan',
+        href: '/cricket',
+      },
+      {
+        name: 'The Hundred (Men)',
+        flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+        format: '100-Ball',
+        season: '2026',
+        country: 'England',
+        href: '/cricket',
+      },
     ],
   },
   {
     region: 'ICC Tournaments',
     icon: '🏆',
     comps: [
-      { name: 'ICC World Test Championship', flag: '🌍', format: 'TEST', season: '2025/27', country: 'Global', href: '/cricket' },
-      { name: 'ICC T20 World Cup', flag: '🌍', format: 'T20', season: '2026', country: 'Global', href: '/cricket' },
-      { name: 'ICC Champions Trophy', flag: '🏆', format: 'ODI', season: '2025', country: 'Global', href: '/cricket' },
-      { name: 'ICC U-19 World Cup', flag: '🏆', format: 'ODI', season: '2026', country: 'Global', href: '/cricket' },
+      {
+        name: 'ICC World Test Championship',
+        flag: '🌍',
+        format: 'TEST',
+        season: '2025/27',
+        country: 'Global',
+        href: '/cricket',
+      },
+      {
+        name: 'ICC T20 World Cup',
+        flag: '🌍',
+        format: 'T20',
+        season: '2026',
+        country: 'Global',
+        href: '/cricket',
+      },
+      {
+        name: 'ICC Champions Trophy',
+        flag: '🏆',
+        format: 'ODI',
+        season: '2025',
+        country: 'Global',
+        href: '/cricket',
+      },
+      {
+        name: 'ICC U-19 World Cup',
+        flag: '🏆',
+        format: 'ODI',
+        season: '2026',
+        country: 'Global',
+        href: '/cricket',
+      },
     ],
   },
   {
     region: 'Africa (Cricket)',
     icon: '🌍',
     comps: [
-      { name: 'Africa T20 Cup', flag: '🌍', format: 'T20', season: '2025/26', country: 'Africa', href: '/cricket' },
-      { name: 'Nigeria Premier League', flag: '🇳🇬', format: 'T20', season: '2025', country: 'Nigeria', href: '/cricket' },
-      { name: 'T20 World Cup Africa Qualifiers', flag: '🌍', format: 'T20', season: '2025/26', country: 'Africa', href: '/cricket' },
-      { name: 'CSA T20 Challenge', flag: '🇿🇦', format: 'T20', season: '2025/26', country: 'South Africa', href: '/cricket' },
+      {
+        name: 'Africa T20 Cup',
+        flag: '🌍',
+        format: 'T20',
+        season: '2025/26',
+        country: 'Africa',
+        href: '/cricket',
+      },
+      {
+        name: 'Nigeria Premier League',
+        flag: '🇳🇬',
+        format: 'T20',
+        season: '2025',
+        country: 'Nigeria',
+        href: '/cricket',
+      },
+      {
+        name: 'T20 World Cup Africa Qualifiers',
+        flag: '🌍',
+        format: 'T20',
+        season: '2025/26',
+        country: 'Africa',
+        href: '/cricket',
+      },
+      {
+        name: 'CSA T20 Challenge',
+        flag: '🇿🇦',
+        format: 'T20',
+        season: '2025/26',
+        country: 'South Africa',
+        href: '/cricket',
+      },
     ],
   },
   {
     region: 'International Bilaterals',
     icon: '🌐',
     comps: [
-      { name: 'The Ashes (ENG vs AUS)', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', format: 'TEST', season: '2025/26', country: 'Bilateral', href: '/cricket' },
-      { name: 'Border-Gavaskar Trophy', flag: '🇮🇳', format: 'TEST', season: '2025/26', country: 'India vs Australia', href: '/cricket' },
-      { name: 'Pakistan vs New Zealand', flag: '🇵🇰', format: 'ODI', season: '2025', country: 'Pakistan', href: '/cricket' },
+      {
+        name: 'The Ashes (ENG vs AUS)',
+        flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+        format: 'TEST',
+        season: '2025/26',
+        country: 'Bilateral',
+        href: '/cricket',
+      },
+      {
+        name: 'Border-Gavaskar Trophy',
+        flag: '🇮🇳',
+        format: 'TEST',
+        season: '2025/26',
+        country: 'India vs Australia',
+        href: '/cricket',
+      },
+      {
+        name: 'Pakistan vs New Zealand',
+        flag: '🇵🇰',
+        format: 'ODI',
+        season: '2025',
+        country: 'Pakistan',
+        href: '/cricket',
+      },
     ],
   },
 ];
 
 const TEAM_HUBS: CricketTeamHub[] = [
   { name: 'India', slug: 'india-139', badge: '🇮🇳', coach: 'Gautam Gambhir', format: 'All formats' },
-  { name: 'Australia', slug: 'australia-140', badge: '🇦🇺', coach: 'Andrew McDonald', format: 'All formats' },
-  { name: 'England', slug: 'england-138', badge: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', coach: 'Brendon McCullum', format: 'All formats' },
-  { name: 'South Africa', slug: 'south-africa-137', badge: '🇿🇦', coach: 'Rob Walter', format: 'All formats' },
-  { name: 'Pakistan', slug: 'pakistan-136', badge: '🇵🇰', coach: 'Gary Kirsten', format: 'All formats' },
+  {
+    name: 'Australia',
+    slug: 'australia-140',
+    badge: '🇦🇺',
+    coach: 'Andrew McDonald',
+    format: 'All formats',
+  },
+  {
+    name: 'England',
+    slug: 'england-138',
+    badge: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    coach: 'Brendon McCullum',
+    format: 'All formats',
+  },
+  {
+    name: 'South Africa',
+    slug: 'south-africa-137',
+    badge: '🇿🇦',
+    coach: 'Rob Walter',
+    format: 'All formats',
+  },
+  {
+    name: 'Pakistan',
+    slug: 'pakistan-136',
+    badge: '🇵🇰',
+    coach: 'Gary Kirsten',
+    format: 'All formats',
+  },
   { name: 'Nigeria', slug: 'nigeria-210', badge: '🇳🇬', coach: 'Clive Ogbogu', format: 'T20 / ODI' },
-  { name: 'West Indies', slug: 'west-indies-135', badge: '🌴', coach: 'Daren Sammy', format: 'All formats' },
-  { name: 'Chennai Super Kings', slug: 'chennai-super-kings-141', badge: '🟡', coach: 'Stephen Fleming', format: 'IPL T20' },
+  {
+    name: 'West Indies',
+    slug: 'west-indies-135',
+    badge: '🌴',
+    coach: 'Daren Sammy',
+    format: 'All formats',
+  },
+  {
+    name: 'Chennai Super Kings',
+    slug: 'chennai-super-kings-141',
+    badge: '🟡',
+    coach: 'Stephen Fleming',
+    format: 'IPL T20',
+  },
 ];
 
 const ANALYSIS_ARTICLES = [
   {
     tag: 'ANALYSIS',
     tagColor: 'bg-emerald-600',
-    title: "How Kohli's off-stump discipline and strike rotation are redefining modern T20 powerplays",
+    title:
+      "How Kohli's off-stump discipline and strike rotation are redefining modern T20 powerplays",
     time: '1 hr ago',
     comp: 'IPL 2026',
     img: '',
@@ -429,7 +754,8 @@ const ANALYSIS_ARTICLES = [
   {
     tag: 'STATS',
     tagColor: 'bg-purple-600',
-    title: 'xRuns: The revolutionary tracking metric making T20 franchises completely rethink auction bidding',
+    title:
+      'xRuns: The revolutionary tracking metric making T20 franchises completely rethink auction bidding',
     time: '3 hr ago',
     comp: 'Deep Data',
     img: '',
@@ -438,7 +764,8 @@ const ANALYSIS_ARTICLES = [
   {
     tag: 'AFRICA',
     tagColor: 'bg-amber-600',
-    title: 'Nigeria cricket is rising on the global radar — and the ICC T20 qualifiers prove the rapid ascent',
+    title:
+      'Nigeria cricket is rising on the global radar — and the ICC T20 qualifiers prove the rapid ascent',
     time: '5 hr ago',
     comp: 'T20 WC Qual.',
     img: '',
@@ -447,7 +774,8 @@ const ANALYSIS_ARTICLES = [
   {
     tag: 'PREVIEW',
     tagColor: 'bg-rose-600',
-    title: 'India vs Australia Day 3: Will the MCG pitch turn in session 2? Complete pitch & weather debrief',
+    title:
+      'India vs Australia Day 3: Will the MCG pitch turn in session 2? Complete pitch & weather debrief',
     time: '8 hr ago',
     comp: 'WTC Final',
     img: '',
@@ -455,26 +783,131 @@ const ANALYSIS_ARTICLES = [
   },
 ];
 
-const COMP_FILTERS = ['All', '🇮🇳 IPL', '🌍 WTC', '🇦🇺 BBL', '🌴 CPL', '🇿🇦 SA20', '🏴 Hundred', '🇳🇬 Nigeria T20'];
+const COMP_FILTERS = [
+  'All',
+  '🇮🇳 IPL',
+  '🌍 WTC',
+  '🇦🇺 BBL',
+  '🌴 CPL',
+  '🇿🇦 SA20',
+  '🏴 Hundred',
+  '🇳🇬 Nigeria T20',
+];
 
 // Featured Elite Cricket Arbiters & Umpires (SOLID / DRS Command Desk)
 const CRICKET_OFFICIALS = [
-  { name: 'Richard Illingworth', role: 'ICC Elite Panel Umpire', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', drsAcc: '94.8%', matches: 142, rating: 'Balanced' },
-  { name: 'Nitin Menon', role: 'ICC Elite Panel Umpire', country: 'India', flag: '🇮🇳', drsAcc: '96.2%', matches: 118, rating: 'High Accuracy' },
-  { name: 'Kumar Dharmasena', role: 'ICC Elite Panel Umpire', country: 'Sri Lanka', flag: '🇱🇰', drsAcc: '93.5%', matches: 165, rating: 'Veteran' },
-  { name: 'Langton Rusere', role: 'International Panel Umpire', country: 'Zimbabwe / Africa', flag: '🇿🇼', drsAcc: '95.1%', matches: 74, rating: 'Fast Decisions' },
-  { name: 'Rod Tucker', role: 'ICC Elite Panel Umpire', country: 'Australia', flag: '🇦🇺', drsAcc: '94.0%', matches: 154, rating: 'Strict' },
-  { name: 'Chris Gaffaney', role: 'ICC Elite Panel Umpire', country: 'New Zealand', flag: '🇳🇿', drsAcc: '95.7%', matches: 122, rating: 'High Accuracy' },
+  {
+    name: 'Richard Illingworth',
+    role: 'ICC Elite Panel Umpire',
+    country: 'England',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    drsAcc: '94.8%',
+    matches: 142,
+    rating: 'Balanced',
+  },
+  {
+    name: 'Nitin Menon',
+    role: 'ICC Elite Panel Umpire',
+    country: 'India',
+    flag: '🇮🇳',
+    drsAcc: '96.2%',
+    matches: 118,
+    rating: 'High Accuracy',
+  },
+  {
+    name: 'Kumar Dharmasena',
+    role: 'ICC Elite Panel Umpire',
+    country: 'Sri Lanka',
+    flag: '🇱🇰',
+    drsAcc: '93.5%',
+    matches: 165,
+    rating: 'Veteran',
+  },
+  {
+    name: 'Langton Rusere',
+    role: 'International Panel Umpire',
+    country: 'Zimbabwe / Africa',
+    flag: '🇿🇼',
+    drsAcc: '95.1%',
+    matches: 74,
+    rating: 'Fast Decisions',
+  },
+  {
+    name: 'Rod Tucker',
+    role: 'ICC Elite Panel Umpire',
+    country: 'Australia',
+    flag: '🇦🇺',
+    drsAcc: '94.0%',
+    matches: 154,
+    rating: 'Strict',
+  },
+  {
+    name: 'Chris Gaffaney',
+    role: 'ICC Elite Panel Umpire',
+    country: 'New Zealand',
+    flag: '🇳🇿',
+    drsAcc: '95.7%',
+    matches: 122,
+    rating: 'High Accuracy',
+  },
 ];
 
 // Featured Head Coaches & Tacticians
 const CRICKET_COACHES = [
-  { name: 'Gautam Gambhir', team: 'India', flag: '🇮🇳', role: 'Aggressive Intent & Deep Batting', winRate: '72.4%', trophies: 4, style: 'Fearless Matchups' },
-  { name: 'Brendon McCullum', team: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', role: 'Bazball High-Tempo Philosophy', winRate: '68.0%', trophies: 2, style: 'Ultra-Attacking Strike' },
-  { name: 'Andrew McDonald', team: 'Australia', flag: '🇦🇺', role: 'Data-Driven Pace Battery', winRate: '70.5%', trophies: 3, style: 'Disciplined Lengths' },
-  { name: 'Stephen Fleming', team: 'CSK / Texas', flag: '🇳🇿', role: '5x IPL Champion Strategist', winRate: '62.8%', trophies: 7, style: 'Calm Execution' },
-  { name: 'Rob Walter', team: 'South Africa', flag: '🇿🇦', role: 'White-Ball Power Hitting', winRate: '64.2%', trophies: 1, style: 'Middle-Overs Acceleration' },
-  { name: 'Clive Ogbogu', team: 'Nigeria Senior Mens', flag: '🇳🇬', role: 'Emerging African Tactics', winRate: '60.0%', trophies: 2, style: 'Tight Spin Traps' },
+  {
+    name: 'Gautam Gambhir',
+    team: 'India',
+    flag: '🇮🇳',
+    role: 'Aggressive Intent & Deep Batting',
+    winRate: '72.4%',
+    trophies: 4,
+    style: 'Fearless Matchups',
+  },
+  {
+    name: 'Brendon McCullum',
+    team: 'England',
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    role: 'Bazball High-Tempo Philosophy',
+    winRate: '68.0%',
+    trophies: 2,
+    style: 'Ultra-Attacking Strike',
+  },
+  {
+    name: 'Andrew McDonald',
+    team: 'Australia',
+    flag: '🇦🇺',
+    role: 'Data-Driven Pace Battery',
+    winRate: '70.5%',
+    trophies: 3,
+    style: 'Disciplined Lengths',
+  },
+  {
+    name: 'Stephen Fleming',
+    team: 'CSK / Texas',
+    flag: '🇳🇿',
+    role: '5x IPL Champion Strategist',
+    winRate: '62.8%',
+    trophies: 7,
+    style: 'Calm Execution',
+  },
+  {
+    name: 'Rob Walter',
+    team: 'South Africa',
+    flag: '🇿🇦',
+    role: 'White-Ball Power Hitting',
+    winRate: '64.2%',
+    trophies: 1,
+    style: 'Middle-Overs Acceleration',
+  },
+  {
+    name: 'Clive Ogbogu',
+    team: 'Nigeria Senior Mens',
+    flag: '🇳🇬',
+    role: 'Emerging African Tactics',
+    winRate: '60.0%',
+    trophies: 2,
+    style: 'Tight Spin Traps',
+  },
 ];
 
 // ─── Helpers & Micro-Components ───────────────────────────────────────────────
@@ -654,9 +1087,7 @@ function SideSection({
       <div className={`${open ? 'block' : 'hidden'} lg:block`}>
         {children}
         {action && (
-          <div className="px-4 py-2 border-t border-[#1e293b] lg:hidden bg-[#0a1120]">
-            {action}
-          </div>
+          <div className="px-4 py-2 border-t border-[#1e293b] lg:hidden bg-[#0a1120]">{action}</div>
         )}
       </div>
     </div>
@@ -733,7 +1164,9 @@ export function CricketPageClient() {
       }
 
       // Fetch fixtures
-      const fixRes = await fetch(`/api/cricket?met=Fixtures&_t=${timestamp}`, { cache: 'no-store' });
+      const fixRes = await fetch(`/api/cricket?met=Fixtures&_t=${timestamp}`, {
+        cache: 'no-store',
+      });
       if (fixRes.ok) {
         const fixData = await fixRes.json();
         const fixList = fixData?.result || (Array.isArray(fixData) ? fixData : []);
@@ -775,7 +1208,9 @@ export function CricketPageClient() {
         }
       }
 
-      setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setLastSyncTime(
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      );
     } catch {
       // Retain robust defaults
     } finally {
@@ -960,7 +1395,9 @@ export function CricketPageClient() {
                 {COMP_GROUPS.map((group) => (
                   <div key={group.region}>
                     <button
-                      onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                      onClick={() =>
+                        setExpandedComp(expandedComp === group.region ? null : group.region)
+                      }
                       className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors text-left"
                     >
                       <div className="flex items-center gap-2">
@@ -1055,7 +1492,9 @@ export function CricketPageClient() {
                   </span>
                   <div className="text-left">
                     <p className="text-xs font-black text-white">Cricket Hubs</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Analysis · Team Hubs · 30+ Tournaments</p>
+                    <p className="text-[10px] text-slate-400 font-normal">
+                      Analysis · Team Hubs · 30+ Tournaments
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1077,7 +1516,10 @@ export function CricketPageClient() {
                     title="Cricket Analysis"
                     defaultOpen={true}
                     action={
-                      <Link href="/analysis" className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold">
+                      <Link
+                        href="/analysis"
+                        className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold"
+                      >
                         All →
                       </Link>
                     }
@@ -1090,14 +1532,24 @@ export function CricketPageClient() {
                           className="flex gap-3 p-3 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer"
                         >
                           <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
-                            <img src={a.img} alt="" className="w-full h-full object-cover opacity-85" />
-                            <span className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}>
+                            <img
+                              src={a.img}
+                              alt=""
+                              className="w-full h-full object-cover opacity-85"
+                            />
+                            <span
+                              className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}
+                            >
                               {a.tag}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[9px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">{a.comp}</p>
-                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">{a.title}</h4>
+                            <p className="text-[9px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">
+                              {a.comp}
+                            </p>
+                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">
+                              {a.title}
+                            </h4>
                             <p className="text-[9px] text-slate-500 mt-1">{a.time}</p>
                           </div>
                         </Link>
@@ -1109,18 +1561,24 @@ export function CricketPageClient() {
                   <SideSection
                     title="Competition Directory"
                     defaultOpen={false}
-                    action={<span className="text-[10px] text-slate-500 font-semibold">30+ Leagues</span>}
+                    action={
+                      <span className="text-[10px] text-slate-500 font-semibold">30+ Leagues</span>
+                    }
                   >
                     <div className="divide-y divide-[#1e293b]">
                       {COMP_GROUPS.map((group) => (
                         <div key={group.region}>
                           <button
-                            onClick={() => setExpandedComp(expandedComp === group.region ? null : group.region)}
+                            onClick={() =>
+                              setExpandedComp(expandedComp === group.region ? null : group.region)
+                            }
                             className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#1e293b]/40 transition-colors text-left"
                           >
                             <div className="flex items-center gap-2">
                               <span className="text-base">{group.icon}</span>
-                              <span className="text-xs font-semibold text-slate-300">{group.region}</span>
+                              <span className="text-xs font-semibold text-slate-300">
+                                {group.region}
+                              </span>
                             </div>
                             <FiChevronDown
                               className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
@@ -1138,7 +1596,9 @@ export function CricketPageClient() {
                                 >
                                   <span className="text-sm">{c.flag}</span>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] font-semibold text-slate-300 truncate">{c.name}</p>
+                                    <p className="text-[11px] font-semibold text-slate-300 truncate">
+                                      {c.name}
+                                    </p>
                                     <p className="text-[9px] text-slate-500">{c.country}</p>
                                   </div>
                                 </Link>
@@ -1155,7 +1615,10 @@ export function CricketPageClient() {
                     title="Featured Teams Hub"
                     defaultOpen={false}
                     action={
-                      <Link href="/cricket" className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold">
+                      <Link
+                        href="/cricket"
+                        className="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold"
+                      >
                         All →
                       </Link>
                     }
@@ -1168,7 +1631,9 @@ export function CricketPageClient() {
                           className="flex flex-col items-center gap-1.5 p-3 bg-[#0f172a] hover:bg-[#131f35] transition-colors text-center"
                         >
                           <span className="text-xl">{t.badge}</span>
-                          <p className="text-[10px] font-bold text-slate-200 leading-tight line-clamp-1">{t.name}</p>
+                          <p className="text-[10px] font-bold text-slate-200 leading-tight line-clamp-1">
+                            {t.name}
+                          </p>
                           <span className="text-[9px] text-emerald-400 font-semibold">Hub →</span>
                         </Link>
                       ))}
@@ -1250,7 +1715,9 @@ export function CricketPageClient() {
                 ) : (
                   <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl py-16 text-center">
                     <p className="text-3xl mb-3">🏏</p>
-                    <p className="text-slate-300 font-bold">No cricket matches found for {compFilter}</p>
+                    <p className="text-slate-300 font-bold">
+                      No cricket matches found for {compFilter}
+                    </p>
                     <p className="text-slate-500 text-xs mt-1">
                       Try selecting &quot;All&quot; or another tournament filter.
                     </p>
@@ -1360,7 +1827,9 @@ export function CricketPageClient() {
                             </td>
                             <td className="px-2 py-3 text-center text-sm tabular-nums font-bold">
                               <span
-                                className={row.nrr.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}
+                                className={
+                                  row.nrr.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'
+                                }
                               >
                                 {row.nrr}
                               </span>
@@ -1496,8 +1965,8 @@ export function CricketPageClient() {
                   Cricket Match Odds & In-Play Markets
                 </h3>
                 <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-                  Real-time match winner markets, top batter props, boundaries over/under, and session
-                  runs indexes powered by verified cricket feed telemetry.
+                  Real-time match winner markets, top batter props, boundaries over/under, and
+                  session runs indexes powered by verified cricket feed telemetry.
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
                   <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
@@ -1672,10 +2141,50 @@ export function CricketPageClient() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: 'Virat Kohli', slug: 'virat-kohli', team: 'Royal Challengers Bengaluru', role: 'Top-Order Anchor', flag: '🇮🇳', val: '₹21.0 Cr', runs: 742, sr: 148.4, photo: '' },
-              { name: 'Jasprit Bumrah', slug: 'jasprit-bumrah', team: 'Mumbai Indians', role: 'Death-Over Specialist', flag: '🇮🇳', val: '₹18.0 Cr', runs: '24 Wkts', sr: 'Econ: 6.4', photo: '' },
-              { name: 'Heinrich Klaasen', slug: 'heinrich-klaasen', team: 'Sunrisers Hyderabad', role: 'Middle-Over Enforcer', flag: '🇿🇦', val: '₹17.5 Cr', runs: 648, sr: 171.6, photo: '' },
-              { name: 'Travis Head', slug: 'travis-head', team: 'Sunrisers Hyderabad', role: 'Powerplay Destroyer', flag: '🇦🇺', val: '₹16.5 Cr', runs: 588, sr: 189.2, photo: '' },
+              {
+                name: 'Virat Kohli',
+                slug: 'virat-kohli',
+                team: 'Royal Challengers Bengaluru',
+                role: 'Top-Order Anchor',
+                flag: '🇮🇳',
+                val: '₹21.0 Cr',
+                runs: 742,
+                sr: 148.4,
+                photo: '',
+              },
+              {
+                name: 'Jasprit Bumrah',
+                slug: 'jasprit-bumrah',
+                team: 'Mumbai Indians',
+                role: 'Death-Over Specialist',
+                flag: '🇮🇳',
+                val: '₹18.0 Cr',
+                runs: '24 Wkts',
+                sr: 'Econ: 6.4',
+                photo: '',
+              },
+              {
+                name: 'Heinrich Klaasen',
+                slug: 'heinrich-klaasen',
+                team: 'Sunrisers Hyderabad',
+                role: 'Middle-Over Enforcer',
+                flag: '🇿🇦',
+                val: '₹17.5 Cr',
+                runs: 648,
+                sr: 171.6,
+                photo: '',
+              },
+              {
+                name: 'Travis Head',
+                slug: 'travis-head',
+                team: 'Sunrisers Hyderabad',
+                role: 'Powerplay Destroyer',
+                flag: '🇦🇺',
+                val: '₹16.5 Cr',
+                runs: 588,
+                sr: 189.2,
+                photo: '',
+              },
             ].map((p) => (
               <Link
                 key={p.slug}
@@ -1741,7 +2250,8 @@ export function CricketPageClient() {
                 Umpires & DRS Command Desk
               </h2>
               <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                ICC Elite Panel umpire tracking, Hawk-Eye ball tracking reviews, and overturn percentages.
+                ICC Elite Panel umpire tracking, Hawk-Eye ball tracking reviews, and overturn
+                percentages.
               </p>
             </div>
             <Link
@@ -1810,7 +2320,8 @@ export function CricketPageClient() {
                 Cricket Tacticians & Head Coaches
               </h2>
               <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                Strategic match philosophies, high-tempo run rates, and international series victories.
+                Strategic match philosophies, high-tempo run rates, and international series
+                victories.
               </p>
             </div>
             <Link
@@ -1834,9 +2345,7 @@ export function CricketPageClient() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <h4 className="text-sm font-black text-slate-100 truncate">{c.name}</h4>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">
-                      {c.team} · Head Coach
-                    </p>
+                    <p className="text-xs text-slate-400 truncate mt-0.5">{c.team} · Head Coach</p>
                   </div>
                   <span className="text-[10px] font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
                     <span>🏆</span>
@@ -1884,8 +2393,9 @@ export function CricketPageClient() {
                 </h3>
 
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  Start your cricket morning with curated pitch moisture reports, dew factor telemetry,
-                  franchise auction rumors, and DRS debate summaries delivered straight to analysts and fans.
+                  Start your cricket morning with curated pitch moisture reports, dew factor
+                  telemetry, franchise auction rumors, and DRS debate summaries delivered straight
+                  to analysts and fans.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
@@ -1902,7 +2412,9 @@ export function CricketPageClient() {
                     </p>
                   </div>
                   <div className="bg-[#0f172a]/80 border border-slate-800 rounded-xl p-3">
-                    <span className="text-blue-400 text-sm font-bold">🌍 African Emerging Wire</span>
+                    <span className="text-blue-400 text-sm font-bold">
+                      🌍 African Emerging Wire
+                    </span>
                     <p className="text-[11px] text-slate-400 mt-1">
                       Nigeria, Uganda, and Namibia ICC pathway progress.
                     </p>
@@ -1919,7 +2431,8 @@ export function CricketPageClient() {
                     </div>
                     <h4 className="text-base font-bold text-white">You&apos;re subscribed!</h4>
                     <p className="text-xs text-slate-400">
-                      Tomorrow&apos;s Cricket Daily Pitch Brief will arrive in your inbox at 08:30 AM.
+                      Tomorrow&apos;s Cricket Daily Pitch Brief will arrive in your inbox at 08:30
+                      AM.
                     </p>
                   </div>
                 ) : (
@@ -1929,7 +2442,8 @@ export function CricketPageClient() {
                         Get the Matchday Briefing
                       </h4>
                       <p className="text-xs text-slate-400 mt-1">
-                        Join 28,000+ cricket coaches, analysts, and fans. Free forever, unsubscribe anytime.
+                        Join 28,000+ cricket coaches, analysts, and fans. Free forever, unsubscribe
+                        anytime.
                       </p>
                     </div>
 

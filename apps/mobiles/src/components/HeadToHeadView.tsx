@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import goalmillsApi from '../services/goalmillsApi';
 
 interface HeadToHeadViewProps {
@@ -87,7 +82,9 @@ export const HeadToHeadView: React.FC<HeadToHeadViewProps> = ({
         </View>
         <View style={styles.statBox}>
           <Text style={styles.statLabel}>CLEAN SHEETS</Text>
-          <Text style={styles.statVal}>{data.cleanSheetsTeamA} - {data.cleanSheetsTeamB}</Text>
+          <Text style={styles.statVal}>
+            {data.cleanSheetsTeamA} - {data.cleanSheetsTeamB}
+          </Text>
         </View>
       </View>
     </View>

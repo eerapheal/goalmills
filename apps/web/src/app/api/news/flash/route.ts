@@ -45,10 +45,7 @@ export async function GET(request: NextRequest) {
 
     if (category && category !== 'all') {
       const catRegex = new RegExp(category.replace(/-/g, ' '), 'i');
-      match.$or = [
-        { categorySlug: category.toLowerCase() },
-        { category: { $regex: catRegex } },
-      ];
+      match.$or = [{ categorySlug: category.toLowerCase() }, { category: { $regex: catRegex } }];
     }
 
     // Try fast random sampling with aggregate $sample

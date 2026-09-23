@@ -14,7 +14,12 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
 import { COMPETITIONS_REGISTRY } from '../../../utils/entityRegistry';
-import { FootballStanding, FootballTopscorer, FootballProbability, FootballOdds } from '@goalmills/types';
+import {
+  FootballStanding,
+  FootballTopscorer,
+  FootballProbability,
+  FootballOdds,
+} from '@goalmills/types';
 import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 import { MatchOddsModal } from '../../../components/MatchOddsModal';
 
@@ -29,12 +34,26 @@ export default function StatsScreen() {
   const [standings, setStandings] = useState<FootballStanding[]>([]);
   const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
   const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
-  const [oddsList, setOddsList] = useState<{ matchId: string; homeTeam: string; awayTeam: string; date: string; time: string; odds: FootballOdds[] }[]>([]);
+  const [oddsList, setOddsList] = useState<
+    {
+      matchId: string;
+      homeTeam: string;
+      awayTeam: string;
+      date: string;
+      time: string;
+      odds: FootballOdds[];
+    }[]
+  >([]);
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const [oddsModal, setOddsModal] = useState<{ visible: boolean; matchId: string; home: string; away: string }>({
+  const [oddsModal, setOddsModal] = useState<{
+    visible: boolean;
+    matchId: string;
+    home: string;
+    away: string;
+  }>({
     visible: false,
     matchId: '',
     home: '',
@@ -66,7 +85,9 @@ export default function StatsScreen() {
       }
 
       if (scorersRes.status === 'fulfilled' && scorersRes.value?.result) {
-        setTopscorers(Array.isArray(scorersRes.value.result) ? scorersRes.value.result.slice(0, 15) : []);
+        setTopscorers(
+          Array.isArray(scorersRes.value.result) ? scorersRes.value.result.slice(0, 15) : []
+        );
       } else {
         setTopscorers([]);
       }
@@ -97,7 +118,9 @@ export default function StatsScreen() {
           }
         });
         const resolvedOdds = await Promise.all(oddsPromises);
-        setOddsList(resolvedOdds.filter((x): x is NonNullable<typeof x> => Boolean(x && x.odds.length > 0)));
+        setOddsList(
+          resolvedOdds.filter((x): x is NonNullable<typeof x> => Boolean(x && x.odds.length > 0))
+        );
       } else {
         setOddsList([]);
       }
@@ -128,7 +151,9 @@ export default function StatsScreen() {
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
+      }
       showsVerticalScrollIndicator={false}
     >
       {/* ── Live Flash Ticker ── */}
@@ -188,10 +213,15 @@ export default function StatsScreen() {
           {(['total', 'home', 'away'] as const).map((v) => (
             <Pressable
               key={v}
-              style={[styles.standingToggleBtn, standingView === v && styles.standingToggleBtnActive]}
+              style={[
+                styles.standingToggleBtn,
+                standingView === v && styles.standingToggleBtnActive,
+              ]}
               onPress={() => setStandingView(v)}
             >
-              <Text style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}>
+              <Text
+                style={[styles.standingToggleLabel, standingView === v && { color: '#F8FAFC' }]}
+              >
                 {v.charAt(0).toUpperCase() + v.slice(1)}
               </Text>
             </Pressable>
@@ -213,15 +243,25 @@ export default function StatsScreen() {
                 <Text style={[styles.th, { width: 30 }]}>#</Text>
                 <Text style={[styles.th, { flex: 1 }]}>Club</Text>
                 <Text style={[styles.th, { width: 32, textAlign: 'center' }]}>P</Text>
-                <Text style={[styles.th, { width: 32, textAlign: 'center', color: '#34D399' }]}>W</Text>
-                <Text style={[styles.th, { width: 32, textAlign: 'center', color: '#94A3B8' }]}>D</Text>
-                <Text style={[styles.th, { width: 32, textAlign: 'center', color: '#F87171' }]}>L</Text>
+                <Text style={[styles.th, { width: 32, textAlign: 'center', color: '#34D399' }]}>
+                  W
+                </Text>
+                <Text style={[styles.th, { width: 32, textAlign: 'center', color: '#94A3B8' }]}>
+                  D
+                </Text>
+                <Text style={[styles.th, { width: 32, textAlign: 'center', color: '#F87171' }]}>
+                  L
+                </Text>
                 <Text style={[styles.th, { width: 32, textAlign: 'center' }]}>GD</Text>
-                <Text style={[styles.th, { width: 38, textAlign: 'right', color: '#FBBF24' }]}>Pts</Text>
+                <Text style={[styles.th, { width: 38, textAlign: 'right', color: '#FBBF24' }]}>
+                  Pts
+                </Text>
               </View>
 
               {standings.length === 0 ? (
-                <Text style={styles.emptyText}>No standings data available for this competition.</Text>
+                <Text style={styles.emptyText}>
+                  No standings data available for this competition.
+                </Text>
               ) : (
                 standings.map((item, idx) => {
                   const rank = Number(item.standing_place || idx + 1);
@@ -233,20 +273,48 @@ export default function StatsScreen() {
                     <Pressable
                       key={item.standing_place || idx}
                       style={styles.tableRow}
-                      onPress={() => item.team_key && router.push(`/(tabs)/home/football/teams/${item.team_key}` as any)}
+                      onPress={() =>
+                        item.team_key &&
+                        router.push(`/(tabs)/home/football/teams/${item.team_key}` as any)
+                      }
                     >
-                      <View style={[styles.rankBadge, isUCL && styles.rankUCL, isUEL && styles.rankUEL, isRel && styles.rankRel]}>
+                      <View
+                        style={[
+                          styles.rankBadge,
+                          isUCL && styles.rankUCL,
+                          isUEL && styles.rankUEL,
+                          isRel && styles.rankRel,
+                        ]}
+                      >
                         <Text style={styles.tdRank}>{item.standing_place || idx + 1}</Text>
                       </View>
                       <Text style={[styles.tdClub, { flex: 1 }]} numberOfLines={1}>
                         {item.standing_team}
                       </Text>
-                      <Text style={[styles.td, { width: 32, textAlign: 'center' }]}>{item.standing_P || 0}</Text>
-                      <Text style={[styles.td, { width: 32, textAlign: 'center', color: '#34D399' }]}>{item.standing_W || 0}</Text>
-                      <Text style={[styles.td, { width: 32, textAlign: 'center', color: '#94A3B8' }]}>{item.standing_D || 0}</Text>
-                      <Text style={[styles.td, { width: 32, textAlign: 'center', color: '#F87171' }]}>{item.standing_L || 0}</Text>
-                      <Text style={[styles.td, { width: 32, textAlign: 'center' }]}>{item.standing_GD || 0}</Text>
-                      <Text style={[styles.tdPts, { width: 38, textAlign: 'right' }]}>{item.standing_PTS || 0}</Text>
+                      <Text style={[styles.td, { width: 32, textAlign: 'center' }]}>
+                        {item.standing_P || 0}
+                      </Text>
+                      <Text
+                        style={[styles.td, { width: 32, textAlign: 'center', color: '#34D399' }]}
+                      >
+                        {item.standing_W || 0}
+                      </Text>
+                      <Text
+                        style={[styles.td, { width: 32, textAlign: 'center', color: '#94A3B8' }]}
+                      >
+                        {item.standing_D || 0}
+                      </Text>
+                      <Text
+                        style={[styles.td, { width: 32, textAlign: 'center', color: '#F87171' }]}
+                      >
+                        {item.standing_L || 0}
+                      </Text>
+                      <Text style={[styles.td, { width: 32, textAlign: 'center' }]}>
+                        {item.standing_GD || 0}
+                      </Text>
+                      <Text style={[styles.tdPts, { width: 38, textAlign: 'right' }]}>
+                        {item.standing_PTS || 0}
+                      </Text>
                     </Pressable>
                   );
                 })
@@ -268,7 +336,10 @@ export default function StatsScreen() {
                   <Pressable
                     key={scorer.player_key || idx}
                     style={styles.scorerCard}
-                    onPress={() => scorer.player_key && router.push(`/(tabs)/home/football/players/${scorer.player_key}` as any)}
+                    onPress={() =>
+                      scorer.player_key &&
+                      router.push(`/(tabs)/home/football/players/${scorer.player_key}` as any)
+                    }
                   >
                     <Text style={styles.scorerRank}>#{scorer.player_place || idx + 1}</Text>
                     {scorer.player_image ? (
@@ -301,7 +372,9 @@ export default function StatsScreen() {
                 <View style={styles.emptyContainer}>
                   <Text style={{ fontSize: 36 }}>🤖</Text>
                   <Text style={styles.emptyTitle}>No AI Predictions</Text>
-                  <Text style={styles.emptyText}>No matches scheduled today in this competition with win probability models.</Text>
+                  <Text style={styles.emptyText}>
+                    No matches scheduled today in this competition with win probability models.
+                  </Text>
                 </View>
               ) : (
                 probabilities.map((item, idx) => {
@@ -313,16 +386,25 @@ export default function StatsScreen() {
                     <Pressable
                       key={idx}
                       style={styles.predCard}
-                      onPress={() => item.event_key && router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)}
+                      onPress={() =>
+                        item.event_key &&
+                        router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)
+                      }
                     >
                       <View style={styles.predHeader}>
-                        <Text style={styles.predLeague} numberOfLines={1}>{item.league_name}</Text>
+                        <Text style={styles.predLeague} numberOfLines={1}>
+                          {item.league_name}
+                        </Text>
                         <Text style={styles.predTime}>{item.event_time}</Text>
                       </View>
                       <View style={styles.predTeams}>
-                        <Text style={styles.predTeamHome} numberOfLines={1}>{item.event_home_team}</Text>
+                        <Text style={styles.predTeamHome} numberOfLines={1}>
+                          {item.event_home_team}
+                        </Text>
                         <Text style={styles.predVS}>VS</Text>
-                        <Text style={styles.predTeamAway} numberOfLines={1}>{item.event_away_team}</Text>
+                        <Text style={styles.predTeamAway} numberOfLines={1}>
+                          {item.event_away_team}
+                        </Text>
                       </View>
                       <View style={styles.predBarLabels}>
                         <Text style={[styles.predBarLabel, { color: '#60A5FA' }]}>{hw}%</Text>
@@ -330,14 +412,26 @@ export default function StatsScreen() {
                         <Text style={[styles.predBarLabel, { color: '#FBBF24' }]}>{aw}%</Text>
                       </View>
                       <View style={styles.predBar}>
-                        <View style={{ flex: hw || 1, backgroundColor: '#2563EB', height: '100%' }} />
-                        <View style={{ flex: d || 1, backgroundColor: '#475569', height: '100%' }} />
-                        <View style={{ flex: aw || 1, backgroundColor: '#D97706', height: '100%' }} />
+                        <View
+                          style={{ flex: hw || 1, backgroundColor: '#2563EB', height: '100%' }}
+                        />
+                        <View
+                          style={{ flex: d || 1, backgroundColor: '#475569', height: '100%' }}
+                        />
+                        <View
+                          style={{ flex: aw || 1, backgroundColor: '#D97706', height: '100%' }}
+                        />
                       </View>
                       <View style={styles.predMetrics}>
-                        <Text style={styles.predMetric}>Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text></Text>
-                        <Text style={styles.predMetric}>BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text></Text>
-                        <Text style={styles.predMetric}>Clean Sheet: <Text style={{ color: '#67E8F9' }}>{item.event_ots}%</Text></Text>
+                        <Text style={styles.predMetric}>
+                          Over 2.5: <Text style={{ color: '#34D399' }}>{item.event_O}%</Text>
+                        </Text>
+                        <Text style={styles.predMetric}>
+                          BTS: <Text style={{ color: '#FBBF24' }}>{item.event_bts}%</Text>
+                        </Text>
+                        <Text style={styles.predMetric}>
+                          Clean Sheet: <Text style={{ color: '#67E8F9' }}>{item.event_ots}%</Text>
+                        </Text>
                       </View>
                     </Pressable>
                   );
@@ -353,7 +447,9 @@ export default function StatsScreen() {
                 <View style={styles.emptyContainer}>
                   <Text style={{ fontSize: 36 }}>📊</Text>
                   <Text style={styles.emptyTitle}>No Live Odds</Text>
-                  <Text style={styles.emptyText}>Bookmaker odds will open closer to kickoff for today&apos;s fixtures.</Text>
+                  <Text style={styles.emptyText}>
+                    Bookmaker odds will open closer to kickoff for today&apos;s fixtures.
+                  </Text>
                 </View>
               ) : (
                 oddsList.map((item, idx) => (
@@ -378,7 +474,9 @@ export default function StatsScreen() {
                     <View style={styles.oddsSummaryRow}>
                       {item.odds.slice(0, 3).map((o, oIdx) => (
                         <View key={oIdx} style={styles.oddsPill}>
-                          <Text style={styles.oddsBookieName} numberOfLines={1}>{o.odd_bookmakers}</Text>
+                          <Text style={styles.oddsBookieName} numberOfLines={1}>
+                            {o.odd_bookmakers}
+                          </Text>
                           <Text style={styles.oddsPillVal}>
                             1: <Text style={{ color: '#60A5FA' }}>{o.odd_1 || '-'}</Text> · X:{' '}
                             <Text style={{ color: '#94A3B8' }}>{o.odd_x || '-'}</Text> · 2:{' '}
