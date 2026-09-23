@@ -859,7 +859,7 @@ export function FootballPageClient({
                     <FiLayers className="w-3.5 h-3.5" />
                   </span>
                   <div className="text-left">
-                    <p className="text-xs font-black text-white">Football Hubs & Directory</p>
+                    <p className="text-xs font-black text-white">Football Hubs</p>
                     <p className="text-[10px] text-slate-400 font-normal">Analysis · Club Hubs · 75+ Competitions</p>
                   </div>
                 </div>

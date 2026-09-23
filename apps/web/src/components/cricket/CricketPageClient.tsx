@@ -1061,7 +1061,7 @@ export function CricketPageClient() {
                     <FiLayers className="w-3.5 h-3.5" />
                   </span>
                   <div className="text-left">
-                    <p className="text-xs font-black text-white">Cricket Hubs & Directory</p>
+                    <p className="text-xs font-black text-white">Cricket Hubs</p>
                     <p className="text-[10px] text-slate-400 font-normal">Analysis · Team Hubs · 30+ Tournaments</p>
                   </div>
                 </div>

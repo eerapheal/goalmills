@@ -2216,7 +2216,7 @@ export function BasketballPageClient() {
                     <FiLayers className="w-3.5 h-3.5" />
                   </span>
                   <div className="text-left">
-                    <p className="text-xs font-black text-white">Basketball Hubs & Directory</p>
+                    <p className="text-xs font-black text-white">Basketball Hubs</p>
                     <p className="text-[10px] text-slate-400 font-normal">Analysis · Team Hubs · 25+ Competitions</p>
                   </div>
                 </div>
