@@ -28,10 +28,11 @@ export interface SlugIdentifiable {
 export function getNewsUrl(item?: SlugIdentifiable | string | null): string {
   if (!item) return '/news';
   if (typeof item === 'string') {
+    if (/^[0-9a-fA-F]{24}$/.test(item)) return '/news';
     return `/news/${item}`;
   }
 
-  const slug = item.slug || (item.title ? slugify(item.title) : '') || item._id?.toString() || item.id;
+  const slug = item.slug || (item.title ? slugify(item.title) : '');
   return slug ? `/news/${slug}` : '/news';
 }
 
@@ -40,8 +41,11 @@ export function getNewsUrl(item?: SlugIdentifiable | string | null): string {
  */
 export function getNewsSlug(item?: SlugIdentifiable | string | null): string {
   if (!item) return '';
-  if (typeof item === 'string') return item;
-  return item.slug || (item.title ? slugify(item.title) : '') || item._id?.toString() || item.id || '';
+  if (typeof item === 'string') {
+    if (/^[0-9a-fA-F]{24}$/.test(item)) return '';
+    return item;
+  }
+  return item.slug || (item.title ? slugify(item.title) : '') || '';
 }
 
 // ─── Football-Specific Slug Utilities ──────────────────────────────────────────

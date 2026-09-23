@@ -54,6 +54,8 @@ export async function GET(request: NextRequest) {
     const tenantFilter = buildTenantFilter(tenantContext);
     const query: any = { ...tenantFilter };
 
+    const conditions: any[] = [];
+
     // If it's an admin request, enforce role-based filtering
     if (isAdminRequest) {
       if (!session || !hasPermission(session.user?.role, 'articles:read')) {
@@ -62,15 +64,19 @@ export async function GET(request: NextRequest) {
       const userRole = session.user.role as UserRole;
       if (userRole === 'contributor' || userRole === 'staff') {
         // Staff and contributors see their own drafts/pending + all published
-        query.$or = [
-          { authorId: session.user.id },
-          { status: 'published' },
-          { status: { $exists: false } },
-        ];
+        conditions.push({
+          $or: [
+            { authorId: session.user.id },
+            { status: 'published' },
+            { status: { $exists: false } },
+          ],
+        });
       }
     } else {
       // Public visitors only see published articles
-      query.$or = [{ status: 'published' }, { status: { $exists: false } }];
+      conditions.push({
+        $or: [{ status: 'published' }, { status: { $exists: false } }],
+      });
     }
 
     // Exclude IDs
@@ -92,60 +98,56 @@ export async function GET(request: NextRequest) {
     // Sport filter
     if (sportParam && sportParam !== 'all') {
       const sRegex = new RegExp(sportParam, 'i');
-      query.$or = [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }];
+      conditions.push({ $or: [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }] });
     }
 
     // Competition filter
     if (competitionParam && competitionParam !== 'all') {
       const cRegex = new RegExp(competitionParam.replace(/-/g, ' '), 'i');
-      query.$or = [
-        { competitionSlug: competitionParam.toLowerCase() },
-        { competition: { $regex: cRegex } },
-      ];
+      conditions.push({
+        $or: [
+          { competitionSlug: competitionParam.toLowerCase() },
+          { competition: { $regex: cRegex } },
+        ],
+      });
     }
 
     // Category filter
     if (categoryParam && categoryParam !== 'all' && categoryParam !== 'All') {
       const catRegex = new RegExp(`^${categoryParam.replace(/-/g, ' ')}`, 'i');
-      query.$or = [
-        { category: { $regex: catRegex } },
-        { categorySlug: categoryParam.toLowerCase() },
-      ];
+      conditions.push({
+        $or: [
+          { category: { $regex: catRegex } },
+          { categorySlug: categoryParam.toLowerCase() },
+        ],
+      });
     }
 
     // Team filter
     if (team) {
       const teamRegex = new RegExp(team.trim(), 'i');
-      const teamConditions = [
-        { 'teams.slug': team.toLowerCase() },
-        { 'teams.name': { $regex: teamRegex } },
-        { relatedTeam: { $regex: teamRegex } },
-        { tags: { $in: [teamRegex] } },
-        { title: { $regex: teamRegex } },
-      ];
-      if (query.$or) {
-        query.$and = [{ $or: query.$or }, { $or: teamConditions }];
-        delete query.$or;
-      } else {
-        query.$or = teamConditions;
-      }
+      conditions.push({
+        $or: [
+          { 'teams.slug': team.toLowerCase() },
+          { 'teams.name': { $regex: teamRegex } },
+          { relatedTeam: { $regex: teamRegex } },
+          { tags: { $in: [teamRegex] } },
+          { title: { $regex: teamRegex } },
+        ],
+      });
     }
 
     // Player filter
     if (player) {
       const playerRegex = new RegExp(player.trim().replace(/-/g, ' '), 'i');
-      const playerConditions = [
-        { 'players.slug': player.toLowerCase() },
-        { 'players.name': { $regex: playerRegex } },
-        { tags: { $in: [playerRegex] } },
-        { title: { $regex: playerRegex } },
-      ];
-      if (query.$or) {
-        query.$and = [{ $or: query.$or }, { $or: playerConditions }];
-        delete query.$or;
-      } else {
-        query.$or = playerConditions;
-      }
+      conditions.push({
+        $or: [
+          { 'players.slug': player.toLowerCase() },
+          { 'players.name': { $regex: playerRegex } },
+          { tags: { $in: [playerRegex] } },
+          { title: { $regex: playerRegex } },
+        ],
+      });
     }
 
     // Article Type filter
@@ -156,26 +158,20 @@ export async function GET(request: NextRequest) {
     // Author filter
     if (authorParam) {
       const aRegex = new RegExp(authorParam.replace(/-/g, ' '), 'i');
-      query.$or = [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: aRegex } }];
+      conditions.push({ $or: [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: aRegex } }] });
     }
 
     // Keyword Search
     if (search && search.trim()) {
       const sRegex = new RegExp(search.trim(), 'i');
-      const searchConditions = [
-        { title: { $regex: sRegex } },
-        { excerpt: { $regex: sRegex } },
-        { tags: { $in: [sRegex] } },
-        { author: { $regex: sRegex } },
-      ];
-      if (query.$and) {
-        query.$and.push({ $or: searchConditions });
-      } else if (query.$or) {
-        query.$and = [{ $or: query.$or }, { $or: searchConditions }];
-        delete query.$or;
-      } else {
-        query.$or = searchConditions;
-      }
+      conditions.push({
+        $or: [
+          { title: { $regex: sRegex } },
+          { excerpt: { $regex: sRegex } },
+          { tags: { $in: [sRegex] } },
+          { author: { $regex: sRegex } },
+        ],
+      });
     }
 
     // Predefined Filter Modes
@@ -186,18 +182,26 @@ export async function GET(request: NextRequest) {
     } else if (filterType === 'popular' || sortParam === 'popular') {
       sortOptions = { views: -1, createdAt: -1 };
     } else if (filterType === 'transfers') {
-      query.$or = [
-        { articleType: 'transfer' },
-        { category: { $regex: /transfer/i } },
-        { categorySlug: 'transfers' },
-      ];
+      conditions.push({
+        $or: [
+          { articleType: 'transfer' },
+          { category: { $regex: /transfer/i } },
+          { categorySlug: 'transfers' },
+        ],
+      });
     } else if (filterType === 'analysis') {
-      query.$or = [
-        { articleType: { $in: ['tactical_analysis', 'player_analysis'] } },
-        { category: { $regex: /analysis|tactics/i } },
-      ];
+      conditions.push({
+        $or: [
+          { articleType: { $in: ['tactical_analysis', 'player_analysis'] } },
+          { category: { $regex: /analysis|tactics/i } },
+        ],
+      });
     } else if (filterType === 'featured') {
       query.isFeatured = true;
+    }
+
+    if (conditions.length > 0) {
+      query.$and = conditions;
     }
 
     if (sortParam === 'oldest') {
@@ -305,9 +309,18 @@ export async function POST(request: NextRequest) {
         ? customTenantId
         : tenantContext.tenantId;
 
+    const generatedSlug = (title || '')
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
     const news = await News.create({
       tenantId: effectiveTenantId,
       title,
+      slug: generatedSlug,
       excerpt,
       content,
       image,

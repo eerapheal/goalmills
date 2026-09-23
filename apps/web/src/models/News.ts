@@ -170,7 +170,13 @@ NewsSchema.pre('save', function () {
 function applyPublishedFilter(this: any) {
   if (!this.getOptions().includeAllStatuses) {
     const conditions = this.getFilter();
-    if (!conditions.status && !conditions.$and?.some?.((c: any) => c.status)) {
+    const hasStatus =
+      conditions.status !== undefined ||
+      conditions.$or?.some?.((c: any) => c.status !== undefined) ||
+      conditions.$and?.some?.(
+        (c: any) => c.status !== undefined || c.$or?.some?.((s: any) => s.status !== undefined)
+      );
+    if (!hasStatus) {
       this.where({ $or: [{ status: 'published' }, { status: { $exists: false } }] });
     }
   }

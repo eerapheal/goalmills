@@ -304,6 +304,7 @@ export async function sendPushNotification(options: SendPushOptions): Promise<Pu
 export async function notifyOnNewNewsArticle(news: {
   _id: string | any;
   title: string;
+  slug?: string;
   excerpt?: string;
   image?: string;
   category?: string;
@@ -316,6 +317,17 @@ export async function notifyOnNewNewsArticle(news: {
       news.excerpt ||
       `New ${news.category || 'sports'} story published on GoalMills. Tap to read now!`;
     const newsId = news._id.toString();
+    const articleSlug =
+      news.slug ||
+      (news.title
+        ? news.title
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+        : newsId);
 
     await sendPushNotification({
       title,
@@ -326,7 +338,7 @@ export async function notifyOnNewNewsArticle(news: {
       data: {
         type: 'news',
         id: newsId,
-        url: `/news/${newsId}`,
+        url: `/news/${articleSlug}`,
       },
     });
   } catch (error) {

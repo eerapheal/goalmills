@@ -23,6 +23,7 @@ import {
   FiAward,
 } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
+import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,29 +94,29 @@ function splitContentAtMidpoint(content: string): { firstHalf: string; secondHal
   return { firstHalf: content, secondHalf: '' };
 }
 
-import { getNewsUrl, slugify } from '@/lib/slugUtils';
-
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   await dbConnect();
 
-  const decoded = decodeURIComponent(id);
+  const decoded = decodeURIComponent(slug);
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
+  if (isObjectId) {
+    return { title: 'News Not Found | GoalMills' };
+  }
+
   // Only serve published articles (or legacy docs without a status field)
   const statusFilter = { $or: [{ status: 'published' }, { status: { $exists: false } }] };
-  const query = isObjectId
-    ? { $and: [{ $or: [{ _id: decoded }, { slug: decoded }] }, statusFilter] }
-    : { $and: [{ slug: decoded }, statusFilter] };
+  const query = { $and: [{ slug: decoded }, statusFilter] };
 
   let news: any = await News.findOne(query)
     .select('title slug excerpt image author createdAt category tags competition')
     .lean();
 
-  if (!news && !isObjectId) {
+  if (!news) {
     const slugClean = decoded.replace(/-/g, ' ');
     news = await News.findOne({
       $and: [
@@ -143,7 +144,7 @@ export async function generateMetadata({
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
-  const canonicalSlug = news.slug || (news.title ? slugify(news.title) : '') || news._id.toString();
+  const canonicalSlug = news.slug || (news.title ? slugify(news.title) : decoded);
   const url = `${baseUrl}/news/${canonicalSlug}`;
 
   return {
@@ -182,21 +183,23 @@ export async function generateMetadata({
   };
 }
 
-export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   await dbConnect();
 
-  const decoded = decodeURIComponent(id);
+  const decoded = decodeURIComponent(slug);
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
+  if (isObjectId) {
+    notFound();
+  }
+
   // Only serve published articles (or legacy docs without a status field)
   const statusFilter = { $or: [{ status: 'published' }, { status: { $exists: false } }] };
-  const query = isObjectId
-    ? { $and: [{ $or: [{ _id: decoded }, { slug: decoded }] }, statusFilter] }
-    : { $and: [{ slug: decoded }, statusFilter] };
+  const query = { $and: [{ slug: decoded }, statusFilter] };
 
   let news: any = await News.findOne(query).lean();
 
-  if (!news && !isObjectId) {
+  if (!news) {
     const slugClean = decoded.replace(/-/g, ' ');
     news = await News.findOne({
       $and: [
@@ -216,9 +219,9 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
-  // Canonical SEO redirect: If accessed via ObjectId or ID rather than title slug, redirect to title slug URL
+  // Canonical SEO redirect: If accessed via fuzzy title matching rather than canonical slug, redirect to canonical slug URL
   const canonicalSlug = news.slug || (news.title ? slugify(news.title) : '');
-  if (canonicalSlug && decoded !== canonicalSlug && (isObjectId || decoded === news._id.toString())) {
+  if (canonicalSlug && decoded !== canonicalSlug) {
     permanentRedirect(`/news/${canonicalSlug}`);
   }
 
@@ -315,7 +318,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
   });
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
-  const effectiveSlug = canonicalSlug || currentDocId;
+  const effectiveSlug = canonicalSlug || decoded;
   const articleUrl = `${baseUrl}/news/${effectiveSlug}`;
 
   const articleJsonLd = generateArticleSchema({

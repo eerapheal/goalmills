@@ -42,8 +42,11 @@ export async function GET(request: NextRequest) {
     const tenantFilter = buildTenantFilter(tenantContext);
     const query: any = {
       ...tenantFilter,
-      $and: [{ $or: [{ status: 'published' }, { status: { $exists: false } }] }],
     };
+
+    const conditions: any[] = [
+      { $or: [{ status: 'published' }, { status: { $exists: false } }] },
+    ];
 
     if (exclude) {
       const excludeList = exclude.split(',').filter((id) => id.match(/^[0-9a-fA-F]{24}$/));
@@ -61,34 +64,38 @@ export async function GET(request: NextRequest) {
 
     if (sportParam && sportParam !== 'all') {
       const sRegex = new RegExp(sportParam, 'i');
-      query.$or = [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }];
+      conditions.push({ $or: [{ sportSlug: sportParam.toLowerCase() }, { sport: { $regex: sRegex } }] });
     }
 
     if (competitionParam && competitionParam !== 'all') {
       const cRegex = new RegExp(competitionParam.replace(/-/g, ' '), 'i');
-      query.$or = [
-        { competitionSlug: competitionParam.toLowerCase() },
-        { competition: { $regex: cRegex } },
-      ];
+      conditions.push({
+        $or: [
+          { competitionSlug: competitionParam.toLowerCase() },
+          { competition: { $regex: cRegex } },
+        ],
+      });
     }
 
     if (categoryParam && categoryParam !== 'all') {
       const catRegex = new RegExp(categoryParam.replace(/-/g, ' '), 'i');
-      query.$or = [{ categorySlug: categoryParam.toLowerCase() }, { category: { $regex: catRegex } }];
+      conditions.push({ $or: [{ categorySlug: categoryParam.toLowerCase() }, { category: { $regex: catRegex } }] });
     }
 
     if (team) {
       const teamRegex = new RegExp(team.replace(/-/g, ' '), 'i');
-      query.$or = [
-        { teams: { $in: [teamRegex] } },
-        { tags: { $in: [teamRegex] } },
-        { relatedTeam: { $regex: teamRegex } },
-      ];
+      conditions.push({
+        $or: [
+          { teams: { $in: [teamRegex] } },
+          { tags: { $in: [teamRegex] } },
+          { relatedTeam: { $regex: teamRegex } },
+        ],
+      });
     }
 
     if (player) {
       const playerRegex = new RegExp(player.replace(/-/g, ' '), 'i');
-      query.$or = [{ players: { $in: [playerRegex] } }, { tags: { $in: [playerRegex] } }];
+      conditions.push({ $or: [{ players: { $in: [playerRegex] } }, { tags: { $in: [playerRegex] } }] });
     }
 
     if (articleType && articleType !== 'all') {
@@ -97,7 +104,7 @@ export async function GET(request: NextRequest) {
 
     if (authorParam && authorParam !== 'all') {
       const authRegex = new RegExp(authorParam.replace(/-/g, ' '), 'i');
-      query.$or = [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: authRegex } }];
+      conditions.push({ $or: [{ authorSlug: authorParam.toLowerCase() }, { author: { $regex: authRegex } }] });
     }
 
     if (filterType === 'breaking') {
@@ -105,26 +112,36 @@ export async function GET(request: NextRequest) {
     } else if (filterType === 'featured') {
       query.isFeatured = true;
     } else if (filterType === 'transfers') {
-      query.$or = [
-        { articleType: 'transfers' },
-        { categorySlug: 'transfers' },
-        { tags: { $in: [/transfer/i, /rumour/i, /signing/i] } },
-      ];
+      conditions.push({
+        $or: [
+          { articleType: 'transfers' },
+          { categorySlug: 'transfers' },
+          { tags: { $in: [/transfer/i, /rumour/i, /signing/i] } },
+        ],
+      });
     } else if (filterType === 'analysis') {
-      query.$or = [
-        { articleType: 'analysis' },
-        { categorySlug: 'analysis' },
-        { tags: { $in: [/tactics/i, /analysis/i, /preview/i] } },
-      ];
+      conditions.push({
+        $or: [
+          { articleType: 'analysis' },
+          { categorySlug: 'analysis' },
+          { tags: { $in: [/tactics/i, /analysis/i, /preview/i] } },
+        ],
+      });
     }
 
     if (search) {
       const sRegex = new RegExp(search, 'i');
-      query.$or = [
-        { title: { $regex: sRegex } },
-        { excerpt: { $regex: sRegex } },
-        { tags: { $in: [sRegex] } },
-      ];
+      conditions.push({
+        $or: [
+          { title: { $regex: sRegex } },
+          { excerpt: { $regex: sRegex } },
+          { tags: { $in: [sRegex] } },
+        ],
+      });
+    }
+
+    if (conditions.length > 0) {
+      query.$and = conditions;
     }
 
     let sortOptions: any = { createdAt: -1 };

@@ -148,4 +148,17 @@ const NewsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Auto-generate SEO slug from title if missing
+NewsSchema.pre('save', function () {
+  if (!this.slug && this.title) {
+    this.slug = this.title
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+});
+
 export default mongoose.models.News || mongoose.model('News', NewsSchema);

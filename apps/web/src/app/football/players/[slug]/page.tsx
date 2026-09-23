@@ -9,6 +9,7 @@ import {
   slugify,
   parsePlayerSlug,
   buildPlayerSlug,
+  getNewsUrl,
 } from '@/lib/slugUtils';
 import { BackButton } from '@/components/BackButton';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
@@ -759,7 +760,7 @@ export default function FootballPlayerPage() {
               {articles.map((art) => (
                 <Link
                   key={art._id?.toString() || art.slug}
-                  href={`/news/${art.slug || art._id}`}
+                  href={getNewsUrl(art)}
                   className="p-3.5 rounded-xl bg-[#07101E] border border-white/5 hover:border-blue-500/30 transition-all group flex flex-col justify-between"
                 >
                   <h4 className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-blue-400 transition-colors line-clamp-2">
