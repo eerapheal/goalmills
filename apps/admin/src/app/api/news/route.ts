@@ -334,13 +334,22 @@ export async function POST(request: NextRequest) {
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
+    // Resolve cover image: if image is provided, trim it; if empty, check if an image is embedded in the content
+    let resolvedImage = typeof image === 'string' ? image.trim() : '';
+    if (!resolvedImage && content) {
+      const imgMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (imgMatch && imgMatch[1]) {
+        resolvedImage = imgMatch[1];
+      }
+    }
+
     const news = await News.create({
       tenantId: effectiveTenantId,
       title,
       slug: generatedSlug,
       excerpt,
       content,
-      image,
+      image: resolvedImage,
       source,
       category: category || 'General',
       categorySlug: catSlug,

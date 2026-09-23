@@ -102,6 +102,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         .map((t: string) => t.trim())
         .filter(Boolean);
     }
+    if (body.image !== undefined) {
+      let resolvedImage = typeof body.image === 'string' ? body.image.trim() : '';
+      if (!resolvedImage && body.content) {
+        const imgMatch = body.content.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (imgMatch && imgMatch[1]) {
+          resolvedImage = imgMatch[1];
+        }
+      }
+      body.image = resolvedImage;
+    }
     const updatedNews = await News.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

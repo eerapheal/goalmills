@@ -968,36 +968,73 @@ export default function CreateNewsForm() {
         </div>
 
         {/* Cover Hero Image */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end bg-slate-900/40 p-4 rounded-2xl border border-white/5">
-          <div>
-            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <FiImage className="text-blue-400" /> Cover Image URL
-            </label>
-            <input
-              type="url"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
-              placeholder="https://images.unsplash.com/..."
-            />
+        <div className="space-y-3 bg-slate-900/40 p-4 rounded-2xl border border-white/5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+            <div>
+              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <FiImage className="text-blue-400" /> Cover Image URL
+              </label>
+              <input
+                type="text"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                placeholder="https://res.cloudinary.com/... or paste image link"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+                Or Upload Cover File to Cloud
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20 transition-all cursor-pointer disabled:opacity-50"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5">
-              Or Upload Cover File
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20 transition-all cursor-pointer"
-            />
-          </div>
+
+          {uploading && (
+            <div className="flex items-center gap-2 text-xs text-blue-400 animate-pulse font-bold p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
+              <span className="w-3 h-3 rounded-full border-2 border-blue-400 border-t-transparent animate-spin" />
+              <span>Uploading cover image to cloud storage...</span>
+            </div>
+          )}
+
+          {/* Visual Cover Image Preview Card */}
+          {image && (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/80 border border-emerald-500/30">
+              <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0 relative border border-white/10">
+                <img
+                  src={image}
+                  alt="Cover preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <FiCheck className="w-3.5 h-3.5" />
+                  <span>Cover Image Ready & Active</span>
+                </div>
+                <p className="text-[11px] text-slate-400 truncate mt-0.5" title={image}>
+                  {image}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setImage('')}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition"
+              >
+                Remove
+              </button>
+            </div>
+          )}
         </div>
-        {uploading && (
-          <div className="text-xs text-blue-400 animate-pulse font-bold">
-            Uploading cover image...
-          </div>
-        )}
 
         {/* Flags & Toggles */}
         <div className="flex flex-wrap items-center gap-6 py-3 border-t border-b border-white/5">
