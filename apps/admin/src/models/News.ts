@@ -140,9 +140,38 @@ const NewsSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['draft', 'pending_approval', 'published'],
+      enum: ['draft', 'pending_approval', 'published', 'rejected', 'archived'],
       default: 'published',
       index: true,
+    },
+    rejectionReason: {
+      type: String,
+      default: null,
+    },
+    reviewedBy: {
+      type: String,
+      default: null,
+    },
+    reviewedById: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    reviewedAt: {
+      type: Date,
+      default: null,
+    },
+    publishedAt: {
+      type: Date,
+      default: null,
+    },
+    scheduledPublishAt: {
+      type: Date,
+      default: null,
+    },
+    editorialNotes: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

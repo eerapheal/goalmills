@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   await dbConnect();
   try {
-    const news = await News.findById(id).lean();
+    const news = await News.findById(id).lean().setOptions({ includeAllStatuses: true });
     if (!news) return NextResponse.json({ message: 'News not found' }, { status: 404 });
 
     await cacheSet(cacheKey, news, 300);
@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   await dbConnect();
   try {
-    const news = await News.findById(id);
+    const news = await News.findById(id).setOptions({ includeAllStatuses: true });
     if (!news) return NextResponse.json({ message: 'News not found' }, { status: 404 });
 
     const userRole = session.user.role as UserRole;
@@ -74,8 +74,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json();
 
     // Enforce approval workflow: contributors & staff cannot directly publish
-    if (body.status === 'published' && !canDirectPublish(userRole)) {
-      body.status = 'pending_approval';
+    if (body.status === 'published') {
+      if (!canDirectPublish(userRole)) {
+        body.status = 'pending_approval';
+      } else {
+        body.publishedAt = body.publishedAt || new Date();
+        body.reviewedBy = session.user.name || session.user.email || 'Admin';
+        body.reviewedById = session.user.id;
+        body.reviewedAt = new Date();
+        body.rejectionReason = null;
+      }
+    } else if (body.status === 'rejected') {
+      body.reviewedBy = session.user.name || session.user.email || 'Admin';
+      body.reviewedById = session.user.id;
+      body.reviewedAt = new Date();
     }
     if (body.category && !body.categorySlug) {
       body.categorySlug = body.category

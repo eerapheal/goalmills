@@ -77,7 +77,9 @@ export async function GET(req: NextRequest) {
           avgReadDurationSec: {
             $cond: [
               { $gt: ['$totalViews', 0] },
-              { $round: [{ $divide: [{ $divide: ['$totalDurationMs', '$totalViews'] }, 1000] }, 0] },
+              {
+                $round: [{ $divide: [{ $divide: ['$totalDurationMs', '$totalViews'] }, 1000] }, 0],
+              },
               0,
             ],
           },

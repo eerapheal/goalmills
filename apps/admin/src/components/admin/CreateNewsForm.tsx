@@ -109,6 +109,9 @@ export default function CreateNewsForm() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [savingEntity, setSavingEntity] = useState<string | null>(null);
+  const [targetStatus, setTargetStatus] = useState<'published' | 'pending_approval' | 'draft'>(
+    isDirectPublisher ? 'published' : 'pending_approval'
+  );
 
   // Fetch categories & ecosystem entities
   useEffect(() => {
@@ -443,13 +446,20 @@ export default function CreateNewsForm() {
           relatedTeam: clubShortName || relatedTeam.trim(),
           isBreaking,
           isFeatured,
-          status: isDirectPublisher ? 'published' : 'pending_approval',
+          status:
+            targetStatus === 'draft'
+              ? 'draft'
+              : isDirectPublisher
+                ? 'published'
+                : 'pending_approval',
         }),
       });
 
       const data = await res.json();
       if (res.ok) {
-        if (isDirectPublisher) {
+        if (targetStatus === 'draft') {
+          toast.success('Article saved as draft in the publishing queue!');
+        } else if (isDirectPublisher) {
           toast.success('News story published & cross-distributed across custom ecosystem hubs!');
         } else {
           toast.success('Article submitted for editorial approval!');
@@ -1032,25 +1042,38 @@ export default function CreateNewsForm() {
           />
         </div>
 
-        {/* Publish Action Button */}
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={loading || uploading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
-          >
-            <span>
-              {loading
-                ? 'Processing Submission...'
-                : isDirectPublisher
-                  ? 'Publish to Sports Network'
-                  : 'Submit for Editorial Approval'}
-            </span>
-          </button>
+        {/* Publish / Submit / Draft Action Buttons */}
+        <div className="pt-2 space-y-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <button
+              type="submit"
+              onClick={() => setTargetStatus(isDirectPublisher ? 'published' : 'pending_approval')}
+              disabled={loading || uploading}
+              className="flex-1 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+            >
+              <span>
+                {loading
+                  ? 'Processing Submission...'
+                  : isDirectPublisher
+                    ? '🚀 Publish to Sports Network'
+                    : '📤 Submit for Editorial Approval'}
+              </span>
+            </button>
+
+            <button
+              type="submit"
+              onClick={() => setTargetStatus('draft')}
+              disabled={loading || uploading}
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl border border-white/10 bg-slate-900 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-sm transition-all flex items-center justify-center gap-2"
+            >
+              <FiFileText className="w-4 h-4" />
+              <span>Save as Draft</span>
+            </button>
+          </div>
+
           {!isDirectPublisher && (
-            <p className="text-[11px] text-amber-400 text-center mt-2 font-medium">
-              ℹ️ Your role submits drafts for review. An Editor, Manager, or Super Admin will review
-              and publish.
+            <p className="text-[11px] text-amber-400 text-center font-medium">
+              ℹ️ Your role submits drafts to the Editorial Queue for review. An Editor, Manager, or Super Admin will review and approve.
             </p>
           )}
         </div>

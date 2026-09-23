@@ -79,14 +79,31 @@ export async function GET(req: NextRequest) {
               activeCount: a.activeCount,
             }))
           : [
-              { articleId: 'art-1', title: 'Champions League Tactical Breakdown', slug: 'champions-league-tactics', activeCount: 12 },
-              { articleId: 'art-2', title: 'Premier League Deadline Day Transfer Radar', slug: 'pl-deadline-day', activeCount: 9 },
-              { articleId: 'art-3', title: 'Cricket World Cup Semi-Final Pitch Preview', slug: 'cricket-wc-preview', activeCount: 7 },
+              {
+                articleId: 'art-1',
+                title: 'Champions League Tactical Breakdown',
+                slug: 'champions-league-tactics',
+                activeCount: 12,
+              },
+              {
+                articleId: 'art-2',
+                title: 'Premier League Deadline Day Transfer Radar',
+                slug: 'pl-deadline-day',
+                activeCount: 9,
+              },
+              {
+                articleId: 'art-3',
+                title: 'Cricket World Cup Semi-Final Pitch Preview',
+                slug: 'cricket-wc-preview',
+                activeCount: 7,
+              },
             ],
       recentEvents: recentEvents.map((e: any) => ({
         eventType: e.eventType,
         title: e.metadata?.title || e.entityId || 'Live page view',
-        timestamp: e.createdAt ? new Date(e.createdAt).toLocaleTimeString() : new Date().toLocaleTimeString(),
+        timestamp: e.createdAt
+          ? new Date(e.createdAt).toLocaleTimeString()
+          : new Date().toLocaleTimeString(),
         device: e.metadata?.device || 'desktop',
       })),
     };

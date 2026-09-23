@@ -97,26 +97,35 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        sportAffinities: sportAffinityAgg.length > 0 ? sportAffinityAgg : [
-          { sport: 'football', views: 8940, uniqueUsers: 4520 },
-          { sport: 'cricket', views: 3210, uniqueUsers: 1890 },
-          { sport: 'basketball', views: 1840, uniqueUsers: 980 },
-          { sport: 'tennis', views: 760, uniqueUsers: 410 },
-        ],
-        frequencyBuckets: sessionFrequencyAgg.length > 0 ? sessionFrequencyAgg : [
-          { _id: 1, readers: 1420 },
-          { _id: 2, readers: 890 },
-          { _id: 5, readers: 450 },
-          { _id: 10, readers: 210 },
-          { _id: 25, readers: 85 },
-        ],
-        topLocations: geoAgg.length > 0 ? geoAgg : [
-          { _id: 'United Kingdom', count: 4520 },
-          { _id: 'United States', count: 3210 },
-          { _id: 'Nigeria', count: 2140 },
-          { _id: 'India', count: 1890 },
-          { _id: 'Germany', count: 980 },
-        ],
+        sportAffinities:
+          sportAffinityAgg.length > 0
+            ? sportAffinityAgg
+            : [
+                { sport: 'football', views: 8940, uniqueUsers: 4520 },
+                { sport: 'cricket', views: 3210, uniqueUsers: 1890 },
+                { sport: 'basketball', views: 1840, uniqueUsers: 980 },
+                { sport: 'tennis', views: 760, uniqueUsers: 410 },
+              ],
+        frequencyBuckets:
+          sessionFrequencyAgg.length > 0
+            ? sessionFrequencyAgg
+            : [
+                { _id: 1, readers: 1420 },
+                { _id: 2, readers: 890 },
+                { _id: 5, readers: 450 },
+                { _id: 10, readers: 210 },
+                { _id: 25, readers: 85 },
+              ],
+        topLocations:
+          geoAgg.length > 0
+            ? geoAgg
+            : [
+                { _id: 'United Kingdom', count: 4520 },
+                { _id: 'United States', count: 3210 },
+                { _id: 'Nigeria', count: 2140 },
+                { _id: 'India', count: 1890 },
+                { _id: 'Germany', count: 980 },
+              ],
       },
     });
   } catch (error: any) {

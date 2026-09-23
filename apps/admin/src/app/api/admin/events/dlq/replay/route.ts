@@ -17,16 +17,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Dead letter event ID is required' }, { status: 400 });
     }
 
-    const replayed = await sportsEventWorker.replayDeadLetter(
-      id,
-      session.user?.email || 'admin'
-    );
+    const replayed = await sportsEventWorker.replayDeadLetter(id, session.user?.email || 'admin');
 
     if (!replayed) {
-      return NextResponse.json(
-        { error: 'Failed to replay dead letter event' },
-        { status: 422 }
-      );
+      return NextResponse.json({ error: 'Failed to replay dead letter event' }, { status: 422 });
     }
 
     return NextResponse.json({

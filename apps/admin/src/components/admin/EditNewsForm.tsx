@@ -73,7 +73,10 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
   const [source, setSource] = useState('');
   const [category, setCategory] = useState('');
   const [customCategory, setCustomCategory] = useState('');
-  const [status, setStatus] = useState<'draft' | 'pending_approval' | 'published'>('published');
+  const [status, setStatus] = useState<'draft' | 'pending_approval' | 'published' | 'rejected' | 'archived'>('published');
+  const [rejectionReason, setRejectionReason] = useState<string | null>(null);
+  const [reviewedBy, setReviewedBy] = useState<string | null>(null);
+  const [publishedAt, setPublishedAt] = useState<string | null>(null);
 
   // 4-Level Content Ecosystem Selectors & Custom States
   const [ecosystemEntities, setEcosystemEntities] = useState<EcosystemEntityItem[]>([]);
@@ -144,6 +147,9 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           setTags(Array.isArray(article.tags) ? article.tags.join(', ') : '');
           setRelatedTeam(article.relatedTeam || '');
           setStatus(article.status || 'published');
+          setRejectionReason(article.rejectionReason || null);
+          setReviewedBy(article.reviewedBy || null);
+          setPublishedAt(article.publishedAt || null);
           setIsBreaking(Boolean(article.isBreaking));
           setIsFeatured(Boolean(article.isFeatured));
 
@@ -520,6 +526,7 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           isBreaking,
           isFeatured,
           status: isDirectPublisher ? status : status === 'draft' ? 'draft' : 'pending_approval',
+          rejectionReason: status === 'rejected' ? rejectionReason : null,
         }),
       });
 
@@ -573,6 +580,51 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           </button>
         </div>
       </div>
+
+      {/* Editorial Status Alert Banner */}
+      {status === 'rejected' && (
+        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3">
+          <span className="p-2 rounded-xl bg-rose-500/20 text-rose-400 text-lg">⚠️</span>
+          <div>
+            <h4 className="text-sm font-bold text-rose-300">Editorial Revision Requested</h4>
+            <p className="text-xs text-rose-200 mt-0.5">
+              {rejectionReason || 'The editorial board has requested updates to this article.'}
+            </p>
+            {reviewedBy && (
+              <p className="text-[10px] text-slate-400 mt-1">Reviewed by: {reviewedBy}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {status === 'pending_approval' && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+          <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400 text-lg">⏳</span>
+          <div>
+            <h4 className="text-sm font-bold text-amber-300">Pending Editorial Review</h4>
+            <p className="text-xs text-amber-200 mt-0.5">
+              This article is currently in the review queue awaiting approval from an Editor or Super Admin.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {status === 'published' && (
+        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3">
+          <span className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 text-lg">✅</span>
+          <div>
+            <h4 className="text-sm font-bold text-emerald-300">Live on Sports Network</h4>
+            <p className="text-xs text-emerald-200 mt-0.5">
+              This article is live for public readership across all platform channels.
+            </p>
+            {publishedAt && (
+              <p className="text-[10px] text-slate-400 mt-1">
+                Published: {new Date(publishedAt).toLocaleString()}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Title & Source */}
@@ -1107,15 +1159,94 @@ export default function EditNewsForm({ id }: EditNewsFormProps) {
           />
         </div>
 
-        {/* Update Action Button */}
-        <div className="pt-2 flex items-center gap-3">
+        {/* Editorial Workflow Status Bar */}
+        <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
+                Editorial Pipeline Status
+              </span>
+              <p className="text-[11px] text-slate-400">
+                {isDirectPublisher
+                  ? 'As an Editor or Super Admin, you can set the status directly or publish live.'
+                  : 'Contributors and Staff can save drafts or submit for editorial review.'}
+              </p>
+            </div>
+
+            {isDirectPublisher ? (
+              <div className="flex items-center gap-2">
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as any)}
+                  className="bg-slate-800 border border-white/15 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="draft">📝 Writer Draft</option>
+                  <option value="pending_approval">⏳ Pending Approval</option>
+                  <option value="published">✅ Published Live</option>
+                  <option value="rejected">⚠️ Revision Requested</option>
+                </select>
+              </div>
+            ) : (
+              <span
+                className={`px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider ${
+                  status === 'pending_approval'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : status === 'published'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : status === 'rejected'
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                        : 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                }`}
+              >
+                Current: {status.replace('_', ' ')}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Update & Workflow Action Buttons */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
           <button
             type="submit"
             disabled={loading || uploading}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="flex-1 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black uppercase tracking-wider py-4 rounded-2xl transition-all hover:scale-[1.005] shadow-xl shadow-blue-500/25 disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             <span>{loading ? 'Saving Changes...' : 'Save & Update Article'}</span>
           </button>
+
+          {isDirectPublisher && status !== 'published' && (
+            <button
+              type="button"
+              onClick={() => {
+                setStatus('published');
+                setTimeout(() => {
+                  const form = document.querySelector('form');
+                  if (form) form.requestSubmit();
+                }, 50);
+              }}
+              disabled={loading || uploading}
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              <span>✅ Approve & Publish Live</span>
+            </button>
+          )}
+
+          {!isDirectPublisher && (status === 'draft' || status === 'rejected') && (
+            <button
+              type="button"
+              onClick={() => {
+                setStatus('pending_approval');
+                setTimeout(() => {
+                  const form = document.querySelector('form');
+                  if (form) form.requestSubmit();
+                }, 50);
+              }}
+              disabled={loading || uploading}
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg shadow-purple-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              <span>📤 Submit for Review</span>
+            </button>
+          )}
         </div>
       </form>
     </div>

@@ -4,7 +4,13 @@ import ContentMetricSummary from '@/models/ContentMetricSummary';
 import AnalyticsEvent from '@/models/AnalyticsEvent';
 import { requirePermission } from '@/lib/serverAuth';
 import { resolveTenantContext } from '@/lib/tenantContext';
-import type { AnalyticsOverviewKPIs, SportAffinityItem, DeviceDistributionItem, ReferralSourceItem, TopArticleMetric } from '@goalmills/types';
+import type {
+  AnalyticsOverviewKPIs,
+  SportAffinityItem,
+  DeviceDistributionItem,
+  ReferralSourceItem,
+  TopArticleMetric,
+} from '@goalmills/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -176,17 +182,43 @@ export async function GET(req: NextRequest) {
 
     if (topSports.length === 0) {
       topSports.push(
-        { sportSlug: 'football', views: 1240, totalDurationMs: 3720000, shareCount: 84, percentage: 65 },
-        { sportSlug: 'cricket', views: 420, totalDurationMs: 1260000, shareCount: 22, percentage: 22 },
-        { sportSlug: 'basketball', views: 250, totalDurationMs: 750000, shareCount: 14, percentage: 13 }
+        {
+          sportSlug: 'football',
+          views: 1240,
+          totalDurationMs: 3720000,
+          shareCount: 84,
+          percentage: 65,
+        },
+        {
+          sportSlug: 'cricket',
+          views: 420,
+          totalDurationMs: 1260000,
+          shareCount: 22,
+          percentage: 22,
+        },
+        {
+          sportSlug: 'basketball',
+          views: 250,
+          totalDurationMs: 750000,
+          shareCount: 14,
+          percentage: 13,
+        }
       );
     }
 
     // Top Referrers
     const topReferrers: ReferralSourceItem[] = [
       { source: 'Direct / Bookmark', count: Math.round(totalViews * 0.45) || 450, percentage: 45 },
-      { source: 'Google Search / SEO', count: Math.round(totalViews * 0.32) || 320, percentage: 32 },
-      { source: 'Newsletter Campaign', count: Math.round(totalViews * 0.14) || 140, percentage: 14 },
+      {
+        source: 'Google Search / SEO',
+        count: Math.round(totalViews * 0.32) || 320,
+        percentage: 32,
+      },
+      {
+        source: 'Newsletter Campaign',
+        count: Math.round(totalViews * 0.14) || 140,
+        percentage: 14,
+      },
       { source: 'Social Media / X', count: Math.round(totalViews * 0.09) || 90, percentage: 9 },
     ];
 
@@ -203,7 +235,8 @@ export async function GET(req: NextRequest) {
     });
 
     const avgReadSec = totalViews > 0 ? Math.round(totalDurationMs / totalViews / 1000) : 84;
-    const scrollCompletionRate = totalViews > 0 ? Math.min(100, Math.round((totalP75 / totalViews) * 100)) : 68;
+    const scrollCompletionRate =
+      totalViews > 0 ? Math.min(100, Math.round((totalP75 / totalViews) * 100)) : 68;
 
     const responseKPIs: AnalyticsOverviewKPIs = {
       totalPageViews: totalViews || 3240,

@@ -19,10 +19,7 @@ export async function GET(req: NextRequest) {
     const filter: any = { tenantSlug };
     if (status && status !== 'all') filter.status = status;
 
-    const jobs = await SyndicationJobModel.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .lean();
+    const jobs = await SyndicationJobModel.find(filter).sort({ createdAt: -1 }).limit(50).lean();
 
     return NextResponse.json({
       success: true,

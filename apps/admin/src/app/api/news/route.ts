@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
   const session = (await getServerSession(authOptions)) as any;
   const tenantContext = await resolveTenantContext(request, session);
   const { searchParams } = new URL(request.url);
-  const isAdminRequest = searchParams.get('admin') === 'true';
+  const statusParam = searchParams.get('status');
+  const isAdminRequest = searchParams.get('admin') === 'true' || Boolean(statusParam);
   const filterType = searchParams.get('filter'); // 'trending', 'breaking', 'transfers', 'analysis', 'popular', 'featured', 'team', etc.
   const categoryParam = searchParams.get('category');
   const sportParam = searchParams.get('sport');
@@ -63,14 +64,31 @@ export async function GET(request: NextRequest) {
       }
       const userRole = session.user.role as UserRole;
       if (userRole === 'contributor' || userRole === 'staff') {
-        // Staff and contributors see their own drafts/pending + all published
-        conditions.push({
-          $or: [
-            { authorId: session.user.id },
-            { status: 'published' },
-            { status: { $exists: false } },
-          ],
-        });
+        // Staff and contributors see their own drafts/pending/rejected + all published
+        if (statusParam && statusParam !== 'all') {
+          if (statusParam === 'published') {
+            conditions.push({ $or: [{ status: 'published' }, { status: { $exists: false } }] });
+          } else {
+            conditions.push({ authorId: session.user.id, status: statusParam });
+          }
+        } else {
+          conditions.push({
+            $or: [
+              { authorId: session.user.id },
+              { status: 'published' },
+              { status: { $exists: false } },
+            ],
+          });
+        }
+      } else {
+        // Editor, Manager, Super-Admin can see everything across all authors
+        if (statusParam && statusParam !== 'all') {
+          if (statusParam === 'published') {
+            conditions.push({ $or: [{ status: 'published' }, { status: { $exists: false } }] });
+          } else {
+            conditions.push({ status: statusParam });
+          }
+        }
       }
     } else {
       // Public visitors only see published articles

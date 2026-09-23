@@ -15,7 +15,11 @@ export async function GET(req: NextRequest) {
     const sponsorId = searchParams.get('sponsorId') || undefined;
 
     if (sponsorId) {
-      const report = await advertiserReportingService.generateCampaignReport(sponsorId, '2026-02', tenantSlug);
+      const report = await advertiserReportingService.generateCampaignReport(
+        sponsorId,
+        '2026-02',
+        tenantSlug
+      );
       return NextResponse.json({ success: true, report });
     }
 

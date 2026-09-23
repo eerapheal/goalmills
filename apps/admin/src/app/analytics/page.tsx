@@ -21,11 +21,17 @@ import {
   FiGlobe,
 } from 'react-icons/fi';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
-import type { AnalyticsOverviewKPIs, RealtimeAnalyticsSummary, TopArticleMetric } from '@goalmills/types';
+import type {
+  AnalyticsOverviewKPIs,
+  RealtimeAnalyticsSummary,
+  TopArticleMetric,
+} from '@goalmills/types';
 
 export default function AnalyticsDashboardPage() {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<'overview' | 'content' | 'audience' | 'realtime'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'content' | 'audience' | 'realtime'>(
+    'overview'
+  );
   const [timeRange, setTimeRange] = useState<'today' | '7d' | '30d' | '90d'>('7d');
   const [tenantFilter, setTenantFilter] = useState<string>('all');
   const [sportFilter, setSportFilter] = useState<string>('all');
@@ -104,7 +110,8 @@ export default function AnalyticsDashboardPage() {
 
   function exportCSV() {
     if (!articlesList || articlesList.length === 0) return;
-    const headers = 'Article ID,Title,Sport,Category,Views,Unique Readers,Avg Read Duration (Sec),Scroll Completion (%),Shares\n';
+    const headers =
+      'Article ID,Title,Sport,Category,Views,Unique Readers,Avg Read Duration (Sec),Scroll Completion (%),Shares\n';
     const rows = articlesList
       .map(
         (a) =>
@@ -234,7 +241,11 @@ export default function AnalyticsDashboardPage() {
 
       {loading ? (
         <div className="flex items-center justify-center p-16">
-          <GoalmillsLoader size="lg" label="Audience Analytics" sublabel="Aggregating telemetry records..." />
+          <GoalmillsLoader
+            size="lg"
+            label="Audience Analytics"
+            sublabel="Aggregating telemetry records..."
+          />
         </div>
       ) : (
         <>
@@ -276,7 +287,8 @@ export default function AnalyticsDashboardPage() {
                 <FiClock className="text-purple-400" size={16} />
               </div>
               <div className="text-2xl sm:text-3xl font-black text-white">
-                {Math.floor((overviewData?.avgReadDurationSec || 90) / 60)}m {(overviewData?.avgReadDurationSec || 90) % 60}s
+                {Math.floor((overviewData?.avgReadDurationSec || 90) / 60)}m{' '}
+                {(overviewData?.avgReadDurationSec || 90) % 60}s
               </div>
               <p className="text-[11px] text-purple-400 font-bold mt-1 flex items-center gap-1">
                 <span>⚡ High Focus</span>
@@ -292,9 +304,7 @@ export default function AnalyticsDashboardPage() {
               <div className="text-2xl sm:text-3xl font-black text-white">
                 {overviewData?.scrollCompletionRate || 74}%
               </div>
-              <p className="text-[11px] text-slate-400 font-medium mt-1">
-                Reached 75%+ content
-              </p>
+              <p className="text-[11px] text-slate-400 font-medium mt-1">Reached 75%+ content</p>
             </div>
 
             <div className="glass-card border border-white/10 rounded-2xl p-4 sm:p-5 bg-slate-950/60 backdrop-blur-xl relative overflow-hidden group col-span-2 sm:col-span-1">
@@ -305,9 +315,7 @@ export default function AnalyticsDashboardPage() {
               <div className="text-2xl sm:text-3xl font-black text-white">
                 {(overviewData?.totalShares || 142).toLocaleString()}
               </div>
-              <p className="text-[11px] text-rose-400 font-bold mt-1">
-                Viral amplification
-              </p>
+              <p className="text-[11px] text-rose-400 font-bold mt-1">Viral amplification</p>
             </div>
           </div>
 
@@ -369,7 +377,9 @@ export default function AnalyticsDashboardPage() {
                       <div key={sp.sportSlug} className="space-y-1.5">
                         <div className="flex items-center justify-between text-xs font-bold">
                           <span className="text-slate-300 capitalize">{sp.sportSlug}</span>
-                          <span className="text-amber-400 font-mono">{sp.views} views ({sp.percentage}%)</span>
+                          <span className="text-amber-400 font-mono">
+                            {sp.views} views ({sp.percentage}%)
+                          </span>
                         </div>
                         <div className="w-full h-2 rounded-full bg-slate-900 border border-white/5 overflow-hidden">
                           <div
@@ -392,7 +402,10 @@ export default function AnalyticsDashboardPage() {
                   {/* Devices */}
                   <div className="grid grid-cols-3 gap-3">
                     {overviewData?.deviceDistribution.map((d) => (
-                      <div key={d.device} className="p-3 rounded-xl bg-white/5 border border-white/5 text-center">
+                      <div
+                        key={d.device}
+                        className="p-3 rounded-xl bg-white/5 border border-white/5 text-center"
+                      >
                         <span className="text-slate-400 capitalize text-[11px] font-bold block">
                           {d.device}
                         </span>
@@ -416,7 +429,9 @@ export default function AnalyticsDashboardPage() {
                           className="p-2.5 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between text-xs"
                         >
                           <span className="text-slate-300 font-medium truncate">{ref.source}</span>
-                          <span className="text-amber-400 font-mono font-bold">{ref.percentage}%</span>
+                          <span className="text-amber-400 font-mono font-bold">
+                            {ref.percentage}%
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -477,7 +492,10 @@ export default function AnalyticsDashboardPage() {
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {articlesList.map((art, idx) => (
-                        <tr key={art.articleId + idx} className="hover:bg-white/5 transition-colors group">
+                        <tr
+                          key={art.articleId + idx}
+                          className="hover:bg-white/5 transition-colors group"
+                        >
                           <td className="py-3 px-3 max-w-[280px] sm:max-w-md">
                             <span className="font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1">
                               {art.title}
@@ -498,14 +516,17 @@ export default function AnalyticsDashboardPage() {
                             {art.uniqueReaders.toLocaleString()}
                           </td>
                           <td className="py-3 px-2 text-right font-mono text-purple-300">
-                            {Math.floor(art.avgReadDurationSec / 60)}m {art.avgReadDurationSec % 60}s
+                            {Math.floor(art.avgReadDurationSec / 60)}m {art.avgReadDurationSec % 60}
+                            s
                           </td>
                           <td className="py-3 px-3 w-32">
                             <div className="flex items-center gap-2">
                               <div className="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
                                 <div
                                   className="h-full bg-emerald-400 rounded-full"
-                                  style={{ width: `${Math.min(100, art.scrollCompletionRate || 50)}%` }}
+                                  style={{
+                                    width: `${Math.min(100, art.scrollCompletionRate || 50)}%`,
+                                  }}
                                 />
                               </div>
                               <span className="text-[10px] font-mono text-slate-400">
@@ -556,7 +577,9 @@ export default function AnalyticsDashboardPage() {
                     <div key={bucket._id} className="space-y-1">
                       <div className="flex items-center justify-between text-xs font-bold">
                         <span className="text-slate-300">
-                          {bucket._id === 1 ? '1 Visit (First-time readers)' : `${bucket._id}+ Visits (Returning Loyalists)`}
+                          {bucket._id === 1
+                            ? '1 Visit (First-time readers)'
+                            : `${bucket._id}+ Visits (Returning Loyalists)`}
                         </span>
                         <span className="text-amber-400 font-mono">{bucket.readers} sessions</span>
                       </div>
@@ -660,9 +683,7 @@ export default function AnalyticsDashboardPage() {
                         </span>
                         <div className="min-w-0">
                           <h4 className="text-xs font-bold text-white truncate">{item.title}</h4>
-                          <span className="text-[10px] text-slate-500 font-mono">
-                            /{item.slug}
-                          </span>
+                          <span className="text-[10px] text-slate-500 font-mono">/{item.slug}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">

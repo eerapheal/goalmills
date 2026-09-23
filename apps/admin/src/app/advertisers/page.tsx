@@ -42,7 +42,9 @@ export default function AdvertiserReportingStudio() {
   async function generateProofCertificate(sponsorId: string) {
     setGenerating(true);
     try {
-      const res = await fetch(`/api/admin/advertisers/report?sponsorId=${encodeURIComponent(sponsorId)}`);
+      const res = await fetch(
+        `/api/admin/advertisers/report?sponsorId=${encodeURIComponent(sponsorId)}`
+      );
       const data = await res.json();
       if (data.success && data.report) {
         setSelectedReport(data.report);
@@ -75,7 +77,8 @@ export default function AdvertiserReportingStudio() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Certified viewability audits, cryptographic SHA-256 delivery certificates, and sponsor settlement.
+                Certified viewability audits, cryptographic SHA-256 delivery certificates, and
+                sponsor settlement.
               </p>
             </div>
           </div>
@@ -104,7 +107,9 @@ export default function AdvertiserReportingStudio() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-2xl bg-slate-900/60 border border-white/10">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Delivered Impressions</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Delivered Impressions
+            </span>
             <FiLayers className="text-emerald-400" />
           </div>
           <div className="text-3xl font-black text-white">
@@ -140,9 +145,7 @@ export default function AdvertiserReportingStudio() {
             <span className="text-xs font-bold uppercase tracking-wider">Active Sponsors</span>
             <FiShield className="text-blue-400" />
           </div>
-          <div className="text-3xl font-black text-white">
-            {stats ? stats.activeSponsors : '—'}
-          </div>
+          <div className="text-3xl font-black text-white">{stats ? stats.activeSponsors : '—'}</div>
           <div className="text-[11px] text-emerald-400 mt-1">100% Brand Safety Compliance</div>
         </div>
       </div>
@@ -170,7 +173,14 @@ export default function AdvertiserReportingStudio() {
                 <div>
                   <div className="font-bold text-white text-sm">{s.sponsorName}</div>
                   <div className="text-slate-400 text-[11px]">
-                    Delivered: <span className="text-slate-200 font-mono font-bold">{s.impressions.toLocaleString()}</span> impressions | Spend: <span className="text-emerald-400 font-mono font-bold">${s.spend.toLocaleString()}</span>
+                    Delivered:{' '}
+                    <span className="text-slate-200 font-mono font-bold">
+                      {s.impressions.toLocaleString()}
+                    </span>{' '}
+                    impressions | Spend:{' '}
+                    <span className="text-emerald-400 font-mono font-bold">
+                      ${s.spend.toLocaleString()}
+                    </span>
                   </div>
                 </div>
 
@@ -210,7 +220,10 @@ export default function AdvertiserReportingStudio() {
                   <span>Certified Delivery Certificate</span>
                 </div>
                 <div className="text-[11px] opacity-80">
-                  SHA-256 Hash: <span className="font-mono text-[10px] break-all">{selectedReport.certificateHash}</span>
+                  SHA-256 Hash:{' '}
+                  <span className="font-mono text-[10px] break-all">
+                    {selectedReport.certificateHash}
+                  </span>
                 </div>
               </div>
 
@@ -225,19 +238,28 @@ export default function AdvertiserReportingStudio() {
                 </div>
                 <div className="flex justify-between py-1 border-b border-white/5">
                   <span className="text-slate-400">Total Impressions:</span>
-                  <span className="font-mono font-bold text-white">{selectedReport.impressions.toLocaleString()}</span>
+                  <span className="font-mono font-bold text-white">
+                    {selectedReport.impressions.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-white/5">
                   <span className="text-slate-400">Viewable Impressions:</span>
-                  <span className="font-mono font-bold text-emerald-400">{selectedReport.viewableImpressions.toLocaleString()} ({selectedReport.viewabilityRate}%)</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    {selectedReport.viewableImpressions.toLocaleString()} (
+                    {selectedReport.viewabilityRate}%)
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-white/5">
                   <span className="text-slate-400">Clicks / CTR:</span>
-                  <span className="font-mono font-bold text-amber-400">{selectedReport.clicks.toLocaleString()} ({selectedReport.ctr}%)</span>
+                  <span className="font-mono font-bold text-amber-400">
+                    {selectedReport.clicks.toLocaleString()} ({selectedReport.ctr}%)
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-white/5">
                   <span className="text-slate-400">Campaign Spend:</span>
-                  <span className="font-mono font-bold text-emerald-400">${selectedReport.totalSpend.toLocaleString()}</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    ${selectedReport.totalSpend.toLocaleString()}
+                  </span>
                 </div>
               </div>
 
@@ -247,7 +269,8 @@ export default function AdvertiserReportingStudio() {
             </div>
           ) : (
             <div className="text-center py-12 text-slate-500 text-xs">
-              Click &quot;Audit Certificate&quot; on any brand sponsor to render a verifiable cryptographic delivery certificate.
+              Click &quot;Audit Certificate&quot; on any brand sponsor to render a verifiable
+              cryptographic delivery certificate.
             </div>
           )}
         </div>

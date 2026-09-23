@@ -14,7 +14,7 @@ interface NewsArticle {
   authorId?: string;
   createdAt: string;
   category: string;
-  status?: 'draft' | 'pending_approval' | 'published';
+  status?: 'draft' | 'pending_approval' | 'published' | 'rejected' | 'archived';
 }
 
 export default function NewsList() {
@@ -83,10 +83,19 @@ export default function NewsList() {
 
   return (
     <div className="glass-card p-6 rounded-2xl h-fit">
-      <h2 className="text-xl font-bold text-white mb-4 flex flex-wrap items-center gap-2">
-        <span>📰</span>
-        <span className="break-words">Manage News Articles</span>
-      </h2>
+      <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <span>📰</span>
+          <span className="break-words">Manage News Articles</span>
+        </h2>
+        <Link
+          href="/admin/publishing"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 font-bold border border-purple-500/20 text-xs transition-colors"
+        >
+          <span>Publishing & Approval Pipeline</span>
+          <span>→</span>
+        </Link>
+      </div>
       <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
         {news.map((item) => {
           const canEdit = canEditArticle(session?.user, item.authorId);
@@ -108,14 +117,18 @@ export default function NewsList() {
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                         : item.status === 'draft'
                           ? 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : item.status === 'rejected'
+                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                     }`}
                   >
                     {item.status === 'pending_approval'
                       ? '⏳ Pending Approval'
                       : item.status === 'draft'
                         ? '📝 Draft'
-                        : '✅ Published'}
+                        : item.status === 'rejected'
+                          ? '⚠️ Needs Revision'
+                          : '✅ Published'}
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-text-muted uppercase font-black">

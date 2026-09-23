@@ -555,8 +555,13 @@ export interface BlogPost {
   isBreaking?: boolean;
   isFeatured?: boolean;
   tags?: string[];
-  relatedTeam?: string;
-  status?: 'draft' | 'pending_approval' | 'published';
+  status?: 'draft' | 'pending_approval' | 'published' | 'rejected' | 'archived';
+  rejectionReason?: string;
+  reviewedBy?: string;
+  reviewedById?: string;
+  reviewedAt?: string;
+  scheduledPublishAt?: string;
+  editorialNotes?: string;
 }
 
 export type TransferStatus = 'rumour' | 'negotiation' | 'agreement' | 'done_deal' | 'medical';

@@ -20,16 +20,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const jobs = await contentDistributionService.manualBroadcast(
-      tenantSlug || 'goalmills',
-      {
-        headline,
-        body: content,
-        sport: sport || 'football',
-        targetChannels,
-        linkUrl,
-      }
-    );
+    const jobs = await contentDistributionService.manualBroadcast(tenantSlug || 'goalmills', {
+      headline,
+      body: content,
+      sport: sport || 'football',
+      targetChannels,
+      linkUrl,
+    });
 
     return NextResponse.json({
       success: true,

@@ -73,7 +73,9 @@ export async function GET(req: NextRequest) {
     } catch (e) {
       console.warn('[Employees GET] Could not fetch training progress:', e);
     }
-    const progressMap = new Map((progressList || []).map((p: any) => [p.employeeId?.toString(), p]));
+    const progressMap = new Map(
+      (progressList || []).map((p: any) => [p.employeeId?.toString(), p])
+    );
 
     const enrichedEmployees = employees.map((emp) => {
       const p: any = progressMap.get(emp._id.toString());
@@ -101,7 +103,11 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ success: true, count: enrichedEmployees.length, data: enrichedEmployees });
+    return NextResponse.json({
+      success: true,
+      count: enrichedEmployees.length,
+      data: enrichedEmployees,
+    });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to fetch employees' },

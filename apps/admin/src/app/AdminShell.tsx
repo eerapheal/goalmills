@@ -70,7 +70,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
      *   Desktop (≥ lg): horizontal — Sidebar | TopBar + Content
      */
     <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-
       {/* ── Desktop Sidebar (hidden on mobile, rendered inside AdminSidebar) ── */}
       <AdminSidebar
         desktopCollapsed={desktopCollapsed}
@@ -82,7 +81,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {/* ── Main Column ─────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
-
         {/* Top navigation bar */}
         <AdminNavBar
           sidebarCollapsed={desktopCollapsed}
@@ -91,9 +89,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
         {/* Page content */}
         <main className="flex-1 p-3 sm:p-5 md:p-6 pb-24 lg:pb-6">
-          <div className="max-w-7xl mx-auto w-full">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto w-full">{children}</div>
         </main>
       </div>
     </div>
