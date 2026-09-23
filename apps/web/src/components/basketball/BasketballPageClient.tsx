@@ -2002,7 +2002,7 @@ export function BasketballPageClient() {
       {/* ════════════════════════════════════════
           HERO SECTION
       ════════════════════════════════════════ */}
-      <div className="relative bg-gradient-to-b from-[#1c0e07] via-[#0b0f19] to-[#020617] border-b border-[#1e293b] overflow-hidden">
+      <div className="hidden md:block relative bg-gradient-to-b from-[#1c0e07] via-[#0b0f19] to-[#020617] border-b border-[#1e293b] overflow-hidden">
         <div className="absolute inset-0 opacity-15 pointer-events-none">
           <img
             src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1600&h=400&fit=crop&auto=format"
@@ -2217,7 +2217,7 @@ export function BasketballPageClient() {
                   </span>
                   <div className="text-left">
                     <p className="text-xs font-black text-white">Basketball Hubs & Directory</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Analysis · 25+ Competitions · Team Hubs</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Analysis · Team Hubs · 25+ Competitions</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

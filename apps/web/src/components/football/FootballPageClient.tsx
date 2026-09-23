@@ -860,7 +860,7 @@ export function FootballPageClient({
                   </span>
                   <div className="text-left">
                     <p className="text-xs font-black text-white">Football Hubs & Directory</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Analysis · 75+ Competitions · Club Hubs</p>
+                    <p className="text-[10px] text-slate-400 font-normal">Analysis · Club Hubs · 75+ Competitions</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
