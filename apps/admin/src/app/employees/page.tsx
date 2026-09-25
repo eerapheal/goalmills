@@ -151,7 +151,8 @@ export default function EmployeesPage() {
 
   const handleCopyCredentials = () => {
     if (!createdCredentials) return;
-    const text = `GoalMills Staff Login Credentials:\nPortal: https://goalmills-web.vercel.app/signin\nEmail: ${createdCredentials.email}\nTemporary Password: ${createdCredentials.tempPassword}\nRole: ${createdCredentials.role}`;
+    const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://goalmills-admin.vercel.app';
+    const text = `GoalMills Staff Login Credentials:\nPortal: ${adminUrl}/signin\nEmail: ${createdCredentials.email}\nTemporary Password: ${createdCredentials.tempPassword}\nRole: ${createdCredentials.role}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);

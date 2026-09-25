@@ -203,17 +203,19 @@ export default function AdminNewsletterPage() {
     try {
       setLoadingNews(true);
       const url = new URL('/api/news', window.location.origin);
-      url.searchParams.set('limit', '20');
+      url.searchParams.set('limit', '30');
       if (newsSearch) url.searchParams.set('search', newsSearch);
       if (newsCategory !== 'all') url.searchParams.set('category', newsCategory);
 
       const res = await fetch(url.toString());
       const json = await res.json();
-      if (json.articles) {
-        setAvailableNews(json.articles);
-      }
+      const articlesList = Array.isArray(json)
+        ? json
+        : json.articles || json.data || [];
+      setAvailableNews(articlesList);
     } catch (err) {
       console.error('Error fetching published news:', err);
+      setAvailableNews([]);
     } finally {
       setLoadingNews(false);
     }
@@ -226,9 +228,14 @@ export default function AdminNewsletterPage() {
   useEffect(() => {
     if (showComposeModal) {
       fetchPublishedNews();
+    }
+  }, [showComposeModal, newsSearch, newsCategory]);
+
+  useEffect(() => {
+    if (showComposeModal) {
       runPreflightCheck(targetAudience);
     }
-  }, [showComposeModal, newsSearch, newsCategory, targetAudience]);
+  }, [showComposeModal, targetAudience]);
 
   const runPreflightCheck = async (audience: NewsletterAudience) => {
     try {

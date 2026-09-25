@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export default function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
+  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://goalmills-admin.vercel.app';
 
   // 1. Redirect any legacy admin route requests to the dedicated admin app
   if (path === '/admin' || path.startsWith('/admin/')) {
