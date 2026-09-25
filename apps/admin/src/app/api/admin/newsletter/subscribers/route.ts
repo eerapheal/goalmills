@@ -21,21 +21,30 @@ export async function GET(req: NextRequest) {
       query.frequency = frequency;
     }
     if (status && status !== 'all') {
-      query.status = status;
+      if (status === 'active' || status === 'ACTIVE') {
+        query.status = { $in: ['active', 'ACTIVE', 'CONFIRMED', 'ENGAGED'] };
+      } else if (status === 'unsubscribed' || status === 'UNSUBSCRIBED') {
+        query.status = { $in: ['unsubscribed', 'UNSUBSCRIBED', 'SUPPRESSED', 'HARD_BOUNCE'] };
+      } else {
+        query.status = status;
+      }
     }
     if (search) {
       const safe = escapeRegex(search.trim());
       query.email = { $regex: safe, $options: 'i' };
     }
 
+    const activeFilter = { status: { $in: ['active', 'ACTIVE', 'CONFIRMED', 'ENGAGED'] } };
+    const unsubFilter = { status: { $in: ['unsubscribed', 'UNSUBSCRIBED', 'SUPPRESSED', 'HARD_BOUNCE'] } };
+
     const [subscribers, totalCount, dailyCount, weeklyCount, monthlyCount, unsubCount] =
       await Promise.all([
         NewsletterSubscriber.find(query).sort({ createdAt: -1 }).limit(limit),
-        NewsletterSubscriber.countDocuments({ status: 'active' }),
-        NewsletterSubscriber.countDocuments({ status: 'active', frequency: 'daily' }),
-        NewsletterSubscriber.countDocuments({ status: 'active', frequency: 'weekly' }),
-        NewsletterSubscriber.countDocuments({ status: 'active', frequency: 'monthly' }),
-        NewsletterSubscriber.countDocuments({ status: 'unsubscribed' }),
+        NewsletterSubscriber.countDocuments(activeFilter),
+        NewsletterSubscriber.countDocuments({ ...activeFilter, frequency: 'daily' }),
+        NewsletterSubscriber.countDocuments({ ...activeFilter, frequency: 'weekly' }),
+        NewsletterSubscriber.countDocuments({ ...activeFilter, frequency: 'monthly' }),
+        NewsletterSubscriber.countDocuments(unsubFilter),
       ]);
 
     return NextResponse.json({

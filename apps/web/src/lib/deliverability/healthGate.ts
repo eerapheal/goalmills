@@ -135,9 +135,11 @@ export async function generatePreflightReport(
 ): Promise<{ report: CampaignPreflightReport; eligibleSubscribers: INewsletterSubscriber[] }> {
   await dbConnect();
 
-  const query: any = {};
+  const query: any = {
+    status: { $nin: ['UNSUBSCRIBED', 'unsubscribed', 'SUPPRESSED', 'HARD_BOUNCE', 'COMPLAINT'] },
+  };
   if (audienceTier === 'daily_subscribers') {
-    query.$or = [{ frequency: 'daily' }, { frequency: 'all' }];
+    query.$or = [{ frequency: 'daily' }, { frequency: 'all' }, { frequency: { $exists: false } }];
   } else if (audienceTier === 'weekly_subscribers') {
     query.$or = [{ frequency: 'weekly' }, { frequency: 'all' }];
   } else if (audienceTier === 'monthly_subscribers') {
