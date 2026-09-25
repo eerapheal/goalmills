@@ -78,7 +78,7 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       articleIds: articles.map((a) => a._id),
       status: 'processing',
       preflightReport: report,
-      createdBy: params.createdBy || 'web_auto',
+      createdBy: params.createdBy || 'admin',
       stats: {
         totalRecipients: eligibleSubscribers.length,
         successCount: 0,

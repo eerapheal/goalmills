@@ -195,8 +195,13 @@ export async function curateNewsletterArticles(
   };
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// NEWSLETTER HTML EMAIL TEMPLATE — Professional, Email-Client-Safe
+// ═══════════════════════════════════════════════════════════════════
+
 /**
- * Generate responsive HTML newsletter email
+ * Generate professional responsive HTML newsletter email.
+ * Uses table-based layout for maximum email client compatibility.
  */
 export function generateNewsletterHTML(params: {
   title: string;
@@ -211,103 +216,211 @@ export function generateNewsletterHTML(params: {
     params;
   const year = new Date().getFullYear();
   const dateFormatted = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
 
+  const frequencyLabel = frequency
+    ? frequency.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : 'Daily';
+
+  // Build article cards
   const articleCards = articles
-    .map((art) => {
+    .map((art, idx) => {
       const articleLink = `${siteUrl}/news/${art.slug || art._id}`;
       const badgeHtml = art.isBreaking
-        ? `<span style="background:#ef4444;color:#ffffff;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:900;text-transform:uppercase;display:inline-block;margin-bottom:8px;">⚡ Breaking News</span>`
+        ? `<span style="display:inline-block;background:#dc2626;color:#ffffff;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">⚡ BREAKING</span>`
         : art.isFeatured
-          ? `<span style="background:#8b5cf6;color:#ffffff;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:900;text-transform:uppercase;display:inline-block;margin-bottom:8px;">⭐ Editor's Pick</span>`
+          ? `<span style="display:inline-block;background:#7c3aed;color:#ffffff;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">⭐ EDITOR'S PICK</span>`
           : '';
 
-      const imageHtml = art.image
-        ? `<img src="${art.image}" alt="${art.title}" style="width:100%;height:210px;object-fit:cover;display:block;border-top-left-radius:16px;border-top-right-radius:16px;background-color:#1e293b;" />`
+      const imageSection = art.image
+        ? `<tr>
+            <td style="padding:0;">
+              <a href="${articleLink}" style="text-decoration:none;display:block;">
+                <img src="${art.image}" alt="${art.title}" width="536" style="width:100%;max-width:536px;height:auto;display:block;border:0;" />
+              </a>
+            </td>
+          </tr>`
+        : '';
+
+      const divider = idx < articles.length - 1
+        ? `<tr><td style="padding:0 28px;"><div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0;"></div></td></tr>`
         : '';
 
       return `
-      <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:18px;overflow:hidden;margin-bottom:20px;">
-        ${imageHtml}
-        <div style="padding:18px;">
-          ${badgeHtml}
-          <h2 style="font-size:17px;font-weight:800;line-height:1.35;margin:0 0 8px;color:#ffffff;">
-            <a href="${articleLink}" style="color:#ffffff;text-decoration:none;">${art.title}</a>
-          </h2>
-          <p style="font-size:13px;line-height:1.5;color:#94a3b8;margin:0 0 12px;">${art.excerpt}</p>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;color:#f59e0b;">
-            <span>${art.category} • ${art.readTime} min read</span>
-            <a href="${articleLink}" style="color:#f59e0b;text-decoration:none;font-weight:800;">Read Story &rarr;</a>
-          </div>
-        </div>
-      </div>
-      `;
+      <!-- Article ${idx + 1} -->
+      <tr>
+        <td style="padding:0;">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:0;">
+            ${imageSection}
+            <tr>
+              <td style="padding:20px 28px 24px;">
+                ${badgeHtml}
+                <h2 style="margin:0 0 8px;font-size:18px;font-weight:800;line-height:1.35;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                  <a href="${articleLink}" style="color:#ffffff;text-decoration:none;">${art.title}</a>
+                </h2>
+                <p style="margin:0 0 14px;font-size:14px;line-height:1.6;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                  ${art.excerpt}
+                </p>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="font-size:11px;color:#64748b;font-weight:600;">
+                      ${art.category} &bull; ${art.readTime || 3} min read
+                    </td>
+                    <td align="right">
+                      <a href="${articleLink}" style="display:inline-block;background:#f59e0b;color:#0f172a;padding:8px 16px;border-radius:6px;font-size:11px;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:0.04em;">
+                        Read Story &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      ${divider}`;
     })
     .join('');
 
-  return `<!DOCTYPE html>
-<html lang="en">
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
   <title>${title}</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td, a { font-family: Arial, Helvetica, sans-serif !important; }
+  </style>
+  <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#070b1e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#ffffff;">
-  <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
-    <!-- Header -->
-    <div style="text-align:center;padding:24px 0 20px;border-bottom:1px solid rgba(255,255,255,0.1);">
-      <a href="${siteUrl}" style="font-size:26px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:#ffffff;text-decoration:none;">
-        Goal<span style="color:#f59e0b;">Mills</span>
-      </a>
-      <div style="margin-top:10px;">
-        <span style="display:inline-block;padding:4px 12px;border-radius:9999px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">
-          ${frequency.toUpperCase()} DIGEST • ${dateFormatted}
-        </span>
-      </div>
-    </div>
+<body style="margin:0;padding:0;background-color:#050814;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#ffffff;">
 
-    ${
-      previewText
-        ? `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${previewText}</div>`
-        : ''
-    }
+  <!-- Hidden Preheader -->
+  ${previewText ? `<div style="display:none;font-size:1px;color:#050814;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">${previewText}</div>` : ''}
 
-    <!-- Editorial Note -->
-    ${
-      editorialNote
-        ? `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px 18px;margin:24px 0;font-size:13px;line-height:1.6;color:#cbd5e1;">
-            <strong style="color:#f59e0b;">Newsroom Dispatch:</strong> ${editorialNote}
-          </div>`
-        : ''
-    }
+  <!-- Email Wrapper -->
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#050814;table-layout:fixed;">
+    <tr>
+      <td align="center" style="padding:24px 12px 40px;">
 
-    <!-- Articles Feed -->
-    <div style="margin-top:24px;">
-      ${articleCards}
-    </div>
+        <!-- Main Container -->
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;margin:0 auto;background:#0a0f24;border-radius:16px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.5);">
 
-    <!-- CTA Button -->
-    <div style="text-align:center;margin:32px 0;">
-      <a href="${siteUrl}" style="display:inline-block;background:#f59e0b;color:#020617;font-weight:900;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;padding:12px 24px;border-radius:14px;text-decoration:none;box-shadow:0 10px 25px -5px rgba(245,158,11,0.3);">
-        Explore Live Match Centre & Highlights &rarr;
-      </a>
-    </div>
+          <!-- Amber Gradient Top Bar -->
+          <tr>
+            <td height="4" style="background:linear-gradient(90deg,#f59e0b 0%,#fbbf24 40%,#d97706 100%);font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
 
-    <!-- Footer -->
-    <div style="text-align:center;padding:28px 16px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:#64748b;line-height:1.6;">
-      <p style="margin:0 0 4px;">© ${year} GoalMills Sports Media. All rights reserved.</p>
-      <p style="margin:0 0 10px;">You are receiving this digest because you subscribed to GoalMills Sports Alerts.</p>
-      <p style="margin:0;">
-        <a href="${unsubscribeUrl}" style="color:#f59e0b;text-decoration:underline;">Unsubscribe or Change Preferences</a>
-      </p>
-    </div>
-  </div>
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding:28px 28px 22px;background:#080d1e;border-bottom:1px solid rgba(255,255,255,0.06);">
+              <a href="${siteUrl}" style="text-decoration:none;">
+                <span style="font-size:28px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:#ffffff;">GOAL<span style="color:#f59e0b;">MILLS</span></span>
+              </a>
+              <div style="margin-top:10px;">
+                <span style="display:inline-block;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);">
+                  ${frequencyLabel} Digest &bull; ${dateFormatted}
+                </span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Editorial Note -->
+          ${editorialNote ? `
+          <tr>
+            <td style="padding:24px 28px 0;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;">
+                <tr>
+                  <td style="padding:14px 18px;">
+                    <p style="margin:0;font-size:13px;line-height:1.6;color:#cbd5e1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                      <strong style="color:#fbbf24;">From The Newsroom:</strong> ${editorialNote}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : ''}
+
+          <!-- Section Header -->
+          <tr>
+            <td style="padding:24px 28px 16px;">
+              <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;">
+                TODAY'S TOP STORIES
+              </span>
+              <div style="margin-top:6px;height:1px;background:linear-gradient(90deg,rgba(245,158,11,0.4),rgba(245,158,11,0));"></div>
+            </td>
+          </tr>
+
+          <!-- Articles -->
+          ${articleCards}
+
+          <!-- CTA Button -->
+          <tr>
+            <td align="center" style="padding:28px 28px 32px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="background:#f59e0b;border-radius:8px;box-shadow:0 4px 14px rgba(245,158,11,0.3);">
+                    <a href="${siteUrl}" style="display:inline-block;padding:14px 32px;font-size:12px;font-weight:800;color:#0f172a;text-decoration:none;text-transform:uppercase;letter-spacing:0.06em;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                      Explore All Stories on GoalMills &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:28px 28px;background:#050810;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom:14px;">
+                    <a href="${siteUrl}" style="font-size:18px;font-weight:900;text-transform:uppercase;color:#ffffff;text-decoration:none;">
+                      GOAL<span style="color:#f59e0b;">MILLS</span>
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-bottom:14px;font-size:11px;line-height:1.7;color:#64748b;">
+                    <p style="margin:0 0 4px;">&copy; ${year} GoalMills Sports Media. All rights reserved.</p>
+                    <p style="margin:0;">You're receiving this because you subscribed to GoalMills Sports Alerts.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-bottom:12px;font-size:12px;">
+                    <a href="${unsubscribeUrl}" style="color:#f59e0b;text-decoration:underline;font-weight:700;">
+                      Unsubscribe or Change Preferences
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size:10px;color:#475569;line-height:1.5;">
+                    Tip: Add our sender address to your contacts to ensure delivery to your primary inbox.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+        <!-- End Container -->
+
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// EDITOR'S PICKS FETCHER
+// ═══════════════════════════════════════════════════════════════════
 
 /**
  * Fetch top Editor's Pick news posts for confirmation & welcome emails
@@ -423,6 +536,10 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// CONFIRMATION / WELCOME EMAIL TEMPLATE
+// ═══════════════════════════════════════════════════════════════════
+
 export interface ConfirmationEmailParams {
   subscriberEmail: string;
   frequency: string;
@@ -467,14 +584,14 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
     .map((art, idx) => {
       const articleLink = `${siteUrl}/news/${art.slug || art._id}`;
       const badgeLabel = art.isBreaking ? '⚡ Breaking News' : "⭐ Editor's Pick";
-      const badgeColor = art.isBreaking ? '#ef4444' : '#8b5cf6';
+      const badgeColor = art.isBreaking ? '#dc2626' : '#7c3aed';
       const imageTag = art.image
-        ? `<img src="${art.image}" alt="${art.title}" width="100%" style="width:100%;height:180px;object-fit:cover;display:block;border-top-left-radius:14px;border-top-right-radius:14px;background-color:#1e293b;" />`
-        : `<div style="height:120px;background:linear-gradient(135deg,#1e1b4b,#0f172a);display:flex;align-items:center;justify-content:center;border-top-left-radius:14px;border-top-right-radius:14px;text-align:center;padding:12px;"><span style="color:#f59e0b;font-size:24px;font-weight:900;">GOALMILLS POST #${idx + 1}</span></div>`;
+        ? `<img src="${art.image}" alt="${art.title}" width="100%" style="width:100%;height:180px;object-fit:cover;display:block;border-top-left-radius:12px;border-top-right-radius:12px;background-color:#1e293b;" />`
+        : `<div style="height:120px;background:linear-gradient(135deg,#1e1b4b,#0f172a);display:flex;align-items:center;justify-content:center;border-top-left-radius:12px;border-top-right-radius:12px;text-align:center;padding:12px;"><span style="color:#f59e0b;font-size:24px;font-weight:900;">GOALMILLS POST #${idx + 1}</span></div>`;
 
       return `
     <!-- Post Card ${idx + 1} -->
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:18px;background:#0d1527;border:1px solid rgba(245,158,11,0.22);border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.35);">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:16px;background:#0d1527;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;">
       <tr>
         <td style="padding:0;">
           <a href="${articleLink}" style="text-decoration:none;display:block;">
@@ -487,11 +604,11 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
           <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
               <td style="padding-bottom:8px;">
-                <span style="display:inline-block;padding:3px 8px;border-radius:6px;background:${badgeColor};color:#ffffff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;">
+                <span style="display:inline-block;padding:3px 8px;border-radius:4px;background:${badgeColor};color:#ffffff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;">
                   ${badgeLabel}
                 </span>
                 <span style="display:inline-block;margin-left:6px;color:#94a3b8;font-size:11px;font-weight:600;">
-                  • ${art.category || 'Football'}
+                  &bull; ${art.category || 'Football'}
                 </span>
               </td>
             </tr>
@@ -547,7 +664,7 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
 
   const ctaButtonText = requireDoubleOptIn
     ? `Confirm Subscription Now &rarr;`
-    : `Explore Live Match Centre & News &rarr;`;
+    : `Explore Live Match Centre &amp; News &rarr;`;
 
   const primaryActionUrl = requireDoubleOptIn ? confirmationUrl : siteUrl;
 
@@ -559,13 +676,14 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
               `<span style="display:inline-block;background:rgba(255,255,255,0.08);color:#cbd5e1;padding:2px 8px;border-radius:6px;font-size:11px;margin-right:4px;margin-bottom:4px;">${c}</span>`
           )
           .join('')
-      : '<span style="color:#94a3b8;font-size:11px;">All Sports & Leagues</span>';
+      : '<span style="color:#94a3b8;font-size:11px;">All Sports &amp; Leagues</span>';
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
   <title>${heroHeadline} - GoalMills Sports</title>
   <!--[if mso]>
   <style type="text/css">
@@ -573,9 +691,9 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
   </style>
   <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#050814;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:#ffffff;line-height:1.5;">
+<body style="margin:0;padding:0;background-color:#050814;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#ffffff;line-height:1.5;">
 
-  <!-- Hidden Preheader Preview Text for Email Clients -->
+  <!-- Hidden Preheader -->
   <div style="display:none;font-size:1px;color:#050814;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">
     ${preheaderSnippet}
   </div>
@@ -584,16 +702,16 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#050814;table-layout:fixed;">
     <tr>
       <td align="center" style="padding:24px 12px 36px;">
-        
-        <!-- Main Email Container (Max 600px) -->
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;margin:0 auto;background:#090e21;border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.5);">
-          
-          <!-- Top Accent Gradient Bar -->
+
+        <!-- Main Container -->
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;margin:0 auto;background:#090e21;border-radius:16px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+
+          <!-- Top Accent Bar -->
           <tr>
-            <td height="4" style="background:linear-gradient(90deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);"></td>
+            <td height="4" style="background:linear-gradient(90deg,#f59e0b 0%,#fbbf24 50%,#d97706 100%);font-size:0;line-height:0;">&nbsp;</td>
           </tr>
 
-          <!-- Header / Branding -->
+          <!-- Header -->
           <tr>
             <td align="center" style="padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);background:#070b1a;">
               <a href="${siteUrl}" style="text-decoration:none;display:inline-block;">
@@ -603,13 +721,13 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
               </a>
               <div style="margin-top:8px;">
                 <span style="display:inline-block;padding:4px 12px;border-radius:9999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">
-                  ⚽ SPORTS INTELLIGENCE • ${dateFormatted}
+                  ⚽ SPORTS INTELLIGENCE &bull; ${dateFormatted}
                 </span>
               </div>
             </td>
           </tr>
 
-          <!-- Hero Confirmation Section -->
+          <!-- Hero Section -->
           <tr>
             <td style="padding:32px 28px 24px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -635,12 +753,12 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                   </td>
                 </tr>
 
-                <!-- Primary CTA Button -->
+                <!-- Primary CTA -->
                 <tr>
                   <td align="center" style="padding-bottom:28px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td align="center" style="background:#f59e0b;border-radius:12px;box-shadow:0 8px 20px -4px rgba(245,158,11,0.4);">
+                        <td align="center" style="background:#f59e0b;border-radius:8px;box-shadow:0 8px 20px -4px rgba(245,158,11,0.4);">
                           <a href="${primaryActionUrl}" style="display:inline-block;padding:14px 28px;font-size:13px;font-weight:900;color:#050814;text-decoration:none;text-transform:uppercase;letter-spacing:0.06em;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
                             ${ctaButtonText}
                           </a>
@@ -650,16 +768,16 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                   </td>
                 </tr>
 
-                <!-- Subscription Summary Box -->
+                <!-- Subscription Summary -->
                 <tr>
                   <td>
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
                       <tr>
-                        <td>
+                        <td style="padding:16px;">
                           <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                               <td style="padding-bottom:6px;font-size:12px;color:#94a3b8;font-weight:600;">
-                                Subscriber Account:
+                                Subscriber:
                               </td>
                               <td align="right" style="padding-bottom:6px;font-size:12px;color:#ffffff;font-weight:700;">
                                 ${subscriberEmail}
@@ -667,15 +785,15 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                             </tr>
                             <tr>
                               <td style="padding-bottom:6px;font-size:12px;color:#94a3b8;font-weight:600;">
-                                Delivery Frequency:
+                                Frequency:
                               </td>
                               <td align="right" style="padding-bottom:6px;font-size:12px;color:#fbbf24;font-weight:700;">
-                                ${formattedFrequency} Digest (@ 10:00 AM WAT)
+                                ${formattedFrequency} Digest
                               </td>
                             </tr>
                             <tr>
                               <td style="font-size:12px;color:#94a3b8;font-weight:600;vertical-align:top;padding-top:2px;">
-                                Selected Interests:
+                                Interests:
                               </td>
                               <td align="right" style="vertical-align:top;padding-top:2px;">
                                 ${categoriesBadge}
@@ -687,53 +805,46 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                     </table>
                   </td>
                 </tr>
-
               </table>
             </td>
           </tr>
 
-          <!-- Section Divider & Editor Picks Header -->
+          <!-- Editor Picks Header -->
           <tr>
             <td style="padding:10px 28px 16px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td style="border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                      <tr>
-                        <td>
-                          <span style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;color:#f59e0b;display:block;margin-bottom:4px;">
-                            ⭐ EDITOR'S PICKS
-                          </span>
-                          <h2 style="margin:0;font-size:18px;font-weight:800;color:#ffffff;letter-spacing:-0.2px;">
-                            Two Stories Hand-Picked For You
-                          </h2>
-                        </td>
-                      </tr>
-                    </table>
+                    <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#f59e0b;display:block;margin-bottom:4px;">
+                      ⭐ EDITOR'S PICKS
+                    </span>
+                    <h2 style="margin:0;font-size:18px;font-weight:800;color:#ffffff;letter-spacing:-0.2px;">
+                      Two Stories Hand-Picked For You
+                    </h2>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- 2 Editor Pick Articles -->
+          <!-- Editor Pick Articles -->
           <tr>
             <td style="padding:0 28px 16px;">
               ${editorPicksHtml}
             </td>
           </tr>
 
-          <!-- Newsroom Dispatch / What to Expect Box -->
+          <!-- What to Expect -->
           <tr>
             <td style="padding:0 28px 28px;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(245,158,11,0.05);border:1px dashed rgba(245,158,11,0.3);border-radius:14px;padding:16px 18px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;">
                 <tr>
-                  <td>
+                  <td style="padding:14px 18px;">
                     <h3 style="margin:0 0 6px;font-size:13px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:0.04em;">
                       ⚡ What to Expect in Your Inbox
                     </h3>
                     <p style="margin:0;font-size:12px;line-height:1.6;color:#cbd5e1;">
-                      Our newsroom monitors European leagues, continental tournaments, transfer developments, and match tactics 24/7. Expect concise, fluff-free digests curated every morning at <strong>10:00 AM WAT</strong>.
+                      Our newsroom monitors European leagues, continental tournaments, transfer developments, and match tactics 24/7. Expect concise, fluff-free digests curated every morning.
                     </p>
                   </td>
                 </tr>
@@ -754,31 +865,24 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                 </tr>
                 <tr>
                   <td align="center" style="padding-bottom:12px;font-size:11px;line-height:1.6;color:#64748b;">
-                    <p style="margin:0 0 4px;">
-                      GoalMills Sports Media • Global Football & Sports Intelligence
-                    </p>
-                    <p style="margin:0 0 4px;">
-                      Victoria Island, Lagos & Central London • All Rights Reserved © ${year}
-                    </p>
-                    <p style="margin:0;">
-                      You received this email because you subscribed on <a href="${siteUrl}" style="color:#94a3b8;text-decoration:underline;">goalmills.com</a>.
-                    </p>
+                    <p style="margin:0 0 4px;">&copy; ${year} GoalMills Sports Media. All rights reserved.</p>
+                    <p style="margin:0;">You received this email because you subscribed on <a href="${siteUrl}" style="color:#94a3b8;text-decoration:underline;">goalmills.com</a>.</p>
                   </td>
                 </tr>
                 <tr>
                   <td align="center" style="padding-top:8px;font-size:11px;color:#94a3b8;">
-                    <a href="${primaryActionUrl}" style="color:#f59e0b;text-decoration:none;font-weight:700;margin:0 8px;">
+                    <a href="${siteUrl}/newsletter/preferences" style="color:#f59e0b;text-decoration:none;font-weight:700;margin:0 8px;">
                       Manage Preferences
                     </a>
-                    <span style="color:#475569;">•</span>
+                    <span style="color:#475569;">&bull;</span>
                     <a href="${unsubscribeUrl}" style="color:#f59e0b;text-decoration:underline;font-weight:700;margin:0 8px;">
-                      1-Click Unsubscribe
+                      Unsubscribe
                     </a>
                   </td>
                 </tr>
                 <tr>
                   <td align="center" style="padding-top:16px;font-size:10px;color:#475569;line-height:1.5;">
-                    Deliverability Tip: Add <code>newsletter@goalmills.com</code> to your contacts or VIP senders list to ensure daily digests always land in your Primary inbox.
+                    Tip: Add our sender address to your contacts to ensure delivery to your primary inbox.
                   </td>
                 </tr>
               </table>

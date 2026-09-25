@@ -1664,8 +1664,8 @@ export default function AdminNewsletterPage() {
             </div>
 
             <p className="text-xs text-slate-400">
-              Sends a live HTML test preview rendered through the Go Mailer priority queue to the
-              specified test mailbox.
+              Sends a live HTML test preview directly via Nodemailer SMTP to the specified
+              test mailbox for deliverability verification.
             </p>
 
             <form onSubmit={handleTestSend} className="space-y-4">
