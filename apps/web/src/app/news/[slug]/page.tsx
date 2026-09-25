@@ -105,6 +105,16 @@ export async function generateMetadata({
   const decoded = decodeURIComponent(slug);
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
   if (isObjectId) {
+    const articleById = await News.findById(decoded).select('title slug').lean() as any;
+    if (articleById) {
+      const canonical = articleById.slug || slugify(articleById.title);
+      return {
+        title: `${articleById.title} | GoalMills`,
+        alternates: {
+          canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills-web.vercel.app'}/news/${canonical}`,
+        },
+      };
+    }
     return { title: 'News Not Found | GoalMills' };
   }
 
@@ -194,6 +204,13 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
   const decoded = decodeURIComponent(slug);
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(decoded);
   if (isObjectId) {
+    const articleById = await News.findById(decoded).select('title slug').lean() as any;
+    if (articleById) {
+      const canonical = articleById.slug || slugify(articleById.title);
+      if (canonical) {
+        permanentRedirect(`/news/${canonical}`);
+      }
+    }
     notFound();
   }
 

@@ -23,13 +23,36 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 /**
+ * Generate a clean SEO slug from text
+ */
+export function slugify(text: string): string {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
  * Format Mongoose news document to newsletter article preview
  */
 export function formatArticlePreview(doc: any): NewsletterArticlePreview {
+  const safeSlug =
+    doc.slug && !/^[0-9a-fA-F]{24}$/.test(doc.slug)
+      ? doc.slug
+      : doc.title
+        ? slugify(doc.title)
+        : doc._id.toString();
+
   return {
     _id: doc._id.toString(),
     title: doc.title,
-    slug: doc.slug || doc._id.toString(),
+    slug: safeSlug,
     excerpt: doc.excerpt || '',
     image: doc.image || '',
     category: doc.category || 'Football',
@@ -229,7 +252,13 @@ export function generateNewsletterHTML(params: {
   // Build article cards
   const articleCards = articles
     .map((art, idx) => {
-      const articleLink = `${siteUrl}/news/${art.slug || art._id}`;
+      const articleSlug =
+        art.slug && !/^[0-9a-fA-F]{24}$/.test(art.slug)
+          ? art.slug
+          : art.title
+            ? slugify(art.title)
+            : art._id;
+      const articleLink = `${siteUrl}/news/${articleSlug}`;
       const badgeHtml = art.isBreaking
         ? `<span style="display:inline-block;background:#dc2626;color:#ffffff;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">⚡ BREAKING</span>`
         : art.isFeatured
@@ -582,7 +611,13 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
   const editorPicksHtml = editorPicks
     .slice(0, 2)
     .map((art, idx) => {
-      const articleLink = `${siteUrl}/news/${art.slug || art._id}`;
+      const articleSlug =
+        art.slug && !/^[0-9a-fA-F]{24}$/.test(art.slug)
+          ? art.slug
+          : art.title
+            ? slugify(art.title)
+            : art._id;
+      const articleLink = `${siteUrl}/news/${articleSlug}`;
       const badgeLabel = art.isBreaking ? '⚡ Breaking News' : "⭐ Editor's Pick";
       const badgeColor = art.isBreaking ? '#dc2626' : '#7c3aed';
       const imageTag = art.image
