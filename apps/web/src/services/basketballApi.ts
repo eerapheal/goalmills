@@ -44,7 +44,7 @@ const API_PROXY_URL = '/api/basketball';
 const buildUrl = (method: string, params: Record<string, any> = {}): string => {
   const url = new URL(
     API_PROXY_URL,
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+    typeof window !== 'undefined' ? window.location.origin : 'https://goalmills-web.vercel.app'
   );
   url.searchParams.append('met', method);
 

@@ -41,7 +41,7 @@ const API_PROXY_URL = '/api/cricket';
 
 // Helper function to build URL with parameters
 const buildUrl = (method: string, params: Record<string, any> = {}): string => {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://goalmills-web.vercel.app';
   const url = new URL(API_PROXY_URL, baseUrl);
   url.searchParams.append('met', method);
 

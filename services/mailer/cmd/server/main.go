@@ -298,7 +298,7 @@ func main() {
 func forwardEventToWebhook(eventType, email, campaignID, recipientID string, metadata map[string]any) {
 	siteURL := strings.TrimRight(os.Getenv("NEXT_PUBLIC_SITE_URL"), "/")
 	if siteURL == "" {
-		siteURL = "http://localhost:3000"
+		siteURL = "https://goalmills-web.vercel.app"
 	}
 
 	eventID := fmt.Sprintf("evt_%d_%s_%s", time.Now().UnixNano(), eventType, email)
@@ -323,7 +323,7 @@ func forwardEventToWebhook(eventType, email, campaignID, recipientID string, met
 func triggerCronWebhook(frequency string) {
 	siteURL := strings.TrimRight(os.Getenv("NEXT_PUBLIC_SITE_URL"), "/")
 	if siteURL == "" {
-		siteURL = "http://localhost:3000"
+		siteURL = "https://goalmills-web.vercel.app"
 	}
 	cronSecret := os.Getenv("CRON_SECRET")
 

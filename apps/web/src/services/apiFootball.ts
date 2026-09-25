@@ -264,7 +264,7 @@ async function requestApiFootball<T>(
   // Build URL to our own Next.js proxy route
   const url = new URL(
     '/api/football',
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+    typeof window !== 'undefined' ? window.location.origin : 'https://goalmills-web.vercel.app'
   );
   url.searchParams.append('met', endpoint);
 

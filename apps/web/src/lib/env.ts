@@ -29,8 +29,7 @@ export function getWebEnv(): WebEnvConfig {
   const mongodbUrl = process.env.MONGODB_URL;
   const redisUrl = process.env.REDIS_URL;
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (isProduction ? 'https://goalmills.com' : 'http://localhost:3000');
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app';
   const mailerServiceUrl = process.env.MAILER_SERVICE_URL || 'http://localhost:8085';
   const cronSecret = process.env.CRON_SECRET;
 

@@ -222,7 +222,7 @@ export default function VideoPlayer({
               playsinline: 1,
               rel: 0,
               modestbranding: 1,
-              origin: origin || 'https://localhost:3000',
+              origin: origin || 'https://goalmills-web.vercel.app',
             },
           },
           vimeo: {
