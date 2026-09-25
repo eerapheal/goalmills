@@ -11,6 +11,7 @@ import EcosystemEntity from '@/models/EcosystemEntity';
 import { hasPermission, canDirectPublish } from '@/lib/rbac';
 import { UserRole } from '@goalmills/types';
 import { resolveTenantContext, buildTenantFilter } from '@/lib/tenantContext';
+import { escapeRegex } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -182,12 +183,13 @@ export async function GET(request: NextRequest) {
 
     // Keyword Search
     if (search && search.trim()) {
-      const sRegex = new RegExp(search.trim(), 'i');
+      const escaped = escapeRegex(search.trim());
+      const sRegex = new RegExp(escaped, 'i');
       conditions.push({
         $or: [
           { title: { $regex: sRegex } },
           { excerpt: { $regex: sRegex } },
-          { tags: { $in: [sRegex] } },
+          { tags: { $regex: sRegex } },
           { author: { $regex: sRegex } },
         ],
       });

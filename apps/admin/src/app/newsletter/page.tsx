@@ -199,13 +199,17 @@ export default function AdminNewsletterPage() {
     }
   };
 
-  const fetchPublishedNews = async () => {
+  const fetchPublishedNews = async (searchTerm = newsSearch, cat = newsCategory) => {
     try {
       setLoadingNews(true);
       const url = new URL('/api/news', window.location.origin);
-      url.searchParams.set('limit', '30');
-      if (newsSearch) url.searchParams.set('search', newsSearch);
-      if (newsCategory !== 'all') url.searchParams.set('category', newsCategory);
+      url.searchParams.set('limit', '50');
+      if (searchTerm && searchTerm.trim()) {
+        url.searchParams.set('search', searchTerm.trim());
+      }
+      if (cat && cat !== 'all') {
+        url.searchParams.set('category', cat);
+      }
 
       const res = await fetch(url.toString());
       const json = await res.json();
@@ -226,9 +230,11 @@ export default function AdminNewsletterPage() {
   }, []);
 
   useEffect(() => {
-    if (showComposeModal) {
-      fetchPublishedNews();
-    }
+    if (!showComposeModal) return;
+    const timer = setTimeout(() => {
+      fetchPublishedNews(newsSearch, newsCategory);
+    }, 200);
+    return () => clearTimeout(timer);
   }, [showComposeModal, newsSearch, newsCategory]);
 
   useEffect(() => {
