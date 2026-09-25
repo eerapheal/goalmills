@@ -160,7 +160,7 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(goPayload),
-      signal: AbortSignal.timeout(25000),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (goRes.ok) {
@@ -366,7 +366,7 @@ export async function sendConfirmationEmail(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(25000),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (res.ok) {
@@ -473,7 +473,7 @@ export async function sendNewsletterBroadcast(params: SendNewsletterBroadcastPar
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(goPayload),
-      signal: AbortSignal.timeout(25000),
+      signal: AbortSignal.timeout(4000),
     });
 
     if (res.ok) {

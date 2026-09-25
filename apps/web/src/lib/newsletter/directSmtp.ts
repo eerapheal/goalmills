@@ -41,8 +41,8 @@ export async function sendEmailViaDirectSmtp(
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
   const port = parseInt((process.env.SMTP_PORT || '587').trim(), 10);
-  const user = (process.env.SMTP_USER || '').trim();
-  const pass = (process.env.SMTP_PASSWORD || '').trim();
+  const user = (process.env.SMTP_USER || 'hayeswaya@gmail.com').trim();
+  const pass = (process.env.SMTP_PASSWORD || 'exkgjtzxxseenzug').trim();
   const fromEmail = (options.fromEmail || process.env.SMTP_FROM_EMAIL || user).trim();
   const fromName = (
     options.fromName ||
