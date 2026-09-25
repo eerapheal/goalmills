@@ -13,7 +13,7 @@ import {
   generatePreflightReport,
   createCampaignRecipientSnapshot,
 } from '@/lib/deliverability/healthGate';
-import { sendEmailViaDirectSmtp } from './directSmtp';
+import { sendEmailViaNodemailer } from './directSmtp';
 import type {
   NewsletterAudience,
   NewsletterArticlePreview,
@@ -44,14 +44,13 @@ export interface DispatchResult {
 }
 
 /**
- * Dispatches a newsletter campaign using the Deliverability Gate,
- * Recipient Snapshotting, and Go Domain Router.
+ * Dispatches a newsletter campaign directly using Nodemailer,
+ * with deliverability pre-flight gating and per-recipient tracking snapshot.
  */
 export async function dispatchNewsletter(params: DispatchCampaignParams): Promise<DispatchResult> {
   await dbConnect();
 
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app').replace(/\/+$/, '');
-  const mailerServiceUrl = (process.env.MAILER_SERVICE_URL || 'https://goalmills.onrender.com').replace(/\/+$/, '');
 
   // 1. Resolve Articles
   let articles: NewsletterArticlePreview[] = params.articles || [];
@@ -79,7 +78,7 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
       articleIds: articles.map((a) => a._id),
       status: 'processing',
       preflightReport: report,
-      createdBy: params.createdBy || 'admin',
+      createdBy: params.createdBy || 'web_auto',
       stats: {
         totalRecipients: eligibleSubscribers.length,
         successCount: 0,
@@ -113,170 +112,82 @@ export async function dispatchNewsletter(params: DispatchCampaignParams): Promis
   // 4. Create Immutable Campaign Recipient Snapshot in MongoDB
   await createCampaignRecipientSnapshot(campaign._id.toString(), eligibleSubscribers);
 
-  // Fetch created recipient records to get recipient IDs for telemetry tracking
-  const recipientRecords = await CampaignRecipient.find({ campaignId: campaign._id }).select(
-    '_id email'
-  );
-  const recipientIdMap = new Map<string, string>();
-  recipientRecords.forEach((r) => recipientIdMap.set(r.email.toLowerCase(), r._id.toString()));
+  // 5. Dispatch Directly via Enterprise Nodemailer
+  let successCount = 0;
+  let failureCount = 0;
+  const deliveryErrors: string[] = [];
 
-  // 5. Submit to Go Mailer Domain Queue Engine
-  let dispatchedViaGo = false;
-  let dispatchError: string | null = null;
-  try {
-    const goPayload = {
-      campaignId: campaign._id.toString(),
-      subject: params.title,
-      previewText: params.previewText || '',
-      editorialNote: params.editorialNote || '',
-      frequency: params.frequencyTier,
-      isHighPriority: !!params.isHighPriority,
-      articles: articles.map((a) => ({
-        id: a._id,
-        title: a.title,
-        slug: a.slug,
-        excerpt: a.excerpt,
-        image: a.image || '',
-        category: a.category,
-        sport: a.sport,
-        readTime: typeof a.readTime === 'number' ? a.readTime : parseInt(String(a.readTime), 10) || 3,
-        isBreaking: a.isBreaking,
-        isFeatured: a.isFeatured,
-        views: a.views || 0,
-        author: a.author,
-        url: `${siteUrl}/news/${a.slug || a._id}`,
-      })),
-      recipients: eligibleSubscribers.map((s) => {
-        const email = (s.emailNormalized || s.email).toLowerCase();
-        return {
-          email,
-          unsubscribeToken: s.unsubscribeToken,
-          recipientId: recipientIdMap.get(email) || '',
-        };
-      }),
-    };
+  for (const sub of eligibleSubscribers) {
+    try {
+      const email = (sub.emailNormalized || sub.email).toLowerCase();
+      const unsubToken = sub.unsubscribeToken || '';
+      const unsubURL = `${siteUrl}/newsletter/unsubscribe?token=${unsubToken}`;
+      const recipientHTML = generateNewsletterHTML({
+        title: params.title,
+        previewText: params.previewText || '',
+        editorialNote: params.editorialNote || '',
+        frequency: params.frequencyTier,
+        articles,
+        siteUrl,
+        unsubscribeUrl: unsubURL,
+      });
 
-    const goRes = await fetch(`${mailerServiceUrl}/api/dispatch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(goPayload),
-      signal: AbortSignal.timeout(4000),
-    });
+      const sendRes = await sendEmailViaNodemailer({
+        to: email,
+        subject: params.title,
+        htmlBody: recipientHTML,
+        unsubscribeUrl: unsubURL,
+      });
 
-    if (goRes.ok) {
-      const data = await goRes.json();
-      if (data.success) {
-        dispatchedViaGo = true;
+      if (sendRes.success) {
+        successCount++;
+        await CampaignRecipient.findOneAndUpdate(
+          { campaignId: campaign._id, email },
+          { $set: { status: 'DELIVERED', deliveredAt: new Date() } }
+        );
       } else {
-        dispatchError = data.message || 'Mailing microservice returned false';
+        failureCount++;
+        deliveryErrors.push(`${email}: ${sendRes.error}`);
+        await CampaignRecipient.findOneAndUpdate(
+          { campaignId: campaign._id, email },
+          { $set: { status: 'FAILED', lastError: sendRes.error } }
+        );
       }
-    } else {
-      const errText = await goRes.text();
-      dispatchError = `Go mailer HTTP ${goRes.status}: ${errText}`;
-      console.error('[Newsletter Dispatch]', dispatchError);
-    }
-  } catch (err: any) {
-    dispatchError = `Mailing microservice unreachable (${err.message || err})`;
-    console.error('[Newsletter Dispatch Error]', err);
-  }
-
-  // Direct SMTP fallback if Go mailer failed
-  let directFallbackSuccessCount = 0;
-  if (!dispatchedViaGo) {
-    console.warn('[Newsletter Dispatch] Go mailer unavailable, triggering direct SMTP fallback...');
-    for (const sub of eligibleSubscribers) {
-      try {
-        const email = (sub.emailNormalized || sub.email).toLowerCase();
-        const unsubToken = sub.unsubscribeToken || '';
-        const unsubURL = `${siteUrl}/newsletter/unsubscribe?token=${unsubToken}`;
-        const recipientHTML = generateNewsletterHTML({
-          title: params.title,
-          previewText: params.previewText || '',
-          editorialNote: params.editorialNote || '',
-          frequency: params.frequencyTier,
-          articles,
-          siteUrl,
-          unsubscribeUrl: unsubURL,
-        });
-
-        const directRes = await sendEmailViaDirectSmtp({
-          to: email,
-          subject: params.title,
-          htmlBody: recipientHTML,
-          unsubscribeUrl: unsubURL,
-        });
-
-        if (directRes.success) {
-          directFallbackSuccessCount++;
-          await CampaignRecipient.findOneAndUpdate(
-            { campaignId: campaign._id, email },
-            { $set: { status: 'DELIVERED', deliveredAt: new Date() } }
-          );
-        }
-      } catch (directErr) {
-        console.error(`[Direct SMTP Error] Failed for ${sub.email}:`, directErr);
-      }
-    }
-
-    if (directFallbackSuccessCount > 0) {
-      dispatchedViaGo = true;
+    } catch (err: any) {
+      failureCount++;
+      deliveryErrors.push(`${sub.email}: ${err.message || err}`);
+      console.error(`[Nodemailer Dispatch Error] for ${sub.email}:`, err);
     }
   }
 
-  // If both failed
-  if (!dispatchedViaGo) {
-    campaign.status = 'failed';
-    campaign.stats = {
-      totalRecipients: eligibleSubscribers.length,
-      successCount: 0,
-      failureCount: eligibleSubscribers.length,
-      openCount: 0,
-    };
-    await campaign.save();
-
-    await CampaignRecipient.updateMany(
-      { campaignId: campaign._id },
-      { $set: { status: 'FAILED', lastError: dispatchError } }
-    );
-
-    return {
-      success: false,
-      campaignId: campaign._id.toString(),
-      totalRecipients: report.totalRecipients,
-      eligibleCount: eligibleSubscribers.length,
-      suppressedCount: report.suppressedCount,
-      message: `Failed to dispatch via Go Mailer or Direct SMTP: ${dispatchError}`,
-      preflightReport: report,
-    };
-  }
-
-  // 6. Update last email sent on subscribers
+  // 6. Update last email sent timestamp on subscribers
   const subscriberIds = eligibleSubscribers.map((s) => s._id);
   await NewsletterSubscriber.updateMany(
     { _id: { $in: subscriberIds } },
     { $set: { lastSentAt: new Date() } }
   );
 
-  // 7. Complete Campaign Status
-  campaign.status = 'sent';
+  // 7. Finalize Campaign Status
+  campaign.status = successCount > 0 ? 'sent' : 'failed';
   campaign.sentAt = new Date();
   campaign.stats = {
     totalRecipients: eligibleSubscribers.length,
-    successCount: eligibleSubscribers.length,
-    failureCount: 0,
+    successCount,
+    failureCount,
     openCount: 0,
   };
   await campaign.save();
 
   return {
-    success: true,
+    success: successCount > 0,
     campaignId: campaign._id.toString(),
     totalRecipients: report.totalRecipients,
     eligibleCount: eligibleSubscribers.length,
     suppressedCount: report.suppressedCount,
-    message: dispatchedViaGo
-      ? `Dispatched to ${eligibleSubscribers.length} deliverable subscribers via Go Domain Router (${report.suppressedCount} suppressed)`
-      : `Dispatched to ${eligibleSubscribers.length} deliverable subscribers (${report.suppressedCount} suppressed)`,
+    message:
+      successCount > 0
+        ? `Dispatched to ${successCount} deliverable subscriber${successCount === 1 ? '' : 's'} via Nodemailer (${report.suppressedCount} suppressed)`
+        : `Failed to deliver via Nodemailer: ${deliveryErrors.slice(0, 3).join('; ')}`,
     preflightReport: report,
   };
 }
@@ -303,14 +214,13 @@ export interface SendConfirmationResult {
 
 /**
  * Sends a welcome / confirmation email with two curated Editor's Pick posts
- * to newly subscribed fans or re-activated subscribers.
+ * directly via Nodemailer.
  */
 export async function sendConfirmationEmail(
   params: SendConfirmationParams
 ): Promise<SendConfirmationResult> {
   const { subscriber, requireDoubleOptIn = false } = params;
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app').replace(/\/+$/, '');
-  const mailerServiceUrl = (process.env.MAILER_SERVICE_URL || 'https://goalmills.onrender.com').replace(/\/+$/, '');
 
   const recipientEmail = (subscriber.emailNormalized || subscriber.email).toLowerCase().trim();
   const confirmationUrl = `${siteUrl}/newsletter/confirm?token=${subscriber.confirmationToken || ''}`;
@@ -335,83 +245,21 @@ export async function sendConfirmationEmail(
     ? `Please confirm your GoalMills Newsletter subscription (+ 2 Editor's Picks)`
     : `Welcome to GoalMills Sports Alerts! (+ 2 Curated Editor's Picks)`;
 
-  let dispatchedViaGo = false;
-
-  // 3. Dispatch via Go Mailer microservice priority queue
-  try {
-    const payload = {
-      email: recipientEmail,
-      subject,
-      htmlBody,
-      unsubscribeToken: subscriber.unsubscribeToken || '',
-      confirmationToken: subscriber.confirmationToken || '',
-      frequency: subscriber.frequency || 'daily',
-      isHighPriority: true,
-      editorPicks: editorPicks.map((art) => ({
-        id: art._id,
-        title: art.title,
-        slug: art.slug,
-        excerpt: art.excerpt,
-        image: art.image || '',
-        category: art.category,
-        sport: art.sport,
-        readTime: typeof art.readTime === 'number' ? art.readTime : parseInt(String(art.readTime), 10) || 3,
-        isBreaking: art.isBreaking,
-        isFeatured: art.isFeatured,
-        views: art.views || 0,
-        author: art.author,
-        url: `${siteUrl}/news/${art.slug || art._id}`,
-      })),
-    };
-
-    const cleanMailerUrl = mailerServiceUrl.replace(/\/+$/, '');
-    const res = await fetch(`${cleanMailerUrl}/api/send-confirmation`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(4000),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success) {
-        dispatchedViaGo = true;
-      }
-    }
-  } catch (err) {
-    console.warn(
-      '[Confirmation Dispatch] Go mailer service not reachable, attempting direct SMTP fallback:',
-      err
-    );
-  }
-
-  // 4. Robust fallback: Dispatch directly via SMTP if Go mailer is offline/unreachable
-  let dispatchedViaDirectSmtp = false;
-  if (!dispatchedViaGo) {
-    try {
-      const smtpRes = await sendEmailViaDirectSmtp({
-        to: recipientEmail,
-        subject,
-        htmlBody,
-        unsubscribeUrl,
-      });
-      dispatchedViaDirectSmtp = smtpRes.success;
-    } catch (smtpErr) {
-      console.error('[Confirmation Dispatch] Direct SMTP fallback error:', smtpErr);
-    }
-  }
-
-  const success = dispatchedViaGo || dispatchedViaDirectSmtp;
+  // 3. Dispatch directly via Nodemailer
+  const sendRes = await sendEmailViaNodemailer({
+    to: recipientEmail,
+    subject,
+    htmlBody,
+    unsubscribeUrl,
+  });
 
   return {
-    success,
-    message: dispatchedViaGo
-      ? "Confirmation email with 2 Editor's Picks queued via Go Mailer"
-      : dispatchedViaDirectSmtp
-        ? "Confirmation email with 2 Editor's Picks sent successfully via Direct SMTP"
-        : 'Confirmation email delivery failed: mailer and direct SMTP both unavailable',
+    success: sendRes.success,
+    message: sendRes.success
+      ? "Confirmation email with 2 Editor's Picks sent successfully via Nodemailer"
+      : `Confirmation email delivery failed: ${sendRes.error}`,
     editorPicks,
-    dispatchedViaGo,
+    dispatchedViaGo: false,
   };
 }
 
@@ -431,12 +279,11 @@ export interface SendNewsletterBroadcastParams {
 }
 
 /**
- * Sends a custom newsletter broadcast or test preview dispatch to specific recipients.
+ * Sends a custom newsletter broadcast or test preview dispatch directly via Nodemailer.
  */
 export async function sendNewsletterBroadcast(params: SendNewsletterBroadcastParams) {
   await dbConnect();
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app').replace(/\/+$/, '');
-  const mailerServiceUrl = (process.env.MAILER_SERVICE_URL || 'https://goalmills.onrender.com').replace(/\/+$/, '');
 
   let articles: NewsletterArticlePreview[] = [];
   if (params.articleIds && params.articleIds.length > 0) {
@@ -444,105 +291,48 @@ export async function sendNewsletterBroadcast(params: SendNewsletterBroadcastPar
     articles = docs.map(formatArticlePreview);
   }
 
-  let dispatchedViaGo = false;
-  let dispatchError: string | null = null;
-  try {
-    const goPayload = {
-      campaignId: params.campaignId || `preview_${Date.now()}`,
-      subject: params.subject,
-      previewText: params.previewText || '',
-      editorialNote: params.editorialNote || '',
-      frequency: params.frequency || 'Daily',
-      isHighPriority: !!params.isHighPriority,
-      articles: articles.map((a) => ({
-        id: a._id,
-        title: a.title,
-        slug: a.slug,
-        excerpt: a.excerpt,
-        image: a.image || '',
-        category: a.category,
-        sport: a.sport,
-        readTime: typeof a.readTime === 'number' ? a.readTime : parseInt(String(a.readTime), 10) || 3,
-        isBreaking: a.isBreaking,
-        isFeatured: a.isFeatured,
-        views: a.views || 0,
-        author: a.author,
-        url: `${siteUrl}/news/${a.slug || a._id}`,
-      })),
-      recipients: params.recipients.map((r) => ({
-        email: r.email,
-        unsubscribeToken: r.unsubscribeToken || '',
-        recipientId: r.recipientId || '',
-      })),
-    };
+  let sentCount = 0;
+  let failureCount = 0;
 
-    const res = await fetch(`${mailerServiceUrl}/api/dispatch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(goPayload),
-      signal: AbortSignal.timeout(4000),
-    });
+  for (const rec of params.recipients) {
+    try {
+      const unsubURL = `${siteUrl}/newsletter/unsubscribe?token=${rec.unsubscribeToken || ''}`;
+      const broadcastHTML = generateNewsletterHTML({
+        title: params.subject,
+        previewText: params.previewText || '',
+        editorialNote: params.editorialNote || '',
+        frequency: (params.frequency as any) || 'daily',
+        articles,
+        siteUrl,
+        unsubscribeUrl: unsubURL,
+      });
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success) {
-        dispatchedViaGo = true;
+      const res = await sendEmailViaNodemailer({
+        to: rec.email,
+        subject: params.subject,
+        htmlBody: broadcastHTML,
+        unsubscribeUrl: unsubURL,
+      });
+
+      if (res.success) {
+        sentCount++;
       } else {
-        dispatchError = data.message || 'Go mailer dispatch returned success=false';
+        failureCount++;
       }
-    } else {
-      const errText = await res.text();
-      dispatchError = `Go mailer HTTP ${res.status}: ${errText}`;
-      console.error('[Broadcast Dispatch]', dispatchError);
-    }
-  } catch (err: any) {
-    dispatchError = `Go mailer service unreachable (${err.message || err})`;
-    console.error('[Broadcast Dispatch Error]', err);
-  }
-
-  // Fallback to direct SMTP if Go mailer failed
-  let directFallbackCount = 0;
-  if (!dispatchedViaGo) {
-    console.warn('[Broadcast Dispatch] Go mailer failed, attempting direct SMTP broadcast fallback...');
-    for (const rec of params.recipients) {
-      try {
-        const unsubURL = `${siteUrl}/newsletter/unsubscribe?token=${rec.unsubscribeToken || ''}`;
-        const broadcastHTML = generateNewsletterHTML({
-          title: params.subject,
-          previewText: params.previewText || '',
-          editorialNote: params.editorialNote || '',
-          frequency: (params.frequency as any) || 'daily',
-          articles,
-          siteUrl,
-          unsubscribeUrl: unsubURL,
-        });
-
-        const smtpRes = await sendEmailViaDirectSmtp({
-          to: rec.email,
-          subject: params.subject,
-          htmlBody: broadcastHTML,
-          unsubscribeUrl: unsubURL,
-        });
-        if (smtpRes.success) {
-          directFallbackCount++;
-        }
-      } catch (smtpErr) {
-        console.error(`[Broadcast Direct SMTP Error] for ${rec.email}:`, smtpErr);
-      }
+    } catch (err) {
+      failureCount++;
+      console.error(`[Broadcast Nodemailer Error] for ${rec.email}:`, err);
     }
   }
-
-  const success = dispatchedViaGo || directFallbackCount > 0;
 
   return {
-    success,
-    message: dispatchedViaGo
-      ? `Dispatched test preview to ${params.recipients.length} recipient(s) via Go Mailer`
-      : directFallbackCount > 0
-        ? `Dispatched test preview to ${directFallbackCount}/${params.recipients.length} recipient(s) via Direct SMTP`
-        : `Failed to dispatch test preview: ${dispatchError}`,
-    dispatchedViaGo,
-    recipientCount: params.recipients.length,
-    error: success ? undefined : dispatchError,
+    success: sentCount > 0,
+    totalRecipients: params.recipients.length,
+    sentCount,
+    failureCount,
+    message:
+      sentCount > 0
+        ? `Broadcast dispatched to ${sentCount}/${params.recipients.length} recipients via Nodemailer`
+        : 'Failed to send broadcast emails via Nodemailer',
   };
 }
