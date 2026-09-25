@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer, { type Transporter, type SendMailOptions } from 'nodemailer';
 
 export interface DirectSmtpOptions {
   to: string;
@@ -9,12 +9,12 @@ export interface DirectSmtpOptions {
   unsubscribeUrl?: string;
 }
 
-let transporterInstance: nodemailer.Transporter | null = null;
+let transporterInstance: Transporter | null = null;
 
 /**
  * Returns a pooled singleton nodemailer transporter configured for Gmail / SMTP relay.
  */
-export function getNodemailerTransporter(): nodemailer.Transporter {
+export function getNodemailerTransporter(): Transporter {
   if (transporterInstance) {
     return transporterInstance;
   }
@@ -69,7 +69,7 @@ export async function sendEmailViaNodemailer(
 
     const transporter = getNodemailerTransporter();
 
-    const mailOptions: nodemailer.SendMailOptions = {
+    const mailOptions: SendMailOptions = {
       from: `"${fromName}" <${fromEmail}>`,
       to: options.to,
       subject: options.subject,
