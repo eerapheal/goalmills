@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -92,12 +93,14 @@ func main() {
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]any{
-			"status":            "ok",
-			"service":           "goalmills-mailer-enterprise",
-			"architecture":      "Audience-Intelligence & Deliverability-Gate",
+			"status":             "ok",
+			"service":            "goalmills-mailer-enterprise",
+			"architecture":       "Audience-Intelligence & Deliverability-Gate",
 			"domainRateLimiting": true,
-			"priorityQueuing":   true,
-			"time":              time.Now().Format(time.RFC3339),
+			"priorityQueuing":    true,
+			"sandboxed":          cfg.IsSandboxed,
+			"smtpConfigured":     cfg.Host != "",
+			"time":               time.Now().Format(time.RFC3339),
 		})
 	})
 
@@ -293,7 +296,7 @@ func main() {
 }
 
 func forwardEventToWebhook(eventType, email, campaignID, recipientID string, metadata map[string]any) {
-	siteURL := os.Getenv("NEXT_PUBLIC_SITE_URL")
+	siteURL := strings.TrimRight(os.Getenv("NEXT_PUBLIC_SITE_URL"), "/")
 	if siteURL == "" {
 		siteURL = "http://localhost:3000"
 	}
@@ -318,7 +321,7 @@ func forwardEventToWebhook(eventType, email, campaignID, recipientID string, met
 }
 
 func triggerCronWebhook(frequency string) {
-	siteURL := os.Getenv("NEXT_PUBLIC_SITE_URL")
+	siteURL := strings.TrimRight(os.Getenv("NEXT_PUBLIC_SITE_URL"), "/")
 	if siteURL == "" {
 		siteURL = "http://localhost:3000"
 	}

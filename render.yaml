@@ -11,18 +11,18 @@ services:
       - key: PORT
         value: 8085
       - key: SMTP_HOST
-        sync: false
+        value: smtp.gmail.com
       - key: SMTP_PORT
         value: 587
       - key: SMTP_USER
-        sync: false
+        value: hayeswaya@gmail.com
       - key: SMTP_PASSWORD
-        sync: false
+        value: exkgjtzxxseenzug
       - key: SMTP_FROM_EMAIL
         value: hayeswaya@gmail.com
       - key: SMTP_FROM_NAME
         value: "GoalMills Sports Media"
       - key: NEXT_PUBLIC_SITE_URL
-        sync: false
+        value: https://goalmills-web.vercel.app
       - key: CRON_SECRET
-        sync: false
+        value: ddf52902bf5c49541c119eaae081ae19f11f5672da0f8db763ee9c679fd45440
