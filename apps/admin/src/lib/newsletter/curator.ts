@@ -617,7 +617,7 @@ export interface WelcomeIntroEmailParams {
   confirmationUrl?: string;
   unsubscribeUrl: string;
   siteUrl: string;
-  articles: NewsletterArticlePreview[];
+  articles?: NewsletterArticlePreview[];
   requireDoubleOptIn?: boolean;
 }
 
