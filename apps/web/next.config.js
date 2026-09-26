@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+if (!process.env.NEXT_PRIVATE_WORKER_CONCURRENCY) {
+  process.env.NEXT_PRIVATE_WORKER_CONCURRENCY = '2';
+}
+
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@goalmills/ui', '@goalmills/types'],

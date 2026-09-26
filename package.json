@@ -17,6 +17,10 @@
     "web": "turbo run dev --filter=web",
     "admin": "turbo run dev --filter=admin",
     "mobile": "turbo run dev --filter=mobiles",
+    "build:web": "turbo run build --filter=web...",
+    "build:admin": "turbo run build --filter=admin...",
+    "build:social-engine": "turbo run build --filter=@goalmills/social-engine...",
+    "build:mobile": "turbo run build --filter=mobiles...",
     "mailer:docker": "docker compose -f services/mailer/docker-compose.yml up --build",
     "mailer:docker:down": "docker compose -f services/mailer/docker-compose.yml down",
     "mailer:dev": "cd services/mailer && go run ./cmd/server/main.go"
