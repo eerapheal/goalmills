@@ -63,7 +63,6 @@ const MatchScheduleSchema = new mongoose.Schema(
     lastUpdated: {
       type: Date,
       default: Date.now,
-      index: true,
     },
 
     /** Whether HT scorecard was already posted */

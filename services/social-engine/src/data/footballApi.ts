@@ -5,6 +5,13 @@
  * Mirrors the web app's advancedFootballApi.ts but for Node.js runtime.
  */
 
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
 import axios from 'axios';
 import type {
   FootballEvent,
@@ -17,8 +24,19 @@ import type {
 import { ALL_LEAGUES, type LeagueConfig } from './leagueConfig';
 import { logger } from '../utils/logger';
 
-const API_KEY = () => process.env.FOOTBALL_API_KEY || '';
-const BASE_URL = () => process.env.FOOTBALL_BASE_URL || 'https://apiv2.allsportsapi.com/football';
+const API_KEY = () =>
+  process.env.FOOTBALL_API_KEY ||
+  process.env.ALLSPORTS_API_KEY ||
+  process.env.NEXT_PUBLIC_FOOTBALL_API_KEY ||
+  '';
+
+const BASE_URL = () => {
+  let base = (process.env.FOOTBALL_BASE_URL || 'https://apiv2.allsportsapi.com/football').trim();
+  if (!base.endsWith('/')) {
+    base += '/';
+  }
+  return base;
+};
 
 /**
  * Generic AllSportsAPI request handler with error resilience
@@ -32,7 +50,8 @@ async function apiRequest<T>(
     throw new Error('FOOTBALL_API_KEY is not configured');
   }
 
-  const url = new URL('/', BASE_URL());
+  // Preserve the /football/ path in the base URL
+  const url = new URL(BASE_URL());
   url.searchParams.set('met', method);
   url.searchParams.set('APIkey', key);
 
@@ -42,12 +61,21 @@ async function apiRequest<T>(
     }
   }
 
-  logger.debug(`AllSportsAPI request: ${method}`, { params });
+  logger.debug(`AllSportsAPI request: ${method}`);
 
   const response = await axios.get<T>(url.toString(), {
     timeout: 15000,
-    headers: { Accept: 'application/json' },
+    headers: {
+      Accept: 'application/json',
+      'User-Agent': 'GoalMills-SocialEngine/1.0',
+    },
   });
+
+  const data: any = response.data;
+  if (data && data.error === '1') {
+    const errorMsg = data.result?.[0]?.msg || 'AllSportsAPI error response';
+    logger.warn(`AllSportsAPI note for ${method}: ${errorMsg}`);
+  }
 
   return response.data;
 }
@@ -65,6 +93,18 @@ function getDateRange(daysBack: number, daysForward: number) {
   const to = new Date(now);
   to.setDate(to.getDate() + daysForward);
   return { from: formatDate(from), to: formatDate(to) };
+}
+
+/**
+ * Safely extract valid football events from API response, filtering out error objects
+ */
+function extractEvents(response: any): FootballEvent[] {
+  if (!response || !Array.isArray(response.result) || response.error === '1') {
+    return [];
+  }
+  return response.result.filter(
+    (ev: any) => ev && typeof ev === 'object' && (ev.event_key || ev.event_id || ev.event_home_team)
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -86,7 +126,7 @@ export async function getUpcomingFixtures(
       from,
       to,
     });
-    return Array.isArray(response.result) ? response.result : [];
+    return extractEvents(response);
   } catch (err) {
     logger.error(`Failed to fetch upcoming fixtures for league ${leagueId}`, err);
     return [];
@@ -114,7 +154,7 @@ export async function getAllLeagueFixtures(daysAhead = 7): Promise<Map<LeagueCon
 export async function getLiveMatches(leagueId: number): Promise<FootballEvent[]> {
   try {
     const response = await apiRequest<FootballLivescoreResponse>('Livescore', { leagueId });
-    return Array.isArray(response.result) ? response.result : [];
+    return extractEvents(response);
   } catch (err) {
     logger.error(`Failed to fetch live matches for league ${leagueId}`, err);
     return [];
@@ -142,7 +182,7 @@ export async function getAllLiveMatches(): Promise<FootballEvent[]> {
 export async function getMatchDetails(matchId: string): Promise<FootballEvent | null> {
   try {
     const response = await apiRequest<FootballFixturesResponse>('Fixtures', { matchId });
-    const results = Array.isArray(response.result) ? response.result : [];
+    const results = extractEvents(response);
     return results[0] || null;
   } catch (err) {
     logger.error(`Failed to fetch match details for ${matchId}`, err);
@@ -203,7 +243,7 @@ export async function getFixturesInDays(
       to: dateStr,
     });
 
-    return Array.isArray(response.result) ? response.result : [];
+    return extractEvents(response);
   } catch (err) {
     logger.error(`Failed to fetch fixtures in ${daysFromNow} days for league ${leagueId}`, err);
     return [];

@@ -10,7 +10,15 @@
  */
 
 import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables with fallback across workspace levels
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 
 import express, { Request, Response } from 'express';
 import { connectDB } from './utils/db';
