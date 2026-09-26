@@ -4,7 +4,7 @@ import dbConnect from '@/lib/db';
 import NewsletterSubscriber from '@/models/NewsletterSubscriber';
 import { validateEmail } from '@/lib/deliverability/validator';
 import { isEmailSuppressed } from '@/lib/deliverability/suppression';
-import { sendConfirmationEmail } from '@/lib/newsletter/dispatcher';
+import { sendWelcomeEmail } from '@/lib/newsletter/dispatcher';
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,9 +85,9 @@ export async function POST(req: NextRequest) {
       subscriber.emailHealthScore = 85;
       await subscriber.save();
 
-      // Trigger confirmation email with 2 editor picks
+      // Trigger welcome / intro email with 5 latest posts
       try {
-        await sendConfirmationEmail({
+        await sendWelcomeEmail({
           subscriber: {
             _id: subscriber._id.toString(),
             email: subscriber.email,
@@ -100,13 +100,13 @@ export async function POST(req: NextRequest) {
           requireDoubleOptIn: false,
         });
       } catch (mailErr) {
-        console.error('Error sending update confirmation email:', mailErr);
+        console.error('Error sending update welcome email:', mailErr);
       }
 
       return NextResponse.json({
         success: true,
         message:
-          "Your newsletter subscription preferences have been updated! A confirmation email with today's top editor picks has been sent.",
+          "Your newsletter subscription preferences have been updated! A welcome email with the 5 latest sports posts has been sent to your inbox.",
         data: subscriber,
       });
     }
@@ -131,12 +131,13 @@ export async function POST(req: NextRequest) {
       source: source || 'website',
     });
 
-    const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills.com'}/newsletter/confirm?token=${confirmationToken}`;
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://goalmills-web.vercel.app').replace(/\/+$/, '');
+    const confirmationUrl = `${siteUrl}/newsletter/confirm?token=${confirmationToken}`;
 
-    // Trigger confirmation email with 2 curated editor picks
-    let confirmationEmailResult: any = null;
+    // Trigger welcome & intro email with 5 curated latest posts
+    let welcomeEmailResult: any = null;
     try {
-      confirmationEmailResult = await sendConfirmationEmail({
+      welcomeEmailResult = await sendWelcomeEmail({
         subscriber: {
           _id: subscriber._id?.toString() || 'new-sub',
           email: subscriber.email,
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
         requireDoubleOptIn,
       });
     } catch (mailErr) {
-      console.error('Error sending welcome confirmation email:', mailErr);
+      console.error('Error sending welcome intro email:', mailErr);
     }
 
     return NextResponse.json(
@@ -157,9 +158,9 @@ export async function POST(req: NextRequest) {
         success: true,
         message: requireDoubleOptIn
           ? 'Please check your inbox to confirm your subscription.'
-          : "Thank you for subscribing to GoalMills Newsletters! A confirmation email with 2 Editor's Picks has been sent to your inbox.",
+          : 'Thank you for subscribing to GoalMills Sports Alerts! A welcome email with 5 latest stories has been sent to your inbox.',
         confirmationUrl: requireDoubleOptIn ? confirmationUrl : undefined,
-        confirmationEmailSent: confirmationEmailResult?.success || false,
+        confirmationEmailSent: welcomeEmailResult?.success || false,
         data: subscriber,
       },
       { status: 201 }

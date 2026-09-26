@@ -7,19 +7,30 @@ import type { NewsletterAudience, NewsletterFrequency } from '@goalmills/types';
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('Authorization');
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+    const vercelCronHeader = req.headers.get('x-vercel-cron');
     const cronSecret = process.env.CRON_SECRET;
+    const { searchParams } = new URL(req.url);
+    const querySecret = searchParams.get('secret') || searchParams.get('key');
 
-    // Validate cron secret if configured
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized cron request' },
-        { status: 401 }
-      );
+    // Authorize request:
+    // 1. If CRON_SECRET is configured: accept if Authorization header matches, OR query secret matches, OR x-vercel-cron is present
+    // 2. If CRON_SECRET is not configured: allow if x-vercel-cron is present or no secret required
+    if (cronSecret) {
+      const isAuthorized =
+        authHeader === `Bearer ${cronSecret}` ||
+        querySecret === cronSecret ||
+        Boolean(vercelCronHeader);
+
+      if (!isAuthorized) {
+        return NextResponse.json(
+          { success: false, message: 'Unauthorized cron request. Provide Bearer token, secret query parameter, or Vercel cron header.' },
+          { status: 401 }
+        );
+      }
     }
 
     await dbConnect();
-    const { searchParams } = new URL(req.url);
     const requestedFrequency = (searchParams.get('frequency') as NewsletterFrequency) || 'daily';
 
     // 1. Process any pending scheduled campaigns whose time has arrived

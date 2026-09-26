@@ -7,7 +7,9 @@ import {
   generateNewsletterHTML,
   formatArticlePreview,
   getEditorPickArticles,
+  getLatestPublishedArticles,
   generateConfirmationEmailHTML,
+  generateWelcomeIntroEmailHTML,
 } from './curator';
 import {
   generatePreflightReport,
@@ -213,10 +215,10 @@ export interface SendConfirmationResult {
 }
 
 /**
- * Sends a welcome / confirmation email with two curated Editor's Pick posts
+ * Sends a welcome / intro email with 5 latest news posts and app official icon logo
  * directly via Nodemailer.
  */
-export async function sendConfirmationEmail(
+export async function sendWelcomeEmail(
   params: SendConfirmationParams
 ): Promise<SendConfirmationResult> {
   const { subscriber, requireDoubleOptIn = false } = params;
@@ -226,24 +228,24 @@ export async function sendConfirmationEmail(
   const confirmationUrl = `${siteUrl}/newsletter/confirm?token=${subscriber.confirmationToken || ''}`;
   const unsubscribeUrl = `${siteUrl}/newsletter/unsubscribe?token=${subscriber.unsubscribeToken || ''}`;
 
-  // 1. Fetch 2 top Editor's Pick articles
-  const editorPicks = await getEditorPickArticles(2);
+  // 1. Fetch 5 latest published news posts
+  const latestArticles = await getLatestPublishedArticles(5);
 
-  // 2. Generate responsive HTML email
-  const htmlBody = generateConfirmationEmailHTML({
+  // 2. Generate unified luxury HTML welcome email
+  const htmlBody = generateWelcomeIntroEmailHTML({
     subscriberEmail: recipientEmail,
     frequency: subscriber.frequency || 'daily',
     categories: subscriber.categories || [],
     confirmationUrl,
     unsubscribeUrl,
     siteUrl,
-    editorPicks,
+    articles: latestArticles,
     requireDoubleOptIn,
   });
 
   const subject = requireDoubleOptIn
-    ? `Please confirm your GoalMills Newsletter subscription (+ 2 Editor's Picks)`
-    : `Welcome to GoalMills Sports Alerts! (+ 2 Curated Editor's Picks)`;
+    ? `Please confirm your GoalMills Sports Alerts subscription (+ 5 Latest Stories)`
+    : `Welcome to GoalMills Sports Alerts! (+ 5 Top Stories Inside)`;
 
   // 3. Dispatch directly via Nodemailer
   const sendRes = await sendEmailViaNodemailer({
@@ -256,12 +258,15 @@ export async function sendConfirmationEmail(
   return {
     success: sendRes.success,
     message: sendRes.success
-      ? "Confirmation email with 2 Editor's Picks sent successfully via Nodemailer"
-      : `Confirmation email delivery failed: ${sendRes.error}`,
-    editorPicks,
+      ? 'Welcome & Intro email with 5 latest stories sent successfully via Nodemailer'
+      : `Welcome email delivery failed: ${sendRes.error}`,
+    editorPicks: latestArticles,
     dispatchedViaGo: false,
   };
 }
+
+// Backward-compatibility alias
+export const sendConfirmationEmail = sendWelcomeEmail;
 
 export interface SendNewsletterBroadcastParams {
   campaignId?: string;

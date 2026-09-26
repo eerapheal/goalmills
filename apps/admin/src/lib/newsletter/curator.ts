@@ -81,70 +81,48 @@ export async function curateNewsletterArticles(
   const now = new Date();
 
   if (frequency === 'daily' || frequency === 'all') {
-    const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+    // 1. Fetch pool of latest published news (up to 30) for daily randomized selection
+    const candidateDocs = await News.find({
+      status: 'published',
+    })
+      .sort({ createdAt: -1 })
+      .limit(30);
 
-    // 1. Fetch published breaking stories & featured editor picks from recent window
-    const [breakingDocs, featuredDocs, recentGeneralDocs] = await Promise.all([
-      News.find({
-        status: 'published',
-        isBreaking: true,
-        createdAt: { $gte: twoDaysAgo },
-      })
-        .sort({ createdAt: -1 })
-        .limit(10),
-      News.find({
-        status: 'published',
-        isFeatured: true,
-        createdAt: { $gte: twoDaysAgo },
-      })
-        .sort({ createdAt: -1 })
-        .limit(10),
-      News.find({
-        status: 'published',
-        createdAt: { $gte: twoDaysAgo },
-      })
-        .sort({ views: -1, createdAt: -1 })
-        .limit(15),
-    ]);
+    const previews = candidateDocs.map(formatArticlePreview);
 
-    // Randomize candidates to give subscribers fresh, varied digests
-    const shuffledBreaking = shuffleArray(breakingDocs.map(formatArticlePreview));
-    const shuffledFeatured = shuffleArray(featuredDocs.map(formatArticlePreview));
-    const shuffledGeneral = shuffleArray(recentGeneralDocs.map(formatArticlePreview));
+    // Prioritize breaking news if present in the pool
+    const breaking = previews.filter((p) => p.isBreaking);
+    const standard = previews.filter((p) => !p.isBreaking);
 
-    const selectedMap = new Map<string, NewsletterArticlePreview>();
+    // Shuffle both sets with Fisher-Yates for unpredictable, fresh daily digest
+    const shuffledBreaking = shuffleArray(breaking);
+    const shuffledStandard = shuffleArray(standard);
 
-    // Prioritize at least 1-2 breaking news
+    const selected: NewsletterArticlePreview[] = [];
+
+    // Add up to 2 breaking stories if available
     for (const art of shuffledBreaking) {
-      if (selectedMap.size >= Math.ceil(maxArticles / 2)) break;
-      selectedMap.set(art._id, art);
+      if (selected.length >= 2) break;
+      selected.push(art);
     }
 
-    // Add editor's picks
-    for (const art of shuffledFeatured) {
-      if (selectedMap.size >= maxArticles) break;
-      if (!selectedMap.has(art._id)) {
-        selectedMap.set(art._id, art);
+    // Fill the remainder with randomized standard stories
+    for (const art of shuffledStandard) {
+      if (selected.length >= maxArticles) break;
+      selected.push(art);
+    }
+
+    // If still under maxArticles, backfill from remaining breaking
+    for (const art of shuffledBreaking) {
+      if (selected.length >= maxArticles) break;
+      if (!selected.some((s) => s._id === art._id)) {
+        selected.push(art);
       }
     }
 
-    // Fill remaining spots with top general stories if needed
-    for (const art of shuffledGeneral) {
-      if (selectedMap.size >= maxArticles) break;
-      if (!selectedMap.has(art._id)) {
-        selectedMap.set(art._id, art);
-      }
-    }
+    // Final shuffle so breaking stories aren't always in the same position
+    const articles = shuffleArray(selected).slice(0, maxArticles);
 
-    // Fallback: If still empty, grab any latest published news
-    if (selectedMap.size === 0) {
-      const fallbackDocs = await News.find({ status: 'published' })
-        .sort({ createdAt: -1 })
-        .limit(maxArticles);
-      fallbackDocs.forEach((doc) => selectedMap.set(doc._id.toString(), formatArticlePreview(doc)));
-    }
-
-    const articles = Array.from(selectedMap.values());
     const dateFormatted = now.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'short',
@@ -155,66 +133,74 @@ export async function curateNewsletterArticles(
 
     return {
       title: `⚡ GoalMills Daily: ${topTitle}`,
-      previewText: `Today's top breaking stories and editor picks (${dateFormatted})`,
+      previewText: `Today's top breaking stories and newsroom picks (${dateFormatted})`,
       frequency: 'daily',
       articles,
-      editorialNote: `Here is your 10:00 AM curated daily digest featuring the top breaking updates and editor-selected analysis from the GoalMills newsroom.`,
+      editorialNote: `Here is your 10:00 AM curated daily digest featuring fresh, randomized top stories, breaking updates, and tactical analysis straight from the GoalMills newsroom.`,
     };
   }
 
   if (frequency === 'weekly') {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    const weeklyTopDocs = await News.find({
+    let weeklyTopDocs = await News.find({
       status: 'published',
       createdAt: { $gte: sevenDaysAgo },
     })
       .sort({ views: -1, createdAt: -1 })
       .limit(maxArticles);
 
-    let articles = weeklyTopDocs.map(formatArticlePreview);
-
-    if (articles.length === 0) {
-      const fallback = await News.find({ status: 'published' })
+    if (weeklyTopDocs.length < maxArticles) {
+      const existingIds = weeklyTopDocs.map((d) => d._id);
+      const backfill = await News.find({
+        status: 'published',
+        _id: { $nin: existingIds },
+      })
         .sort({ views: -1, createdAt: -1 })
-        .limit(maxArticles);
-      articles = fallback.map(formatArticlePreview);
+        .limit(maxArticles - weeklyTopDocs.length);
+      weeklyTopDocs = [...weeklyTopDocs, ...backfill];
     }
 
+    const articles = weeklyTopDocs.map(formatArticlePreview);
+
     return {
-      title: `🏆 GoalMills Week in Review: Top Read Sports Stories`,
-      previewText: `The most-read headlines, tactical breakdowns, and viral highlights of the week`,
+      title: `🏆 GoalMills Week in Review: Most-Read Sports Stories`,
+      previewText: `The highest-performing headlines, viral highlights, and tactical breakdowns of the week`,
       frequency: 'weekly',
       articles,
-      editorialNote: `Your weekly roundup of the most discussed and viewed stories across European leagues and world sports.`,
+      editorialNote: `Your weekly roundup of the most-read and discussed stories across European football and global sports.`,
     };
   }
 
   // Monthly
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const monthlyTopDocs = await News.find({
+  let monthlyTopDocs = await News.find({
     status: 'published',
     createdAt: { $gte: thirtyDaysAgo },
   })
     .sort({ views: -1, createdAt: -1 })
     .limit(maxArticles);
 
-  let articles = monthlyTopDocs.map(formatArticlePreview);
-  if (articles.length === 0) {
-    const fallback = await News.find({ status: 'published' })
+  if (monthlyTopDocs.length < maxArticles) {
+    const existingIds = monthlyTopDocs.map((d) => d._id);
+    const backfill = await News.find({
+      status: 'published',
+      _id: { $nin: existingIds },
+    })
       .sort({ views: -1, createdAt: -1 })
-      .limit(maxArticles);
-    articles = fallback.map(formatArticlePreview);
+      .limit(maxArticles - monthlyTopDocs.length);
+    monthlyTopDocs = [...monthlyTopDocs, ...backfill];
   }
 
+  const articles = monthlyTopDocs.map(formatArticlePreview);
   const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return {
     title: `🌟 GoalMills Monthly Edition: ${monthName} Sports Retrospective`,
-    previewText: `The highest-performing stories, transfer debriefs, and match analysis from this month`,
+    previewText: `The most-read stories, transfer debriefs, and match analysis from this month`,
     frequency: 'monthly',
     articles,
-    editorialNote: `A comprehensive monthly retrospective highlighting the biggest moments in sports over the past 30 days.`,
+    editorialNote: `A comprehensive monthly retrospective highlighting the highest-read stories and key moments in sports over the past 30 days.`,
   };
 }
 
@@ -346,12 +332,23 @@ export function generateNewsletterHTML(params: {
             <td height="4" style="background:linear-gradient(90deg,#f59e0b 0%,#fbbf24 40%,#d97706 100%);font-size:0;line-height:0;">&nbsp;</td>
           </tr>
 
-          <!-- Header -->
+          <!-- Header with Official App Icon PNG -->
           <tr>
             <td align="center" style="padding:28px 28px 22px;background:#080d1e;border-bottom:1px solid rgba(255,255,255,0.06);">
-              <a href="${siteUrl}" style="text-decoration:none;">
-                <span style="font-size:28px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:#ffffff;">GOAL<span style="color:#f59e0b;">MILLS</span></span>
-              </a>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td valign="middle" style="padding-right:12px;">
+                    <a href="${siteUrl}" style="text-decoration:none;display:block;">
+                      <img src="${siteUrl}/icon.png" alt="GoalMills Logo" width="40" height="40" style="width:40px;height:40px;border-radius:10px;display:block;border:0;" />
+                    </a>
+                  </td>
+                  <td valign="middle">
+                    <a href="${siteUrl}" style="text-decoration:none;">
+                      <span style="font-size:28px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">GOAL<span style="color:#f59e0b;">MILLS</span></span>
+                    </a>
+                  </td>
+                </tr>
+              </table>
               <div style="margin-top:10px;">
                 <span style="display:inline-block;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);">
                   ${frequencyLabel} Digest &bull; ${dateFormatted}
@@ -404,15 +401,22 @@ export function generateNewsletterHTML(params: {
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Footer with Official Icon -->
           <tr>
             <td style="padding:28px 28px;background:#050810;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td align="center" style="padding-bottom:14px;">
-                    <a href="${siteUrl}" style="font-size:18px;font-weight:900;text-transform:uppercase;color:#ffffff;text-decoration:none;">
-                      GOAL<span style="color:#f59e0b;">MILLS</span>
-                    </a>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                      <tr>
+                        <td valign="middle" style="padding-right:8px;">
+                          <img src="${siteUrl}/icon.png" alt="GoalMills" width="22" height="22" style="width:22px;height:22px;border-radius:6px;display:block;border:0;" />
+                        </td>
+                        <td valign="middle">
+                          <span style="font-size:16px;font-weight:900;text-transform:uppercase;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">GOAL<span style="color:#f59e0b;">MILLS</span></span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
                 <tr>
@@ -549,7 +553,7 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
         title: 'Transfer Radar: Inside the High-Stakes Race for European Football Talent',
         slug: 'transfer-radar-european-talent',
         excerpt:
-          'Exclusive scouting reports and insider negotiations shaping the upcoming transfer window.',
+          'Exclusive scouting reports and insider transfer negotiations as top European giants submit priority inquiries.',
         image:
           'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80',
         category: 'Transfer Radar',
@@ -557,7 +561,7 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
         readTime: 3,
         isBreaking: true,
         isFeatured: true,
-        views: 1850,
+        views: 2150,
         author: 'GoalMills Transfer Desk',
         createdAt: new Date().toISOString(),
       },
@@ -566,25 +570,66 @@ export async function getEditorPickArticles(count = 2): Promise<NewsletterArticl
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// CONFIRMATION / WELCOME EMAIL TEMPLATE
+// LATEST NEWS FETCHER (WELCOME & INTRO EMAILS)
 // ═══════════════════════════════════════════════════════════════════
 
-export interface ConfirmationEmailParams {
+/**
+ * Fetch top latest published news posts for welcome & intro emails
+ */
+export async function getLatestPublishedArticles(count = 5): Promise<NewsletterArticlePreview[]> {
+  await dbConnect();
+  try {
+    const docs = await News.find({ status: 'published' })
+      .sort({ createdAt: -1 })
+      .limit(count);
+
+    if (docs.length >= count) {
+      return docs.map(formatArticlePreview);
+    }
+
+    const existingIds = docs.map((d) => d._id);
+    const backfill = await News.find({
+      status: 'published',
+      _id: { $nin: existingIds },
+    })
+      .sort({ views: -1, createdAt: -1 })
+      .limit(count - docs.length);
+
+    const combined = [...docs, ...backfill];
+    if (combined.length > 0) {
+      return combined.map(formatArticlePreview);
+    }
+  } catch (err) {
+    console.error('Error fetching latest published articles:', err);
+  }
+
+  return getEditorPickArticles(count);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// WELCOME & INTRO EMAIL TEMPLATE — Professional, Unified Design
+// ═══════════════════════════════════════════════════════════════════
+
+export interface WelcomeIntroEmailParams {
   subscriberEmail: string;
   frequency: string;
   categories?: string[];
-  confirmationUrl: string;
+  confirmationUrl?: string;
   unsubscribeUrl: string;
   siteUrl: string;
-  editorPicks: NewsletterArticlePreview[];
+  articles: NewsletterArticlePreview[];
   requireDoubleOptIn?: boolean;
 }
 
+export type ConfirmationEmailParams = WelcomeIntroEmailParams & {
+  editorPicks?: NewsletterArticlePreview[];
+};
+
 /**
- * Generate a professionally designed, bulletproof HTML email template
- * confirming subscription and showcasing two curated Editor's Pick posts.
+ * Generate a luxury dark-mode Welcome & Intro HTML email template
+ * featuring 5 latest published news posts and the official app icon PNG.
  */
-export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): string {
+export function generateWelcomeIntroEmailHTML(params: WelcomeIntroEmailParams): string {
   const {
     subscriberEmail,
     frequency,
@@ -592,7 +637,7 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
     confirmationUrl,
     unsubscribeUrl,
     siteUrl,
-    editorPicks,
+    articles = [],
     requireDoubleOptIn = false,
   } = params;
 
@@ -607,9 +652,9 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
     ? frequency.charAt(0).toUpperCase() + frequency.slice(1).toLowerCase()
     : 'Daily';
 
-  // Render the 2 Editor Pick Post Cards
-  const editorPicksHtml = editorPicks
-    .slice(0, 2)
+  // Render the 5 Latest Article Post Cards
+  const articleCardsHtml = articles
+    .slice(0, 5)
     .map((art, idx) => {
       const articleSlug =
         art.slug && !/^[0-9a-fA-F]{24}$/.test(art.slug)
@@ -618,22 +663,27 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
             ? slugify(art.title)
             : art._id;
       const articleLink = `${siteUrl}/news/${articleSlug}`;
-      const badgeLabel = art.isBreaking ? '⚡ Breaking News' : "⭐ Editor's Pick";
-      const badgeColor = art.isBreaking ? '#dc2626' : '#7c3aed';
-      const imageTag = art.image
-        ? `<img src="${art.image}" alt="${art.title}" width="100%" style="width:100%;height:180px;object-fit:cover;display:block;border-top-left-radius:12px;border-top-right-radius:12px;background-color:#1e293b;" />`
-        : `<div style="height:120px;background:linear-gradient(135deg,#1e1b4b,#0f172a);display:flex;align-items:center;justify-content:center;border-top-left-radius:12px;border-top-right-radius:12px;text-align:center;padding:12px;"><span style="color:#f59e0b;font-size:24px;font-weight:900;">GOALMILLS POST #${idx + 1}</span></div>`;
+      const badgeLabel = art.isBreaking
+        ? '⚡ Breaking'
+        : art.isFeatured
+          ? "⭐ Editor's Pick"
+          : '🔥 Top Story';
+      const badgeColor = art.isBreaking ? '#dc2626' : art.isFeatured ? '#7c3aed' : '#d97706';
+
+      const imageSection = art.image
+        ? `<tr>
+            <td style="padding:0;">
+              <a href="${articleLink}" style="text-decoration:none;display:block;">
+                <img src="${art.image}" alt="${art.title}" width="100%" style="width:100%;height:180px;object-fit:cover;display:block;border-top-left-radius:12px;border-top-right-radius:12px;background-color:#1e293b;" />
+              </a>
+            </td>
+          </tr>`
+        : '';
 
       return `
     <!-- Post Card ${idx + 1} -->
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:16px;background:#0d1527;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;">
-      <tr>
-        <td style="padding:0;">
-          <a href="${articleLink}" style="text-decoration:none;display:block;">
-            ${imageTag}
-          </a>
-        </td>
-      </tr>
+      ${imageSection}
       <tr>
         <td style="padding:16px 18px 18px;">
           <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -680,28 +730,27 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
           </table>
         </td>
       </tr>
-    </table>
-    `;
+    </table>`;
     })
     .join('');
 
   const preheaderSnippet = requireDoubleOptIn
-    ? `Please confirm your subscription to GoalMills Newsletters. Plus, explore 2 exclusive Editor's Pick posts today.`
-    : `You're officially confirmed for GoalMills ${formattedFrequency} Sports Alerts! Check out today's top 2 Editor's Picks.`;
+    ? `Please confirm your GoalMills Sports Alerts subscription. Explore 5 latest stories inside.`
+    : `Welcome to GoalMills Sports Alerts! Explore 5 of today's latest news stories and transfer exclusives.`;
 
   const heroHeadline = requireDoubleOptIn
     ? `Confirm Your Subscription`
-    : `You're Subscribed! Welcome to GoalMills`;
+    : `Welcome to GoalMills Sports Alerts! ⚽`;
 
   const heroSubtitle = requireDoubleOptIn
-    ? `Please click the button below to verify your email address and start receiving high-impact sports intelligence delivered at 10:00 AM WAT.`
-    : `Your subscription to GoalMills ${formattedFrequency} Sports Alerts is now active. Get ready for breaking scoops, tactical breakdowns, and matchday insights.`;
+    ? `Please verify your email address to begin receiving your ${formattedFrequency} digest delivered automatically at 10:00 AM WAT.`
+    : `Your subscription to GoalMills ${formattedFrequency} Sports Alerts is now active. You are now connected to verified sports reporting, exclusive transfer radars, and tactical breakdowns.`;
 
   const ctaButtonText = requireDoubleOptIn
     ? `Confirm Subscription Now &rarr;`
-    : `Explore Live Match Centre &amp; News &rarr;`;
+    : `Explore All Sports News &rarr;`;
 
-  const primaryActionUrl = requireDoubleOptIn ? confirmationUrl : siteUrl;
+  const primaryActionUrl = requireDoubleOptIn && confirmationUrl ? confirmationUrl : siteUrl;
 
   const categoriesBadge =
     categories && categories.length > 0
@@ -711,7 +760,7 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
               `<span style="display:inline-block;background:rgba(255,255,255,0.08);color:#cbd5e1;padding:2px 8px;border-radius:6px;font-size:11px;margin-right:4px;margin-bottom:4px;">${c}</span>`
           )
           .join('')
-      : '<span style="color:#94a3b8;font-size:11px;">All Sports &amp; Leagues</span>';
+      : '<span style="color:#94a3b8;font-size:11px;">All Sports &amp; Competitions</span>';
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -746,17 +795,28 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
             <td height="4" style="background:linear-gradient(90deg,#f59e0b 0%,#fbbf24 50%,#d97706 100%);font-size:0;line-height:0;">&nbsp;</td>
           </tr>
 
-          <!-- Header -->
+          <!-- Header with Official App Icon PNG -->
           <tr>
             <td align="center" style="padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);background:#070b1a;">
-              <a href="${siteUrl}" style="text-decoration:none;display:inline-block;">
-                <span style="font-size:28px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:#ffffff;">
-                  GOAL<span style="color:#f59e0b;">MILLS</span>
-                </span>
-              </a>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td valign="middle" style="padding-right:12px;">
+                    <a href="${siteUrl}" style="text-decoration:none;display:block;">
+                      <img src="${siteUrl}/icon.png" alt="GoalMills Logo" width="40" height="40" style="width:40px;height:40px;border-radius:10px;display:block;border:0;" />
+                    </a>
+                  </td>
+                  <td valign="middle">
+                    <a href="${siteUrl}" style="text-decoration:none;">
+                      <span style="font-size:28px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                        GOAL<span style="color:#f59e0b;">MILLS</span>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+              </table>
               <div style="margin-top:8px;">
                 <span style="display:inline-block;padding:4px 12px;border-radius:9999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);">
-                  ⚽ SPORTS INTELLIGENCE &bull; ${dateFormatted}
+                  ⚽ WELCOME EDITION &bull; ${dateFormatted}
                 </span>
               </div>
             </td>
@@ -768,7 +828,7 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td align="center" style="padding-bottom:12px;">
-                    <div style="width:52px;height:52px;line-height:52px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:50%;text-align:center;font-size:24px;display:inline-block;">
+                    <div style="width:52px;height:52px;line-height:52px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:50%;text-align:center;font-size:24px;display:inline-block;color:#f59e0b;">
                       ✓
                     </div>
                   </td>
@@ -781,10 +841,20 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding-bottom:24px;">
+                  <td align="center" style="padding-bottom:20px;">
                     <p style="margin:0;color:#cbd5e1;font-size:14px;line-height:1.6;max-width:480px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
                       ${heroSubtitle}
                     </p>
+                  </td>
+                </tr>
+
+                <!-- Benefits Chips -->
+                <tr>
+                  <td align="center" style="padding-bottom:24px;">
+                    <span style="display:inline-block;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.05);color:#f59e0b;font-size:11px;font-weight:700;margin:3px;">⚡ Breaking Transfers</span>
+                    <span style="display:inline-block;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.05);color:#f59e0b;font-size:11px;font-weight:700;margin:3px;">⚽ Match Debriefs</span>
+                    <span style="display:inline-block;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.05);color:#f59e0b;font-size:11px;font-weight:700;margin:3px;">📊 Tactical Analysis</span>
+                    <span style="display:inline-block;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.05);color:#f59e0b;font-size:11px;font-weight:700;margin:3px;">🏆 League Standings</span>
                   </td>
                 </tr>
 
@@ -820,15 +890,15 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                             </tr>
                             <tr>
                               <td style="padding-bottom:6px;font-size:12px;color:#94a3b8;font-weight:600;">
-                                Frequency:
+                                Cadence:
                               </td>
                               <td align="right" style="padding-bottom:6px;font-size:12px;color:#fbbf24;font-weight:700;">
-                                ${formattedFrequency} Digest
+                                ${formattedFrequency} Digest (10:00 AM WAT)
                               </td>
                             </tr>
                             <tr>
                               <td style="font-size:12px;color:#94a3b8;font-weight:600;vertical-align:top;padding-top:2px;">
-                                Interests:
+                                Coverage:
                               </td>
                               <td align="right" style="vertical-align:top;padding-top:2px;">
                                 ${categoriesBadge}
@@ -844,17 +914,17 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
             </td>
           </tr>
 
-          <!-- Editor Picks Header -->
+          <!-- 5 Latest Posts Header -->
           <tr>
             <td style="padding:10px 28px 16px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td style="border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;">
                     <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#f59e0b;display:block;margin-bottom:4px;">
-                      ⭐ EDITOR'S PICKS
+                      🔥 LATEST HEADLINES
                     </span>
                     <h2 style="margin:0;font-size:18px;font-weight:800;color:#ffffff;letter-spacing:-0.2px;">
-                      Two Stories Hand-Picked For You
+                      5 Latest Stories to Get You Started
                     </h2>
                   </td>
                 </tr>
@@ -862,24 +932,24 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
             </td>
           </tr>
 
-          <!-- Editor Pick Articles -->
+          <!-- 5 Latest Articles Cards -->
           <tr>
             <td style="padding:0 28px 16px;">
-              ${editorPicksHtml}
+              ${articleCardsHtml}
             </td>
           </tr>
 
-          <!-- What to Expect -->
+          <!-- What to Expect Box -->
           <tr>
             <td style="padding:0 28px 28px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background:rgba(245,158,11,0.05);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;">
                 <tr>
                   <td style="padding:14px 18px;">
                     <h3 style="margin:0 0 6px;font-size:13px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:0.04em;">
-                      ⚡ What to Expect in Your Inbox
+                      ⚡ Curated Daily at 10:00 AM WAT
                     </h3>
                     <p style="margin:0;font-size:12px;line-height:1.6;color:#cbd5e1;">
-                      Our newsroom monitors European leagues, continental tournaments, transfer developments, and match tactics 24/7. Expect concise, fluff-free digests curated every morning.
+                      Our international sports desk operates round the clock. Expect concise, high-impact digests curated every morning and delivered straight to your inbox without spam or fluff.
                     </p>
                   </td>
                 </tr>
@@ -887,25 +957,32 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Footer with Official Icon -->
           <tr>
             <td style="padding:28px 24px;background:#050812;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                  <td align="center" style="padding-bottom:12px;">
-                    <a href="${siteUrl}" style="font-size:16px;font-weight:900;text-transform:uppercase;color:#ffffff;text-decoration:none;">
-                      GOAL<span style="color:#f59e0b;">MILLS</span>
-                    </a>
+                  <td align="center" style="padding-bottom:14px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                      <tr>
+                        <td valign="middle" style="padding-right:8px;">
+                          <img src="${siteUrl}/icon.png" alt="GoalMills" width="22" height="22" style="width:22px;height:22px;border-radius:6px;display:block;border:0;" />
+                        </td>
+                        <td valign="middle">
+                          <span style="font-size:16px;font-weight:900;text-transform:uppercase;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">GOAL<span style="color:#f59e0b;">MILLS</span></span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding-bottom:12px;font-size:11px;line-height:1.6;color:#64748b;">
+                  <td align="center" style="padding-bottom:14px;font-size:11px;line-height:1.7;color:#64748b;">
                     <p style="margin:0 0 4px;">&copy; ${year} GoalMills Sports Media. All rights reserved.</p>
-                    <p style="margin:0;">You received this email because you subscribed on <a href="${siteUrl}" style="color:#94a3b8;text-decoration:underline;">goalmills.com</a>.</p>
+                    <p style="margin:0;">You received this email because you subscribed to GoalMills Sports Alerts.</p>
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding-top:8px;font-size:11px;color:#94a3b8;">
+                  <td align="center" style="padding-bottom:12px;font-size:12px;">
                     <a href="${siteUrl}/newsletter/preferences" style="color:#f59e0b;text-decoration:none;font-weight:700;margin:0 8px;">
                       Manage Preferences
                     </a>
@@ -916,7 +993,7 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
                   </td>
                 </tr>
                 <tr>
-                  <td align="center" style="padding-top:16px;font-size:10px;color:#475569;line-height:1.5;">
+                  <td align="center" style="font-size:10px;color:#475569;line-height:1.5;">
                     Tip: Add our sender address to your contacts to ensure delivery to your primary inbox.
                   </td>
                 </tr>
@@ -932,4 +1009,15 @@ export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): 
   </table>
 </body>
 </html>`;
+}
+
+/**
+ * Backward compatibility alias for generateWelcomeIntroEmailHTML
+ */
+export function generateConfirmationEmailHTML(params: ConfirmationEmailParams): string {
+  const articles = params.articles || params.editorPicks || [];
+  return generateWelcomeIntroEmailHTML({
+    ...params,
+    articles,
+  });
 }
