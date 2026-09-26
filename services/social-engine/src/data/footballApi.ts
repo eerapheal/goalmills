@@ -38,13 +38,47 @@ const BASE_URL = () => {
   return base;
 };
 
+const PROXY_URL = () => {
+  if (process.env.FOOTBALL_PROXY_URL) return process.env.FOOTBALL_PROXY_URL;
+  if (process.env.SITE_URL) return `${process.env.SITE_URL.replace(/\/$/, '')}/api/football`;
+  return 'https://goalmills-web.vercel.app/api/football';
+};
+
+let hasLoggedUpstreamWarning = false;
+
 /**
- * Generic AllSportsAPI request handler with error resilience
+ * Generic AllSportsAPI request handler with error resilience and web proxy support
  */
 async function apiRequest<T>(
   method: string,
   params: Record<string, string | number> = {}
 ): Promise<T> {
+  // 1. Try web application proxy first (mirrors web app caching and fallback)
+  try {
+    const proxyBase = PROXY_URL();
+    if (proxyBase) {
+      const pUrl = new URL(proxyBase);
+      pUrl.searchParams.set('met', method);
+      for (const [k, v] of Object.entries(params)) {
+        if (v !== undefined && v !== null && v !== '') {
+          pUrl.searchParams.set(k, String(v));
+        }
+      }
+
+      const proxyRes = await axios.get<T>(pUrl.toString(), {
+        timeout: 10000,
+        headers: { Accept: 'application/json' },
+      });
+
+      if (proxyRes.data && (proxyRes.data as any).success === 1 && Array.isArray((proxyRes.data as any).result)) {
+        return proxyRes.data;
+      }
+    }
+  } catch {
+    // If proxy unreachable, fallback to direct upstream
+  }
+
+  // 2. Direct AllSportsAPI upstream
   const key = API_KEY();
   if (!key) {
     throw new Error('FOOTBALL_API_KEY is not configured');
@@ -61,7 +95,7 @@ async function apiRequest<T>(
     }
   }
 
-  logger.debug(`AllSportsAPI request: ${method}`);
+  logger.debug(`AllSportsAPI direct request: ${method}`);
 
   const response = await axios.get<T>(url.toString(), {
     timeout: 15000,
@@ -74,7 +108,10 @@ async function apiRequest<T>(
   const data: any = response.data;
   if (data && data.error === '1') {
     const errorMsg = data.result?.[0]?.msg || 'AllSportsAPI error response';
-    logger.warn(`AllSportsAPI note for ${method}: ${errorMsg}`);
+    if (!hasLoggedUpstreamWarning) {
+      logger.info(`AllSportsAPI notice: ${errorMsg} (serving standard fallback)`);
+      hasLoggedUpstreamWarning = true;
+    }
   }
 
   return response.data;
