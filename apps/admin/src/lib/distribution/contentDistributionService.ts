@@ -13,6 +13,18 @@ import { DistributionRuleModel } from '../../models/DistributionRule';
 import { SyndicationJobModel } from '../../models/SyndicationJob';
 import { ChannelConfigModel } from '../../models/ChannelConfig';
 import { connectDB } from '../db';
+import { socialEngineClient } from './socialEngineClient';
+
+const SOCIAL_CHANNELS: Record<string, string> = {
+  x_twitter: 'twitter',
+  twitter: 'twitter',
+  telegram: 'telegram',
+  whatsapp: 'whatsapp',
+  facebook: 'facebook',
+  linkedin: 'linkedin',
+  youtube: 'youtube',
+  tiktok: 'tiktok',
+};
 
 export class ContentDistributionService {
   private static instance: ContentDistributionService;
@@ -24,7 +36,7 @@ export class ContentDistributionService {
     return ContentDistributionService.instance;
   }
 
-  public async dispatchJob(jobId: string): Promise<{ success: boolean; message: string }> {
+  public async dispatchJob(jobId: string): Promise<{ success: boolean; message: string; url?: string }> {
     await connectDB();
 
     const job = await SyndicationJobModel.findOne({ jobId });
@@ -34,21 +46,97 @@ export class ContentDistributionService {
 
     try {
       job.attempts += 1;
-      job.status = 'dispatched';
-      job.dispatchedAt = new Date().toISOString();
-      job.errorMessage = undefined;
-      await job.save();
+      const targetPlatform = SOCIAL_CHANNELS[job.channel.toLowerCase()];
 
-      await ChannelConfigModel.findOneAndUpdate(
-        { tenantSlug: job.tenantSlug, channel: job.channel },
-        {
-          $inc: { 'stats.totalDispatched': 1 },
-          $set: { 'stats.lastDispatchedAt': new Date().toISOString(), status: 'connected' },
-        },
-        { upsert: true }
-      );
+      if (targetPlatform) {
+        // Dispatch to Social Engine microservice
+        const bodyContent = [
+          job.content.headline,
+          job.content.body,
+          job.content.hashtags?.length ? job.content.hashtags.join(' ') : '',
+        ]
+          .filter(Boolean)
+          .join('\n\n');
 
-      return { success: true, message: `Dispatched to ${job.channel}` };
+        const dispatchRes = await socialEngineClient.dispatch({
+          text: bodyContent,
+          headline: job.content.headline,
+          linkUrl: job.content.linkUrl,
+          imageUrl: job.content.mediaUrls?.[0],
+          postType: job.triggerEvent || 'syndication_broadcast',
+          platforms: [targetPlatform],
+          matchId: job.sourceEntityId,
+        });
+
+        if (dispatchRes.success && dispatchRes.summary) {
+          const platResult = dispatchRes.summary.results[targetPlatform];
+          if (platResult && !platResult.success) {
+            job.status = 'failed';
+            job.errorMessage = platResult.error || `Failed to post to ${job.channel}`;
+            await job.save();
+            return { success: false, message: job.errorMessage };
+          }
+
+          job.status = 'dispatched';
+          job.dispatchedAt = new Date().toISOString();
+          job.errorMessage = undefined;
+          if (platResult?.url) {
+            (job as any).platformPostUrl = platResult.url;
+          }
+          if (platResult?.platformPostId) {
+            (job as any).platformPostId = platResult.platformPostId;
+          }
+          await job.save();
+
+          await ChannelConfigModel.findOneAndUpdate(
+            { tenantSlug: job.tenantSlug, channel: job.channel },
+            {
+              $inc: { 'stats.totalDispatched': 1 },
+              $set: { 'stats.lastDispatchedAt': new Date().toISOString(), status: 'connected' },
+            },
+            { upsert: true }
+          );
+
+          return {
+            success: true,
+            message: `Dispatched to ${job.channel} via Social Engine`,
+            url: platResult?.url,
+          };
+        } else {
+          // If social engine reported an error or was unavailable
+          job.status = 'failed';
+          job.errorMessage = dispatchRes.error || `Social Engine failed to dispatch to ${job.channel}`;
+          await job.save();
+
+          await ChannelConfigModel.findOneAndUpdate(
+            { tenantSlug: job.tenantSlug, channel: job.channel },
+            {
+              $inc: { 'stats.totalFailed': 1 },
+              $set: { status: 'error' },
+            },
+            { upsert: true }
+          );
+
+          return { success: false, message: job.errorMessage };
+        }
+      } else {
+        // Non-social feeds (RSS 2.0, Apple News, Google News XML)
+        job.status = 'dispatched';
+        job.dispatchedAt = new Date().toISOString();
+        job.errorMessage = undefined;
+        await job.save();
+
+        await ChannelConfigModel.findOneAndUpdate(
+          { tenantSlug: job.tenantSlug, channel: job.channel },
+          {
+            $inc: { 'stats.totalDispatched': 1 },
+            $set: { 'stats.lastDispatchedAt': new Date().toISOString(), status: 'connected' },
+          },
+          { upsert: true }
+        );
+
+        return { success: true, message: `Dispatched feed update for ${job.channel}` };
+      }
     } catch (error: any) {
       job.status = 'failed';
       job.errorMessage = error?.message || 'Dispatch error';
@@ -79,6 +167,7 @@ export class ContentDistributionService {
       sport: string;
       targetChannels: DistributionChannelType[];
       linkUrl?: string;
+      mediaUrls?: string[];
     }
   ): Promise<SyndicationJob[]> {
     await connectDB();
@@ -98,6 +187,7 @@ export class ContentDistributionService {
           headline: payload.headline,
           body: payload.body,
           linkUrl: payload.linkUrl || 'https://goalmills.com',
+          mediaUrls: payload.mediaUrls,
           hashtags: [`#${payload.sport.toUpperCase()}`, '#BreakingNews', '#GoalMills'],
         },
         status: 'queued',

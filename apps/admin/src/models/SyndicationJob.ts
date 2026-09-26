@@ -68,6 +68,12 @@ const SyndicationJobSchema: Schema = new Schema(
     approvedBy: {
       type: String,
     },
+    platformPostUrl: {
+      type: String,
+    },
+    platformPostId: {
+      type: String,
+    },
   },
   {
     timestamps: true,

@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { headline, content, sport, targetChannels, tenantSlug, linkUrl } = body;
+    const { headline, content, sport, targetChannels, tenantSlug, linkUrl, mediaUrls } = body;
 
     if (!headline || !content || !targetChannels || targetChannels.length === 0) {
       return NextResponse.json(
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       sport: sport || 'football',
       targetChannels,
       linkUrl,
+      mediaUrls,
     });
 
     return NextResponse.json({

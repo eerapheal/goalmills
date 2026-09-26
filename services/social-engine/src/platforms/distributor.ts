@@ -81,11 +81,18 @@ export class PlatformDistributor {
     const activeTargets: PlatformAdapter[] = [];
     const allAdapters = this.getAllAdapters();
 
+    const targetArray = targets === 'all' ? 'all' : Array.isArray(targets) ? targets : [targets];
+
     for (const adapter of allAdapters) {
       const isTargeted =
-        targets === 'all' ||
-        (Array.isArray(targets) &&
-          targets.some((t) => t.toLowerCase() === adapter.name.toLowerCase()));
+        targetArray === 'all' ||
+        targetArray.some((t) => {
+          const norm = String(t).toLowerCase();
+          if (adapter.name.toLowerCase() === 'twitter') {
+            return norm === 'twitter' || norm === 'x_twitter' || norm === 'x';
+          }
+          return norm === adapter.name.toLowerCase();
+        });
 
       if (isTargeted) {
         activeTargets.push(adapter);

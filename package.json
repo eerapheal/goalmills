@@ -17,6 +17,7 @@
     "web": "turbo run dev --filter=web",
     "admin": "turbo run dev --filter=admin",
     "mobile": "turbo run dev --filter=mobiles",
+    "social-engine": "turbo run dev --filter=@goalmills/social-engine",
     "build:web": "turbo run build --filter=web...",
     "build:admin": "turbo run build --filter=admin...",
     "build:social-engine": "turbo run build --filter=@goalmills/social-engine...",

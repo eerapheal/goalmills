@@ -21,8 +21,21 @@ import { distributor } from './platforms/distributor';
 import SocialPost from './models/SocialPost';
 import SocialPlatformConfig from './models/SocialPlatformConfig';
 
+import axios from 'axios';
+
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Enable CORS for admin dashboard and internal microservice requests
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.json({ limit: '20mb' }));
 
@@ -150,22 +163,53 @@ app.post('/api/trigger/:workflow', async (req: Request, res: Response) => {
 // ── 4. Custom Manual Post Dispatch ──
 
 app.post('/api/dispatch', async (req: Request, res: Response) => {
-  const { text, postType, platforms, leagueId, leagueName, matchId, homeTeam, awayTeam, imageBase64 } =
-    req.body || {};
+  const {
+    text,
+    headline,
+    linkUrl,
+    postType,
+    platforms,
+    leagueId,
+    leagueName,
+    matchId,
+    homeTeam,
+    awayTeam,
+    imageBase64,
+    imageUrl,
+  } = req.body || {};
 
-  if (!text) {
-    return res.status(400).json({ success: false, error: 'text is required' });
+  if (!text && !headline) {
+    return res.status(400).json({ success: false, error: 'text or headline is required' });
   }
 
   try {
     let imageBuffer: Buffer | undefined;
     if (imageBase64) {
       imageBuffer = Buffer.from(imageBase64, 'base64');
+    } else if (imageUrl) {
+      try {
+        const imgRes = await axios.get(imageUrl, {
+          responseType: 'arraybuffer',
+          timeout: 8000,
+        });
+        imageBuffer = Buffer.from(imgRes.data);
+      } catch (err: any) {
+        logger.warn(`Could not download image from ${imageUrl}: ${err.message}`);
+      }
+    }
+
+    // Build complete text if headline and linkUrl provided
+    let fullText = text || '';
+    if (headline && !fullText.includes(headline)) {
+      fullText = fullText ? `${headline}\n\n${fullText}` : headline;
+    }
+    if (linkUrl && !fullText.includes(linkUrl)) {
+      fullText = `${fullText}\n\n🔗 ${linkUrl}`;
     }
 
     const summary = await orchestrator.dispatchManualPost(
       {
-        text,
+        text: fullText,
         imageBuffer,
         postType: postType || 'manual',
         leagueId,
