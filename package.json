@@ -26,13 +26,11 @@
     "mailer:docker:down": "docker compose -f services/mailer/docker-compose.yml down",
     "mailer:dev": "cd services/mailer && go run ./cmd/server/main.go"
   },
-  "dependencies": {
-    "turbo": "^1.11.0"
-  },
   "devDependencies": {
     "@types/react": "~19.2.18",
     "@types/react-dom": "~19.2.4",
     "prettier": "^3.1.0",
+    "turbo": "^1.11.0",
     "typescript": "^5.9.0"
   },
   "packageManager": "pnpm@8.10.0",
