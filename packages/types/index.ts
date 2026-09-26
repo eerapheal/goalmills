@@ -4211,3 +4211,99 @@ export interface AdvertiserHubStats {
     ctr: number;
   }>;
 }
+
+// ==========================================
+// PHASE 11: SOCIAL MEDIA AUTOMATION ENGINE
+// ==========================================
+
+export type SocialPlatform =
+  | 'twitter'
+  | 'telegram'
+  | 'whatsapp'
+  | 'facebook'
+  | 'linkedin'
+  | 'youtube'
+  | 'tiktok';
+
+export type SocialPostType =
+  | 'weekly_fixtures'
+  | 'pre_match'
+  | 'match_day_reminder'
+  | 'ht_scorecard'
+  | 'ft_scorecard'
+  | 'post_match'
+  | 'manual';
+
+export type SocialPostStatus = 'queued' | 'posted' | 'failed' | 'retrying';
+
+export type SocialPlatformHealth = 'healthy' | 'degraded' | 'down' | 'unconfigured';
+
+export interface ISocialPost {
+  _id?: string;
+  platform: SocialPlatform;
+  postType: SocialPostType;
+  matchId?: string;
+  leagueId?: string;
+  leagueName?: string;
+  homeTeam?: string;
+  awayTeam?: string;
+  content: string;
+  imageUrl?: string;
+  platformPostId?: string;
+  platformPostUrl?: string;
+  status: SocialPostStatus;
+  error?: string;
+  retryCount?: number;
+  postedAt?: string;
+  scheduledFor?: string;
+  triggeredBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ISocialPlatformConfig {
+  _id?: string;
+  platform: SocialPlatform;
+  enabled: boolean;
+  credentials?: Record<string, any>;
+  config?: Record<string, any>;
+  enabledPostTypes: SocialPostType[];
+  enabledLeagueIds: number[];
+  lastSuccessAt?: string;
+  lastError?: string;
+  healthStatus: SocialPlatformHealth;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IMatchSchedule {
+  _id?: string;
+  matchId: string;
+  currentState: string;
+  leagueId?: string;
+  leagueName?: string;
+  homeTeam?: string;
+  awayTeam?: string;
+  eventDate?: string;
+  eventTime?: string;
+  score?: string;
+  halfTimeScore?: string;
+  lastUpdated?: string;
+  htScorecardPosted?: boolean;
+  ftScorecardPosted?: boolean;
+  postMatchPosted?: boolean;
+}
+
+export interface SocialAutomationStats {
+  totalPosts: number;
+  postsToday: number;
+  postsThisWeek: number;
+  successRate: number;
+  activePlatforms: number;
+  totalPlatforms: number;
+  trackedMatchesCount: number;
+  platformHealth: Record<SocialPlatform, SocialPlatformHealth>;
+  postsByPlatform: Record<SocialPlatform, number>;
+  postsByType: Record<SocialPostType, number>;
+}
+

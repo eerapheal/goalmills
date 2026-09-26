@@ -181,6 +181,15 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
         requiredPermission: 'articles:draft',
       },
       {
+        id: 'social_automation',
+        label: 'Social Automation',
+        href: '/admin/social',
+        icon: FiZap,
+        requiredPermission: 'articles:draft',
+        badge: 'Auto',
+        badgeColor: 'emerald',
+      },
+      {
         id: 'search',
         label: 'Search Diagnostics',
         href: '/admin/search',

@@ -26,3 +26,35 @@ services:
         value: https://goalmills-web.vercel.app
       - key: CRON_SECRET
         value: ddf52902bf5c49541c119eaae081ae19f11f5672da0f8db763ee9c679fd45440
+
+  - type: web
+    name: goalmills-social-engine
+    runtime: docker
+    dockerfilePath: ./services/social-engine/Dockerfile
+    dockerContext: ./services/social-engine
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URL
+        sync: false
+      - key: FOOTBALL_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHANNEL_ID
+        sync: false
+      - key: TWITTER_API_KEY
+        sync: false
+      - key: TWITTER_API_SECRET
+        sync: false
+      - key: TWITTER_ACCESS_TOKEN
+        sync: false
+      - key: TWITTER_ACCESS_SECRET
+        sync: false

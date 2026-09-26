@@ -1,0 +1,31 @@
+{
+  "name": "@goalmills/social-engine",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc",
+    "start": "node dist/index.js",
+    "typecheck": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "@goalmills/types": "workspace:*",
+    "axios": "^1.9.0",
+    "cloudinary": "^2.8.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "form-data": "^4.0.2",
+    "ioredis": "^6.0.0",
+    "mongoose": "^9.1.2",
+    "node-cron": "^3.0.3",
+    "sharp": "^0.34.0",
+    "twitter-api-v2": "^1.19.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.15.0",
+    "@types/node-cron": "^3.0.11",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
