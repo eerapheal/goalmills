@@ -37,11 +37,26 @@ for (const comp of CANONICAL_COMPETITIONS_LIST) {
 // Well-known alias overrides from provider quirks (exact match only)
 EXACT_NAME_COUNTRY_MAP.set('england:::premier league', 'ENG-PREMIER-LEAGUE');
 EXACT_NAME_COUNTRY_MAP.set('england:::championship', 'ENG-CHAMPIONSHIP');
+EXACT_NAME_COUNTRY_MAP.set("england:::women's super league", 'ENG-WOMENS-SUPER-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('england:::womens super league', 'ENG-WOMENS-SUPER-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set("england:::barclays women's super league", 'ENG-WOMENS-SUPER-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('england:::wsl', 'ENG-WOMENS-SUPER-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('england:::fa cup', 'ENG-FA-CUP');
 EXACT_NAME_COUNTRY_MAP.set('spain:::la liga', 'ESP-LA-LIGA');
 EXACT_NAME_COUNTRY_MAP.set('spain:::primera division', 'ESP-LA-LIGA');
+EXACT_NAME_COUNTRY_MAP.set('spain:::copa del rey', 'ESP-COPA-DEL-REY');
+EXACT_NAME_COUNTRY_MAP.set('spain:::liga f', 'ESP-LIGA-F');
 EXACT_NAME_COUNTRY_MAP.set('italy:::serie a', 'ITA-SERIE-A');
+EXACT_NAME_COUNTRY_MAP.set('italy:::coppa italia', 'ITA-COPPA-ITALIA');
+EXACT_NAME_COUNTRY_MAP.set('italy:::serie a femminile', 'ITA-SERIE-A-FEMMINILE');
 EXACT_NAME_COUNTRY_MAP.set('germany:::bundesliga', 'GER-BUNDESLIGA');
+EXACT_NAME_COUNTRY_MAP.set('germany:::dfb-pokal', 'GER-DFB-POKAL');
+EXACT_NAME_COUNTRY_MAP.set('germany:::dfb pokal', 'GER-DFB-POKAL');
+EXACT_NAME_COUNTRY_MAP.set('germany:::frauen-bundesliga', 'GER-FRAUEN-BUNDESLIGA');
 EXACT_NAME_COUNTRY_MAP.set('france:::ligue 1', 'FRA-LIGUE-1');
+EXACT_NAME_COUNTRY_MAP.set('france:::coupe de france', 'FRA-COUPE-DE-FRANCE');
+EXACT_NAME_COUNTRY_MAP.set('france:::division 1 féminine', 'FRA-DIVISION-1-FEMININE');
+EXACT_NAME_COUNTRY_MAP.set('france:::d1 arkema', 'FRA-DIVISION-1-FEMININE');
 EXACT_NAME_COUNTRY_MAP.set('nigeria:::npfl', 'NGA-NPFL');
 EXACT_NAME_COUNTRY_MAP.set('nigeria:::nigeria premier league', 'NGA-NPFL');
 EXACT_NAME_COUNTRY_MAP.set('south africa:::premier soccer league', 'ZAF-PSL');

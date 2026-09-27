@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cacheGet, cacheSet, singleFlight } from '@/lib/redisCache';
 import { broadcastLiveScore } from '@/lib/socketBroadcaster';
-import { resolveCompetitionForFixture } from '@/lib/football';
+import { resolveCompetitionForFixture, processFixture } from '@/lib/football';
 
 let rateLimitBackoffUntil = 0;
 let consecutiveFailures = 0;
@@ -442,15 +442,22 @@ export async function GET(request: NextRequest) {
 
       const rawListResult = Array.isArray(sanitizedResult) ? sanitizedResult : [];
 
-      // Enrich fixtures with canonical competition resolution without breaking existing fields
+      // Enrich fixtures with canonical competition resolution and single normalization pipeline
       const listResult =
         rawListResult.length > 0 && rawListResult[0]?.event_key
           ? rawListResult.map((match: any) => {
+              const normalized = processFixture(match);
               const res = resolveCompetitionForFixture(match);
               return {
                 ...match,
-                competitionId: res.competitionId,
-                classificationStatus: res.status,
+                competitionId: normalized.competitionId,
+                classificationStatus: normalized.classificationStatus,
+                gender: normalized.gender,
+                ageCategory: normalized.ageCategory,
+                countryCode: normalized.countryCode,
+                confederationCode: normalized.confederationCode,
+                priorityRank: normalized.priorityRank,
+                _normalized: normalized,
                 ...(res.competition
                   ? {
                       canonicalCompetition: {
@@ -462,6 +469,8 @@ export async function GET(request: NextRequest) {
                         confederationCode: res.competition.confederationCode,
                         tier: res.competition.tier,
                         priorityRank: res.competition.priorityRank,
+                        gender: res.competition.gender,
+                        ageCategory: res.competition.ageCategory,
                       },
                     }
                   : {}),
