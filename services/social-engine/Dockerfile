@@ -25,7 +25,8 @@ COPY services/social-engine ./services/social-engine
 
 # Install dependencies for social-engine and compile TypeScript
 RUN pnpm install --frozen-lockfile --filter @goalmills/social-engine...
-RUN pnpm --filter @goalmills/social-engine build
+RUN pnpm --filter @goalmills/social-engine build && \
+    node -e "const fs=require('fs'),path=require('path'); const d=path.resolve('/app/services/social-engine/dist'); const nested=path.join(d,'services','social-engine','src','index.js'); const top=path.join(d,'index.js'); if(fs.existsSync(nested) && !fs.existsSync(top)){ fs.writeFileSync(top, \"require('./services/social-engine/src/index.js');\\n\"); console.log('Created dist/index.js entry wrapper'); }"
 
 # Production runtime stage
 FROM node:22-slim AS runner
@@ -50,4 +51,4 @@ COPY --from=builder /app/packages/types /app/packages/types
 COPY --from=builder /app/services/social-engine /app/services/social-engine
 
 EXPOSE 4000
-CMD ["node", "dist/index.js"]
+CMD ["node", "-e", "const fs=require('fs'); const p=fs.existsSync('./dist/index.js')?'./dist/index.js':'./dist/services/social-engine/src/index.js'; require(p);"]
