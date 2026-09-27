@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const engineUrl = process.env.SOCIAL_ENGINE_URL || 'http://localhost:4000';
+    const engineUrl = process.env.SOCIAL_ENGINE_URL || 'https://goalmills-2.onrender.com';
 
     try {
       const response = await fetch(`${engineUrl}/api/trigger/${workflow}`, {

@@ -76,7 +76,9 @@ export default function ContentDistributionStudio() {
   const [jobs, setJobs] = useState<SyndicationJob[]>([]);
   const [engineStatus, setEngineStatus] = useState<SocialEngineStatusData | null>(null);
   const [platforms, setPlatforms] = useState<PlatformDetail[]>([]);
-  const [engineBaseUrl, setEngineBaseUrl] = useState<string>('http://localhost:4000');
+  const [engineBaseUrl, setEngineBaseUrl] = useState<string>(
+    process.env.NEXT_PUBLIC_SOCIAL_ENGINE_URL || 'https://goalmills-2.onrender.com'
+  );
   const [loading, setLoading] = useState(true);
   const [broadcasting, setBroadcasting] = useState(false);
   const [testingPlatform, setTestingPlatform] = useState<string | null>(null);

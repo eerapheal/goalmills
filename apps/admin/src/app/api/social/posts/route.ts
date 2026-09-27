@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Try proxying retry request to social-engine service
-    const engineUrl = process.env.SOCIAL_ENGINE_URL || 'http://localhost:4000';
+    const engineUrl = process.env.SOCIAL_ENGINE_URL || 'https://goalmills-2.onrender.com';
     try {
       const retryRes = await fetch(`${engineUrl}/api/posts/${postId}/retry`, {
         method: 'POST',
