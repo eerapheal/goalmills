@@ -1,0 +1,271 @@
+/**
+ * GoalMills Football Competition Architecture & Data Models
+ * Canonical types, enums, and interfaces for multi-tier football taxonomy.
+ */
+
+// ── Controlled Enums & Scalar Types ──────────────────────────────────────────
+
+export type CompetitionGender = 'MALE' | 'FEMALE' | 'MIXED' | 'UNKNOWN';
+
+export type CompetitionAgeCategory =
+  | 'U15'
+  | 'U16'
+  | 'U17'
+  | 'U18'
+  | 'U19'
+  | 'U20'
+  | 'U21'
+  | 'U23'
+  | 'SENIOR'
+  | 'ALL_AGES';
+
+export type CompetitionType =
+  | 'LEAGUE'
+  | 'CUP'
+  | 'SUPER_CUP'
+  | 'CHAMPIONSHIP'
+  | 'QUALIFIER'
+  | 'TOURNAMENT'
+  | 'NATIONS_LEAGUE'
+  | 'WORLD_CUP'
+  | 'CONTINENTAL_CLUB'
+  | 'CONTINENTAL_NATIONAL'
+  | 'FRIENDLY'
+  | 'OTHER';
+
+export type CompetitionLevel =
+  | 'GLOBAL'
+  | 'CONFEDERATION'
+  | 'NATIONAL'
+  | 'DOMESTIC'
+  | 'REGIONAL';
+
+export type CompetitionTier = 1 | 2 | 3 | 4 | 5 | 6;
+
+export type ConfederationCode =
+  | 'FIFA'
+  | 'UEFA'
+  | 'CAF'
+  | 'AFC'
+  | 'CONMEBOL'
+  | 'CONCACAF'
+  | 'OFC';
+
+export type CompetitionStatus =
+  | 'ACTIVE'
+  | 'INACTIVE'
+  | 'ARCHIVED'
+  | 'PROVIDER_UNAVAILABLE'
+  | 'PENDING_VERIFICATION';
+
+export type FixtureClassificationStatus =
+  | 'RESOLVED'
+  | 'UNRESOLVED'
+  | 'LOW_CONFIDENCE'
+  | 'QUARANTINED';
+
+// ── Canonical Competition ────────────────────────────────────────────────────
+
+export interface CanonicalCompetition {
+  /** GoalMills canonical ID, e.g. "ENG-PREMIER-LEAGUE" */
+  id: string;
+
+  /** AllSportsAPI league_key (0 or -1 if provider unavailable) */
+  providerId: number;
+  providerName: 'allsportsapi';
+
+  /** API-Football league ID (for logos/alternative provider) */
+  apiSportsId?: number;
+
+  /** URL slug, e.g. "premier-league" */
+  slug: string;
+
+  /** Full display name */
+  name: string;
+
+  /** Abbreviated name for UI chips */
+  shortName: string;
+
+  /** Country ISO 3166-1 alpha-2 / FIFA code, e.g. "GB-ENG" */
+  countryCode: string;
+  countryName: string;
+
+  /** Confederation membership */
+  confederationCode: ConfederationCode;
+
+  sport: 'football';
+  gender: CompetitionGender;
+  ageCategory: CompetitionAgeCategory;
+  competitionType: CompetitionType;
+  level: CompetitionLevel;
+  tier: CompetitionTier;
+
+  season: string;
+  status: CompetitionStatus;
+
+  // Classification booleans for high-speed deterministic filtering
+  isDomestic: boolean;
+  isContinental: boolean;
+  isInternational: boolean;
+  isNationalTeam: boolean;
+  isYouth: boolean;
+  isSenior: boolean;
+  isWomens: boolean;
+  isMens: boolean;
+
+  // Display & SEO
+  isFeatured: boolean;
+  isIndexable: boolean;
+  priorityRank: number;
+  displayOrder: number;
+
+  // Media
+  logoUrl: string;
+  countryFlagUrl: string;
+
+  // SEO
+  canonicalSlug: string;
+
+  // Hierarchy
+  parentCompetitionId?: string;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Normalized Fixture ───────────────────────────────────────────────────────
+
+export interface NormalizedFixture {
+  /** GoalMills internal fixture ID */
+  fixtureId: string;
+
+  /** Provider's original fixture ID */
+  providerFixtureId: string;
+
+  /** GoalMills canonical competition ID */
+  competitionId: string;
+
+  seasonId: string;
+
+  homeTeamId: string;
+  homeTeamName: string;
+  homeTeamLogo: string;
+
+  awayTeamId: string;
+  awayTeamName: string;
+  awayTeamLogo: string;
+
+  countryCode: string;
+  confederationCode: ConfederationCode;
+
+  gender: CompetitionGender;
+  ageCategory: CompetitionAgeCategory;
+
+  status: string;
+  classificationStatus: FixtureClassificationStatus;
+
+  scheduledAt: string;
+  startedAt?: string;
+  finishedAt?: string;
+
+  homeScore?: number;
+  awayScore?: number;
+  htHomeScore?: number;
+  htAwayScore?: number;
+  penaltyResult?: string;
+
+  round?: string;
+  stage?: string;
+  group?: string;
+  venue?: string;
+  referee?: string;
+
+  priorityRank: number;
+  isFeatured: boolean;
+  lastUpdatedAt: string;
+
+  /** Original provider data preserved for backward compatibility */
+  _raw?: Record<string, unknown>;
+}
+
+// ── Country & Confederation Hierarchy ────────────────────────────────────────
+
+export interface CountryRecord {
+  code: string; // ISO alpha-2 or internal code (e.g., "NG", "GB-ENG")
+  name: string;
+  confederationCode: ConfederationCode;
+  flagUrl: string;
+  priorityRank: number;
+  isFeatured: boolean;
+  /** Priority domestic competition IDs */
+  priorityCompetitions: string[];
+}
+
+export interface ConfederationRecord {
+  code: ConfederationCode;
+  name: string;
+  slug: string;
+  logoUrl: string;
+  displayOrder: number;
+}
+
+// ── Priority Club Model ──────────────────────────────────────────────────────
+
+export interface PriorityClub {
+  id: string;
+  providerId: string;
+  providerName: 'allsportsapi';
+  name: string;
+  shortName: string;
+  slug: string;
+
+  competitionId: string;
+  countryCode: string;
+  confederationCode: ConfederationCode;
+
+  logoUrl: string;
+  stadium?: string;
+  founded?: number;
+
+  globalRank: number;
+  countryRank: number;
+  competitionRank: number;
+  continentalPriority: number;
+
+  isFeatured: boolean;
+  isPopular: boolean;
+  isAfrican: boolean;
+  isNationalTeam: boolean;
+  isWomens: boolean;
+
+  priorityRank: number;
+}
+
+// ── Africa Priority Registry Model ───────────────────────────────────────────
+
+export interface AfricaPriorityEntry {
+  countryCode: string;
+  countryName: string;
+  competitionId: string;
+  competitionName: string;
+  tier: CompetitionTier;
+  gender: CompetitionGender;
+  ageCategory: CompetitionAgeCategory;
+  priorityRank: number;
+  providerId: number;
+  isActive: boolean;
+}
+
+// ── Filter and Sort Types ────────────────────────────────────────────────────
+
+export interface FixtureFilterCriteria {
+  competitionId?: string;
+  countryCode?: string;
+  confederationCode?: ConfederationCode;
+  gender?: CompetitionGender;
+  isLive?: boolean;
+  date?: string;
+  status?: string;
+}
+
+export type CompetitionSortOption = 'priority' | 'name' | 'tier' | 'country';

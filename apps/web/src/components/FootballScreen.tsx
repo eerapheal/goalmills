@@ -9,9 +9,15 @@ import {
   FootballProbability,
   FootballCountry,
   FootballLeague,
+  FootballEvent,
 } from '@goalmills/types';
 import { GoalmillsLoader } from './GoalmillsLoader';
 import { footballRoutes } from '@/lib/slugUtils';
+import {
+  isFixtureInCompetition,
+  resolveCompetitionForFixture,
+  sortFootballEvents,
+} from '@/lib/football';
 import {
   FiRefreshCw,
   FiSearch,
@@ -390,10 +396,17 @@ export function FootballScreen() {
     if (selectedLeague !== 'all') {
       const matchLeague = competitions.find((c) => c.id === selectedLeague);
       list = list.filter((f) => {
+        if (!f) return false;
+        // Strict provider ID match
         if (f.league_key && String(f.league_key) === selectedLeague) return true;
+        // Strict canonical competition resolution (No substring match)
+        if (isFixtureInCompetition(f, selectedLeague)) return true;
         if (matchLeague) {
-          const lName = (f.league_name || '').toLowerCase();
-          return lName.includes(matchLeague.name.toLowerCase());
+          if (f.league_key && String(f.league_key) === String(matchLeague.id)) return true;
+          // Exact name match fallback only (never loose substring)
+          const lName = (f.league_name || '').trim().toLowerCase();
+          const targetName = matchLeague.name.trim().toLowerCase();
+          return lName === targetName;
         }
         return false;
       });
@@ -413,44 +426,48 @@ export function FootballScreen() {
     return list;
   }, [fixtures, activeTab, searchQuery, selectedLeague, competitions]);
 
-  // Group fixtures by competition
+  // Group fixtures by canonical competition with deterministic ordering
   const leagueGroups = useMemo(() => {
     const groups: {
       [key: string]: {
         title: string;
+        shortName?: string;
         logo?: string;
         league_key?: string | number;
+        priorityRank: number;
         matches: UnifiedWebMatchEvent[];
       };
     } = {};
 
     filteredFixtures.forEach((item) => {
-      const leagueTitle = item.league_name || 'Other Matches';
-      if (!groups[leagueTitle]) {
-        groups[leagueTitle] = {
-          title: leagueTitle,
-          logo: item.league_logo,
+      const resolved = resolveCompetitionForFixture(item);
+      const groupKey = resolved.isResolved
+        ? resolved.competitionId
+        : item.league_name || 'Other Matches';
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = {
+          title: resolved.competition?.name || item.league_name || 'Other Matches',
+          shortName: resolved.competition?.shortName,
+          logo: resolved.competition?.logoUrl || item.league_logo,
           league_key: item.league_key,
+          priorityRank: resolved.competition?.priorityRank ?? 999,
           matches: [],
         };
       }
-      groups[leagueTitle].matches.push(item);
+      groups[groupKey].matches.push(item);
     });
 
-    const MAJOR_LEAGUE_IDS = ['152', '3', '302', '207', '175', '168'];
-
-    return Object.values(groups).sort((a, b) => {
-      const aKeyStr = String(a.league_key || '');
-      const bKeyStr = String(b.league_key || '');
-
-      const aIdx = MAJOR_LEAGUE_IDS.indexOf(aKeyStr);
-      const bIdx = MAJOR_LEAGUE_IDS.indexOf(bKeyStr);
-
-      if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
-      if (aIdx !== -1) return -1;
-      if (bIdx !== -1) return 1;
-      return a.title.localeCompare(b.title);
-    });
+    // Deterministically sort matches inside each group and sort groups by priorityRank
+    return Object.values(groups)
+      .map((g) => ({
+        ...g,
+        matches: sortFootballEvents(g.matches as FootballEvent[]) as UnifiedWebMatchEvent[],
+      }))
+      .sort((a, b) => {
+        if (a.priorityRank !== b.priorityRank) return a.priorityRank - b.priorityRank;
+        return a.title.localeCompare(b.title);
+      });
   }, [filteredFixtures]);
 
   const tabs = [

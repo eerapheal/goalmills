@@ -4307,3 +4307,5 @@ export interface SocialAutomationStats {
   postsByType: Record<SocialPostType, number>;
 }
 
+export * from './football';
+

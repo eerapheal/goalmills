@@ -1567,3 +1567,23 @@ export function getAllLeagueIds(): string[] {
 export function getFeaturedLeagueIds(): string[] {
   return ALL_COMPETITIONS.filter((c) => c.featured || c.tier === 1).map((c) => String(c.id));
 }
+
+// Re-export canonical football registry and resolver helpers for backward compatibility
+export {
+  CANONICAL_COMPETITIONS,
+  CANONICAL_COMPETITIONS_LIST,
+  getCanonicalCompetition,
+  getCanonicalCompetitionByProviderId,
+  getCompetitionsByCountry,
+  getCompetitionsByConfederation,
+  getFeaturedCompetitions,
+  getTop5EuropeanCompetitions,
+  getAfricaPriorityCompetitions,
+  isFixtureInCompetition,
+  resolveCompetitionForFixture,
+  normalizeFixture,
+  normalizeFixtures,
+  sortFootballEvents,
+  sortCompetitions,
+  sortNormalizedFixtures,
+} from './football';

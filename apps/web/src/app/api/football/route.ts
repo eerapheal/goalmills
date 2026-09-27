@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cacheGet, cacheSet, singleFlight } from '@/lib/redisCache';
 import { broadcastLiveScore } from '@/lib/socketBroadcaster';
+import { resolveCompetitionForFixture } from '@/lib/football';
 
 let rateLimitBackoffUntil = 0;
 let consecutiveFailures = 0;
@@ -439,7 +440,34 @@ export async function GET(request: NextRequest) {
           ? data
           : (data.result ?? data.response ?? data);
 
-      const listResult = Array.isArray(sanitizedResult) ? sanitizedResult : [];
+      const rawListResult = Array.isArray(sanitizedResult) ? sanitizedResult : [];
+
+      // Enrich fixtures with canonical competition resolution without breaking existing fields
+      const listResult =
+        rawListResult.length > 0 && rawListResult[0]?.event_key
+          ? rawListResult.map((match: any) => {
+              const res = resolveCompetitionForFixture(match);
+              return {
+                ...match,
+                competitionId: res.competitionId,
+                classificationStatus: res.status,
+                ...(res.competition
+                  ? {
+                      canonicalCompetition: {
+                        id: res.competition.id,
+                        slug: res.competition.slug,
+                        name: res.competition.name,
+                        shortName: res.competition.shortName,
+                        countryCode: res.competition.countryCode,
+                        confederationCode: res.competition.confederationCode,
+                        tier: res.competition.tier,
+                        priorityRank: res.competition.priorityRank,
+                      },
+                    }
+                  : {}),
+              };
+            })
+          : rawListResult;
 
       const resultPayload = {
         success: 1,
