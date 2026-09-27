@@ -31,7 +31,7 @@ services:
     name: goalmills-social-engine
     runtime: docker
     dockerfilePath: ./services/social-engine/Dockerfile
-    dockerContext: ./services/social-engine
+    dockerContext: .
     plan: starter
     region: oregon
     healthCheckPath: /health

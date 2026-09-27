@@ -15,22 +15,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy package manifests
-COPY package.json tsconfig.json ./
+# Enable corepack and pnpm
+RUN corepack enable && corepack prepare pnpm@8.10.0 --activate
 
-# Install packages
-RUN npm install
+# Copy workspace configs and dependencies
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY packages/types ./packages/types
+COPY services/social-engine ./services/social-engine
 
-# Copy source code
-COPY src/ ./src/
-
-# Compile TypeScript
-RUN npm run build
+# Install dependencies for social-engine and compile TypeScript
+RUN pnpm install --frozen-lockfile --filter @goalmills/social-engine...
+RUN pnpm --filter @goalmills/social-engine build
 
 # Production runtime stage
 FROM node:22-slim AS runner
 
-WORKDIR /app
+WORKDIR /app/services/social-engine
 ENV NODE_ENV=production
 
 # Install runtime libraries (Cairo, Pango, RSVG, and FFmpeg for video slides)
@@ -45,9 +45,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/packages/types /app/packages/types
+COPY --from=builder /app/services/social-engine /app/services/social-engine
 
 EXPOSE 4000
 CMD ["node", "dist/index.js"]
