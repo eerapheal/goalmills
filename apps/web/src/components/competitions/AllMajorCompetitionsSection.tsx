@@ -30,6 +30,8 @@ export function AllMajorCompetitionsSection({
   const [selectedCategory, setSelectedCategory] = useState<CompetitionCategory | 'all'>(
     initialCategory
   );
+  const [selectedGender, setSelectedGender] = useState<'all' | 'men' | 'women'>('all');
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState<'all' | 'senior' | 'youth'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,12 +56,24 @@ export function AllMajorCompetitionsSection({
     return counts;
   }, []);
 
-  // Filtered competitions based on category and search query
+  // Filtered competitions based on category, gender, age, and search query
   const filteredCompetitions = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     return ALL_COMPETITIONS.filter((comp) => {
       const matchesCategory = selectedCategory === 'all' || comp.category === selectedCategory;
       if (!matchesCategory) return false;
+
+      // Strict Gender Isolation
+      if (selectedGender !== 'all') {
+        if (selectedGender === 'men' && comp.gender !== 'men') return false;
+        if (selectedGender === 'women' && comp.gender !== 'women') return false;
+      }
+
+      // Strict Age Group Isolation
+      if (selectedAgeGroup !== 'all') {
+        if (selectedAgeGroup === 'senior' && comp.ageGroup !== 'senior') return false;
+        if (selectedAgeGroup === 'youth' && comp.ageGroup === 'senior') return false;
+      }
 
       if (!query) return true;
       return (
@@ -68,11 +82,17 @@ export function AllMajorCompetitionsSection({
         comp.slug.toLowerCase().includes(query)
       );
     });
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, selectedGender, selectedAgeGroup, searchQuery]);
 
-  // Grouped competitions for "all" mode when no search query
+  // Grouped competitions for "all" mode when no search query and default filters
+  const isCustomFiltered =
+    selectedCategory !== 'all' ||
+    selectedGender !== 'all' ||
+    selectedAgeGroup !== 'all' ||
+    searchQuery.trim() !== '';
+
   const groupedCompetitions = useMemo(() => {
-    if (selectedCategory !== 'all' || searchQuery.trim() !== '') {
+    if (isCustomFiltered) {
       return null;
     }
 
@@ -93,17 +113,19 @@ export function AllMajorCompetitionsSection({
         };
       })
       .filter((g) => g.competitions.length > 0);
-  }, [selectedCategory, searchQuery]);
+  }, [isCustomFiltered]);
 
-  // Quick jump pill items
+  // Quick jump pill items (Elevating Africa CAF as first-class regional pillar)
   const quickFilters: { key: CompetitionCategory | 'all'; label: string; icon: string }[] = [
     { key: 'all', label: 'All Leagues', icon: '🌐' },
+    { key: 'caf', label: 'Africa (CAF)', icon: '🌍' },
     { key: 'european-top5', label: 'Top 5 Europe', icon: '⭐' },
     { key: 'european-club', label: 'European Cups', icon: '🏆' },
-    { key: 'caf', label: 'Africa (CAF)', icon: '🌍' },
     { key: 'fifa', label: 'FIFA Tournaments', icon: '🌐' },
     { key: 'domestic-cups', label: 'Domestic Cups', icon: '🥇' },
     { key: 'conmebol', label: 'South America', icon: '🌎' },
+    { key: 'concacaf', label: 'North America', icon: '🌎' },
+    { key: 'afc', label: 'Asia (AFC)', icon: '🌏' },
     { key: 'other-leagues', label: 'Global Leagues', icon: '⚽' },
   ];
 
@@ -282,11 +304,88 @@ export function AllMajorCompetitionsSection({
               );
             })}
           </div>
+
+          {/* Gender & Age Category Isolation Filters */}
+          <div className="flex flex-wrap items-center gap-2 ml-auto shrink-0 pt-1 sm:pt-0">
+            {/* Gender Toggle */}
+            <div className="flex items-center rounded-xl bg-[#061022] p-0.5 border border-white/10">
+              <button
+                type="button"
+                onClick={() => setSelectedGender('all')}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  selectedGender === 'all'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedGender('men')}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  selectedGender === 'men'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Men&apos;s
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedGender('women')}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  selectedGender === 'women'
+                    ? 'bg-pink-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Women&apos;s
+              </button>
+            </div>
+
+            {/* Age Group Toggle */}
+            <div className="flex items-center rounded-xl bg-[#061022] p-0.5 border border-white/10">
+              <button
+                type="button"
+                onClick={() => setSelectedAgeGroup('all')}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  selectedAgeGroup === 'all'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                All Ages
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedAgeGroup('senior')}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  selectedAgeGroup === 'senior'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Senior
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedAgeGroup('youth')}
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  selectedAgeGroup === 'youth'
+                    ? 'bg-amber-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Youth
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ─── COMPETITIONS CONTENT DISPLAY ─── */}
-      {searchQuery || selectedCategory !== 'all' ? (
+      {isCustomFiltered ? (
         // Filtered Grid View
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-slate-400 pb-1">
@@ -297,10 +396,12 @@ export function AllMajorCompetitionsSection({
               </span>
               <span>matching your filter</span>
             </div>
-            {(selectedCategory !== 'all' || searchQuery) && (
+            {isCustomFiltered && (
               <button
                 onClick={() => {
                   setSelectedCategory('all');
+                  setSelectedGender('all');
+                  setSelectedAgeGroup('all');
                   setSearchQuery('');
                 }}
                 className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
@@ -318,12 +419,13 @@ export function AllMajorCompetitionsSection({
               </div>
               <h3 className="text-sm font-bold text-white">No competitions found</h3>
               <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                We couldn&apos;t find any competitions matching &ldquo;{searchQuery}&rdquo;. Try
-                another name or country.
+                We couldn&apos;t find any competitions matching your selected filter. Try another category, gender, or search term.
               </p>
               <button
                 onClick={() => {
                   setSelectedCategory('all');
+                  setSelectedGender('all');
+                  setSelectedAgeGroup('all');
                   setSearchQuery('');
                 }}
                 className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white transition shadow-lg"

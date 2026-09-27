@@ -7,3 +7,5 @@ export * from './africaRegistry';
 export * from './competitionResolver';
 export * from './fixtureNormalizer';
 export * from './fixtureSorter';
+export * from './countryDomesticConfigs';
+export * from './hierarchyService';

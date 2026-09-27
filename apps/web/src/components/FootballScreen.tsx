@@ -10,6 +10,7 @@ import {
   FootballCountry,
   FootballLeague,
   FootballEvent,
+  CompetitionGender,
 } from '@goalmills/types';
 import { GoalmillsLoader } from './GoalmillsLoader';
 import { footballRoutes } from '@/lib/slugUtils';
@@ -18,6 +19,7 @@ import {
   resolveCompetitionForFixture,
   sortFootballEvents,
 } from '@/lib/football';
+import { FootballNavSwitcher, MainCategoryTab } from './football/FootballNavSwitcher';
 import {
   FiRefreshCw,
   FiSearch,
@@ -182,6 +184,10 @@ export const MAJOR_LEAGUES = [
 export function FootballScreen() {
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
   const [selectedLeague, setSelectedLeague] = useState<string>('all');
+  const [selectedNavCategory, setSelectedNavCategory] = useState<MainCategoryTab>('all');
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedGender, setSelectedGender] = useState<CompetitionGender | 'all'>('all');
+  const [selectedAgeCategory, setSelectedAgeCategory] = useState<'senior' | 'youth' | 'all'>('all');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -193,6 +199,15 @@ export function FootballScreen() {
   const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
   const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
   const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
+
+  const handleResetFilters = useCallback(() => {
+    setSelectedNavCategory('all');
+    setSelectedCountry(null);
+    setSelectedGender('all');
+    setSelectedAgeCategory('all');
+    setSelectedLeague('all');
+    setSearchQuery('');
+  }, []);
 
   // Dynamically load active leagues if available
   useEffect(() => {
@@ -393,6 +408,67 @@ export function FootballScreen() {
       );
     }
 
+    // 1. Strict Confederation / Hub filtering
+    if (selectedNavCategory !== 'all') {
+      list = list.filter((f) => {
+        const comp = resolveCompetitionForFixture(f).competition;
+        if (!comp) return false;
+
+        if (selectedNavCategory === 'CAF') {
+          return comp.confederationCode === 'CAF';
+        }
+        if (selectedNavCategory === 'top5') {
+          const top5Countries = new Set(['GB-ENG', 'ES', 'IT', 'DE', 'FR']);
+          return top5Countries.has(comp.countryCode) && comp.tier === 1 && comp.isDomestic;
+        }
+        if (selectedNavCategory === 'UEFA') {
+          return comp.confederationCode === 'UEFA';
+        }
+        if (selectedNavCategory === 'FIFA') {
+          return comp.confederationCode === 'FIFA' || comp.level === 'GLOBAL';
+        }
+        if (selectedNavCategory === 'CONMEBOL') {
+          return comp.confederationCode === 'CONMEBOL';
+        }
+        if (selectedNavCategory === 'CONCACAF') {
+          return comp.confederationCode === 'CONCACAF';
+        }
+        if (selectedNavCategory === 'AFC') {
+          return comp.confederationCode === 'AFC';
+        }
+        return true;
+      });
+    }
+
+    // 2. Strict Country filtering
+    if (selectedCountry !== null) {
+      list = list.filter((f) => {
+        const comp = resolveCompetitionForFixture(f).competition;
+        return comp ? comp.countryCode.toUpperCase() === selectedCountry.toUpperCase() : false;
+      });
+    }
+
+    // 3. Strict Gender separation (No cross-mixing)
+    if (selectedGender !== 'all') {
+      list = list.filter((f) => {
+        const comp = resolveCompetitionForFixture(f).competition;
+        return comp ? comp.gender === selectedGender : selectedGender === 'MALE';
+      });
+    }
+
+    // 4. Strict Age-Category separation (No youth/senior mixing)
+    if (selectedAgeCategory !== 'all') {
+      list = list.filter((f) => {
+        const comp = resolveCompetitionForFixture(f).competition;
+        if (comp) {
+          if (selectedAgeCategory === 'youth') return comp.isYouth;
+          if (selectedAgeCategory === 'senior') return comp.isSenior;
+        }
+        return selectedAgeCategory === 'senior';
+      });
+    }
+
+    // 5. Strict Competition / League selection
     if (selectedLeague !== 'all') {
       const matchLeague = competitions.find((c) => c.id === selectedLeague);
       list = list.filter((f) => {
@@ -424,7 +500,17 @@ export function FootballScreen() {
     }
 
     return list;
-  }, [fixtures, activeTab, searchQuery, selectedLeague, competitions]);
+  }, [
+    fixtures,
+    activeTab,
+    searchQuery,
+    selectedLeague,
+    selectedNavCategory,
+    selectedCountry,
+    selectedGender,
+    selectedAgeCategory,
+    competitions,
+  ]);
 
   // Group fixtures by canonical competition with deterministic ordering
   const leagueGroups = useMemo(() => {
@@ -481,6 +567,19 @@ export function FootballScreen() {
 
   return (
     <div className="w-full space-y-6">
+      {/* Multi-Dimensional Navigation Switcher */}
+      <FootballNavSwitcher
+        selectedCategory={selectedNavCategory}
+        onCategoryChange={setSelectedNavCategory}
+        selectedCountry={selectedCountry}
+        onCountryChange={setSelectedCountry}
+        selectedGender={selectedGender}
+        onGenderChange={setSelectedGender}
+        selectedAgeCategory={selectedAgeCategory}
+        onAgeCategoryChange={setSelectedAgeCategory}
+        onResetFilters={handleResetFilters}
+      />
+
       {/* Top Controls Header */}
       <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
         {/* Navigation Tabs Bar */}

@@ -297,13 +297,6 @@ export const AFRICA_DOMESTIC_CONFIGS: Record<string, CountryDomesticConfig> = {
         slug: 'npfl',
         providerId: 247,
       },
-      {
-        competitionId: 'NGA-FEDERATION-CUP',
-        role: 'DOMESTIC_CUP',
-        displayName: 'President Federation Cup',
-        slug: 'nigeria-federation-cup',
-        providerId: 0,
-      },
     ],
   },
   ZA: {
@@ -319,13 +312,6 @@ export const AFRICA_DOMESTIC_CONFIGS: Record<string, CountryDomesticConfig> = {
         displayName: 'Betway Premiership (PSL)',
         slug: 'south-african-psl',
         providerId: 288,
-      },
-      {
-        competitionId: 'ZAF-NEDBANK-CUP',
-        role: 'DOMESTIC_CUP',
-        displayName: 'Nedbank Cup',
-        slug: 'nedbank-cup',
-        providerId: 0,
       },
     ],
   },

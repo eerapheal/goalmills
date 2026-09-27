@@ -27,6 +27,7 @@ import {
   FiZap,
 } from 'react-icons/fi';
 import { EntityService, PlayerMeta, OfficialMeta, CoachMeta, ClubMeta } from '@/lib/entityService';
+import { AllMajorCompetitionsSection } from '@/components/competitions/AllMajorCompetitionsSection';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -2400,6 +2401,11 @@ export function FootballPageClient({
             ))}
           </div>
         </section>
+
+        {/* ════════════════════════════════════════
+            GLOBAL & AFRICAN COMPETITIONS DIRECTORY
+        ════════════════════════════════════════ */}
+        <AllMajorCompetitionsSection />
 
         {/* ════════════════════════════════════════
             SPECIAL SECTION 4: FOOTBALL DAILY BRIEF
