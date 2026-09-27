@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc",
+    "build": "tsc",
     "start": "node dist/index.js",
-    "typecheck": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@goalmills/types": "workspace:*",
