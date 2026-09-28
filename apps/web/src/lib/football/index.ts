@@ -16,3 +16,5 @@ export * from './ageGroupResolver';
 export * from './fixtureValidator';
 export * from './fixturePipeline';
 export * from './fixtureCacheService';
+export * from './footballSchema';
+export * from './seoService';

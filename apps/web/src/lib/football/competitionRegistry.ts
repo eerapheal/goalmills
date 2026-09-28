@@ -2499,6 +2499,10 @@ for (const comp of CANONICAL_COMPETITIONS_LIST) {
   }
 }
 
+export function getAllCanonicalCompetitions(): CanonicalCompetition[] {
+  return CANONICAL_COMPETITIONS_LIST;
+}
+
 export function getCanonicalCompetition(idOrSlug: string): CanonicalCompetition | undefined {
   if (!idOrSlug) return undefined;
   const normalized = idOrSlug.trim().toLowerCase();
