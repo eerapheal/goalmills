@@ -6,6 +6,7 @@ if (!process.env.NEXT_PRIVATE_WORKER_CONCURRENCY) {
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@goalmills/ui', '@goalmills/types'],
+  serverExternalPackages: ['ioredis', 'mongoose'],
   typescript: {
     // Typecheck is strictly enforced in dedicated `pnpm typecheck` suite
     ignoreBuildErrors: true,
