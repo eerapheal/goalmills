@@ -269,3 +269,88 @@ export interface FixtureFilterCriteria {
 }
 
 export type CompetitionSortOption = 'priority' | 'name' | 'tier' | 'country';
+
+// ── Competition Format & Standings Engine Types (Phase 1) ───────────────────
+
+export type CompetitionFormatType =
+  | 'LEAGUE'
+  | 'GROUP_STAGE'
+  | 'LEAGUE_PHASE'
+  | 'KNOCKOUT'
+  | 'HYBRID'
+  | 'ROUND_ROBIN'
+  | 'QUALIFICATION'
+  | 'PLAYOFF';
+
+export type StageType =
+  | 'LEAGUE'
+  | 'GROUP_STAGE'
+  | 'LEAGUE_PHASE'
+  | 'KNOCKOUT'
+  | 'QUALIFICATION'
+  | 'PLAYOFF'
+  | 'ROUND_ROBIN';
+
+export type StageStatus = 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export interface CompetitionStage {
+  id: string;
+  competitionId: string;
+  seasonId: string;
+  name: string;
+  slug: string;
+  type: StageType;
+  order: number;
+  status: StageStatus;
+  startDate?: string;
+  endDate?: string;
+  isGroupStage: boolean;
+  isLeaguePhase: boolean;
+  isKnockout: boolean;
+  isQualification: boolean;
+  rulesetId?: string;
+  groupsCount?: number;
+  advancingTeamsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CompetitionFormatConfig {
+  id: string;
+  competitionId: string;
+  seasonId: string;
+  formatType: CompetitionFormatType;
+  name: string;
+  description?: string;
+  stages: CompetitionStage[];
+  defaultStageId?: string;
+  hasGroups: boolean;
+  hasKnockout: boolean;
+  hasLeagueTable: boolean;
+  rulesetId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type TiebreakerRule =
+  | 'POINTS'
+  | 'GOAL_DIFFERENCE'
+  | 'GOALS_FOR'
+  | 'HEAD_TO_HEAD'
+  | 'HEAD_TO_HEAD_GOAL_DIFFERENCE'
+  | 'HEAD_TO_HEAD_AWAY_GOALS'
+  | 'AWAY_GOALS'
+  | 'WINS'
+  | 'DISCIPLINARY_POINTS'
+  | 'PLAYOFF'
+  | 'DRAWING_OF_LOTS';
+
+export interface StandingsRuleset {
+  id: string;
+  name: string;
+  winPoints: number;
+  drawPoints: number;
+  lossPoints: number;
+  tiebreakers: TiebreakerRule[];
+  rankingDirection: 'ASC' | 'DESC';
+}

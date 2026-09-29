@@ -17,3 +17,6 @@ export * from './fixtureValidator';
 export * from './fixturePipeline';
 export * from './footballSchema';
 export * from './seoService';
+export * from './standingsRulesets';
+export * from './competitionFormatRegistry';
+export * from './competitionFormatEngine';
