@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getNewsUrl } from '@/lib/slugUtils';
+import { getNewsUrl, buildMatchSlug, footballRoutes } from '@/lib/slugUtils';
 
 interface TickerItem {
   id: string;
@@ -62,7 +62,17 @@ export function GlobalLiveTicker() {
                 id: `live-m-${m.event_key || idx}`,
                 text: `🔴 ${home} ${score} ${away} · ${time}`,
                 isLive: true,
-                href: m.event_key ? `/matches/${m.event_key}` : '/football',
+                href: m.event_key
+                  ? footballRoutes.match(
+                      buildMatchSlug({
+                        event_home_team: m.event_home_team,
+                        event_away_team: m.event_away_team,
+                        league_name: m.league_name,
+                        event_date: m.event_date,
+                        event_key: m.event_key,
+                      })
+                    )
+                  : '/football',
               });
             });
           }

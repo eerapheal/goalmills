@@ -30,6 +30,8 @@ import { EntityService, PlayerMeta, OfficialMeta, CoachMeta, ClubMeta } from '@/
 import { AllMajorCompetitionsSection } from '@/components/competitions/AllMajorCompetitionsSection';
 import { FootballNavSwitcher, MainCategoryTab } from './FootballNavSwitcher';
 import { processFixture, getCanonicalCompetition } from '@/lib/football';
+import { footballRoutes, buildMatchSlug, slugify } from '@/lib/slugUtils';
+import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { CompetitionGender } from '@goalmills/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -114,668 +116,15 @@ export interface ClubHub {
   country: string;
 }
 
-// ─── Curated Fallback / Baseline Data (from Figma) ─────────────────────────────
-
-const DEFAULT_LIVE_FIXTURES: FixtureItem[] = [
-  {
-    id: 'mci-ars-2026',
-    competitionId: 'ENG-PREMIER-LEAGUE',
-    countryCode: 'GB-ENG',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Premier League',
-    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Man City',
-    homeBadge: '🔵',
-    away: 'Arsenal',
-    awayBadge: '🔴',
-    hScore: 2,
-    aScore: 1,
-    minute: 67,
-    status: 'LIVE',
-    stadium: 'Etihad Stadium',
-  },
-  {
-    id: 'nap-juv-2026',
-    competitionId: 'ITA-SERIE-A',
-    countryCode: 'IT',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Serie A',
-    compFlag: '🇮🇹',
-    home: 'Napoli',
-    homeBadge: '🔵',
-    away: 'Juventus',
-    awayBadge: '⚫',
-    hScore: 3,
-    aScore: 0,
-    minute: 82,
-    status: 'LIVE',
-    stadium: 'Stadio Diego Maradona',
-  },
-  {
-    id: 'che-bay-2026',
-    competitionId: 'UEFA-CHAMPIONS-LEAGUE',
-    countryCode: 'EU',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'UEFA Champions League',
-    compFlag: '⭐',
-    home: 'Chelsea',
-    homeBadge: '🔵',
-    away: 'Bayern',
-    awayBadge: '🔴',
-    hScore: 1,
-    aScore: 1,
-    minute: 45,
-    status: 'HT',
-    stadium: 'Stamford Bridge',
-  },
-  {
-    id: 'psg-lyo-2026',
-    competitionId: 'FRA-LIGUE-1',
-    countryCode: 'FR',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Ligue 1',
-    compFlag: '🇫🇷',
-    home: 'PSG',
-    homeBadge: '🔵',
-    away: 'Lyon',
-    awayBadge: '⚪',
-    hScore: 2,
-    aScore: 0,
-    minute: 71,
-    status: 'LIVE',
-    stadium: 'Parc des Princes',
-  },
-  {
-    id: 'nga-rwa-2026',
-    competitionId: 'CAF-AFCON-QUALIFIERS',
-    countryCode: 'NG',
-    confederationCode: 'CAF',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'AFCON Qualifiers',
-    compFlag: '🌍',
-    home: 'Nigeria',
-    homeBadge: '🟢',
-    away: 'Rwanda',
-    awayBadge: '🔵',
-    hScore: 3,
-    aScore: 0,
-    minute: null,
-    status: 'FT',
-    stadium: 'Godswill Akpabio Stadium',
-  },
-  {
-    id: 'dor-rbl-2026',
-    competitionId: 'GER-BUNDESLIGA',
-    countryCode: 'DE',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Bundesliga',
-    compFlag: '🇩🇪',
-    home: 'Dortmund',
-    homeBadge: '🟡',
-    away: 'Leipzig',
-    awayBadge: '🔴',
-    hScore: 2,
-    aScore: 2,
-    minute: null,
-    status: 'FT',
-    stadium: 'Signal Iduna Park',
-  },
-];
-
-const DEFAULT_UPCOMING_FIXTURES: FixtureItem[] = [
-  {
-    id: 'bar-rma-2026',
-    competitionId: 'ESP-LA-LIGA',
-    countryCode: 'ES',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'La Liga',
-    compFlag: '🇪🇸',
-    home: 'Barcelona',
-    homeBadge: '🔵',
-    away: 'Real Madrid',
-    awayBadge: '⚪',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '17:00',
-    date: 'Today',
-    stadium: 'Spotify Camp Nou',
-  },
-  {
-    id: 'liv-tot-2026',
-    competitionId: 'ENG-PREMIER-LEAGUE',
-    countryCode: 'GB-ENG',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Premier League',
-    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Liverpool',
-    homeBadge: '🔴',
-    away: 'Tottenham',
-    awayBadge: '⚪',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '14:00',
-    date: 'Today',
-    stadium: 'Anfield',
-  },
-  {
-    id: 'rma-atl-2026',
-    competitionId: 'UEFA-CHAMPIONS-LEAGUE',
-    countryCode: 'EU',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'UEFA Champions League',
-    compFlag: '⭐',
-    home: 'Real Madrid',
-    homeBadge: '⚪',
-    away: 'Atlético',
-    awayBadge: '🔴',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '20:00',
-    date: 'Tue 17 Sep',
-    stadium: 'Santiago Bernabéu',
-  },
-  {
-    id: 'mar-sen-2026',
-    competitionId: 'CAF-AFCON-QUALIFIERS',
-    countryCode: 'MA',
-    confederationCode: 'CAF',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'AFCON Qualifiers',
-    compFlag: '🌍',
-    home: 'Morocco',
-    homeBadge: '🔴',
-    away: 'Senegal',
-    awayBadge: '🟢',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '20:00',
-    date: 'Wed 18 Sep',
-    stadium: 'Stade Mohammed V',
-  },
-  {
-    id: 'bay-dor-2026',
-    competitionId: 'GER-BUNDESLIGA',
-    countryCode: 'DE',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Bundesliga',
-    compFlag: '🇩🇪',
-    home: 'Bayern',
-    homeBadge: '🔴',
-    away: 'Dortmund',
-    awayBadge: '🟡',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '18:30',
-    date: 'Sat 20 Sep',
-    stadium: 'Allianz Arena',
-  },
-  {
-    id: 'int-mil-2026',
-    competitionId: 'ITA-SERIE-A',
-    countryCode: 'IT',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Serie A',
-    compFlag: '🇮🇹',
-    home: 'Inter',
-    homeBadge: '🔵',
-    away: 'AC Milan',
-    awayBadge: '🔴',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '20:45',
-    date: 'Sun 21 Sep',
-    stadium: 'San Siro',
-  },
-  {
-    id: 'lee-shu-2026',
-    competitionId: 'ENG-CHAMPIONSHIP',
-    countryCode: 'GB-ENG',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Championship',
-    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Leeds United',
-    homeBadge: '⚪',
-    away: 'Sheffield United',
-    awayBadge: '🔴',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '15:00',
-    date: 'Saturday',
-    stadium: 'Elland Road',
-  },
-  {
-    id: 'che-ars-w-2026',
-    competitionId: 'ENG-WSL',
-    countryCode: 'GB-ENG',
-    confederationCode: 'UEFA',
-    gender: 'FEMALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: "Women's Super League",
-    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Chelsea Women',
-    homeBadge: '🔵',
-    away: 'Arsenal Women',
-    awayBadge: '🔴',
-    hScore: null,
-    aScore: null,
-    minute: null,
-    status: 'UPCOMING',
-    time: '14:30',
-    date: 'Sunday',
-    stadium: 'Kingsmeadow',
-  },
-];
-
-const DEFAULT_RESULTS: FixtureItem[] = [
-  {
-    id: 'mci-dor-2026',
-    competitionId: 'UEFA-CHAMPIONS-LEAGUE',
-    countryCode: 'EU',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'UEFA Champions League',
-    compFlag: '⭐',
-    home: 'Man City',
-    homeBadge: '🔵',
-    away: 'Dortmund',
-    awayBadge: '🟡',
-    hScore: 3,
-    aScore: 0,
-    minute: null,
-    status: 'FT',
-    date: 'Yesterday',
-    stadium: 'Etihad Stadium',
-  },
-  {
-    id: 'liv-mci-2026',
-    competitionId: 'ENG-PREMIER-LEAGUE',
-    countryCode: 'GB-ENG',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Premier League',
-    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Liverpool',
-    homeBadge: '🔴',
-    away: 'Man City',
-    awayBadge: '🔵',
-    hScore: 1,
-    aScore: 1,
-    minute: null,
-    status: 'FT',
-    date: '2 days ago',
-    stadium: 'Anfield',
-  },
-  {
-    id: 'rma-fcb-2026',
-    competitionId: 'ESP-LA-LIGA',
-    countryCode: 'ES',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'La Liga',
-    compFlag: '🇪🇸',
-    home: 'Real Madrid',
-    homeBadge: '⚪',
-    away: 'Barça',
-    awayBadge: '🔵',
-    hScore: 2,
-    aScore: 3,
-    minute: null,
-    status: 'FT',
-    date: 'Aug 31',
-    stadium: 'Bernabéu',
-  },
-  {
-    id: 'cmr-gha-2026',
-    competitionId: 'CAF-AFCON-QUALIFIERS',
-    countryCode: 'CM',
-    confederationCode: 'CAF',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'AFCON Qualifiers',
-    compFlag: '🌍',
-    home: 'Cameroon',
-    homeBadge: '🟢',
-    away: 'Ghana',
-    awayBadge: '🟡',
-    hScore: 1,
-    aScore: 0,
-    minute: null,
-    status: 'FT',
-    date: 'Aug 29',
-    stadium: 'Olembe Stadium',
-  },
-  {
-    id: 'ars-che-2026',
-    competitionId: 'ENG-PREMIER-LEAGUE',
-    countryCode: 'GB-ENG',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Premier League',
-    compFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    home: 'Arsenal',
-    homeBadge: '🔴',
-    away: 'Chelsea',
-    awayBadge: '🔵',
-    hScore: 2,
-    aScore: 0,
-    minute: null,
-    status: 'FT',
-    date: 'Aug 28',
-    stadium: 'Emirates Stadium',
-  },
-  {
-    id: 'bay-lev-2026',
-    competitionId: 'GER-BUNDESLIGA',
-    countryCode: 'DE',
-    confederationCode: 'UEFA',
-    gender: 'MALE',
-    ageCategory: 'SENIOR',
-    classificationStatus: 'RESOLVED',
-    comp: 'Bundesliga',
-    compFlag: '🇩🇪',
-    home: 'Bayern',
-    homeBadge: '🔴',
-    away: 'Leverkusen',
-    awayBadge: '🔴',
-    hScore: 2,
-    aScore: 1,
-    minute: null,
-    status: 'FT',
-    date: 'Aug 27',
-    stadium: 'Allianz Arena',
-  },
-];
-
-const PL_TABLE: TableEntry[] = [
-  {
-    pos: 1,
-    team: 'Man City',
-    slug: 'manchester-city',
-    badge: '🔵',
-    p: 32,
-    w: 23,
-    d: 5,
-    l: 4,
-    gd: 46,
-    pts: 74,
-    form: ['W', 'W', 'D', 'W', 'W'],
-    zone: 'champions',
-  },
-  {
-    pos: 2,
-    team: 'Arsenal',
-    slug: 'arsenal',
-    badge: '🔴',
-    p: 32,
-    w: 22,
-    d: 4,
-    l: 6,
-    gd: 43,
-    pts: 70,
-    form: ['L', 'W', 'W', 'W', 'D'],
-    zone: 'champions',
-  },
-  {
-    pos: 3,
-    team: 'Liverpool',
-    slug: 'liverpool',
-    badge: '🔴',
-    p: 32,
-    w: 20,
-    d: 6,
-    l: 6,
-    gd: 30,
-    pts: 66,
-    form: ['W', 'D', 'W', 'L', 'W'],
-    zone: 'champions',
-  },
-  {
-    pos: 4,
-    team: 'Aston Villa',
-    slug: 'aston-villa',
-    badge: '🟣',
-    p: 32,
-    w: 18,
-    d: 5,
-    l: 9,
-    gd: 16,
-    pts: 59,
-    form: ['W', 'W', 'L', 'W', 'D'],
-    zone: 'champions',
-  },
-  {
-    pos: 5,
-    team: 'Chelsea',
-    slug: 'chelsea',
-    badge: '🔵',
-    p: 32,
-    w: 17,
-    d: 6,
-    l: 9,
-    gd: 11,
-    pts: 57,
-    form: ['D', 'W', 'W', 'L', 'W'],
-    zone: 'europa',
-  },
-  {
-    pos: 6,
-    team: 'Tottenham',
-    slug: 'tottenham',
-    badge: '⚪',
-    p: 32,
-    w: 16,
-    d: 5,
-    l: 11,
-    gd: 8,
-    pts: 53,
-    form: ['L', 'W', 'D', 'W', 'L'],
-    zone: 'europa',
-  },
-  {
-    pos: 7,
-    team: 'Newcastle',
-    slug: 'newcastle',
-    badge: '⚫',
-    p: 32,
-    w: 14,
-    d: 8,
-    l: 10,
-    gd: 5,
-    pts: 50,
-    form: ['W', 'D', 'W', 'W', 'L'],
-  },
-  {
-    pos: 8,
-    team: 'Brighton',
-    slug: 'brighton',
-    badge: '🔵',
-    p: 32,
-    w: 13,
-    d: 9,
-    l: 10,
-    gd: 4,
-    pts: 48,
-    form: ['D', 'W', 'L', 'D', 'W'],
-  },
-  {
-    pos: 17,
-    team: 'Nottm Forest',
-    slug: 'nottingham-forest',
-    badge: '🔴',
-    p: 32,
-    w: 9,
-    d: 5,
-    l: 18,
-    gd: -18,
-    pts: 32,
-    form: ['L', 'L', 'D', 'L', 'W'],
-    zone: 'relegation',
-  },
-  {
-    pos: 18,
-    team: 'Luton Town',
-    slug: 'luton-town',
-    badge: '🟠',
-    p: 32,
-    w: 7,
-    d: 4,
-    l: 21,
-    gd: -28,
-    pts: 25,
-    form: ['L', 'D', 'L', 'L', 'L'],
-    zone: 'relegation',
-  },
-  {
-    pos: 19,
-    team: 'Sheffield Utd',
-    slug: 'sheffield-united',
-    badge: '🔴',
-    p: 32,
-    w: 5,
-    d: 4,
-    l: 23,
-    gd: -42,
-    pts: 19,
-    form: ['L', 'L', 'L', 'D', 'L'],
-    zone: 'relegation',
-  },
-];
-
-const TOP_SCORERS: TopScorer[] = [
-  {
-    rank: 1,
-    name: 'Erling Haaland',
-    team: 'Man City',
-    badge: '🔵',
-    flag: '🇳🇴',
-    goals: 31,
-    assists: 7,
-    apps: 32,
-    photo: '',
-    playerId: 'erling-haaland',
-  },
-  {
-    rank: 2,
-    name: 'Victor Osimhen',
-    team: 'Napoli / Al-Ahli',
-    badge: '🔵',
-    flag: '🇳🇬',
-    goals: 26,
-    assists: 5,
-    apps: 30,
-    photo: '',
-    playerId: 'victor-osimhen',
-  },
-  {
-    rank: 3,
-    name: 'Kylian Mbappé',
-    team: 'Real Madrid',
-    badge: '⚪',
-    flag: '🇫🇷',
-    goals: 24,
-    assists: 8,
-    apps: 29,
-    photo: '',
-    playerId: 'kylian-mbappe',
-  },
-  {
-    rank: 4,
-    name: 'Bukayo Saka',
-    team: 'Arsenal',
-    badge: '🔴',
-    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    goals: 16,
-    assists: 14,
-    apps: 30,
-    photo: '',
-    playerId: 'bukayo-saka',
-  },
-  {
-    rank: 5,
-    name: 'Harry Kane',
-    team: 'Bayern Munich',
-    badge: '🔴',
-    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    goals: 28,
-    assists: 10,
-    apps: 31,
-    photo: '',
-    playerId: 'harry-kane',
-  },
-  {
-    rank: 6,
-    name: 'Mohamed Salah',
-    team: 'Liverpool',
-    badge: '🔴',
-    flag: '🇪🇬',
-    goals: 22,
-    assists: 13,
-    apps: 32,
-    photo: '',
-    playerId: 'mohamed-salah',
-  },
-];
+// ─── Canonical League IDs for Dynamic Standings & Top Scorers ────────────────
+const LEAGUE_ID_MAP: Record<string, number> = {
+  'Premier League': 152,
+  'La Liga': 302,
+  'Serie A': 207,
+  'Bundesliga': 175,
+  'Ligue 1': 168,
+  'CAF Champions League': 570,
+};
 
 const COMP_GROUPS: CompGroup[] = [
   {
@@ -1060,10 +409,18 @@ function FormDot({ r }: { r: 'W' | 'D' | 'L' }) {
 function MatchCard({ f }: { f: FixtureItem }) {
   const isLive = f.status === 'LIVE' || f.status === 'HT';
   const isFT = f.status === 'FT';
+  const matchSlug = buildMatchSlug({
+    home: f.home,
+    away: f.away,
+    comp: f.comp,
+    competitionId: f.competitionId,
+    date: f.date,
+    id: f.id,
+  });
 
   return (
     <Link
-      href={`/football/matches/${f.id}`}
+      href={footballRoutes.match(matchSlug)}
       className="block bg-[#0f172a] border border-[#1e293b] rounded-xl hover:border-blue-500/40 hover:bg-[#131f35] transition-all duration-200 group overflow-hidden shadow-sm"
     >
       <div className="flex items-center justify-between px-3.5 pt-3 pb-2 border-b border-[#1e293b]/60">
@@ -1229,11 +586,17 @@ export function FootballPageClient({
   const [lastSyncTime, setLastSyncTime] = useState<string>('Just now');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Dynamic Matches State
-  const [liveFixtures, setLiveFixtures] = useState<FixtureItem[]>(DEFAULT_LIVE_FIXTURES);
-  const [upcomingFixtures, setUpcomingFixtures] =
-    useState<FixtureItem[]>(DEFAULT_UPCOMING_FIXTURES);
-  const [resultsFixtures, setResultsFixtures] = useState<FixtureItem[]>(DEFAULT_RESULTS);
+  // Dynamic Matches State (Pure Live Data — Zero Mock Fallbacks)
+  const [liveFixtures, setLiveFixtures] = useState<FixtureItem[]>([]);
+  const [upcomingFixtures, setUpcomingFixtures] = useState<FixtureItem[]>([]);
+  const [resultsFixtures, setResultsFixtures] = useState<FixtureItem[]>([]);
+  const [initialSyncDone, setInitialSyncDone] = useState(false);
+
+  // Dynamic Standings & Top Scorers State (Pure Live API)
+  const [tableData, setTableData] = useState<TableEntry[]>([]);
+  const [tableLoading, setTableLoading] = useState(false);
+  const [scorersData, setScorersData] = useState<TopScorer[]>([]);
+  const [scorersLoading, setScorersLoading] = useState(false);
 
   // Daily Brief Newsletter State
   const [briefEmail, setBriefEmail] = useState('');
@@ -1279,7 +642,86 @@ export function FootballPageClient({
     return liveFixtures.filter((f) => f.status === 'LIVE' || f.status === 'HT').length;
   }, [liveFixtures]);
 
-  // Fetch real matches from live API with fallbacks
+  // Fetch live standings and top scorers dynamically
+  const fetchTableAndScorers = useCallback(async (leagueName: string) => {
+    const leagueId = LEAGUE_ID_MAP[leagueName] || 152;
+    setTableLoading(true);
+    setScorersLoading(true);
+    try {
+      const [standingsRes, scorersRes] = await Promise.all([
+        advancedFootballApi.getStandings(leagueId).catch(() => null),
+        advancedFootballApi.getTopscorers(leagueId).catch(() => null),
+      ]);
+
+      if (standingsRes?.result) {
+        const list =
+          standingsRes.result.total ||
+          (Array.isArray(standingsRes.result) ? standingsRes.result : []);
+        if (Array.isArray(list) && list.length > 0) {
+          const parsed: TableEntry[] = list.map((r: any, idx: number) => {
+            const pos = parseInt(r.standing_place) || idx + 1;
+            const formStr = r.standing_form || '';
+            const formArr = formStr
+              ? formStr
+                  .split('')
+                  .filter((c: string) => ['W', 'D', 'L'].includes(c.toUpperCase()))
+              : [];
+            const zone =
+              pos <= 4 ? 'champions' : pos <= 6 ? 'europa' : pos >= 18 ? 'relegation' : undefined;
+            return {
+              pos,
+              team: r.standing_team || `Club ${pos}`,
+              slug: slugify(r.standing_team || ''),
+              badge: '⚽',
+              p: parseInt(r.standing_P) || 0,
+              w: parseInt(r.standing_W) || 0,
+              d: parseInt(r.standing_D) || 0,
+              l: parseInt(r.standing_L) || 0,
+              gd: parseInt(r.standing_GD) || 0,
+              pts: parseInt(r.standing_PTS) || 0,
+              form: formArr.length > 0 ? (formArr as ('W' | 'D' | 'L')[]) : ['D'],
+              zone,
+            };
+          });
+          setTableData(parsed);
+        } else {
+          setTableData([]);
+        }
+      } else {
+        setTableData([]);
+      }
+
+      if (scorersRes?.result && Array.isArray(scorersRes.result) && scorersRes.result.length > 0) {
+        const parsedScorers: TopScorer[] = scorersRes.result.slice(0, 20).map((s: any, idx: number) => ({
+          rank: idx + 1,
+          name: s.player_name || 'Player',
+          team: s.team_name || '',
+          badge: '⚽',
+          flag: '🌍',
+          goals: parseInt(s.goals) || 0,
+          assists: parseInt(s.assists) || 0,
+          apps: 0,
+          photo: s.player_photo || '',
+          playerId: slugify(s.player_name || ''),
+        }));
+        setScorersData(parsedScorers);
+      } else {
+        setScorersData([]);
+      }
+    } catch {
+      setTableData([]);
+      setScorersData([]);
+    } finally {
+      setTableLoading(false);
+      setScorersLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTableAndScorers(tableLeague);
+  }, [tableLeague, fetchTableAndScorers]);
+
+  // Fetch real matches from live API (NO MOCK DATA)
   const fetchLiveMatches = useCallback(async () => {
     setIsSyncing(true);
     try {
@@ -1387,9 +829,10 @@ export function FootballPageClient({
         new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       );
     } catch {
-      // Fallbacks already in state
+      // Keep empty arrays on network/provider error — NO MOCK DATA
     } finally {
       setIsSyncing(false);
+      setInitialSyncDone(true);
     }
   }, []);
 
@@ -1955,7 +1398,26 @@ export function FootballPageClient({
             {/* ── Fixtures Grid Tab ── */}
             {isFixtureTab && (
               <>
-                {currentFixtures.length > 0 ? (
+                {!initialSyncDone && isSyncing ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className="bg-[#0f172a] border border-[#1e293b] rounded-xl p-4 animate-pulse space-y-3"
+                      >
+                        <div className="h-3 w-28 bg-slate-800 rounded" />
+                        <div className="flex justify-between items-center">
+                          <div className="h-4 w-32 bg-slate-800 rounded" />
+                          <div className="h-5 w-8 bg-slate-800 rounded" />
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="h-4 w-32 bg-slate-800 rounded" />
+                          <div className="h-5 w-8 bg-slate-800 rounded" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : currentFixtures.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {currentFixtures.map((f) => (
                       <MatchCard key={f.id} f={f} />
@@ -1964,16 +1426,26 @@ export function FootballPageClient({
                 ) : (
                   <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl py-16 text-center">
                     <p className="text-3xl mb-3">📋</p>
-                    <p className="text-slate-300 font-bold">No fixtures found for {compFilter}</p>
-                    <p className="text-slate-500 text-xs mt-1">
-                      Try selecting &quot;All&quot; or another competition filter.
+                    <p className="text-slate-300 font-bold">
+                      {mainTab === 'live'
+                        ? 'No live football fixtures currently in progress'
+                        : mainTab === 'upcoming'
+                          ? `No upcoming fixtures scheduled for ${compFilter}`
+                          : `No recent match results found for ${compFilter}`}
                     </p>
-                    <button
-                      onClick={() => setCompFilter('All')}
-                      className="mt-4 text-xs text-blue-400 font-bold hover:underline"
-                    >
-                      Reset filter
-                    </button>
+                    <p className="text-slate-500 text-xs mt-1">
+                      {mainTab === 'live'
+                        ? 'Live score updates sync automatically when matches kick off.'
+                        : 'Try selecting "All" or switching category tabs.'}
+                    </p>
+                    {compFilter !== 'All' && (
+                      <button
+                        onClick={() => setCompFilter('All')}
+                        className="mt-4 text-xs text-blue-400 font-bold hover:underline"
+                      >
+                        Reset filter
+                      </button>
+                    )}
                   </div>
                 )}
               </>
@@ -2037,7 +1509,16 @@ export function FootballPageClient({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#1e293b]">
-                        {PL_TABLE.map((row) => (
+                        {tableLoading ? (
+                          [1, 2, 3, 4, 5, 6].map((i) => (
+                            <tr key={i} className="animate-pulse">
+                              <td colSpan={9} className="py-4 px-5">
+                                <div className="h-4 bg-slate-800/80 rounded w-full" />
+                              </td>
+                            </tr>
+                          ))
+                        ) : tableData.length > 0 ? (
+                          tableData.map((row) => (
                           <tr
                             key={row.pos}
                             className={`hover:bg-[#1e293b]/40 transition-colors ${
@@ -2112,7 +1593,14 @@ export function FootballPageClient({
                               </div>
                             </td>
                           </tr>
-                        ))}
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={9} className="py-12 text-center text-slate-400 text-xs">
+                            Standings table is currently being synchronized for {tableLeague}.
+                          </td>
+                        </tr>
+                      )}
                       </tbody>
                     </table>
                   </div>
@@ -2269,7 +1757,16 @@ export function FootballPageClient({
                 {liveFixtures.slice(0, 3).map((f) => (
                   <Link
                     key={f.id}
-                    href={`/football/matches/${f.id}`}
+                    href={footballRoutes.match(
+                      buildMatchSlug({
+                        home: f.home,
+                        away: f.away,
+                        comp: f.comp,
+                        competitionId: f.competitionId,
+                        date: f.date,
+                        id: f.id,
+                      })
+                    )}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-[#1e293b]/40 transition-colors group"
                   >
                     <div className="flex-1 min-w-0 space-y-1">
@@ -2312,7 +1809,8 @@ export function FootballPageClient({
                 </button>
               </div>
               <div className="divide-y divide-[#1e293b]">
-                {PL_TABLE.slice(0, 6).map((row) => (
+                {tableData.length > 0 ? (
+                  tableData.slice(0, 6).map((row) => (
                   <div
                     key={row.pos}
                     className={`flex items-center gap-2.5 px-4 py-2 hover:bg-[#1e293b]/40 transition-colors ${
@@ -2336,7 +1834,10 @@ export function FootballPageClient({
                     </span>
                     <span className="text-xs font-black text-white tabular-nums">{row.pts}</span>
                   </div>
-                ))}
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-slate-500">Live standings syncing...</div>
+              )}
               </div>
             </div>
 

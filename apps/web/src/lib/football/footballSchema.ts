@@ -5,6 +5,7 @@ import {
   ConfederationRecord,
   PriorityClub,
 } from '@goalmills/types';
+import { buildMatchSlug } from '../slugUtils';
 
 export interface BreadcrumbItem {
   name: string;
@@ -100,11 +101,13 @@ export function generateSportsEventJsonLd(
       name: fixture.awayTeamName,
       logo: fixture.awayTeamLogo || undefined,
     },
-    location: {
-      '@type': 'Place',
-      name: fixture.venue || `${fixture.homeTeamName} Stadium`,
-    },
-    url: `${baseUrl}/football/matches/${fixture.fixtureId}`,
+    url: `${baseUrl}/football/matches/${buildMatchSlug({
+      home: fixture.homeTeamName,
+      away: fixture.awayTeamName,
+      competitionId: fixture.competitionId,
+      date: fixture.date,
+      id: fixture.fixtureId,
+    })}`,
     ...(fixture.homeScore !== undefined && fixture.awayScore !== undefined
       ? {
           result: `${fixture.homeScore} - ${fixture.awayScore}`,

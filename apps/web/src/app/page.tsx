@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getNewsUrl, slugify } from '@/lib/slugUtils';
+import { getNewsUrl, slugify, buildMatchSlug, footballRoutes } from '@/lib/slugUtils';
 
 interface MatchItem {
   id: string;
@@ -126,12 +126,16 @@ function formatRelativeTime(dateStr?: string | Date): string {
 }
 
 function MatchCard({ m }: { m: MatchItem }) {
-  const matchIdStr = String(m?.id ?? '');
   const matchHref =
     m.sport === 'Football'
-      ? matchIdStr.includes('-')
-        ? `/football/matches/${matchIdStr}`
-        : `/matches/${matchIdStr}`
+      ? footballRoutes.match(
+          buildMatchSlug({
+            home: m.home,
+            away: m.away,
+            comp: m.league,
+            id: m.id,
+          })
+        )
       : m.sport === 'Cricket'
         ? `/cricket`
         : `/basketball`;

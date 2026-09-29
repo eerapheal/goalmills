@@ -55,19 +55,75 @@ export function getNewsSlug(item?: SlugIdentifiable | string | null): string {
  * e.g. "arsenal-vs-manchester-city-2026-12345" or "arsenal-vs-chelsea-2026"
  * The year is dynamically computed from event_date or current calendar year.
  */
-export function buildMatchSlug(match: {
+export interface MatchSlugParams {
   event_home_team?: string;
   event_away_team?: string;
+  home?: string;
+  away?: string;
   event_date?: string;
+  date?: string;
+  league_name?: string;
+  comp?: string;
+  competitionId?: string;
   event_key?: string | number;
-}): string {
-  const home = slugify(match.event_home_team || 'home');
-  const away = slugify(match.event_away_team || 'away');
-  const year = match.event_date
-    ? match.event_date.split('-')[0]
-    : new Date().getFullYear().toString();
-  const key = match.event_key;
-  return key ? `${home}-vs-${away}-${year}-${key}` : `${home}-vs-${away}-${year}`;
+  id?: string | number;
+  league_season?: string;
+  season?: string;
+}
+
+export function getMatchSeasonSlug(season?: string, date?: string): string {
+  if (season) {
+    const s = slugify(season.replace('/', '-'));
+    return s.endsWith('season') || s.endsWith('sesion') ? s : `${s}-season`;
+  }
+  let dateObj = new Date();
+  if (date) {
+    const parsed = new Date(date);
+    if (!isNaN(parsed.getTime())) dateObj = parsed;
+  }
+  const year = dateObj.getFullYear();
+  const month = dateObj.getMonth() + 1;
+  const s = month >= 7 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+  return `${s}-season`;
+}
+
+/**
+ * Build a match slug: home-team-vs-away-team-competition-season-eventKey
+ * e.g. "man-city-vs-man-united-english-premier-league-2026-2027-season-1869244"
+ * or keyless: "man-city-vs-man-united-english-premier-league-2026-2027-season"
+ */
+export function buildMatchSlug(match: MatchSlugParams): string {
+  const home = slugify(match.home || match.event_home_team || 'home');
+  const away = slugify(match.away || match.event_away_team || 'away');
+
+  let compRaw = match.comp || match.league_name || match.competitionId || '';
+  if (compRaw === 'ENG-PREMIER-LEAGUE' || compRaw.toLowerCase() === 'premier league') {
+    compRaw = 'English Premier League';
+  } else if (compRaw === 'ESP-LA-LIGA' || compRaw.toLowerCase() === 'la liga') {
+    compRaw = 'Spanish La Liga';
+  } else if (compRaw === 'ITA-SERIE-A' || compRaw.toLowerCase() === 'serie a') {
+    compRaw = 'Italian Serie A';
+  } else if (compRaw === 'GER-BUNDESLIGA' || compRaw.toLowerCase() === 'bundesliga') {
+    compRaw = 'German Bundesliga';
+  } else if (compRaw === 'FRA-LIGUE-1' || compRaw.toLowerCase() === 'ligue 1') {
+    compRaw = 'French Ligue 1';
+  }
+  const comp = slugify(compRaw || 'football');
+
+  const seasonSlug = getMatchSeasonSlug(
+    match.season || match.league_season,
+    match.date || match.event_date
+  );
+
+  const rawKey = match.event_key !== undefined ? match.event_key : match.id;
+  const isSynthetic =
+    typeof rawKey === 'string' &&
+    (rawKey.startsWith('live-') || rawKey.startsWith('fix-') || rawKey.includes('-'));
+  const key = rawKey && !isSynthetic ? String(rawKey) : '';
+
+  return key
+    ? `${home}-vs-${away}-${comp}-${seasonSlug}-${key}`
+    : `${home}-vs-${away}-${comp}-${seasonSlug}`;
 }
 
 export interface ParsedMatchSlug {
@@ -75,15 +131,18 @@ export interface ParsedMatchSlug {
   eventKey: string;
   homeSlug: string;
   awaySlug: string;
+  competitionSlug: string;
+  season: string;
   year: string;
 }
 
 /**
- * Parses match slugs of various canonical forms:
- * - "teama-vs-teamb-2026-12345"
- * - "teama-vs-teamb-2026"
- * - "teama-vs-teamb-2026-09-14-12345" (legacy)
- * - "12345" (pure numeric ID)
+ * Parses match slugs of various dynamic and canonical forms:
+ * - "man-city-vs-man-united-english-premier-league-2026-2027-season-1869244"
+ * - "man-city-vs-man-united-english-premier-league-2026-2027-season"
+ * - "man-city-vs-man-united-enslish-primier-leangue-2026/2027-sesion"
+ * - "arsenal-vs-chelsea-2026-12345" (legacy)
+ * - "1869244" (pure numeric ID)
  */
 export function parseMatchSlug(slug: string): ParsedMatchSlug {
   if (!slug) {
@@ -92,96 +151,151 @@ export function parseMatchSlug(slug: string): ParsedMatchSlug {
       eventKey: '',
       homeSlug: '',
       awaySlug: '',
+      competitionSlug: '',
+      season: '2026-2027',
       year: new Date().getFullYear().toString(),
     };
   }
+
+  // Normalize slashes (from [...slug] catch-all or encoded URL)
+  const normalized = slug.trim().replace(/\/+/g, '/');
 
   // Pure numeric ID: e.g. "1869244"
-  if (/^\d+$/.test(slug)) {
+  if (/^\d+$/.test(normalized)) {
     return {
-      rawSlug: slug,
-      eventKey: slug,
+      rawSlug: normalized,
+      eventKey: normalized,
       homeSlug: '',
       awaySlug: '',
+      competitionSlug: '',
+      season: '2026-2027',
       year: new Date().getFullYear().toString(),
     };
   }
 
-  // Legacy format: {home}-vs-{away}-YYYY-MM-DD-{key}
-  const legacyMatch = slug.match(/^(.*?)-vs-(.*?)-(\d{4})-\d{2}-\d{2}-(\d+)$/);
-  if (legacyMatch) {
+  // Check for trailing event key: e.g. -1869244 or /1869244
+  let eventKey = '';
+  let workingSlug = normalized;
+
+  const trailingKeyMatch = workingSlug.match(/[-/](\d+)$/);
+  if (trailingKeyMatch) {
+    const candidate = trailingKeyMatch[1];
+    // If it's not a 4-digit year directly preceded by a word or season
+    const isYear = /^\d{4}$/.test(candidate) && /(?:season|sesion|vs|[a-z])[-/]\d{4}$/i.test(workingSlug);
+    if (!isYear) {
+      eventKey = candidate;
+      workingSlug = workingSlug.substring(0, workingSlug.length - trailingKeyMatch[0].length);
+    }
+  }
+
+  // Must have "-vs-" to split home and remainder
+  const vsParts = workingSlug.split(/-vs-/i);
+  if (vsParts.length < 2) {
     return {
-      rawSlug: slug,
-      homeSlug: legacyMatch[1],
-      awaySlug: legacyMatch[2],
-      year: legacyMatch[3],
-      eventKey: legacyMatch[4],
+      rawSlug: normalized,
+      eventKey: eventKey || (workingSlug.match(/\d+$/) ? workingSlug.match(/\d+$/)![0] : ''),
+      homeSlug: '',
+      awaySlug: '',
+      competitionSlug: '',
+      season: '2026-2027',
+      year: new Date().getFullYear().toString(),
     };
   }
 
-  // Standard format: {home}-vs-{away}-{year}-{key}
-  const standardMatch = slug.match(/^(.*?)-vs-(.*?)-(\d{4})-(\d+)$/);
-  if (standardMatch) {
-    return {
-      rawSlug: slug,
-      homeSlug: standardMatch[1],
-      awaySlug: standardMatch[2],
-      year: standardMatch[3],
-      eventKey: standardMatch[4],
-    };
+  const homeSlug = slugify(vsParts[0]);
+  let rest = vsParts.slice(1).join('-vs-');
+
+  // Extract Season
+  let season = '2026-2027';
+  let year = new Date().getFullYear().toString();
+
+  // Pattern: 2026/2027-season or 2026-2027-season or 2026/2027-sesion or 2026-2027
+  const seasonMatch = rest.match(/[-/](\d{4})[/-](\d{4})(?:-(?:season|sesion))?/i);
+  if (seasonMatch) {
+    year = seasonMatch[1];
+    season = `${seasonMatch[1]}-${seasonMatch[2]}`;
+    rest = rest.substring(0, seasonMatch.index);
+  } else {
+    // Single year season: e.g. -2026-season or -2026
+    const singleYearMatch = rest.match(/[-/](\d{4})(?:-(?:season|sesion))?/i);
+    if (singleYearMatch) {
+      year = singleYearMatch[1];
+      season = singleYearMatch[1];
+      rest = rest.substring(0, singleYearMatch.index);
+    }
   }
 
-  // Keyless format: {home}-vs-{away}-{year} (e.g. "arsenal-vs-chelsea-2026")
-  const keylessMatch = slug.match(/^(.*?)-vs-(.*?)-(\d{4})$/);
-  if (keylessMatch) {
-    return {
-      rawSlug: slug,
-      homeSlug: keylessMatch[1],
-      awaySlug: keylessMatch[2],
-      year: keylessMatch[3],
-      eventKey: '',
-    };
+  // What remains in `rest` is awaySlug and competitionSlug
+  const restParts = rest.split('-').filter(Boolean);
+  let awaySlug = '';
+  let competitionSlug = '';
+
+  const KNOWN_COMPS = [
+    'english-premier-league',
+    'premier-league',
+    'enslish-primier-leangue',
+    'la-liga',
+    'spanish-la-liga',
+    'serie-a',
+    'italian-serie-a',
+    'bundesliga',
+    'german-bundesliga',
+    'ligue-1',
+    'french-ligue-1',
+    'champions-league',
+    'uefa-champions-league',
+    'europa-league',
+    'conference-league',
+    'caf-champions-league',
+    'afcon',
+    'africa-cup-of-nations',
+    'fa-cup',
+    'carabao-cup',
+    'copa-del-rey',
+    'dfb-pokal',
+    'coppa-italia',
+  ];
+
+  let matchedComp = '';
+  for (const c of KNOWN_COMPS) {
+    if (rest.endsWith(c)) {
+      matchedComp = c;
+      awaySlug = rest.substring(0, rest.length - c.length).replace(/-+$/, '');
+      competitionSlug = c;
+      break;
+    }
   }
 
-  // Fallback
-  const fallbackKey = extractEventKeyFromSlug(slug);
+  if (!matchedComp) {
+    if (restParts.length >= 3) {
+      awaySlug = restParts.slice(0, 2).join('-');
+      competitionSlug = restParts.slice(2).join('-');
+    } else {
+      awaySlug = rest;
+      competitionSlug = '';
+    }
+  }
+
   return {
-    rawSlug: slug,
-    homeSlug: '',
-    awaySlug: '',
-    year: new Date().getFullYear().toString(),
-    eventKey: fallbackKey,
+    rawSlug: normalized,
+    eventKey,
+    homeSlug,
+    awaySlug,
+    competitionSlug,
+    season,
+    year,
   };
 }
 
 /**
  * Extract the event key (numeric ID) from a match slug.
+ * e.g. "man-city-vs-man-united-english-premier-league-2026-2027-season-1869244" → "1869244"
  * e.g. "arsenal-vs-manchester-city-2026-12345" → "12345"
- * e.g. "arsenal-vs-manchester-city-2026-08-31-12345" → "12345"
- * Returns empty string if slug is purely keyless like "arsenal-vs-chelsea-2026".
+ * Returns empty string if slug is purely keyless.
  */
 export function extractEventKeyFromSlug(slug: string): string {
   if (!slug) return '';
-  // Purely numeric ID
-  if (/^\d+$/.test(slug)) return slug;
-
-  // Legacy pattern: ...-YYYY-MM-DD-{eventKey}
-  const legacyMatch = slug.match(/-(\d{4}-\d{2}-\d{2})-(\d+)$/);
-  if (legacyMatch) return legacyMatch[2];
-
-  // Dynamic Year pattern: ...-{YYYY}-{eventKey}
-  const yearKeyMatch = slug.match(/-(\d{4})-(\d+)$/);
-  if (yearKeyMatch) return yearKeyMatch[2];
-
-  // If slug ends with -{YYYY} without key (e.g. teama-vs-teamb-2026), no event key attached
-  if (/-\d{4}$/.test(slug)) return '';
-
-  // Fallback: last numeric segment after hyphen
-  const parts = slug.split('-');
-  const lastPart = parts[parts.length - 1];
-  if (/^\d+$/.test(lastPart)) return lastPart;
-
-  return '';
+  return parseMatchSlug(slug).eventKey;
 }
 
 /**

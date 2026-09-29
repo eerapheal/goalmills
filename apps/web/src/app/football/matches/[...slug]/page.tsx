@@ -4,7 +4,8 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
-import { parseMatchSlug, footballRoutes, slugify } from '@/lib/slugUtils';
+import { parseMatchSlug, footballRoutes, slugify, buildMatchSlug } from '@/lib/slugUtils';
+import { getCanonicalCompetition } from '@/lib/football';
 import { BackButton } from '@/components/BackButton';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 import type {
@@ -1039,7 +1040,10 @@ function CommentaryTab({ comments }: { comments: FootballComment[] }) {
 
 export default function FootballMatchPage() {
   const params = useParams();
-  const slug = (params.slug as string) || '';
+  const rawSlug = params?.slug;
+  const slug = useMemo(() => {
+    return Array.isArray(rawSlug) ? rawSlug.join('/') : (rawSlug as string) || '';
+  }, [rawSlug]);
   const parsedSlug = useMemo(() => parseMatchSlug(slug), [slug]);
 
   const [loading, setLoading] = useState(true);
@@ -1076,7 +1080,7 @@ export default function FootballMatchPage() {
         }
       }
 
-      // 2. If keyless slug (e.g. teama-vs-teamb-2026), search active matches by team slugs
+      // 2. If keyless slug (e.g. man-city-vs-man-united-english-premier-league-2026-2027-season), search active matches by team & competition
       if (!foundMatch && parsedSlug.homeSlug && parsedSlug.awaySlug) {
         const liveScores = await advancedFootballApi.getLivescore();
         if (liveScores?.result && Array.isArray(liveScores.result)) {
@@ -1092,10 +1096,22 @@ export default function FootballMatchPage() {
         }
 
         if (!foundMatch) {
-          const fixtures = await advancedFootballApi.getFixtures();
-          if (fixtures?.result && Array.isArray(fixtures.result)) {
+          // If competitionSlug is present, check if it maps to a known providerId
+          let leagueFixtures: any[] | null = null;
+          if (parsedSlug.competitionSlug) {
+            const canonical = getCanonicalCompetition(parsedSlug.competitionSlug);
+            if (canonical?.providerId) {
+              const res = await advancedFootballApi.getFixtures({ leagueId: canonical.providerId });
+              if (res?.result && Array.isArray(res.result)) {
+                leagueFixtures = res.result;
+              }
+            }
+          }
+
+          const fixturesToSearch = leagueFixtures || (await advancedFootballApi.getFixtures())?.result;
+          if (Array.isArray(fixturesToSearch)) {
             foundMatch =
-              fixtures.result.find((m) => {
+              fixturesToSearch.find((m) => {
                 const h = slugify(m.event_home_team);
                 const a = slugify(m.event_away_team);
                 return (
@@ -1110,6 +1126,14 @@ export default function FootballMatchPage() {
       if (foundMatch) {
         setMatch(foundMatch);
         setError(null);
+
+        // Dynamically update browser URL to full canonical SEO slug if accessed via pure ID or keyless slug
+        if (typeof window !== 'undefined' && foundMatch) {
+          const canonicalSlug = buildMatchSlug(foundMatch);
+          if (canonicalSlug && (!slug || /^\d+$/.test(slug))) {
+            window.history.replaceState(null, '', footballRoutes.match(canonicalSlug));
+          }
+        }
 
         const key = foundMatch.event_key || parsedSlug.eventKey;
 

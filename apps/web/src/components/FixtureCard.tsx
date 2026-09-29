@@ -31,6 +31,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
   const matchSlug = buildMatchSlug({
     event_home_team: teams.home.name,
     event_away_team: teams.away.name,
+    league_name: league.name,
     event_date: fixtureData.date?.split('T')[0],
     event_key: fixtureData.id,
   });
