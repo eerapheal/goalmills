@@ -428,14 +428,10 @@ function MatchCard({ f }: { f: FixtureItem }) {
           <span>{f.compFlag}</span>
           <span className="truncate">{f.comp}</span>
         </span>
-        {f.classificationStatus === 'UNRESOLVED' ? (
-          <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
-            Pending Classification
-          </span>
-        ) : isLive ? (
+        {isLive ? (
           <span className="flex items-center gap-1.5 text-[10px] font-black text-rose-400 uppercase tracking-widest flex-shrink-0 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 inline-block animate-pulse" />
-            {f.status === 'HT' ? 'HT' : `${f.minute}'`}
+            {f.status === 'HT' ? 'HT' : `${f.minute || 'LIVE'}'`}
           </span>
         ) : isFT ? (
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-800/60 px-2 py-0.5 rounded">
@@ -729,8 +725,13 @@ export function FootballPageClient({
       const res = await fetch(`/api/football?met=Livescore&_t=${timestamp}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        const fList = data?.result || data?.response || (Array.isArray(data) ? data : []);
-        if (Array.isArray(fList) && fList.length > 0) {
+        const rawList = data?.result || data?.response || (Array.isArray(data) ? data : []);
+        const fList = Array.isArray(rawList)
+          ? rawList.filter(
+              (m: any) => m && (m.event_key || m.id) && (m.event_home_team || m.homeTeam || m.home)
+            )
+          : [];
+        if (fList.length > 0) {
           const parsedLive: FixtureItem[] = fList.slice(0, 20).map((m: any, idx: number) => {
             const normalized = processFixture(m);
             const canonical = getCanonicalCompetition(normalized.competitionId);
@@ -770,6 +771,8 @@ export function FootballPageClient({
             };
           });
           setLiveFixtures(parsedLive);
+        } else {
+          setLiveFixtures([]);
         }
       }
 
@@ -779,9 +782,14 @@ export function FootballPageClient({
       });
       if (fixRes.ok) {
         const fixData = await fixRes.json();
-        const fixList =
+        const rawFixList =
           fixData?.result || fixData?.response || (Array.isArray(fixData) ? fixData : []);
-        if (Array.isArray(fixList) && fixList.length > 0) {
+        const fixList = Array.isArray(rawFixList)
+          ? rawFixList.filter(
+              (m: any) => m && (m.event_key || m.id) && (m.event_home_team || m.homeTeam || m.home)
+            )
+          : [];
+        if (fixList.length > 0) {
           const up: FixtureItem[] = [];
           const ft: FixtureItem[] = [];
           fixList.forEach((m: any, idx: number) => {
@@ -822,6 +830,9 @@ export function FootballPageClient({
           });
           if (up.length > 0) setUpcomingFixtures(up.slice(0, 16));
           if (ft.length > 0) setResultsFixtures(ft.slice(0, 16));
+        } else {
+          setUpcomingFixtures([]);
+          setResultsFixtures([]);
         }
       }
 
@@ -1640,66 +1651,80 @@ export function FootballPageClient({
                 </div>
 
                 <div className="divide-y divide-[#1e293b]">
-                  {TOP_SCORERS.map((p) => (
-                    <Link
-                      key={p.rank}
-                      href={`/football/players/${p.playerId}`}
-                      className="flex items-center gap-4 px-5 py-4 hover:bg-[#1e293b]/40 transition-colors group"
-                    >
-                      <span
-                        className={`w-7 text-center text-sm font-black flex-shrink-0 ${
-                          p.rank === 1
-                            ? 'text-amber-400 text-lg'
-                            : p.rank === 2
-                              ? 'text-slate-300 text-lg'
-                              : p.rank === 3
-                                ? 'text-amber-600 text-lg'
-                                : 'text-slate-500'
-                        }`}
+                  {scorersLoading ? (
+                    [1, 2, 3, 4].map((i) => (
+                      <div key={i} className="p-4 flex items-center gap-4 animate-pulse">
+                        <div className="w-8 h-8 rounded-full bg-slate-800" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-slate-800 rounded w-1/3" />
+                          <div className="h-3 bg-slate-800 rounded w-1/4" />
+                        </div>
+                      </div>
+                    ))
+                  ) : scorersData.length > 0 ? (
+                    scorersData.map((p) => (
+                      <Link
+                        key={p.rank}
+                        href={`/football/players/${p.playerId}`}
+                        className="flex items-center gap-4 px-5 py-4 hover:bg-[#1e293b]/40 transition-colors group"
                       >
-                        {p.rank <= 3 ? ['🥇', '🥈', '🥉'][p.rank - 1] : p.rank}
-                      </span>
+                        <span
+                          className={`w-7 text-center text-sm font-black flex-shrink-0 ${
+                            p.rank === 1
+                              ? 'text-amber-400 text-lg'
+                              : p.rank === 2
+                                ? 'text-slate-300 text-lg'
+                                : p.rank === 3
+                                  ? 'text-amber-600 text-lg'
+                                  : 'text-slate-500'
+                          }`}
+                        >
+                          {p.rank <= 3 ? ['🥇', '🥈', '🥉'][p.rank - 1] : p.rank}
+                        </span>
 
-                      <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-800 flex-shrink-0 border border-slate-700">
-                        <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
-                      </div>
+                        <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-800 flex-shrink-0 border border-slate-700 flex items-center justify-center text-xs">
+                          {p.photo ? (
+                            <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span>⚽</span>
+                          )}
+                        </div>
 
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors truncate">
-                          {p.name}
-                        </p>
-                        <p className="text-xs text-slate-400 truncate">
-                          {p.flag} · {p.badge} {p.team}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-5 text-right flex-shrink-0">
-                        <div>
-                          <p className="text-lg font-black text-amber-400 tabular-nums">
-                            {p.goals}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors truncate">
+                            {p.name}
                           </p>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
-                            Goals
+                          <p className="text-xs text-slate-400 truncate">
+                            {p.flag} · {p.badge} {p.team}
                           </p>
                         </div>
-                        <div className="hidden sm:block">
-                          <p className="text-sm font-black text-blue-400 tabular-nums">
-                            {p.assists}
-                          </p>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
-                            Assists
-                          </p>
+
+                        <div className="flex items-center gap-5 text-right flex-shrink-0">
+                          <div>
+                            <p className="text-lg font-black text-amber-400 tabular-nums">
+                              {p.goals}
+                            </p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
+                              Goals
+                            </p>
+                          </div>
+                          <div className="hidden sm:block">
+                            <p className="text-sm font-black text-blue-400 tabular-nums">
+                              {p.assists}
+                            </p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
+                              Assists
+                            </p>
+                          </div>
+                          <FiChevronRight className="text-slate-600 group-hover:text-white transition-colors" />
                         </div>
-                        <div className="hidden sm:block">
-                          <p className="text-sm font-black text-slate-300 tabular-nums">{p.apps}</p>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
-                            Apps
-                          </p>
-                        </div>
-                        <FiChevronRight className="text-slate-600 group-hover:text-white transition-colors" />
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-slate-400 text-xs">
+                      Top scorers data is currently unavailable for {tableLeague}.
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1855,31 +1880,39 @@ export function FootballPageClient({
                 </button>
               </div>
               <div className="divide-y divide-[#1e293b]">
-                {TOP_SCORERS.slice(0, 4).map((p) => (
-                  <Link
-                    key={p.rank}
-                    href={`/football/players/${p.playerId}`}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors group"
-                  >
-                    <span className="text-xs font-black text-slate-500 w-4 tabular-nums">
-                      {p.rank}
-                    </span>
-                    <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-700 flex-shrink-0">
-                      <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-200 group-hover:text-white truncate">
-                        {p.name}
-                      </p>
-                      <p className="text-[10px] text-slate-500 truncate">
-                        {p.badge} {p.team}
-                      </p>
-                    </div>
-                    <span className="text-sm font-black text-amber-400 tabular-nums">
-                      {p.goals}
-                    </span>
-                  </Link>
-                ))}
+                {scorersData.length > 0 ? (
+                  scorersData.slice(0, 4).map((p) => (
+                    <Link
+                      key={p.rank}
+                      href={`/football/players/${p.playerId}`}
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors group"
+                    >
+                      <span className="text-xs font-black text-slate-500 w-4 tabular-nums">
+                        {p.rank}
+                      </span>
+                      <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-700 flex-shrink-0 flex items-center justify-center text-xs">
+                        {p.photo ? (
+                          <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span>⚽</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-200 group-hover:text-white truncate">
+                          {p.name}
+                        </p>
+                        <p className="text-[10px] text-slate-400 truncate">
+                          {p.badge} {p.team}
+                        </p>
+                      </div>
+                      <span className="text-sm font-black text-amber-400 tabular-nums">
+                        {p.goals}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-xs text-slate-500">Golden boot syncing...</div>
+                )}
               </div>
             </div>
           </aside>

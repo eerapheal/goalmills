@@ -431,6 +431,7 @@ export async function GET(request: NextRequest) {
       const hasUpstreamError =
         data.error === '1' ||
         data.error === 1 ||
+        data.cod === 1006 ||
         (Array.isArray(data.result) &&
           data.result.some((r: any) => r && (r.cod || (r.msg && !r.event_key))));
 
@@ -479,11 +480,11 @@ export async function GET(request: NextRequest) {
           : rawListResult;
 
       const resultPayload = {
-        success: 1,
+        ...(!Array.isArray(data) ? data : {}),
+        success: hasUpstreamError ? 0 : 1,
         result: listResult,
         response: listResult,
-        ...(!Array.isArray(data) ? data : {}),
-        ...(hasUpstreamError ? { message: 'Upstream notice, using fallback data' } : {}),
+        ...(hasUpstreamError ? { message: 'Upstream notice, zero mock fixtures returned' } : {}),
         lastUpdatedAt: new Date().toISOString(),
         isStale: false,
       };
