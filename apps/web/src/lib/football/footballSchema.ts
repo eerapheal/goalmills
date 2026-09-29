@@ -105,7 +105,7 @@ export function generateSportsEventJsonLd(
       home: fixture.homeTeamName,
       away: fixture.awayTeamName,
       competitionId: fixture.competitionId,
-      date: fixture.date,
+      date: (fixture as any).date || fixture.scheduledAt?.split('T')[0],
       id: fixture.fixtureId,
     })}`,
     ...(fixture.homeScore !== undefined && fixture.awayScore !== undefined

@@ -151,7 +151,7 @@ describe('GoalMills Competition Isolation & Deterministic Sorting Tests', () => 
   it('produces identical deterministic ordering regardless of provider input array order', () => {
     const matchLive: NormalizedFixture = {
       fixtureId: 'match-1',
-      providerFixtureId: 1,
+      providerFixtureId: '1',
       competitionId: 'ENG-PREMIER-LEAGUE',
       seasonId: '2025/2026',
       homeTeamId: 'arsenal',
@@ -174,7 +174,7 @@ describe('GoalMills Competition Isolation & Deterministic Sorting Tests', () => 
 
     const matchUpcoming: NormalizedFixture = {
       fixtureId: 'match-2',
-      providerFixtureId: 2,
+      providerFixtureId: '2',
       competitionId: 'ESP-LA-LIGA',
       seasonId: '2025/2026',
       homeTeamId: 'real-madrid',
@@ -197,7 +197,7 @@ describe('GoalMills Competition Isolation & Deterministic Sorting Tests', () => 
 
     const matchFinished: NormalizedFixture = {
       fixtureId: 'match-3',
-      providerFixtureId: 3,
+      providerFixtureId: '3',
       competitionId: 'ITA-SERIE-A',
       seasonId: '2025/2026',
       homeTeamId: 'inter',

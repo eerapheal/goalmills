@@ -293,6 +293,29 @@ export type StageType =
 
 export type StageStatus = 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
+export interface StageGroupSummary {
+  id: string;
+  stageId: string;
+  name: string;
+  shortName: string;
+  slug: string;
+  displayOrder: number;
+  status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+  teamsCount?: number;
+  advancingTeamsCount?: number;
+}
+
+export interface StageKnockoutRoundSummary {
+  id: string;
+  stageId: string;
+  name: string;
+  slug: string;
+  order: number;
+  matchCount: number;
+  legType: 'SINGLE' | 'TWO_LEGGED';
+  status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+}
+
 export interface CompetitionStage {
   id: string;
   competitionId: string;
@@ -311,6 +334,8 @@ export interface CompetitionStage {
   rulesetId?: string;
   groupsCount?: number;
   advancingTeamsCount?: number;
+  groups?: StageGroupSummary[];
+  knockoutRounds?: StageKnockoutRoundSummary[];
   createdAt?: string;
   updatedAt?: string;
 }

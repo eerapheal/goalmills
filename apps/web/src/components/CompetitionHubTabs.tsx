@@ -243,10 +243,12 @@ export function CompetitionHubTabs({
                         ) : (
                           <>
                             <div className="text-[10px] text-slate-500">
-                              {new Date(match.event_date).toLocaleDateString(undefined, {
-                                month: 'short',
-                                day: 'numeric',
-                              })}
+                              {match.event_date
+                                ? new Date(match.event_date).toLocaleDateString(undefined, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })
+                                : 'TBD'}
                             </div>
                             <div className="text-[10px] text-amber-400 font-bold">
                               {match.event_time}

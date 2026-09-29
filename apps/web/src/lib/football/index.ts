@@ -20,3 +20,4 @@ export * from './seoService';
 export * from './standingsRulesets';
 export * from './competitionFormatRegistry';
 export * from './competitionFormatEngine';
+export * from './stageService';

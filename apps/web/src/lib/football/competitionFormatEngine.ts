@@ -257,3 +257,5 @@ export function determineCompetitionFormatType(
 export function getAllRegisteredFormats(): CompetitionFormatConfig[] {
   return Object.values(COMPETITION_FORMAT_REGISTRY);
 }
+
+export { getStandingsRulesetById, STANDINGS_RULESETS };

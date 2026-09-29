@@ -906,24 +906,24 @@ export interface FootballStatistic {
 }
 
 export interface FootballEvent {
-  event_key: string;
-  event_date: string;
-  event_time: string;
+  event_key: string | number;
+  event_date?: string;
+  event_time?: string;
   event_home_team: string;
-  home_team_key: string;
+  home_team_key?: string | number;
   event_away_team: string;
-  away_team_key: string;
-  event_halftime_result: string;
-  event_final_result: string;
-  event_ft_result: string;
-  event_penalty_result: string;
-  event_status: string;
-  country_name: string;
-  league_name: string;
-  league_key: string;
-  league_round: string;
-  league_season: string;
-  event_live: string;
+  away_team_key?: string | number;
+  event_halftime_result?: string;
+  event_final_result?: string;
+  event_ft_result?: string;
+  event_penalty_result?: string;
+  event_status?: string;
+  country_name?: string;
+  league_name?: string;
+  league_key?: string | number;
+  league_round?: string;
+  league_season?: string;
+  event_live?: string | number;
   event_stadium?: string;
   event_referee?: string;
   home_team_logo?: string;

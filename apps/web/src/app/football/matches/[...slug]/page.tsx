@@ -1520,7 +1520,7 @@ export default function FootballMatchPage() {
             standings={standings}
             homeTeam={match.event_home_team}
             awayTeam={match.event_away_team}
-            leagueName={match.league_name}
+            leagueName={match.league_name || 'League'}
           />
         )}
         {activeTab === 'odds' && (
