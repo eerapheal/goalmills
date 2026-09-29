@@ -21,3 +21,4 @@ export * from './standingsRulesets';
 export * from './competitionFormatRegistry';
 export * from './competitionFormatEngine';
 export * from './stageService';
+export * from './groupStandingsEngine';

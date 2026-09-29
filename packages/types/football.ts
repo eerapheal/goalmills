@@ -379,3 +379,66 @@ export interface StandingsRuleset {
   tiebreakers: TiebreakerRule[];
   rankingDirection: 'ASC' | 'DESC';
 }
+
+// ── Groups & Standings Architecture Models (Phase 3) ─────────────────────────
+
+export interface CompetitionGroup {
+  id: string;
+  stageId: string;
+  name: string;
+  shortName: string;
+  slug: string;
+  displayOrder: number;
+  status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+  teamsCount?: number;
+  advancingTeamsCount?: number;
+}
+
+export type StandingTableType = 'LEAGUE' | 'GROUP' | 'LEAGUE_PHASE';
+
+export interface StandingEntry {
+  id: string;
+  standingTableId: string;
+  teamId: string;
+  teamName: string;
+  teamLogo?: string;
+  teamBadge?: string;
+  position: number;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+  form?: ('W' | 'D' | 'L')[];
+  rankChange?: number;
+  qualificationStatus?: 'QUALIFIED' | 'PLAYOFF' | 'ELIMINATED' | 'PENDING';
+  promotionStatus?: 'PROMOTED' | 'PROMOTION_PLAYOFF' | 'NONE';
+  relegationStatus?: 'RELEGATED' | 'RELEGATION_PLAYOFF' | 'NONE';
+  gamesRemaining?: number;
+  updatedAt?: string;
+}
+
+export interface StandingTable {
+  id: string;
+  competitionId: string;
+  seasonId: string;
+  stageId: string;
+  groupId?: string;
+  type: StandingTableType;
+  name: string;
+  slug: string;
+  rulesetId: string;
+  displayOrder: number;
+  status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+  entries: StandingEntry[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface GroupWithStandings {
+  group: CompetitionGroup;
+  table: StandingTable;
+}
