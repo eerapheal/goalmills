@@ -2482,6 +2482,43 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-09-27T00:00:00Z',
   },
+  'UEFA-U21-EURO': {
+    id: 'UEFA-U21-EURO',
+    providerId: 32,
+    providerName: 'allsportsapi',
+    apiSportsId: 32,
+    slug: 'uefa-u21-championship',
+    name: 'UEFA European Under-21 Championship',
+    shortName: 'UEFA U21',
+    countryCode: 'EU',
+    countryName: 'Europe',
+    confederationCode: 'UEFA',
+    sport: 'football',
+    gender: 'MALE',
+    ageCategory: 'U21',
+    competitionType: 'TOURNAMENT',
+    level: 'CONFEDERATION',
+    tier: 1,
+    season: '2025/2027',
+    status: 'ACTIVE',
+    isDomestic: false,
+    isContinental: true,
+    isInternational: true,
+    isNationalTeam: true,
+    isYouth: true,
+    isSenior: false,
+    isWomens: false,
+    isMens: true,
+    isFeatured: false,
+    isIndexable: true,
+    priorityRank: 40,
+    displayOrder: 40,
+    logoUrl: leagueLogo(32),
+    countryFlagUrl: 'https://media.api-sports.io/flags/eu.svg',
+    canonicalSlug: 'uefa-u21-championship',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-09-27T00:00:00Z',
+  },
 };
 
 export const CANONICAL_COMPETITIONS_LIST: CanonicalCompetition[] =
@@ -2496,6 +2533,21 @@ for (const comp of CANONICAL_COMPETITIONS_LIST) {
   SLUG_MAP.set(comp.id.toLowerCase(), comp);
   if (comp.providerId > 0) {
     PROVIDER_ID_MAP.set(comp.providerId, comp);
+  }
+}
+
+// Canonical aliases
+const COMPETITION_ALIASES: Record<string, string> = {
+  'eng-wsl': 'ENG-WOMENS-SUPER-LEAGUE',
+  'wsl': 'ENG-WOMENS-SUPER-LEAGUE',
+  'uefa-u21': 'UEFA-U21-EURO',
+  'u21-euro': 'UEFA-U21-EURO',
+};
+
+for (const [alias, targetId] of Object.entries(COMPETITION_ALIASES)) {
+  const target = CANONICAL_COMPETITIONS[targetId];
+  if (target) {
+    SLUG_MAP.set(alias.toLowerCase(), target);
   }
 }
 

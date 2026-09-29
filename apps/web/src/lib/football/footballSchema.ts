@@ -3,6 +3,7 @@ import {
   NormalizedFixture,
   CountryRecord,
   ConfederationRecord,
+  PriorityClub,
 } from '@goalmills/types';
 
 export interface BreadcrumbItem {
@@ -156,5 +157,42 @@ export function generateCountryPyramidJsonLd(
       name: comp.name,
       url: `${baseUrl}/football/${comp.slug}`,
     })),
+  };
+}
+
+/**
+ * Generates Schema.org SportsTeam microdata for a Priority Club.
+ */
+export function generateSportsTeamJsonLd(
+  club: PriorityClub,
+  competition?: CanonicalCompetition,
+  country?: CountryRecord,
+  baseUrl = 'https://goalmills.com'
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SportsTeam',
+    name: club.name,
+    alternateName: club.shortName,
+    url: `${baseUrl}/football/clubs/${club.slug}`,
+    logo: club.logoUrl || `${baseUrl}/icon.png`,
+    sport: 'Football',
+    location: {
+      '@type': 'Place',
+      name: club.stadium || `${club.name} Stadium`,
+      address: {
+        '@type': 'PostalAddress',
+        addressCountry: country?.name || club.countryCode,
+      },
+    },
+    ...(competition
+      ? {
+          memberOf: {
+            '@type': 'SportsOrganization',
+            name: competition.name,
+            url: `${baseUrl}/football/${competition.slug}`,
+          },
+        }
+      : {}),
   };
 }

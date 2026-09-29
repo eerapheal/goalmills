@@ -70,13 +70,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  // 5. Registered Priority Clubs (150+ clubs)
-  const clubRoutes: MetadataRoute.Sitemap = PRIORITY_CLUBS_LIST.map((club) => ({
-    url: `${baseUrl}/football/teams/${club.slug}`,
-    lastModified: now,
-    changeFrequency: 'daily',
-    priority: club.isFeatured ? 0.8 : 0.7,
-  }));
+  // 5. Registered Priority Clubs (150+ clubs with canonical clean SEO URLs)
+  const clubRoutes: MetadataRoute.Sitemap = PRIORITY_CLUBS_LIST.flatMap((club) => [
+    {
+      url: `${baseUrl}/football/clubs/${club.slug}`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: club.isFeatured ? 0.85 : 0.75,
+    },
+    {
+      url: `${baseUrl}/football/teams/${club.slug}`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: club.isFeatured ? 0.8 : 0.7,
+    },
+  ]);
 
   const allFootballRoutes = [
     ...staticRoutes,

@@ -229,6 +229,30 @@ export const AFRICA_PRIORITY_REGISTRY: AfricaPriorityEntry[] = [
     providerId: 0,
     isActive: true,
   },
+  {
+    countryCode: 'SD',
+    countryName: 'Sudan',
+    competitionId: 'SDN-PREMIER-LEAGUE',
+    competitionName: 'Sudan Premier League',
+    tier: 2,
+    gender: 'MALE',
+    ageCategory: 'SENIOR',
+    priorityRank: 20,
+    providerId: 0,
+    isActive: true,
+  },
+  {
+    countryCode: 'CM',
+    countryName: 'Cameroon',
+    competitionId: 'CMR-ELITE-ONE',
+    competitionName: 'Cameroon Elite One',
+    tier: 2,
+    gender: 'MALE',
+    ageCategory: 'SENIOR',
+    priorityRank: 21,
+    providerId: 0,
+    isActive: true,
+  },
 ];
 
 export function getAfricaPriorityEntries(): AfricaPriorityEntry[] {
@@ -239,4 +263,8 @@ export function getAfricaDomesticLeagues(): AfricaPriorityEntry[] {
   return AFRICA_PRIORITY_REGISTRY.filter((entry) => entry.countryCode !== 'CAF').sort(
     (a, b) => a.priorityRank - b.priorityRank
   );
+}
+
+export function getAfricanCountries(): AfricaPriorityEntry[] {
+  return getAfricaDomesticLeagues();
 }

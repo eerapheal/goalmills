@@ -33,7 +33,7 @@ interface NormalizedTimelineEvent {
 
 // ─── DRY & SOLID Reusable UI Helpers ──────────────────────────────────────────
 
-export function FormBadge({ result }: { result: 'W' | 'D' | 'L' | string }) {
+function FormBadge({ result }: { result: 'W' | 'D' | 'L' | string }) {
   const r = (result || 'D').toUpperCase();
   const colorMap: Record<string, string> = {
     W: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
@@ -51,7 +51,7 @@ export function FormBadge({ result }: { result: 'W' | 'D' | 'L' | string }) {
   );
 }
 
-export function EventIcon({ type }: { type: string }) {
+function EventIcon({ type }: { type: string }) {
   const icons: Record<string, { icon: string; color: string }> = {
     goal: { icon: '⚽', color: 'text-white' },
     og: { icon: '⚽', color: 'text-rose-400' },
@@ -65,7 +65,7 @@ export function EventIcon({ type }: { type: string }) {
   return <span className={`text-sm ${e.color}`}>{e.icon}</span>;
 }
 
-export function StatBar({
+function StatBar({
   label,
   home,
   away,

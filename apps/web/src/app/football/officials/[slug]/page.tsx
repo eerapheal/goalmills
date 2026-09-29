@@ -17,13 +17,14 @@ import {
 } from 'react-icons/fi';
 
 interface OfficialDetailPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: OfficialDetailPageProps): Promise<Metadata> {
-  const official = EntityService.getOfficial(params.slug);
+  const { slug } = await params;
+  const official = EntityService.getOfficial(slug);
   if (!official) {
     return {
       title: 'Match Official Profile | GoalMills',
@@ -36,8 +37,9 @@ export async function generateMetadata({ params }: OfficialDetailPageProps): Pro
   };
 }
 
-export default function OfficialDetailPage({ params }: OfficialDetailPageProps) {
-  const official = EntityService.getOfficial(params.slug);
+export default async function OfficialDetailPage({ params }: OfficialDetailPageProps) {
+  const { slug } = await params;
+  const official = EntityService.getOfficial(slug);
 
   if (!official) {
     notFound();

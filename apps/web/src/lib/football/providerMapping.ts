@@ -7,6 +7,8 @@ import { FixtureClassificationStatus } from '@goalmills/types';
  */
 export const ALLSPORTS_TO_GOALMILLS_MAP: Record<number, string> = {};
 export const GOALMILLS_TO_ALLSPORTS_MAP: Record<string, number> = {};
+export const PROVIDER_LEAGUE_TO_CANONICAL = ALLSPORTS_TO_GOALMILLS_MAP;
+export const CANONICAL_TO_PROVIDER_LEAGUE = GOALMILLS_TO_ALLSPORTS_MAP;
 
 // Initialize bidirectional maps from canonical registry
 for (const comp of CANONICAL_COMPETITIONS_LIST) {

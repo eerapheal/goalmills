@@ -21,7 +21,8 @@ export type MainCategoryTab =
   | 'FIFA'
   | 'CONMEBOL'
   | 'CONCACAF'
-  | 'AFC';
+  | 'AFC'
+  | 'OFC';
 
 export interface FootballNavSwitcherProps {
   selectedCategory: MainCategoryTab;
@@ -44,6 +45,7 @@ const CONFED_TABS: { id: MainCategoryTab; label: string; icon: string; badge?: s
   { id: 'CONMEBOL', label: 'South America', icon: '🌎' },
   { id: 'CONCACAF', label: 'North America', icon: '🌎' },
   { id: 'AFC', label: 'Asia (AFC)', icon: '🌏' },
+  { id: 'OFC', label: 'Oceania (OFC)', icon: '🌊' },
 ];
 
 const TOP5_COUNTRIES = [
@@ -59,11 +61,18 @@ const AFRICA_PRIORITY_COUNTRIES = [
   { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
   { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
   { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
-  { code: 'GH', name: 'Ghana', flag: '🇬🇭' },
   { code: 'DZ', name: 'Algeria', flag: '🇩🇿' },
   { code: 'TN', name: 'Tunisia', flag: '🇹🇳' },
+  { code: 'GH', name: 'Ghana', flag: '🇬🇭' },
   { code: 'TZ', name: 'Tanzania', flag: '🇹🇿' },
   { code: 'CD', name: 'DR Congo', flag: '🇨🇩' },
+  { code: 'ZM', name: 'Zambia', flag: '🇿🇲' },
+  { code: 'KE', name: 'Kenya', flag: '🇰🇪' },
+  { code: 'AO', name: 'Angola', flag: '🇦🇴' },
+  { code: 'UG', name: 'Uganda', flag: '🇺🇬' },
+  { code: 'SD', name: 'Sudan', flag: '🇸🇩' },
+  { code: 'CM', name: 'Cameroon', flag: '🇨🇲' },
+  { code: 'CI', name: 'Ivory Coast', flag: '🇨🇮' },
 ];
 
 export function FootballNavSwitcher({
