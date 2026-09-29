@@ -442,3 +442,70 @@ export interface GroupWithStandings {
   group: CompetitionGroup;
   table: StandingTable;
 }
+
+// ── Qualification & Knockout Engine Models (Phase 4) ─────────────────────────
+
+export interface QualificationRule {
+  targetPosition: number;
+  ruleType: 'AUTOMATIC_QUALIFICATION' | 'PLAYOFF' | 'RELEGATION' | 'PROMOTION';
+  destinationStageId?: string;
+  destinationRoundSlug?: string;
+  label: string;
+  isWildcardThirdPlace?: boolean;
+}
+
+export interface KnockoutParticipant {
+  teamId?: string;
+  teamName: string;
+  teamLogo?: string;
+  score?: number;
+  homeScore?: number;
+  awayScore?: number;
+  penaltyScore?: number;
+  isWinner?: boolean;
+  seedSource?: string;
+}
+
+export interface KnockoutMatchNode {
+  id: string;
+  roundId: string;
+  roundSlug: string;
+  matchNumber: number;
+  homeTeam: KnockoutParticipant;
+  awayTeam: KnockoutParticipant;
+  winnerTeamId?: string;
+  winnerTeamName?: string;
+  status: 'SCHEDULED' | 'LIVE' | 'FT' | 'AET' | 'PEN';
+  scheduledAt?: string;
+  nextMatchId?: string;
+  nextMatchSlot?: 'home' | 'away';
+  legType: 'SINGLE' | 'TWO_LEGGED';
+  legs?: {
+    leg1Score?: { home: number; away: number };
+    leg2Score?: { home: number; away: number };
+    aggregateScore?: { home: number; away: number };
+  };
+}
+
+export interface KnockoutRound {
+  id: string;
+  stageId: string;
+  name: string;
+  slug: string;
+  order: number;
+  matchCount: number;
+  legType: 'SINGLE' | 'TWO_LEGGED';
+  status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+  matches?: KnockoutMatchNode[];
+}
+
+export interface TournamentBracket {
+  competitionId: string;
+  seasonId: string;
+  stageId: string;
+  name: string;
+  rounds: KnockoutRound[];
+  championTeam?: KnockoutParticipant;
+  runnerUpTeam?: KnockoutParticipant;
+  thirdPlaceTeam?: KnockoutParticipant;
+}

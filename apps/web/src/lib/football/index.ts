@@ -22,3 +22,5 @@ export * from './competitionFormatRegistry';
 export * from './competitionFormatEngine';
 export * from './stageService';
 export * from './groupStandingsEngine';
+export * from './qualificationEngine';
+export * from './knockoutEngine';
