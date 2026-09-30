@@ -161,4 +161,210 @@ export interface BettingFeatureFlags {
   betloyIntegration: boolean;
   sponsoredBookmakers: boolean;
   oddsMovement: boolean;
+  betScanner?: boolean;
+  betAnalyzer?: boolean;
+  betEditor?: boolean;
+  betTrimmer?: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// Phase 3: Bet Intelligence & BetTools Provider Abstraction
+// ---------------------------------------------------------------------------
+
+export interface BetSlipSelection {
+  market: string;
+  selection: string;
+  odds: number;
+  probability?: number;
+  isBanker?: boolean;
+}
+
+export interface BetSlipLeg {
+  id: string;
+  fixture: string;
+  homeTeam: string;
+  awayTeam: string;
+  sport: string;
+  league?: string;
+  kickoffTime?: string;
+  status: 'PENDING' | 'WON' | 'LOST' | 'VOID';
+  selection: BetSlipSelection;
+}
+
+export interface DecodedBetSlip {
+  code: string;
+  sourceBookmaker: string;
+  totalOdds: number;
+  legCount: number;
+  legs: BetSlipLeg[];
+  potentialPayout?: number;
+  currency?: string;
+  generatedAt?: string;
+}
+
+export interface BookmakerScanQuote {
+  bookmakerId: string;
+  bookmakerName: string;
+  bookmakerLogo?: string;
+  totalOdds: number;
+  differencePercent?: number; // e.g. +14.2% vs baseline
+  isBestOdds: boolean;
+  affiliateUrl?: string;
+  supportedLegCount: number;
+  totalLegCount: number;
+  availableMarkets: string[];
+}
+
+export interface BetScanRequest {
+  code: string;
+  sourceBookmaker: string;
+  stake?: number;
+  country?: string;
+}
+
+export interface NormalizedBetScanResult {
+  code: string;
+  sourceBookmaker: string;
+  baselineOdds: number;
+  stake: number;
+  scannedAt: string;
+  legs: BetSlipLeg[];
+  quotes: BookmakerScanQuote[];
+  bestBookmaker: BookmakerScanQuote;
+}
+
+export interface RiskFactor {
+  title: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  description: string;
+}
+
+export interface BetAnalysisRequest {
+  code: string;
+  sourceBookmaker: string;
+  stake?: number;
+}
+
+export interface NormalizedBetAnalysisResult {
+  code: string;
+  sourceBookmaker: string;
+  overallRiskScore: number; // 0 (safest) to 100 (extreme risk)
+  riskRating: 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME';
+  estimatedWinProbabilityPercent: number;
+  recommendedMaxStakePercent?: number;
+  expectedValueIndicator: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE';
+  riskFactors: RiskFactor[];
+  strengths: string[];
+  disclaimer: string;
+  analyzedAt: string;
+}
+
+export interface BetConvertRequest {
+  code: string;
+  sourceBookmaker: string;
+  targetBookmaker: string;
+}
+
+export interface NormalizedBetConvertResult {
+  originalCode: string;
+  sourceBookmaker: string;
+  targetBookmaker: string;
+  targetCode: string;
+  convertedOdds: number;
+  originalOdds: number;
+  oddsDifferencePercent: number;
+  matchedLegs: number;
+  totalLegs: number;
+  convertedAt: string;
+}
+
+export interface TrimmedLegDifference {
+  legId: string;
+  fixture: string;
+  action: 'REMOVED' | 'ADJUSTED_MARKET' | 'KEPT';
+  reason: string;
+  originalOdds: number;
+  adjustedOdds?: number;
+}
+
+export interface BetTrimRequest {
+  code: string;
+  sourceBookmaker: string;
+  riskTolerance?: 'CONSERVATIVE' | 'MODERATE' | 'AGGRESSIVE';
+}
+
+export interface NormalizedBetTrimResult {
+  originalCode: string;
+  trimmedCode?: string;
+  sourceBookmaker: string;
+  originalOdds: number;
+  trimmedOdds: number;
+  originalLegCount: number;
+  trimmedLegCount: number;
+  riskReductionPercent: number;
+  estimatedWinProbabilityBefore: number;
+  estimatedWinProbabilityAfter: number;
+  differences: TrimmedLegDifference[];
+  disclaimer: string;
+  trimmedAt: string;
+}
+
+export interface ProviderBookmakerSummary {
+  id: string;
+  slug: string;
+  name: string;
+  country: string;
+  isActive: boolean;
+  supportedFeatures: {
+    scan: boolean;
+    decode: boolean;
+    convert: boolean;
+    analyze: boolean;
+    trim: boolean;
+  };
+}
+
+export interface ProviderHealthStatus {
+  providerId: string;
+  status: 'HEALTHY' | 'DEGRADED' | 'DOWN';
+  latencyMs: number;
+  lastChecked: string;
+  circuitBreakerStatus: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+  error?: string;
+}
+
+export interface ProviderUsageStats {
+  providerId: string;
+  requestsToday: number;
+  limitDaily?: number;
+  rateLimitRemaining?: number;
+  resetAt?: string;
+}
+
+export interface BookmakerProviderMapping {
+  id: string;
+  bookmakerId: string;
+  provider: ExternalOddsProvider | string;
+  providerBookmakerId: string;
+  country?: string;
+  supportedMarkets: string[];
+  status: 'ACTIVE' | 'INACTIVE' | 'UNSUPPORTED';
+  lastSyncedAt: string | Date;
+}
+
+/**
+ * Universal Provider Contract for Bet Tools & Intelligence.
+ * Isolates Betloy and future external providers behind an interchangeable interface.
+ */
+export interface BetToolsProvider {
+  readonly providerId: string;
+  decodeBet(request: { code: string; sourceBookmaker: string }): Promise<DecodedBetSlip>;
+  scanOdds(request: BetScanRequest): Promise<NormalizedBetScanResult>;
+  analyzeBet(request: BetAnalysisRequest): Promise<NormalizedBetAnalysisResult>;
+  convertBet(request: BetConvertRequest): Promise<NormalizedBetConvertResult>;
+  trimBet(request: BetTrimRequest): Promise<NormalizedBetTrimResult>;
+  getBookmakers(): Promise<ProviderBookmakerSummary[]>;
+  healthCheck(): Promise<ProviderHealthStatus>;
+  getUsage?(): Promise<ProviderUsageStats>;
+}
+

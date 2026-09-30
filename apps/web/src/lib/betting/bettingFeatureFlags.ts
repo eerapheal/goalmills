@@ -14,18 +14,20 @@ export interface BettingFeatureFlagsConfig {
   betScanner: boolean;
   betAnalyzer: boolean;
   betEditor: boolean;
+  betTrimmer: boolean;
 }
 
 const DEFAULT_FLAGS: BettingFeatureFlagsConfig = {
   oddsComparison: true,
   affiliateLinks: true,
   affiliateTracking: true,
-  betloyIntegration: false, // Activated in Phase 3
+  betloyIntegration: true,
   sponsoredBookmakers: false,
   oddsMovement: true,
-  betScanner: false,
-  betAnalyzer: false,
-  betEditor: false,
+  betScanner: true,
+  betAnalyzer: true,
+  betEditor: true,
+  betTrimmer: true,
 };
 
 /**

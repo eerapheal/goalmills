@@ -306,8 +306,9 @@ describe('GoalMills Betting Domain Foundation (Phase 1)', () => {
     it('evaluates default betting feature flags', () => {
       expect(isBettingFeatureEnabled('oddsComparison')).toBe(true);
       expect(isBettingFeatureEnabled('affiliateLinks')).toBe(true);
-      expect(isBettingFeatureEnabled('affiliateTracking')).toBe(true);
-      expect(isBettingFeatureEnabled('betloyIntegration')).toBe(false); // Dormant until Phase 3
+      expect(isBettingFeatureEnabled('betloyIntegration')).toBe(true); // Activated in Phase 3
+      expect(isBettingFeatureEnabled('betScanner')).toBe(true);
+      expect(isBettingFeatureEnabled('betAnalyzer')).toBe(true);
     });
   });
 });

@@ -19,7 +19,7 @@ import type {
 import { getCanonicalBookmaker } from '@/lib/betting/bookmakerRegistry';
 import { buildSecureAffiliateRedirectUrl } from '@/lib/betting/affiliateEngine';
 import { isBettingFeatureEnabled } from '@/lib/betting/bettingFeatureFlags';
-import { OddsComparisonMatrix } from '@/components/betting/OddsComparisonMatrix';
+import { OddsComparisonMatrix, BetScannerWidget } from '@/components/betting';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -946,12 +946,17 @@ function OddsTab({
   matchId?: string | number;
 }) {
   return (
-    <OddsComparisonMatrix
-      rawOdds={odds}
-      homeTeam={homeTeam}
-      awayTeam={awayTeam}
-      eventId={matchId}
-    />
+    <div className="space-y-8">
+      <OddsComparisonMatrix
+        rawOdds={odds}
+        homeTeam={homeTeam}
+        awayTeam={awayTeam}
+        eventId={matchId}
+      />
+      {isBettingFeatureEnabled('betScanner') && (
+        <BetScannerWidget />
+      )}
+    </div>
   );
 }
 
