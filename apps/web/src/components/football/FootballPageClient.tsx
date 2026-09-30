@@ -335,44 +335,6 @@ const COMP_GROUPS: CompGroup[] = [
   },
 ];
 
-const ANALYSIS_ARTICLES = [
-  {
-    tag: 'ANALYSIS',
-    tagColor: 'bg-blue-600',
-    title: "How Guardiola's inverted full-backs are breaking every pressing system in Europe",
-    time: '2 hr ago',
-    comp: 'Premier League',
-    img: '',
-    slug: 'guardiola-inverted-fullbacks-pressing-system',
-  },
-  {
-    tag: 'TRANSFER',
-    tagColor: 'bg-rose-600',
-    title: 'Osimhen to Al-Hilal & Premier League suitors: €120m record market valuation report',
-    time: '4 hr ago',
-    comp: 'Transfer Wire',
-    img: '',
-    slug: 'osimhen-transfer-valuation-premier-league',
-  },
-  {
-    tag: 'AFCON',
-    tagColor: 'bg-amber-600',
-    title: "Super Eagles' xG dominance and attacking depth make Nigeria 2026/27 favourites",
-    time: '6 hr ago',
-    comp: 'CAF Africa',
-    img: '',
-    slug: 'super-eagles-xg-dominance-afcon',
-  },
-  {
-    tag: 'STATS',
-    tagColor: 'bg-purple-600',
-    title: "Haaland's box conversion rate is statistically unprecedented in top-flight history",
-    time: '8 hr ago',
-    comp: 'Deep Data',
-    img: '',
-    slug: 'haaland-conversion-rate-unprecedented',
-  },
-];
 
 export const COMP_FILTERS: { id: string; label: string }[] = [
   { id: 'All', label: 'All Fixtures' },
@@ -1000,50 +962,6 @@ export function FootballPageClient({
               LEFT SIDEBAR
           ────────────────────────────────────────── */}
           <aside className="hidden lg:block space-y-5 lg:sticky lg:top-24">
-            {/* Football Analysis Articles */}
-            <SideSection
-              title="Football Analysis"
-              action={
-                <Link
-                  href="/analysis"
-                  className="text-[10px] text-blue-400 hover:text-blue-300 font-bold transition-colors"
-                >
-                  All →
-                </Link>
-              }
-            >
-              <div className="divide-y divide-[#1e293b]">
-                {ANALYSIS_ARTICLES.map((a, i) => (
-                  <Link
-                    key={i}
-                    href={`/news/${a.slug}`}
-                    className="flex gap-3 p-3.5 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer"
-                  >
-                    <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
-                      <img
-                        src={a.img}
-                        alt=""
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85"
-                      />
-                      <span
-                        className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded leading-tight`}
-                      >
-                        {a.tag}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider mb-1">
-                        {a.comp}
-                      </p>
-                      <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-snug line-clamp-2 transition-colors">
-                        {a.title}
-                      </h4>
-                      <p className="text-[10px] text-slate-500 mt-1">{a.time}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </SideSection>
 
             {/* Competition Directory */}
             <SideSection
@@ -1195,52 +1113,6 @@ export function FootballPageClient({
 
               {mobileMenuOpen && (
                 <div className="mt-3 space-y-4 p-3.5 bg-[#080f1e] border border-blue-500/30 rounded-2xl shadow-xl animate-fadeIn">
-                  {/* Football Analysis */}
-                  <SideSection
-                    title="Football Analysis"
-                    defaultOpen={true}
-                    action={
-                      <Link
-                        href="/analysis"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 font-bold"
-                      >
-                        All →
-                      </Link>
-                    }
-                  >
-                    <div className="divide-y divide-[#1e293b]">
-                      {ANALYSIS_ARTICLES.slice(0, 4).map((a, i) => (
-                        <Link
-                          key={i}
-                          href={`/news/${a.slug}`}
-                          className="flex gap-3 p-3 hover:bg-[#1e293b]/40 transition-colors group cursor-pointer"
-                        >
-                          <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-slate-800">
-                            <img
-                              src={a.img}
-                              alt=""
-                              className="w-full h-full object-cover opacity-85"
-                            />
-                            <span
-                              className={`absolute top-1 left-1 ${a.tagColor} text-white text-[8px] font-black uppercase px-1 py-0.5 rounded`}
-                            >
-                              {a.tag}
-                            </span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[9px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">
-                              {a.comp}
-                            </p>
-                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white leading-tight line-clamp-2">
-                              {a.title}
-                            </h4>
-                            <p className="text-[9px] text-slate-500 mt-1">{a.time}</p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </SideSection>
-
                   {/* Competition Directory */}
                   <SideSection
                     title="Competition Directory"
