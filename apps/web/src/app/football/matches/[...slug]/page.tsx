@@ -16,6 +16,11 @@ import type {
   FootballComment,
   FootballLineupPlayer,
 } from '@goalmills/types';
+import {
+  getCanonicalBookmaker,
+  buildSecureAffiliateRedirectUrl,
+  isBettingFeatureEnabled,
+} from '@/lib/betting';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -934,11 +939,15 @@ function OddsTab({
   odds,
   homeTeam,
   awayTeam,
+  matchId,
 }: {
   odds: FootballOdds[];
   homeTeam: string;
   awayTeam: string;
+  matchId?: string | number;
 }) {
+  const showAffiliate = isBettingFeatureEnabled('affiliateLinks');
+
   if (!odds || odds.length === 0) {
     return (
       <div className="bg-[#0f172a] rounded-2xl border border-[#1e293b] p-12 text-center text-slate-400 text-sm">
@@ -948,50 +957,103 @@ function OddsTab({
   }
 
   return (
-    <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-xl">
-      <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
-        <h3 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-          <span>🎲</span> Market Betting Odds
-        </h3>
-        <span className="text-[10px] text-slate-400 font-semibold">{odds.length} Bookmakers</span>
+    <div className="space-y-4">
+      <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-xl">
+        <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
+          <h3 className="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
+            <span>🎲</span> Market Betting Odds
+          </h3>
+          <span className="text-[10px] text-slate-400 font-semibold">{odds.length} Bookmakers</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead>
+              <tr className="border-b border-[#1e293b] text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white/[0.01]">
+                <th className="px-5 py-3">Bookmaker</th>
+                <th className="px-3 py-3 text-center text-blue-400">1 ({homeTeam})</th>
+                <th className="px-3 py-3 text-center text-slate-300">X (Draw)</th>
+                <th className="px-3 py-3 text-center text-rose-400">2 ({awayTeam})</th>
+                <th className="px-3 py-3 text-center hidden sm:table-cell">Over 2.5</th>
+                <th className="px-3 py-3 text-center hidden sm:table-cell">Under 2.5</th>
+                {showAffiliate && <th className="px-4 py-3 text-right">Action</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#1e293b]">
+              {odds.map((o, idx) => {
+                const canonical = getCanonicalBookmaker(o.odd_bookmakers);
+                const bookieName = canonical?.displayName || o.odd_bookmakers;
+                const redirectUrl = canonical
+                  ? buildSecureAffiliateRedirectUrl({
+                      bookmakerId: canonical.id,
+                      campaign: 'match_details',
+                      placement: 'odds_table',
+                      eventId: matchId ? String(matchId) : undefined,
+                    })
+                  : null;
+
+                return (
+                  <tr key={idx} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="px-5 py-3 font-bold text-white flex items-center gap-2.5">
+                      {canonical?.logoUrl ? (
+                        <img
+                          src={canonical.logoUrl}
+                          alt={bookieName}
+                          className="w-5 h-5 rounded-md object-contain bg-white/10 p-0.5"
+                        />
+                      ) : (
+                        <div className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                          {bookieName[0]}
+                        </div>
+                      )}
+                      <span>{bookieName}</span>
+                    </td>
+                    <td className="px-3 py-3 text-center font-mono font-black text-blue-400">
+                      {o.odd_1 || '-'}
+                    </td>
+                    <td className="px-3 py-3 text-center font-mono font-black text-slate-300">
+                      {o.odd_x || '-'}
+                    </td>
+                    <td className="px-3 py-3 text-center font-mono font-black text-rose-400">
+                      {o.odd_2 || '-'}
+                    </td>
+                    <td className="px-3 py-3 text-center font-mono hidden sm:table-cell text-slate-300">
+                      {o['o+2.5'] || '-'}
+                    </td>
+                    <td className="px-3 py-3 text-center font-mono hidden sm:table-cell text-slate-300">
+                      {o['u+2.5'] || '-'}
+                    </td>
+                    {showAffiliate && (
+                      <td className="px-4 py-3 text-right">
+                        {redirectUrl ? (
+                          <a
+                            href={redirectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer nofollow"
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-black text-[11px] transition-all shadow-sm shadow-blue-600/30"
+                          >
+                            <span>Bet Now</span>
+                            <span className="text-[9px]">&rarr;</span>
+                          </a>
+                        ) : (
+                          <span className="text-slate-600 text-[10px]">-</span>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs text-left">
-          <thead>
-            <tr className="border-b border-[#1e293b] text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white/[0.01]">
-              <th className="px-5 py-3">Bookmaker</th>
-              <th className="px-3 py-3 text-center text-blue-400">1 ({homeTeam})</th>
-              <th className="px-3 py-3 text-center text-slate-300">X (Draw)</th>
-              <th className="px-3 py-3 text-center text-rose-400">2 ({awayTeam})</th>
-              <th className="px-3 py-3 text-center hidden sm:table-cell">Over 2.5</th>
-              <th className="px-3 py-3 text-center hidden sm:table-cell">Under 2.5</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#1e293b]">
-            {odds.map((o, idx) => (
-              <tr key={idx} className="hover:bg-white/[0.03] transition-colors">
-                <td className="px-5 py-3 font-bold text-white">{o.odd_bookmakers}</td>
-                <td className="px-3 py-3 text-center font-mono font-black text-blue-400">
-                  {o.odd_1 || '-'}
-                </td>
-                <td className="px-3 py-3 text-center font-mono font-black text-slate-300">
-                  {o.odd_x || '-'}
-                </td>
-                <td className="px-3 py-3 text-center font-mono font-black text-rose-400">
-                  {o.odd_2 || '-'}
-                </td>
-                <td className="px-3 py-3 text-center font-mono hidden sm:table-cell text-slate-300">
-                  {o['o+2.5'] || '-'}
-                </td>
-                <td className="px-3 py-3 text-center font-mono hidden sm:table-cell text-slate-300">
-                  {o['u+2.5'] || '-'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Legal & Editorial Disclaimer */}
+      {showAffiliate && (
+        <p className="text-[10px] text-slate-500 text-center leading-relaxed px-2">
+          Advertiser Disclosure: Odds are displayed for editorial and informational comparison. GoalMills may receive affiliate compensation when you register via links on our platform. 18+ / 21+ only. Please gamble responsibly.
+        </p>
+      )}
     </div>
   );
 }
@@ -1524,7 +1586,12 @@ export default function FootballMatchPage() {
           />
         )}
         {activeTab === 'odds' && (
-          <OddsTab odds={odds} homeTeam={match.event_home_team} awayTeam={match.event_away_team} />
+          <OddsTab
+            odds={odds}
+            homeTeam={match.event_home_team}
+            awayTeam={match.event_away_team}
+            matchId={match.event_key}
+          />
         )}
         {activeTab === 'commentary' && <CommentaryTab comments={comments} />}
       </div>

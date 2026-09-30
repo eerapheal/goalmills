@@ -4308,4 +4308,5 @@ export interface SocialAutomationStats {
 }
 
 export * from './football';
+export * from './betting';
 
