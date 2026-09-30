@@ -132,7 +132,7 @@ export default async function StatsHubPage() {
                   ].map((league) => (
                     <Link
                       key={league.slug}
-                      href={`/football/${league.slug}`}
+                      href={`/football/${league.slug}/table`}
                       className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#091529]/80 hover:bg-blue-600/30 border border-blue-500/20 hover:border-amber-400/40 text-xs font-bold text-slate-200 hover:text-white transition-all shadow-md group"
                     >
                       <span>{league.flag}</span>
@@ -164,7 +164,7 @@ export default async function StatsHubPage() {
               {competitions.map((comp) => (
                 <Link
                   key={comp.slug}
-                  href={`/football/${comp.slug}`}
+                  href={`/football/${comp.slug}/table`}
                   className="group flex items-center justify-between p-3 rounded-2xl bg-[#070F1E] hover:bg-blue-600/20 border border-blue-500/15 hover:border-amber-400/40 transition-all text-xs font-bold text-slate-200 hover:text-white shadow-sm"
                 >
                   <div className="flex items-center gap-2.5">
@@ -252,9 +252,13 @@ export default async function StatsHubPage() {
               </span>
               <span>Premier League Standings & Form Guide</span>
             </h2>
-            <span className="text-[10px] font-mono text-blue-300 font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-              Matchday 28
-            </span>
+            <Link
+              href="/football/premier-league/table"
+              className="text-xs font-bold text-blue-400 hover:text-white flex items-center gap-1 transition-colors"
+            >
+              <span>Full Table & Tiebreaker Rules</span>
+              <span>&rarr;</span>
+            </Link>
           </div>
           <FootballStandingsTable standings={eplStandings} leagueId={152} />
         </section>

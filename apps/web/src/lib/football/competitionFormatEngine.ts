@@ -160,17 +160,25 @@ export function getCompetitionFormat(
   seasonId?: string
 ): CompetitionFormatConfig {
   const normSeason = normalizeSeason(seasonId);
-  const exactKey = `${competitionId.toUpperCase()}:${normSeason}`;
-  if (COMPETITION_FORMAT_REGISTRY[exactKey]) {
-    return COMPETITION_FORMAT_REGISTRY[exactKey];
+  const canonical = getCanonicalCompetition(competitionId);
+  const targetIds = [competitionId.toUpperCase()];
+  if (canonical && canonical.id.toUpperCase() !== competitionId.toUpperCase()) {
+    targetIds.unshift(canonical.id.toUpperCase());
   }
 
-  const defaultKey = `${competitionId.toUpperCase()}:default`;
-  if (COMPETITION_FORMAT_REGISTRY[defaultKey]) {
-    return COMPETITION_FORMAT_REGISTRY[defaultKey];
+  for (const cid of targetIds) {
+    const exactKey = `${cid}:${normSeason}`;
+    if (COMPETITION_FORMAT_REGISTRY[exactKey]) {
+      return COMPETITION_FORMAT_REGISTRY[exactKey];
+    }
+
+    const defaultKey = `${cid}:default`;
+    if (COMPETITION_FORMAT_REGISTRY[defaultKey]) {
+      return COMPETITION_FORMAT_REGISTRY[defaultKey];
+    }
   }
 
-  return generateDeterministicFallback(competitionId.toUpperCase(), normSeason);
+  return generateDeterministicFallback(targetIds[0], normSeason);
 }
 
 /**

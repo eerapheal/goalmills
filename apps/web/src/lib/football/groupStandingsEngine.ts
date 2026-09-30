@@ -159,8 +159,11 @@ export function separateProviderStandingsByGroup(
     : stages.find((s) => s.isGroupStage || s.isLeaguePhase) || stages[0];
 
   const ruleset = getStandingsRulesetForCompetition(competitionId, seasonId);
-  const isGroupStage = targetStage?.isGroupStage ?? false;
+  const hasDistinctGroupsInPayload = rawStandings.some(
+    (r) => r.league_group || r.group_name || r.group || r.standing_group
+  );
   const isLeaguePhase = targetStage?.isLeaguePhase ?? false;
+  const isGroupStage = (targetStage?.isGroupStage ?? false) || (!isLeaguePhase && hasDistinctGroupsInPayload);
 
   // 1. Single Domestic League Table (Premier League, La Liga, etc.)
   if (!isGroupStage && !isLeaguePhase) {

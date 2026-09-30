@@ -5,9 +5,15 @@ import Link from 'next/link';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { FootballMatchCard, UnifiedWebMatchEvent } from './FootballMatchCard';
 import { FootballStandingsTable } from './FootballStandingsTable';
+import { GroupStandingsView } from './football/GroupStandingsView';
+import { TournamentBracketView } from './football/TournamentBracketView';
 import { FootballTopScorers } from './FootballTopScorers';
 import { GoalmillsLoader } from './GoalmillsLoader';
 import { footballRoutes, slugify, buildMatchSlug } from '@/lib/slugUtils';
+import {
+  separateProviderStandingsByGroup,
+  buildTournamentBracket,
+} from '@/lib/football';
 import type {
   FootballStanding,
   FootballTopscorer,
@@ -325,46 +331,67 @@ export function CompetitionHubTabs({
           {/* Table */}
           {activeTab === 'table' && (
             <div className="space-y-6">
-              {/* View Selector */}
-              <div className="flex items-center gap-2">
-                {(['total', 'home', 'away'] as const).map((view) => (
-                  <button
-                    key={view}
-                    onClick={() => setStandingView(view)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                      standingView === view
-                        ? 'bg-blue-600 text-white border-blue-400'
-                        : 'bg-[#0B1526] text-slate-400 border-white/5 hover:text-white'
-                    }`}
-                  >
-                    {view.charAt(0).toUpperCase() + view.slice(1)}
-                  </button>
-                ))}
+              {/* Header Ribbon with Link to Dedicated Table Page */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                {/* View Selector (Total / Home / Away) */}
+                <div className="flex items-center gap-2">
+                  {(['total', 'home', 'away'] as const).map((view) => (
+                    <button
+                      key={view}
+                      onClick={() => setStandingView(view)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                        standingView === view
+                          ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30'
+                          : 'bg-[#0B1526] text-slate-400 border-white/5 hover:text-white'
+                      }`}
+                    >
+                      {view.charAt(0).toUpperCase() + view.slice(1)}
+                    </button>
+                  ))}
+                </div>
+
+                <Link
+                  href={`/football/${competitionSlug}/table`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600 hover:text-white transition-all text-xs font-bold self-start sm:self-auto"
+                >
+                  <span>📊</span>
+                  <span>Dedicated Table Page & Rules</span>
+                  <span>&rarr;</span>
+                </Link>
               </div>
 
-              {standingsByGroup ? (
-                // Group Stage Tables
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {Object.entries(standingsByGroup)
-                    .sort()
-                    .map(([groupName, groupStandings]) => (
-                      <div
-                        key={groupName}
-                        className="rounded-2xl border border-white/10 bg-[#0B1526]/50 overflow-hidden"
-                      >
-                        <div className="px-4 py-2 bg-blue-600/10 border-b border-white/5">
-                          <h4 className="text-xs font-black text-white uppercase">{groupName}</h4>
-                        </div>
-                        <FootballStandingsTable
-                          standings={groupStandings}
-                          leagueId={competitionId}
-                          compact
-                        />
-                      </div>
-                    ))}
-                </div>
+              {/* Group Standings or Unified Standings or Knockout Bracket */}
+              {hasGroups && standings.length > 0 ? (
+                (() => {
+                  const separated = separateProviderStandingsByGroup(
+                    standings,
+                    competitionSlug,
+                    '2026/2027'
+                  );
+                  if (separated.length > 1) {
+                    return <GroupStandingsView groups={separated} leagueId={competitionId} />;
+                  }
+                  return (
+                    <FootballStandingsTable
+                      table={separated[0]}
+                      standings={standings}
+                      leagueId={competitionId}
+                    />
+                  );
+                })()
               ) : standings.length > 0 ? (
                 <FootballStandingsTable standings={standings} leagueId={competitionId} />
+              ) : hasKnockout ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">
+                      Tournament Knockout Tree
+                    </h3>
+                  </div>
+                  <TournamentBracketView
+                    bracket={buildTournamentBracket(competitionSlug, '2026/2027', fixtures)}
+                  />
+                </div>
               ) : (
                 <div className="text-center text-slate-400 py-12 text-sm">
                   No standings data available.

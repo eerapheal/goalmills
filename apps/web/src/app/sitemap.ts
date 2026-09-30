@@ -38,15 +38,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 2. Canonical Football Competitions (75+ Global & African Leagues)
   const canonicalCompetitions = getAllCanonicalCompetitions();
-  const competitionRoutes: MetadataRoute.Sitemap = canonicalCompetitions.map((comp) => {
+  const competitionRoutes: MetadataRoute.Sitemap = canonicalCompetitions.flatMap((comp) => {
     // Top-tier leagues get higher crawl priority
     const priority = comp.priorityRank <= 10 ? 0.9 : comp.priorityRank <= 25 ? 0.85 : 0.75;
-    return {
-      url: `${baseUrl}/football/${comp.slug}`,
-      lastModified: now,
-      changeFrequency: 'hourly',
-      priority,
-    };
+    return [
+      {
+        url: `${baseUrl}/football/${comp.slug}`,
+        lastModified: now,
+        changeFrequency: 'hourly' as const,
+        priority,
+      },
+      {
+        url: `${baseUrl}/football/${comp.slug}/table`,
+        lastModified: now,
+        changeFrequency: 'daily' as const,
+        priority: Math.max(0.7, priority - 0.05),
+      },
+    ];
   });
 
   // 3. Continental Confederations (CAF, UEFA, CONMEBOL, CONCACAF, AFC, OFC, FIFA)
