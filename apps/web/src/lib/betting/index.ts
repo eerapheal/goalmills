@@ -1,5 +1,6 @@
 export * from './bettingFeatureFlags';
 export * from './bookmakerRegistry';
+export * from './canonicalEventId';
 export * from './canonicalEventResolver';
 export * from './oddsNormalizer';
 export * from './affiliateEngine';

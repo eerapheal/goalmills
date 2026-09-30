@@ -2,19 +2,9 @@ import { GoalMillsEventId, EventProviderMapping, ExternalOddsProvider } from '@g
 import { cacheGet, cacheSet } from '@/lib/redisCache';
 import dbConnect from '@/lib/db';
 import EventProviderMappingModel from '@/models/EventProviderMapping';
+import { buildCanonicalEventId } from './canonicalEventId';
 
-/**
- * Builds deterministic GoalMills canonical event ID.
- * Standard format: gm_event_{sport}_{cleanId}
- */
-export function buildCanonicalEventId(
-  sport: string,
-  providerEventId: string | number
-): GoalMillsEventId {
-  const cleanSport = sport.toLowerCase().trim();
-  const cleanId = String(providerEventId).trim().replace(/[^a-zA-Z0-9_-]/g, '');
-  return `gm_event_${cleanSport}_${cleanId}` as GoalMillsEventId;
-}
+export { buildCanonicalEventId };
 
 /**
  * Resolves or stores an event provider mapping.

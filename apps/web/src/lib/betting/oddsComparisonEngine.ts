@@ -1,6 +1,6 @@
 import { OddsMarketType, Bookmaker, FootballOdds } from '@goalmills/types';
 import { getCanonicalBookmaker, normalizeBookmakerSlug } from './bookmakerRegistry';
-import { buildCanonicalEventId } from './canonicalEventResolver';
+import { buildCanonicalEventId } from './canonicalEventId';
 
 export type OddsFormat = 'decimal' | 'fractional' | 'american';
 
