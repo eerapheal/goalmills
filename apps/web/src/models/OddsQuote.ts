@@ -87,7 +87,6 @@ const OddsQuoteSchema = new mongoose.Schema(
     capturedAt: {
       type: Date,
       default: Date.now,
-      index: true,
     },
     expiresAt: {
       type: Date,

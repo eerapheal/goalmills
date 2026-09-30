@@ -51,7 +51,12 @@ export type MarketType =
   | '1X2'
   | 'DOUBLE_CHANCE'
   | 'OVER_UNDER'
+  | 'OVER_UNDER_1_5'
+  | 'OVER_UNDER_2_5'
+  | 'OVER_UNDER_3_5'
   | 'BTTS'
+  | 'BOTH_TEAMS_TO_SCORE'
+  | 'DRAW_NO_BET'
   | 'ASIAN_HANDICAP'
   | 'EUROPEAN_HANDICAP'
   | 'CORRECT_SCORE'
@@ -59,6 +64,8 @@ export type MarketType =
   | 'CARDS'
   | 'GOALSCORER'
   | 'CUSTOM';
+
+export type OddsMarketType = MarketType;
 
 export type SelectionType =
   | 'HOME'

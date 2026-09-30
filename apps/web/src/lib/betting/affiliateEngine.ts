@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import { getCanonicalBookmaker } from './bookmakerRegistry';
 import { isBettingFeatureEnabled } from './bettingFeatureFlags';
 
@@ -99,5 +98,16 @@ export function renderAffiliateTrackingTemplate(
  */
 export function hashIpForTelemetry(ip: string): string {
   const salt = process.env.TELEMETRY_SALT || 'goalmills_telemetry_salt_2026';
-  return crypto.createHmac('sha256', salt).update(ip).digest('hex').substring(0, 16);
+  try {
+    const nodeCrypto = require('crypto');
+    return nodeCrypto.createHmac('sha256', salt).update(ip).digest('hex').substring(0, 16);
+  } catch {
+    let hash = 0;
+    const str = `${ip}:${salt}`;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash).toString(16).padStart(16, '0');
+  }
 }
