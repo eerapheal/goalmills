@@ -18,3 +18,6 @@ export * from './betSlipSaverService';
 export * from './oddsAlertService';
 export * from './affiliateIntelligenceService';
 export * from './bettingAnalyticsService';
+export * from './affiliate/affiliateProvider';
+export * from './campaignService';
+export * from './wagering/wageringBoundary';

@@ -485,4 +485,154 @@ export interface BettingAnalyticsEventPayload {
   timestamp?: string;
 }
 
+/**
+ * Phase 5: Enterprise Monetization, Campaign Engine & Future Wagering Boundary
+ */
+
+export type CommercialPlacementType =
+  | 'odds_table'
+  | 'best_odds'
+  | 'match_details'
+  | 'betting_scanner'
+  | 'sidebar'
+  | 'homepage'
+  | 'article'
+  | 'newsletter'
+  | 'mobile';
+
+export interface BettingCampaignDTO {
+  id: string;
+  name: string;
+  sport: string;
+  country: string;
+  bookmakers: string[];
+  placements: CommercialPlacementType[];
+  startAt: string | Date;
+  endAt?: string | Date;
+  budget: {
+    total: number;
+    daily: number;
+    spent: number;
+    currency: string;
+  };
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'EXPIRED' | 'ARCHIVED';
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+export interface CampaignPlacementDTO {
+  id: string;
+  campaignId: string;
+  bookmakerId: string;
+  placement: CommercialPlacementType;
+  priority: number;
+  badgeText: string;
+  customCta?: string;
+  targetCountry: string;
+  impressions: number;
+  clicks: number;
+  status: 'ACTIVE' | 'PAUSED' | 'EXPIRED';
+}
+
+export interface AffiliateLinkRequest {
+  bookmakerId: string;
+  placement: CommercialPlacementType | string;
+  campaign?: string;
+  eventId?: string;
+  sport?: string;
+  subid?: string;
+  country?: string;
+}
+
+export interface AffiliateClickTrackRequest {
+  bookmakerId: string;
+  affiliateLinkId?: string;
+  placement: string;
+  campaign?: string;
+  eventId?: string;
+  sport?: string;
+  ip: string;
+  deviceType?: string;
+  referrer?: string;
+}
+
+export interface AffiliateClickRecord {
+  clickId: string;
+  bookmakerId: string;
+  redirectUrl: string;
+  trackedAt: string | Date;
+}
+
+export interface AffiliateConversionFilter {
+  bookmakerId?: string;
+  since?: Date;
+  status?: string;
+  limit?: number;
+  page?: number;
+}
+
+export interface AffiliateConversionRecord {
+  id: string;
+  clickId?: string;
+  bookmakerId: string;
+  conversionType: 'REGISTRATION' | 'FIRST_DEPOSIT' | 'WAGER' | 'REVENUE_SHARE';
+  conversionValue: number;
+  currency: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  convertedAt: string | Date;
+}
+
+/**
+ * Universal Affiliate Provider Interface
+ * Decouples GoalMills from any single provider (Betloy, direct bookmaker feeds, affiliate networks)
+ */
+export interface AffiliateProviderInterface {
+  id: string;
+  name: string;
+  getAffiliateLink(req: AffiliateLinkRequest): Promise<string>;
+  trackClick(req: AffiliateClickTrackRequest): Promise<AffiliateClickRecord>;
+  getConversions(filter?: AffiliateConversionFilter): Promise<AffiliateConversionRecord[]>;
+  getCommission(bookmakerId: string): Promise<AffiliateCommissionRule[]>;
+  getCampaigns(): Promise<BettingCampaignDTO[]>;
+}
+
+/**
+ * Dormant Future Wagering Architectural Boundary
+ * STRICT NON-NEGOTIABLE: Zero real-money wagering is activated on GoalMills.
+ * These interfaces exist strictly as structural boundaries for future reference.
+ */
+export interface WageringAdapterInterface {
+  readonly isActivated: false;
+  validateWagerIntent(intent: any): Promise<never>;
+}
+
+export interface WalletServiceInterface {
+  readonly isActivated: false;
+  getBalance(userId: string): Promise<never>;
+  deposit(userId: string, amount: number): Promise<never>;
+  withdraw(userId: string, amount: number): Promise<never>;
+}
+
+export interface PaymentGatewayInterface {
+  readonly isActivated: false;
+  processPayment(req: any): Promise<never>;
+}
+
+export interface RiskEngineInterface {
+  readonly isActivated: false;
+  evaluateLiability(wager: any): Promise<never>;
+}
+
+export interface SettlementServiceInterface {
+  readonly isActivated: false;
+  settleWager(wagerId: string, outcome: any): Promise<never>;
+}
+
+export interface ComplianceServiceInterface {
+  readonly isActivated: false;
+  verifyKYC(userId: string): Promise<never>;
+  screenAML(userId: string, transaction: any): Promise<never>;
+}
+
+
 
