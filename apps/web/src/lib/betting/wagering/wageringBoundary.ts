@@ -23,7 +23,7 @@ export class WageringNotPermittedError extends Error {
 export class DormantWageringAdapter implements WageringAdapterInterface {
   readonly isActivated = false as const;
 
-  async validateWagerIntent(): Promise<never> {
+  async validateWagerIntent(_intent?: any): Promise<never> {
     throw new WageringNotPermittedError('Cannot validate wager intent. Sportsbook is dormant.');
   }
 }
@@ -34,15 +34,15 @@ export class DormantWageringAdapter implements WageringAdapterInterface {
 export class DormantWalletService implements WalletServiceInterface {
   readonly isActivated = false as const;
 
-  async getBalance(): Promise<never> {
+  async getBalance(_userId?: string): Promise<never> {
     throw new WageringNotPermittedError('Customer wallet balances are not supported.');
   }
 
-  async deposit(): Promise<never> {
+  async deposit(_userId?: string, _amount?: number): Promise<never> {
     throw new WageringNotPermittedError('Real-money account funding/deposits are strictly prohibited.');
   }
 
-  async withdraw(): Promise<never> {
+  async withdraw(_userId?: string, _amount?: number): Promise<never> {
     throw new WageringNotPermittedError('Real-money withdrawals are strictly prohibited.');
   }
 }
@@ -53,7 +53,7 @@ export class DormantWalletService implements WalletServiceInterface {
 export class DormantPaymentGateway implements PaymentGatewayInterface {
   readonly isActivated = false as const;
 
-  async processPayment(): Promise<never> {
+  async processPayment(_req?: any): Promise<never> {
     throw new WageringNotPermittedError('Wagering payment gateway is not operational.');
   }
 }
@@ -64,7 +64,7 @@ export class DormantPaymentGateway implements PaymentGatewayInterface {
 export class DormantRiskEngine implements RiskEngineInterface {
   readonly isActivated = false as const;
 
-  async evaluateLiability(): Promise<never> {
+  async evaluateLiability(_wager?: any): Promise<never> {
     throw new WageringNotPermittedError('Sportsbook liability calculation is dormant.');
   }
 }
@@ -75,7 +75,7 @@ export class DormantRiskEngine implements RiskEngineInterface {
 export class DormantSettlementService implements SettlementServiceInterface {
   readonly isActivated = false as const;
 
-  async settleWager(): Promise<never> {
+  async settleWager(_wagerId?: string, _outcome?: any): Promise<never> {
     throw new WageringNotPermittedError('Wager settlement is not supported.');
   }
 }
@@ -86,14 +86,15 @@ export class DormantSettlementService implements SettlementServiceInterface {
 export class DormantComplianceService implements ComplianceServiceInterface {
   readonly isActivated = false as const;
 
-  async verifyKYC(): Promise<never> {
+  async verifyKYC(_userId?: string): Promise<never> {
     throw new WageringNotPermittedError('Wagering KYC verification is dormant.');
   }
 
-  async screenAML(): Promise<never> {
+  async screenAML(_userId?: string, _transaction?: any): Promise<never> {
     throw new WageringNotPermittedError('Wagering AML transaction screening is dormant.');
   }
 }
+
 
 /**
  * Runtime Invariant Guard

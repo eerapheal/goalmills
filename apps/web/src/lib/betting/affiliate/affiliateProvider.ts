@@ -27,8 +27,8 @@ import crypto from 'crypto';
  * 1. Bookmaker Direct Provider (Internal GoalMills DB Configuration)
  */
 export class BookmakerDirectProvider implements AffiliateProviderInterface {
-  readonly id = 'direct';
-  readonly name = 'GoalMills Direct Bookmaker Integrator';
+  readonly id: string = 'direct';
+  readonly name: string = 'GoalMills Direct Bookmaker Integrator';
 
   async getAffiliateLink(req: AffiliateLinkRequest): Promise<string> {
     const bookmaker = getCanonicalBookmaker(req.bookmakerId);
