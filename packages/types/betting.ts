@@ -165,6 +165,9 @@ export interface BettingFeatureFlags {
   betAnalyzer?: boolean;
   betEditor?: boolean;
   betTrimmer?: boolean;
+  betSlipSaver?: boolean;
+  oddsAlerts?: boolean;
+  affiliateAnalytics?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -367,4 +370,119 @@ export interface BetToolsProvider {
   healthCheck(): Promise<ProviderHealthStatus>;
   getUsage?(): Promise<ProviderUsageStats>;
 }
+
+// ---------------------------------------------------------------------------
+// Phase 4: Unified Platform, Bet Editor, Saved Slips, Alerts & Analytics
+// ---------------------------------------------------------------------------
+
+export interface SavedBetSlip {
+  id: string;
+  publicId: string; // e.g. "gm_slip_8f9a2b"
+  userId?: string;
+  title: string;
+  sourceBookmaker: string;
+  originalCode: string;
+  totalOdds: number;
+  legCount: number;
+  legs: BetSlipLeg[];
+  isPublic: boolean;
+  status: 'ACTIVE' | 'ARCHIVED' | 'SETTLED';
+  tags?: string[];
+  notes?: string;
+  potentialPayout?: number;
+  stake?: number;
+  currency?: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface BetSlipEditRequest {
+  slipId?: string;
+  legs: BetSlipLeg[];
+  sourceBookmaker: string;
+  stake?: number;
+}
+
+export interface BetSlipEditResult {
+  totalOdds: number;
+  legCount: number;
+  legs: BetSlipLeg[];
+  potentialPayout: number;
+  oddsDeltaPercent: number;
+  estimatedWinProbability: number;
+}
+
+export type OddsAlertDirection = 'GREATER_THAN_OR_EQUAL' | 'LESS_THAN_OR_EQUAL';
+export type OddsAlertChannel = 'EMAIL' | 'PUSH' | 'IN_APP';
+export type OddsAlertStatus = 'ACTIVE' | 'TRIGGERED' | 'CANCELLED';
+
+export interface OddsAlert {
+  id: string;
+  userId?: string;
+  userEmail?: string;
+  eventId: string;
+  sport: string;
+  matchName: string;
+  marketId: string;
+  marketName: string;
+  selection: string;
+  bookmakerId?: string;
+  bookmakerName?: string;
+  targetOdds: number;
+  initialOdds: number;
+  targetDirection: OddsAlertDirection;
+  channel: OddsAlertChannel;
+  status: OddsAlertStatus;
+  triggeredAt?: string | Date;
+  lastCheckedOdds?: number;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export type AffiliateCommissionType = 'CPA' | 'REV_SHARE' | 'HYBRID' | 'SPONSORED';
+
+export interface AffiliateCommissionRule {
+  id: string;
+  bookmakerId: string;
+  provider?: string;
+  country: string;
+  commissionType: AffiliateCommissionType;
+  commissionValue: number; // e.g. 50 (EUR CPA) or 25 (% RevShare)
+  currency: string;
+  effectiveFrom: string | Date;
+  effectiveTo?: string | Date;
+  status: 'ACTIVE' | 'INACTIVE';
+}
+
+export type BettingAnalyticsEventName =
+  | 'odds_viewed'
+  | 'bookmaker_viewed'
+  | 'best_odds_viewed'
+  | 'bet_now_clicked'
+  | 'affiliate_redirected'
+  | 'scanner_opened'
+  | 'scan_completed'
+  | 'bet_analyzed'
+  | 'bet_decoded'
+  | 'bet_converted'
+  | 'bet_trimmed'
+  | 'bet_edited'
+  | 'slip_saved'
+  | 'slip_shared'
+  | 'odds_alert_created'
+  | 'odds_alert_triggered';
+
+export interface BettingAnalyticsEventPayload {
+  eventName: BettingAnalyticsEventName;
+  bookmakerId?: string;
+  eventId?: string;
+  sport?: string;
+  placement?: string;
+  campaign?: string;
+  sessionId?: string;
+  anonymousVisitorId?: string;
+  metadata?: Record<string, any>;
+  timestamp?: string;
+}
+
 

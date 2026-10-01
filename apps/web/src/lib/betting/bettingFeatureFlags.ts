@@ -15,6 +15,9 @@ export interface BettingFeatureFlagsConfig {
   betAnalyzer: boolean;
   betEditor: boolean;
   betTrimmer: boolean;
+  betSlipSaver: boolean;
+  oddsAlerts: boolean;
+  affiliateAnalytics: boolean;
 }
 
 const DEFAULT_FLAGS: BettingFeatureFlagsConfig = {
@@ -28,6 +31,9 @@ const DEFAULT_FLAGS: BettingFeatureFlagsConfig = {
   betAnalyzer: true,
   betEditor: true,
   betTrimmer: true,
+  betSlipSaver: true,
+  oddsAlerts: true,
+  affiliateAnalytics: true,
 };
 
 /**

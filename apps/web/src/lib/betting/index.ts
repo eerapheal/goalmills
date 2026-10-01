@@ -13,3 +13,8 @@ export * from './betAnalyzerService';
 export * from './betTrimmerService';
 export * from './betConverterService';
 export * from './providers/providerFactory';
+export * from './betEditorService';
+export * from './betSlipSaverService';
+export * from './oddsAlertService';
+export * from './affiliateIntelligenceService';
+export * from './bettingAnalyticsService';

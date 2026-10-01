@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { label: 'News', href: '/news' },
   { label: 'Highlights', href: '/highlights' },
   { label: 'Tables', href: '/stats' },
+  { label: 'Betting', href: '/betting' },
 ];
 
 export function Header() {
