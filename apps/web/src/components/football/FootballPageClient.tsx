@@ -4,27 +4,12 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  FiActivity,
-  FiAward,
-  FiCheckCircle,
   FiChevronDown,
   FiChevronRight,
-  FiClock,
-  FiDollarSign,
-  FiExternalLink,
-  FiEye,
-  FiFilter,
-  FiGlobe,
-  FiInfo,
   FiLayers,
   FiMail,
   FiRefreshCw,
   FiSearch,
-  FiShield,
-  FiStar,
-  FiTrendingUp,
-  FiUsers,
-  FiZap,
   FiCalendar,
 } from 'react-icons/fi';
 import { EntityService, PlayerMeta, OfficialMeta, CoachMeta, ClubMeta } from '@/lib/entityService';
@@ -33,7 +18,6 @@ import { processFixture, getCanonicalCompetition } from '@/lib/football';
 import { footballRoutes, buildMatchSlug, slugify } from '@/lib/slugUtils';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { CompetitionGender } from '@goalmills/types';
-import { AllMajorCompetitionsSection } from '../competitions/AllMajorCompetitionsSection';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -2196,11 +2180,6 @@ export function FootballPageClient({
             ))}
           </div>
         </section>
-
-        {/* ════════════════════════════════════════
-            GLOBAL & AFRICAN COMPETITIONS DIRECTORY
-        ════════════════════════════════════════ */}
-        <AllMajorCompetitionsSection />
 
         {/* ════════════════════════════════════════
             SPECIAL SECTION 4: FOOTBALL DAILY BRIEF
