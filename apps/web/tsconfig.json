@@ -21,7 +21,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@goalmills/core-sports": ["../../core/sports/src/index.ts"]
+      "@goalmills/types": ["../../packages/types/index.ts"],
+      "@goalmills/types/*": ["../../packages/types/*"],
+      "@goalmills/core-sports": ["../../core/sports/src/index.ts"],
+      "@goalmills/core-commercial": ["../../core/commercial/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
