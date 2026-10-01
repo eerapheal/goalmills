@@ -19,7 +19,7 @@ import {
   resolveCompetitionForFixture,
   sortFootballEvents,
 } from '@/lib/football';
-import { FootballNavSwitcher, MainCategoryTab } from './football/FootballNavSwitcher';
+import { type MainCategoryTab } from './football/FootballNavSwitcher';
 import {
   FiRefreshCw,
   FiSearch,
@@ -567,19 +567,6 @@ export function FootballScreen() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Multi-Dimensional Navigation Switcher */}
-      <FootballNavSwitcher
-        selectedCategory={selectedNavCategory}
-        onCategoryChange={setSelectedNavCategory}
-        selectedCountry={selectedCountry}
-        onCountryChange={setSelectedCountry}
-        selectedGender={selectedGender}
-        onGenderChange={setSelectedGender}
-        selectedAgeCategory={selectedAgeCategory}
-        onAgeCategoryChange={setSelectedAgeCategory}
-        onResetFilters={handleResetFilters}
-      />
-
       {/* Top Controls Header */}
       <div className="rounded-3xl border border-blue-500/20 bg-[#08142A]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
         {/* Navigation Tabs Bar */}

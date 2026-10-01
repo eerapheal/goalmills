@@ -25,14 +25,15 @@ import {
   FiTrendingUp,
   FiUsers,
   FiZap,
+  FiCalendar,
 } from 'react-icons/fi';
 import { EntityService, PlayerMeta, OfficialMeta, CoachMeta, ClubMeta } from '@/lib/entityService';
-import { AllMajorCompetitionsSection } from '@/components/competitions/AllMajorCompetitionsSection';
-import { FootballNavSwitcher, MainCategoryTab } from './FootballNavSwitcher';
+import { type MainCategoryTab } from './FootballNavSwitcher';
 import { processFixture, getCanonicalCompetition } from '@/lib/football';
 import { footballRoutes, buildMatchSlug, slugify } from '@/lib/slugUtils';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { CompetitionGender } from '@goalmills/types';
+import { AllMajorCompetitionsSection } from '../competitions/AllMajorCompetitionsSection';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -355,13 +356,12 @@ export const COMP_FILTERS: { id: string; label: string }[] = [
 function FormDot({ r }: { r: 'W' | 'D' | 'L' }) {
   return (
     <span
-      className={`w-5 h-5 rounded text-[10px] font-black flex items-center justify-center ${
-        r === 'W'
-          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-          : r === 'D'
-            ? 'bg-slate-700/50 text-slate-300 border border-slate-600/30'
-            : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-      }`}
+      className={`w-5 h-5 rounded text-[10px] font-black flex items-center justify-center ${r === 'W'
+        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+        : r === 'D'
+          ? 'bg-slate-700/50 text-slate-300 border border-slate-600/30'
+          : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+        }`}
     >
       {r}
     </span>
@@ -426,9 +426,8 @@ function MatchCard({ f }: { f: FixtureItem }) {
             </span>
           </div>
           <span
-            className={`text-lg font-black tabular-nums flex-shrink-0 ${
-              isLive ? 'text-white' : isFT ? 'text-slate-200' : 'text-slate-500'
-            }`}
+            className={`text-lg font-black tabular-nums flex-shrink-0 ${isLive ? 'text-white' : isFT ? 'text-slate-200' : 'text-slate-500'
+              }`}
           >
             {f.hScore !== null ? f.hScore : '–'}
           </span>
@@ -453,9 +452,8 @@ function MatchCard({ f }: { f: FixtureItem }) {
             </span>
           </div>
           <span
-            className={`text-lg font-black tabular-nums flex-shrink-0 ${
-              isLive ? 'text-white' : isFT ? 'text-slate-200' : 'text-slate-500'
-            }`}
+            className={`text-lg font-black tabular-nums flex-shrink-0 ${isLive ? 'text-white' : isFT ? 'text-slate-200' : 'text-slate-500'
+              }`}
           >
             {f.aScore !== null ? f.aScore : '–'}
           </span>
@@ -500,9 +498,8 @@ function SideSection({
         <div className="flex items-center gap-2">
           {action && <span className="hidden lg:block">{action}</span>}
           <FiChevronDown
-            className={`w-4 h-4 text-slate-500 transition-transform lg:hidden ${
-              open ? 'rotate-180' : ''
-            }`}
+            className={`w-4 h-4 text-slate-500 transition-transform lg:hidden ${open ? 'rotate-180' : ''
+              }`}
           />
         </div>
       </button>
@@ -543,6 +540,31 @@ export function FootballPageClient({
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<string>('Just now');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // 7-day dynamic date strip for upcoming & results
+  const dateStrip = useMemo(() => {
+    const dates = [];
+    const today = new Date();
+    const offsets = mainTab === 'results' ? [-4, -3, -2, -1, 0] : [0, 1, 2, 3, 4];
+    for (const offset of offsets) {
+      const d = new Date();
+      d.setDate(today.getDate() + offset);
+      const iso = d.toISOString().split('T')[0];
+      const label =
+        offset === 0
+          ? 'Today'
+          : offset === -1
+            ? 'Yesterday'
+            : offset === 1
+              ? 'Tomorrow'
+              : d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayMonth = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      dates.push({ iso, label, dayMonth });
+    }
+    return dates;
+  }, [mainTab]);
 
   // Dynamic Matches State (Pure Live Data — Zero Mock Fallbacks)
   const [liveFixtures, setLiveFixtures] = useState<FixtureItem[]>([]);
@@ -621,8 +643,8 @@ export function FootballPageClient({
             const formStr = r.standing_form || '';
             const formArr = formStr
               ? formStr
-                  .split('')
-                  .filter((c: string) => ['W', 'D', 'L'].includes(c.toUpperCase()))
+                .split('')
+                .filter((c: string) => ['W', 'D', 'L'].includes(c.toUpperCase()))
               : [];
             const zone =
               pos <= 4 ? 'champions' : pos <= 6 ? 'europa' : pos >= 18 ? 'relegation' : undefined;
@@ -690,8 +712,8 @@ export function FootballPageClient({
         const rawList = data?.result || data?.response || (Array.isArray(data) ? data : []);
         const fList = Array.isArray(rawList)
           ? rawList.filter(
-              (m: any) => m && (m.event_key || m.id) && (m.event_home_team || m.homeTeam || m.home)
-            )
+            (m: any) => m && (m.event_key || m.id) && (m.event_home_team || m.homeTeam || m.home)
+          )
           : [];
         if (fList.length > 0) {
           const parsedLive: FixtureItem[] = fList.slice(0, 20).map((m: any, idx: number) => {
@@ -748,8 +770,8 @@ export function FootballPageClient({
           fixData?.result || fixData?.response || (Array.isArray(fixData) ? fixData : []);
         const fixList = Array.isArray(rawFixList)
           ? rawFixList.filter(
-              (m: any) => m && (m.event_key || m.id) && (m.event_home_team || m.homeTeam || m.home)
-            )
+            (m: any) => m && (m.event_key || m.id) && (m.event_home_team || m.homeTeam || m.home)
+          )
           : [];
         if (fixList.length > 0) {
           const up: FixtureItem[] = [];
@@ -861,13 +883,59 @@ export function FootballPageClient({
       }
     }
 
-    // 5. Canonical Competition Filter (Never substring guess!)
+    // 5. Canonical Competition Filter (with resilient keyword mapping)
     if (compFilter !== 'All') {
-      list = list.filter((f) => f.competitionId === compFilter);
+      const canonicalMap: Record<string, string[]> = {
+        'ENG-PREMIER-LEAGUE': ['premier league', 'epl', '152'],
+        'ENG-CHAMPIONSHIP': ['championship', '153'],
+        'ENG-WSL': ['wsl', "women's super league", 'women'],
+        'ESP-LA-LIGA': ['la liga', 'laliga', 'primera', '302'],
+        'ITA-SERIE-A': ['serie a', '207'],
+        'GER-BUNDESLIGA': ['bundesliga', '175'],
+        'FRA-LIGUE-1': ['ligue 1', '168'],
+        'UEFA-CHAMPIONS-LEAGUE': ['champions league', 'ucl', '3'],
+        'CAF-AFCON': ['afcon', 'africa cup', 'caf'],
+        'NGA-NPFL': ['npfl', 'nigeria premier', 'nigerian'],
+      };
+
+      const keywords = canonicalMap[compFilter] || [compFilter.toLowerCase()];
+      list = list.filter((f) => {
+        if (f.competitionId === compFilter) return true;
+        const compLower = (f.comp || '').toLowerCase();
+        return keywords.some((k) => compLower.includes(k));
+      });
+    }
+
+    // 6. Search Query Filter (Teams, Leagues, Stadiums)
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(
+        (f) =>
+          (f.home && f.home.toLowerCase().includes(q)) ||
+          (f.away && f.away.toLowerCase().includes(q)) ||
+          (f.comp && f.comp.toLowerCase().includes(q)) ||
+          (f.stadium && f.stadium.toLowerCase().includes(q))
+      );
     }
 
     return list;
-  }, [tabFixtures, mainTab, navCategory, navCountry, navGender, navAge, compFilter]);
+  }, [tabFixtures, mainTab, navCategory, navCountry, navGender, navAge, compFilter, searchQuery]);
+
+  // Search-filtered Standings
+  const filteredTableData = useMemo(() => {
+    if (!searchQuery.trim()) return tableData;
+    const q = searchQuery.toLowerCase().trim();
+    return tableData.filter((r) => r.team.toLowerCase().includes(q));
+  }, [tableData, searchQuery]);
+
+  // Search-filtered Top Scorers
+  const filteredScorersData = useMemo(() => {
+    if (!searchQuery.trim()) return scorersData;
+    const q = searchQuery.toLowerCase().trim();
+    return scorersData.filter(
+      (s) => s.name.toLowerCase().includes(q) || s.team.toLowerCase().includes(q)
+    );
+  }, [scorersData, searchQuery]);
 
   const isFixtureTab = mainTab === 'live' || mainTab === 'upcoming' || mainTab === 'results';
 
@@ -987,9 +1055,8 @@ export function FootballPageClient({
                           {group.comps.length}
                         </span>
                         <FiChevronDown
-                          className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
-                            expandedComp === group.region ? 'rotate-180' : ''
-                          }`}
+                          className={`w-3.5 h-3.5 text-slate-500 transition-transform ${expandedComp === group.region ? 'rotate-180' : ''
+                            }`}
                         />
                       </div>
                     </button>
@@ -1009,13 +1076,12 @@ export function FootballPageClient({
                               <p className="text-[10px] text-slate-500">{c.country}</p>
                             </div>
                             <span
-                              className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded flex-shrink-0 ${
-                                c.tier === 'T1'
-                                  ? 'bg-blue-500/20 text-blue-400'
-                                  : c.tier === 'T2'
-                                    ? 'bg-orange-500/20 text-orange-400'
-                                    : 'bg-yellow-500/20 text-yellow-400'
-                              }`}
+                              className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded flex-shrink-0 ${c.tier === 'T1'
+                                ? 'bg-blue-500/20 text-blue-400'
+                                : c.tier === 'T2'
+                                  ? 'bg-orange-500/20 text-orange-400'
+                                  : 'bg-yellow-500/20 text-yellow-400'
+                                }`}
                             >
                               {c.tier}
                             </span>
@@ -1104,9 +1170,8 @@ export function FootballPageClient({
                     {mobileMenuOpen ? 'Close Menu' : 'Explore Menu'}
                   </span>
                   <FiChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
-                      mobileMenuOpen ? 'rotate-180 text-blue-400' : ''
-                    }`}
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180 text-blue-400' : ''
+                      }`}
                   />
                 </div>
               </button>
@@ -1137,9 +1202,8 @@ export function FootballPageClient({
                               </span>
                             </div>
                             <FiChevronDown
-                              className={`w-3.5 h-3.5 text-slate-500 transition-transform ${
-                                expandedComp === group.region ? 'rotate-180' : ''
-                              }`}
+                              className={`w-3.5 h-3.5 text-slate-500 transition-transform ${expandedComp === group.region ? 'rotate-180' : ''
+                                }`}
                             />
                           </button>
                           {expandedComp === group.region && (
@@ -1205,75 +1269,194 @@ export function FootballPageClient({
               )}
             </div>
 
-            {/* Hierarchical Football Nav Switcher */}
-            <FootballNavSwitcher
-              selectedCategory={navCategory}
-              onCategoryChange={setNavCategory}
-              selectedCountry={navCountry}
-              onCountryChange={setNavCountry}
-              selectedGender={navGender}
-              onGenderChange={setNavGender}
-              selectedAgeCategory={navAge}
-              onAgeCategoryChange={setNavAge}
-              onResetFilters={handleResetFilters}
-            />
-
-            {/* Tab Bar */}
+            {/* Navigation Tabs Bar (Simplified Basketball Style) */}
             <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
               <div className="flex overflow-x-auto no-scrollbar">
-                {(['live', 'upcoming', 'results', 'table', 'scorers', 'odds'] as MainTab[]).map(
-                  (tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setMainTab(tab)}
-                      className={`flex-shrink-0 flex items-center gap-2 px-5 py-3.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-                        mainTab === tab
-                          ? 'border-blue-500 text-white bg-blue-500/10'
-                          : 'border-transparent text-slate-400 hover:text-white hover:bg-[#1e293b]/40'
+                {(
+                  [
+                    { key: 'live', label: 'Live' },
+                    { key: 'upcoming', label: 'Upcoming' },
+                    { key: 'results', label: 'Results' },
+                    { key: 'table', label: 'Table' },
+                    { key: 'scorers', label: 'Top Scorer' },
+                    { key: 'odds', label: 'Odds' },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => {
+                      setMainTab(tab.key);
+                    }}
+                    className={`flex-shrink-0 flex items-center gap-2 px-5 py-3.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${mainTab === tab.key
+                      ? 'border-blue-500 text-white bg-blue-500/10'
+                      : 'border-transparent text-slate-400 hover:text-white hover:bg-[#1e293b]/40'
                       }`}
-                    >
-                      {tab === 'live' && liveCount > 0 && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-                      )}
-                      <span>
-                        {tab === 'live'
-                          ? 'Live'
-                          : tab === 'upcoming'
-                            ? 'Upcoming'
-                            : tab === 'results'
-                              ? 'Results'
-                              : tab === 'table'
-                                ? 'Table'
-                                : tab === 'scorers'
-                                  ? 'Top Scorer'
-                                  : 'Odds'}
+                  >
+                    {tab.key === 'live' && liveCount > 0 && (
+                      <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                    )}
+                    <span>{tab.label}</span>
+                    {tab.key === 'live' && liveCount > 0 && (
+                      <span className="bg-rose-500/20 text-rose-400 text-[9px] font-black px-1.5 py-0.5 rounded-full border border-rose-500/30">
+                        {liveCount}
                       </span>
-                      {tab === 'live' && liveCount > 0 && (
-                        <span className="bg-rose-500/20 text-rose-400 text-[10px] font-black px-1.5 py-0.5 rounded-full border border-rose-500/30">
-                          {liveCount}
-                        </span>
-                      )}
-                    </button>
-                  )
-                )}
+                    )}
+                  </button>
+                ))}
               </div>
 
-              {/* League Quick Filters (Canonical Competition ID Matching) */}
-              {isFixtureTab && (
-                <div className="flex gap-2 px-4 py-3 border-t border-[#1e293b] overflow-x-auto no-scrollbar bg-[#091120]">
-                  {COMP_FILTERS.map((f) => (
+              {/* Dynamic Date Strip (Upcoming & Results) */}
+              {(mainTab === 'upcoming' || mainTab === 'results') && (
+                <div className="flex items-center gap-2 px-4 py-2.5 border-t border-[#1e293b] bg-[#070d1a] overflow-x-auto no-scrollbar">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1 flex-shrink-0 mr-1">
+                    <FiCalendar className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Select Date:</span>
+                  </span>
+                  {dateStrip.map((item) => (
                     <button
-                      key={f.id}
-                      onClick={() => setCompFilter(f.id)}
-                      className={`flex-shrink-0 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
-                        compFilter === f.id
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                          : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-[#334155] hover:text-slate-200'
-                      }`}
+                      key={item.iso}
+                      onClick={() => setSelectedDate(item.iso)}
+                      className={`flex-shrink-0 flex flex-col items-center px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${selectedDate === item.iso
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-600/30'
+                        : 'bg-[#0f172a] border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                        }`}
                     >
-                      {f.label}
+                      <span className="text-[9px] uppercase tracking-wider font-semibold opacity-80">
+                        {item.label}
+                      </span>
+                      <span className="text-[11px] font-black font-mono">{item.dayMonth}</span>
                     </button>
                   ))}
+                </div>
+              )}
+
+              {/* Fixtures Sub-filters & Search Bar */}
+              {isFixtureTab && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {COMP_FILTERS.map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setCompFilter(f.id)}
+                        className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${compFilter === f.id
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
+                          : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                          }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative sm:w-60 flex-shrink-0">
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search matches or teams..."
+                      className="w-full pl-8 pr-7 py-1.5 bg-[#06101E] border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Table Sub-bar with league pills & search */}
+              {mainTab === 'table' && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {[
+                      'Premier League',
+                      'La Liga',
+                      'Serie A',
+                      'Bundesliga',
+                      'Ligue 1',
+                      'CAF Champions League',
+                    ].map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => setTableLeague(l)}
+                        className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${tableLeague === l
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
+                          : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                          }`}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative sm:w-60 flex-shrink-0">
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search clubs in table..."
+                      className="w-full pl-8 pr-7 py-1.5 bg-[#06101E] border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Scorers Sub-bar with league pills & search */}
+              {mainTab === 'scorers' && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {[
+                      'Premier League',
+                      'La Liga',
+                      'Serie A',
+                      'Bundesliga',
+                      'Ligue 1',
+                    ].map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => setTableLeague(l)}
+                        className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${tableLeague === l
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
+                          : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                          }`}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative sm:w-60 flex-shrink-0">
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search players or clubs..."
+                      className="w-full pl-8 pr-7 py-1.5 bg-[#06101E] border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1337,29 +1520,6 @@ export function FootballPageClient({
             {/* ── Standings Tab ── */}
             {mainTab === 'table' && (
               <div className="space-y-4">
-                <div className="flex gap-2 flex-wrap">
-                  {[
-                    'Premier League',
-                    'La Liga',
-                    'Serie A',
-                    'Bundesliga',
-                    'Ligue 1',
-                    'CAF Champions League',
-                  ].map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => setTableLeague(l)}
-                      className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all cursor-pointer ${
-                        tableLeague === l
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                          : 'border-[#1e293b] text-slate-400 hover:border-[#334155] hover:text-white'
-                      }`}
-                    >
-                      {l}
-                    </button>
-                  ))}
-                </div>
-
                 <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
                   <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
                     <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-2">
@@ -1376,15 +1536,14 @@ export function FootballPageClient({
                           {['#', 'Club', 'P', 'W', 'D', 'L', 'GD', 'Pts', 'Form'].map((h, i) => (
                             <th
                               key={h}
-                              className={`py-2.5 text-[10px] font-black text-slate-400 uppercase tracking-widest ${
-                                i === 0
-                                  ? 'pl-5 pr-2 text-left'
-                                  : i === 1
-                                    ? 'px-3 text-left'
-                                    : i === 8
-                                      ? 'pr-5 pl-2 text-right hidden md:table-cell'
-                                      : 'px-2 text-center'
-                              }`}
+                              className={`py-2.5 text-[10px] font-black text-slate-400 uppercase tracking-widest ${i === 0
+                                ? 'pl-5 pr-2 text-left'
+                                : i === 1
+                                  ? 'px-3 text-left'
+                                  : i === 8
+                                    ? 'pr-5 pl-2 text-right hidden md:table-cell'
+                                    : 'px-2 text-center'
+                                }`}
                             >
                               {h}
                             </th>
@@ -1400,90 +1559,90 @@ export function FootballPageClient({
                               </td>
                             </tr>
                           ))
-                        ) : tableData.length > 0 ? (
-                          tableData.map((row) => (
-                          <tr
-                            key={row.pos}
-                            className={`hover:bg-[#1e293b]/40 transition-colors ${
-                              row.zone === 'champions'
+                        ) : filteredTableData.length > 0 ? (
+                          filteredTableData.map((row) => (
+                            <tr
+                              key={row.pos}
+                              className={`hover:bg-[#1e293b]/40 transition-colors ${row.zone === 'champions'
                                 ? 'border-l-2 border-l-blue-500 bg-blue-500/[0.02]'
                                 : row.zone === 'europa'
                                   ? 'border-l-2 border-l-amber-500 bg-amber-500/[0.02]'
                                   : row.zone === 'relegation'
                                     ? 'border-l-2 border-l-rose-500 bg-rose-500/[0.02]'
                                     : ''
-                            }`}
-                          >
-                            <td className="pl-5 pr-2 py-3">
-                              <span
-                                className={`text-sm font-black tabular-nums ${
-                                  row.zone === 'champions'
+                                }`}
+                            >
+                              <td className="pl-5 pr-2 py-3">
+                                <span
+                                  className={`text-sm font-black tabular-nums ${row.zone === 'champions'
                                     ? 'text-blue-400'
                                     : row.zone === 'relegation'
                                       ? 'text-rose-400'
                                       : 'text-slate-400'
-                                }`}
-                              >
-                                {row.pos}
-                              </span>
-                            </td>
-                            <td className="px-3 py-3">
-                              <Link
-                                href={`/football/teams/${row.slug || 'arsenal'}`}
-                                className="flex items-center gap-2 group/link"
-                              >
-                                <span className="text-sm">{row.badge}</span>
-                                <span className="text-sm font-semibold text-slate-100 group-hover/link:text-blue-400 transition-colors">
-                                  {row.team}
+                                    }`}
+                                >
+                                  {row.pos}
                                 </span>
-                              </Link>
-                            </td>
-                            <td className="px-2 py-3 text-center text-sm text-slate-400 tabular-nums">
-                              {row.p}
-                            </td>
-                            <td className="px-2 py-3 text-center text-sm text-slate-300 tabular-nums font-semibold">
-                              {row.w}
-                            </td>
-                            <td className="px-2 py-3 text-center text-sm text-slate-300 tabular-nums">
-                              {row.d}
-                            </td>
-                            <td className="px-2 py-3 text-center text-sm text-slate-300 tabular-nums">
-                              {row.l}
-                            </td>
-                            <td className="px-2 py-3 text-center text-sm tabular-nums">
-                              <span
-                                className={
-                                  row.gd > 0
-                                    ? 'text-emerald-400 font-bold'
-                                    : row.gd < 0
-                                      ? 'text-rose-400 font-bold'
-                                      : 'text-slate-400'
-                                }
-                              >
-                                {row.gd > 0 ? `+${row.gd}` : row.gd}
-                              </span>
-                            </td>
-                            <td className="px-2 py-3 text-center">
-                              <span className="text-sm font-black text-white tabular-nums bg-slate-800/80 px-2 py-1 rounded">
-                                {row.pts}
-                              </span>
-                            </td>
-                            <td className="pr-5 pl-2 py-3 hidden md:table-cell">
-                              <div className="flex gap-1 justify-end">
-                                {row.form.map((f, i) => (
-                                  <FormDot key={i} r={f} />
-                                ))}
-                              </div>
+                              </td>
+                              <td className="px-3 py-3">
+                                <Link
+                                  href={`/football/teams/${row.slug || 'arsenal'}`}
+                                  className="flex items-center gap-2 group/link"
+                                >
+                                  <span className="text-sm">{row.badge}</span>
+                                  <span className="text-sm font-semibold text-slate-100 group-hover/link:text-blue-400 transition-colors">
+                                    {row.team}
+                                  </span>
+                                </Link>
+                              </td>
+                              <td className="px-2 py-3 text-center text-sm text-slate-400 tabular-nums">
+                                {row.p}
+                              </td>
+                              <td className="px-2 py-3 text-center text-sm text-slate-300 tabular-nums font-semibold">
+                                {row.w}
+                              </td>
+                              <td className="px-2 py-3 text-center text-sm text-slate-300 tabular-nums">
+                                {row.d}
+                              </td>
+                              <td className="px-2 py-3 text-center text-sm text-slate-300 tabular-nums">
+                                {row.l}
+                              </td>
+                              <td className="px-2 py-3 text-center text-sm tabular-nums">
+                                <span
+                                  className={
+                                    row.gd > 0
+                                      ? 'text-emerald-400 font-bold'
+                                      : row.gd < 0
+                                        ? 'text-rose-400 font-bold'
+                                        : 'text-slate-400'
+                                  }
+                                >
+                                  {row.gd > 0 ? `+${row.gd}` : row.gd}
+                                </span>
+                              </td>
+                              <td className="px-2 py-3 text-center">
+                                <span className="text-sm font-black text-white tabular-nums bg-slate-800/80 px-2 py-1 rounded">
+                                  {row.pts}
+                                </span>
+                              </td>
+                              <td className="pr-5 pl-2 py-3 hidden md:table-cell">
+                                <div className="flex gap-1 justify-end">
+                                  {row.form.map((f, i) => (
+                                    <FormDot key={i} r={f} />
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={9} className="py-12 text-center text-slate-400 text-xs">
+                              {searchQuery.trim()
+                                ? `No clubs matching "${searchQuery}" found in ${tableLeague}.`
+                                : `Standings table is currently being synchronized for ${tableLeague}.`}
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={9} className="py-12 text-center text-slate-400 text-xs">
-                            Standings table is currently being synchronized for {tableLeague}.
-                          </td>
-                        </tr>
-                      )}
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -1533,23 +1692,22 @@ export function FootballPageClient({
                         </div>
                       </div>
                     ))
-                  ) : scorersData.length > 0 ? (
-                    scorersData.map((p) => (
+                  ) : filteredScorersData.length > 0 ? (
+                    filteredScorersData.map((p) => (
                       <Link
                         key={p.rank}
                         href={`/football/players/${p.playerId}`}
                         className="flex items-center gap-4 px-5 py-4 hover:bg-[#1e293b]/40 transition-colors group"
                       >
                         <span
-                          className={`w-7 text-center text-sm font-black flex-shrink-0 ${
-                            p.rank === 1
-                              ? 'text-amber-400 text-lg'
-                              : p.rank === 2
-                                ? 'text-slate-300 text-lg'
-                                : p.rank === 3
-                                  ? 'text-amber-600 text-lg'
-                                  : 'text-slate-500'
-                          }`}
+                          className={`w-7 text-center text-sm font-black flex-shrink-0 ${p.rank === 1
+                            ? 'text-amber-400 text-lg'
+                            : p.rank === 2
+                              ? 'text-slate-300 text-lg'
+                              : p.rank === 3
+                                ? 'text-amber-600 text-lg'
+                                : 'text-slate-500'
+                            }`}
                         >
                           {p.rank <= 3 ? ['🥇', '🥈', '🥉'][p.rank - 1] : p.rank}
                         </span>
@@ -1594,7 +1752,9 @@ export function FootballPageClient({
                     ))
                   ) : (
                     <div className="p-8 text-center text-slate-400 text-xs">
-                      Top scorers data is currently unavailable for {tableLeague}.
+                      {searchQuery.trim()
+                        ? `No top scorers matching "${searchQuery}" found.`
+                        : `Top scorers data is currently unavailable for ${tableLeague}.`}
                     </div>
                   )}
                 </div>
@@ -1708,33 +1868,31 @@ export function FootballPageClient({
               <div className="divide-y divide-[#1e293b]">
                 {tableData.length > 0 ? (
                   tableData.slice(0, 6).map((row) => (
-                  <div
-                    key={row.pos}
-                    className={`flex items-center gap-2.5 px-4 py-2 hover:bg-[#1e293b]/40 transition-colors ${
-                      row.zone === 'champions'
+                    <div
+                      key={row.pos}
+                      className={`flex items-center gap-2.5 px-4 py-2 hover:bg-[#1e293b]/40 transition-colors ${row.zone === 'champions'
                         ? 'border-l-2 border-l-blue-500'
                         : row.zone === 'europa'
                           ? 'border-l-2 border-l-amber-500'
                           : ''
-                    }`}
-                  >
-                    <span
-                      className={`text-xs font-black w-4 tabular-nums ${
-                        row.zone === 'champions' ? 'text-blue-400' : 'text-slate-500'
-                      }`}
+                        }`}
                     >
-                      {row.pos}
-                    </span>
-                    <span className="text-sm flex-shrink-0">{row.badge}</span>
-                    <span className="text-xs font-semibold text-slate-200 flex-1 truncate">
-                      {row.team}
-                    </span>
-                    <span className="text-xs font-black text-white tabular-nums">{row.pts}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="p-4 text-center text-xs text-slate-500">Live standings syncing...</div>
-              )}
+                      <span
+                        className={`text-xs font-black w-4 tabular-nums ${row.zone === 'champions' ? 'text-blue-400' : 'text-slate-500'
+                          }`}
+                      >
+                        {row.pos}
+                      </span>
+                      <span className="text-sm flex-shrink-0">{row.badge}</span>
+                      <span className="text-xs font-semibold text-slate-200 flex-1 truncate">
+                        {row.team}
+                      </span>
+                      <span className="text-xs font-black text-white tabular-nums">{row.pts}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-xs text-slate-500">Live standings syncing...</div>
+                )}
               </div>
             </div>
 
@@ -1931,11 +2089,10 @@ export function FootballPageClient({
                     </p>
                   </div>
                   <span
-                    className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border flex-shrink-0 ${
-                      o.strictnessRating === 'Strict'
-                        ? 'bg-rose-500/15 border-rose-500/30 text-rose-300'
-                        : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                    }`}
+                    className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border flex-shrink-0 ${o.strictnessRating === 'Strict'
+                      ? 'bg-rose-500/15 border-rose-500/30 text-rose-300'
+                      : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                      }`}
                   >
                     {o.strictnessRating || 'Strict'}
                   </span>
