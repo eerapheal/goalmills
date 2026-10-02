@@ -169,7 +169,7 @@ Manages newsletter subscriber lifecycle:
 
 ### 5.2 Social Engine Service (`services/social-engine` / Node.js)
 - **Decision:** **RETAIN 100% INDEPENDENT.**
-- **Rationale:** Native image manipulation (`sharp`, canvas rendering) and intensive third-party platform API handshakes (Twitter, Telegram, WhatsApp) are CPU/IO-heavy operations that must not block public web response times.
+- **Rationale:** Native image manipulation (`sharp`, canvas rendering) and intensive third-party platform API handshakes (Twitter, Telegram, WhatsApp,facebook,youtube and linkedIn) are CPU/IO-heavy operations that must not block public web response times.
 - **Contract Boundary:**
   - `GoalMills Admin ──▶ REST / Webhooks ──▶ Social Engine`
   - Social Engine maintains independent cron schedules and platform token vaults.

@@ -26,6 +26,15 @@ importers:
 
   apps/admin:
     dependencies:
+      '@goalmills/core-commercial':
+        specifier: workspace:*
+        version: link:../../core/commercial
+      '@goalmills/core-content':
+        specifier: workspace:*
+        version: link:../../core/content
+      '@goalmills/core-sports':
+        specifier: workspace:*
+        version: link:../../core/sports
       '@goalmills/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -268,6 +277,15 @@ importers:
 
   apps/web:
     dependencies:
+      '@goalmills/core-commercial':
+        specifier: workspace:*
+        version: link:../../core/commercial
+      '@goalmills/core-content':
+        specifier: workspace:*
+        version: link:../../core/content
+      '@goalmills/core-sports':
+        specifier: workspace:*
+        version: link:../../core/sports
       '@goalmills/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -371,6 +389,58 @@ importers:
       vitest:
         specifier: ^3.0.7
         version: 3.2.7(@types/node@20.19.43)(jsdom@26.1.0)
+
+  core/audience:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
+  core/commercial:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
+  core/content:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
+  core/identity:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
 
   core/sports:
     dependencies:
