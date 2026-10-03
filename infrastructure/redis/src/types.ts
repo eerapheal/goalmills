@@ -10,6 +10,7 @@ export interface CacheClient {
   invalidatePattern(pattern: string): Promise<number>;
   isHealthy(): boolean;
   getTelemetry(): CacheTelemetry;
+  cacheAside<T>(key: string, fetcher: () => Promise<T>, ttlSeconds?: number): Promise<T>;
 }
 
 export interface CacheTelemetry {

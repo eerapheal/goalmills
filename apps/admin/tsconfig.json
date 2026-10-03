@@ -25,7 +25,16 @@
       "@goalmills/types/*": ["../../packages/types/*"],
       "@goalmills/core-sports": ["../../core/sports/src/index.ts"],
       "@goalmills/core-commercial": ["../../core/commercial/src/index.ts"],
-      "@goalmills/core-content": ["../../core/content/src/index.ts"]
+      "@goalmills/core-content": ["../../core/content/src/index.ts"],
+      "@goalmills/core-audience": ["../../core/audience/src/index.ts"],
+      "@goalmills/core-identity": ["../../core/identity/src/index.ts"],
+      "@goalmills/core-analytics": ["../../core/analytics/src/index.ts"],
+      "@goalmills/core-warehouse": ["../../core/warehouse/src/index.ts"],
+      "@goalmills/infrastructure-database": ["../../infrastructure/database/src/index.ts"],
+      "@goalmills/infrastructure-redis": ["../../infrastructure/redis/src/index.ts"],
+      "@goalmills/infrastructure-logging": ["../../infrastructure/logging/src/index.ts"],
+      "@goalmills/infrastructure-events": ["../../infrastructure/events/src/index.ts"],
+      "@goalmills/contracts": ["../../packages/contracts/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

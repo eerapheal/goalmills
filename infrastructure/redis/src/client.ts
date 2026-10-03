@@ -44,6 +44,35 @@ export class CentralizedCacheClient implements CacheClient {
     return this.memoryFallback.invalidatePattern(pattern);
   }
 
+  private inFlight = new Map<string, Promise<any>>();
+
+  async cacheAside<T>(key: string, fetcher: () => Promise<T>, ttlSeconds?: number): Promise<T> {
+    const cached = await this.get<T>(key);
+    if (cached !== null) {
+      return cached;
+    }
+
+    const existingPromise = this.inFlight.get(key);
+    if (existingPromise) {
+      return existingPromise as Promise<T>;
+    }
+
+    const fetchPromise = (async () => {
+      try {
+        const fresh = await fetcher();
+        if (fresh !== undefined && fresh !== null) {
+          await this.set(key, fresh, ttlSeconds);
+        }
+        return fresh;
+      } finally {
+        this.inFlight.delete(key);
+      }
+    })();
+
+    this.inFlight.set(key, fetchPromise);
+    return fetchPromise;
+  }
+
   isHealthy(): boolean {
     return true;
   }

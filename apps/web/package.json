@@ -14,9 +14,18 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
+    "@goalmills/contracts": "workspace:*",
+    "@goalmills/core-analytics": "workspace:*",
+    "@goalmills/core-audience": "workspace:*",
     "@goalmills/core-commercial": "workspace:*",
     "@goalmills/core-content": "workspace:*",
+    "@goalmills/core-identity": "workspace:*",
     "@goalmills/core-sports": "workspace:*",
+    "@goalmills/core-warehouse": "workspace:*",
+    "@goalmills/infrastructure-database": "workspace:*",
+    "@goalmills/infrastructure-events": "workspace:*",
+    "@goalmills/infrastructure-logging": "workspace:*",
+    "@goalmills/infrastructure-redis": "workspace:*",
     "@goalmills/types": "workspace:*",
     "@goalmills/ui": "workspace:*",
     "@tailwindcss/typography": "^0.5.19",

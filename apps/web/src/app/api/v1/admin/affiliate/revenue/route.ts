@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     let totalCpaValue = 0;
     let totalRevShareValue = 0;
 
-    conversionAgg.forEach((item) => {
+    conversionAgg.forEach((item: any) => {
       conversionBreakdown[item._id] = {
         count: item.count,
         value: item.totalValue,

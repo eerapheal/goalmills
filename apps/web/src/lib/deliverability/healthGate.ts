@@ -149,7 +149,7 @@ export async function generatePreflightReport(
   }
 
   const allSubscribers = await NewsletterSubscriber.find(query);
-  const emails = allSubscribers.map((s) => s.emailNormalized || s.email);
+  const emails = allSubscribers.map((s: any) => s.emailNormalized || s.email);
   const suppressedSet = await getSuppressedEmailSet(emails);
 
   let suppressedCount = 0;

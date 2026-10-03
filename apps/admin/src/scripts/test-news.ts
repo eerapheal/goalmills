@@ -26,7 +26,7 @@ async function verify() {
   // 1. Categories Check
   const categories = await Category.find({}).sort({ order: 1 });
   console.log(`\n✅ CATEGORIES IN DB (${categories.length}):`);
-  categories.forEach((c) => console.log(`  - [${c.slug}] ${c.name} (${c.color})`));
+  categories.forEach((c: any) => console.log(`  - [${c.slug}] ${c.name} (${c.color})`));
 
   // 2. All News Count
   const allNews = await News.find({});

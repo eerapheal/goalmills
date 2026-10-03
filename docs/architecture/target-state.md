@@ -218,9 +218,11 @@ Phase 2: Domain Boundary Definition & Adapter Shims [COMPLETED]
     │    └── core/warehouse (Time-series partitions, archives)
     │
     ▼
-Phase 3: Centralized Infrastructure Extraction      [IN PROGRESS]
-    │    ├── infrastructure/redis (CacheClient, memory fallback)
+Phase 3: Centralized Infrastructure Extraction      [COMPLETED]
+    │    ├── infrastructure/database (connectToDatabase, shared Mongoose models)
+    │    ├── infrastructure/redis (CacheClient, cacheAside, single-flight stampede protection)
     │    ├── infrastructure/logging (Structured JSON, correlation IDs)
+    │    ├── infrastructure/events (Type-safe domain event dispatcher)
     │    └── packages/contracts (Mailer, social, realtime DTOs)
     │
     ▼
