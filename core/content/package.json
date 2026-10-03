@@ -9,6 +9,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@goalmills/contracts": "workspace:*",
     "@goalmills/types": "workspace:*"
   },
   "devDependencies": {

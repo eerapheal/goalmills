@@ -3,27 +3,21 @@
  * Connects Admin Hub & Content Distribution Studio directly with the Social Engine
  */
 
-export interface SocialEngineStatus {
-  online: boolean;
-  service?: string;
-  uptime?: number;
-  platforms?: Array<{
-    name: string;
-    displayName: string;
-    isConfigured: boolean;
-  }>;
-  scheduledTasks?: Array<{
-    id: string;
-    name: string;
-    cronExpression: string;
-    enabled: boolean;
-  }>;
-  metrics?: {
-    totalPosts: number;
-    postsToday: number;
-  };
-  error?: string;
-}
+import type {
+  SocialEngineStatus,
+  SocialPlatform,
+  SocialPublishRequest,
+  SocialPublishResponse,
+  SocialGraphicOptions,
+} from '@goalmills/contracts';
+
+export type {
+  SocialEngineStatus,
+  SocialPlatform,
+  SocialPublishRequest,
+  SocialPublishResponse,
+  SocialGraphicOptions,
+};
 
 export interface PlatformDetail {
   platform: string;

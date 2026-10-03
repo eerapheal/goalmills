@@ -59,3 +59,25 @@ export interface SocialPublishResponse {
   results: PlatformPublishResult[];
   processedAt: string;
 }
+
+export interface SocialEngineStatus {
+  online: boolean;
+  service?: string;
+  uptime?: number;
+  platforms?: Array<{
+    name: string;
+    displayName: string;
+    isConfigured: boolean;
+  }>;
+  scheduledTasks?: Array<{
+    id: string;
+    name: string;
+    cronExpression: string;
+    enabled: boolean;
+  }>;
+  metrics?: {
+    totalPosts: number;
+    postsToday: number;
+  };
+  error?: string;
+}

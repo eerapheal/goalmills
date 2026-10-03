@@ -6,4 +6,5 @@
 export * from './mailer/contracts';
 export * from './mailer/client';
 export * from './social/contracts';
+export * from './social/client';
 export * from './realtime/contracts';

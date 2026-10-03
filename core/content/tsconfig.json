@@ -12,7 +12,8 @@
     "declarationMap": true,
     "noEmit": true,
     "paths": {
-      "@goalmills/types": ["../../packages/types/index.ts"]
+      "@goalmills/types": ["../../packages/types/index.ts"],
+      "@goalmills/contracts": ["../../packages/contracts/src/index.ts"]
     }
   },
   "include": ["src/**/*"],

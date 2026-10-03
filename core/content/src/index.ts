@@ -7,3 +7,4 @@ export * from './editorial/readingTime';
 export * from './media/mediaOptimizer';
 export * from './taxonomy/categories';
 export * from './recommendations/scoring';
+export * from './distribution/socialPublisher';
