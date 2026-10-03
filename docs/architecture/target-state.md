@@ -243,7 +243,10 @@ Phase 6: Core Sports Domain Ingestion & Normalization [COMPLETED]
     │    └── Verification (28/28 regression tests passed across sports normalization, stages & Betloy)
     │
     ▼
-Phase 7: Application Layer Decoupling & Dead Code Cleanup
+Phase 7: Application Layer Decoupling & Dead Code Cleanup [COMPLETED]
+    │    ├── apps/web & apps/admin (Canonical models unified to @goalmills/infrastructure-database)
+    │    ├── apps/web & apps/admin (Cache layer decoupled to @goalmills/infrastructure-redis)
+    │    └── Verification (apps/web & apps/admin compile cleanly with zero TypeScript errors)
     │
     ▼
 Phase 8: Comprehensive Integration & Regression Testing

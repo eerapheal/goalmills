@@ -37,27 +37,32 @@ vi.mock('@/lib/deliverability/validator', () => ({
   }),
 }));
 
-vi.mock('@/lib/newsletter/dispatcher', () => ({
-  sendConfirmationEmail: vi.fn().mockResolvedValue({
+const { mockSubscriber, mockSendConfirmationEmail } = vi.hoisted(() => {
+  const fn = vi.fn().mockResolvedValue({
     success: true,
     message: 'Confirmation email queued',
     editorPicks: [
       { _id: '1', title: 'Editor Pick 1' },
       { _id: '2', title: 'Editor Pick 2' },
     ],
-  }),
-}));
+  });
+  return {
+    mockSendConfirmationEmail: fn,
+    mockSubscriber: {
+      _id: 'sub-1',
+      email: 'fan@goalmills.com',
+      emailNormalized: 'fan@goalmills.com',
+      frequency: 'daily',
+      status: 'CONFIRMED',
+      unsubscribeToken: 'mock-unsub-token-123',
+      save: vi.fn().mockResolvedValue(true),
+    },
+  };
+});
 
-const { mockSubscriber } = vi.hoisted(() => ({
-  mockSubscriber: {
-    _id: 'sub-1',
-    email: 'fan@goalmills.com',
-    emailNormalized: 'fan@goalmills.com',
-    frequency: 'daily',
-    status: 'CONFIRMED',
-    unsubscribeToken: 'mock-unsub-token-123',
-    save: vi.fn().mockResolvedValue(true),
-  },
+vi.mock('@/lib/newsletter/dispatcher', () => ({
+  sendConfirmationEmail: mockSendConfirmationEmail,
+  sendWelcomeEmail: mockSendConfirmationEmail,
 }));
 
 vi.mock('@/models/NewsletterSubscriber', () => ({

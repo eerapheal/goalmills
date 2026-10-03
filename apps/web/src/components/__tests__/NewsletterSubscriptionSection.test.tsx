@@ -12,6 +12,11 @@ describe('NewsletterSubscriptionSection', () => {
 
     expect(screen.getByText(/GoalMills Sports Intelligence Dispatch/i)).toBeInTheDocument();
     expect(screen.getByText(/Curated Match Intel & Analytics/i)).toBeInTheDocument();
+
+    const toggleBtn = screen.getByText(/Customize Topics & Frequency/i).closest('button');
+    expect(toggleBtn).toBeInTheDocument();
+    fireEvent.click(toggleBtn!);
+
     expect(screen.getByText('Football')).toBeInTheDocument();
     expect(screen.getByText('Basketball (NBA)')).toBeInTheDocument();
     expect(screen.getByText('Cricket')).toBeInTheDocument();
@@ -21,12 +26,16 @@ describe('NewsletterSubscriptionSection', () => {
   it('allows toggling sport topic preferences', () => {
     render(<NewsletterSubscriptionSection />);
 
+    const toggleBtn = screen.getByText(/Customize Topics & Frequency/i).closest('button');
+    expect(toggleBtn).toBeInTheDocument();
+    fireEvent.click(toggleBtn!);
+
     const basketballBtn = screen.getByText('Basketball (NBA)').closest('button');
     expect(basketballBtn).toBeInTheDocument();
     fireEvent.click(basketballBtn!);
 
     // Should update selected count
-    expect(screen.getByText(/selected/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/selected/i).length).toBeGreaterThan(0);
   });
 
   it('submits subscription and displays success state', async () => {

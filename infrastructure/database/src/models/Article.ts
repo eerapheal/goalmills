@@ -190,7 +190,36 @@ ArticleSchema.pre('save', function () {
   }
 });
 
+// ─── PUBLIC VISIBILITY MIDDLEWARE ────────────────────────────────────────────
+// Automatically filter out non-published articles on public web queries.
+// Only articles with status 'published' (or legacy documents without a status
+// field) are served. This prevents staff drafts and pending_approval articles
+// from leaking to the consumer site.
+// To bypass in admin or scripts, use .setOptions({ includeAllStatuses: true }) or process.env.APP_NAME === 'admin'.
+function applyPublishedFilter(this: any) {
+  if (process.env.APP_NAME === 'admin' || process.env.NEXT_PUBLIC_APP_NAME === 'admin') {
+    return;
+  }
+  if (!this.getOptions().includeAllStatuses) {
+    const conditions = this.getFilter();
+    const hasStatus =
+      conditions.status !== undefined ||
+      conditions.$or?.some?.((c: any) => c.status !== undefined) ||
+      conditions.$and?.some?.(
+        (c: any) => c.status !== undefined || c.$or?.some?.((s: any) => s.status !== undefined)
+      );
+    if (!hasStatus) {
+      this.where({ $or: [{ status: 'published' }, { status: { $exists: false } }] });
+    }
+  }
+}
+
+ArticleSchema.pre('find', applyPublishedFilter);
+ArticleSchema.pre('findOne', applyPublishedFilter);
+ArticleSchema.pre('countDocuments', applyPublishedFilter);
+
 export const Article = mongoose.models.News || mongoose.model('News', ArticleSchema);
 export const News = Article;
 
 export default Article;
+

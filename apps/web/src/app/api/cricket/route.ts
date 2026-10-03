@@ -178,7 +178,8 @@ function getTtlForMethod(method: string): number {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const rawMethod = searchParams.get('met');
+    const rawMethod =
+      searchParams.get('met') || searchParams.get('endpoint') || searchParams.get('action');
 
     if (!rawMethod) {
       return NextResponse.json({ error: 'Method parameter (met) is required' }, { status: 400 });
