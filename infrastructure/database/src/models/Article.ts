@@ -177,6 +177,10 @@ export const ArticleSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+ArticleSchema.index({ status: 1, sportSlug: 1, createdAt: -1 });
+ArticleSchema.index({ status: 1, competitionSlug: 1, createdAt: -1 });
+ArticleSchema.index({ slug: 1 }, { unique: true, sparse: true });
+
 // Auto-generate SEO slug from title if missing
 ArticleSchema.pre('save', function () {
   if (!this.slug && this.title) {

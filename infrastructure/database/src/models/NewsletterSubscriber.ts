@@ -123,6 +123,8 @@ export const NewsletterSubscriberSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+NewsletterSubscriberSchema.index({ status: 1, emailHealthScore: -1 });
+
 // Pre-validate hook to ensure emailNormalized is always populated and lowercased
 NewsletterSubscriberSchema.pre('validate', function () {
   if (this.email && !this.emailNormalized) {
