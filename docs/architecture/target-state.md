@@ -14,8 +14,7 @@ The target architecture transitions GoalMills from an application-coupled monore
 
 > **Modular Core Application + Selectively Extracted Enterprise Services**
 
-This architecture achieves enterprise scalability, domain boundary clarity, and high developer velocity while avoiding the operational failure modes of premature microservices.
-
+This architecture achieves enterprise scalability, domain boundary clarity, and high developer velocity while avoiding the operational failure modes of  
 ```text
                                GoalMills Platform
                                        │
@@ -203,22 +202,32 @@ Eliminates the 29 duplicated Mongoose model definitions between `web` and `admin
 To guarantee **zero functional downtime**, restructuring executes incrementally across 10 defined phases:
 
 ```text
-Phase 0: Discovery & Documentation Baseline        [CURRENT]
+Phase 0: Discovery & Documentation Baseline        [COMPLETED]
     │
     ▼
-Phase 1: Safety Baseline & Test Suite Verification
+Phase 1: Safety Baseline & Test Suite Verification  [COMPLETED]
     │
     ▼
-Phase 2: Domain Boundary Definition & Adapter Shims
+Phase 2: Domain Boundary Definition & Adapter Shims [COMPLETED]
+    │    ├── core/sports (Multi-sport adapters, normalization)
+    │    ├── core/content (Media, editorial, recommendations)
+    │    ├── core/commercial (Betting, wagering, affiliate)
+    │    ├── core/audience (Deliverability, opt-in tokens)
+    │    ├── core/identity (RBAC, sanitization, token security)
+    │    ├── core/analytics (Clickstream, attribution, bot filter)
+    │    └── core/warehouse (Time-series partitions, archives)
     │
     ▼
-Phase 3: Centralized Infrastructure Extraction (Redis, DB, Logger)
+Phase 3: Centralized Infrastructure Extraction      [IN PROGRESS]
+    │    ├── infrastructure/redis (CacheClient, memory fallback)
+    │    ├── infrastructure/logging (Structured JSON, correlation IDs)
+    │    └── packages/contracts (Mailer, social, realtime DTOs)
     │
     ▼
-Phase 4: Go Mailer Service Contract Formalization
+Phase 4: Go Mailer Service Contract Formalization   [IN PROGRESS]
     │
     ▼
-Phase 5: Social Engine Contract Formalization
+Phase 5: Social Engine Contract Formalization       [IN PROGRESS]
     │
     ▼
 Phase 6: Core Sports Domain Ingestion & Normalization

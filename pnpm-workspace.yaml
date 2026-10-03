@@ -3,3 +3,4 @@ packages:
   - "packages/*"
   - "services/social-engine"
   - "core/*"
+  - "infrastructure/*"

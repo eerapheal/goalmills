@@ -390,6 +390,19 @@ importers:
         specifier: ^3.0.7
         version: 3.2.7(@types/node@20.19.43)(jsdom@26.1.0)
 
+  core/analytics:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
   core/audience:
     dependencies:
       '@goalmills/types':
@@ -455,7 +468,59 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
+  core/warehouse:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
+  infrastructure/logging:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
+  infrastructure/redis:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+
   packages/config: {}
+
+  packages/contracts:
+    dependencies:
+      '@goalmills/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.19.43
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
 
   packages/types:
     devDependencies:
