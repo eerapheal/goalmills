@@ -3,3 +3,4 @@
  */
 
 export * from './competitionRegistry';
+export * from './normalizer';

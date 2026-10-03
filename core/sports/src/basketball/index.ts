@@ -24,3 +24,5 @@ export interface BasketballMatchSummary {
     away: BasketballQuarterScores;
   };
 }
+
+export * from './normalizer';

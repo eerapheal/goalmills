@@ -237,7 +237,10 @@ Phase 5: Social Engine Contract Formalization       [COMPLETED]
     │    └── apps/admin (socialEngineClient shimming, Content Distribution Studio preservation)
     │
     ▼
-Phase 6: Core Sports Domain Ingestion & Normalization
+Phase 6: Core Sports Domain Ingestion & Normalization [COMPLETED]
+    │    ├── core/sports (Multi-sport normalizers for Football, Cricket, Basketball)
+    │    ├── core/sports/providers (ProviderCircuitBreaker, rate-limit spacing, exponential backoff)
+    │    └── Verification (28/28 regression tests passed across sports normalization, stages & Betloy)
     │
     ▼
 Phase 7: Application Layer Decoupling & Dead Code Cleanup
