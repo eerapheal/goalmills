@@ -294,10 +294,11 @@ describe('Phase 8: Comprehensive Architecture Integration & Regression Suite', (
       await dispatcher.publish({
         eventId: 'evt-101',
         eventType: 'sports.match.live_score_updated',
-        aggregateId: 'fb-101',
+        source: 'sports-engine',
         correlationId: 'req-trace-abc1234',
-        occurredAt: new Date().toISOString(),
+        timestamp: new Date(),
         payload: {
+          matchId: 'fb-101',
           sport: 'football',
           homeScore: 3,
           awayScore: 1,
@@ -305,7 +306,7 @@ describe('Phase 8: Comprehensive Architecture Integration & Regression Suite', (
       });
 
       expect(receivedEvents.length).toBe(1);
-      expect(receivedEvents[0].aggregateId).toBe('fb-101');
+      expect(receivedEvents[0].source).toBe('sports-engine');
       expect(receivedEvents[0].correlationId).toBe('req-trace-abc1234');
       expect(receivedEvents[0].payload.homeScore).toBe(3);
     });
