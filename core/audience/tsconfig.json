@@ -13,7 +13,8 @@
     "noEmit": true,
     "types": ["node"],
     "paths": {
-      "@goalmills/types": ["../../packages/types/index.ts"]
+      "@goalmills/types": ["../../packages/types/index.ts"],
+      "@goalmills/contracts": ["../../packages/contracts/src/index.ts"]
     }
   },
   "include": ["src/**/*"],
