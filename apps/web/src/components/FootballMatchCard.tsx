@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { buildMatchSlug, footballRoutes, slugify } from '@/lib/slugUtils';
+import { resolveLeagueLogo, resolveTeamLogo } from '@/lib/football/logoUtils';
 
 export interface UnifiedWebMatchEvent {
   event_key: string | number;
@@ -113,18 +114,18 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
       {!hideLeague && (
         <div className="hidden sm:flex mb-2 items-center justify-between border-b border-white/5 pb-1.5 text-xs">
           <div className="flex items-center space-x-1.5 truncate">
-            {event.league_logo ? (
-              <img
-                src={event.league_logo}
+            <div className="relative h-4 w-4 rounded-sm overflow-hidden flex-shrink-0 bg-slate-900/80 p-0.5 border border-white/10 flex items-center justify-center">
+              <Image
+                src={resolveLeagueLogo(event.league_name || event.league_key, event.league_logo)}
                 alt={event.league_name || 'League'}
-                className="h-3.5 w-3.5 object-contain"
+                width={16}
+                height={16}
+                className="h-full w-full object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
-            ) : (
-              <span className="text-blue-400 text-xs">⚽</span>
-            )}
+            </div>
             <span className="font-bold text-[11px] text-slate-300 group-hover:text-white transition-colors truncate">
               {event.league_name || 'Football Match'}
             </span>
@@ -158,21 +159,17 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
           onClick={(e) => e.stopPropagation()}
           className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
         >
-          <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {event.home_team_logo ? (
-              <img
-                src={event.home_team_logo}
-                alt={event.event_home_team}
-                className="h-full w-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                {event.event_home_team.slice(0, 3).toUpperCase()}
-              </span>
-            )}
+          <div className="relative h-6 w-6 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors overflow-hidden">
+            <Image
+              src={resolveTeamLogo(event.event_home_team, event.home_team_logo)}
+              alt={event.event_home_team}
+              width={28}
+              height={28}
+              className="h-full w-full object-contain"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
           </div>
           <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
             {event.event_home_team}
@@ -210,21 +207,17 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
           <span className="font-bold text-[11px] sm:text-xs text-white truncate group-hover:text-blue-300 transition-colors">
             {event.event_away_team}
           </span>
-          <div className="h-5.5 w-5.5 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors">
-            {event.away_team_logo ? (
-              <img
-                src={event.away_team_logo}
-                alt={event.event_away_team}
-                className="h-full w-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-[7px] sm:text-[9px] font-black text-blue-400">
-                {event.event_away_team.slice(0, 3).toUpperCase()}
-              </span>
-            )}
+          <div className="relative h-6 w-6 sm:h-7 sm:w-7 rounded bg-slate-900/80 border border-white/10 p-0.5 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:border-blue-400/40 transition-colors overflow-hidden">
+            <Image
+              src={resolveTeamLogo(event.event_away_team, event.away_team_logo)}
+              alt={event.event_away_team}
+              width={28}
+              height={28}
+              className="h-full w-full object-contain"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
           </div>
         </Link>
       </div>

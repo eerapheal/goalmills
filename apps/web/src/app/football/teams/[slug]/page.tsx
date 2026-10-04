@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import {
   footballRoutes,
@@ -21,6 +22,7 @@ import {
   ClubMeta,
   CoachMeta,
 } from '@/lib/entityService';
+import { resolveTeamLogo, resolveLeagueLogo } from '@/lib/football/logoUtils';
 import type {
   FootballTeam,
   FootballPlayer,
@@ -118,8 +120,8 @@ export default function FootballTeamPage() {
     photo: string;
     nationality: string;
     flag: string;
-    since: string;
-    winRate: number;
+    since?: string;
+    winRate?: number;
   } | null>(null);
 
   useEffect(() => {
@@ -227,7 +229,7 @@ export default function FootballTeamPage() {
                     ? 'Midfielders'
                     : 'Forwards',
               player_age: String(p.age),
-              player_match_played: String(p.seasonStats.appearances || 18),
+              player_match_played: String(p.seasonStats.appearances || 0),
               player_goals: String(p.seasonStats.goals || 0),
               player_assists: String(p.seasonStats.assists || 0),
               player_yellow_cards: String(p.seasonStats.yellowCards || 0),
@@ -299,8 +301,8 @@ export default function FootballTeamPage() {
           photo: string;
           nationality: string;
           flag: string;
-          since: string;
-          winRate: number;
+          since?: string;
+          winRate?: number;
         } | null = null;
 
         // Check local registry first
@@ -315,8 +317,7 @@ export default function FootballTeamPage() {
             photo: coachMeta.photo,
             nationality: coachMeta.nationality,
             flag: coachMeta.countryFlag || '🌍',
-            since: '2023',
-            winRate: coachMeta.winPercentage || 65,
+            winRate: coachMeta.winPercentage ?? undefined,
           };
         } else if (localClub?.manager) {
           coachResolved = {
@@ -327,20 +328,9 @@ export default function FootballTeamPage() {
             nationality:
               (teamData as any).team_country || clubMeta?.competitionName || 'International',
             flag: '🌍',
-            since: '2023',
-            winRate: 64,
           };
         } else {
-          // Generic placeholder coach so UI remains complete
-          coachResolved = {
-            name: 'Head Coach',
-            photo: `https://ui-avatars.com/api/?name=Head+Coach&background=0f172a&color=38bdf8&size=128&bold=true`,
-            nationality:
-              (teamData as any).team_country || clubMeta?.competitionName || 'International',
-            flag: '📋',
-            since: '2024',
-            winRate: 58,
-          };
+          coachResolved = null;
         }
 
         if (isMounted) setCoachData(coachResolved);
@@ -377,29 +367,29 @@ export default function FootballTeamPage() {
     }
   };
 
-  // Last 5 form results
+  // Last 5 form results - strictly derived from real matches
   const last5Form: ('W' | 'D' | 'L')[] = useMemo(() => {
     if (recentMatches.length === 0) {
-      return ['W', 'W', 'D', 'W', 'L'];
+      return [];
     }
     return recentMatches.slice(0, 5).map(getMatchResult).reverse();
   }, [recentMatches, team]);
 
-  // Season totals
+  // Season totals - real league standing or aggregated from actual match history
   const seasonStats = useMemo(() => {
     if (standing) {
-      const p = parseInt(String(standing.standing_P || '0'), 10);
-      const w = parseInt(String(standing.standing_W || '0'), 10);
-      const d = parseInt(String(standing.standing_D || '0'), 10);
-      const l = parseInt(String(standing.standing_L || '0'), 10);
-      const gf = parseInt(String(standing.standing_F || '0'), 10);
-      const ga = parseInt(String(standing.standing_A || '0'), 10);
-      const pts = parseInt(String(standing.standing_PTS || '0'), 10);
+      const p = parseInt(String(standing.standing_P || '0'), 10) || 0;
+      const w = parseInt(String(standing.standing_W || '0'), 10) || 0;
+      const d = parseInt(String(standing.standing_D || '0'), 10) || 0;
+      const l = parseInt(String(standing.standing_L || '0'), 10) || 0;
+      const gf = parseInt(String(standing.standing_F || '0'), 10) || 0;
+      const ga = parseInt(String(standing.standing_A || '0'), 10) || 0;
+      const pts = parseInt(String(standing.standing_PTS || '0'), 10) || 0;
       const gd = gf - ga;
-      return { p, w, d, l, gf, ga, pts, gd, pos: standing.standing_place };
+      return { p, w, d, l, gf, ga, pts, gd, pos: standing.standing_place || '-' };
     }
 
-    // Calculated from match history
+    // Calculated strictly from actual match history
     let w = 0;
     let d = 0;
     let l = 0;
@@ -428,53 +418,55 @@ export default function FootballTeamPage() {
       }
     });
 
-    const p = w + d + l || 28;
-    const pts = w * 3 + d || 62;
-    const fallbackGf = gf || 68;
-    const fallbackGa = ga || 28;
+    const p = w + d + l;
+    const pts = w * 3 + d;
     return {
       p,
-      w: w || 19,
-      d: d || 5,
-      l: l || 4,
-      gf: fallbackGf,
-      ga: fallbackGa,
+      w,
+      d,
+      l,
+      gf,
+      ga,
       pts,
-      gd: fallbackGf - fallbackGa,
-      pos: clubMeta?.position ? String(clubMeta.position) : '2',
+      gd: gf - ga,
+      pos: clubMeta?.position ? String(clubMeta.position) : '-',
     };
   }, [standing, recentMatches, team, clubMeta]);
 
-  // Performance metrics for Stats tab
+  // Performance metrics for Stats tab - purely computed from actual matches
   const performanceMetrics = useMemo(() => {
-    const ppg = (seasonStats.pts / Math.max(seasonStats.p, 1)).toFixed(2);
-    const cleanSheets = Math.round(seasonStats.w * 0.7) || 12;
-    const xG = (seasonStats.gf / Math.max(seasonStats.p, 1)).toFixed(1);
-    const shots = (parseFloat(xG) * 7.5).toFixed(1);
+    const p = seasonStats.p;
+    let cleanSheets = 0;
+
+    recentMatches.forEach((m) => {
+      const parts = (m.event_final_result || m.event_ft_result || '').split(' - ');
+      if (parts.length === 2) {
+        const isHome =
+          team &&
+          (String(m.home_team_key) === String(team.team_key) ||
+            slugify(m.event_home_team || '').includes(slugify(team.team_name)));
+        const opponentScore = parseInt(isHome ? parts[1] : parts[0], 10);
+        if (opponentScore === 0) cleanSheets++;
+      }
+    });
+
+    const winRate = p > 0 ? Math.round((seasonStats.w / p) * 100) : 0;
+    const lossRate = p > 0 ? Math.round((seasonStats.l / p) * 100) : 0;
+    const drawRate = p > 0 ? Math.round((seasonStats.d / p) * 100) : 0;
+    const gpg = p > 0 ? (seasonStats.gf / p).toFixed(2) : '0.00';
+    const gcpg = p > 0 ? (seasonStats.ga / p).toFixed(2) : '0.00';
 
     return [
-      { label: 'Goals Scored', value: seasonStats.gf, max: 100, color: 'bg-blue-500' },
-      { label: 'Goals Conceded', value: seasonStats.ga, max: 80, color: 'bg-red-500' },
-      { label: 'Clean Sheets', value: cleanSheets, max: 38, color: 'bg-green-500' },
-      { label: 'Avg. Possession %', value: 62, max: 100, color: 'bg-yellow-500' },
-      { label: 'Pass Accuracy %', value: 89, max: 100, color: 'bg-blue-400' },
-      {
-        label: 'xG Per Game',
-        value: parseFloat(xG) || 2.1,
-        max: 4,
-        color: 'bg-purple-500',
-        decimals: 1,
-      },
-      {
-        label: 'Shots Per Game',
-        value: parseFloat(shots) || 16.4,
-        max: 30,
-        color: 'bg-cyan-500',
-        decimals: 1,
-      },
-      { label: 'Tackles Won %', value: 64, max: 100, color: 'bg-orange-500' },
+      { label: 'Goals Scored', value: seasonStats.gf, max: Math.max(seasonStats.gf, 50), color: 'bg-green-500' },
+      { label: 'Goals Conceded', value: seasonStats.ga, max: Math.max(seasonStats.ga, 50), color: 'bg-red-500' },
+      { label: 'Clean Sheets', value: cleanSheets, max: Math.max(p, 1), color: 'bg-blue-500' },
+      { label: 'Win Rate %', value: winRate, max: 100, color: 'bg-emerald-500' },
+      { label: 'Loss Rate %', value: lossRate, max: 100, color: 'bg-rose-500' },
+      { label: 'Draw Rate %', value: drawRate, max: 100, color: 'bg-amber-500' },
+      { label: 'Goals Scored / Match', value: parseFloat(gpg), max: 5, color: 'bg-purple-500', decimals: 2 },
+      { label: 'Goals Conceded / Match', value: parseFloat(gcpg), max: 5, color: 'bg-cyan-500', decimals: 2 },
     ];
-  }, [seasonStats]);
+  }, [seasonStats, recentMatches, team]);
 
   // Categorize squad into position groups
   const squadByGroup = useMemo(() => {
@@ -521,7 +513,7 @@ export default function FootballTeamPage() {
 
       const goals = parseInt(p.player_goals || '0', 10);
       const assists = parseInt(p.player_assists || '0', 10);
-      const apps = parseInt(p.player_match_played || '0', 10) || 15;
+      const apps = parseInt(p.player_match_played || '0', 10);
       const baseRating = 7.1 + ((goals * 0.15 + assists * 0.1) % 1.5);
       const rating = Math.min(8.9, Math.max(6.8, Number(baseRating.toFixed(1))));
 
@@ -581,10 +573,10 @@ export default function FootballTeamPage() {
     );
   }
 
-  const stadium = clubMeta?.stadium || (team as any).venue || 'Home Stadium';
-  const founded = clubMeta?.founded || (team as any).founded || '1895';
-  const capacity = 55000;
-  const country = (team as any).team_country || clubMeta?.competitionName || 'International';
+  const stadium = clubMeta?.stadium || (team as any).venue || '';
+  const founded = clubMeta?.founded || (team as any).founded || '';
+  const capacity = (team as any).capacity || null;
+  const country = (team as any).team_country || clubMeta?.competitionName || '';
 
   return (
     <div className="min-h-screen bg-[#070a1a] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
@@ -617,16 +609,15 @@ export default function FootballTeamPage() {
           {/* Main Hero row */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             {/* Team Crest Badge */}
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#1e293b] border border-[#334155] flex items-center justify-center p-3 text-6xl sm:text-7xl flex-shrink-0 shadow-xl overflow-hidden relative group">
-              {team.team_logo ? (
-                <img
-                  src={team.team_logo}
-                  alt={team.team_name}
-                  className="w-full h-full object-contain drop-shadow-md transition-transform group-hover:scale-105 duration-300"
-                />
-              ) : (
-                <span>⚽</span>
-              )}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#1e293b] border border-[#334155] flex items-center justify-center p-3 flex-shrink-0 shadow-xl overflow-hidden relative group">
+              <Image
+                src={resolveTeamLogo(team.team_name, team.team_logo)}
+                alt={team.team_name}
+                width={100}
+                height={100}
+                className="w-full h-full object-contain drop-shadow-md transition-transform group-hover:scale-105 duration-300"
+                priority
+              />
             </div>
 
             {/* Info Column */}
@@ -635,31 +626,37 @@ export default function FootballTeamPage() {
                 <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">
                   {leagueName || clubMeta?.competitionName || 'Football'}
                 </span>
-                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                  {country}
-                </span>
+                {country && (
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                    {country}
+                  </span>
+                )}
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
                 {team.team_name}
               </h1>
               <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-400 font-medium">
-                <span>🏟️ {stadium.split(',')[0]}</span>
-                <span>· Est. {founded}</span>
-                <span>· {capacity.toLocaleString()} cap.</span>
+                {stadium && <span>🏟️ {stadium.split(',')[0]}</span>}
+                {founded && <span>· Est. {founded}</span>}
+                {capacity && <span>· {capacity.toLocaleString()} cap.</span>}
               </div>
             </div>
 
             {/* League Position & Points Box */}
             <div className="flex sm:flex-col items-center justify-center gap-6 sm:gap-2 bg-[#1e293b] border border-[#334155] rounded-2xl px-6 py-4 sm:py-5 text-center shadow-lg shrink-0 w-full sm:w-auto">
               <div>
-                <p className="text-3xl sm:text-4xl font-black text-white">#{seasonStats.pos}</p>
+                <p className="text-3xl sm:text-4xl font-black text-white">
+                  {seasonStats.pos && seasonStats.pos !== '-' ? `#${seasonStats.pos}` : '—'}
+                </p>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
                   Position
                 </p>
               </div>
               <div className="w-px h-8 sm:w-10 sm:h-px bg-[#334155]" />
               <div>
-                <p className="text-3xl sm:text-4xl font-black text-white">{seasonStats.pts}</p>
+                <p className="text-3xl sm:text-4xl font-black text-white">
+                  {seasonStats.p > 0 ? seasonStats.pts : '—'}
+                </p>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
                   Points
                 </p>
@@ -743,13 +740,16 @@ export default function FootballTeamPage() {
                       {coachData.name}
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      {coachData.flag} {coachData.nationality} · In charge since {coachData.since}
+                      {coachData.flag} {coachData.nationality}
+                      {coachData.since ? ` · In charge since ${coachData.since}` : ''}
                     </p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-lg font-black text-green-400">{coachData.winRate}%</p>
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">Win rate</p>
-                  </div>
+                  {coachData.winRate !== undefined && (
+                    <div className="text-right shrink-0">
+                      <p className="text-lg font-black text-green-400">{coachData.winRate}%</p>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-widest">Win rate</p>
+                    </div>
+                  )}
                 </Link>
               </div>
             )}

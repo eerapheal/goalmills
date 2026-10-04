@@ -12,6 +12,7 @@ import { advancedFootballApi } from '../services/advancedFootballApi';
 import { useState, useEffect, useMemo } from 'react';
 import { footballRoutes } from '@/lib/slugUtils';
 import { getStandingsRulesetById } from '@/lib/football/standingsRulesets';
+import { resolveTeamLogo } from '@/lib/football/logoUtils';
 
 interface UnifiedStandingRow {
   key: string;
@@ -118,7 +119,7 @@ export function FootballStandingsTable({
         key: e.id || `entry-${idx}`,
         rank: e.position,
         teamName: e.teamName,
-        teamLogo: e.teamLogo,
+        teamLogo: resolveTeamLogo(e.teamName, e.teamLogo),
         played: e.played,
         won: e.won,
         drawn: e.drawn,
@@ -137,7 +138,7 @@ export function FootballStandingsTable({
           key: `${s.team_key}-${idx}`,
           rank: parseInt(s.standing_place, 10) || idx + 1,
           teamName: s.standing_team,
-          teamLogo: logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(s.standing_team)}&background=random`,
+          teamLogo: resolveTeamLogo(s.standing_team, logo),
           played: parseInt(s.standing_P, 10) || 0,
           won: parseInt(s.standing_W, 10) || 0,
           drawn: parseInt(s.standing_D, 10) || 0,
@@ -214,44 +215,54 @@ export function FootballStandingsTable({
 
       {/* Table Rows */}
       <div className="divide-y divide-white/5 font-medium">
-        {rows.map((row) => {
-          const teamUrl = footballRoutes.teamFromName(row.teamName);
+        {rows.length === 0 ? (
+          <div className="py-12 px-4 text-center">
+            <p className="text-2xl mb-2">📊</p>
+            <p className="text-slate-300 font-bold text-sm">No standings records currently available</p>
+            <p className="text-slate-500 text-xs mt-1">Official league standings synchronize automatically as match results are confirmed.</p>
+          </div>
+        ) : (
+          rows.map((row) => {
+            const teamUrl = footballRoutes.teamFromName(row.teamName);
 
-          return (
-            <div
-              key={row.key}
-              className="flex items-center py-2.5 sm:py-3 px-3 sm:px-5 transition-colors duration-200 hover:bg-blue-600/10 group"
-            >
-              {/* Rank */}
-              <div className="w-7 sm:w-8 shrink-0 flex justify-center">
-                <span
-                  className={`w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg sm:rounded-xl text-[11px] sm:text-xs transition-all ${getRankStyles(
-                    row.rank
-                  )}`}
-                >
-                  {row.rank}
-                </span>
-              </div>
-
-              {/* Club */}
-              <div className="flex-1 min-w-0 pl-2 sm:pl-3 pr-1 sm:pr-2">
-                <Link
-                  href={teamUrl}
-                  className="flex items-center min-w-0 hover:scale-[1.01] transition-transform origin-left"
-                >
-                  <div className="relative w-5 h-5 sm:w-6 sm:h-6 mr-2 shrink-0 p-0.5 bg-slate-900/80 rounded-md border border-white/10 group-hover:border-blue-400/40 transition-colors flex items-center justify-center">
-                    <Image
-                      src={row.teamLogo || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.teamName)}&background=random`}
-                      alt={row.teamName}
-                      width={24}
-                      height={24}
-                      className="object-contain w-full h-full"
-                    />
-                  </div>
-                  <span className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
-                    {row.teamName}
+            return (
+              <div
+                key={row.key}
+                className="flex items-center py-2.5 sm:py-3 px-3 sm:px-5 transition-colors duration-200 hover:bg-blue-600/10 group"
+              >
+                {/* Rank */}
+                <div className="w-7 sm:w-8 shrink-0 flex justify-center">
+                  <span
+                    className={`w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg sm:rounded-xl text-[11px] sm:text-xs transition-all ${getRankStyles(
+                      row.rank
+                    )}`}
+                  >
+                    {row.rank}
                   </span>
-                </Link>
+                </div>
+
+                {/* Club */}
+                <div className="flex-1 min-w-0 pl-2 sm:pl-3 pr-1 sm:pr-2">
+                  <Link
+                    href={teamUrl}
+                    className="flex items-center min-w-0 hover:scale-[1.01] transition-transform origin-left"
+                  >
+                    <div className="relative w-5 h-5 sm:w-6 sm:h-6 mr-2 shrink-0 p-0.5 bg-slate-900/80 rounded-md border border-white/10 group-hover:border-blue-400/40 transition-colors flex items-center justify-center">
+                      <Image
+                        src={row.teamLogo || resolveTeamLogo(row.teamName)}
+                        alt={row.teamName}
+                        width={24}
+                        height={24}
+                        className="object-contain w-full h-full"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
+                      {row.teamName}
+                    </span>
+                  </Link>
               </div>
 
               {/* Numeric Stats */}
@@ -308,7 +319,7 @@ export function FootballStandingsTable({
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* Ruleset & Qualification Legend Footer */}

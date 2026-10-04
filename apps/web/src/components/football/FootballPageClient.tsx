@@ -18,6 +18,9 @@ import { processFixture, getCanonicalCompetition } from '@/lib/football';
 import { footballRoutes, buildMatchSlug, slugify } from '@/lib/slugUtils';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { CompetitionGender } from '@goalmills/types';
+import { resolveLeagueLogo, resolveTeamLogo } from '@/lib/football/logoUtils';
+import { CompetitionDirectory } from './CompetitionDirectory';
+import { ALL_COMPETITIONS } from '@/lib/competitionCategories';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,6 +31,7 @@ export interface FixtureItem {
   id: string;
   comp: string;
   compFlag: string;
+  compLogo?: string;
   home: string;
   homeBadge: string;
   away: string;
@@ -109,6 +113,16 @@ const LEAGUE_ID_MAP: Record<string, number> = {
   'Bundesliga': 175,
   'Ligue 1': 168,
   'CAF Champions League': 570,
+  'NPFL — Nigeria': 483,
+};
+
+const resolveLeagueId = (leagueName: string): number => {
+  const norm = leagueName.toLowerCase().trim();
+  const found = ALL_COMPETITIONS.find(
+    (c) => c.name.toLowerCase() === norm || c.slug.toLowerCase() === norm
+  );
+  if (found) return found.id || found.apiSportsId || 152;
+  return LEAGUE_ID_MAP[leagueName] || 152;
 };
 
 const COMP_GROUPS: CompGroup[] = [
@@ -370,8 +384,19 @@ function MatchCard({ f }: { f: FixtureItem }) {
       className="block bg-[#0f172a] border border-[#1e293b] rounded-xl hover:border-blue-500/40 hover:bg-[#131f35] transition-all duration-200 group overflow-hidden shadow-sm"
     >
       <div className="flex items-center justify-between px-3.5 pt-3 pb-2 border-b border-[#1e293b]/60">
-        <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase truncate flex items-center gap-1.5">
-          <span>{f.compFlag}</span>
+        <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase truncate flex items-center gap-2">
+          <div className="relative w-4 h-4 rounded-sm overflow-hidden flex-shrink-0 bg-slate-900/80 p-0.5 border border-white/10 flex items-center justify-center">
+            <Image
+              src={f.compLogo || resolveLeagueLogo(f.comp, f.competitionId)}
+              alt={f.comp}
+              width={16}
+              height={16}
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+          </div>
           <span className="truncate">{f.comp}</span>
         </span>
         {isLive ? (
@@ -393,18 +418,18 @@ function MatchCard({ f }: { f: FixtureItem }) {
       <div className="px-3.5 py-3 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            {f.homeLogo ? (
-              <img
-                src={f.homeLogo}
-                alt=""
-                className="w-5 h-5 object-contain rounded flex-shrink-0"
+            <div className="relative w-5 h-5 flex-shrink-0 flex items-center justify-center rounded bg-slate-900/80 p-0.5 border border-white/10 overflow-hidden">
+              <Image
+                src={resolveTeamLogo(f.home, f.homeLogo)}
+                alt={f.home}
+                width={20}
+                height={20}
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
-            ) : (
-              <span className="text-base flex-shrink-0">{f.homeBadge}</span>
-            )}
+            </div>
             <span className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors truncate">
               {f.home}
             </span>
@@ -419,18 +444,18 @@ function MatchCard({ f }: { f: FixtureItem }) {
 
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            {f.awayLogo ? (
-              <img
-                src={f.awayLogo}
-                alt=""
-                className="w-5 h-5 object-contain rounded flex-shrink-0"
+            <div className="relative w-5 h-5 flex-shrink-0 flex items-center justify-center rounded bg-slate-900/80 p-0.5 border border-white/10 overflow-hidden">
+              <Image
+                src={resolveTeamLogo(f.away, f.awayLogo)}
+                alt={f.away}
+                width={20}
+                height={20}
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
-            ) : (
-              <span className="text-base flex-shrink-0">{f.awayBadge}</span>
-            )}
+            </div>
             <span className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors truncate">
               {f.away}
             </span>
@@ -608,7 +633,7 @@ export function FootballPageClient({
 
   // Fetch live standings and top scorers dynamically
   const fetchTableAndScorers = useCallback(async (leagueName: string) => {
-    const leagueId = LEAGUE_ID_MAP[leagueName] || 152;
+    const leagueId = resolveLeagueId(leagueName);
     setTableLoading(true);
     setScorersLoading(true);
     try {
@@ -637,13 +662,14 @@ export function FootballPageClient({
               team: r.standing_team || `Club ${pos}`,
               slug: slugify(r.standing_team || ''),
               badge: '⚽',
+              logo: resolveTeamLogo(r.standing_team, r.team_logo || r.standing_team_logo),
               p: parseInt(r.standing_P) || 0,
               w: parseInt(r.standing_W) || 0,
               d: parseInt(r.standing_D) || 0,
               l: parseInt(r.standing_L) || 0,
               gd: parseInt(r.standing_GD) || 0,
               pts: parseInt(r.standing_PTS) || 0,
-              form: formArr.length > 0 ? (formArr as ('W' | 'D' | 'L')[]) : ['D'],
+              form: formArr as ('W' | 'D' | 'L')[],
               zone,
             };
           });
@@ -721,12 +747,13 @@ export function FootballPageClient({
               classificationStatus: normalized.classificationStatus,
               comp: canonical?.name || m.league_name || 'Football League',
               compFlag: canonical?.countryFlagUrl || '⚽',
+              compLogo: resolveLeagueLogo(m.league_name || normalized.competitionId, m.league_logo || canonical?.logoUrl),
               home: normalized.homeTeamName || m.event_home_team || 'Home',
               homeBadge: '🔵',
-              homeLogo: m.home_team_logo,
+              homeLogo: resolveTeamLogo(normalized.homeTeamName || m.event_home_team, m.home_team_logo),
               away: normalized.awayTeamName || m.event_away_team || 'Away',
               awayBadge: '🔴',
-              awayLogo: m.away_team_logo,
+              awayLogo: resolveTeamLogo(normalized.awayTeamName || m.event_away_team, m.away_team_logo),
               hScore: normalized.homeScore ?? (m.event_final_result
                 ? m.event_final_result.split('-')[0]?.trim()
                 : (m.event_home_final_result ?? 0)),
@@ -775,12 +802,13 @@ export function FootballPageClient({
               classificationStatus: normalized.classificationStatus,
               comp: canonical?.name || m.league_name || 'Football League',
               compFlag: canonical?.countryFlagUrl || '⚽',
+              compLogo: resolveLeagueLogo(m.league_name || normalized.competitionId, m.league_logo || canonical?.logoUrl),
               home: normalized.homeTeamName || m.event_home_team || 'Home',
               homeBadge: '⚪',
-              homeLogo: m.home_team_logo,
+              homeLogo: resolveTeamLogo(normalized.homeTeamName || m.event_home_team, m.home_team_logo),
               away: normalized.awayTeamName || m.event_away_team || 'Away',
               awayBadge: '⚫',
-              awayLogo: m.away_team_logo,
+              awayLogo: resolveTeamLogo(normalized.awayTeamName || m.event_away_team, m.away_team_logo),
               hScore: normalized.homeScore ?? (m.event_final_result
                 ? m.event_final_result.split('-')[0]?.trim()
                 : (m.event_home_final_result ?? null)),
@@ -1018,63 +1046,18 @@ export function FootballPageClient({
             {/* Competition Directory */}
             <SideSection
               title="Competition Directory"
-              defaultOpen={false}
-              action={<span className="text-[10px] text-slate-500 font-semibold">75+ Leagues</span>}
+              defaultOpen={true}
+              action={
+                <Link
+                  href="/football/competitions"
+                  className="text-[10px] text-blue-400 hover:text-blue-300 font-semibold hover:underline"
+                >
+                  75+ Leagues →
+                </Link>
+              }
             >
-              <div className="divide-y divide-[#1e293b]">
-                {COMP_GROUPS.map((group) => (
-                  <div key={group.region}>
-                    <button
-                      onClick={() =>
-                        setExpandedComp(expandedComp === group.region ? null : group.region)
-                      }
-                      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-[#1e293b]/40 transition-colors text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{group.icon}</span>
-                        <span className="text-xs font-semibold text-slate-300">{group.region}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-slate-500 font-semibold">
-                          {group.comps.length}
-                        </span>
-                        <FiChevronDown
-                          className={`w-3.5 h-3.5 text-slate-500 transition-transform ${expandedComp === group.region ? 'rotate-180' : ''
-                            }`}
-                        />
-                      </div>
-                    </button>
-                    {expandedComp === group.region && (
-                      <div className="bg-[#080f1f] border-t border-[#1e293b] divide-y divide-[#1e293b]/60">
-                        {group.comps.map((c) => (
-                          <Link
-                            key={c.name}
-                            href={c.href || '/football'}
-                            className="flex items-center gap-2.5 px-5 py-2 hover:bg-[#1e293b]/60 transition-colors group"
-                          >
-                            <span className="text-base flex-shrink-0">{c.flag}</span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[11px] font-semibold text-slate-300 group-hover:text-white transition-colors truncate">
-                                {c.name}
-                              </p>
-                              <p className="text-[10px] text-slate-500">{c.country}</p>
-                            </div>
-                            <span
-                              className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded flex-shrink-0 ${c.tier === 'T1'
-                                ? 'bg-blue-500/20 text-blue-400'
-                                : c.tier === 'T2'
-                                  ? 'bg-orange-500/20 text-orange-400'
-                                  : 'bg-yellow-500/20 text-yellow-400'
-                                }`}
-                            >
-                              {c.tier}
-                            </span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
+              <div className="p-2">
+                <CompetitionDirectory compact />
               </div>
             </SideSection>
 
@@ -1165,52 +1148,18 @@ export function FootballPageClient({
                   {/* Competition Directory */}
                   <SideSection
                     title="Competition Directory"
-                    defaultOpen={false}
+                    defaultOpen={true}
                     action={
-                      <span className="text-[10px] text-slate-500 font-semibold">75+ Leagues</span>
+                      <Link
+                        href="/football/competitions"
+                        className="text-[10px] text-blue-400 hover:text-blue-300 font-semibold hover:underline"
+                      >
+                        75+ Leagues →
+                      </Link>
                     }
                   >
-                    <div className="divide-y divide-[#1e293b]">
-                      {COMP_GROUPS.map((group) => (
-                        <div key={group.region}>
-                          <button
-                            onClick={() =>
-                              setExpandedComp(expandedComp === group.region ? null : group.region)
-                            }
-                            className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#1e293b]/40 transition-colors text-left"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">{group.icon}</span>
-                              <span className="text-xs font-semibold text-slate-300">
-                                {group.region}
-                              </span>
-                            </div>
-                            <FiChevronDown
-                              className={`w-3.5 h-3.5 text-slate-500 transition-transform ${expandedComp === group.region ? 'rotate-180' : ''
-                                }`}
-                            />
-                          </button>
-                          {expandedComp === group.region && (
-                            <div className="bg-[#080f1f] border-t border-[#1e293b] divide-y divide-[#1e293b]/60">
-                              {group.comps.map((c) => (
-                                <Link
-                                  key={c.name}
-                                  href={c.href || '/football'}
-                                  className="flex items-center gap-2 px-3 py-2 hover:bg-[#1e293b]/60 transition-colors"
-                                >
-                                  <span className="text-sm">{c.flag}</span>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] font-semibold text-slate-300 truncate">
-                                      {c.name}
-                                    </p>
-                                    <p className="text-[9px] text-slate-500">{c.country}</p>
-                                  </div>
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                    <div className="p-2">
+                      <CompetitionDirectory compact />
                     </div>
                   </SideSection>
 
@@ -1356,7 +1305,7 @@ export function FootballPageClient({
               {/* Table Sub-bar with league pills & search */}
               {mainTab === 'table' && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     {[
                       'Premier League',
                       'La Liga',
@@ -1364,6 +1313,7 @@ export function FootballPageClient({
                       'Bundesliga',
                       'Ligue 1',
                       'CAF Champions League',
+                      'NPFL — Nigeria',
                     ].map((l) => (
                       <button
                         key={l}
@@ -1376,6 +1326,23 @@ export function FootballPageClient({
                         {l}
                       </button>
                     ))}
+
+                    <select
+                      value={ALL_COMPETITIONS.some((c) => c.name === tableLeague) ? tableLeague : ''}
+                      onChange={(e) => {
+                        if (e.target.value) setTableLeague(e.target.value);
+                      }}
+                      className="flex-shrink-0 text-[10px] font-bold bg-[#06101E] border border-blue-500/40 text-blue-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        More Leagues (75+)...
+                      </option>
+                      {ALL_COMPETITIONS.map((c) => (
+                        <option key={c.slug} value={c.name} className="bg-[#0f172a] text-white">
+                          {c.flag} {c.name} ({c.country})
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="relative sm:w-60 flex-shrink-0">
@@ -1402,13 +1369,15 @@ export function FootballPageClient({
               {/* Scorers Sub-bar with league pills & search */}
               {mainTab === 'scorers' && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     {[
                       'Premier League',
                       'La Liga',
                       'Serie A',
                       'Bundesliga',
                       'Ligue 1',
+                      'CAF Champions League',
+                      'NPFL — Nigeria',
                     ].map((l) => (
                       <button
                         key={l}
@@ -1421,6 +1390,23 @@ export function FootballPageClient({
                         {l}
                       </button>
                     ))}
+
+                    <select
+                      value={ALL_COMPETITIONS.some((c) => c.name === tableLeague) ? tableLeague : ''}
+                      onChange={(e) => {
+                        if (e.target.value) setTableLeague(e.target.value);
+                      }}
+                      className="flex-shrink-0 text-[10px] font-bold bg-[#06101E] border border-blue-500/40 text-blue-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        More Leagues (75+)...
+                      </option>
+                      {ALL_COMPETITIONS.map((c) => (
+                        <option key={c.slug} value={c.name} className="bg-[#0f172a] text-white">
+                          {c.flag} {c.name} ({c.country})
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="relative sm:w-60 flex-shrink-0">
@@ -1570,11 +1556,22 @@ export function FootballPageClient({
                               </td>
                               <td className="px-3 py-3">
                                 <Link
-                                  href={`/football/teams/${row.slug || 'arsenal'}`}
+                                  href={row.slug ? `/football/teams/${row.slug}` : '#'}
                                   className="flex items-center gap-2 group/link"
                                 >
-                                  <span className="text-sm">{row.badge}</span>
-                                  <span className="text-sm font-semibold text-slate-100 group-hover/link:text-blue-400 transition-colors">
+                                  <div className="relative w-5 h-5 flex-shrink-0 flex items-center justify-center rounded bg-slate-900/80 p-0.5 border border-white/10 overflow-hidden">
+                                    <Image
+                                      src={resolveTeamLogo(row.team, row.logo)}
+                                      alt={row.team}
+                                      width={20}
+                                      height={20}
+                                      className="w-full h-full object-contain"
+                                      onError={(e) => {
+                                        (e.target as HTMLElement).style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-sm font-semibold text-slate-100 group-hover/link:text-blue-400 transition-colors truncate">
                                     {row.team}
                                   </span>
                                 </Link>
@@ -1611,9 +1608,13 @@ export function FootballPageClient({
                               </td>
                               <td className="pr-5 pl-2 py-3 hidden md:table-cell">
                                 <div className="flex gap-1 justify-end">
-                                  {row.form.map((f, i) => (
-                                    <FormDot key={i} r={f} />
-                                  ))}
+                                  {row.form && row.form.length > 0 ? (
+                                    row.form.map((f, i) => (
+                                      <FormDot key={i} r={f} />
+                                    ))
+                                  ) : (
+                                    <span className="text-slate-600 text-xs">—</span>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -1708,9 +1709,23 @@ export function FootballPageClient({
                           <p className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors truncate">
                             {p.name}
                           </p>
-                          <p className="text-xs text-slate-400 truncate">
-                            {p.flag} · {p.badge} {p.team}
-                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-slate-400 truncate mt-0.5">
+                            <span>{p.flag}</span>
+                            <span>·</span>
+                            <div className="relative w-3.5 h-3.5 flex-shrink-0 flex items-center justify-center rounded bg-slate-900 overflow-hidden">
+                              <Image
+                                src={resolveTeamLogo(p.team)}
+                                alt={p.team}
+                                width={14}
+                                height={14}
+                                className="w-full h-full object-contain"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            </div>
+                            <span className="truncate">{p.team}</span>
+                          </div>
                         </div>
 
                         <div className="flex items-center gap-5 text-right flex-shrink-0">
