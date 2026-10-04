@@ -26,15 +26,42 @@ importers:
 
   apps/admin:
     dependencies:
+      '@goalmills/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@goalmills/core-analytics':
+        specifier: workspace:*
+        version: link:../../core/analytics
+      '@goalmills/core-audience':
+        specifier: workspace:*
+        version: link:../../core/audience
       '@goalmills/core-commercial':
         specifier: workspace:*
         version: link:../../core/commercial
       '@goalmills/core-content':
         specifier: workspace:*
         version: link:../../core/content
+      '@goalmills/core-identity':
+        specifier: workspace:*
+        version: link:../../core/identity
       '@goalmills/core-sports':
         specifier: workspace:*
         version: link:../../core/sports
+      '@goalmills/core-warehouse':
+        specifier: workspace:*
+        version: link:../../core/warehouse
+      '@goalmills/infrastructure-database':
+        specifier: workspace:*
+        version: link:../../infrastructure/database
+      '@goalmills/infrastructure-events':
+        specifier: workspace:*
+        version: link:../../infrastructure/events
+      '@goalmills/infrastructure-logging':
+        specifier: workspace:*
+        version: link:../../infrastructure/logging
+      '@goalmills/infrastructure-redis':
+        specifier: workspace:*
+        version: link:../../infrastructure/redis
       '@goalmills/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -277,15 +304,42 @@ importers:
 
   apps/web:
     dependencies:
+      '@goalmills/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@goalmills/core-analytics':
+        specifier: workspace:*
+        version: link:../../core/analytics
+      '@goalmills/core-audience':
+        specifier: workspace:*
+        version: link:../../core/audience
       '@goalmills/core-commercial':
         specifier: workspace:*
         version: link:../../core/commercial
       '@goalmills/core-content':
         specifier: workspace:*
         version: link:../../core/content
+      '@goalmills/core-identity':
+        specifier: workspace:*
+        version: link:../../core/identity
       '@goalmills/core-sports':
         specifier: workspace:*
         version: link:../../core/sports
+      '@goalmills/core-warehouse':
+        specifier: workspace:*
+        version: link:../../core/warehouse
+      '@goalmills/infrastructure-database':
+        specifier: workspace:*
+        version: link:../../infrastructure/database
+      '@goalmills/infrastructure-events':
+        specifier: workspace:*
+        version: link:../../infrastructure/events
+      '@goalmills/infrastructure-logging':
+        specifier: workspace:*
+        version: link:../../infrastructure/logging
+      '@goalmills/infrastructure-redis':
+        specifier: workspace:*
+        version: link:../../infrastructure/redis
       '@goalmills/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -405,6 +459,9 @@ importers:
 
   core/audience:
     dependencies:
+      '@goalmills/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@goalmills/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -431,6 +488,9 @@ importers:
 
   core/content:
     dependencies:
+      '@goalmills/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@goalmills/types':
         specifier: workspace:*
         version: link:../../packages/types

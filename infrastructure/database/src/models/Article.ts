@@ -29,7 +29,6 @@ export const ArticleSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      index: true,
     },
     excerpt: {
       type: String,

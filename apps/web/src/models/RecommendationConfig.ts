@@ -33,7 +33,6 @@ const RecommendationConfigSchema = new Schema<IRecommendationConfigDocument>(
       type: String,
       default: 'goalmills',
       required: true,
-      index: true,
     },
     weights: {
       sportMatchWeight: { type: Number, default: DEFAULT_WEIGHTS.sportMatchWeight },
