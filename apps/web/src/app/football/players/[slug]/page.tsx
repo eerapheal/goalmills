@@ -21,6 +21,7 @@ import {
   ClubMeta,
 } from '@/lib/entityService';
 import type { FootballPlayer, FootballEvent, BlogPost } from '@goalmills/types';
+import { PlayerAvatar } from '@/components/football/PlayerAvatar';
 
 const POSITIONS: Record<string, string> = {
   GK: 'Goalkeeper',
@@ -458,10 +459,12 @@ export default function FootballPlayerPage() {
             {/* Player Photo with Squad Number Badge */}
             <div className="relative flex-shrink-0">
               <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-[#1e293b] border border-[#334155] shadow-2xl p-1 group">
-                <img
+                <PlayerAvatar
+                  name={playerData.name}
                   src={playerData.photo}
-                  alt={playerData.name}
+                  size={160}
                   className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105 duration-300"
+                  priority
                 />
               </div>
               <div className="absolute -bottom-3 -right-3 w-12 h-12 rounded-xl bg-[#0f172a] border border-[#334155] flex items-center justify-center text-2xl font-black text-white shadow-xl">

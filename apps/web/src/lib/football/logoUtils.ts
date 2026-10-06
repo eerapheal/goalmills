@@ -109,3 +109,31 @@ export function resolveTeamLogo(teamNameOrId?: string | number, fallbackUrl?: st
     queryStr.slice(0, 15)
   )}&background=0f172a&color=38bdf8&bold=true&size=128`;
 }
+
+/**
+ * Generate a high-performance, dark-themed SVG player avatar data URI with player initials.
+ * Zero network requests, never 404s, works offline and immediately.
+ */
+export function getPlayerFallbackAvatar(name: string, size = 128): string {
+  const clean = (name || 'Player').replace(/[^a-zA-Z\s]/g, '').trim();
+  const initials =
+    clean
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join('') || 'P';
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+    <defs>
+      <linearGradient id="grad-p" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0f172a" />
+        <stop offset="100%" stop-color="#1e293b" />
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" rx="${size / 2}" fill="url(#grad-p)" stroke="#334155" stroke-width="2"/>
+    <text x="50%" y="54%" font-family="system-ui, -apple-system, sans-serif" font-size="${Math.round(size * 0.38)}" font-weight="800" fill="#38bdf8" text-anchor="middle" dominant-baseline="middle">${initials}</text>
+  </svg>`;
+
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}

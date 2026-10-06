@@ -23,6 +23,7 @@ import {
   CoachMeta,
 } from '@/lib/entityService';
 import { resolveTeamLogo, resolveLeagueLogo } from '@/lib/football/logoUtils';
+import { PlayerAvatar } from '@/components/football/PlayerAvatar';
 import type {
   FootballTeam,
   FootballPlayer,
@@ -729,9 +730,10 @@ export default function FootballTeamPage() {
                   className="flex items-center gap-4 group"
                 >
                   <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-700 flex-shrink-0 border border-white/10">
-                    <img
+                    <PlayerAvatar
+                      name={coachData.name}
                       src={coachData.photo}
-                      alt={coachData.name}
+                      size={56}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
@@ -797,14 +799,10 @@ export default function FootballTeamPage() {
                         className="flex items-center gap-4 px-5 py-3 hover:bg-[#1e293b]/40 transition-colors group"
                       >
                         <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-700 flex-shrink-0 border border-white/10">
-                          <img
-                            src={
-                              p.player_image ||
-                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                p.player_name
-                              )}&background=07101e&color=38bdf8&size=128&bold=true`
-                            }
-                            alt={p.player_name}
+                          <PlayerAvatar
+                            name={p.player_name}
+                            src={p.player_image}
+                            size={40}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                           />
                         </div>
@@ -852,10 +850,10 @@ export default function FootballTeamPage() {
             {/* Club Info 4-grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Founded', value: founded },
-                { label: 'Stadium', value: stadium.split(',')[0].split(' ')[0] || 'Main Ground' },
-                { label: 'Capacity', value: capacity.toLocaleString() },
-                { label: 'Country', value: country },
+                { label: 'Founded', value: founded || '—' },
+                { label: 'Stadium', value: stadium ? stadium.split(',')[0] : '—' },
+                { label: 'Capacity', value: capacity ? capacity.toLocaleString() : '—' },
+                { label: 'Country', value: country || '—' },
               ].map((s) => (
                 <div
                   key={s.label}
@@ -897,14 +895,10 @@ export default function FootballTeamPage() {
                           {p.player_number || '–'}
                         </span>
                         <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-700 flex-shrink-0 border border-white/10">
-                          <img
-                            src={
-                              p.player_image ||
-                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                p.player_name
-                              )}&background=07101e&color=38bdf8&size=128&bold=true`
-                            }
-                            alt={p.player_name}
+                          <PlayerAvatar
+                            name={p.player_name}
+                            src={p.player_image}
+                            size={40}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                           />
                         </div>

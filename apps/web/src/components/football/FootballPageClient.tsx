@@ -20,6 +20,7 @@ import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { CompetitionGender } from '@goalmills/types';
 import { resolveLeagueLogo, resolveTeamLogo } from '@/lib/football/logoUtils';
 import { CompetitionDirectory } from './CompetitionDirectory';
+import { PlayerAvatar } from './PlayerAvatar';
 import { ALL_COMPETITIONS } from '@/lib/competitionCategories';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1698,11 +1699,12 @@ export function FootballPageClient({
                         </span>
 
                         <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-800 flex-shrink-0 border border-slate-700 flex items-center justify-center text-xs">
-                          {p.photo ? (
-                            <img src={p.photo} alt={p.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span>⚽</span>
-                          )}
+                          <PlayerAvatar
+                            name={p.name}
+                            src={p.photo}
+                            size={44}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
 
                         <div className="flex-1 min-w-0">
