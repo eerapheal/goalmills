@@ -332,7 +332,7 @@ export const OddsComparisonMatrix: React.FC<OddsComparisonMatrixProps> = ({
                             />
                           ) : (
                             <div className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-[10px] font-bold text-slate-400 flex-shrink-0">
-                              {b.bookmakerName[0]}
+                              {b.bookmakerName?.[0] || 'B'}
                             </div>
                           )}
                           <div className="flex flex-col">

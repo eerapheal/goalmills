@@ -376,6 +376,9 @@ export function DynamicTeamLogo({
   );
 }
 
+// Global cache of broken basketball player image URLs to prevent repeated 404 console spam
+const failedBasketballImages = new Set<string>();
+
 export function DynamicPlayerAvatar({
   name,
   photo,
@@ -385,12 +388,24 @@ export function DynamicPlayerAvatar({
   photo?: string;
   className?: string;
 }) {
-  const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0f172a&color=f97316&bold=true&size=128`;
-  const [src, setSrc] = useState(photo || fallback);
+  const fallback = useMemo(
+    () =>
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Player')}&background=0f172a&color=f97316&bold=true&size=128`,
+    [name]
+  );
+
+  const cleanPhoto = photo && typeof photo === 'string' ? photo.trim() : '';
+  const isInitiallyBroken = !cleanPhoto || failedBasketballImages.has(cleanPhoto);
+
+  const [src, setSrc] = useState(isInitiallyBroken ? fallback : cleanPhoto);
 
   useEffect(() => {
-    setSrc(photo || fallback);
-  }, [photo, name, fallback]);
+    if (cleanPhoto && !failedBasketballImages.has(cleanPhoto)) {
+      setSrc(cleanPhoto);
+    } else {
+      setSrc(fallback);
+    }
+  }, [cleanPhoto, fallback]);
 
   return (
     <div
@@ -398,10 +413,15 @@ export function DynamicPlayerAvatar({
     >
       <img
         src={src}
-        alt={name}
+        alt={name || 'Player'}
         loading="lazy"
         className="w-full h-full object-cover"
-        onError={() => setSrc(fallback)}
+        onError={() => {
+          if (cleanPhoto) {
+            failedBasketballImages.add(cleanPhoto);
+          }
+          setSrc(fallback);
+        }}
       />
     </div>
   );

@@ -1,8 +1,9 @@
 'use client';
 
 import { FootballTopscorer, FootballTeam } from '@goalmills/types';
-import Image from 'next/image';
 import Link from 'next/link';
+import { PlayerAvatar } from './football/PlayerAvatar';
+import { resolveTeamLogo } from '@/lib/football/logoUtils';
 
 interface FootballTopScorersProps {
   scorers: FootballTopscorer[];
@@ -15,9 +16,8 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
     const teamKey = scorer.team_key;
     const team = teams.find((t) => String(t.team_key) === String(teamKey));
     const logo = team?.team_logo;
-    return logo && logo !== ''
-      ? logo
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.team_name)}&background=random`;
+    if (logo && logo !== '') return logo;
+    return resolveTeamLogo(scorer.team_name);
   };
 
   const getPlayerAvatar = (scorer: FootballTopscorer) => {
@@ -28,9 +28,9 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
       if (team?.players) {
         let player = team.players.find((p) => String(p.player_key) === String(scorer.player_key));
 
-        if (!player) {
+        if (!player && scorer.player_name) {
           player = team.players.find(
-            (p) => p.player_name.toLowerCase() === scorer.player_name.toLowerCase()
+            (p) => (p.player_name || '').toLowerCase() === (scorer.player_name || '').toLowerCase()
           );
         }
 
@@ -40,7 +40,7 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
       }
     }
 
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(scorer.player_name)}&background=random&color=fff`;
+    return null;
   };
 
   const sortedScorers = [...scorers].sort((a, b) => {
@@ -81,11 +81,10 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
                     : 'border-blue-500/30 group-hover:border-blue-400'
                 }`}
               >
-                <Image
+                <PlayerAvatar
+                  name={scorer.player_name || 'Player'}
                   src={playerAvatar}
-                  alt={scorer.player_name}
-                  width={56}
-                  height={56}
+                  size={56}
                   className="object-cover w-full h-full rounded-xl"
                 />
               </div>
@@ -107,20 +106,25 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
             <div className="flex-1 min-w-0">
               <Link href={`/football/players/${scorer.player_key}`} className="block">
                 <h3 className="text-white font-bold text-sm truncate group-hover:text-amber-300 transition-colors">
-                  {scorer.player_name}
+                  {scorer.player_name || 'Player'}
                 </h3>
               </Link>
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-4 h-4 rounded bg-slate-900 border border-white/10 p-0.5 flex items-center justify-center">
-                  <Image
+                <div className="w-4 h-4 rounded bg-slate-900 border border-white/10 p-0.5 flex items-center justify-center overflow-hidden">
+                  <img
                     src={teamLogo}
-                    alt={scorer.team_name}
+                    alt={scorer.team_name || 'Team'}
                     width={14}
                     height={14}
-                    className="object-contain"
+                    className="object-contain w-full h-full"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        (scorer.team_name || 'FC').slice(0, 5)
+                      )}&background=0f172a&color=38bdf8&size=32`;
+                    }}
                   />
                 </div>
-                <span className="text-xs text-slate-400 truncate">{scorer.team_name}</span>
+                <span className="text-xs text-slate-400 truncate">{scorer.team_name || 'Team'}</span>
               </div>
             </div>
 

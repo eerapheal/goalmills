@@ -376,12 +376,14 @@ export default function HomePage() {
               minute = 'FT';
             }
 
-            const hScore = m.event_final_result
-              ? (m.event_final_result.split('-')[0]?.trim() ?? 0)
-              : (m.event_home_final_result ?? 0);
-            const aScore = m.event_final_result
-              ? (m.event_final_result.split('-')[1]?.trim() ?? 0)
-              : (m.event_away_final_result ?? 0);
+            const hScore =
+              typeof m.event_final_result === 'string' && m.event_final_result.includes('-')
+                ? (m.event_final_result.split('-')[0]?.trim() ?? 0)
+                : (m.event_home_final_result ?? 0);
+            const aScore =
+              typeof m.event_final_result === 'string' && m.event_final_result.includes('-')
+                ? (m.event_final_result.split('-')[1]?.trim() ?? 0)
+                : (m.event_away_final_result ?? 0);
 
             parsedMatches.push({
               id: String(m.event_key || `ft-${idx}`),
@@ -458,12 +460,14 @@ export default function HomePage() {
               flag: '🏀',
               home,
               away,
-              hScore: b.event_final_result
-                ? b.event_final_result.split('-')[0]?.trim()
-                : (b.event_home_final_result ?? 0),
-              aScore: b.event_final_result
-                ? b.event_final_result.split('-')[1]?.trim()
-                : (b.event_away_final_result ?? 0),
+              hScore:
+                typeof b.event_final_result === 'string' && b.event_final_result.includes('-')
+                  ? b.event_final_result.split('-')[0]?.trim()
+                  : (b.event_home_final_result ?? 0),
+              aScore:
+                typeof b.event_final_result === 'string' && b.event_final_result.includes('-')
+                  ? b.event_final_result.split('-')[1]?.trim()
+                  : (b.event_away_final_result ?? 0),
               minute: rawStatus || 'LIVE',
               status,
             });

@@ -671,10 +671,10 @@ function LineupsTab({
       )}
 
       {/* Coach info */}
-      {coaches.length > 0 && (
+      {coaches.length > 0 && coaches[0] && (
         <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 flex items-center justify-between text-xs">
           <span className="text-slate-400 uppercase font-bold text-[10px]">Head Coach</span>
-          <span className="text-white font-bold">{coaches[0].coache}</span>
+          <span className="text-white font-bold">{coaches[0]?.coache || (coaches[0] as any)?.coach_name || 'Coach'}</span>
         </div>
       )}
     </div>

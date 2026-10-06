@@ -55,7 +55,7 @@ export function TournamentBracketView({ bracket, className = '' }: TournamentBra
       {/* Mobile Round Selector Tabs */}
       <div className="flex lg:hidden items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         {bracket.rounds.map((round) => {
-          const isActive = (selectedRoundSlug || bracket.rounds[0].slug) === round.slug;
+          const isActive = (selectedRoundSlug || bracket.rounds[0]?.slug) === round.slug;
           return (
             <button
               key={round.id}
@@ -99,7 +99,7 @@ export function TournamentBracketView({ bracket, className = '' }: TournamentBra
       {/* Mobile Single Round View */}
       <div className="lg:hidden space-y-3">
         {bracket.rounds
-          .filter((r) => r.slug === (selectedRoundSlug || bracket.rounds[0].slug))
+          .filter((r) => r.slug === (selectedRoundSlug || bracket.rounds[0]?.slug))
           .map((round) => (
             <div key={round.id} className="space-y-3">
               <div className="flex items-center justify-between text-xs text-slate-400 px-1">

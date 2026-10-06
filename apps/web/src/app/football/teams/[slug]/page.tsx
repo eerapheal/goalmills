@@ -94,7 +94,7 @@ function getCompAbbr(compName?: string): string {
   if (words.length >= 2) {
     return words
       .slice(0, 3)
-      .map((w) => w[0].toUpperCase())
+      .map((w) => w[0]?.toUpperCase() || '')
       .join('');
   }
   return compName.slice(0, 3).toUpperCase();

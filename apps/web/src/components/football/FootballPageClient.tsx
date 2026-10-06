@@ -755,10 +755,10 @@ export function FootballPageClient({
               away: normalized.awayTeamName || m.event_away_team || 'Away',
               awayBadge: '🔴',
               awayLogo: resolveTeamLogo(normalized.awayTeamName || m.event_away_team, m.away_team_logo),
-              hScore: normalized.homeScore ?? (m.event_final_result
+              hScore: normalized.homeScore ?? (typeof m.event_final_result === 'string' && m.event_final_result.includes('-')
                 ? m.event_final_result.split('-')[0]?.trim()
                 : (m.event_home_final_result ?? 0)),
-              aScore: normalized.awayScore ?? (m.event_final_result
+              aScore: normalized.awayScore ?? (typeof m.event_final_result === 'string' && m.event_final_result.includes('-')
                 ? m.event_final_result.split('-')[1]?.trim()
                 : (m.event_away_final_result ?? 0)),
               minute: isHT ? 'HT' : minute,
@@ -810,10 +810,10 @@ export function FootballPageClient({
               away: normalized.awayTeamName || m.event_away_team || 'Away',
               awayBadge: '⚫',
               awayLogo: resolveTeamLogo(normalized.awayTeamName || m.event_away_team, m.away_team_logo),
-              hScore: normalized.homeScore ?? (m.event_final_result
+              hScore: normalized.homeScore ?? (typeof m.event_final_result === 'string' && m.event_final_result.includes('-')
                 ? m.event_final_result.split('-')[0]?.trim()
                 : (m.event_home_final_result ?? null)),
-              aScore: normalized.awayScore ?? (m.event_final_result
+              aScore: normalized.awayScore ?? (typeof m.event_final_result === 'string' && m.event_final_result.includes('-')
                 ? m.event_final_result.split('-')[1]?.trim()
                 : (m.event_away_final_result ?? null)),
               minute: null,

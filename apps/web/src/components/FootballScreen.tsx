@@ -20,6 +20,7 @@ import {
   sortFootballEvents,
 } from '@/lib/football';
 import { type MainCategoryTab } from './football/FootballNavSwitcher';
+import { PlayerAvatar } from './football/PlayerAvatar';
 import {
   FiRefreshCw,
   FiSearch,
@@ -821,16 +822,13 @@ export function FootballScreen() {
                         <span className="w-6 text-center font-mono font-black text-yellow-400 text-sm">
                           #{s.player_place || idx + 1}
                         </span>
-                        <div className="h-11 w-11 rounded-xl bg-slate-900 border border-white/10 overflow-hidden flex items-center justify-center p-1">
-                          {s.player_image ? (
-                            <img
-                              src={s.player_image}
-                              alt={s.player_name}
-                              className="h-full w-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <span className="text-lg">👤</span>
-                          )}
+                        <div className="h-11 w-11 rounded-xl bg-slate-900 border border-white/10 overflow-hidden flex items-center justify-center p-0.5">
+                          <PlayerAvatar
+                            name={s.player_name || 'Player'}
+                            src={s.player_image}
+                            size={44}
+                            className="h-full w-full object-cover rounded-lg"
+                          />
                         </div>
                         <div>
                           <h4 className="text-xs font-bold text-white group-hover:text-yellow-300 transition-colors">

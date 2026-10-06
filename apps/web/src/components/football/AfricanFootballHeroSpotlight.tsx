@@ -259,7 +259,7 @@ export function AfricanFootballHeroSpotlight({
                 {star.marketValue}
               </span>
               <span className="text-[9px] text-slate-400 truncate max-w-full">
-                {star.clubName.split(' ')[0]}
+                {star.clubName ? star.clubName.split(' ')[0] : ''}
               </span>
             </Link>
           ))}
