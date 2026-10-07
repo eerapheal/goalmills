@@ -34,153 +34,28 @@ import {
   FiSliders,
 } from 'react-icons/fi';
 import Link from 'next/link';
+import { useLeagues } from '@/hooks/useLeagues';
+import {
+  getLeaguePriority,
+  parseStandingsIntoGroups,
+  isTournamentLeague,
+  getCompetitionSeasonOrCycle,
+} from '@/lib/football/leagueRanking';
+import { LeagueRibbonSkeleton, MatchCardSkeleton } from './football/FootballSkeletons';
 
 export type FootballTab =
   'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
 
-export const MAJOR_LEAGUES = [
-  { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐' },
-  {
-    id: '152',
-    name: 'Premier League',
-    country: 'England',
-    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/152_premier-league.png',
-  },
-  {
-    id: '3',
-    name: 'Champions League',
-    country: 'Europe',
-    flag: '🇪🇺',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/3_uefa_champions_league.png',
-  },
-  {
-    id: '302',
-    name: 'La Liga',
-    country: 'Spain',
-    flag: '🇪🇸',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/302_la-liga.png',
-  },
-  {
-    id: '207',
-    name: 'Serie A',
-    country: 'Italy',
-    flag: '🇮🇹',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/207_serie-a.png',
-  },
-  {
-    id: '175',
-    name: 'Bundesliga',
-    country: 'Germany',
-    flag: '🇩🇪',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/175_bundesliga.png',
-  },
-  {
-    id: '168',
-    name: 'Ligue 1',
-    country: 'France',
-    flag: '🇫🇷',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/168_ligue-1.png',
-  },
-  {
-    id: '4',
-    name: 'Europa League',
-    country: 'Europe',
-    flag: '🇪🇺',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/4_uefa-europa-league.png',
-  },
-  {
-    id: '6',
-    name: 'AFCON',
-    country: 'Africa',
-    flag: '🌍',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/6_africa-cup-of-nations.png',
-  },
-  {
-    id: '28',
-    name: 'FIFA World Cup',
-    country: 'International',
-    flag: '🌐',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/28_fifa-world-cup.png',
-  },
-  {
-    id: '1',
-    name: 'UEFA EURO',
-    country: 'Europe',
-    flag: '🇪🇺',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/1_european-championship.png',
-  },
-  {
-    id: '17',
-    name: 'Copa América',
-    country: 'S. America',
-    flag: '🌎',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/17_copa-america.png',
-  },
-  {
-    id: '5',
-    name: 'Nations League',
-    country: 'Europe',
-    flag: '🇪🇺',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/5_uefa-nations-league.png',
-  },
-  {
-    id: '146',
-    name: 'FA Cup',
-    country: 'England',
-    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/146_fa-cup.png',
-  },
-  {
-    id: '19',
-    name: 'CAF CL',
-    country: 'Africa',
-    flag: '🌍',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/19_caf-champions-league.png',
-  },
-  {
-    id: '13',
-    name: 'Libertadores',
-    country: 'S. America',
-    flag: '🌎',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/13_copa-libertadores.png',
-  },
-  {
-    id: '278',
-    name: 'Saudi Pro League',
-    country: 'Saudi Arabia',
-    flag: '🇸🇦',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/278_pro-league.png',
-  },
-  {
-    id: '244',
-    name: 'Eredivisie',
-    country: 'Netherlands',
-    flag: '🇳🇱',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/244_eredivisie.png',
-  },
-  {
-    id: '266',
-    name: 'Liga Portugal',
-    country: 'Portugal',
-    flag: '🇵🇹',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/266_liga-portugal.png',
-  },
-  {
-    id: '322',
-    name: 'Süper Lig',
-    country: 'Turkey',
-    flag: '🇹🇷',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/322_super-lig.png',
-  },
-  {
-    id: '99',
-    name: 'Brasileirão',
-    country: 'Brazil',
-    flag: '🇧🇷',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/99_serie-a.png',
-  },
-];
+export interface LeagueOption {
+  id: string;
+  name: string;
+  country: string;
+  flag: string;
+  logo?: string;
+  priority: number;
+}
+
+export const MAJOR_LEAGUES: LeagueOption[] = [];
 
 export function FootballScreen() {
   const [activeTab, setActiveTab] = useState<FootballTab>('live');
@@ -193,13 +68,36 @@ export function FootballScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [competitions, setCompetitions] = useState(MAJOR_LEAGUES);
+
+  const { leagues: apiLeagues, loading: leaguesLoading } = useLeagues();
+
+  const competitions = useMemo<LeagueOption[]>(() => {
+    const list: LeagueOption[] = [
+      { id: 'all', name: 'All Competitions', country: 'Global', flag: '🌐', priority: 0 },
+    ];
+    apiLeagues.forEach((l) => {
+      list.push({
+        id: String(l.league_key),
+        name: l.league_name,
+        country: l.country_name || 'Football',
+        flag: l.country_logo || '⚽',
+        logo: l.league_logo,
+        priority: getLeaguePriority(l.league_key),
+      });
+    });
+    return list;
+  }, [apiLeagues]);
 
   const [fixtures, setFixtures] = useState<UnifiedWebMatchEvent[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
   const [topscorers, setTopscorers] = useState<FootballTopscorer[]>([]);
   const [probabilities, setProbabilities] = useState<FootballProbability[]>([]);
   const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
+  const [selectedGroupTab, setSelectedGroupTab] = useState<string>('all');
+
+  const parsedGroups = useMemo(() => {
+    return parseStandingsIntoGroups(standings, selectedLeague);
+  }, [standings, selectedLeague]);
 
   const handleResetFilters = useCallback(() => {
     setSelectedNavCategory('all');
@@ -208,48 +106,6 @@ export function FootballScreen() {
     setSelectedAgeCategory('all');
     setSelectedLeague('all');
     setSearchQuery('');
-  }, []);
-
-  // Dynamically load active leagues if available
-  useEffect(() => {
-    advancedFootballApi
-      .getLeagues()
-      .then((res) => {
-        if (Array.isArray(res?.result)) {
-          const activeLeagues = res.result;
-          const priorityKeywords = [
-            'Premier',
-            'Champions',
-            'Liga',
-            'Serie A',
-            'Bundesliga',
-            'Ligue 1',
-            'AFCON',
-            'Cup',
-          ];
-          const matched = activeLeagues
-            .filter((l: any) =>
-              priorityKeywords.some((k) =>
-                (l.league_name || '').toLowerCase().includes(k.toLowerCase())
-              )
-            )
-            .slice(0, 10)
-            .map((l: any) => ({
-              id: String(l.league_key),
-              name: l.league_name,
-              country: l.country_name || 'Football',
-              flag: '⚽',
-              logo: l.league_logo,
-            }));
-
-          const existingIds = new Set(MAJOR_LEAGUES.map((c) => c.id));
-          const additions = matched.filter((m: any) => !existingIds.has(m.id));
-          if (additions.length > 0) {
-            setCompetitions([...MAJOR_LEAGUES, ...additions]);
-          }
-        }
-      })
-      .catch(() => {});
   }, []);
 
   // 7-day date slider (3 days before, today, 3 days after)
@@ -513,7 +369,7 @@ export function FootballScreen() {
     competitions,
   ]);
 
-  // Group fixtures by canonical competition with deterministic ordering
+  // Group fixtures by stage uniqueness using league ID (league_key) and sort by ID-based ranking
   const leagueGroups = useMemo(() => {
     const groups: {
       [key: string]: {
@@ -527,32 +383,34 @@ export function FootballScreen() {
     } = {};
 
     filteredFixtures.forEach((item) => {
+      // Stage uniqueness using league ID (league_key)
+      const stageKey = item.league_key ? `league_${item.league_key}` : (item.league_name || 'other_matches');
       const resolved = resolveCompetitionForFixture(item);
-      const groupKey = resolved.isResolved
-        ? resolved.competitionId
-        : item.league_name || 'Other Matches';
+      const priority = getLeaguePriority(item.league_key);
 
-      if (!groups[groupKey]) {
-        groups[groupKey] = {
+      if (!groups[stageKey]) {
+        groups[stageKey] = {
           title: resolved.competition?.name || item.league_name || 'Other Matches',
           shortName: resolved.competition?.shortName,
           logo: resolved.competition?.logoUrl || item.league_logo,
           league_key: item.league_key,
-          priorityRank: resolved.competition?.priorityRank ?? 999,
+          priorityRank: priority,
           matches: [],
         };
       }
-      groups[groupKey].matches.push(item);
+      groups[stageKey].matches.push(item);
     });
 
-    // Deterministically sort matches inside each group and sort groups by priorityRank
+    // Deterministically sort matches inside each group and sort groups by league ranking ID
     return Object.values(groups)
       .map((g) => ({
         ...g,
         matches: sortFootballEvents(g.matches as FootballEvent[]) as UnifiedWebMatchEvent[],
       }))
       .sort((a, b) => {
-        if (a.priorityRank !== b.priorityRank) return a.priorityRank - b.priorityRank;
+        const rankA = getLeaguePriority(a.league_key);
+        const rankB = getLeaguePriority(b.league_key);
+        if (rankA !== rankB) return rankA - rankB;
         return a.title.localeCompare(b.title);
       });
   }, [filteredFixtures]);
@@ -637,28 +495,32 @@ export function FootballScreen() {
         )}
 
         {/* Competitions / Leagues Filter Ribbon */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10">
-          <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
-            <FiSliders className="text-blue-400" /> Filter:
-          </span>
-          {competitions.map((league) => {
-            const isSelected = selectedLeague === league.id;
-            return (
-              <button
-                key={league.id}
-                onClick={() => setSelectedLeague(league.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                  isSelected
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-black'
-                    : 'bg-[#091529] text-slate-400 hover:text-white border border-white/5 hover:border-white/15'
-                }`}
-              >
-                <span>{league.flag}</span>
-                <span>{league.name}</span>
-              </button>
-            );
-          })}
-        </div>
+        {leaguesLoading && competitions.length <= 1 ? (
+          <LeagueRibbonSkeleton />
+        ) : (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-white/10">
+            <span className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1 flex-shrink-0">
+              <FiSliders className="text-blue-400" /> Filter:
+            </span>
+            {competitions.map((league) => {
+              const isSelected = selectedLeague === league.id;
+              return (
+                <button
+                  key={league.id}
+                  onClick={() => setSelectedLeague(league.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    isSelected
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 font-black'
+                      : 'bg-[#091529] text-slate-400 hover:text-white border border-white/5 hover:border-white/15'
+                  }`}
+                >
+                  <span>{league.flag}</span>
+                  <span>{league.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Live Search Filter */}
         <div className="relative">
@@ -684,17 +546,23 @@ export function FootballScreen() {
         </div>
       ) : (
         <>
-          {/* TAB: STANDINGS */}
+          {/* TAB: STANDINGS (Single Table for Club Leagues, Multi-Group A-Z for Tournaments) */}
           {activeTab === 'standings' && (
             <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                   <h3 className="text-base font-black text-white flex items-center gap-2 uppercase">
                     <FiAward className="text-amber-400" />
-                    <span>Official League Table & Standings</span>
+                    <span>
+                      {isTournamentLeague(selectedLeague)
+                        ? `${getCompetitionSeasonOrCycle(selectedLeague)} • Tournament Group Standings`
+                        : `${getCompetitionSeasonOrCycle(selectedLeague)} Official Table & Standings`}
+                    </span>
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Updated standings, goal differentials, and points
+                    {isTournamentLeague(selectedLeague)
+                      ? 'International tournament groups (Group A to last group) & qualifiers'
+                      : 'Updated standings, goal differentials, and points'}
                   </p>
                 </div>
 
@@ -716,85 +584,119 @@ export function FootballScreen() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs sm:text-sm text-slate-300 font-mono">
-                  <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
-                    <tr>
-                      <th className="py-3 px-2 text-center w-8">#</th>
-                      <th className="py-3 px-3 font-sans">Club</th>
-                      <th className="py-3 px-2 text-center">PL</th>
-                      <th className="py-3 px-2 text-center text-blue-400">W</th>
-                      <th className="py-3 px-2 text-center text-slate-400">D</th>
-                      <th className="py-3 px-2 text-center text-red-400">L</th>
-                      <th className="py-3 px-2 text-center">GD</th>
-                      <th className="py-3 px-3 text-right font-black text-yellow-400">PTS</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5 font-medium">
-                    {standings.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={8}
-                          className="py-12 text-center text-slate-400 text-xs font-sans"
-                        >
-                          No standings telemetry available for this competition.
-                        </td>
-                      </tr>
-                    ) : (
-                      standings.map((row, index) => {
-                        const rankNum = Number(row.standing_place);
-                        const isUCL = rankNum <= 4;
-                        const isUEL = rankNum === 5 || rankNum === 6;
-                        const isRelegation = rankNum >= 18;
+              {/* Tournament Group Tabs (Group A to Last Group) */}
+              {parsedGroups.length > 1 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-white/10 no-scrollbar">
+                  <button
+                    onClick={() => setSelectedGroupTab('all')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                      selectedGroupTab === 'all'
+                        ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30 font-black'
+                        : 'bg-[#091529] text-slate-400 hover:text-white border-white/5'
+                    }`}
+                  >
+                    All Groups ({parsedGroups.length})
+                  </button>
+                  {parsedGroups.map((g) => (
+                    <button
+                      key={g.groupName}
+                      onClick={() => setSelectedGroupTab(g.groupName)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                        selectedGroupTab === g.groupName
+                          ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30 font-black'
+                          : 'bg-[#091529] text-slate-400 hover:text-white border-white/5'
+                      }`}
+                    >
+                      {g.groupName}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-                        return (
-                          <tr key={index} className="hover:bg-blue-600/10 transition-colors">
-                            <td className="py-2.5 px-2 text-center">
-                              <span
-                                className={`inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-black ${
-                                  isUCL
-                                    ? 'bg-blue-600/30 text-blue-300 border border-blue-400/40'
-                                    : isUEL
-                                      ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                      : isRelegation
-                                        ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                                        : 'text-slate-400'
-                                }`}
-                              >
-                                {row.standing_place}
-                              </span>
-                            </td>
-                            <td className="py-2.5 px-3 font-bold text-white font-sans">
-                              <Link
-                                href={row.team_key ? `/teams/${row.team_key}` : '#'}
-                                className="hover:text-blue-300 transition-colors"
-                              >
-                                {row.standing_team}
-                              </Link>
-                            </td>
-                            <td className="py-2.5 px-2 text-center text-slate-300">
-                              {row.standing_P}
-                            </td>
-                            <td className="py-2.5 px-2 text-center text-blue-400 font-bold">
-                              {row.standing_W}
-                            </td>
-                            <td className="py-2.5 px-2 text-center text-slate-400">
-                              {row.standing_D}
-                            </td>
-                            <td className="py-2.5 px-2 text-center text-red-400">
-                              {row.standing_L}
-                            </td>
-                            <td className="py-2.5 px-2 text-center">{row.standing_GD}</td>
-                            <td className="py-2.5 px-3 text-right font-black text-yellow-400">
-                              {row.standing_PTS}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              {/* Groups Rendering */}
+              {standings.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 text-xs font-sans">
+                  No standings telemetry available for this competition.
+                </div>
+              ) : (
+                <div className={parsedGroups.length > 1 && selectedGroupTab === 'all' ? 'grid grid-cols-1 xl:grid-cols-2 gap-4' : 'space-y-4'}>
+                  {parsedGroups
+                    .filter((g) => selectedGroupTab === 'all' || selectedGroupTab === g.groupName)
+                    .map((group) => (
+                      <div
+                        key={group.groupName}
+                        className="rounded-xl border border-white/10 bg-[#09162C]/50 overflow-hidden shadow-md"
+                      >
+                        {parsedGroups.length > 1 && (
+                          <div className="px-4 py-2.5 bg-[#0C1B35] border-b border-white/10 flex items-center justify-between">
+                            <h4 className="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-amber-400" />
+                              <span>{group.groupName}</span>
+                            </h4>
+                            <span className="text-[10px] font-mono font-bold text-slate-400">
+                              {group.rows.length} Teams
+                            </span>
+                          </div>
+                        )}
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs sm:text-sm text-slate-300 font-mono">
+                            <thead className="border-b border-white/10 text-[11px] uppercase font-black tracking-wider text-slate-400">
+                              <tr>
+                                <th className="py-2.5 px-2 text-center w-8">#</th>
+                                <th className="py-2.5 px-3 font-sans">Team</th>
+                                <th className="py-2.5 px-2 text-center">PL</th>
+                                <th className="py-2.5 px-2 text-center text-blue-400">W</th>
+                                <th className="py-2.5 px-2 text-center text-slate-400">D</th>
+                                <th className="py-2.5 px-2 text-center text-red-400">L</th>
+                                <th className="py-2.5 px-2 text-center">GD</th>
+                                <th className="py-2.5 px-3 text-right font-black text-yellow-400">PTS</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5 font-medium">
+                              {group.rows.map((row, index) => {
+                                const rankNum = Number(row.standing_place);
+                                const isAdvance = parsedGroups.length > 1 ? rankNum <= 2 : rankNum <= 4;
+                                const isPlayoff = parsedGroups.length > 1 ? rankNum === 3 : (rankNum === 5 || rankNum === 6);
+
+                                return (
+                                  <tr key={index} className="hover:bg-blue-600/10 transition-colors">
+                                    <td className="py-2 px-2 text-center">
+                                      <span
+                                        className={`inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-black ${
+                                          isAdvance
+                                            ? 'bg-blue-600/30 text-blue-300 border border-blue-400/40'
+                                            : isPlayoff
+                                              ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                              : 'text-slate-400'
+                                        }`}
+                                      >
+                                        {row.standing_place}
+                                      </span>
+                                    </td>
+                                    <td className="py-2 px-3 font-bold text-white font-sans">
+                                      <Link
+                                        href={row.team_key ? `/football/teams/${row.team_key}` : '#'}
+                                        className="hover:text-blue-300 transition-colors"
+                                      >
+                                        {row.standing_team}
+                                      </Link>
+                                    </td>
+                                    <td className="py-2 px-2 text-center text-slate-300">{row.standing_P}</td>
+                                    <td className="py-2 px-2 text-center text-blue-400 font-bold">{row.standing_W}</td>
+                                    <td className="py-2 px-2 text-center text-slate-400">{row.standing_D}</td>
+                                    <td className="py-2 px-2 text-center text-red-400">{row.standing_L}</td>
+                                    <td className="py-2 px-2 text-center">{row.standing_GD}</td>
+                                    <td className="py-2 px-3 text-right font-black text-yellow-400">{row.standing_PTS}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           )}
 

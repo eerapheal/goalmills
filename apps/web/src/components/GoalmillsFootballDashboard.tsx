@@ -19,127 +19,18 @@ import {
   FiCheckCircle,
 } from 'react-icons/fi';
 import { FootballScreen } from './FootballScreen';
+import { MatchCardSkeleton, MarqueeMatchSkeleton, NewsListSkeleton } from './football/FootballSkeletons';
 import { getNewsUrl, slugify } from '@/lib/slugUtils';
 
 export function GoalmillsFootballDashboard() {
   const router = useRouter();
   const [activeSubTab, setActiveSubTab] = useState<'hub' | 'livescores'>('hub');
   const [tickerIndex, setTickerIndex] = useState(0);
-  const [pulseNews, setPulseNews] = useState<
-    { id?: string; _id?: string; tag: string; title: string; time: string }[]
-  >([
-    {
-      id: 'football-1',
-      tag: 'TRANSFER',
-      title: 'Victor Osimhen signs landmark deal with €75M release clause',
-      time: '10m ago',
-    },
-    {
-      id: 'football-2',
-      tag: 'UCL',
-      title: 'Champions League Quarterfinal Draw announced: Blockbuster ties set',
-      time: '25m ago',
-    },
-    {
-      id: 'football-3',
-      tag: 'EPL',
-      title: 'Arsenal narrow gap at top of table after dramatic North London Derby',
-      time: '1h ago',
-    },
-    {
-      id: 'football-4',
-      tag: 'EL CLÁSICO',
-      title: 'Real Madrid vs Barcelona: Tactical team news and predicted lineups',
-      time: '2h ago',
-    },
-    {
-      id: 'football-5',
-      tag: 'AFCON',
-      title: 'CAF confirms host venues and official tournament schedule for 2025/26',
-      time: '3h ago',
-    },
-  ]);
-
-  const [liveMatches, setLiveMatches] = useState<any[]>([
-    {
-      id: 'm-1',
-      league: 'Premier League • Matchday 28',
-      status: "78'",
-      isLive: true,
-      homeTeam: 'Man United',
-      homeCode: 'MU',
-      homeGoalScorer: "B. Fernandes (60')",
-      awayTeam: 'Arsenal',
-      awayCode: 'ARS',
-      awayGoalScorer: "B. Saka (76')",
-      score: '1 - 2',
-      homePossession: 44,
-      awayPossession: 56,
-      homeXg: '1.82',
-      awayXg: '1.45',
-    },
-    {
-      id: 'm-2',
-      league: 'La Liga • El Clásico',
-      status: 'HT',
-      isLive: true,
-      homeTeam: 'Real Madrid',
-      homeCode: 'RMA',
-      homeGoalScorer: "Vinicius Jr (32')",
-      awayTeam: 'Barcelona',
-      awayCode: 'FCB',
-      awayGoalScorer: "Lamine Yamal (18')",
-      score: '1 - 1',
-      homePossession: 49,
-      awayPossession: 51,
-      homeXg: '1.10',
-      awayXg: '1.30',
-    },
-  ]);
-
-  const [marqueeMatch, setMarqueeMatch] = useState<{
-    id?: string | number;
-    league: string;
-    stage: string;
-    homeTeam: string;
-    homeCode: string;
-    home_team_key?: string | number;
-    home_team_logo?: string;
-    awayTeam: string;
-    awayCode: string;
-    away_team_key?: string | number;
-    away_team_logo?: string;
-    kickoff: string;
-    venue: string;
-    probability: string;
-  }>({
-    league: 'UEFA Champions League',
-    stage: 'UCL Semi-Final',
-    homeTeam: 'Man City',
-    homeCode: 'MCFC',
-    awayTeam: 'Real Madrid',
-    awayCode: 'RMA',
-    kickoff: '20:00 GMT',
-    venue: 'Tomorrow • Etihad',
-    probability: 'Win Probability: City 44% • Draw 28% • Madrid 28%',
-  });
-
-  const [transfers, setTransfers] = useState<any[]>([
-    {
-      id: 't-1',
-      player: 'Victor Osimhen',
-      summary: 'Napoli → Galatasaray (Permanent €75M)',
-      tag: 'DONE DEAL',
-      tagColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    },
-    {
-      id: 't-2',
-      player: 'Viktor Gyökeres',
-      summary: 'Sporting CP → Arsenal (Talks Ongoing)',
-      tag: 'HOT RUMOR',
-      tagColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    },
-  ]);
+  const [pulseNews, setPulseNews] = useState<{ id?: string; _id?: string; tag: string; title: string; time: string; slug?: string }[]>([]);
+  const [liveMatches, setLiveMatches] = useState<any[]>([]);
+  const [marqueeMatch, setMarqueeMatch] = useState<any | null>(null);
+  const [transfers, setTransfers] = useState<any[]>([]);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -190,8 +81,8 @@ export function GoalmillsFootballDashboard() {
 
         if (Array.isArray(matches) && matches.length > 0 && isMounted) {
           const mappedMatches = matches.slice(0, 2).map((m: any, idx: number) => {
-            const home = m.event_home_team || m.homeTeam || 'Team A';
-            const away = m.event_away_team || m.awayTeam || 'Team B';
+            const home = m.event_home_team || m.homeTeam || '';
+            const away = m.event_away_team || m.awayTeam || '';
             const score =
               m.event_final_result ||
               m.event_ft_result ||
@@ -215,18 +106,18 @@ export function GoalmillsFootballDashboard() {
               away_team_logo: m.away_team_logo,
               awayGoalScorer: '',
               score,
-              homePossession: 52,
-              awayPossession: 48,
-              homeXg: '1.45',
-              awayXg: '1.20',
+              homePossession: m.home_possession || null,
+              awayPossession: m.away_possession || null,
+              homeXg: m.home_xg || null,
+              awayXg: m.away_xg || null,
             };
           });
           setLiveMatches(mappedMatches);
 
           // Update marquee match
           const topM = matches[0];
-          const topHome = topM.event_home_team || 'Man City';
-          const topAway = topM.event_away_team || 'Real Madrid';
+          const topHome = topM.event_home_team || '';
+          const topAway = topM.event_away_team || '';
           setMarqueeMatch({
             id: topM.event_key,
             league: topM.league_name || 'UEFA Champions League',
@@ -264,6 +155,8 @@ export function GoalmillsFootballDashboard() {
         }
       } catch (err) {
         console.warn('Failed to fetch football dashboard live data:', err);
+      } finally {
+        if (isMounted) setDashboardLoading(false);
       }
     }
     loadDashboardData();
@@ -293,15 +186,21 @@ export function GoalmillsFootballDashboard() {
               FOOTBALL PULSE
             </span>
 
-            <Link
-              href={newsLink}
-              className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
-            >
-              {currentItem?.title}
-            </Link>
+            {currentItem ? (
+              <Link
+                href={newsLink}
+                className="text-white font-semibold transition-all text-center md:text-left line-clamp-2 duration-500 ease-in-out hover:text-blue-400 hover:underline transition-colors flex-1"
+              >
+                {currentItem.title}
+              </Link>
+            ) : dashboardLoading ? (
+              <span className="h-3.5 w-64 bg-white/10 rounded animate-pulse" />
+            ) : (
+              <span className="text-slate-400 font-semibold">No football headlines right now.</span>
+            )}
 
             <span className="text-slate-500 text-[10px] hidden sm:inline flex-shrink-0">
-              • {currentItem?.time}
+              {currentItem?.time ? `• ${currentItem.time}` : ''}
             </span>
           </div>
         </div>
@@ -351,7 +250,17 @@ export function GoalmillsFootballDashboard() {
               </div>
 
               <div className="space-y-3.5">
-                {liveMatches.map((m) => {
+                {dashboardLoading && liveMatches.length === 0 ? (
+                  <>
+                    <MatchCardSkeleton />
+                    <MatchCardSkeleton />
+                  </>
+                ) : liveMatches.length === 0 ? (
+                  <div className="py-8 text-center text-xs text-slate-400">
+                    No live football matches currently in progress. Check upcoming schedule.
+                  </div>
+                ) : (
+                  liveMatches.map((m) => {
                   const matchUrl = footballRoutes.matchFromEvent({
                     event_home_team: m.homeTeam,
                     event_away_team: m.awayTeam,
@@ -501,7 +410,7 @@ export function GoalmillsFootballDashboard() {
                       </div>
                     </div>
                   );
-                })}
+                }))}
               </div>
             </div>
 
@@ -549,13 +458,16 @@ export function GoalmillsFootballDashboard() {
           {/* ─── RIGHT COLUMN (col-span-5): VIP MATCH OF THE DAY, TRANSFERS & LEAGUES ─── */}
           <div className="lg:col-span-5 space-y-6">
             {/* 1. VIP MATCH OF THE DAY SHOWDOWN */}
+            {dashboardLoading && !marqueeMatch ? (
+              <MarqueeMatchSkeleton />
+            ) : marqueeMatch ? (
             <div className="rounded-2xl bg-gradient-to-br from-[#0D213F] via-[#09172E] to-[#060E1C] border border-amber-500/30 p-4 sm:p-5 shadow-2xl relative overflow-hidden">
               <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2.5">
                 <span className="flex items-center gap-1.5 text-xs font-black uppercase text-amber-400 tracking-wider">
                   <FiAward /> MATCH OF THE WEEK
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  {marqueeMatch.stage}
+                  {marqueeMatch.stage || 'Featured Match'}
                 </span>
               </div>
 
@@ -654,6 +566,7 @@ export function GoalmillsFootballDashboard() {
                 </div>
               </Link>
             </div>
+            ) : null}
 
             {/* 2. CONFIRMED TRANSFERS SNIPPET */}
             <div className="rounded-2xl bg-[#09162C]/90 border border-blue-500/25 p-4 sm:p-5 shadow-xl backdrop-blur-md space-y-3">
@@ -671,7 +584,13 @@ export function GoalmillsFootballDashboard() {
               </div>
 
               <div className="space-y-2.5">
-                {transfers.map((t) => (
+                {dashboardLoading && transfers.length === 0 ? (
+                  <NewsListSkeleton />
+                ) : transfers.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-slate-400">
+                    No transfer updates yet. Check back soon.
+                  </div>
+                ) : transfers.map((t) => (
                   <div
                     key={t.id}
                     className="p-3 rounded-xl bg-[#0E1F38] border border-blue-500/15 flex items-center justify-between gap-3"

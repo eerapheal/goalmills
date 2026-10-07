@@ -22,6 +22,16 @@ import { resolveLeagueLogo, resolveTeamLogo } from '@/lib/football/logoUtils';
 import { CompetitionDirectory } from './CompetitionDirectory';
 import { PlayerAvatar } from './PlayerAvatar';
 import { ALL_COMPETITIONS } from '@/lib/competitionCategories';
+import { useLeagues } from '@/hooks/useLeagues';
+import { getLeaguePriority, getCurrentSeason } from '@/lib/football/leagueRanking';
+import { usePlayers } from '@/hooks/usePlayers';
+import { useCoaches } from '@/hooks/useCoaches';
+import { useTeams } from '@/hooks/useTeams';
+import {
+  MatchCardSkeleton,
+  StandingsTableSkeleton,
+  LeagueRibbonSkeleton,
+} from './FootballSkeletons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,6 +43,7 @@ export interface FixtureItem {
   comp: string;
   compFlag: string;
   compLogo?: string;
+  league_key?: number | string;
   home: string;
   homeBadge: string;
   away: string;
@@ -106,249 +117,10 @@ export interface ClubHub {
   country: string;
 }
 
-// ─── Canonical League IDs for Dynamic Standings & Top Scorers ────────────────
-const LEAGUE_ID_MAP: Record<string, number> = {
-  'Premier League': 152,
-  'La Liga': 302,
-  'Serie A': 207,
-  'Bundesliga': 175,
-  'Ligue 1': 168,
-  'CAF Champions League': 570,
-  'NPFL — Nigeria': 483,
-};
-
-const resolveLeagueId = (leagueName: string): number => {
-  const norm = leagueName.toLowerCase().trim();
-  const found = ALL_COMPETITIONS.find(
-    (c) => c.name.toLowerCase() === norm || c.slug.toLowerCase() === norm
-  );
-  if (found) return found.id || found.apiSportsId || 152;
-  return LEAGUE_ID_MAP[leagueName] || 152;
-};
-
-const COMP_GROUPS: CompGroup[] = [
-  {
-    region: 'Africa (CAF)',
-    icon: '🌍',
-    comps: [
-      {
-        name: 'AFCON 2026/2027',
-        flag: '🏆',
-        tier: 'INT',
-        season: '2026/27',
-        country: 'Africa',
-        href: '/football',
-      },
-      {
-        name: 'CAF Champions League',
-        flag: '🏆',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Africa',
-        href: '/football',
-      },
-      {
-        name: 'CAF Confederation Cup',
-        flag: '🥈',
-        tier: 'T2',
-        season: '2025/26',
-        country: 'Africa',
-        href: '/football',
-      },
-      {
-        name: 'NPFL — Nigeria',
-        flag: '🇳🇬',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Nigeria',
-        href: '/football',
-      },
-      {
-        name: 'Betway Premiership PSL',
-        flag: '🇿🇦',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'South Africa',
-        href: '/football',
-      },
-      {
-        name: 'Botola Pro — Morocco',
-        flag: '🇲🇦',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Morocco',
-        href: '/football',
-      },
-    ],
-  },
-  {
-    region: 'Top 5 European Leagues',
-    icon: '⭐',
-    comps: [
-      {
-        name: 'Premier League',
-        flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'England',
-        href: '/football',
-      },
-      {
-        name: 'La Liga',
-        flag: '🇪🇸',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Spain',
-        href: '/football',
-      },
-      {
-        name: 'Bundesliga',
-        flag: '🇩🇪',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Germany',
-        href: '/football',
-      },
-      {
-        name: 'Serie A',
-        flag: '🇮🇹',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Italy',
-        href: '/football',
-      },
-      {
-        name: 'Ligue 1',
-        flag: '🇫🇷',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'France',
-        href: '/football',
-      },
-    ],
-  },
-  {
-    region: 'European Cups',
-    icon: '🏆',
-    comps: [
-      {
-        name: 'UEFA Champions League',
-        flag: '⭐',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Europe',
-        href: '/football',
-      },
-      {
-        name: 'UEFA Europa League',
-        flag: '🟠',
-        tier: 'T2',
-        season: '2025/26',
-        country: 'Europe',
-        href: '/football',
-      },
-      {
-        name: 'UEFA Conference League',
-        flag: '🟢',
-        tier: 'T3',
-        season: '2025/26',
-        country: 'Europe',
-        href: '/football',
-      },
-      {
-        name: 'UEFA Super Cup',
-        flag: '🏅',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Europe',
-        href: '/football',
-      },
-    ],
-  },
-  {
-    region: 'FIFA Competitions',
-    icon: '🌐',
-    comps: [
-      {
-        name: 'FIFA World Cup 2026',
-        flag: '🌎',
-        tier: 'INT',
-        season: '2026',
-        country: 'Global',
-        href: '/football',
-      },
-      {
-        name: 'FIFA Club World Cup',
-        flag: '🏆',
-        tier: 'INT',
-        season: '2025',
-        country: 'Global',
-        href: '/football',
-      },
-      {
-        name: 'FIFA U-20 World Cup',
-        flag: '🏆',
-        tier: 'INT',
-        season: '2025',
-        country: 'Global',
-        href: '/football',
-      },
-    ],
-  },
-  {
-    region: 'South & North America',
-    icon: '🌎',
-    comps: [
-      {
-        name: 'Copa Libertadores',
-        flag: '🏆',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'South America',
-        href: '/football',
-      },
-      {
-        name: 'Série A — Brazil',
-        flag: '🇧🇷',
-        tier: 'T1',
-        season: '2025',
-        country: 'Brazil',
-        href: '/football',
-      },
-      {
-        name: 'MLS — North America',
-        flag: '🇺🇸',
-        tier: 'T1',
-        season: '2025',
-        country: 'USA',
-        href: '/football',
-      },
-      {
-        name: 'Liga MX — Mexico',
-        flag: '🇲🇽',
-        tier: 'T1',
-        season: '2025/26',
-        country: 'Mexico',
-        href: '/football',
-      },
-    ],
-  },
-];
+// League IDs are passed dynamically from API / selection
 
 
-export const COMP_FILTERS: { id: string; label: string }[] = [
-  { id: 'All', label: 'All Fixtures' },
-  { id: 'ENG-PREMIER-LEAGUE', label: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League' },
-  { id: 'ENG-CHAMPIONSHIP', label: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Championship' },
-  { id: 'ENG-WSL', label: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Women's Super League" },
-  { id: 'ESP-LA-LIGA', label: '🇪🇸 La Liga' },
-  { id: 'ITA-SERIE-A', label: '🇮🇹 Serie A' },
-  { id: 'GER-BUNDESLIGA', label: '🇩🇪 Bundesliga' },
-  { id: 'FRA-LIGUE-1', label: '🇫🇷 Ligue 1' },
-  { id: 'UEFA-CHAMPIONS-LEAGUE', label: '⭐ UCL' },
-  { id: 'CAF-AFCON', label: '🌍 AFCON' },
-  { id: 'NGA-NPFL', label: '🇳🇬 NPFL' },
-];
+export const COMP_FILTERS: { id: string; label: string }[] = [];
 
 // ─── Sub-Components ───────────────────────────────────────────────────────────
 
@@ -545,8 +317,24 @@ export function FootballPageClient({
   const [navCountry, setNavCountry] = useState<string | null>(null);
   const [navGender, setNavGender] = useState<CompetitionGender | 'all'>('all');
   const [navAge, setNavAge] = useState<'senior' | 'youth' | 'all'>('all');
-  const [tableLeague, setTableLeague] = useState('Premier League');
-  const [expandedComp, setExpandedComp] = useState<string | null>('Africa (CAF)');
+  const { leagues: apiLeagues, loading: leaguesLoading } = useLeagues();
+  const { players: dynamicPlayers } = usePlayers();
+  const { coaches: dynamicCoaches } = useCoaches();
+
+  // Table league is tracked by numeric league ID (never by name).
+  // Defaults to the top-ranked league returned by the API.
+  const [tableLeagueId, setTableLeagueId] = useState<number | null>(null);
+  useEffect(() => {
+    if (tableLeagueId === null && apiLeagues.length > 0) {
+      setTableLeagueId(Number(apiLeagues[0].league_key));
+    }
+  }, [apiLeagues, tableLeagueId]);
+  const tableLeague = useMemo(
+    () => apiLeagues.find((l) => Number(l.league_key) === tableLeagueId)?.league_name || '',
+    [apiLeagues, tableLeagueId]
+  );
+  const { teams: dynamicClubs } = useTeams(tableLeagueId ? { leagueId: tableLeagueId } : undefined);
+  const [expandedComp, setExpandedComp] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<string>('Just now');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -594,23 +382,61 @@ export function FootballPageClient({
   const [briefSubmitting, setBriefSubmitting] = useState(false);
   const [briefMessage, setBriefMessage] = useState('');
 
-  // Loaded Entities from Registry or Props
+  // Loaded Entities dynamically from hooks or initialProps (Zero hardcoded mock fallbacks)
   const players = useMemo(() => {
-    return initialPlayers || EntityService.getAllPlayers();
-  }, [initialPlayers]);
+    if (initialPlayers && initialPlayers.length > 0) return initialPlayers;
+    if (dynamicPlayers && dynamicPlayers.length > 0) {
+      return dynamicPlayers.map((p) => ({
+        name: p.player_name || 'Player',
+        slug: slugify(p.player_name || ''),
+        photo: p.player_image || '',
+        club: p.team_name || '',
+        country: p.player_country || '',
+        position: p.player_type || 'Forward',
+        age: parseInt(p.player_age) || 24,
+        africanOrigin: ['Nigeria', 'Senegal', 'Egypt', 'Ghana', 'Cameroon', 'Morocco', 'Algeria', 'Ivory Coast'].includes(p.player_country || ''),
+        marketValue: '€' + (parseInt(p.player_rating || '50') * 500000).toLocaleString(),
+      })) as unknown as PlayerMeta[];
+    }
+    return [];
+  }, [initialPlayers, dynamicPlayers]);
 
   const officials = useMemo(() => {
-    return initialOfficials || EntityService.getAllOfficials();
+    return initialOfficials || [];
   }, [initialOfficials]);
 
   const coaches = useMemo(() => {
-    return initialCoaches || EntityService.getAllCoaches();
-  }, [initialCoaches]);
+    if (initialCoaches && initialCoaches.length > 0) return initialCoaches;
+    if (dynamicCoaches && dynamicCoaches.length > 0) {
+      return dynamicCoaches.map((c) => ({
+        name: c.coache || 'Coach',
+        slug: slugify(c.coache || ''),
+        photo: c.coache_image || '',
+        club: c.team_name || '',
+        country: c.coache_country || '',
+        age: parseInt(c.coache_age || '') || 50,
+        trophies: c.trophies ?? 0,
+        winRate: '60%',
+      })) as unknown as CoachMeta[];
+    }
+    return [];
+  }, [initialCoaches, dynamicCoaches]);
 
   const clubs = useMemo(() => {
     if (initialClubs && initialClubs.length > 0) return initialClubs;
-    return [...EntityService.getAfricanClubs(), ...EntityService.getAllClubs()].slice(0, 10);
-  }, [initialClubs]);
+    if (dynamicClubs && dynamicClubs.length > 0) {
+      return dynamicClubs.slice(0, 10).map((t) => ({
+        name: t.team_name || 'Team',
+        slug: slugify(t.team_name || ''),
+        logo: t.team_logo || '',
+        badge: '⚽',
+        manager: '',
+        country: '',
+        shortName: t.team_name || 'Team',
+      })) as unknown as ClubMeta[];
+    }
+    return [];
+  }, [initialClubs, dynamicClubs]);
 
   // Featured subsets
   const featuredSuperstars = useMemo(() => {
@@ -633,8 +459,7 @@ export function FootballPageClient({
   }, [liveFixtures]);
 
   // Fetch live standings and top scorers dynamically
-  const fetchTableAndScorers = useCallback(async (leagueName: string) => {
-    const leagueId = resolveLeagueId(leagueName);
+  const fetchTableAndScorers = useCallback(async (leagueId: number) => {
     setTableLoading(true);
     setScorersLoading(true);
     try {
@@ -709,8 +534,8 @@ export function FootballPageClient({
   }, []);
 
   useEffect(() => {
-    fetchTableAndScorers(tableLeague);
-  }, [tableLeague, fetchTableAndScorers]);
+    if (tableLeagueId !== null) fetchTableAndScorers(tableLeagueId);
+  }, [tableLeagueId, fetchTableAndScorers]);
 
   // Fetch real matches from live API (NO MOCK DATA)
   const fetchLiveMatches = useCallback(async () => {
@@ -740,6 +565,7 @@ export function FootballPageClient({
               : 'LIVE';
             return {
               id: String(m.event_key || normalized.fixtureId || `live-${idx}`),
+              league_key: m.league_key,
               competitionId: normalized.competitionId,
               countryCode: canonical?.countryCode,
               confederationCode: canonical?.confederationCode,
@@ -795,6 +621,7 @@ export function FootballPageClient({
             const isFinished = rawStatus === 'Finished' || rawStatus === 'FT';
             const item: FixtureItem = {
               id: String(m.event_key || normalized.fixtureId || `fix-${idx}`),
+              league_key: m.league_key,
               competitionId: normalized.competitionId,
               countryCode: canonical?.countryCode,
               confederationCode: canonical?.confederationCode,
@@ -896,28 +723,18 @@ export function FootballPageClient({
       }
     }
 
-    // 5. Canonical Competition Filter (with resilient keyword mapping)
+    // 5. Strict league-ID filter (no name/keyword matching)
     if (compFilter !== 'All') {
-      const canonicalMap: Record<string, string[]> = {
-        'ENG-PREMIER-LEAGUE': ['premier league', 'epl', '152'],
-        'ENG-CHAMPIONSHIP': ['championship', '153'],
-        'ENG-WSL': ['wsl', "women's super league", 'women'],
-        'ESP-LA-LIGA': ['la liga', 'laliga', 'primera', '302'],
-        'ITA-SERIE-A': ['serie a', '207'],
-        'GER-BUNDESLIGA': ['bundesliga', '175'],
-        'FRA-LIGUE-1': ['ligue 1', '168'],
-        'UEFA-CHAMPIONS-LEAGUE': ['champions league', 'ucl', '3'],
-        'CAF-AFCON': ['afcon', 'africa cup', 'caf'],
-        'NGA-NPFL': ['npfl', 'nigeria premier', 'nigerian'],
-      };
-
-      const keywords = canonicalMap[compFilter] || [compFilter.toLowerCase()];
-      list = list.filter((f) => {
-        if (f.competitionId === compFilter) return true;
-        const compLower = (f.comp || '').toLowerCase();
-        return keywords.some((k) => compLower.includes(k));
-      });
+      list = list.filter((f) => String(f.league_key) === compFilter);
     }
+
+    // Sort by top ranking using league ID, then group-stable by league_key
+    list = [...list].sort((a, b) => {
+      const rankA = getLeaguePriority(a.league_key);
+      const rankB = getLeaguePriority(b.league_key);
+      if (rankA !== rankB) return rankA - rankB;
+      return String(a.league_key ?? '').localeCompare(String(b.league_key ?? ''));
+    });
 
     // 6. Search Query Filter (Teams, Leagues, Stadiums)
     if (searchQuery.trim()) {
@@ -949,6 +766,17 @@ export function FootballPageClient({
       (s) => s.name.toLowerCase().includes(q) || s.team.toLowerCase().includes(q)
     );
   }, [scorersData, searchQuery]);
+
+  const compFilters = useMemo(() => {
+    const filters = [{ id: 'All', label: 'All Fixtures' }];
+    apiLeagues.slice(0, 15).forEach((l) => {
+      filters.push({
+        id: String(l.league_key),
+        label: l.league_name,
+      });
+    });
+    return filters;
+  }, [apiLeagues]);
 
   const isFixtureTab = mainTab === 'live' || mainTab === 'upcoming' || mainTab === 'results';
 
@@ -1268,7 +1096,7 @@ export function FootballPageClient({
               {isFixtureTab && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
                   <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                    {COMP_FILTERS.map((f) => (
+                    {compFilters.map((f) => (
                       <button
                         key={f.id}
                         onClick={() => setCompFilter(f.id)}
@@ -1307,40 +1135,33 @@ export function FootballPageClient({
               {mainTab === 'table' && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                    {[
-                      'Premier League',
-                      'La Liga',
-                      'Serie A',
-                      'Bundesliga',
-                      'Ligue 1',
-                      'CAF Champions League',
-                      'NPFL — Nigeria',
-                    ].map((l) => (
-                      <button
-                        key={l}
-                        onClick={() => setTableLeague(l)}
-                        className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${tableLeague === l
-                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
-                          : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
-                          }`}
-                      >
-                        {l}
-                      </button>
-                    ))}
+                    {apiLeagues.slice(0, 7).map((l) => {
+                      const lid = Number(l.league_key);
+                      return (
+                        <button
+                          key={l.league_key}
+                          onClick={() => setTableLeagueId(lid)}
+                          className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${tableLeagueId === lid
+                            ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
+                            : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                            }`}
+                        >
+                          {l.league_name}
+                        </button>
+                      );
+                    })}
 
                     <select
-                      value={ALL_COMPETITIONS.some((c) => c.name === tableLeague) ? tableLeague : ''}
-                      onChange={(e) => {
-                        if (e.target.value) setTableLeague(e.target.value);
-                      }}
+                      value={tableLeagueId ?? ''}
+                      onChange={(e) => setTableLeagueId(Number(e.target.value))}
                       className="flex-shrink-0 text-[10px] font-bold bg-[#06101E] border border-blue-500/40 text-blue-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
                     >
                       <option value="" disabled>
-                        More Leagues (75+)...
+                        More Leagues...
                       </option>
-                      {ALL_COMPETITIONS.map((c) => (
-                        <option key={c.slug} value={c.name} className="bg-[#0f172a] text-white">
-                          {c.flag} {c.name} ({c.country})
+                      {apiLeagues.map((l) => (
+                        <option key={l.league_key} value={l.league_key} className="bg-[#0f172a] text-white">
+                          {l.league_name} ({l.country_name || 'Global'})
                         </option>
                       ))}
                     </select>
@@ -1371,40 +1192,33 @@ export function FootballPageClient({
               {mainTab === 'scorers' && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                    {[
-                      'Premier League',
-                      'La Liga',
-                      'Serie A',
-                      'Bundesliga',
-                      'Ligue 1',
-                      'CAF Champions League',
-                      'NPFL — Nigeria',
-                    ].map((l) => (
-                      <button
-                        key={l}
-                        onClick={() => setTableLeague(l)}
-                        className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${tableLeague === l
-                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
-                          : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
-                          }`}
-                      >
-                        {l}
-                      </button>
-                    ))}
+                    {apiLeagues.slice(0, 7).map((l) => {
+                      const lid = Number(l.league_key);
+                      return (
+                        <button
+                          key={l.league_key}
+                          onClick={() => setTableLeagueId(lid)}
+                          className={`flex-shrink-0 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${tableLeagueId === lid
+                            ? 'bg-blue-600 border-blue-500 text-white shadow-sm shadow-blue-600/30'
+                            : 'bg-transparent border-[#1e293b] text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                            }`}
+                        >
+                          {l.league_name}
+                        </button>
+                      );
+                    })}
 
                     <select
-                      value={ALL_COMPETITIONS.some((c) => c.name === tableLeague) ? tableLeague : ''}
-                      onChange={(e) => {
-                        if (e.target.value) setTableLeague(e.target.value);
-                      }}
+                      value={tableLeagueId ?? ''}
+                      onChange={(e) => setTableLeagueId(Number(e.target.value))}
                       className="flex-shrink-0 text-[10px] font-bold bg-[#06101E] border border-blue-500/40 text-blue-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
                     >
                       <option value="" disabled>
-                        More Leagues (75+)...
+                        More Leagues...
                       </option>
-                      {ALL_COMPETITIONS.map((c) => (
-                        <option key={c.slug} value={c.name} className="bg-[#0f172a] text-white">
-                          {c.flag} {c.name} ({c.country})
+                      {apiLeagues.map((l) => (
+                        <option key={l.league_key} value={l.league_key} className="bg-[#0f172a] text-white">
+                          {l.league_name} ({l.country_name || 'Global'})
                         </option>
                       ))}
                     </select>
@@ -1495,7 +1309,7 @@ export function FootballPageClient({
                   <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
                     <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-2">
                       <span>🏆</span>
-                      <span>{tableLeague} · 2025/2026 Standings</span>
+                      <span>{tableLeague || 'League'} · {getCurrentSeason()} Standings</span>
                     </h3>
                     <span className="text-[10px] text-slate-500 font-mono">Live Points Table</span>
                   </div>

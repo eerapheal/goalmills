@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PlayerMeta, EntityService } from '@/lib/entityService';
+import { PlayerMeta } from '@/lib/entityService';
+import { usePlayers } from '@/hooks/usePlayers';
+import { PlayerCardSkeleton } from './FootballSkeletons';
+import { slugify } from '@/lib/slugUtils';
 import {
   FiTrendingUp,
   FiAward,
@@ -23,7 +26,33 @@ interface AfricanFootballHeroSpotlightProps {
 export function AfricanFootballHeroSpotlight({
   initialPlayers,
 }: AfricanFootballHeroSpotlightProps) {
-  const players = initialPlayers || EntityService.getAfricanPlayers();
+  const { players: dynamicPlayers, loading } = usePlayers();
+
+  const players: PlayerMeta[] = useMemo(() => {
+    if (initialPlayers && initialPlayers.length > 0) return initialPlayers;
+    const africanCountries = [
+      'Nigeria', 'Senegal', 'Egypt', 'Ghana', 'Cameroon', 'Morocco',
+      'Algeria', 'Ivory Coast', "Cote d'Ivoire", 'Mali', 'Tunisia',
+      'South Africa', 'DR Congo', 'Burkina Faso', 'Guinea'
+    ];
+    if (dynamicPlayers && dynamicPlayers.length > 0) {
+      return dynamicPlayers
+        .filter((p) => africanCountries.some((c) => (p.player_country || '').toLowerCase().includes(c.toLowerCase())))
+        .map((p) => ({
+          name: p.player_name || 'Player',
+          slug: slugify(p.player_name || ''),
+          photo: p.player_image || '',
+          club: p.team_name || '',
+          country: p.player_country || '',
+          position: p.player_type || 'Forward',
+          age: parseInt(p.player_age) || 24,
+          africanOrigin: true,
+          marketValue: '€' + (parseInt(p.player_rating || '50') * 500000).toLocaleString(),
+        })) as unknown as PlayerMeta[];
+    }
+    return [];
+  }, [initialPlayers, dynamicPlayers]);
+
   const [selectedCategory, setSelectedCategory] = useState<
     'all' | 'strikers' | 'playmakers' | 'defenders'
   >('all');
