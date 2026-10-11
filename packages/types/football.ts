@@ -126,8 +126,9 @@ export interface CanonicalCompetition {
   // SEO
   canonicalSlug: string;
 
-  // Hierarchy
+  // Hierarchy & Alternate Provider Identifiers
   parentCompetitionId?: string;
+  qualifierLeagueId?: number;
 
   createdAt: string;
   updatedAt: string;

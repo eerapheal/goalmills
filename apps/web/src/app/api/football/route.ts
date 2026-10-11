@@ -441,43 +441,46 @@ export async function GET(request: NextRequest) {
           ? data
           : (data.result ?? data.response ?? data);
 
-      const rawListResult = Array.isArray(sanitizedResult) ? sanitizedResult : [];
+      let listResult: any;
 
-      // Enrich fixtures with canonical competition resolution and single normalization pipeline
-      const listResult =
-        rawListResult.length > 0 && rawListResult[0]?.event_key
-          ? rawListResult.map((match: any) => {
-              const normalized = processFixture(match);
-              const res = resolveCompetitionForFixture(match);
-              return {
-                ...match,
-                competitionId: normalized.competitionId,
-                classificationStatus: normalized.classificationStatus,
-                gender: normalized.gender,
-                ageCategory: normalized.ageCategory,
-                countryCode: normalized.countryCode,
-                confederationCode: normalized.confederationCode,
-                priorityRank: normalized.priorityRank,
-                _normalized: normalized,
-                ...(res.competition
-                  ? {
-                      canonicalCompetition: {
-                        id: res.competition.id,
-                        slug: res.competition.slug,
-                        name: res.competition.name,
-                        shortName: res.competition.shortName,
-                        countryCode: res.competition.countryCode,
-                        confederationCode: res.competition.confederationCode,
-                        tier: res.competition.tier,
-                        priorityRank: res.competition.priorityRank,
-                        gender: res.competition.gender,
-                        ageCategory: res.competition.ageCategory,
-                      },
-                    }
-                  : {}),
-              };
-            })
-          : rawListResult;
+      if (Array.isArray(sanitizedResult)) {
+        listResult =
+          sanitizedResult.length > 0 && sanitizedResult[0]?.event_key
+            ? sanitizedResult.map((match: any) => {
+                const normalized = processFixture(match);
+                const res = resolveCompetitionForFixture(match);
+                return {
+                  ...match,
+                  competitionId: normalized.competitionId,
+                  classificationStatus: normalized.classificationStatus,
+                  gender: normalized.gender,
+                  ageCategory: normalized.ageCategory,
+                  countryCode: normalized.countryCode,
+                  confederationCode: normalized.confederationCode,
+                  priorityRank: normalized.priorityRank,
+                  _normalized: normalized,
+                  ...(res.competition
+                    ? {
+                        canonicalCompetition: {
+                          id: res.competition.id,
+                          slug: res.competition.slug,
+                          name: res.competition.name,
+                          shortName: res.competition.shortName,
+                          countryCode: res.competition.countryCode,
+                          confederationCode: res.competition.confederationCode,
+                          tier: res.competition.tier,
+                          priorityRank: res.competition.priorityRank,
+                          gender: res.competition.gender,
+                          ageCategory: res.competition.ageCategory,
+                        },
+                      }
+                    : {}),
+                };
+              })
+            : sanitizedResult;
+      } else {
+        listResult = sanitizedResult ?? [];
+      }
 
       const resultPayload = {
         ...(!Array.isArray(data) ? data : {}),

@@ -245,12 +245,14 @@ export const advancedFootballApi = {
     paramsOrLeagueId: FootballStandingsParams | { leagueId: string | number } | string | number
   ): Promise<FootballStandingsResponse> => {
     try {
-      const leagueId =
-        typeof paramsOrLeagueId === 'object' && paramsOrLeagueId !== null
-          ? (paramsOrLeagueId as any).leagueId
-          : paramsOrLeagueId;
+      let params: Record<string, any> = {};
+      if (typeof paramsOrLeagueId === 'object' && paramsOrLeagueId !== null) {
+        params = { ...paramsOrLeagueId };
+      } else {
+        params = { leagueId: paramsOrLeagueId };
+      }
 
-      const response = await fetchFromAPI<FootballStandingsResponse>('Standings', { leagueId });
+      const response = await fetchFromAPI<FootballStandingsResponse>('Standings', params);
       return response;
     } catch (error) {
       console.error('Error fetching standings:', error);

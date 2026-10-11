@@ -11,6 +11,7 @@ export interface CompetitionMeta {
   featured: boolean;
   tier: number;
   description: string;
+  qualifierLeagueId?: number;
 }
 
 export interface ClubMeta {
@@ -146,6 +147,7 @@ function buildCompetitionsRegistry(): Record<string, CompetitionMeta> {
       featured: comp.featured,
       tier: comp.tier,
       description: comp.description,
+      qualifierLeagueId: comp.qualifierLeagueId,
     };
   }
   return registry;

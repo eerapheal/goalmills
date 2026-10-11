@@ -44,6 +44,7 @@ export interface CompetitionEntry {
   hasKnockout: boolean;
   gender: Gender;
   ageGroup: AgeGroup;
+  qualifierLeagueId?: number;
 }
 
 export const COMPETITION_CATEGORY_LABELS: Record<
@@ -70,7 +71,7 @@ export const COMPETITION_CATEGORY_LABELS: Record<
 export const ALL_COMPETITIONS: CompetitionEntry[] = [
   // ─── Africa (CAF & Major National Leagues) ──────────────────────────────────
   {
-    id: 6,
+    id: 29,
     apiSportsId: 6,
     name: 'Africa Cup of Nations',
     slug: 'afcon',
@@ -87,9 +88,10 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     hasKnockout: true,
     gender: 'men',
     ageGroup: 'senior',
+    qualifierLeagueId: 7098,
   },
   {
-    id: 19,
+    id: 346,
     apiSportsId: 12,
     name: 'CAF Champions League',
     slug: 'caf-champions-league',
@@ -108,7 +110,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 20,
+    id: 390,
     apiSportsId: 20,
     name: 'CAF Confederation Cup',
     slug: 'caf-confederation-cup',
@@ -127,7 +129,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 288,
+    id: 297,
     apiSportsId: 288,
     name: 'Betway Premiership (PSL)',
     slug: 'south-african-psl',
@@ -223,7 +225,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 360,
+    id: 480,
     apiSportsId: 321,
     name: 'CHAN',
     slug: 'chan',
@@ -1051,7 +1053,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 29,
+    id: 21,
     apiSportsId: 32,
     name: 'FIFA World Cup Qualifiers (CAF & Global)',
     slug: 'fifa-wc-qualifiers',
@@ -1091,7 +1093,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 5,
+    id: 633,
     apiSportsId: 5,
     name: 'UEFA Nations League',
     slug: 'uefa-nations-league',

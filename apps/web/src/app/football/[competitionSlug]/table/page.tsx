@@ -19,6 +19,7 @@ import {
   getCompetitionFormat,
   getStandingsRulesetForCompetition,
   separateProviderStandingsByGroup,
+  generatePreviewGroupStandings,
   buildTournamentBracket,
 } from '@/lib/football';
 import { FiGlobe, FiShield, FiAward, FiArrowLeft, FiCheckCircle } from 'react-icons/fi';
@@ -100,7 +101,10 @@ export default async function CompetitionTablePage({
 
   // Fetch standings & fixtures in parallel
   let rawStandings: FootballStanding[] = [];
+  let rawHomeStandings: FootballStanding[] = [];
+  let rawAwayStandings: FootballStanding[] = [];
   let fixtures: any[] = [];
+  let isQualifierFallback = false;
 
   try {
     const [standingsRes, fixturesRes] = await Promise.all([
@@ -112,6 +116,26 @@ export default async function CompetitionTablePage({
       const resObj = standingsRes.result as any;
       const list = resObj.total || (Array.isArray(resObj) ? resObj : []);
       rawStandings = Array.isArray(list) ? list : [];
+      if (Array.isArray(resObj.home)) rawHomeStandings = resObj.home;
+      if (Array.isArray(resObj.away)) rawAwayStandings = resObj.away;
+    }
+
+    // Qualifier fallback for international tournaments where main finals haven't kicked off
+    if (rawStandings.length === 0 && comp.qualifierLeagueId) {
+      const qualifierRes = await advancedFootballApi
+        .getStandings(comp.qualifierLeagueId)
+        .catch(() => null);
+
+      if (qualifierRes?.result) {
+        const qObj = qualifierRes.result as any;
+        const qList = qObj.total || (Array.isArray(qObj) ? qObj : []);
+        if (Array.isArray(qList) && qList.length > 0) {
+          rawStandings = qList;
+          if (Array.isArray(qObj.home)) rawHomeStandings = qObj.home;
+          if (Array.isArray(qObj.away)) rawAwayStandings = qObj.away;
+          isQualifierFallback = true;
+        }
+      }
     }
 
     if (fixturesRes?.result && Array.isArray(fixturesRes.result)) {
@@ -122,14 +146,24 @@ export default async function CompetitionTablePage({
   }
 
   // Separate standings by group/phase
-  const standingTables = separateProviderStandingsByGroup(
+  let standingTables = separateProviderStandingsByGroup(
     rawStandings,
     competitionIdStr,
     seasonStr
   );
 
+  let isPreviewMode = false;
+  if (standingTables.length === 0 && (format.hasGroups || format.formatType === 'HYBRID')) {
+    standingTables = generatePreviewGroupStandings(competitionIdStr, seasonStr);
+    if (standingTables.length > 0) {
+      isPreviewMode = true;
+    }
+  }
+
   const isMultiGroup = format.hasGroups || standingTables.length > 1;
-  const isKnockoutOnly = format.formatType === 'KNOCKOUT' || (format.hasKnockout && !format.hasLeagueTable && rawStandings.length === 0);
+  const isKnockoutOnly =
+    format.formatType === 'KNOCKOUT' ||
+    (format.hasKnockout && !format.hasLeagueTable && rawStandings.length === 0 && !isPreviewMode);
 
   // Structured Data (JSON-LD)
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://goalmills.com';
@@ -202,6 +236,16 @@ export default async function CompetitionTablePage({
                         <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
                           Season {comp.season}
                         </span>
+                        {isQualifierFallback && (
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                            Active Qualifiers
+                          </span>
+                        )}
+                        {isPreviewMode && (
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                            Tournament Preview
+                          </span>
+                        )}
                       </div>
                       <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
                         {comp.name} Standings Table
@@ -355,6 +399,8 @@ export default async function CompetitionTablePage({
             <FootballStandingsTable
               table={standingTables[0]}
               standings={rawStandings}
+              homeStandings={rawHomeStandings}
+              awayStandings={rawAwayStandings}
               leagueId={comp.id}
             />
           </div>
@@ -366,7 +412,12 @@ export default async function CompetitionTablePage({
                 <span>{comp.name} Standings</span>
               </h2>
             </div>
-            <FootballStandingsTable standings={rawStandings} leagueId={comp.id} />
+            <FootballStandingsTable
+              standings={rawStandings}
+              homeStandings={rawHomeStandings}
+              awayStandings={rawAwayStandings}
+              leagueId={comp.id}
+            />
           </div>
         ) : (
           <div className="rounded-2xl border border-white/10 bg-[#0B1526]/50 p-12 text-center text-slate-400 space-y-2">

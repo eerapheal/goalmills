@@ -20,7 +20,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   // ─── CAF & African Competitions ─────────────────────────────────────────────
   'CAF-AFCON': {
     id: 'CAF-AFCON',
-    providerId: 6,
+    providerId: 29,
     providerName: 'allsportsapi',
     apiSportsId: 6,
     slug: 'afcon',
@@ -52,12 +52,13 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
     logoUrl: leagueLogo(6),
     countryFlagUrl: 'https://media.api-sports.io/flags/africa.svg',
     canonicalSlug: 'afcon',
+    qualifierLeagueId: 7098,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-09-27T00:00:00Z',
   },
   'CAF-CHAMPIONS-LEAGUE': {
     id: 'CAF-CHAMPIONS-LEAGUE',
-    providerId: 19,
+    providerId: 346,
     providerName: 'allsportsapi',
     apiSportsId: 12,
     slug: 'caf-champions-league',
@@ -94,7 +95,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CAF-CONFEDERATION-CUP': {
     id: 'CAF-CONFEDERATION-CUP',
-    providerId: 20,
+    providerId: 390,
     providerName: 'allsportsapi',
     apiSportsId: 20,
     slug: 'caf-confederation-cup',
@@ -131,7 +132,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CAF-CHAN': {
     id: 'CAF-CHAN',
-    providerId: 360,
+    providerId: 480,
     providerName: 'allsportsapi',
     apiSportsId: 321,
     slug: 'chan',
@@ -318,7 +319,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'ZAF-PSL': {
     id: 'ZAF-PSL',
-    providerId: 288,
+    providerId: 297,
     providerName: 'allsportsapi',
     apiSportsId: 288,
     slug: 'south-african-psl',
@@ -1812,7 +1813,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'FIFA-CLUB-WORLD-CUP': {
     id: 'FIFA-CLUB-WORLD-CUP',
-    providerId: 531,
+    providerId: 12614,
     providerName: 'allsportsapi',
     apiSportsId: 15,
     slug: 'fifa-club-world-cup',
@@ -1849,7 +1850,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'FIFA-WORLD-CUP-QUALIFIERS': {
     id: 'FIFA-WORLD-CUP-QUALIFIERS',
-    providerId: 29,
+    providerId: 21,
     providerName: 'allsportsapi',
     apiSportsId: 32,
     slug: 'fifa-wc-qualifiers',
@@ -1923,7 +1924,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'UEFA-NATIONS-LEAGUE': {
     id: 'UEFA-NATIONS-LEAGUE',
-    providerId: 5,
+    providerId: 633,
     providerName: 'allsportsapi',
     apiSportsId: 5,
     slug: 'uefa-nations-league',

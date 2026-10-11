@@ -3,6 +3,7 @@ import {
   getCompetitionFormat,
   getStandingsRulesetForCompetition,
   separateProviderStandingsByGroup,
+  generatePreviewGroupStandings,
   buildTournamentBracket,
   sortStandingEntries,
   getCanonicalCompetition,
@@ -115,4 +116,48 @@ describe('Phase 5: Professional Table & Standings Architecture Integration', () 
     expect(sorted[1].teamName).toBe('Chelsea');
     expect(sorted[1].position).toBe(2);
   });
+
+  it('correctly handles live AllSportsAPI group payload using league_round (World Cup / AFCON / Nations League)', () => {
+    const rawAllSportsData = [
+      { standing_place: '1', standing_team: 'Mexico', standing_P: '3', standing_W: '3', standing_D: '0', standing_L: '0', standing_GD: '6', standing_PTS: '9', league_round: 'Group A', stage_name: 'Group Stage' },
+      { standing_place: '2', standing_team: 'South Africa', standing_P: '3', standing_W: '1', standing_D: '1', standing_L: '1', standing_GD: '-1', standing_PTS: '4', league_round: 'Group A', stage_name: 'Group Stage' },
+      { standing_place: '1', standing_team: 'France', standing_P: '3', standing_W: '3', standing_D: '0', standing_L: '0', standing_GD: '7', standing_PTS: '9', league_round: 'Group B', stage_name: 'Group Stage' },
+      { standing_place: '2', standing_team: 'Brazil', standing_P: '3', standing_W: '2', standing_D: '0', standing_L: '1', standing_GD: '4', standing_PTS: '6', league_round: 'Group B', stage_name: 'Group Stage' },
+    ];
+
+    const tables = separateProviderStandingsByGroup(rawAllSportsData, 'fifa-world-cup', '2026');
+    expect(tables).toHaveLength(2);
+    expect(tables[0].name).toBe('Group A');
+    expect(tables[1].name).toBe('Group B');
+    expect(tables[0].entries[0].teamName).toBe('Mexico');
+    expect(tables[1].entries[0].teamName).toBe('France');
+  });
+
+  it('generates structured preview groups for upcoming tournaments with no match records yet', () => {
+    const previewTables = generatePreviewGroupStandings('FIFA-WORLD-CUP', '2026');
+    expect(previewTables.length).toBe(12); // World Cup 2026 has 12 groups (A through L)
+    expect(previewTables[0].name).toBe('Group A');
+    expect(previewTables[11].name).toBe('Group L');
+    expect(previewTables[0].status).toBe('UPCOMING');
+  });
+
+  it('verifies verified provider IDs for African and European competitions', () => {
+    const afcon = getCanonicalCompetition('afcon')!;
+    expect(afcon).toBeDefined();
+    expect(afcon.providerId).toBe(29);
+    expect(afcon.qualifierLeagueId).toBe(7098);
+
+    const cafCl = getCanonicalCompetition('caf-champions-league')!;
+    expect(cafCl).toBeDefined();
+    expect(cafCl.providerId).toBe(346);
+
+    const chan = getCanonicalCompetition('chan')!;
+    expect(chan).toBeDefined();
+    expect(chan.providerId).toBe(480);
+
+    const nationsLeague = getCanonicalCompetition('uefa-nations-league')!;
+    expect(nationsLeague).toBeDefined();
+    expect(nationsLeague.providerId).toBe(633);
+  });
 });
+

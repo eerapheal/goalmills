@@ -23,6 +23,8 @@ interface UnifiedStandingRow {
   won: number;
   drawn: number;
   lost: number;
+  gf?: number;
+  ga?: number;
   gd: number;
   pts: number;
   form?: ('W' | 'D' | 'L')[];
@@ -30,6 +32,8 @@ interface UnifiedStandingRow {
 
 interface FootballStandingsTableProps {
   standings?: FootballStanding[];
+  homeStandings?: FootballStanding[];
+  awayStandings?: FootballStanding[];
   table?: StandingTable;
   teams?: FootballTeam[];
   leagueId?: string | number;
@@ -39,12 +43,15 @@ interface FootballStandingsTableProps {
 
 export function FootballStandingsTable({
   standings = [],
+  homeStandings = [],
+  awayStandings = [],
   table,
   teams = [],
   leagueId,
   compact = false,
   showRulesetFooter = true,
 }: FootballStandingsTableProps) {
+  const [viewType, setViewType] = useState<'total' | 'home' | 'away'>('total');
   // Resolve ruleset from table if provided
   const ruleset = useMemo(() => {
     if (table?.rulesetId) {
@@ -114,7 +121,14 @@ export function FootballStandingsTable({
 
   // Normalize input into unified row models
   const rows: UnifiedStandingRow[] = useMemo(() => {
-    if (table && table.entries && table.entries.length > 0) {
+    const activeStandings =
+      viewType === 'home' && homeStandings.length > 0
+        ? homeStandings
+        : viewType === 'away' && awayStandings.length > 0
+          ? awayStandings
+          : standings;
+
+    if (viewType === 'total' && table && table.entries && table.entries.length > 0) {
       return table.entries.map((e, idx) => ({
         key: e.id || `entry-${idx}`,
         rank: e.position,
@@ -124,18 +138,22 @@ export function FootballStandingsTable({
         won: e.won,
         drawn: e.drawn,
         lost: e.lost,
+        gf: e.goalsFor,
+        ga: e.goalsAgainst,
         gd: e.goalDifference,
         pts: e.points,
         form: e.form,
       }));
     }
 
-    if (standings && standings.length > 0) {
-      return standings.map((s, idx) => {
+    if (activeStandings && activeStandings.length > 0) {
+      return activeStandings.map((s, idx) => {
         const teamObj = teams.find((t) => String(t.team_key) === String(s.team_key));
         const logo = teamObj?.team_logo;
+        const gf = parseInt(s.standing_F ?? (s as any).goalsFor ?? '0', 10);
+        const ga = parseInt(s.standing_A ?? (s as any).goalsAgainst ?? '0', 10);
         return {
-          key: `${s.team_key}-${idx}`,
+          key: `${s.team_key}-${idx}-${viewType}`,
           rank: parseInt(s.standing_place, 10) || idx + 1,
           teamName: s.standing_team,
           teamLogo: resolveTeamLogo(s.standing_team, logo),
@@ -143,6 +161,8 @@ export function FootballStandingsTable({
           won: parseInt(s.standing_W, 10) || 0,
           drawn: parseInt(s.standing_D, 10) || 0,
           lost: parseInt(s.standing_L, 10) || 0,
+          gf: isNaN(gf) ? undefined : gf,
+          ga: isNaN(ga) ? undefined : ga,
           gd: parseInt(s.standing_GD, 10) || 0,
           pts: parseInt(s.standing_PTS, 10) || 0,
           form: (teamForms[s.team_key] as ('W' | 'D' | 'L')[]) || undefined,
@@ -151,7 +171,7 @@ export function FootballStandingsTable({
     }
 
     return [];
-  }, [table, standings, teams, teamForms]);
+  }, [table, standings, homeStandings, awayStandings, teams, teamForms, viewType]);
 
   // Style helpers based on league/rank
   const getRankStyles = (rank: number) => {
@@ -178,6 +198,8 @@ export function FootballStandingsTable({
     if (rank === 1)
       return 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black shadow-md shadow-amber-500/20 scale-105';
     if (rank <= 4) return 'bg-blue-600/20 text-blue-300 border border-blue-500/30 font-bold';
+    if (rank === 5) return 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold';
+    if (rank === 6) return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold';
     if (rank >= 18) return 'bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold';
     return 'text-slate-400 group-hover:text-white';
   };
@@ -196,8 +218,52 @@ export function FootballStandingsTable({
     DRAWING_OF_LOTS: 'Drawing of Lots',
   };
 
+  const hasSplits = homeStandings.length > 0 || awayStandings.length > 0;
+
   return (
     <div className="w-full bg-[#0A1424]/90 backdrop-blur-md rounded-2xl overflow-hidden border border-blue-500/20 shadow-2xl">
+      {/* Table Subnav / View Filter Bar (Total / Home / Away) */}
+      {hasSplits && (
+        <div className="flex items-center justify-between bg-[#081220] px-4 py-2 border-b border-white/5">
+          <span className="text-[11px] font-bold text-slate-400">Record View:</span>
+          <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/5">
+            <button
+              type="button"
+              onClick={() => setViewType('total')}
+              className={`px-2.5 py-1 text-[10px] font-black rounded-md transition-all ${
+                viewType === 'total'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Overall
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewType('home')}
+              className={`px-2.5 py-1 text-[10px] font-black rounded-md transition-all ${
+                viewType === 'home'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Home
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewType('away')}
+              className={`px-2.5 py-1 text-[10px] font-black rounded-md transition-all ${
+                viewType === 'away'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Away
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table Header */}
       <div className="flex items-center bg-[#0E1F38] py-3 px-3 sm:px-5 border-b border-white/10 text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-wider">
         <div className="w-7 sm:w-8 shrink-0 text-center">#</div>
@@ -207,6 +273,8 @@ export function FootballStandingsTable({
           <div className="hidden sm:block w-7 sm:w-8 text-center text-blue-400">W</div>
           <div className="hidden sm:block w-7 sm:w-8 text-center text-slate-400">D</div>
           <div className="hidden sm:block w-7 sm:w-8 text-center text-rose-400">L</div>
+          <div className="hidden lg:block w-7 sm:w-8 text-center text-slate-400">GF</div>
+          <div className="hidden lg:block w-7 sm:w-8 text-center text-slate-400">GA</div>
           <div className="w-8 sm:w-9 text-center">GD</div>
           <div className="w-8 sm:w-10 text-center text-amber-400 font-black">Pts</div>
           {!compact && <div className="hidden xl:block w-28 text-center">Form (Last 5)</div>}
@@ -276,6 +344,12 @@ export function FootballStandingsTable({
                 </div>
                 <div className="hidden sm:block w-7 sm:w-8 text-center text-rose-400 font-bold font-mono">
                   {row.lost}
+                </div>
+                <div className="hidden lg:block w-7 sm:w-8 text-center text-slate-400 font-mono">
+                  {row.gf ?? '-'}
+                </div>
+                <div className="hidden lg:block w-7 sm:w-8 text-center text-slate-400 font-mono">
+                  {row.ga ?? '-'}
                 </div>
                 <div
                   className={`w-8 sm:w-9 text-center font-mono text-[11px] sm:text-xs ${

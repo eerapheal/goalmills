@@ -120,12 +120,13 @@ function cleanGroupName(rawGroup?: string): string {
   if (!rawGroup) return 'Group A';
   const trimmed = rawGroup.trim();
 
-  // If already "Group A", "Group B"
-  if (/^group\s+[a-z]$/i.test(trimmed)) {
-    return `Group ${trimmed.slice(-1).toUpperCase()}`;
+  // If already "Group A", "Group B", "Group 1", "Group 12"
+  const groupMatch = trimmed.match(/^group\s+([a-z0-9]+)$/i);
+  if (groupMatch) {
+    return `Group ${groupMatch[1].toUpperCase()}`;
   }
-  // If just "A", "B", "C"
-  if (/^[a-z]$/i.test(trimmed)) {
+  // If just "A", "B", "C" or single digit
+  if (/^[a-z0-9]$/i.test(trimmed)) {
     return `Group ${trimmed.toUpperCase()}`;
   }
   // If "League Phase"
@@ -160,7 +161,13 @@ export function separateProviderStandingsByGroup(
 
   const ruleset = getStandingsRulesetForCompetition(competitionId, seasonId);
   const hasDistinctGroupsInPayload = rawStandings.some(
-    (r) => r.league_group || r.group_name || r.group || r.standing_group
+    (r) =>
+      r.league_group ||
+      r.group_name ||
+      r.group ||
+      r.standing_group ||
+      (r.league_round && /group/i.test(r.league_round)) ||
+      (r.stage_name && /group/i.test(r.stage_name) && !/group\s+stage$/i.test(r.stage_name))
   );
   const isLeaguePhase = targetStage?.isLeaguePhase ?? false;
   const isGroupStage = (targetStage?.isGroupStage ?? false) || (!isLeaguePhase && hasDistinctGroupsInPayload);
@@ -226,7 +233,11 @@ export function separateProviderStandingsByGroup(
       raw.group_name ||
       raw.group ||
       raw.standing_group ||
-      raw.stage_name ||
+      (raw.league_round && /group/i.test(raw.league_round) ? raw.league_round : null) ||
+      (raw.stage_name && /group/i.test(raw.stage_name) && !/group\s+stage$/i.test(raw.stage_name)
+        ? raw.stage_name
+        : null) ||
+      raw.league_round ||
       'Group A';
 
     const groupTitle = cleanGroupName(rawGroupName);
@@ -293,4 +304,39 @@ export function getAllGroupStandingsForStage(
   rawStandings: any[] = []
 ): StandingTable[] {
   return separateProviderStandingsByGroup(rawStandings, competitionId, seasonId, stageSlug);
+}
+
+/**
+ * Generates structured preview group tables for an upcoming or preview tournament stage
+ * when live matches are not yet in progress.
+ */
+export function generatePreviewGroupStandings(
+  competitionId: string,
+  seasonId = 'default'
+): StandingTable[] {
+  const stages = getStagesForCompetition(competitionId, seasonId);
+  const groupStage = stages.find((s) => s.isGroupStage);
+  if (!groupStage || !groupStage.groups || groupStage.groups.length === 0) {
+    return [];
+  }
+
+  const ruleset = getStandingsRulesetForCompetition(competitionId, seasonId);
+
+  return groupStage.groups.map((g, idx) => {
+    const tableId = `preview-table-${competitionId.toLowerCase()}-${g.slug}-${seasonId}`;
+    return {
+      id: tableId,
+      competitionId,
+      seasonId,
+      stageId: groupStage.id,
+      groupId: g.id,
+      type: 'GROUP',
+      name: g.name,
+      slug: g.slug,
+      rulesetId: ruleset.id,
+      displayOrder: idx + 1,
+      status: 'UPCOMING',
+      entries: [],
+    };
+  });
 }
