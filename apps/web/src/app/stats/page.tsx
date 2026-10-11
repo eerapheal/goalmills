@@ -30,14 +30,16 @@ export const metadata: Metadata = {
 export default async function StatsHubPage() {
   const competitions = EntityService.getAllCompetitions();
 
-  // Load premier league (152) and champions league (300) stats by default
+  // Load premier league (152), la liga (302) and standings
   let eplStandings: FootballStanding[] = [];
   let eplScorers: FootballTopscorer[] = [];
+  let laLigaScorers: FootballTopscorer[] = [];
 
   try {
-    const [standingsRes, scorersRes] = await Promise.all([
+    const [standingsRes, scorersRes, laLigaScorersRes] = await Promise.all([
       advancedFootballApi.getStandings(152).catch(() => ({ success: 0, result: { total: [] } })),
       advancedFootballApi.getTopscorers(152).catch(() => ({ success: 0, result: [] })),
+      advancedFootballApi.getTopscorers(302).catch(() => ({ success: 0, result: [] })),
     ]);
 
     if (standingsRes?.result?.total && Array.isArray(standingsRes.result.total)) {
@@ -46,9 +48,23 @@ export default async function StatsHubPage() {
     if (scorersRes?.result && Array.isArray(scorersRes.result)) {
       eplScorers = scorersRes.result.slice(0, 10);
     }
+    if (laLigaScorersRes?.result && Array.isArray(laLigaScorersRes.result)) {
+      laLigaScorers = laLigaScorersRes.result.slice(0, 10);
+    }
   } catch (err) {
     console.error('Error fetching stats hub data:', err);
   }
+
+  // Derive live top defensive units from current 2026/2027 season standings (fewest goals conceded)
+  const topDefenses = [...eplStandings]
+    .filter((t) => Number(t.standing_P) > 0)
+    .sort((a, b) => {
+      const gaA = Number(a.standing_GA) ?? 999;
+      const gaB = Number(b.standing_GA) ?? 999;
+      if (gaA !== gaB) return gaA - gaB;
+      return (Number(b.standing_GD) || 0) - (Number(a.standing_GD) || 0);
+    })
+    .slice(0, 5);
 
   return (
     <ContentHubLayout
@@ -183,48 +199,57 @@ export default async function StatsHubPage() {
             </div>
           </div>
 
-          {/* Clean Sheet / Defensive Radar Box */}
+          {/* Defensive Records & Clean Sheets Box */}
           <div className="rounded-3xl border border-blue-500/20 bg-[#0A162B]/90 p-5 space-y-3 shadow-xl backdrop-blur-md">
             <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
               <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <FiShield className="text-blue-400" />
-                <span>Golden Glove Clean Sheets</span>
+                <span>Top Defensive Records</span>
               </h3>
-              <span className="text-[10px] font-mono text-blue-300 font-bold">25/26</span>
+              <span className="text-[10px] font-mono text-blue-300 font-bold">2026/2027</span>
             </div>
             <div className="space-y-2.5">
-              {[
-                { name: 'David Raya', team: 'Arsenal', cleanSheets: 14, saves: '82%' },
-                { name: 'Thibaut Courtois', team: 'Real Madrid', cleanSheets: 13, saves: '80%' },
-                { name: 'Alisson Becker', team: 'Liverpool', cleanSheets: 12, saves: '79%' },
-              ].map((keeper, i) => (
-                <div
-                  key={keeper.name}
-                  className="p-3 rounded-2xl bg-[#070F1E] border border-blue-500/15 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-xs font-black text-amber-400">
-                      {i + 1}
-                    </span>
-                    <div>
-                      <h4 className="text-xs font-bold text-white">{keeper.name}</h4>
-                      <p className="text-[10px] text-slate-400">{keeper.team}</p>
+              {topDefenses.length > 0 ? (
+                topDefenses.map((team, i) => {
+                  const ga = Number(team.standing_GA) || 0;
+                  const p = Number(team.standing_P) || 1;
+                  const gaPerGame = (ga / p).toFixed(2);
+                  return (
+                    <div
+                      key={team.standing_team || i}
+                      className="p-3 rounded-2xl bg-[#070F1E] border border-blue-500/15 flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-6 h-6 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-xs font-black text-amber-400">
+                          {i + 1}
+                        </span>
+                        <div>
+                          <h4 className="text-xs font-bold text-white">{team.standing_team}</h4>
+                          <p className="text-[10px] text-slate-400">
+                            {team.standing_P} Matches · Pos #{team.standing_place}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-black text-emerald-400">
+                          {ga} GA
+                        </span>
+                        <p className="text-[9px] text-slate-400">{gaPerGame} per game</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-black text-amber-400">
-                      {keeper.cleanSheets} CS
-                    </span>
-                    <p className="text-[9px] text-slate-500">{keeper.saves} Save %</p>
-                  </div>
+                  );
+                })
+              ) : (
+                <div className="p-3 rounded-2xl bg-[#070F1E] text-xs text-slate-400 text-center">
+                  Standings synchronizing...
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
       }
     >
-      {/* Top Scorers Widget */}
+      {/* Premier League Top Scorers Widget */}
       {eplScorers.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b border-blue-500/20 pb-3">
@@ -232,13 +257,31 @@ export default async function StatsHubPage() {
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 text-base border border-amber-500/30">
                 <FiAward />
               </span>
-              <span>Premier League Golden Boot Race</span>
+              <span>Premier League Golden Boot Race (2026/2027)</span>
             </h2>
             <span className="text-[10px] font-mono text-amber-300 font-bold px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
-              Top 10 Scorers
+              Live API
             </span>
           </div>
           <FootballTopScorers scorers={eplScorers} />
+        </section>
+      )}
+
+      {/* La Liga Top Scorers Widget */}
+      {laLigaScorers.length > 0 && (
+        <section className="space-y-4 pt-4">
+          <div className="flex items-center justify-between border-b border-blue-500/20 pb-3">
+            <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2 uppercase tracking-tight">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 text-base border border-amber-500/30">
+                <FiAward />
+              </span>
+              <span>La Liga Pichichi Race (2026/2027)</span>
+            </h2>
+            <span className="text-[10px] font-mono text-amber-300 font-bold px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
+              Live API
+            </span>
+          </div>
+          <FootballTopScorers scorers={laLigaScorers} />
         </section>
       )}
 
@@ -250,7 +293,7 @@ export default async function StatsHubPage() {
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-base shadow-md shadow-blue-600/30">
                 <FiActivity />
               </span>
-              <span>Premier League Standings & Form Guide</span>
+              <span>Premier League Standings & Form Guide (2026/2027)</span>
             </h2>
             <Link
               href="/football/premier-league/table"

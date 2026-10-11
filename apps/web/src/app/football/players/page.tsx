@@ -6,6 +6,7 @@ import { ContentHubLayout } from '@/components/ContentHubLayout';
 import { TransferCenterCard } from '@/components/TransferCenterCard';
 import { LiveNewsFlashTicker } from '@/components/LiveNewsFlashTicker';
 import { PlayersHubClient } from '@/components/players/PlayersHubClient';
+import { getLiveSeasonPlayers } from '@/lib/football/livePlayersService';
 import { FiTrendingUp, FiShield, FiMail, FiArrowRight } from 'react-icons/fi';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export default async function FootballPlayersHubPage() {
-  const allPlayers = EntityService.getAllPlayers();
+  const allPlayers = await getLiveSeasonPlayers();
   // Spotlight African players at the top of the hub
   const players = [
     ...allPlayers.filter((p) => p.africanOrigin),

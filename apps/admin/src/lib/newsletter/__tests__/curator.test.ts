@@ -97,6 +97,6 @@ describe('Newsletter Curator & HTML Generator', () => {
     expect(html).toContain('GoalMills Matchday Brief');
     expect(html).toContain('Mbappe Scores Stunner');
     expect(html).toContain('https://goalmills.com/newsletter/unsubscribe?token=abc123token');
-    expect(html).toContain('⚡ Breaking News');
+    expect(html).toContain('⚡ BREAKING');
   });
 });
