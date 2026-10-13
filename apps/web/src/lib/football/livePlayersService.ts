@@ -3,64 +3,10 @@ import { EntityService, PlayerMeta, PLAYERS_REGISTRY } from '@/lib/entityService
 import { slugify } from '@/lib/slugUtils';
 import type { FootballTopscorer } from '@goalmills/types';
 
-// African superstar names to identify African origin dynamically
-const AFRICAN_PLAYERS_SET = new Set([
-  'victor osimhen',
-  'v. osimhen',
-  'osimhen',
-  'mohamed salah',
-  'm. salah',
-  'salah',
-  'ademola lookman',
-  'a. lookman',
-  'lookman',
-  'achraf hakimi',
-  'a. hakimi',
-  'hakimi',
-  'mohammed kudus',
-  'm. kudus',
-  'kudus',
-  'bryan mbeumo',
-  'b. mbeumo',
-  'mbeumo',
-  'nicolas jackson',
-  'n. jackson',
-  'antoine semenyo',
-  'a. semenyo',
-  'semenyo',
-  'amad diallo',
-  'a. diallo',
-  'serhou guirassy',
-  's. guirassy',
-  'guirassy',
-  'inaki williams',
-  'i. williams',
-  'pape matar sarr',
-  'p. sarr',
-  'alex iwobi',
-  'a. iwobi',
-  'frank onyeka',
-  'wilfred ndidi',
-  'w. ndidi',
-  'calvin bassey',
-  'c. bassey',
-  'youssef en-nesyri',
-  'y. en-nesyri',
-  'brahim diaz',
-  'b. diaz',
-  'hakim ziyech',
-  'sadio mane',
-  's. mane',
-  'pierre-emerick aubameyang',
-  'thomas partey',
-  't. partey',
-  'andre onana',
-  'a. onana',
-  'edouard mendy',
-  'yassine bounou',
-]);
-
-function isAfricanOrigin(playerName: string, nationality?: string): boolean {
+function isAfricanOrigin(playerName: string, nationality?: string, competitionSlug?: string): boolean {
+  if (competitionSlug && competitionSlug.toLowerCase().includes('caf')) {
+    return true;
+  }
   if (nationality) {
     const nat = nationality.toLowerCase();
     const africanCountries = [
@@ -71,7 +17,7 @@ function isAfricanOrigin(playerName: string, nationality?: string): boolean {
       'senegal',
       'cameroon',
       'ivory coast',
-      'côte d\'ivoire',
+      "côte d'ivoire",
       'algeria',
       'tunisia',
       'mali',
@@ -89,8 +35,16 @@ function isAfricanOrigin(playerName: string, nationality?: string): boolean {
     ];
     if (africanCountries.some((c) => nat.includes(c))) return true;
   }
-  const normalized = (playerName || '').trim().toLowerCase();
-  return AFRICAN_PLAYERS_SET.has(normalized);
+
+  // Derive origin dynamically from canonical registry if player exists
+  const regPlayer = EntityService.getAllPlayers().find(
+    (p) =>
+      slugify(p.name) === slugify(playerName) ||
+      p.name.toLowerCase() === (playerName || '').toLowerCase()
+  );
+  if (regPlayer?.africanOrigin) return true;
+
+  return false;
 }
 
 /**
@@ -104,7 +58,7 @@ function scorerToPlayerMeta(scorer: FootballTopscorer, competitionSlug: string):
   const assists = parseInt(String(scorer.assists || '0'), 10) || 0;
   const teamName = scorer.team_name || 'Club';
   const teamSlug = slugify(teamName);
-  const african = isAfricanOrigin(name);
+  const african = isAfricanOrigin(name, undefined, competitionSlug);
 
   // Approximate appearances based on goals (current season)
   const appearances = Math.max(Math.round(goals * 1.2), 6);
