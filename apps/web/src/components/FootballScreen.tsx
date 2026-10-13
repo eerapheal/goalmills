@@ -176,17 +176,17 @@ export function FootballScreen() {
           }
         } else if (activeTab === 'topscorers') {
           const res = await advancedFootballApi.getTopscorers(targetLeague);
-          setTopscorers(res?.result || []);
+          setTopscorers(Array.isArray(res?.result) ? res.result : []);
         } else if (activeTab === 'predictions') {
           const res = await advancedFootballApi.getProbabilities({
             from: selectedDate,
             to: selectedDate,
             leagueId: targetLeague,
           });
-          setProbabilities(res?.result || []);
+          setProbabilities(Array.isArray(res?.result) ? res.result : []);
         } else if (activeTab === 'live') {
           const res = await advancedFootballApi.getLivescore();
-          const raw = res?.result || [];
+          const raw = Array.isArray(res?.result) ? res.result : [];
           setFixtures(raw.map(adaptMatch));
         } else {
           // 'upcoming' or 'results'
@@ -195,7 +195,7 @@ export function FootballScreen() {
             to: selectedDate,
             leagueId: selectedLeague !== 'all' ? selectedLeague : undefined,
           });
-          const raw = res?.result || [];
+          const raw = Array.isArray(res?.result) ? res.result : [];
           setFixtures(raw.map(adaptMatch));
         }
       } catch (err) {
@@ -227,7 +227,7 @@ export function FootballScreen() {
   };
 
   const filteredFixtures = useMemo(() => {
-    let list = fixtures;
+    let list = Array.isArray(fixtures) ? fixtures : [];
 
     if (activeTab === 'live') {
       list = list.filter(

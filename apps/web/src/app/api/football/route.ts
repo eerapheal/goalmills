@@ -429,9 +429,13 @@ export async function GET(request: NextRequest) {
       const data = await response.json();
 
       const hasUpstreamError =
-        data.error === '1' ||
-        data.error === 1 ||
+        Boolean(data.error) ||
         data.cod === 1006 ||
+        typeof data.result === 'string' ||
+        (data.result &&
+          typeof data.result === 'object' &&
+          !Array.isArray(data.result) &&
+          Boolean(data.result.msg || data.result.error)) ||
         (Array.isArray(data.result) &&
           data.result.some((r: any) => r && (r.cod || (r.msg && !r.event_key))));
 
@@ -479,7 +483,20 @@ export async function GET(request: NextRequest) {
               })
             : sanitizedResult;
       } else {
-        listResult = sanitizedResult ?? [];
+        const methodLower = normalizedMethod.toLowerCase();
+        if (methodLower === 'standings') {
+          listResult =
+            sanitizedResult && typeof sanitizedResult === 'object'
+              ? sanitizedResult
+              : { total: [], home: [], away: [] };
+        } else if (methodLower === 'h2h') {
+          listResult =
+            sanitizedResult && typeof sanitizedResult === 'object'
+              ? sanitizedResult
+              : { H2H: [], firstTeamResults: [], secondTeamResults: [] };
+        } else {
+          listResult = [];
+        }
       }
 
       const resultPayload = {

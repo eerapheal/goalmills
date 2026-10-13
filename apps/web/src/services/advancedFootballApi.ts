@@ -124,7 +124,10 @@ export const advancedFootballApi = {
   getCountries: async (): Promise<FootballCountriesResponse> => {
     try {
       const response = await fetchFromAPI<FootballCountriesResponse>('Countries');
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching countries:', error);
       return { success: 1, result: [] };
@@ -153,7 +156,10 @@ export const advancedFootballApi = {
       }
 
       const response = await fetchFromAPI<FootballLeaguesResponse>('Leagues', params);
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching leagues:', error);
       return { success: 1, result: [] };
@@ -175,7 +181,10 @@ export const advancedFootballApi = {
       };
 
       const response = await fetchFromAPI<FootballFixturesResponse>('Fixtures', apiParams);
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching fixtures:', error);
       return { success: 1, result: [] };
@@ -208,7 +217,21 @@ export const advancedFootballApi = {
       }
 
       const response = await fetchFromAPI<FootballH2HResponse>('H2H', params);
-      return response;
+      const resResult = response?.result;
+      const isH2HObj =
+        resResult &&
+        typeof resResult === 'object' &&
+        Array.isArray((resResult as any).H2H);
+      return {
+        ...response,
+        result: isH2HObj
+          ? resResult
+          : {
+              H2H: [],
+              firstTeamResults: [],
+              secondTeamResults: [],
+            },
+      };
     } catch (error) {
       console.error('Error fetching H2H:', error);
       return {
@@ -230,7 +253,10 @@ export const advancedFootballApi = {
     try {
       const apiParams: Record<string, any> = params || {};
       const response = await fetchFromAPI<FootballLivescoreResponse>('Livescore', apiParams);
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching livescore:', error);
       return { success: 1, result: [] };
@@ -253,7 +279,19 @@ export const advancedFootballApi = {
       }
 
       const response = await fetchFromAPI<FootballStandingsResponse>('Standings', params);
-      return response;
+      const resResult = response?.result;
+      const isStandingsObj =
+        resResult &&
+        typeof resResult === 'object' &&
+        !Array.isArray(resResult) &&
+        (Array.isArray((resResult as any).total) ||
+          Array.isArray((resResult as any).home) ||
+          Array.isArray((resResult as any).away));
+      const isStandingsArr = Array.isArray(resResult);
+      return {
+        ...response,
+        result: isStandingsObj || isStandingsArr ? resResult : { total: [], home: [], away: [] },
+      };
     } catch (error) {
       console.error('Error fetching standings:', error);
       return {
@@ -281,7 +319,10 @@ export const advancedFootballApi = {
           : paramsOrLeagueId;
 
       const response = await fetchFromAPI<FootballTopscorersResponse>('Topscorers', { leagueId });
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching topscorers:', error);
       return { success: 1, result: [] };
@@ -296,7 +337,10 @@ export const advancedFootballApi = {
     try {
       const apiParams: Record<string, any> = params || {};
       const response = await fetchFromAPI<FootballTeamsResponse>('Teams', apiParams);
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching teams:', error);
       return { success: 1, result: [] };
@@ -311,7 +355,10 @@ export const advancedFootballApi = {
     try {
       const apiParams: Record<string, any> = params || {};
       const response = await fetchFromAPI<FootballPlayersResponse>('Players', apiParams);
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching players:', error);
       return { success: 1, result: [] };
@@ -346,7 +393,10 @@ export const advancedFootballApi = {
         'Probabilities',
         apiParams
       );
-      return response;
+      return {
+        ...response,
+        result: Array.isArray(response?.result) ? response.result : [],
+      };
     } catch (error) {
       console.error('Error fetching probabilities:', error);
       return { success: 1, result: [] };

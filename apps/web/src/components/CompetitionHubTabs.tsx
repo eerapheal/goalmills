@@ -86,10 +86,10 @@ export function CompetitionHubTabs({
         }
       } else if (activeTab === 'stats') {
         const res = await advancedFootballApi.getTopscorers(competitionId);
-        setTopscorers(res?.result || []);
+        setTopscorers(Array.isArray(res?.result) ? res.result : []);
       } else if (activeTab === 'live') {
         const res = await advancedFootballApi.getLivescore({ leagueId: competitionId });
-        setFixtures(res?.result || []);
+        setFixtures(Array.isArray(res?.result) ? res.result : []);
       } else {
         // fixtures or results
         const res = await advancedFootballApi.getFixtures({
@@ -97,7 +97,7 @@ export function CompetitionHubTabs({
           to: selectedDate,
           leagueId: competitionId,
         });
-        setFixtures(res?.result || []);
+        setFixtures(Array.isArray(res?.result) ? res.result : []);
       }
     } catch (err) {
       console.error('[CompHubTabs] Error:', err);
@@ -111,7 +111,7 @@ export function CompetitionHubTabs({
     const fetchTeams = async () => {
       try {
         const res = await advancedFootballApi.getTeams({ leagueId: competitionId });
-        setTeams(res?.result || []);
+        setTeams(Array.isArray(res?.result) ? res.result : []);
       } catch {}
     };
     fetchTeams();
@@ -122,35 +122,38 @@ export function CompetitionHubTabs({
   }, [fetchData]);
 
   const filteredFixtures = useMemo(() => {
-    let list = fixtures;
+    let list = Array.isArray(fixtures) ? fixtures : [];
     if (activeTab === 'live') {
       list = list.filter(
         (f) =>
-          String(f.event_live) === '1' ||
-          (f.event_status &&
-            !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
-              f.event_status as string
-            ))
+          f &&
+          (String(f.event_live) === '1' ||
+            (f.event_status &&
+              !['Finished', 'FT', 'Cancelled', 'Postponed', 'Not Started', 'NS'].includes(
+                f.event_status as string
+              )))
       );
     } else if (activeTab === 'fixtures') {
       list = list.filter(
         (f) =>
-          f.event_status === 'Not Started' ||
-          f.event_status === 'NS' ||
-          f.event_status === 'TBA' ||
-          (String(f.event_live) !== '1' &&
-            f.event_status !== 'FT' &&
-            f.event_status !== 'Finished' &&
-            !f.event_final_result)
+          f &&
+          (f.event_status === 'Not Started' ||
+            f.event_status === 'NS' ||
+            f.event_status === 'TBA' ||
+            (String(f.event_live) !== '1' &&
+              f.event_status !== 'FT' &&
+              f.event_status !== 'Finished' &&
+              !f.event_final_result))
       );
     } else if (activeTab === 'results') {
       list = list.filter(
         (f) =>
-          f.event_status === 'FT' ||
-          f.event_status === 'Finished' ||
-          f.event_status === 'AET' ||
-          f.event_status === 'AP' ||
-          Boolean(f.event_final_result && f.event_final_result !== '-')
+          f &&
+          (f.event_status === 'FT' ||
+            f.event_status === 'Finished' ||
+            f.event_status === 'AET' ||
+            f.event_status === 'AP' ||
+            Boolean(f.event_final_result && f.event_final_result !== '-'))
       );
     }
     return list;
@@ -158,9 +161,10 @@ export function CompetitionHubTabs({
 
   // Detect group stage standings (if standings have "group_name" field)
   const standingsByGroup = useMemo(() => {
-    if (!hasGroups || standings.length === 0) return null;
+    if (!hasGroups || !Array.isArray(standings) || standings.length === 0) return null;
     const groups: Record<string, FootballStanding[]> = {};
     for (const s of standings) {
+      if (!s) continue;
       const groupName = (s as any).league_round || (s as any).group_name || '';
       if (groupName) {
         if (!groups[groupName]) groups[groupName] = [];
@@ -362,7 +366,7 @@ export function CompetitionHubTabs({
               </div>
 
               {/* Group Standings or Unified Standings or Knockout Bracket */}
-              {hasGroups && standings.length > 0 ? (
+              {hasGroups && Array.isArray(standings) && standings.length > 0 ? (
                 (() => {
                   const separated = separateProviderStandingsByGroup(
                     standings,
@@ -380,7 +384,7 @@ export function CompetitionHubTabs({
                     />
                   );
                 })()
-              ) : standings.length > 0 ? (
+              ) : Array.isArray(standings) && standings.length > 0 ? (
                 <FootballStandingsTable standings={standings} leagueId={competitionId} />
               ) : hasKnockout ? (
                 <div className="space-y-4">
@@ -390,7 +394,11 @@ export function CompetitionHubTabs({
                     </h3>
                   </div>
                   <TournamentBracketView
-                    bracket={buildTournamentBracket(competitionSlug, '2026/2027', fixtures)}
+                    bracket={buildTournamentBracket(
+                      competitionSlug,
+                      '2026/2027',
+                      Array.isArray(fixtures) ? fixtures : []
+                    )}
                   />
                 </div>
               ) : (
@@ -404,7 +412,7 @@ export function CompetitionHubTabs({
           {/* Stats (Top Scorers) */}
           {activeTab === 'stats' && (
             <div>
-              {topscorers.length > 0 ? (
+              {Array.isArray(topscorers) && topscorers.length > 0 ? (
                 <FootballTopScorers scorers={topscorers} />
               ) : (
                 <div className="text-center text-slate-400 py-12 text-sm">
@@ -417,7 +425,7 @@ export function CompetitionHubTabs({
       )}
 
       {/* All Teams in Competition */}
-      {teams && teams.length > 0 && (
+      {Array.isArray(teams) && teams.length > 0 && (
         <section className="pt-6 border-t border-white/10">
           <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
             <span>🏟️</span> All {competitionName} Teams ({teams.filter((t) => Boolean(t && (t.team_name || t.team_key))).length})

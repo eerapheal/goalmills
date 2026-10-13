@@ -43,7 +43,8 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
     return null;
   };
 
-  const sortedScorers = [...scorers].sort((a, b) => {
+  const safeScorers = Array.isArray(scorers) ? scorers : [];
+  const sortedScorers = [...safeScorers].sort((a, b) => {
     const goalsA = parseInt(a.goals) || 0;
     const goalsB = parseInt(b.goals) || 0;
     if (goalsB !== goalsA) return goalsB - goalsA;

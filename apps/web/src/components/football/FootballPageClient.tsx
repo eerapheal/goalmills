@@ -455,7 +455,9 @@ export function FootballPageClient({
 
   // Live score counting
   const liveCount = useMemo(() => {
-    return liveFixtures.filter((f) => f.status === 'LIVE' || f.status === 'HT').length;
+    return (Array.isArray(liveFixtures) ? liveFixtures : []).filter(
+      (f) => f && (f.status === 'LIVE' || f.status === 'HT')
+    ).length;
   }, [liveFixtures]);
 
   // Fetch live standings and top scorers dynamically
@@ -692,7 +694,7 @@ export function FootballPageClient({
   }, []);
 
   const currentFixtures = useMemo(() => {
-    let list = tabFixtures[mainTab] ?? [];
+    let list = Array.isArray(tabFixtures[mainTab]) ? tabFixtures[mainTab]! : [];
 
     // 1. Confederation & Top 5 Isolation
     if (navCategory !== 'all') {
@@ -753,16 +755,18 @@ export function FootballPageClient({
 
   // Search-filtered Standings
   const filteredTableData = useMemo(() => {
-    if (!searchQuery.trim()) return tableData;
+    const safeTable = Array.isArray(tableData) ? tableData : [];
+    if (!searchQuery.trim()) return safeTable;
     const q = searchQuery.toLowerCase().trim();
-    return tableData.filter((r) => r.team.toLowerCase().includes(q));
+    return safeTable.filter((r) => r.team.toLowerCase().includes(q));
   }, [tableData, searchQuery]);
 
   // Search-filtered Top Scorers
   const filteredScorersData = useMemo(() => {
-    if (!searchQuery.trim()) return scorersData;
+    const safeScorers = Array.isArray(scorersData) ? scorersData : [];
+    if (!searchQuery.trim()) return safeScorers;
     const q = searchQuery.toLowerCase().trim();
-    return scorersData.filter(
+    return safeScorers.filter(
       (s) => s.name.toLowerCase().includes(q) || s.team.toLowerCase().includes(q)
     );
   }, [scorersData, searchQuery]);

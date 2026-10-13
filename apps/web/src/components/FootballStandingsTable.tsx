@@ -81,7 +81,7 @@ export function FootballStandingsTable({
         const res = await advancedFootballApi
           .getFixtures({ leagueId: Number(leagueId), from, to })
           .catch(() => null);
-        if (res?.result) {
+        if (res?.result && Array.isArray(res.result)) {
           const forms: Record<string, string[]> = {};
 
           const finished = res.result
@@ -122,11 +122,13 @@ export function FootballStandingsTable({
   // Normalize input into unified row models
   const rows: UnifiedStandingRow[] = useMemo(() => {
     const activeStandings =
-      viewType === 'home' && homeStandings.length > 0
+      viewType === 'home' && Array.isArray(homeStandings) && homeStandings.length > 0
         ? homeStandings
-        : viewType === 'away' && awayStandings.length > 0
+        : viewType === 'away' && Array.isArray(awayStandings) && awayStandings.length > 0
           ? awayStandings
-          : standings;
+          : Array.isArray(standings)
+            ? standings
+            : [];
 
     if (viewType === 'total' && table && table.entries && table.entries.length > 0) {
       return table.entries.map((e, idx) => ({
