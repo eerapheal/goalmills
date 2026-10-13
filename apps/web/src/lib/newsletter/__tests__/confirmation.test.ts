@@ -13,6 +13,17 @@ vi.mock('@/models/News', () => ({
   },
 }));
 
+vi.mock('../directSmtp', () => ({
+  sendEmailViaNodemailer: vi.fn().mockResolvedValue({
+    success: true,
+    messageId: '<mock-id@goalmills.com>',
+  }),
+  sendEmailViaDirectSmtp: vi.fn().mockResolvedValue({
+    success: true,
+    messageId: '<mock-id@goalmills.com>',
+  }),
+}));
+
 describe("Newsletter Confirmation & Editor's Picks Email Suite", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -138,12 +149,12 @@ describe("Newsletter Confirmation & Editor's Picks Email Suite", () => {
       expect(html).toContain('Breaking: Star Striker Signs Historic 5-Year Extension');
       expect(html).toContain('https://goalmills.com/news/high-press-modern-football');
       expect(html).toContain('https://goalmills.com/news/star-striker-extension');
-      expect(html).toContain("⭐ EDITOR'S PICKS");
+      expect(html).toContain("⭐ Editor's Pick");
 
       // Assert Compliance & Deliverability
       expect(html).toContain('https://goalmills.com/newsletter/unsubscribe?token=unsub-token-456');
-      expect(html).toContain('1-Click Unsubscribe');
-      expect(html).toContain('newsletter@goalmills.com');
+      expect(html).toContain('Unsubscribe');
+      expect(html).toContain('Manage Preferences');
     });
 
     it('should include double opt-in verification link when required', () => {

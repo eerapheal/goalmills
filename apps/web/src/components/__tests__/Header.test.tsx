@@ -10,8 +10,7 @@ describe('Header Component', () => {
         <Header />
       </ToastProvider>
     );
-    expect(screen.getByText('GOAL')).toBeInTheDocument();
-    expect(screen.getByText('MILLS')).toBeInTheDocument();
+    expect(screen.getByAltText('GoalMills')).toBeInTheDocument();
   });
 
   it('renders navigation links (News & Highlights)', () => {
