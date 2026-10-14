@@ -169,7 +169,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CAF-WAFCON': {
     id: 'CAF-WAFCON',
-    providerId: 365,
+    providerId: 7547,
     providerName: 'allsportsapi',
     apiSportsId: 365,
     slug: 'afcon-women',
@@ -206,7 +206,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CAF-AFCON-U20': {
     id: 'CAF-AFCON-U20',
-    providerId: 362,
+    providerId: 619,
     providerName: 'allsportsapi',
     apiSportsId: 322,
     slug: 'afcon-u20',
@@ -243,7 +243,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CAF-AFCON-U17': {
     id: 'CAF-AFCON-U17',
-    providerId: 363,
+    providerId: 10253,
     providerName: 'allsportsapi',
     apiSportsId: 325,
     slug: 'afcon-u17',
@@ -282,7 +282,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   // ─── African Domestic Leagues ────────────────────────────────────────────────
   'NGA-NPFL': {
     id: 'NGA-NPFL',
-    providerId: 247,
+    providerId: 248,
     providerName: 'allsportsapi',
     apiSportsId: 234,
     slug: 'npfl',
@@ -356,7 +356,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'EGY-PREMIER-LEAGUE': {
     id: 'EGY-PREMIER-LEAGUE',
-    providerId: 178,
+    providerId: 141,
     providerName: 'allsportsapi',
     apiSportsId: 233,
     slug: 'egyptian-premier-league',
@@ -393,7 +393,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'MAR-BOTOLA-PRO': {
     id: 'MAR-BOTOLA-PRO',
-    providerId: 233,
+    providerId: 239,
     providerName: 'allsportsapi',
     apiSportsId: 200,
     slug: 'botola-pro',
@@ -430,7 +430,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'GHA-PREMIER-LEAGUE': {
     id: 'GHA-PREMIER-LEAGUE',
-    providerId: 198,
+    providerId: 177,
     providerName: 'allsportsapi',
     apiSportsId: 387,
     slug: 'ghanaian-premier-league',
@@ -987,7 +987,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'ENG-EFL-CUP': {
     id: 'ENG-EFL-CUP',
-    providerId: 151,
+    providerId: 147,
     providerName: 'allsportsapi',
     apiSportsId: 48,
     slug: 'efl-league-cup',
@@ -1437,7 +1437,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'GER-DFB-POKAL': {
     id: 'GER-DFB-POKAL',
-    providerId: 173,
+    providerId: 172,
     providerName: 'allsportsapi',
     apiSportsId: 81,
     slug: 'dfb-pokal',
@@ -1587,7 +1587,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'FRA-COUPE-DE-FRANCE': {
     id: 'FRA-COUPE-DE-FRANCE',
-    providerId: 166,
+    providerId: 165,
     providerName: 'allsportsapi',
     apiSportsId: 66,
     slug: 'coupe-de-france',
@@ -1737,7 +1737,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'UEFA-SUPER-CUP': {
     id: 'UEFA-SUPER-CUP',
-    providerId: 2,
+    providerId: 372,
     providerName: 'allsportsapi',
     apiSportsId: 531,
     slug: 'uefa-super-cup',
@@ -2000,7 +2000,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CONMEBOL-LIBERTADORES': {
     id: 'CONMEBOL-LIBERTADORES',
-    providerId: 13,
+    providerId: 18,
     providerName: 'allsportsapi',
     apiSportsId: 13,
     slug: 'copa-libertadores',
@@ -2037,7 +2037,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CONMEBOL-SUDAMERICANA': {
     id: 'CONMEBOL-SUDAMERICANA',
-    providerId: 14,
+    providerId: 385,
     providerName: 'allsportsapi',
     apiSportsId: 11,
     slug: 'copa-sudamericana',
@@ -2111,7 +2111,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'ARG-PRIMERA-DIVISION': {
     id: 'ARG-PRIMERA-DIVISION',
-    providerId: 135,
+    providerId: 44,
     providerName: 'allsportsapi',
     apiSportsId: 128,
     slug: 'liga-profesional',
@@ -2224,7 +2224,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'SCO-PREMIERSHIP': {
     id: 'SCO-PREMIERSHIP',
-    providerId: 179,
+    providerId: 279,
     providerName: 'allsportsapi',
     apiSportsId: 179,
     slug: 'scottish-premiership',
@@ -2298,7 +2298,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'BEL-PRO-LEAGUE': {
     id: 'BEL-PRO-LEAGUE',
-    providerId: 344,
+    providerId: 63,
     providerName: 'allsportsapi',
     apiSportsId: 144,
     slug: 'belgian-pro-league',
@@ -2337,7 +2337,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   // ─── CONCACAF & Other Global Competitions ───────────────────────────────────
   'USA-MLS': {
     id: 'USA-MLS',
-    providerId: 330,
+    providerId: 332,
     providerName: 'allsportsapi',
     apiSportsId: 253,
     slug: 'mls',
@@ -2411,7 +2411,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'AFC-CHAMPIONS-LEAGUE': {
     id: 'AFC-CHAMPIONS-LEAGUE',
-    providerId: 16,
+    providerId: 10,
     providerName: 'allsportsapi',
     apiSportsId: 17,
     slug: 'afc-champions-league',
@@ -2448,7 +2448,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'CONCACAF-CHAMPIONS-CUP': {
     id: 'CONCACAF-CHAMPIONS-CUP',
-    providerId: 489,
+    providerId: 5,
     providerName: 'allsportsapi',
     apiSportsId: 16,
     slug: 'concacaf-champions-cup',
@@ -2485,7 +2485,7 @@ export const CANONICAL_COMPETITIONS: Record<string, CanonicalCompetition> = {
   },
   'UEFA-U21-EURO': {
     id: 'UEFA-U21-EURO',
-    providerId: 32,
+    providerId: 511,
     providerName: 'allsportsapi',
     apiSportsId: 32,
     slug: 'uefa-u21-championship',

@@ -148,7 +148,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 247,
+    id: 248,
     apiSportsId: 234,
     name: 'NPFL (Nigeria)',
     slug: 'npfl',
@@ -167,7 +167,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 178,
+    id: 141,
     apiSportsId: 233,
     name: 'Egyptian Premier League',
     slug: 'egyptian-premier-league',
@@ -186,7 +186,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 233,
+    id: 239,
     apiSportsId: 200,
     name: 'Botola Pro Inwi',
     slug: 'botola-pro',
@@ -205,7 +205,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 198,
+    id: 177,
     apiSportsId: 387,
     name: 'Ghana Premier League',
     slug: 'ghanaian-premier-league',
@@ -244,7 +244,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 362,
+    id: 619,
     apiSportsId: 322,
     name: 'AFCON U-20',
     slug: 'afcon-u20',
@@ -263,7 +263,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u20',
   },
   {
-    id: 363,
+    id: 10253,
     apiSportsId: 325,
     name: 'AFCON U-17',
     slug: 'afcon-u17',
@@ -282,7 +282,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u17',
   },
   {
-    id: 365,
+    id: 7547,
     apiSportsId: 365,
     name: 'WAFCON',
     slug: 'afcon-women',
@@ -300,25 +300,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     gender: 'women',
     ageGroup: 'senior',
   },
-  {
-    id: 631,
-    apiSportsId: 631,
-    name: 'WAFU-B Nations Cup',
-    slug: 'wafu-b-nations-cup',
-    country: 'West Africa',
-    flag: '🌍',
-    logo: leagueLogo(631),
-    season: '2026/2027',
-    featured: false,
-    tier: 3,
-    description: 'West African Football Union (Zone B) tournament.',
-    category: 'caf',
-    competitionType: 'knockout',
-    hasGroups: true,
-    hasKnockout: true,
-    gender: 'men',
-    ageGroup: 'senior',
-  },
+
 
   // ─── European Top 5 ────────────────────────────────────────────────────────
   {
@@ -476,7 +458,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 2,
+    id: 372,
     apiSportsId: 531,
     name: 'UEFA Super Cup',
     slug: 'uefa-super-cup',
@@ -535,7 +517,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 179,
+    id: 279,
     apiSportsId: 179,
     name: 'Scottish Premiership',
     slug: 'scottish-premiership',
@@ -573,7 +555,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 344,
+    id: 63,
     apiSportsId: 144,
     name: 'Belgian Pro League',
     slug: 'belgian-pro-league',
@@ -611,7 +593,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 148,
+    id: 56,
     apiSportsId: 218,
     name: 'Austrian Bundesliga',
     slug: 'austrian-bundesliga',
@@ -630,7 +612,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 197,
+    id: 178,
     apiSportsId: 197,
     name: 'Greek Super League',
     slug: 'greek-super-league',
@@ -649,7 +631,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 283,
+    id: 344,
     apiSportsId: 235,
     name: 'Russian Premier League',
     slug: 'russian-premier-league',
@@ -668,7 +650,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 164,
+    id: 134,
     apiSportsId: 345,
     name: 'Czech First League',
     slug: 'czech-first-league',
@@ -706,7 +688,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 165,
+    id: 135,
     apiSportsId: 119,
     name: 'Danish Superliga',
     slug: 'danish-superliga',
@@ -725,7 +707,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 249,
+    id: 253,
     apiSportsId: 103,
     name: 'Norwegian Eliteserien',
     slug: 'norwegian-eliteserien',
@@ -744,7 +726,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 310,
+    id: 307,
     apiSportsId: 113,
     name: 'Swedish Allsvenskan',
     slug: 'swedish-allsvenskan',
@@ -763,7 +745,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 332,
+    id: 325,
     apiSportsId: 333,
     name: 'Ukrainian Premier League',
     slug: 'ukrainian-premier-league',
@@ -782,7 +764,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 161,
+    id: 124,
     apiSportsId: 210,
     name: 'Croatian First League',
     slug: 'croatian-first-league',
@@ -801,7 +783,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 286,
+    id: 288,
     apiSportsId: 286,
     name: 'Serbian SuperLiga',
     slug: 'serbian-superliga',
@@ -820,7 +802,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 271,
+    id: 272,
     apiSportsId: 283,
     name: 'Romanian Liga 1',
     slug: 'romanian-liga-1',
@@ -860,7 +842,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 151,
+    id: 147,
     apiSportsId: 48,
     name: 'EFL League Cup',
     slug: 'efl-league-cup',
@@ -898,7 +880,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 173,
+    id: 172,
     apiSportsId: 81,
     name: 'DFB-Pokal',
     slug: 'dfb-pokal',
@@ -936,7 +918,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 166,
+    id: 165,
     apiSportsId: 66,
     name: 'Coupe de France',
     slug: 'coupe-de-france',
@@ -976,7 +958,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 140,
+    id: 20,
     apiSportsId: 141,
     name: 'FIFA World Cup Women',
     slug: 'fifa-world-cup-women',
@@ -995,7 +977,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 139,
+    id: 425,
     apiSportsId: 21,
     name: 'FIFA U-20 World Cup',
     slug: 'fifa-u20-world-cup',
@@ -1014,7 +996,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u20',
   },
   {
-    id: 138,
+    id: 415,
     apiSportsId: 23,
     name: 'FIFA U-17 World Cup',
     slug: 'fifa-u17-world-cup',
@@ -1033,7 +1015,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u17',
   },
   {
-    id: 531,
+    id: 12614,
     apiSportsId: 15,
     name: 'FIFA Club World Cup',
     slug: 'fifa-club-world-cup',
@@ -1112,7 +1094,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 373,
+    id: 511,
     apiSportsId: 24,
     name: 'UEFA EURO U-21',
     slug: 'uefa-euro-u21',
@@ -1131,7 +1113,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u21',
   },
   {
-    id: 374,
+    id: 611,
     apiSportsId: 25,
     name: 'UEFA EURO U-19',
     slug: 'uefa-euro-u19',
@@ -1150,7 +1132,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u19',
   },
   {
-    id: 375,
+    id: 7099,
     apiSportsId: 26,
     name: 'UEFA EURO U-17',
     slug: 'uefa-euro-u17',
@@ -1169,7 +1151,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'u17',
   },
   {
-    id: 141,
+    id: 499,
     apiSportsId: 142,
     name: "UEFA Women's EURO",
     slug: 'uefa-womens-euro',
@@ -1209,7 +1191,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 13,
+    id: 18,
     apiSportsId: 13,
     name: 'Copa Libertadores',
     slug: 'copa-libertadores',
@@ -1228,7 +1210,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 14,
+    id: 385,
     apiSportsId: 11,
     name: 'Copa Sudamericana',
     slug: 'copa-sudamericana',
@@ -1249,7 +1231,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
 
   // ─── CONCACAF ───────────────────────────────────────────────────────────────
   {
-    id: 18,
+    id: 15,
     apiSportsId: 22,
     name: 'CONCACAF Gold Cup',
     slug: 'concacaf-gold-cup',
@@ -1268,7 +1250,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 487,
+    id: 664,
     apiSportsId: 34,
     name: 'CONCACAF Nations League',
     slug: 'concacaf-nations-league',
@@ -1287,7 +1269,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 489,
+    id: 5,
     apiSportsId: 16,
     name: 'CONCACAF Champions Cup',
     slug: 'concacaf-champions-cup',
@@ -1308,7 +1290,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
 
   // ─── AFC (Asia) ─────────────────────────────────────────────────────────────
   {
-    id: 15,
+    id: 347,
     apiSportsId: 7,
     name: 'AFC Asian Cup',
     slug: 'afc-asian-cup',
@@ -1327,7 +1309,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 16,
+    id: 10,
     apiSportsId: 17,
     name: 'AFC Champions League Elite',
     slug: 'afc-champions-league',
@@ -1348,7 +1330,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
 
   // ─── Major Global Leagues ───────────────────────────────────────────────────
   {
-    id: 330,
+    id: 332,
     apiSportsId: 253,
     name: 'MLS',
     slug: 'mls',
@@ -1386,7 +1368,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 135,
+    id: 44,
     apiSportsId: 128,
     name: 'Liga Profesional',
     slug: 'liga-profesional',
@@ -1424,7 +1406,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 210,
+    id: 209,
     apiSportsId: 98,
     name: 'J1 League',
     slug: 'j1-league',
@@ -1443,7 +1425,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 211,
+    id: 219,
     apiSportsId: 292,
     name: 'K League 1',
     slug: 'k-league-1',
@@ -1462,7 +1444,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 188,
+    id: 566,
     apiSportsId: 323,
     name: 'Indian Super League',
     slug: 'indian-super-league',
@@ -1481,7 +1463,7 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     ageGroup: 'senior',
   },
   {
-    id: 147,
+    id: 49,
     apiSportsId: 188,
     name: 'A-League',
     slug: 'a-league',

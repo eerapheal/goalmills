@@ -302,26 +302,6 @@ export const ALL_COMPETITIONS: CompetitionEntry[] = [
     gender: 'women',
     ageGroup: 'senior',
   },
-  {
-    id: 631,
-    apiSportsId: 631,
-    name: 'WAFU-B Nations Cup',
-    slug: 'wafu-b-nations-cup',
-    country: 'West Africa',
-    flag: '🌍',
-    logo: leagueLogo(631),
-    season: '2026/2027',
-    featured: false,
-    tier: 3,
-    description: 'West African Football Union (Zone B) tournament.',
-    category: 'caf',
-    competitionType: 'knockout',
-    hasGroups: true,
-    hasKnockout: true,
-    gender: 'men',
-    ageGroup: 'senior',
-  },
-
   // ─── European Top 5 ────────────────────────────────────────────────────────
   {
     id: 152,

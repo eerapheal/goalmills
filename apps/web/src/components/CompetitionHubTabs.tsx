@@ -117,6 +117,19 @@ export function CompetitionHubTabs({
     fetchTeams();
   }, [competitionId]);
 
+  const validTeams = useMemo(() => {
+    if (!Array.isArray(teams)) return [];
+    return teams.filter(
+      (t): t is FootballTeam =>
+        Boolean(
+          t &&
+            t.team_name &&
+            t.team_name.trim() !== '' &&
+            !/^team\s*\d+$/i.test(t.team_name.trim())
+        )
+    );
+  }, [teams]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -425,47 +438,45 @@ export function CompetitionHubTabs({
       )}
 
       {/* All Teams in Competition */}
-      {Array.isArray(teams) && teams.length > 0 && (
+      {validTeams.length > 0 && (
         <section className="pt-6 border-t border-white/10">
           <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <span>🏟️</span> All {competitionName} Teams ({teams.filter((t) => Boolean(t && (t.team_name || t.team_key))).length})
+            <span>🏟️</span> All {competitionName} Teams ({validTeams.length})
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {teams
-              .filter((t): t is FootballTeam => Boolean(t && (t.team_name || t.team_key)))
-              .map((t, idx) => {
-                const teamName = t.team_name || `Team ${t.team_key || idx + 1}`;
-                const initialChar = teamName.trim() ? teamName.trim()[0]?.toUpperCase() || '⚽' : '⚽';
-                const teamLogo = resolveTeamLogo(teamName, t.team_logo);
+            {validTeams.map((t, idx) => {
+              const teamName = t.team_name;
+              const initialChar = teamName.trim() ? teamName.trim()[0]?.toUpperCase() || '⚽' : '⚽';
+              const teamLogo = resolveTeamLogo(teamName, t.team_logo);
 
-                return (
-                  <Link
-                    key={t.team_key || `team-${idx}`}
-                    href={footballRoutes.teamFromName(teamName, t.team_key)}
-                    className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#0B1526]/50 border border-white/5 hover:border-blue-500/30 transition-all group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-white/5 p-1 flex items-center justify-center shrink-0 overflow-hidden">
-                      {teamLogo ? (
-                        <img
-                          src={teamLogo}
-                          alt={teamName}
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              teamName.slice(0, 10)
-                            )}&background=0f172a&color=38bdf8&bold=true&size=64`;
-                          }}
-                        />
-                      ) : (
-                        <span className="text-xs font-bold text-white">{initialChar}</span>
-                      )}
-                    </div>
-                    <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">
-                      {teamName}
-                    </span>
-                  </Link>
-                );
-              })}
+              return (
+                <Link
+                  key={t.team_key || `team-${idx}`}
+                  href={footballRoutes.teamFromName(teamName, t.team_key)}
+                  className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#0B1526]/50 border border-white/5 hover:border-blue-500/30 transition-all group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white/5 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                    {teamLogo ? (
+                      <img
+                        src={teamLogo}
+                        alt={teamName}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            teamName.slice(0, 10)
+                          )}&background=0f172a&color=38bdf8&bold=true&size=64`;
+                        }}
+                      />
+                    ) : (
+                      <span className="text-xs font-bold text-white">{initialChar}</span>
+                    )}
+                  </div>
+                  <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate">
+                    {teamName}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

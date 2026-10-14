@@ -24,6 +24,7 @@ import {
 } from '@/lib/entityService';
 import { resolveTeamLogo, resolveLeagueLogo } from '@/lib/football/logoUtils';
 import { PlayerAvatar } from '@/components/football/PlayerAvatar';
+import { resolveFootballTeam } from '@/lib/football/teamResolver';
 import type {
   FootballTeam,
   FootballPlayer,
@@ -133,85 +134,49 @@ export default function FootballTeamPage() {
       try {
         setLoading(true);
 
-        const { teamKey, nameSlug } = parseTeamSlug(rawSlug);
-        const resolvedSlug = nameSlug || rawSlug;
-
-        // Check local registry first for metadata enrichment
-        const localClub =
-          CLUBS_REGISTRY[resolvedSlug.toLowerCase()] ||
-          Object.values(CLUBS_REGISTRY).find(
-            (c) =>
-              slugify(c.name) === resolvedSlug ||
-              slugify(c.shortName) === resolvedSlug ||
-              String(c.id) === teamKey
-          );
-        if (localClub && isMounted) {
-          setClubMeta(localClub);
-          setLeagueName(localClub.competitionName);
-          setLeagueSlug(localClub.competitionSlug);
-        }
-
-        let teamData: FootballTeam | null = null;
-        let teamId: number | null = teamKey ? Number(teamKey) : null;
-
-        // 1. Try fetching team by ID if key exists
-        if (teamId && !isNaN(teamId)) {
-          const res = await advancedFootballApi.getTeams({ teamId });
-          if (res?.result && res.result.length > 0) {
-            teamData = res.result[0];
-          }
-        }
-
-        // 2. If not found by ID, search by name
-        if (!teamData) {
-          const searchName = (localClub?.shortName || localClub?.name || resolvedSlug).replace(
-            /-/g,
-            ' '
-          );
-          const nameRes = await advancedFootballApi.getTeams({ teamName: searchName });
-          if (nameRes?.result && nameRes.result.length > 0) {
-            const exactMatch = nameRes.result.find(
-              (t: FootballTeam) =>
-                slugify(t.team_name) === resolvedSlug ||
-                (localClub && slugify(t.team_name) === slugify(localClub.name))
-            );
-            teamData = exactMatch || nameRes.result[0];
-            teamId = Number(teamData.team_key);
-          }
-        }
-
-        // 3. Fallback to local club metadata if remote API yields nothing
-        if (!teamData && localClub) {
-          teamData = {
-            team_key: String(localClub.id),
-            team_name: localClub.name,
-            team_logo: localClub.logo,
-          };
-          teamId = localClub.id;
-        }
-
-        if (!teamData) {
+        const resolved = await resolveFootballTeam(rawSlug);
+        if (!resolved) {
           if (isMounted) setLoading(false);
           return;
         }
 
-        if (isMounted) setTeam(teamData);
+        const {
+          team: teamData,
+          teamKey: teamId,
+          clubMeta: localClub,
+          leagueId: resolvedLeagueId,
+          leagueName: resolvedLeagueName,
+          leagueSlug: resolvedLeagueSlug,
+          standing: resolvedStanding,
+        } = resolved;
 
-        // Fetch players and fixtures in parallel
-        let remotePlayers: FootballPlayer[] = [];
-        let remoteFixtures: FootballEvent[] = [];
-
-        if (teamId) {
-          const [playersRes, fixturesRes] = await Promise.all([
-            advancedFootballApi.getPlayers({ teamId }),
-            advancedFootballApi.getFixtures({ teamId }),
-          ]);
-
-          remotePlayers = playersRes?.result || teamData.players || [];
-          remoteFixtures = (fixturesRes?.result as FootballEvent[]) || [];
+        if (isMounted) {
+          setTeam(teamData);
+          if (localClub) setClubMeta(localClub);
+          if (resolvedLeagueName) setLeagueName(resolvedLeagueName);
+          if (resolvedLeagueSlug) setLeagueSlug(resolvedLeagueSlug);
+          if (resolvedStanding) setStanding(resolvedStanding);
         }
 
-        // Fallback for players if API returned none
+        // Squad players directly from teamData.players
+        let remotePlayers: FootballPlayer[] = Array.isArray(teamData.players) ? teamData.players : [];
+        let remoteFixtures: FootballEvent[] = [];
+
+        // Fetch fixtures and players (if squad was empty) in parallel
+        const promises: Promise<any>[] = [
+          advancedFootballApi.getFixtures({ teamId }),
+        ];
+        if (remotePlayers.length === 0) {
+          promises.push(advancedFootballApi.getPlayers({ teamId }));
+        }
+
+        const [fixturesRes, playersRes] = await Promise.all(promises);
+        remoteFixtures = (fixturesRes?.result as FootballEvent[]) || [];
+        if (playersRes?.result && Array.isArray(playersRes.result) && playersRes.result.length > 0) {
+          remotePlayers = playersRes.result;
+        }
+
+        // Fallback for players from PLAYERS_REGISTRY if still empty
         if (remotePlayers.length === 0 && localClub) {
           const registryPlayers = Object.values(PLAYERS_REGISTRY).filter(
             (p) => p.clubSlug === localClub.slug
@@ -271,27 +236,28 @@ export default function FootballTeamPage() {
           setUpcomingMatches(upcoming);
         }
 
-        // Standings lookup
-        const refMatch = finished[0] || upcoming[0];
-        if (refMatch?.league_key) {
-          if (refMatch.league_name && isMounted) {
-            setLeagueName(refMatch.league_name);
-            setLeagueSlug(slugify(refMatch.league_name));
-          }
-          try {
-            const standingsRes = await advancedFootballApi.getStandings(
-              Number(refMatch.league_key)
-            );
-            if (standingsRes?.result) {
-              const resObj = standingsRes.result as any;
-              const table = Array.isArray(resObj) ? resObj : resObj.total || [];
-              const ts = table.find(
-                (s: FootballStanding) => s && String(s.team_key) === String(teamId)
-              );
-              if (ts && isMounted) setStanding(ts);
+        // Standings lookup if not already resolved
+        if (!resolvedStanding) {
+          const refMatch = finished[0] || upcoming[0];
+          const targetLeagueKey = refMatch?.league_key || resolvedLeagueId;
+          if (targetLeagueKey) {
+            if (refMatch?.league_name && isMounted) {
+              setLeagueName(refMatch.league_name);
+              setLeagueSlug(slugify(refMatch.league_name));
             }
-          } catch (e) {
-            console.warn('Could not fetch league standings:', e);
+            try {
+              const standingsRes = await advancedFootballApi.getStandings(Number(targetLeagueKey));
+              if (standingsRes?.result) {
+                const resObj = standingsRes.result as any;
+                const table = Array.isArray(resObj) ? resObj : resObj.total || [];
+                const ts = table.find(
+                  (s: FootballStanding) => s && (String(s.team_key) === String(teamId) || slugify(s.team_name || '') === slugify(teamData.team_name))
+                );
+                if (ts && isMounted) setStanding(ts);
+              }
+            } catch (e) {
+              console.warn('Could not fetch league standings:', e);
+            }
           }
         }
 
@@ -311,13 +277,30 @@ export default function FootballTeamPage() {
           ? Object.values(COACHES_REGISTRY).find((c) => c.currentClubSlug === localClub.slug)
           : undefined;
 
-        if (coachMeta) {
+        if (teamData.coaches && teamData.coaches.length > 0 && teamData.coaches[0]?.coach_name) {
+          const c = teamData.coaches[0];
+          coachResolved = {
+            name: c.coach_name,
+            slug: slugify(c.coach_name),
+            photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.coach_name)}&background=0f172a&color=38bdf8&size=128&bold=true`,
+            nationality: c.coach_country || localClub?.competitionName || 'International',
+            flag: '🌍',
+            since: coachMeta?.appointedDate,
+            winRate: coachMeta?.winPercentage ?? undefined,
+          };
+          if (coachMeta) {
+            if (coachMeta.photo) coachResolved.photo = coachMeta.photo;
+            if (coachMeta.countryFlag) coachResolved.flag = coachMeta.countryFlag;
+            if (coachMeta.nationality) coachResolved.nationality = coachMeta.nationality;
+          }
+        } else if (coachMeta) {
           coachResolved = {
             name: coachMeta.name,
             slug: coachMeta.slug,
             photo: coachMeta.photo,
             nationality: coachMeta.nationality,
             flag: coachMeta.countryFlag || '🌍',
+            since: coachMeta.appointedDate,
             winRate: coachMeta.winPercentage ?? undefined,
           };
         } else if (localClub?.manager) {
@@ -330,8 +313,6 @@ export default function FootballTeamPage() {
               (teamData as any).team_country || clubMeta?.competitionName || 'International',
             flag: '🌍',
           };
-        } else {
-          coachResolved = null;
         }
 
         if (isMounted) setCoachData(coachResolved);
@@ -515,8 +496,13 @@ export default function FootballTeamPage() {
       const goals = parseInt(p.player_goals || '0', 10);
       const assists = parseInt(p.player_assists || '0', 10);
       const apps = parseInt(p.player_match_played || '0', 10);
-      const baseRating = 7.1 + ((goals * 0.15 + assists * 0.1) % 1.5);
-      const rating = Math.min(8.9, Math.max(6.8, Number(baseRating.toFixed(1))));
+      let rating = 7.0;
+      if (p.player_rating && !isNaN(Number(p.player_rating)) && Number(p.player_rating) > 0) {
+        rating = Number(Number(p.player_rating).toFixed(1));
+      } else {
+        const baseRating = 6.8 + ((goals * 0.15 + assists * 0.1 + (apps > 0 ? 0.3 : 0)) % 1.6);
+        rating = Math.min(8.9, Math.max(6.5, Number(baseRating.toFixed(1))));
+      }
 
       groups[targetIndex].players.push({
         ...p,
@@ -737,15 +723,24 @@ export default function FootballTeamPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-base font-black text-white group-hover:text-blue-300 transition-colors truncate">
-                      {coachData.name}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {coachData.flag} {coachData.nationality}
-                      {coachData.since ? ` · In charge since ${coachData.since}` : ''}
-                    </p>
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-black text-white group-hover:text-blue-300 transition-colors truncate">
+                        {coachData.name}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                        {coachData.flag && coachData.flag.startsWith('http') ? (
+                          <img
+                            src={coachData.flag}
+                            alt={coachData.nationality}
+                            className="w-4 h-3 object-cover rounded-xs inline-block"
+                          />
+                        ) : (
+                          <span>{coachData.flag || '🌍'}</span>
+                        )}
+                        <span>{coachData.nationality}</span>
+                        {coachData.since ? <span>· In charge since {coachData.since}</span> : null}
+                      </p>
+                    </div>
                   {coachData.winRate !== undefined && (
                     <div className="text-right shrink-0">
                       <p className="text-lg font-black text-green-400">{coachData.winRate}%</p>

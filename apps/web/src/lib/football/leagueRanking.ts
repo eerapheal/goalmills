@@ -20,55 +20,75 @@ export const LEAGUE_PRIORITY_BY_ID: Record<number, number> = {
   683: 8,   // UEFA Conference League
 
   // ─── African Competitions (CAF) ─────────────────────────────────
-  6: 9,     // Africa Cup of Nations (AFCON)
-  19: 10,   // CAF Champions League
-  20: 11,   // CAF Confederation Cup
-  483: 12,  // NPFL — Nigeria
-  270: 13,  // Betway Premiership PSL — South Africa
-  200: 14,  // Botola Pro — Morocco
-  271: 15,  // Egyptian Premier League
-  404: 16,  // Ghana Premier League
+  29: 9,    // Africa Cup of Nations (AFCON)
+  6: 9,     // Legacy AFCON
+  346: 10,  // CAF Champions League
+  19: 10,   // Legacy CAF CL
+  390: 11,  // CAF Confederation Cup
+  20: 11,   // Legacy CAF Confed
+  248: 12,  // NPFL — Nigeria
+  483: 12,  // Legacy NPFL
+  297: 13,  // Betway Premiership PSL — South Africa
+  270: 13,  // Legacy PSL
+  239: 14,  // Botola Pro — Morocco
+  200: 14,  // Legacy Botola Pro
+  141: 15,  // Egyptian Premier League
+  271: 15,  // Legacy Egyptian Premier League
+  177: 16,  // Ghana Premier League
+  404: 16,  // Legacy Ghana Premier League
   397: 17,  // Kenyan Premier League
   406: 18,  // Tanzanian Premier League
 
   // ─── FIFA Competitions ──────────────────────────────────────────
   28: 19,   // FIFA World Cup
-  29: 20,   // FIFA World Cup Qualification
-  15: 21,   // FIFA Club World Cup
+  21: 20,   // FIFA World Cup Qualification
+  12614: 21,// FIFA Club World Cup
+  15: 21,   // Legacy FIFA Club World Cup
 
   // ─── UEFA National Team ─────────────────────────────────────────
   1: 22,    // UEFA EURO
-  5: 23,    // UEFA Nations League
+  633: 23,  // UEFA Nations League
+  5: 23,    // Legacy Nations League
 
   // ─── South America ──────────────────────────────────────────────
   17: 24,   // Copa América
-  13: 25,   // Copa Libertadores
-  14: 26,   // Copa Sudamericana
+  18: 25,   // Copa Libertadores
+  13: 25,   // Legacy Copa Libertadores
+  385: 26,  // Copa Sudamericana
+  14: 26,   // Legacy Copa Sudamericana
   99: 27,   // Brasileirão Série A
-  128: 28,  // Argentine Primera División
+  44: 28,   // Argentine Primera División
+  128: 28,  // Legacy Argentine
 
   // ─── Other Major European Leagues ───────────────────────────────
   244: 29,  // Eredivisie
   266: 30,  // Liga Portugal
   322: 31,  // Süper Lig — Turkey
-  88: 32,   // Jupiler Pro League — Belgium
-  284: 33,  // Scottish Premiership
+  63: 32,   // Jupiler Pro League — Belgium
+  88: 32,   // Legacy Belgian Pro League
+  279: 33,  // Scottish Premiership
+  284: 33,  // Legacy Scottish Premiership
 
   // ─── English Lower Tiers ────────────────────────────────────────
   153: 34,  // Championship
   146: 35,  // FA Cup
-  48: 36,   // EFL Cup (Carabao Cup)
+  147: 36,  // EFL Cup (Carabao Cup)
+  48: 36,   // Legacy EFL Cup
 
   // ─── Asia ───────────────────────────────────────────────────────
   278: 37,  // Saudi Pro League
-  169: 38,  // J1 League — Japan
-  292: 39,  // K League 1 — South Korea
+  209: 38,  // J1 League — Japan
+  169: 38,  // Legacy J1
+  219: 39,  // K League 1 — South Korea
+  292: 39,  // Legacy K League 1
+  566: 40,  // Indian Super League
   307: 40,  // Chinese Super League
 
   // ─── North & Central America ────────────────────────────────────
-  253: 41,  // MLS — North America
+  332: 41,  // MLS — North America
   262: 42,  // Liga MX — Mexico
-  16: 43,   // CONCACAF Champions Cup
+  5: 43,    // CONCACAF Champions Cup
+  16: 43,   // Legacy CONCACAF Champions Cup
 };
 
 /**
@@ -148,21 +168,28 @@ export function getCurrentSeason(date: Date = new Date(), apiSeason?: string | n
  * use 4-year or 2-year cycles with qualifiers and tables grouped from A to the last group.
  */
 export const TOURNAMENT_LEAGUE_IDS = new Set<number>([
-  1,   // UEFA EURO (4-year tournament, Groups A-F)
-  3,   // UEFA Champions League (Group stage / 36-team Swiss League phase)
-  4,   // UEFA Europa League
-  5,   // UEFA Nations League (Groups)
-  6,   // AFCON - Africa Cup of Nations (2-year tournament, Groups A-F + Qualifiers)
-  13,  // Copa Libertadores (Groups A-H)
-  14,  // Copa Sudamericana (Groups A-H)
-  15,  // FIFA Club World Cup
-  16,  // CONCACAF Champions Cup
-  17,  // Copa América (4-year tournament, Groups)
-  19,  // CAF Champions League (Groups A-D)
-  20,  // CAF Confederation Cup (Groups A-D)
-  28,  // FIFA World Cup (4-year tournament, Groups A-L)
-  29,  // FIFA World Cup Qualification (Groups A-I)
-  683, // UEFA Conference League
+  1,     // UEFA EURO (4-year tournament, Groups A-F)
+  3,     // UEFA Champions League (Group stage / 36-team Swiss League phase)
+  4,     // UEFA Europa League
+  5,     // CONCACAF Champions Cup (was 16; also legacy Nations League)
+  16,    // Legacy CONCACAF Champions Cup
+  633,   // UEFA Nations League
+  6,     // Legacy AFCON
+  29,    // AFCON - Africa Cup of Nations
+  13,    // Legacy Copa Libertadores
+  18,    // Copa Libertadores
+  14,    // Legacy Copa Sudamericana
+  385,   // Copa Sudamericana
+  15,    // Legacy FIFA Club World Cup
+  12614, // FIFA Club World Cup
+  17,    // Copa América (4-year tournament, Groups)
+  19,    // Legacy CAF Champions League
+  346,   // CAF Champions League
+  20,    // Legacy CAF Confederation Cup
+  390,   // CAF Confederation Cup
+  28,    // FIFA World Cup
+  21,    // FIFA World Cup Qualification
+  683,   // UEFA Conference League
 ]);
 
 export function isTournamentLeague(leagueId: number | string | undefined | null): boolean {
@@ -182,8 +209,8 @@ export function getCompetitionSeasonOrCycle(
 ): string {
   if (apiSeason && apiSeason.trim()) return apiSeason.trim();
   const numId = Number(leagueId);
-  if (numId === 28 || numId === 29) return '2026 FIFA World Cup';
-  if (numId === 6) return 'AFCON 2025/2026';
+  if (numId === 28 || numId === 21) return '2026 FIFA World Cup';
+  if (numId === 29 || numId === 6) return 'AFCON 2025/2026';
   if (numId === 1) return 'UEFA EURO';
   if (numId === 17) return 'Copa América';
   return `${getCurrentSeason()} Season`;

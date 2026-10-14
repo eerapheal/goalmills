@@ -25,12 +25,10 @@ export function resolveLeagueLogo(leagueNameOrId?: string | number, fallbackUrl?
   const querySlug = slugify(queryStr);
   const queryNum = Number(queryStr);
 
-  // 1. Check ALL_COMPETITIONS (75 Major Competitions)
+  // 1. Check ALL_COMPETITIONS (by provider ID first)
   if (!isNaN(queryNum) && queryNum > 0) {
-    const byId = ALL_COMPETITIONS.find(
-      (c) => c.id === queryNum || c.apiSportsId === queryNum
-    );
-    if (byId?.logo) return byId.logo;
+    const byProviderId = ALL_COMPETITIONS.find((c) => c.id === queryNum);
+    if (byProviderId?.logo) return byProviderId.logo;
   }
 
   const bySlug = ALL_COMPETITIONS.find(
@@ -41,20 +39,23 @@ export function resolveLeagueLogo(leagueNameOrId?: string | number, fallbackUrl?
   );
   if (bySlug?.logo) return bySlug.logo;
 
-  // 2. Check CANONICAL_COMPETITIONS
+  // 2. Check CANONICAL_COMPETITIONS (by providerId or slug)
   const canon =
     CANONICAL_COMPETITIONS[queryStr.toUpperCase()] ||
     CANONICAL_COMPETITIONS_LIST.find(
       (c) =>
+        (c.providerId && Number(c.providerId) === queryNum) ||
         c.slug === querySlug ||
-        slugify(c.name) === querySlug ||
-        (c.apiSportsId && c.apiSportsId === queryNum) ||
-        (c.providerId && Number(c.providerId) === queryNum)
+        slugify(c.name) === querySlug
     );
   if (canon?.logoUrl) return canon.logoUrl;
 
-  // 3. If numeric ID passed, use API-Sports league CDN
+  // 3. Check by apiSportsId as fallback
   if (!isNaN(queryNum) && queryNum > 0) {
+    const byApiSportsId = ALL_COMPETITIONS.find((c) => c.apiSportsId === queryNum);
+    if (byApiSportsId?.logo) return byApiSportsId.logo;
+    const canonByApiSports = CANONICAL_COMPETITIONS_LIST.find((c) => c.apiSportsId === queryNum);
+    if (canonByApiSports?.logoUrl) return canonByApiSports.logoUrl;
     return leagueLogo(queryNum);
   }
 
