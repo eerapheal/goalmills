@@ -111,7 +111,7 @@ export default function OfficialsScreen() {
           <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
         </Pressable>
         <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle}>🚩 Match Officials & VAR</Text>
+          <Text style={styles.headerTitle}>🚩 Match Officials</Text>
           <Text style={styles.headerSubtitle}>
             {filteredOfficials.length} Elite Referee{filteredOfficials.length !== 1 ? 's' : ''}{' '}
             Tracked

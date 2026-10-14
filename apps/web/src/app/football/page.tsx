@@ -5,27 +5,21 @@ import { FootballPageClient } from '@/components/football/FootballPageClient';
 export const revalidate = 60; // Revalidate every minute for live scores & fresh data
 
 export const metadata: Metadata = {
-  title:
-    'Football Match Centre | Live Scores, Standings, Superstars, Officials & Tacticians | GoalMills',
+  title: 'Football Match Centre | Live Scores, Fixtures, Results & Standings | GoalMills',
   description:
-    'Live football scores, Premier League, Champions League, AFCON & CAF fixtures, league tables, player market values, referee VAR tracking, and manager tactical philosophies.',
+    'Live football scores, Premier League, Champions League, AFCON & CAF fixtures, league tables, and telemetry intelligence.',
   keywords: [
     'Football live scores',
     'Premier League live scores',
     'Champions League fixtures',
     'AFCON 2026 2027 live scores',
     'CAF Champions League results',
-    'Football player market values',
-    'Victor Osimhen stats',
-    'Erling Haaland goals',
-    'Football referees VAR ratings',
-    'Football managers tactics',
     'GoalMills Football Match Centre',
   ],
   openGraph: {
-    title: 'GoalMills Football Match Centre | Live Scores, Tables & Tactical Intelligence',
+    title: 'GoalMills Football Match Centre | Live Scores, Tables & Match Intelligence',
     description:
-      'Real-time football scores, standings, superstar valuations, referee stats, and tactical managerial profiles across 75+ global and African leagues.',
+      'Real-time football scores, standings, and telemetry intelligence across 75+ global and African leagues.',
     siteName: 'GoalMills',
     type: 'website',
   },
