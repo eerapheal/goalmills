@@ -48,7 +48,6 @@ export const LEAGUE_PRIORITY_BY_ID: Record<number, number> = {
   // ─── UEFA National Team ─────────────────────────────────────────
   1: 22,    // UEFA EURO
   633: 23,  // UEFA Nations League
-  5: 23,    // Legacy Nations League
 
   // ─── South America ──────────────────────────────────────────────
   17: 24,   // Copa América

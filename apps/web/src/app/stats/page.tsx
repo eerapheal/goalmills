@@ -59,8 +59,8 @@ export default async function StatsHubPage() {
   const topDefenses = [...eplStandings]
     .filter((t) => Number(t.standing_P) > 0)
     .sort((a, b) => {
-      const gaA = Number(a.standing_GA) ?? 999;
-      const gaB = Number(b.standing_GA) ?? 999;
+      const gaA = Number(a.standing_A) ?? 999;
+      const gaB = Number(b.standing_A) ?? 999;
       if (gaA !== gaB) return gaA - gaB;
       return (Number(b.standing_GD) || 0) - (Number(a.standing_GD) || 0);
     })
@@ -211,7 +211,7 @@ export default async function StatsHubPage() {
             <div className="space-y-2.5">
               {topDefenses.length > 0 ? (
                 topDefenses.map((team, i) => {
-                  const ga = Number(team.standing_GA) || 0;
+                  const ga = Number(team.standing_A) || 0;
                   const p = Number(team.standing_P) || 1;
                   const gaPerGame = (ga / p).toFixed(2);
                   return (

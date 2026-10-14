@@ -251,7 +251,11 @@ export default function FootballTeamPage() {
                 const resObj = standingsRes.result as any;
                 const table = Array.isArray(resObj) ? resObj : resObj.total || [];
                 const ts = table.find(
-                  (s: FootballStanding) => s && (String(s.team_key) === String(teamId) || slugify(s.team_name || '') === slugify(teamData.team_name))
+                  (s: FootballStanding) =>
+                    s &&
+                    (String(s.team_key) === String(teamId) ||
+                      slugify(s.standing_team || (s as any).team_name || '') ===
+                        slugify(teamData.team_name))
                 );
                 if (ts && isMounted) setStanding(ts);
               }
@@ -277,15 +281,17 @@ export default function FootballTeamPage() {
           ? Object.values(COACHES_REGISTRY).find((c) => c.currentClubSlug === localClub.slug)
           : undefined;
 
-        if (teamData.coaches && teamData.coaches.length > 0 && teamData.coaches[0]?.coach_name) {
-          const c = teamData.coaches[0];
+        const firstCoach = teamData.coaches && teamData.coaches.length > 0 ? teamData.coaches[0] : null;
+        const coachName = firstCoach?.coach_name || firstCoach?.coache;
+
+        if (coachName) {
           coachResolved = {
-            name: c.coach_name,
-            slug: slugify(c.coach_name),
-            photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.coach_name)}&background=0f172a&color=38bdf8&size=128&bold=true`,
-            nationality: c.coach_country || localClub?.competitionName || 'International',
+            name: coachName,
+            slug: slugify(coachName),
+            photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(coachName)}&background=0f172a&color=38bdf8&size=128&bold=true`,
+            nationality: firstCoach?.coach_country || firstCoach?.coache_country || localClub?.competitionName || 'International',
             flag: '🌍',
-            since: coachMeta?.appointedDate,
+            since: (coachMeta as any)?.appointedDate,
             winRate: coachMeta?.winPercentage ?? undefined,
           };
           if (coachMeta) {
@@ -300,8 +306,8 @@ export default function FootballTeamPage() {
             photo: coachMeta.photo,
             nationality: coachMeta.nationality,
             flag: coachMeta.countryFlag || '🌍',
-            since: coachMeta.appointedDate,
-            winRate: coachMeta.winPercentage ?? undefined,
+            since: (coachMeta as any)?.appointedDate,
+            winRate: coachMeta?.winPercentage ?? undefined,
           };
         } else if (localClub?.manager) {
           coachResolved = {

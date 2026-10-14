@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
     for (const data of SEED_AFRICAN_SUPERSTARS) {
       const existing = await Player.findOne({ slug: data.slug });
       if (!existing) {
-        await Player.create(data);
+        await Player.create(data as any);
         createdCount++;
       } else {
         await Player.updateOne({ slug: data.slug }, { $set: data });

@@ -778,6 +778,14 @@ export interface FootballTeam {
   team_name: string;
   team_logo?: string;
   players?: FootballPlayer[];
+  coaches?: {
+    coach_name?: string;
+    coach_country?: string | null;
+    coach_age?: string;
+    coach_image?: string;
+    coache?: string;
+    coache_country?: string | null;
+  }[];
 }
 
 export interface FootballPlayer {
