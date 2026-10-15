@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getNewsUrl, buildMatchSlug, footballRoutes } from '@/lib/slugUtils';
+import { getLeaguePriority } from '@/lib/football/leagueRanking';
+import { getLeagueShortName } from '@/lib/football/topLeagues';
 
 interface TickerItem {
   id: string;
@@ -51,16 +53,20 @@ export function GlobalLiveTicker() {
           const matches =
             footData?.result || footData?.response || (Array.isArray(footData) ? footData : []);
           if (Array.isArray(matches) && matches.length > 0) {
-            matches.slice(0, 6).forEach((m: any, idx: number) => {
+            const sortedMatches = [...matches].sort(
+              (a: any, b: any) => getLeaguePriority(a.league_key) - getLeaguePriority(b.league_key)
+            );
+            sortedMatches.slice(0, 6).forEach((m: any, idx: number) => {
               const home = m.event_home_team || 'Home';
               const away = m.event_away_team || 'Away';
               const score =
                 m.event_final_result ||
                 `${m.event_home_final_result ?? 0}–${m.event_away_final_result ?? 0}`;
               const time = m.event_status ? `${m.event_status}'` : 'LIVE';
+              const shortLeague = getLeagueShortName(m.league_key, m.league_name, m.country_name);
               items.push({
                 id: `live-m-${m.event_key || idx}`,
-                text: `🔴 ${home} ${score} ${away} · ${time}`,
+                text: `🔴 ${shortLeague}: ${home} ${score} ${away} · ${time}`,
                 isLive: true,
                 href: m.event_key
                   ? footballRoutes.match(
@@ -100,11 +106,8 @@ export function GlobalLiveTicker() {
     }
 
     loadDynamicTicker();
-    // Fast 15s refresh for real-time live wire updates
-    const interval = setInterval(loadDynamicTicker, 15_000);
     return () => {
       isMounted = false;
-      clearInterval(interval);
     };
   }, []);
 

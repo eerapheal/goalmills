@@ -24,3 +24,6 @@ export * from './stageService';
 export * from './groupStandingsEngine';
 export * from './qualificationEngine';
 export * from './knockoutEngine';
+export * from './topLeagues';
+export * from './leagueService';
+

@@ -19,6 +19,8 @@ import {
 } from 'react-icons/fi';
 import { FaFire } from 'react-icons/fa6';
 import { getNewsUrl, slugify } from '@/lib/slugUtils';
+import { getLeaguePriority } from '@/lib/football/leagueRanking';
+import { getLeagueShortName } from '@/lib/football/topLeagues';
 
 /** Pulse skeleton shimmer line */
 function SkeletonLine({ className = '' }: { className?: string }) {
@@ -79,9 +81,6 @@ function HighlightSkeleton() {
     </div>
   );
 }
-
-/** Real-time live score refresh interval (30 seconds) */
-const LIVE_REFRESH_MS = 30_000;
 
 export function GoalmillsLiveDashboard({ onSelectTab }: { onSelectTab?: (tab: string) => void }) {
   const router = useRouter();
@@ -149,16 +148,28 @@ export function GoalmillsLiveDashboard({ onSelectTab }: { onSelectTab?: (tab: st
       if (signal?.aborted) return;
 
       if (Array.isArray(matches) && matches.length > 0) {
-        const mapped = matches.slice(0, 2).map((m: any, idx: number) => {
+        const sortedMatches = [...matches].sort((a: any, b: any) => {
+          const rankA = getLeaguePriority(a.league_key ?? a.leagueId);
+          const rankB = getLeaguePriority(b.league_key ?? b.leagueId);
+          if (rankA !== rankB) return rankA - rankB;
+          return 0;
+        });
+
+        const mapped = sortedMatches.slice(0, 2).map((m: any, idx: number) => {
           const home = m.event_home_team || m.homeTeam || 'Home';
           const away = m.event_away_team || m.awayTeam || 'Away';
           const score =
             m.event_final_result ||
             m.event_ft_result ||
             `${m.event_home_final_result ?? 0} - ${m.event_away_final_result ?? 0}`;
+          const shortLeague = getLeagueShortName(
+            m.league_key ?? m.leagueId,
+            m.league_name || m.league,
+            m.country_name || m.country
+          );
           return {
             id: m.event_key || `lf-${idx}`,
-            league: m.league_name || 'Premier League',
+            league: shortLeague,
             homeTeam: home,
             homeCode: home.substring(0, 3).toUpperCase(),
             home_team_key: m.home_team_key,
@@ -253,13 +264,7 @@ export function GoalmillsLiveDashboard({ onSelectTab }: { onSelectTab?: (tab: st
     return () => controller.abort();
   }, [fetchLiveData]);
 
-  // ── Real-time auto-refresh every 30 seconds for live scores ──
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchLiveData();
-    }, LIVE_REFRESH_MS);
-    return () => clearInterval(interval);
-  }, [fetchLiveData]);
+
 
   useEffect(() => {
     if (pulseNews.length === 0) return;

@@ -32,8 +32,24 @@ for (const comp of CANONICAL_COMPETITIONS_LIST) {
 
   EXACT_NAME_COUNTRY_MAP.set(`${normCountry}:::${normName}`, comp.id);
   EXACT_NAME_COUNTRY_MAP.set(`${normCountry}:::${normShort}`, comp.id);
-  // Also register direct full name if unique
-  EXACT_NAME_COUNTRY_MAP.set(`*:::${normName}`, comp.id);
+  // Only register wildcard if the name is distinctive and not shared across multiple countries
+  const isGeneric = [
+    'premier league',
+    'premier division',
+    'championship',
+    'fa cup',
+    'cup',
+    'super cup',
+    'league 1',
+    'league 2',
+    'division 1',
+    'division 2',
+    'national league',
+  ].includes(normName);
+
+  if (!isGeneric) {
+    EXACT_NAME_COUNTRY_MAP.set(`*:::${normName}`, comp.id);
+  }
 }
 
 // Well-known alias overrides from provider quirks (exact match only)

@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { getLeaguePriority } from '@/lib/football/leagueRanking';
+import { getLeagueShortName } from '@/lib/football/topLeagues';
 
 export function SportsIntelligenceSection() {
   const [votedMatch, setVotedMatch] = useState<string | null>(null);
@@ -41,10 +43,19 @@ export function SportsIntelligenceSection() {
         const data = await res.json();
         const matches = data?.result || data?.matches || (Array.isArray(data) ? data : []);
         if (Array.isArray(matches) && matches.length > 0 && isMounted) {
-          const m = matches[0];
-          const home = m.event_home_team || m.homeTeam || 'Arsenal';
-          const away = m.event_away_team || m.awayTeam || 'Chelsea';
-          const league = m.league_name || m.league || 'Premier League';
+          const sorted = [...matches].sort(
+            (a: any, b: any) =>
+              getLeaguePriority(a.league_key ?? a.leagueId) -
+              getLeaguePriority(b.league_key ?? b.leagueId)
+          );
+          const m = sorted[0];
+          const home = m.event_home_team || m.homeTeam || 'Home';
+          const away = m.event_away_team || m.awayTeam || 'Away';
+          const league = getLeagueShortName(
+            m.league_key ?? m.leagueId,
+            m.league_name || m.league,
+            m.country_name
+          );
           const kickoff = m.event_status
             ? `Live • ${m.event_status}'`
             : m.event_time || 'Today 20:00 GMT';

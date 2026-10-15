@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getNewsUrl, slugify, buildMatchSlug, footballRoutes } from '@/lib/slugUtils';
+import { getLeagueShortName } from '@/lib/football/topLeagues';
 
 interface MatchItem {
   id: string;
@@ -388,7 +389,7 @@ export default function HomePage() {
             parsedMatches.push({
               id: String(m.event_key || `ft-${idx}`),
               sport: 'Football',
-              league: m.league_name || 'Football League',
+              league: getLeagueShortName(m.league_key, m.league_name, m.country_name),
               flag: getLeagueFlag(m.league_name, 'Football'),
               home,
               away,
@@ -567,8 +568,6 @@ export default function HomePage() {
     fetchNews();
     fetchVideos();
 
-    // Fast 12-second polling for live match center accuracy
-    const matchInterval = setInterval(fetchMatches, 12_000);
     // 45-second refresh for news and videos
     const contentInterval = setInterval(() => {
       fetchNews();
@@ -576,7 +575,6 @@ export default function HomePage() {
     }, 45_000);
 
     return () => {
-      clearInterval(matchInterval);
       clearInterval(contentInterval);
     };
   }, [fetchMatches, fetchNews, fetchVideos]);

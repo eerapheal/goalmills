@@ -18,6 +18,7 @@ import {
   isFixtureInCompetition,
   resolveCompetitionForFixture,
   sortFootballEvents,
+  getLeagueShortName,
 } from '@/lib/football';
 import { type MainCategoryTab } from './football/FootballNavSwitcher';
 import { PlayerAvatar } from './football/PlayerAvatar';
@@ -151,7 +152,7 @@ export function FootballScreen() {
       away_team_logo: f.away_team_logo,
       event_final_result: f.event_final_result || f.event_ft_result,
       event_ft_result: f.event_ft_result,
-      league_name: f.league_name || 'League',
+      league_name: getLeagueShortName(f.league_key, f.league_name, f.country_name),
       league_key: f.league_key,
       league_logo: f.league_logo,
       country_name: f.country_name,
@@ -211,14 +212,7 @@ export function FootballScreen() {
     fetchMatches();
   }, [fetchMatches]);
 
-  // Polling interval for live matches (every 15s)
-  useEffect(() => {
-    if (activeTab !== 'live') return;
-    const interval = setInterval(() => {
-      fetchMatches(true);
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [activeTab, fetchMatches]);
+
 
   const handleManualRefresh = async () => {
     setRefreshing(true);
@@ -391,7 +385,7 @@ export function FootballScreen() {
       if (!groups[stageKey]) {
         groups[stageKey] = {
           title: resolved.competition?.name || item.league_name || 'Other Matches',
-          shortName: resolved.competition?.shortName,
+          shortName: resolved.competition?.shortName || getLeagueShortName(item.league_key, item.league_name, item.country_name),
           logo: resolved.competition?.logoUrl || item.league_logo,
           league_key: item.league_key,
           priorityRank: priority,

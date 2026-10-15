@@ -24,6 +24,7 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { ALL_COMPETITIONS } from '@/lib/competitionCategories';
 import { useLeagues } from '@/hooks/useLeagues';
 import { getLeaguePriority, getCurrentSeason } from '@/lib/football/leagueRanking';
+import { getLeagueShortName } from '@/lib/football/topLeagues';
 import { usePlayers } from '@/hooks/usePlayers';
 import { useCoaches } from '@/hooks/useCoaches';
 import { useTeams } from '@/hooks/useTeams';
@@ -559,7 +560,7 @@ export function FootballPageClient({
               gender: normalized.gender,
               ageCategory: normalized.ageCategory,
               classificationStatus: normalized.classificationStatus,
-              comp: canonical?.name || m.league_name || 'Football League',
+              comp: getLeagueShortName(m.league_key, canonical?.shortName || m.league_name, canonical?.countryName || m.country_name),
               compFlag: canonical?.countryFlagUrl || '⚽',
               compLogo: resolveLeagueLogo(m.league_name || normalized.competitionId, m.league_logo || canonical?.logoUrl),
               home: normalized.homeTeamName || m.event_home_team || 'Home',
@@ -579,7 +580,13 @@ export function FootballPageClient({
               stadium: m.event_stadium || undefined,
             };
           });
-          setLiveFixtures(parsedLive);
+          const sortedLive = parsedLive.sort((a, b) => {
+            const rankA = getLeaguePriority(a.league_key);
+            const rankB = getLeaguePriority(b.league_key);
+            if (rankA !== rankB) return rankA - rankB;
+            return a.home.localeCompare(b.home);
+          });
+          setLiveFixtures(sortedLive);
         } else {
           setLiveFixtures([]);
         }
@@ -615,7 +622,7 @@ export function FootballPageClient({
               gender: normalized.gender,
               ageCategory: normalized.ageCategory,
               classificationStatus: normalized.classificationStatus,
-              comp: canonical?.name || m.league_name || 'Football League',
+              comp: getLeagueShortName(m.league_key, canonical?.shortName || m.league_name, canonical?.countryName || m.country_name),
               compFlag: canonical?.countryFlagUrl || '⚽',
               compLogo: resolveLeagueLogo(m.league_name || normalized.competitionId, m.league_logo || canonical?.logoUrl),
               home: normalized.homeTeamName || m.event_home_team || 'Home',
@@ -639,8 +646,24 @@ export function FootballPageClient({
             if (isFinished) ft.push(item);
             else up.push(item);
           });
-          if (up.length > 0) setUpcomingFixtures(up.slice(0, 16));
-          if (ft.length > 0) setResultsFixtures(ft.slice(0, 16));
+          if (up.length > 0) {
+            up.sort((a, b) => {
+              const rankA = getLeaguePriority(a.league_key);
+              const rankB = getLeaguePriority(b.league_key);
+              if (rankA !== rankB) return rankA - rankB;
+              return a.home.localeCompare(b.home);
+            });
+            setUpcomingFixtures(up.slice(0, 16));
+          }
+          if (ft.length > 0) {
+            ft.sort((a, b) => {
+              const rankA = getLeaguePriority(a.league_key);
+              const rankB = getLeaguePriority(b.league_key);
+              if (rankA !== rankB) return rankA - rankB;
+              return a.home.localeCompare(b.home);
+            });
+            setResultsFixtures(ft.slice(0, 16));
+          }
         } else {
           setUpcomingFixtures([]);
           setResultsFixtures([]);
@@ -660,8 +683,6 @@ export function FootballPageClient({
 
   useEffect(() => {
     fetchLiveMatches();
-    const interval = setInterval(fetchLiveMatches, 25_000);
-    return () => clearInterval(interval);
   }, [fetchLiveMatches]);
 
   const tabFixtures: Partial<Record<MainTab, FixtureItem[]>> = {

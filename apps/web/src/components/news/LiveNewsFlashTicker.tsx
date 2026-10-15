@@ -55,11 +55,8 @@ export function LiveNewsFlashTicker({
     }
 
     loadFlashPosts();
-    // Fast 15s refresh for real-time live flash news reports
-    const interval = setInterval(loadFlashPosts, 15_000);
     return () => {
       isMounted = false;
-      clearInterval(interval);
     };
   }, [sport, category]);
 

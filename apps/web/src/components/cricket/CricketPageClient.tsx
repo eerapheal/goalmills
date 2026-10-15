@@ -1220,8 +1220,6 @@ export function CricketPageClient() {
 
   useEffect(() => {
     fetchLiveCricket();
-    const interval = setInterval(fetchLiveCricket, 25_000);
-    return () => clearInterval(interval);
   }, [fetchLiveCricket]);
 
   const tabFixtures: Partial<Record<MainTab, CricketMatch[]>> = {

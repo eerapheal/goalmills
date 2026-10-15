@@ -1170,34 +1170,7 @@ export default function FootballMatchPage() {
     loadMatchData();
   }, [loadMatchData]);
 
-  // Periodic polling for live updates if match is live
-  useEffect(() => {
-    if (!match) return;
-    const isLive =
-      match.event_live === '1' ||
-      ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(match.event_status || '') ||
-      !isNaN(Number(match.event_status));
 
-    if (!isLive) return;
-
-    const interval = setInterval(async () => {
-      const key = match.event_key || parsedSlug.eventKey;
-      if (!key) return;
-      try {
-        const liveRes = await advancedFootballApi.getLivescore({ matchId: key });
-        if (liveRes?.result && Array.isArray(liveRes.result) && liveRes.result.length > 0) {
-          setMatch(liveRes.result[0]);
-        }
-        const commRes = await advancedFootballApi.getComments(key);
-        const commentList = (commRes?.result && (commRes.result as any)[String(key)]) || [];
-        if (Array.isArray(commentList)) setComments(commentList);
-      } catch (e) {
-        console.error('Error refreshing live match:', e);
-      }
-    }, 20000);
-
-    return () => clearInterval(interval);
-  }, [match, parsedSlug]);
 
   // Aggregate and sort timeline events (Goals, Cards, Substitutions)
   const timelineEvents = useMemo<NormalizedTimelineEvent[]>(() => {

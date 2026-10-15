@@ -3080,13 +3080,8 @@ export function BasketballPageClient() {
     }
   }, []);
 
-  // Polling interval for live scores (every 25s)
   useEffect(() => {
     fetchLiveScores();
-    const interval = setInterval(() => {
-      fetchLiveScores();
-    }, 25000);
-    return () => clearInterval(interval);
   }, [fetchLiveScores]);
 
   // When date or tab changes to upcoming or results, fetch fixtures for that date
