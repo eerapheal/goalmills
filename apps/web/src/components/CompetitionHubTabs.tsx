@@ -30,6 +30,7 @@ interface CompetitionHubTabsProps {
   competitionName: string;
   hasGroups?: boolean;
   hasKnockout?: boolean;
+  qualifierLeagueId?: number;
 }
 
 export function CompetitionHubTabs({
@@ -38,10 +39,13 @@ export function CompetitionHubTabs({
   competitionName,
   hasGroups = false,
   hasKnockout = false,
+  qualifierLeagueId,
 }: CompetitionHubTabsProps) {
   const [activeTab, setActiveTab] = useState<CompHubTab>('table');
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [tournamentSubView, setTournamentSubView] = useState<'groups' | 'knockout'>('groups');
+  const [isQualifierFallback, setIsQualifierFallback] = useState(false);
 
   // Data states
   const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
@@ -75,47 +79,88 @@ export function CompetitionHubTabs({
     setLoading(true);
     try {
       if (activeTab === 'table') {
-        const res = await advancedFootballApi.getStandings(competitionId);
-        if (res?.result) {
-          const resObj = res.result as any;
-          const table =
-            resObj[standingView] || resObj.total || (Array.isArray(resObj) ? resObj : []);
-          setStandings(Array.isArray(table) ? table : []);
+        let res = await advancedFootballApi.getStandings(competitionId);
+        let resObj = res?.result as any;
+        let table =
+          resObj?.[standingView] || resObj?.total || (Array.isArray(resObj) ? resObj : []);
+
+        // Live API Qualifier Fallback for tournaments (e.g. AFCON 29 finals not started -> 7098 active qualifiers)
+        if ((!Array.isArray(table) || table.length === 0) && qualifierLeagueId) {
+          const qRes = await advancedFootballApi.getStandings(qualifierLeagueId).catch(() => null);
+          if (qRes?.result) {
+            const qObj = qRes.result as any;
+            const qTable =
+              qObj?.[standingView] || qObj?.total || (Array.isArray(qObj) ? qObj : []);
+            if (Array.isArray(qTable) && qTable.length > 0) {
+              table = qTable;
+              setIsQualifierFallback(true);
+            }
+          }
         } else {
-          setStandings([]);
+          setIsQualifierFallback(false);
         }
+
+        setStandings(Array.isArray(table) ? table : []);
       } else if (activeTab === 'stats') {
-        const res = await advancedFootballApi.getTopscorers(competitionId);
-        setTopscorers(Array.isArray(res?.result) ? res.result : []);
+        let res = await advancedFootballApi.getTopscorers(competitionId);
+        let list = Array.isArray(res?.result) ? res.result : [];
+        if (list.length === 0 && qualifierLeagueId) {
+          const qRes = await advancedFootballApi.getTopscorers(qualifierLeagueId).catch(() => null);
+          if (Array.isArray(qRes?.result) && qRes.result.length > 0) {
+            list = qRes.result;
+          }
+        }
+        setTopscorers(list);
       } else if (activeTab === 'live') {
-        const res = await advancedFootballApi.getLivescore({ leagueId: competitionId });
-        setFixtures(Array.isArray(res?.result) ? res.result : []);
+        let res = await advancedFootballApi.getLivescore({ leagueId: competitionId });
+        let list = Array.isArray(res?.result) ? res.result : [];
+        if (list.length === 0 && qualifierLeagueId) {
+          const qRes = await advancedFootballApi.getLivescore({ leagueId: qualifierLeagueId }).catch(() => null);
+          if (Array.isArray(qRes?.result)) list = qRes.result;
+        }
+        setFixtures(list);
       } else {
         // fixtures or results
-        const res = await advancedFootballApi.getFixtures({
+        let res = await advancedFootballApi.getFixtures({
           from: selectedDate,
           to: selectedDate,
           leagueId: competitionId,
         });
-        setFixtures(Array.isArray(res?.result) ? res.result : []);
+        let list = Array.isArray(res?.result) ? res.result : [];
+        if (list.length === 0 && qualifierLeagueId) {
+          const qRes = await advancedFootballApi.getFixtures({
+            from: selectedDate,
+            to: selectedDate,
+            leagueId: qualifierLeagueId,
+          }).catch(() => null);
+          if (Array.isArray(qRes?.result)) list = qRes.result;
+        }
+        setFixtures(list);
       }
     } catch (err) {
       console.error('[CompHubTabs] Error:', err);
     } finally {
       setLoading(false);
     }
-  }, [activeTab, competitionId, selectedDate, standingView]);
+  }, [activeTab, competitionId, qualifierLeagueId, selectedDate, standingView]);
 
-  // Fetch teams for the "all teams" list
+  // Fetch teams for the "all teams" list from live API
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await advancedFootballApi.getTeams({ leagueId: competitionId });
-        setTeams(Array.isArray(res?.result) ? res.result : []);
+        let res = await advancedFootballApi.getTeams({ leagueId: competitionId });
+        let list = Array.isArray(res?.result) ? res.result : [];
+        if (list.length === 0 && qualifierLeagueId) {
+          const qRes = await advancedFootballApi.getTeams({ leagueId: qualifierLeagueId }).catch(() => null);
+          if (Array.isArray(qRes?.result) && qRes.result.length > 0) {
+            list = qRes.result;
+          }
+        }
+        setTeams(list);
       } catch {}
     };
     fetchTeams();
-  }, [competitionId]);
+  }, [competitionId, qualifierLeagueId]);
 
   const validTeams = useMemo(() => {
     if (!Array.isArray(teams)) return [];
@@ -378,8 +423,59 @@ export function CompetitionHubTabs({
                 </Link>
               </div>
 
+              {/* Tournament View Switcher for Major Competitions (AFCON & FIFA World Cup) */}
+              {hasGroups && hasKnockout && (
+                <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+                  <button
+                    onClick={() => setTournamentSubView('groups')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      tournamentSubView === 'groups'
+                        ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30'
+                        : 'bg-[#0B1526] text-slate-400 border-white/5 hover:text-white'
+                    }`}
+                  >
+                    <span>🏆</span>
+                    <span>Group Stage & Tables</span>
+                  </button>
+                  <button
+                    onClick={() => setTournamentSubView('knockout')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                      tournamentSubView === 'knockout'
+                        ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30'
+                        : 'bg-[#0B1526] text-slate-400 border-white/5 hover:text-white'
+                    }`}
+                  >
+                    <span>⚔️</span>
+                    <span>Knockout Tree</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Live Qualifier Feed Notice */}
+              {isQualifierFallback && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+                  <span>⚡</span>
+                  <span>Displaying live official tournament qualification groups & standings from API feed</span>
+                </div>
+              )}
+
               {/* Group Standings or Unified Standings or Knockout Bracket */}
-              {hasGroups && Array.isArray(standings) && standings.length > 0 ? (
+              {hasGroups && hasKnockout && tournamentSubView === 'knockout' ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">
+                      Tournament Knockout Tree
+                    </h3>
+                  </div>
+                  <TournamentBracketView
+                    bracket={buildTournamentBracket(
+                      competitionSlug,
+                      '2026/2027',
+                      Array.isArray(fixtures) ? fixtures : []
+                    )}
+                  />
+                </div>
+              ) : hasGroups && Array.isArray(standings) && standings.length > 0 ? (
                 (() => {
                   const separated = separateProviderStandingsByGroup(
                     standings,

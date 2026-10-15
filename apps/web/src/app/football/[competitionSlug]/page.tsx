@@ -44,6 +44,7 @@ function resolveCompetition(slug: string): {
       featured: canonicalComp.isFeatured ?? true,
       tier: canonicalComp.tier,
       description: `${canonicalComp.name} (${canonicalComp.countryName || canonicalComp.confederationCode}) - Complete Match Centre with Live Scores, Standings, and Fixture Intelligence.`,
+      qualifierLeagueId: canonicalComp.qualifierLeagueId,
     };
     return { comp: adapted, canonicalComp };
   }
@@ -88,8 +89,17 @@ export default async function CompetitionHubPage({
 
   // Look up extended competition metadata from ALL_COMPETITIONS
   const compMeta = ALL_COMPETITIONS.find((c) => c.slug === comp.slug);
-  const hasGroups = compMeta?.hasGroups ?? (canonicalComp ? canonicalComp.competitionType === 'TOURNAMENT' : false);
-  const hasKnockout = compMeta?.hasKnockout ?? (canonicalComp ? canonicalComp.competitionType === 'CUP' || canonicalComp.competitionType === 'SUPER_CUP' : false);
+  const isTournament = Boolean(
+    compMeta?.hasGroups ||
+      canonicalComp?.competitionType === 'WORLD_CUP' ||
+      canonicalComp?.competitionType === 'CONTINENTAL_NATIONAL' ||
+      canonicalComp?.competitionType === 'TOURNAMENT' ||
+      canonicalComp?.isNationalTeam ||
+      canonicalComp?.isContinental ||
+      ['afcon', 'afcon-women', 'wafcon', 'afcon-u20', 'afcon-u17', 'chan', 'fifa-world-cup'].includes(comp.slug.toLowerCase())
+  );
+  const hasGroups = compMeta?.hasGroups ?? isTournament;
+  const hasKnockout = compMeta?.hasKnockout ?? isTournament;
 
   // Fetch articles related to this competition
   let competitionArticles: BlogPost[] = [];
@@ -223,6 +233,7 @@ export default async function CompetitionHubPage({
             competitionName={comp.name}
             hasGroups={hasGroups}
             hasKnockout={hasKnockout}
+            qualifierLeagueId={comp.qualifierLeagueId || canonicalComp?.qualifierLeagueId}
           />
         </section>
 

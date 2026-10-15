@@ -41,7 +41,7 @@ const API_KEY =
   process.env.ALLSPORTS_API_KEY ||
   process.env.FOOTBALL_API_KEY ||
   process.env.NEXT_PUBLIC_FOOTBALL_API_KEY ||
-  '95c9b0311d4bfef71b062bb07cf0186dd20a77ac34160b0c2d1a0c24f3c4a008';
+  '';
 
 /**
  * Map generic/API-Football parameter and method names to AllSportsAPI's exact format
