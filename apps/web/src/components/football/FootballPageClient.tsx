@@ -861,23 +861,8 @@ export function FootballPageClient({
           ────────────────────────────────────────── */}
           <aside className="hidden lg:block space-y-5 lg:sticky lg:top-24">
 
-            {/* Competition Directory */}
-            <SideSection
-              title="Competition Directory"
-              defaultOpen={true}
-              action={
-                <Link
-                  href="/football/competitions"
-                  className="text-[10px] text-blue-400 hover:text-blue-300 font-semibold hover:underline"
-                >
-                  75+ Leagues →
-                </Link>
-              }
-            >
-              <div className="p-2">
-                <CompetitionDirectory compact />
-              </div>
-            </SideSection>
+            {/* Major Competitions Navigator */}
+            <CompetitionDirectory compact />
 
             {/* Featured Club Hubs */}
             <SideSection
@@ -963,23 +948,8 @@ export function FootballPageClient({
 
               {mobileMenuOpen && (
                 <div className="mt-3 space-y-4 p-3.5 bg-[#080f1e] border border-blue-500/30 rounded-2xl shadow-xl animate-fadeIn">
-                  {/* Competition Directory */}
-                  <SideSection
-                    title="Competition Directory"
-                    defaultOpen={true}
-                    action={
-                      <Link
-                        href="/football/competitions"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 font-semibold hover:underline"
-                      >
-                        75+ Leagues →
-                      </Link>
-                    }
-                  >
-                    <div className="p-2">
-                      <CompetitionDirectory compact />
-                    </div>
-                  </SideSection>
+                  {/* Major Competitions Navigator */}
+                  <CompetitionDirectory compact />
 
                   {/* Featured Club Hubs */}
                   <SideSection

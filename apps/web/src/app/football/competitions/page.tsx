@@ -6,7 +6,7 @@ import { ALL_COMPETITIONS } from '@/lib/competitionCategories';
 import { FiArrowLeft, FiGlobe, FiAward, FiShield } from 'react-icons/fi';
 
 export const metadata: Metadata = {
-  title: 'Football Competition Directory (75+ Global & African Leagues) | GoalMills',
+  title: 'Major Football Competitions (75+ Global & African Leagues) | GoalMills',
   description:
     'Authoritative directory of 75+ major world football competitions, African leagues (CAF Champions League, NPFL, Betway Premiership), European leagues (EPL, La Liga, UCL), and domestic tournaments.',
   alternates: {
@@ -37,7 +37,7 @@ export default function CompetitionsDirectoryPage() {
               Football
             </Link>
             <span>/</span>
-            <span className="text-white">Competition Directory</span>
+            <span className="text-white">Major Competitions</span>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -47,7 +47,7 @@ export default function CompetitionsDirectoryPage() {
                 <span>Authoritative Coverage</span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-                Competition Directory
+                Major Competitions
               </h1>
               <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
                 Explore 75+ canonical football leagues and tournaments with real-time match centres,
