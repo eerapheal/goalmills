@@ -728,6 +728,11 @@ export function getCanonicalCompetition(idOrSlug: string): CanonicalCompetition 
   if (!idOrSlug) return undefined;
   const clean = idOrSlug.toLowerCase().trim();
 
+  // Guard: Quarantine sentinel IDs should never resolve to a valid canonical competition
+  if (clean === 'goalmills-unresolved' || clean === 'unresolved' || clean === 'goalmills_unresolved') {
+    return undefined;
+  }
+
   // 1. Direct hit in pre-built top competitions
   if (CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[idOrSlug.toUpperCase()]) {
     return CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[idOrSlug.toUpperCase()];

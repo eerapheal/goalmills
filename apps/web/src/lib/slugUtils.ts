@@ -97,6 +97,9 @@ export function buildMatchSlug(match: MatchSlugParams): string {
   const away = slugify(match.away || match.event_away_team || 'away');
 
   let compRaw = match.comp || match.league_name || match.competitionId || '';
+  if (compRaw.toLowerCase().includes('unresolved')) {
+    compRaw = match.league_name || 'football';
+  }
   if (compRaw === 'ENG-PREMIER-LEAGUE' || compRaw.toLowerCase() === 'premier league') {
     compRaw = 'English Premier League';
   } else if (compRaw === 'ESP-LA-LIGA' || compRaw.toLowerCase() === 'la liga') {

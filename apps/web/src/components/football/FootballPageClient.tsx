@@ -542,7 +542,11 @@ export function FootballPageClient({
         if (fList.length > 0) {
           const parsedLive: FixtureItem[] = fList.slice(0, 20).map((m: any, idx: number) => {
             const normalized = processFixture(m);
-            const canonical = getCanonicalCompetition(normalized.competitionId);
+            const isResolved =
+              normalized.competitionId &&
+              normalized.competitionId !== 'GOALMILLS-UNRESOLVED' &&
+              normalized.classificationStatus !== 'UNRESOLVED';
+            const canonical = isResolved ? getCanonicalCompetition(normalized.competitionId) : undefined;
             const rawStatus = (m.event_status || '').trim();
             const isHT =
               rawStatus.toLowerCase().includes('ht') || rawStatus.toLowerCase().includes('half');
@@ -562,7 +566,7 @@ export function FootballPageClient({
               classificationStatus: normalized.classificationStatus,
               comp: getLeagueShortName(m.league_key, canonical?.shortName || m.league_name, canonical?.countryName || m.country_name),
               compFlag: canonical?.countryFlagUrl || '⚽',
-              compLogo: resolveLeagueLogo(m.league_name || normalized.competitionId, m.league_logo || canonical?.logoUrl),
+              compLogo: resolveLeagueLogo(m.league_name || (isResolved ? normalized.competitionId : undefined), m.league_logo || canonical?.logoUrl),
               home: normalized.homeTeamName || m.event_home_team || 'Home',
               homeBadge: '🔵',
               homeLogo: resolveTeamLogo(normalized.homeTeamName || m.event_home_team, m.home_team_logo),
@@ -610,7 +614,11 @@ export function FootballPageClient({
           const ft: FixtureItem[] = [];
           fixList.forEach((m: any, idx: number) => {
             const normalized = processFixture(m);
-            const canonical = getCanonicalCompetition(normalized.competitionId);
+            const isResolved =
+              normalized.competitionId &&
+              normalized.competitionId !== 'GOALMILLS-UNRESOLVED' &&
+              normalized.classificationStatus !== 'UNRESOLVED';
+            const canonical = isResolved ? getCanonicalCompetition(normalized.competitionId) : undefined;
             const rawStatus = (m.event_status || '').trim();
             const isFinished = rawStatus === 'Finished' || rawStatus === 'FT';
             const item: FixtureItem = {
@@ -624,7 +632,7 @@ export function FootballPageClient({
               classificationStatus: normalized.classificationStatus,
               comp: getLeagueShortName(m.league_key, canonical?.shortName || m.league_name, canonical?.countryName || m.country_name),
               compFlag: canonical?.countryFlagUrl || '⚽',
-              compLogo: resolveLeagueLogo(m.league_name || normalized.competitionId, m.league_logo || canonical?.logoUrl),
+              compLogo: resolveLeagueLogo(m.league_name || (isResolved ? normalized.competitionId : undefined), m.league_logo || canonical?.logoUrl),
               home: normalized.homeTeamName || m.event_home_team || 'Home',
               homeBadge: '⚪',
               homeLogo: resolveTeamLogo(normalized.homeTeamName || m.event_home_team, m.home_team_logo),
