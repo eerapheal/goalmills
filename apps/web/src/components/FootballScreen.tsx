@@ -699,7 +699,7 @@ export function FootballScreen() {
             <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
               <h3 className="text-base font-black text-white flex items-center gap-2 uppercase border-b border-white/10 pb-3">
                 <FiAward className="text-yellow-400" />
-                <span>Golden Boot & Top Goal Scorers</span>
+                <span>Golden Boot & Top Goal Scorers (2026/2027)</span>
               </h3>
 
               {topscorers.length === 0 ? (

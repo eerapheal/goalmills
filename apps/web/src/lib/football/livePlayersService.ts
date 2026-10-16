@@ -108,11 +108,13 @@ function scorerToPlayerMeta(scorer: FootballTopscorer, competitionSlug: string):
 export async function getLiveSeasonPlayers(): Promise<PlayerMeta[]> {
   try {
     // 1. Fetch live top scorers across major competitions
-    const [eplRes, laLigaRes, uclRes, cafRes] = await Promise.all([
+    const [eplRes, laLigaRes, uclRes, cafRes, serieARes, bundesligaRes] = await Promise.all([
       advancedFootballApi.getTopscorers(152).catch(() => ({ success: 0, result: [] })),
       advancedFootballApi.getTopscorers(302).catch(() => ({ success: 0, result: [] })),
       advancedFootballApi.getTopscorers(3).catch(() => ({ success: 0, result: [] })),
       advancedFootballApi.getTopscorers(346).catch(() => ({ success: 0, result: [] })),
+      advancedFootballApi.getTopscorers(207).catch(() => ({ success: 0, result: [] })),
+      advancedFootballApi.getTopscorers(175).catch(() => ({ success: 0, result: [] })),
     ]);
 
     const liveScorers: { scorer: FootballTopscorer; comp: string }[] = [];
@@ -128,6 +130,12 @@ export async function getLiveSeasonPlayers(): Promise<PlayerMeta[]> {
     }
     if (cafRes?.result && Array.isArray(cafRes.result)) {
       cafRes.result.slice(0, 8).forEach((s) => liveScorers.push({ scorer: s, comp: 'caf-champions-league' }));
+    }
+    if (serieARes?.result && Array.isArray(serieARes.result)) {
+      serieARes.result.slice(0, 10).forEach((s) => liveScorers.push({ scorer: s, comp: 'serie-a' }));
+    }
+    if (bundesligaRes?.result && Array.isArray(bundesligaRes.result)) {
+      bundesligaRes.result.slice(0, 10).forEach((s) => liveScorers.push({ scorer: s, comp: 'bundesliga' }));
     }
 
     // 2. Map scorers to PlayerMeta entries and deduplicate by player_key
@@ -160,8 +168,17 @@ export async function getLiveSeasonPlayers(): Promise<PlayerMeta[]> {
       );
 
       if (!matchInApi) {
-        // Not in top scorers, keep curated star with their profile
-        finalPlayers.push(rp);
+        // Not in top scorers: keep curated profile details but zero out 2026/2027 season goal tallies
+        // so placeholder/mock data never contaminates Golden Boot / Top Goalscorer leaderboards
+        finalPlayers.push({
+          ...rp,
+          seasonStats: {
+            ...rp.seasonStats,
+            goals: 0,
+            assists: 0,
+            appearances: 0,
+          },
+        });
       } else {
         // Update registry star with authentic live season goals and assists
         matchInApi.africanOrigin = rp.africanOrigin ?? matchInApi.africanOrigin;
@@ -176,6 +193,14 @@ export async function getLiveSeasonPlayers(): Promise<PlayerMeta[]> {
     return finalPlayers;
   } catch (error) {
     console.error('Error fetching live season players:', error);
-    return EntityService.getAllPlayers();
+    return EntityService.getAllPlayers().map((p) => ({
+      ...p,
+      seasonStats: {
+        ...p.seasonStats,
+        goals: 0,
+        assists: 0,
+        appearances: 0,
+      },
+    }));
   }
 }

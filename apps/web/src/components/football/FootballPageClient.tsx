@@ -323,15 +323,15 @@ export function FootballPageClient({
   const { coaches: dynamicCoaches } = useCoaches();
 
   // Table league is tracked by numeric league ID (never by name).
-  // Defaults to the top-ranked league returned by the API.
-  const [tableLeagueId, setTableLeagueId] = useState<number | null>(null);
+  // Defaults to 152 (Premier League) for immediate 2026/2027 live data fetch, then follows selected league.
+  const [tableLeagueId, setTableLeagueId] = useState<number | null>(152);
   useEffect(() => {
     if (tableLeagueId === null && apiLeagues.length > 0) {
       setTableLeagueId(Number(apiLeagues[0].league_key));
     }
   }, [apiLeagues, tableLeagueId]);
   const tableLeague = useMemo(
-    () => apiLeagues.find((l) => Number(l.league_key) === tableLeagueId)?.league_name || '',
+    () => apiLeagues.find((l) => Number(l.league_key) === tableLeagueId)?.league_name || (tableLeagueId === 152 ? 'Premier League' : ''),
     [apiLeagues, tableLeagueId]
   );
   const { teams: dynamicClubs } = useTeams(tableLeagueId ? { leagueId: tableLeagueId } : undefined);
@@ -1119,8 +1119,8 @@ export function FootballPageClient({
                 </div>
               )}
 
-              {/* Table Sub-bar with league pills & search */}
-              {mainTab === 'table' && (
+              {/* Table & Scorers Sub-bar with league pills & search */}
+              {(mainTab === 'table' || mainTab === 'scorers') && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-[#1e293b] bg-[#0c1322]">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     {apiLeagues.slice(0, 7).map((l) => {
@@ -1459,7 +1459,7 @@ export function FootballPageClient({
                 <div className="px-5 py-3.5 border-b border-[#1e293b] flex items-center justify-between">
                   <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-2">
                     <span>👟</span>
-                    <span>European & African Golden Boot Race — 2025/2026</span>
+                    <span>{tableLeague ? `${tableLeague} ` : ''}Golden Boot Race (2026/2027)</span>
                   </h3>
                   <Link
                     href="/football/players"
@@ -1703,7 +1703,7 @@ export function FootballPageClient({
             <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl overflow-hidden shadow-sm">
               <div className="px-4 py-3 border-b border-[#1e293b] flex items-center justify-between">
                 <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                  Golden Boot
+                  Golden Boot (2026/2027)
                 </h3>
                 <button
                   onClick={() => setMainTab('scorers')}
@@ -1744,7 +1744,13 @@ export function FootballPageClient({
                     </Link>
                   ))
                 ) : (
-                  <div className="p-4 text-center text-xs text-slate-500">Golden boot syncing...</div>
+                  <div className="p-4 text-center text-xs text-slate-500">
+                    {scorersLoading
+                      ? 'Loading 2026/2027 Golden Boot...'
+                      : tableLeague
+                        ? `${tableLeague} Golden Boot syncing...`
+                        : 'Golden boot syncing...'}
+                  </div>
                 )}
               </div>
             </div>

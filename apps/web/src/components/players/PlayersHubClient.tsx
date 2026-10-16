@@ -114,9 +114,10 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
       });
   }, [initialPlayers, searchQuery, positionFilter, competitionFilter, sortBy]);
 
-  // Spotlight leaders for top widgets
+  // Spotlight leaders for top widgets (strictly authentic live API scorers for 2026/2027)
   const topGoalscorers = useMemo(() => {
     return [...initialPlayers]
+      .filter((p) => (p.seasonStats?.goals ?? 0) > 0)
       .sort((a, b) => b.seasonStats.goals - a.seasonStats.goals)
       .slice(0, 3);
   }, [initialPlayers]);
@@ -161,34 +162,40 @@ export function PlayersHubClient({ initialPlayers }: PlayersHubClientProps) {
               <span>Top Goalscorers</span>
             </div>
             <span className="text-[10px] text-amber-300 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-              Golden Boot
+              2026/2027 Golden Boot
             </span>
           </div>
           <div className="space-y-2">
-            {topGoalscorers.map((p, idx) => (
-              <Link
-                key={p.slug}
-                href={`/football/players/${p.slug}`}
-                className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-amber-500/10 border border-white/5 transition-all"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-xs font-black text-amber-400 font-mono w-4">
-                    #{idx + 1}
-                  </span>
-                  <PlayerImage src={p.photo} alt={p.name} size={32} rounded="rounded-lg" />
-                  <div className="min-w-0">
-                    <h5 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors truncate">
-                      {p.name}
-                    </h5>
-                    <p className="text-[10px] text-slate-400 truncate">{p.clubName}</p>
+            {topGoalscorers.length > 0 ? (
+              topGoalscorers.map((p, idx) => (
+                <Link
+                  key={p.slug}
+                  href={`/football/players/${p.slug}`}
+                  className="group flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-amber-500/10 border border-white/5 transition-all"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-xs font-black text-amber-400 font-mono w-4">
+                      #{idx + 1}
+                    </span>
+                    <PlayerImage src={p.photo} alt={p.name} size={32} rounded="rounded-lg" />
+                    <div className="min-w-0">
+                      <h5 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors truncate">
+                        {p.name}
+                      </h5>
+                      <p className="text-[10px] text-slate-400 truncate">{p.clubName}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="text-right pl-2 shrink-0">
-                  <span className="text-xs font-black text-amber-400">{p.seasonStats.goals}</span>
-                  <span className="text-[9px] text-slate-500 block">Goals</span>
-                </div>
-              </Link>
-            ))}
+                  <div className="text-right pl-2 shrink-0">
+                    <span className="text-xs font-black text-amber-400">{p.seasonStats.goals}</span>
+                    <span className="text-[9px] text-slate-500 block">Goals</span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-xs text-slate-400 py-3 text-center">
+                Syncing 2026/2027 Golden Boot scorers...
+              </p>
+            )}
           </div>
         </div>
 

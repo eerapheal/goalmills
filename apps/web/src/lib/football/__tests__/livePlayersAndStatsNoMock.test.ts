@@ -53,4 +53,50 @@ describe('Live Players and Authentic 2026/2027 Season Statistics Suite', () => {
     expect(content).toContain('getLiveSeasonPlayers');
     expect(content).toContain('await getLiveSeasonPlayers()');
   });
+
+  it('should verify FootballPageClient.tsx uses 2026/2027 Golden Boot and no outdated 2025/2026 tag', () => {
+    const pagePath = path.resolve(
+      __dirname,
+      '../../../components/football/FootballPageClient.tsx'
+    );
+    const content = fs.readFileSync(pagePath, 'utf8');
+
+    // Must not contain outdated 2025/2026 Golden Boot label
+    expect(content).not.toContain('European & African Golden Boot Race — 2025/2026');
+
+    // Must contain 2026/2027 Golden Boot label and default tableLeagueId to 152
+    expect(content).toContain('Golden Boot Race (2026/2027)');
+    expect(content).toContain('Golden Boot (2026/2027)');
+    expect(content).toContain('useState<number | null>(152)');
+  });
+
+  it('should verify livePlayersService.ts zeros out mock stats for unverified registry players', () => {
+    const servicePath = path.resolve(__dirname, '../livePlayersService.ts');
+    const content = fs.readFileSync(servicePath, 'utf8');
+
+    // Must zero out goals and assists for registry players not found in live API top scorers
+    expect(content).toContain('goals: 0');
+    expect(content).toContain('assists: 0');
+    expect(content).toContain('appearances: 0');
+    expect(content).toContain('advancedFootballApi.getTopscorers(207)');
+    expect(content).toContain('advancedFootballApi.getTopscorers(175)');
+  });
+
+  it('should verify PlayersHubClient.tsx filters Golden Boot by goals > 0 and displays 2026/2027 Golden Boot badge', () => {
+    const hubClientPath = path.resolve(
+      __dirname,
+      '../../../components/players/PlayersHubClient.tsx'
+    );
+    const content = fs.readFileSync(hubClientPath, 'utf8');
+
+    expect(content).toContain('2026/2027 Golden Boot');
+    expect(content).toContain('.filter((p) => (p.seasonStats?.goals ?? 0) > 0)');
+  });
+
+  it('should verify FootballScreen.tsx targets 2026/2027 Golden Boot', () => {
+    const screenPath = path.resolve(__dirname, '../../../components/FootballScreen.tsx');
+    const content = fs.readFileSync(screenPath, 'utf8');
+
+    expect(content).toContain('Golden Boot & Top Goal Scorers (2026/2027)');
+  });
 });

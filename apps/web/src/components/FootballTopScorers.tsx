@@ -142,7 +142,7 @@ export function FootballTopScorers({ scorers, teams = [] }: FootballTopScorersPr
                   {scorer.assists} Assists
                 </div>
               ) : (
-                <div className="text-[10px] text-slate-500">Golden Boot</div>
+                <div className="text-[10px] text-slate-500">Golden Boot (2026/2027)</div>
               )}
             </div>
           </div>
