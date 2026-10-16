@@ -158,6 +158,7 @@ export default function FootballTeamPage() {
           if (resolvedLeagueName) setLeagueName(resolvedLeagueName);
           if (resolvedLeagueSlug) setLeagueSlug(resolvedLeagueSlug);
           if (resolvedStanding) setStanding(resolvedStanding);
+          setLoading(false);
         }
 
         // Squad players directly from teamData.players
@@ -562,12 +563,8 @@ export default function FootballTeamPage() {
     { id: 'stats', label: 'Team Stats' },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#070a1a] pt-[90px] flex items-center justify-center">
-        <GoalmillsLoader />
-      </div>
-    );
+  if (loading && !team) {
+    return null;
   }
 
   if (!team) {

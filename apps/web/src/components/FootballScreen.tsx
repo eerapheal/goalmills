@@ -12,7 +12,6 @@ import {
   FootballEvent,
   CompetitionGender,
 } from '@goalmills/types';
-import { GoalmillsLoader } from './GoalmillsLoader';
 import { footballRoutes } from '@/lib/slugUtils';
 import {
   isFixtureInCompetition,
@@ -529,19 +528,10 @@ export function FootballScreen() {
         </div>
       </div>
 
-      {/* Loading State */}
-      {loading ? (
-        <div className="flex h-64 items-center justify-center rounded-2xl bg-[#0A1424]/60 border border-blue-500/20">
-          <GoalmillsLoader
-            size="lg"
-            label="GoalMills Football"
-            sublabel="Syncing live match telemetry..."
-          />
-        </div>
-      ) : (
-        <>
-          {/* TAB: STANDINGS (Single Table for Club Leagues, Multi-Group A-Z for Tournaments) */}
-          {activeTab === 'standings' && (
+      {/* Content */}
+      <>
+        {/* TAB: STANDINGS (Single Table for Club Leagues, Multi-Group A-Z for Tournaments) */}
+        {activeTab === 'standings' && (
             <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
@@ -875,7 +865,6 @@ export function FootballScreen() {
             </div>
           )}
         </>
-      )}
-    </div>
+      </div>
   );
 }

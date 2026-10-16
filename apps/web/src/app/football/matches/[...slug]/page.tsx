@@ -1091,6 +1091,7 @@ export default function FootballMatchPage() {
       if (foundMatch) {
         setMatch(foundMatch);
         setError(null);
+        setLoading(false);
 
         // Dynamically update browser URL to full canonical SEO slug if accessed via pure ID or keyless slug
         if (typeof window !== 'undefined' && foundMatch) {
@@ -1102,7 +1103,7 @@ export default function FootballMatchPage() {
 
         const key = foundMatch.event_key || parsedSlug.eventKey;
 
-        // Fetch Secondary Match Insights in Parallel
+        // Fetch Secondary Match Insights in Parallel without blocking match UI
         const promises: Promise<any>[] = [];
 
         // H2H
@@ -1154,7 +1155,7 @@ export default function FootballMatchPage() {
           );
         }
 
-        await Promise.allSettled(promises);
+        Promise.allSettled(promises);
       } else {
         setError('Match fixture could not be located.');
       }
@@ -1216,12 +1217,8 @@ export default function FootballMatchPage() {
     });
   }, [match]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#070a1a] pt-[90px] flex items-center justify-center">
-        <GoalmillsLoader />
-      </div>
-    );
+  if (loading && !match) {
+    return null;
   }
 
   if (error || !match) {

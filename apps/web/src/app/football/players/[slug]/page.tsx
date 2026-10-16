@@ -378,6 +378,7 @@ export default function FootballPlayerPage() {
             career: careerList,
             recentMatches: realRecentMatches,
           });
+          setLoading(false);
         }
 
         // Fetch related articles
@@ -404,12 +405,8 @@ export default function FootballPlayerPage() {
     };
   }, [rawSlug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#070a1a] pt-[90px] flex items-center justify-center">
-        <GoalmillsLoader />
-      </div>
-    );
+  if (loading && !playerData) {
+    return null;
   }
 
   if (!playerData) {

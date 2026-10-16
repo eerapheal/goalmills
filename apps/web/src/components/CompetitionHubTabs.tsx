@@ -8,7 +8,6 @@ import { FootballStandingsTable } from './FootballStandingsTable';
 import { GroupStandingsView } from './football/GroupStandingsView';
 import { TournamentBracketView } from './football/TournamentBracketView';
 import { FootballTopScorers } from './FootballTopScorers';
-import { GoalmillsLoader } from './GoalmillsLoader';
 import { footballRoutes, slugify, buildMatchSlug } from '@/lib/slugUtils';
 import {
   separateProviderStandingsByGroup,
@@ -286,14 +285,9 @@ export function CompetitionHubTabs({
       )}
 
       {/* Content */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <GoalmillsLoader />
-        </div>
-      ) : (
-        <>
-          {/* Live / Fixtures / Results */}
-          {(activeTab === 'live' || activeTab === 'fixtures' || activeTab === 'results') && (
+      <>
+        {/* Live / Fixtures / Results */}
+        {(activeTab === 'live' || activeTab === 'fixtures' || activeTab === 'results') && (
             <div className="space-y-3">
               {filteredFixtures.length > 0 ? (
                 filteredFixtures.map((match, i) => (
@@ -531,7 +525,6 @@ export function CompetitionHubTabs({
             </div>
           )}
         </>
-      )}
 
       {/* All Teams in Competition */}
       {validTeams.length > 0 && (

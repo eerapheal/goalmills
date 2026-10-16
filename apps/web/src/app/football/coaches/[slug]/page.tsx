@@ -346,6 +346,7 @@ export default function CoachDetailPage() {
             career: careerList,
             recentMatches: recentMatchesList,
           });
+          setLoading(false);
         }
       } catch (err) {
         console.error('Error loading coach page:', err);
@@ -361,12 +362,8 @@ export default function CoachDetailPage() {
     };
   }, [rawSlug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#070a1a] pt-[90px] flex items-center justify-center">
-        <GoalmillsLoader />
-      </div>
-    );
+  if (loading && !coachData) {
+    return null;
   }
 
   if (!coachData) {
