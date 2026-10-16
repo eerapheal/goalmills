@@ -14,6 +14,7 @@ import {
 } from '@/lib/slugUtils';
 import { BackButton } from '@/components/BackButton';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   EntityService,
   CLUBS_REGISTRY,
@@ -26,6 +27,7 @@ import { resolveTeamLogo, resolveLeagueLogo } from '@/lib/football/logoUtils';
 import { PlayerAvatar } from '@/components/football/PlayerAvatar';
 import { resolveFootballTeam } from '@/lib/football/teamResolver';
 import type {
+  EntityBreadcrumbItem,
   FootballTeam,
   FootballPlayer,
   FootballEvent,
@@ -571,6 +573,29 @@ export default function FootballTeamPage() {
   const capacity = (team as any).capacity || null;
   const country = (team as any).team_country || clubMeta?.competitionName || '';
 
+  const displayLeagueName = leagueName || clubMeta?.competitionName;
+  const displayLeagueSlug =
+    leagueSlug ||
+    clubMeta?.competitionSlug ||
+    (displayLeagueName ? slugify(displayLeagueName) : '');
+
+  const breadcrumbItems: EntityBreadcrumbItem[] = useMemo(() => {
+    const items: EntityBreadcrumbItem[] = [{ name: 'Football', url: '/football' }];
+    if (displayLeagueName) {
+      items.push({
+        name: displayLeagueName,
+        url: displayLeagueSlug ? `/football/${displayLeagueSlug}` : '/football',
+      });
+    }
+    if (team?.team_name) {
+      items.push({
+        name: team.team_name,
+        url: `/football/teams/${rawSlug}`,
+      });
+    }
+    return items;
+  }, [displayLeagueName, displayLeagueSlug, team?.team_name, rawSlug]);
+
   return (
     <div className="min-h-screen bg-[#070a1a] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
       {/* ── Team Hero Header ── */}
@@ -584,19 +609,8 @@ export default function FootballTeamPage() {
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           {/* Breadcrumb navigation */}
-          <div className="flex items-center gap-2 mb-6 text-xs font-semibold">
-            <Link href="/" className="text-slate-400 hover:text-white transition-colors">
-              Home
-            </Link>
-            <span className="text-slate-600">/</span>
-            <Link
-              href={leagueSlug ? `/football/${leagueSlug}` : '/football'}
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              {leagueName || 'Football'}
-            </Link>
-            <span className="text-slate-600">/</span>
-            <span className="text-slate-200">{team.team_name}</span>
+          <div className="mb-6">
+            <Breadcrumbs items={breadcrumbItems} />
           </div>
 
           {/* Main Hero row */}
