@@ -7,6 +7,7 @@ import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { parseMatchSlug, footballRoutes, slugify, buildMatchSlug } from '@/lib/slugUtils';
 import { getCanonicalCompetition } from '@/lib/football';
 import { BackButton } from '@/components/BackButton';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 import type {
   FootballEvent,
@@ -15,6 +16,7 @@ import type {
   FootballOdds,
   FootballComment,
   FootballLineupPlayer,
+  EntityBreadcrumbItem,
 } from '@goalmills/types';
 import { getCanonicalBookmaker } from '@/lib/betting/bookmakerRegistry';
 import { buildSecureAffiliateRedirectUrl } from '@/lib/betting/affiliateEngine';
@@ -1217,6 +1219,59 @@ export default function FootballMatchPage() {
     });
   }, [match]);
 
+  // Resolve canonical competition / league info for breadcrumb & links
+  const leagueCanonical = useMemo(() => {
+    if (!match) return null;
+    return (
+      (match.league_key ? getCanonicalCompetition(String(match.league_key)) : undefined) ||
+      (parsedSlug.competitionSlug ? getCanonicalCompetition(parsedSlug.competitionSlug) : undefined) ||
+      (match.league_name ? getCanonicalCompetition(match.league_name) : undefined)
+    );
+  }, [match, parsedSlug.competitionSlug]);
+
+  const leagueSlug = useMemo(() => {
+    return (
+      leagueCanonical?.slug ||
+      (match?.league_name ? slugify(match.league_name) : parsedSlug.competitionSlug || '')
+    );
+  }, [leagueCanonical, match?.league_name, parsedSlug.competitionSlug]);
+
+  const leagueName = useMemo(() => {
+    return leagueCanonical?.name || match?.league_name || 'Football League';
+  }, [leagueCanonical, match?.league_name]);
+
+  // Construct canonical team page URLs
+  const homeTeamUrl = useMemo(() => {
+    if (!match?.event_home_team) return '/football';
+    return footballRoutes.teamFromName(match.event_home_team, match.home_team_key);
+  }, [match?.event_home_team, match?.home_team_key]);
+
+  const awayTeamUrl = useMemo(() => {
+    if (!match?.event_away_team) return '/football';
+    return footballRoutes.teamFromName(match.event_away_team, match.away_team_key);
+  }, [match?.event_away_team, match?.away_team_key]);
+
+  // Breadcrumbs items: Home (automatic) -> Football -> League -> Match (Home vs Away)
+  const breadcrumbItems = useMemo<EntityBreadcrumbItem[]>(() => {
+    const items: EntityBreadcrumbItem[] = [{ name: 'Football', url: '/football' }];
+
+    if (leagueSlug) {
+      items.push({
+        name: leagueName,
+        url: `/football/${leagueSlug}`,
+      });
+    }
+
+    if (match?.event_home_team && match?.event_away_team) {
+      items.push({
+        name: `${match.event_home_team} vs ${match.event_away_team}`,
+        url: footballRoutes.match(slug || buildMatchSlug(match)),
+      });
+    }
+
+    return items;
+  }, [leagueSlug, leagueName, match, slug]);
+
   if (loading && !match) {
     return null;
   }
@@ -1274,17 +1329,90 @@ export default function FootballMatchPage() {
         <div className="absolute top-0 right-1/4 w-96 h-48 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-4 relative z-10">
+          {/* Breadcrumb Navigation & Back to Leagues/Teams */}
+          <div className="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-white/5">
+            <Breadcrumbs
+              items={breadcrumbItems}
+              renderLastItem={() => (
+                <span className="inline-flex items-center gap-1.5 font-bold text-white max-w-[340px] sm:max-w-none flex-wrap">
+                  <Link
+                    href={homeTeamUrl}
+                    className="text-blue-400 hover:text-blue-300 hover:underline transition-colors font-bold"
+                    title={`View ${match.event_home_team} Team Page`}
+                  >
+                    {match.event_home_team}
+                  </Link>
+                  <span className="text-slate-500 font-normal text-xs">vs</span>
+                  <Link
+                    href={awayTeamUrl}
+                    className="text-rose-400 hover:text-rose-300 hover:underline transition-colors font-bold"
+                    title={`View ${match.event_away_team} Team Page`}
+                  >
+                    {match.event_away_team}
+                  </Link>
+                </span>
+              )}
+            />
+
+            {/* Direct Jump to Team Pages */}
+            <div className="flex items-center gap-2 text-xs flex-wrap">
+              <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider hidden sm:inline">
+                Team Hubs:
+              </span>
+              <Link
+                href={homeTeamUrl}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/20 font-bold transition-all hover:scale-105 shadow-sm group"
+                title={`Go to ${match.event_home_team} page`}
+              >
+                {match.home_team_logo && (
+                  <img src={match.home_team_logo} alt="" className="w-3.5 h-3.5 object-contain" />
+                )}
+                <span>{match.event_home_team}</span>
+                <span className="text-[10px] text-blue-400 opacity-70 group-hover:opacity-100">↗</span>
+              </Link>
+              <span className="text-slate-600 font-bold">•</span>
+              <Link
+                href={awayTeamUrl}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 font-bold transition-all hover:scale-105 shadow-sm group"
+                title={`Go to ${match.event_away_team} page`}
+              >
+                {match.away_team_logo && (
+                  <img src={match.away_team_logo} alt="" className="w-3.5 h-3.5 object-contain" />
+                )}
+                <span>{match.event_away_team}</span>
+                <span className="text-[10px] text-rose-400 opacity-70 group-hover:opacity-100">↗</span>
+              </Link>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between mb-4">
             <BackButton />
 
-            {/* League info badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-300">
-              {match.league_logo && (
-                <img src={match.league_logo} alt="" className="w-4 h-4 object-contain" />
-              )}
-              <span>{match.league_name}</span>
-              {match.league_round && <span className="text-slate-500">• {match.league_round}</span>}
-            </div>
+            {/* League info badge - now links directly to league page */}
+            {leagueSlug ? (
+              <Link
+                href={`/football/${leagueSlug}`}
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/40 text-xs font-bold text-slate-300 hover:text-white transition-all group"
+                title={`View ${leagueName} Standings & Fixtures`}
+              >
+                {match.league_logo && (
+                  <img src={match.league_logo} alt="" className="w-4 h-4 object-contain" />
+                )}
+                <span>{match.league_name || leagueName}</span>
+                {match.league_round && (
+                  <span className="text-slate-500 group-hover:text-slate-400">• {match.league_round}</span>
+                )}
+                <span className="text-[10px] text-blue-400 opacity-60 group-hover:opacity-100">↗</span>
+              </Link>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-300">
+                {match.league_logo && (
+                  <img src={match.league_logo} alt="" className="w-4 h-4 object-contain" />
+                )}
+                <span>{match.league_name}</span>
+                {match.league_round && <span className="text-slate-500">• {match.league_round}</span>}
+              </div>
+            )}
 
             <div className="w-8" />
           </div>
@@ -1311,7 +1439,7 @@ export default function FootballMatchPage() {
           <div className="grid grid-cols-3 items-center gap-4 sm:gap-8 max-w-2xl mx-auto">
             {/* Home Team */}
             <Link
-              href={footballRoutes.teamFromName(match.event_home_team)}
+              href={homeTeamUrl}
               className="flex flex-col items-center gap-2.5 group text-center"
             >
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center transition-all group-hover:border-blue-400 group-hover:bg-white/[0.08] shadow-xl">
@@ -1354,7 +1482,7 @@ export default function FootballMatchPage() {
 
             {/* Away Team */}
             <Link
-              href={footballRoutes.teamFromName(match.event_away_team)}
+              href={awayTeamUrl}
               className="flex flex-col items-center gap-2.5 group text-center"
             >
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/[0.04] border border-white/10 p-2.5 flex items-center justify-center transition-all group-hover:border-rose-400 group-hover:bg-white/[0.08] shadow-xl">

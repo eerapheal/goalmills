@@ -8,9 +8,10 @@ import { generateBreadcrumbSchema } from '@/lib/seo/schemaGenerator';
 interface BreadcrumbsProps {
   items: EntityBreadcrumbItem[];
   className?: string;
+  renderLastItem?: (item: EntityBreadcrumbItem) => React.ReactNode;
 }
 
-export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, className = '', renderLastItem }: BreadcrumbsProps) {
   const fullItems: EntityBreadcrumbItem[] = [{ name: 'Home', url: '/' }, ...items];
   const schemaJson = generateBreadcrumbSchema(fullItems);
 
@@ -30,12 +31,16 @@ export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
             <li key={item.url + index} className="flex items-center space-x-1.5 sm:space-x-2">
               {index > 0 && <FiChevronRight className="text-slate-600 flex-shrink-0" size={13} />}
               {isLast ? (
-                <span
-                  className="font-bold text-white max-w-[200px] sm:max-w-[320px] truncate"
-                  aria-current="page"
-                >
-                  {item.name}
-                </span>
+                renderLastItem ? (
+                  renderLastItem(item)
+                ) : (
+                  <span
+                    className="font-bold text-white max-w-[200px] sm:max-w-[320px] truncate"
+                    aria-current="page"
+                  >
+                    {item.name}
+                  </span>
+                )
               ) : (
                 <Link
                   href={item.url}
