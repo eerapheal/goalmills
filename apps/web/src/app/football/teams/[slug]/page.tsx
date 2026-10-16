@@ -532,6 +532,29 @@ export default function FootballTeamPage() {
       .slice(0, 5);
   }, [squadByGroup]);
 
+  const displayLeagueName = leagueName || clubMeta?.competitionName;
+  const displayLeagueSlug =
+    leagueSlug ||
+    clubMeta?.competitionSlug ||
+    (displayLeagueName ? slugify(displayLeagueName) : '');
+
+  const breadcrumbItems: EntityBreadcrumbItem[] = useMemo(() => {
+    const items: EntityBreadcrumbItem[] = [{ name: 'Football', url: '/football' }];
+    if (displayLeagueName) {
+      items.push({
+        name: displayLeagueName,
+        url: displayLeagueSlug ? `/football/${displayLeagueSlug}` : '/football',
+      });
+    }
+    if (team?.team_name) {
+      items.push({
+        name: team.team_name,
+        url: `/football/teams/${rawSlug}`,
+      });
+    }
+    return items;
+  }, [displayLeagueName, displayLeagueSlug, team?.team_name, rawSlug]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'squad', label: 'Squad' },
@@ -568,33 +591,10 @@ export default function FootballTeamPage() {
     );
   }
 
-  const stadium = clubMeta?.stadium || (team as any).venue || '';
-  const founded = clubMeta?.founded || (team as any).founded || '';
-  const capacity = (team as any).capacity || null;
-  const country = (team as any).team_country || clubMeta?.competitionName || '';
-
-  const displayLeagueName = leagueName || clubMeta?.competitionName;
-  const displayLeagueSlug =
-    leagueSlug ||
-    clubMeta?.competitionSlug ||
-    (displayLeagueName ? slugify(displayLeagueName) : '');
-
-  const breadcrumbItems: EntityBreadcrumbItem[] = useMemo(() => {
-    const items: EntityBreadcrumbItem[] = [{ name: 'Football', url: '/football' }];
-    if (displayLeagueName) {
-      items.push({
-        name: displayLeagueName,
-        url: displayLeagueSlug ? `/football/${displayLeagueSlug}` : '/football',
-      });
-    }
-    if (team?.team_name) {
-      items.push({
-        name: team.team_name,
-        url: `/football/teams/${rawSlug}`,
-      });
-    }
-    return items;
-  }, [displayLeagueName, displayLeagueSlug, team?.team_name, rawSlug]);
+  const stadium = clubMeta?.stadium || (team as any)?.venue || '';
+  const founded = clubMeta?.founded || (team as any)?.founded || '';
+  const capacity = (team as any)?.capacity || null;
+  const country = (team as any)?.team_country || clubMeta?.competitionName || '';
 
   return (
     <div className="min-h-screen bg-[#070a1a] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
