@@ -13,13 +13,8 @@ import {
 } from '@/lib/slugUtils';
 import { BackButton } from '@/components/BackButton';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
-import {
-  EntityService,
-  CLUBS_REGISTRY,
-  PLAYERS_REGISTRY,
-  PlayerMeta,
-  ClubMeta,
-} from '@/lib/entityService';
+import { EntityService, PLAYERS_REGISTRY, PlayerMeta } from '@/lib/entityService';
+import { KNOWN_PROVIDER_TEAM_KEYS } from '@/lib/football/teamResolver';
 import type { FootballPlayer, FootballEvent, BlogPost } from '@goalmills/types';
 import { PlayerAvatar } from '@/components/football/PlayerAvatar';
 
@@ -208,10 +203,13 @@ export default function FootballPlayerPage() {
 
         // Determine Team & Club details
         const clubSlug =
-          curated?.clubSlug || (apiPlayer?.team_name ? slugify(apiPlayer.team_name) : 'arsenal');
-        const club: ClubMeta | undefined = CLUBS_REGISTRY[clubSlug];
-        const teamName = curated?.clubName || apiPlayer?.team_name || club?.name || 'Football Club';
-        const teamKey = apiPlayer?.team_key || (club ? String(club.id) : undefined);
+          curated?.clubSlug || (apiPlayer?.team_name ? slugify(apiPlayer.team_name) : '');
+        const teamName = curated?.clubName || apiPlayer?.team_name || 'Football Club';
+        const teamKey =
+          apiPlayer?.team_key ||
+          (clubSlug && KNOWN_PROVIDER_TEAM_KEYS[clubSlug]
+            ? String(KNOWN_PROVIDER_TEAM_KEYS[clubSlug])
+            : undefined);
 
         // Calculate authentic stats from live API or registry
         const goals = apiPlayer

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { EntityService, CLUBS_REGISTRY } from '@/lib/entityService';
+import { EntityService } from '@/lib/entityService';
 import { FootballPageClient } from '@/components/football/FootballPageClient';
 
 export const revalidate = 60; // Revalidate every minute for live scores & fresh data
@@ -29,7 +29,6 @@ export default function FootballPage() {
   const allPlayers = EntityService.getAllPlayers();
   const allOfficials = EntityService.getAllOfficials();
   const allCoaches = EntityService.getAllCoaches();
-  const clubs = [...EntityService.getAfricanClubs(), ...Object.values(CLUBS_REGISTRY)];
 
   return (
     <main className="min-h-screen bg-[#020617]">
@@ -37,7 +36,6 @@ export default function FootballPage() {
         initialPlayers={allPlayers}
         initialOfficials={allOfficials}
         initialCoaches={allCoaches}
-        initialClubs={clubs}
       />
     </main>
   );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EntityService, CLUBS_REGISTRY, COACHES_REGISTRY } from '@/lib/entityService';
+import { EntityService, COACHES_REGISTRY } from '@/lib/entityService';
 import { ALL_COMPETITIONS, COMPETITION_CATEGORY_LABELS } from '@/lib/competitionCategories';
 
 export const dynamic = 'force-dynamic';

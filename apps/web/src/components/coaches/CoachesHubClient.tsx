@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { CoachMeta, CLUBS_REGISTRY } from '@/lib/entityService';
+import { CoachMeta } from '@/lib/entityService';
+import { resolveTeamLogo } from '@/lib/football/logoUtils';
 import { CoachImage } from '@/components/CoachImage';
 import {
   FiSearch,
@@ -205,7 +206,6 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredCoaches.map((coach) => {
-            const club = CLUBS_REGISTRY[coach.currentClubSlug];
             return (
               <div
                 key={coach.slug}
@@ -218,7 +218,7 @@ export const CoachesHubClient: React.FC<CoachesHubClientProps> = ({ initialCoach
                       src={coach.photo}
                       name={coach.name}
                       countryFlag={coach.countryFlag}
-                      clubLogo={club?.logo}
+                      clubLogo={resolveTeamLogo(coach.currentClubName)}
                       size={68}
                       className="border-2 border-blue-500/30"
                     />

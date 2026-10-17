@@ -13,13 +13,8 @@ import {
 } from '@/lib/slugUtils';
 import { BackButton } from '@/components/BackButton';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
-import {
-  EntityService,
-  CLUBS_REGISTRY,
-  COACHES_REGISTRY,
-  CoachMeta,
-  ClubMeta,
-} from '@/lib/entityService';
+import { EntityService, COACHES_REGISTRY, CoachMeta } from '@/lib/entityService';
+import { KNOWN_PROVIDER_TEAM_KEYS } from '@/lib/football/teamResolver';
 import type { FootballCoach, FootballEvent } from '@goalmills/types';
 
 interface TrophyItem {
@@ -144,11 +139,13 @@ export default function CoachDetailPage() {
         const coachName = curated?.name || apiCoach?.coache || 'Head Coach';
         const clubSlug =
           curated?.currentClubSlug ||
-          (apiCoach?.team_name ? slugify(apiCoach.team_name) : 'manchester-city');
-        const club: ClubMeta | undefined = CLUBS_REGISTRY[clubSlug];
+          (apiCoach?.team_name ? slugify(apiCoach.team_name) : '');
         const teamName =
-          curated?.currentClubName || apiCoach?.team_name || club?.name || 'Top Flight Club';
-        const teamKey = club ? String(club.id) : undefined;
+          curated?.currentClubName || apiCoach?.team_name || 'Top Flight Club';
+        const teamKey =
+          (clubSlug && KNOWN_PROVIDER_TEAM_KEYS[clubSlug]
+            ? String(KNOWN_PROVIDER_TEAM_KEYS[clubSlug])
+            : undefined);
 
         // Record numbers
         const totalMatches = curated?.matchesManaged || 320;
@@ -215,9 +212,9 @@ export default function CoachDetailPage() {
 
         // Fetch team fixtures for real recent results as manager
         let recentMatchesList: ManagerMatch[] = [];
-        if (club?.id) {
+        if (teamKey) {
           try {
-            const fixRes = await advancedFootballApi.getFixtures({ teamId: club.id });
+            const fixRes = await advancedFootballApi.getFixtures({ teamId: Number(teamKey) });
             if (fixRes?.result && Array.isArray(fixRes.result)) {
               const finished = (fixRes.result as FootballEvent[])
                 .filter(
@@ -233,7 +230,7 @@ export default function CoachDetailPage() {
               if (finished.length > 0) {
                 recentMatchesList = finished.map((m) => {
                   const isHome =
-                    String(m.home_team_key) === String(club.id) ||
+                    String(m.home_team_key) === String(teamKey) ||
                     slugify(m.event_home_team || '').includes(slugify(teamName));
                   const opp = isHome ? m.event_away_team : m.event_home_team;
                   const parts = (m.event_final_result || m.event_ft_result || '0 - 0').split(' - ');

@@ -1,9 +1,8 @@
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { slugify, parseTeamSlug } from '../slugUtils';
-import { CLUBS_REGISTRY, ClubMeta } from '../entityService';
+import { ClubMeta } from '../entityService';
 import { ALL_COMPETITIONS } from '../competitionCategories';
 import { PriorityClub } from '@goalmills/types';
-import { PRIORITY_CLUBS, PRIORITY_CLUBS_LIST, getPriorityClub } from './clubRegistry';
 import type { FootballTeam, FootballStanding } from '@goalmills/types';
 
 export interface ResolvedTeam {
@@ -15,31 +14,252 @@ export interface ResolvedTeam {
   priorityClub?: PriorityClub;
 }
 
-// Reverse map from provider team key (AllSportsAPI / API-Sports) to PriorityClub
-const PROVIDER_TEAM_KEY_MAP = new Map<string, PriorityClub>();
-// Exact lowercase team name map
-const TEAM_NAME_EXACT_MAP = new Map<string, PriorityClub>();
-
-for (const club of Object.values(CLUBS_REGISTRY)) {
-  const pClub: PriorityClub = {
-    id: club.slug,
-    name: club.name,
-    shortName: club.shortName,
-    slug: club.slug,
-    competitionCanonicalId: club.competitionSlug,
-    countryCode: 'XX',
-    logoUrl: club.logo,
-    providerId: club.id,
-  };
-  if (club.id) {
-    PROVIDER_TEAM_KEY_MAP.set(String(club.id).trim(), pClub);
-  }
-  TEAM_NAME_EXACT_MAP.set(club.name.trim().toLowerCase(), pClub);
-  TEAM_NAME_EXACT_MAP.set(club.shortName.trim().toLowerCase(), pClub);
-  TEAM_NAME_EXACT_MAP.set(club.slug.trim().toLowerCase(), pClub);
+// Curated priority clubs identity map for instant resolution
+interface LocalPriorityClub {
+  id: string;
+  providerId: string;
+  name: string;
+  shortName: string;
+  slug: string;
+  competitionCanonicalId: string;
+  countryCode: string;
+  logoUrl?: string;
 }
 
-for (const club of PRIORITY_CLUBS_LIST) {
+const KNOWN_PRIORITY_CLUBS: Record<string, LocalPriorityClub> = {
+  arsenal: {
+    id: 'arsenal',
+    name: 'Arsenal FC',
+    shortName: 'Arsenal',
+    slug: 'arsenal',
+    competitionCanonicalId: 'premier-league',
+    countryCode: 'GB-ENG',
+    providerId: '141',
+  },
+  chelsea: {
+    id: 'chelsea',
+    name: 'Chelsea FC',
+    shortName: 'Chelsea',
+    slug: 'chelsea',
+    competitionCanonicalId: 'premier-league',
+    countryCode: 'GB-ENG',
+    providerId: '88',
+  },
+  liverpool: {
+    id: 'liverpool',
+    name: 'Liverpool FC',
+    shortName: 'Liverpool',
+    slug: 'liverpool',
+    competitionCanonicalId: 'premier-league',
+    countryCode: 'GB-ENG',
+    providerId: '84',
+  },
+  'manchester-city': {
+    id: 'manchester-city',
+    name: 'Manchester City FC',
+    shortName: 'Man City',
+    slug: 'manchester-city',
+    competitionCanonicalId: 'premier-league',
+    countryCode: 'GB-ENG',
+    providerId: '80',
+  },
+  'manchester-united': {
+    id: 'manchester-united',
+    name: 'Manchester United FC',
+    shortName: 'Man United',
+    slug: 'manchester-united',
+    competitionCanonicalId: 'premier-league',
+    countryCode: 'GB-ENG',
+    providerId: '102',
+  },
+  'tottenham-hotspur': {
+    id: 'tottenham-hotspur',
+    name: 'Tottenham Hotspur',
+    shortName: 'Spurs',
+    slug: 'tottenham-hotspur',
+    competitionCanonicalId: 'premier-league',
+    countryCode: 'GB-ENG',
+    providerId: '164',
+  },
+  'real-madrid': {
+    id: 'real-madrid',
+    name: 'Real Madrid CF',
+    shortName: 'Real Madrid',
+    slug: 'real-madrid',
+    competitionCanonicalId: 'la-liga',
+    countryCode: 'ES',
+    providerId: '76',
+  },
+  barcelona: {
+    id: 'barcelona',
+    name: 'FC Barcelona',
+    shortName: 'Barcelona',
+    slug: 'barcelona',
+    competitionCanonicalId: 'la-liga',
+    countryCode: 'ES',
+    providerId: '97',
+  },
+  'atletico-madrid': {
+    id: 'atletico-madrid',
+    name: 'Atlético de Madrid',
+    shortName: 'Atleti',
+    slug: 'atletico-madrid',
+    competitionCanonicalId: 'la-liga',
+    countryCode: 'ES',
+    providerId: '73',
+  },
+  'inter-milan': {
+    id: 'inter-milan',
+    name: 'FC Internazionale Milano',
+    shortName: 'Inter',
+    slug: 'inter-milan',
+    competitionCanonicalId: 'serie-a',
+    countryCode: 'IT',
+    providerId: '79',
+  },
+  juventus: {
+    id: 'juventus',
+    name: 'Juventus FC',
+    shortName: 'Juventus',
+    slug: 'juventus',
+    competitionCanonicalId: 'serie-a',
+    countryCode: 'IT',
+    providerId: '96',
+  },
+  'ac-milan': {
+    id: 'ac-milan',
+    name: 'AC Milan',
+    shortName: 'AC Milan',
+    slug: 'ac-milan',
+    competitionCanonicalId: 'serie-a',
+    countryCode: 'IT',
+    providerId: '159',
+  },
+  'bayern-munich': {
+    id: 'bayern-munich',
+    name: 'FC Bayern München',
+    shortName: 'Bayern',
+    slug: 'bayern-munich',
+    competitionCanonicalId: 'bundesliga',
+    countryCode: 'DE',
+    providerId: '72',
+  },
+  'borussia-dortmund': {
+    id: 'borussia-dortmund',
+    name: 'Borussia Dortmund',
+    shortName: 'Dortmund',
+    slug: 'borussia-dortmund',
+    competitionCanonicalId: 'bundesliga',
+    countryCode: 'DE',
+    providerId: '92',
+  },
+  'paris-saint-germain': {
+    id: 'paris-saint-germain',
+    name: 'Paris Saint-Germain',
+    shortName: 'PSG',
+    slug: 'paris-saint-germain',
+    competitionCanonicalId: 'ligue-1',
+    countryCode: 'FR',
+    providerId: '100',
+  },
+  'al-ahly': {
+    id: 'al-ahly',
+    name: 'Al Ahly SC',
+    shortName: 'Al Ahly',
+    slug: 'al-ahly',
+    competitionCanonicalId: 'caf-champions-league',
+    countryCode: 'EG',
+    providerId: '585',
+  },
+  'mamelodi-sundowns': {
+    id: 'mamelodi-sundowns',
+    name: 'Mamelodi Sundowns FC',
+    shortName: 'Sundowns',
+    slug: 'mamelodi-sundowns',
+    competitionCanonicalId: 'south-african-psl',
+    countryCode: 'ZA',
+    providerId: '1032',
+  },
+  zamalek: {
+    id: 'zamalek',
+    name: 'Zamalek SC',
+    shortName: 'Zamalek',
+    slug: 'zamalek',
+    competitionCanonicalId: 'caf-confederation-cup',
+    countryCode: 'EG',
+    providerId: '2760',
+  },
+  'orlando-pirates': {
+    id: 'orlando-pirates',
+    name: 'Orlando Pirates FC',
+    shortName: 'Orlando Pirates',
+    slug: 'orlando-pirates',
+    competitionCanonicalId: 'south-african-psl',
+    countryCode: 'ZA',
+    providerId: '1033',
+  },
+  'kaizer-chiefs': {
+    id: 'kaizer-chiefs',
+    name: 'Kaizer Chiefs FC',
+    shortName: 'Kaizer Chiefs',
+    slug: 'kaizer-chiefs',
+    competitionCanonicalId: 'south-african-psl',
+    countryCode: 'ZA',
+    providerId: '1035',
+  },
+  'raja-casablanca': {
+    id: 'raja-casablanca',
+    name: 'Raja Club Athletic',
+    shortName: 'Raja CA',
+    slug: 'raja-casablanca',
+    competitionCanonicalId: 'botola-pro',
+    countryCode: 'MA',
+    providerId: '1031',
+  },
+  'wydad-ac': {
+    id: 'wydad-ac',
+    name: 'Wydad AC',
+    shortName: 'Wydad',
+    slug: 'wydad-ac',
+    competitionCanonicalId: 'botola-pro',
+    countryCode: 'MA',
+    providerId: '1030',
+  },
+  'esperance-tunis': {
+    id: 'esperance-tunis',
+    name: 'Espérance Sportive de Tunis',
+    shortName: 'ES Tunis',
+    slug: 'esperance-tunis',
+    competitionCanonicalId: 'caf-champions-league',
+    countryCode: 'TN',
+    providerId: '1034',
+  },
+  enyimba: {
+    id: 'enyimba',
+    name: 'Enyimba FC',
+    shortName: 'Enyimba',
+    slug: 'enyimba',
+    competitionCanonicalId: 'npfl',
+    countryCode: 'NG',
+    providerId: '1222',
+  },
+  'rivers-united': {
+    id: 'rivers-united',
+    name: 'Rivers United FC',
+    shortName: 'Rivers Utd',
+    slug: 'rivers-united',
+    competitionCanonicalId: 'npfl',
+    countryCode: 'NG',
+    providerId: '5530',
+  },
+};
+
+// Reverse map from provider team key to PriorityClub
+const PROVIDER_TEAM_KEY_MAP = new Map<string, LocalPriorityClub>();
+// Exact lowercase team name map
+const TEAM_NAME_EXACT_MAP = new Map<string, LocalPriorityClub>();
+
+for (const club of Object.values(KNOWN_PRIORITY_CLUBS)) {
   if (club.providerId) {
     PROVIDER_TEAM_KEY_MAP.set(String(club.providerId).trim(), club);
   }
@@ -48,29 +268,34 @@ for (const club of PRIORITY_CLUBS_LIST) {
   TEAM_NAME_EXACT_MAP.set(club.slug.trim().toLowerCase(), club);
 }
 
+// Legacy API-Sports test IDs compatibility
+if (KNOWN_PRIORITY_CLUBS['arsenal']) {
+  PROVIDER_TEAM_KEY_MAP.set('42', KNOWN_PRIORITY_CLUBS['arsenal']);
+}
+
 // Common aliases for major clubs across different provider spellings
 const TEAM_ALIASES: Record<string, string> = {
   'man utd': 'manchester-united',
   'man united': 'manchester-united',
   'man city': 'manchester-city',
-  'tottenham': 'tottenham-hotspur',
-  'spurs': 'tottenham-hotspur',
-  'wolves': 'wolverhampton-wanderers',
-  'wolverhampton': 'wolverhampton-wanderers',
-  'atleti': 'atletico-madrid',
+  tottenham: 'tottenham-hotspur',
+  spurs: 'tottenham-hotspur',
+  wolves: 'wolverhampton-wanderers',
+  wolverhampton: 'wolverhampton-wanderers',
+  atleti: 'atletico-madrid',
   'atl. madrid': 'atletico-madrid',
   'athletic club': 'athletic-bilbao',
   'bayern munich': 'bayern-munich',
   'fc bayern': 'bayern-munich',
-  'bvb': 'borussia-dortmund',
-  'dortmund': 'borussia-dortmund',
-  'psg': 'paris-saint-germain',
+  bvb: 'borussia-dortmund',
+  dortmund: 'borussia-dortmund',
+  psg: 'paris-saint-germain',
   'paris sg': 'paris-saint-germain',
   'inter milan': 'inter-milan',
-  'internazionale': 'inter-milan',
-  'inter': 'inter-milan',
+  internazionale: 'inter-milan',
+  inter: 'inter-milan',
   'ac milan': 'ac-milan',
-  'juve': 'juventus',
+  juve: 'juventus',
   'al ahly sc': 'al-ahly',
   'zamalek sc': 'zamalek',
   'mamelodi sundowns fc': 'mamelodi-sundowns',
@@ -105,7 +330,18 @@ export function resolveTeam(
       shortName: club.shortName,
       teamLogo: club.logoUrl || rawTeamLogo || '',
       isPriority: true,
-      priorityClub: club,
+      priorityClub: {
+        id: club.id,
+        providerId: club.providerId,
+        providerName: 'allsportsapi',
+        name: club.name,
+        shortName: club.shortName,
+        slug: club.slug,
+        competitionId: club.competitionCanonicalId,
+        countryCode: club.countryCode,
+        confederationCode: 'UEFA',
+        logoUrl: club.logoUrl || rawTeamLogo || '',
+      } as PriorityClub,
     };
   }
 
@@ -118,24 +354,25 @@ export function resolveTeam(
       shortName: club.shortName,
       teamLogo: club.logoUrl || rawTeamLogo || '',
       isPriority: true,
-      priorityClub: club,
+      priorityClub: {
+        id: club.id,
+        providerId: club.providerId,
+        providerName: 'allsportsapi',
+        name: club.name,
+        shortName: club.shortName,
+        slug: club.slug,
+        competitionId: club.competitionCanonicalId,
+        countryCode: club.countryCode,
+        confederationCode: 'UEFA',
+        logoUrl: club.logoUrl || rawTeamLogo || '',
+      } as PriorityClub,
     };
   }
 
   // 3. Known alias lookup
   if (TEAM_ALIASES[normName]) {
     const slug = TEAM_ALIASES[normName];
-    const local = CLUBS_REGISTRY[slug];
-    if (local) {
-      return {
-        teamId: local.slug,
-        teamName: local.name,
-        shortName: local.shortName,
-        teamLogo: local.logo || rawTeamLogo || '',
-        isPriority: true,
-      };
-    }
-    const club = getPriorityClub(slug);
+    const club = KNOWN_PRIORITY_CLUBS[slug];
     if (club) {
       return {
         teamId: club.id,
@@ -143,7 +380,18 @@ export function resolveTeam(
         shortName: club.shortName,
         teamLogo: club.logoUrl || rawTeamLogo || '',
         isPriority: true,
-        priorityClub: club,
+        priorityClub: {
+        id: club.id,
+        providerId: club.providerId,
+        providerName: 'allsportsapi',
+        name: club.name,
+        shortName: club.shortName,
+        slug: club.slug,
+        competitionId: club.competitionCanonicalId,
+        countryCode: club.countryCode,
+        confederationCode: 'UEFA',
+        logoUrl: club.logoUrl || rawTeamLogo || '',
+      } as PriorityClub,
       };
     }
   }
@@ -294,7 +542,8 @@ export const KNOWN_PROVIDER_TEAM_KEYS: Record<string, number> = {
   'sporting-cp': 17884,
 
   // African Giants
-  'al-ahly': 1028,
+  'al-ahly': 585,
+  pyramids: 2761,
   zamalek: 2760,
   'mamelodi-sundowns': 1032,
   sundowns: 1032,
@@ -310,7 +559,14 @@ export const KNOWN_PROVIDER_TEAM_KEYS: Record<string, number> = {
 };
 
 // Direct mapping of provider team keys to their canonical league
-export const KNOWN_TEAM_LEAGUES: Record<number, { leagueId: number; leagueName: string; leagueSlug: string }> = {
+export const KNOWN_TEAM_LEAGUES: Record<
+  number,
+  { leagueId: number; leagueName: string; leagueSlug: string }
+> = {
+  // Egyptian Premier League (141)
+  585: { leagueId: 141, leagueName: 'Egyptian Premier League', leagueSlug: 'egyptian-premier-league' },
+  2760: { leagueId: 141, leagueName: 'Egyptian Premier League', leagueSlug: 'egyptian-premier-league' },
+  2761: { leagueId: 141, leagueName: 'Egyptian Premier League', leagueSlug: 'egyptian-premier-league' },
   // Premier League (152)
   80: { leagueId: 152, leagueName: 'Premier League', leagueSlug: 'premier-league' },
   141: { leagueId: 152, leagueName: 'Premier League', leagueSlug: 'premier-league' },
@@ -398,7 +654,7 @@ export const KNOWN_TEAM_LEAGUES: Record<number, { leagueId: number; leagueName: 
   3794: { leagueId: 168, leagueName: 'Ligue 1', leagueSlug: 'ligue-1' },
 };
 
-function teamNamesMatch(fetchedTeamName: string, targetSlug: string, localClubName?: string): boolean {
+function teamNamesMatch(fetchedTeamName: string, targetSlug: string): boolean {
   if (!fetchedTeamName || !targetSlug) return true;
   const f = slugify(fetchedTeamName);
   const t = slugify(targetSlug);
@@ -406,15 +662,24 @@ function teamNamesMatch(fetchedTeamName: string, targetSlug: string, localClubNa
   if (f === t || f.includes(t) || t.includes(f)) return true;
 
   // Inter / Internazionale
-  if ((t.includes('inter') || t === 'internazionale') && (f.includes('inter') || f.includes('internazionale'))) {
+  if (
+    (t.includes('inter') || t === 'internazionale') &&
+    (f.includes('inter') || f.includes('internazionale'))
+  ) {
     return true;
   }
   // Man City
-  if ((t.includes('manchester-city') || t === 'man-city') && (f.includes('manchester-city') || f.includes('man-city'))) {
+  if (
+    (t.includes('manchester-city') || t === 'man-city') &&
+    (f.includes('manchester-city') || f.includes('man-city'))
+  ) {
     return true;
   }
   // Man Utd
-  if ((t.includes('manchester-united') || t === 'man-utd' || t === 'man-united') && (f.includes('manchester-united') || f.includes('man-united'))) {
+  if (
+    (t.includes('manchester-united') || t === 'man-utd' || t === 'man-united') &&
+    (f.includes('manchester-united') || f.includes('man-united'))
+  ) {
     return true;
   }
   // Bayern
@@ -442,11 +707,6 @@ function teamNamesMatch(fetchedTeamName: string, targetSlug: string, localClubNa
     return true;
   }
 
-  if (localClubName) {
-    const l = slugify(localClubName);
-    if (f.includes(l) || l.includes(f)) return true;
-  }
-
   return false;
 }
 
@@ -461,11 +721,13 @@ export interface ResolvedTeamData {
 }
 
 /**
- * Resolves a team and its full data using prioritized fallbacks:
- * 1. Numeric ID in URL (e.g. "arsenal-141" -> 141) with name sanity check
- * 2. KNOWN_PROVIDER_TEAM_KEYS map
- * 3. Competition Standings lookup (using club registry competitionSlug -> leagueId)
- * 4. AllSportsAPI getTeams search with candidate squad verification
+ * Resolves a team and its full authentic data directly from AllSportsAPI:
+ * 1. Checks numeric ID in URL (e.g. "manchester-city-80" -> 80)
+ * 2. Checks KNOWN_PROVIDER_TEAM_KEYS map to get exact provider key
+ * 3. Fetches team directly from AllSportsAPI met=Teams with squad and coaches
+ * 4. Resolves league standings from AllSportsAPI met=Standings
+ * 5. Falls back to direct teamName search on AllSportsAPI
+ * Under no circumstance does this synthesize fake or placeholder candidate data.
  */
 export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeamData | null> {
   if (!rawSlug) return null;
@@ -473,22 +735,10 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
   const { teamKey: parsedTeamKey, nameSlug } = parseTeamSlug(rawSlug);
   const resolvedSlug = (nameSlug || rawSlug).toLowerCase();
 
-  // Find local metadata if present
-  const localClub =
-    CLUBS_REGISTRY[resolvedSlug] ||
-    Object.values(CLUBS_REGISTRY).find(
-      (c) =>
-        c.slug.toLowerCase() === resolvedSlug ||
-        slugify(c.name).toLowerCase() === resolvedSlug ||
-        slugify(c.shortName).toLowerCase() === resolvedSlug ||
-        String(c.id) === parsedTeamKey
-    ) ||
-    null;
-
   let teamId: number | null = null;
   let candidateTeam: FootballTeam | null = null;
 
-  // 1. If known provider key exists for this name slug, prefer it to prevent stale/corrupt ID collisions
+  // 1. If known provider key exists for this name slug, prefer it
   if (nameSlug && KNOWN_PROVIDER_TEAM_KEYS[nameSlug]) {
     teamId = KNOWN_PROVIDER_TEAM_KEYS[nameSlug];
   } else if (KNOWN_PROVIDER_TEAM_KEYS[resolvedSlug]) {
@@ -497,15 +747,14 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
     teamId = Number(parsedTeamKey);
   }
 
-  // 2. Try fetching team by ID if known
+  // 2. Fetch team directly from AllSportsAPI by teamId
   if (teamId) {
     try {
       const res = await advancedFootballApi.getTeams({ teamId });
       if (Array.isArray(res?.result) && res.result.length > 0) {
         const found = res.result[0];
         if (found && found.team_name && !('cod' in (found as any))) {
-          // Safeguard: verify that the fetched team name matches the requested slug
-          if (!nameSlug || teamNamesMatch(found.team_name, nameSlug, localClub?.name)) {
+          if (!nameSlug || teamNamesMatch(found.team_name, nameSlug)) {
             candidateTeam = found;
           } else {
             console.warn(
@@ -522,84 +771,87 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
 
   // 3. Known league mapping for established teams
   let leagueId: number | undefined;
-  let leagueName = localClub?.competitionName;
-  let leagueSlug = localClub?.competitionSlug;
+  let leagueName: string | undefined;
+  let leagueSlug: string | undefined;
 
   if (teamId && KNOWN_TEAM_LEAGUES[teamId]) {
     const knownLeague = KNOWN_TEAM_LEAGUES[teamId];
     leagueId = knownLeague.leagueId;
     leagueName = knownLeague.leagueName;
     leagueSlug = knownLeague.leagueSlug;
-  } else if (localClub?.competitionSlug) {
-    const compMeta = ALL_COMPETITIONS.find((c) => c.slug === localClub.competitionSlug);
-    if (compMeta?.id) {
-      leagueId = compMeta.id;
-    }
   }
 
-  // 4. If not resolved, check competition standings
+  // 4. If not resolved, check top competition standings dynamically from AllSportsAPI
   let standing: FootballStanding | null = null;
-  if (!candidateTeam && leagueId) {
-    try {
-      const standingsRes = await advancedFootballApi.getStandings(leagueId);
-      if (standingsRes?.result) {
-        const resObj = standingsRes.result as any;
-        const table: FootballStanding[] = Array.isArray(resObj)
-          ? resObj
-          : Array.isArray(resObj.total)
-            ? resObj.total
-            : [];
-        const match = table.find((s) => {
-          if (!s) return false;
-          const sTeam = s.standing_team || (s as any).team_name;
-          if (!sTeam) return false;
-          const sSlug = slugify(sTeam);
-          return (
-            sSlug === resolvedSlug ||
-            teamNamesMatch(sTeam, resolvedSlug, localClub?.name) ||
-            (localClub && sSlug === slugify(localClub.name)) ||
-            (localClub && sSlug === slugify(localClub.shortName))
-          );
-        });
-        if (match && match.team_key) {
-          teamId = Number(match.team_key);
-          standing = match;
-          // Fetch full team squad using resolved team_key
-          const teamRes = await advancedFootballApi.getTeams({ teamId });
-          if (Array.isArray(teamRes?.result) && teamRes.result.length > 0) {
-            candidateTeam = teamRes.result[0];
+  if (!candidateTeam) {
+    const topLeagues = [152, 302, 207, 175, 168, 141]; // EPL, La Liga, Serie A, Bundesliga, Ligue 1
+    for (const lid of topLeagues) {
+      try {
+        const standingsRes = await advancedFootballApi.getStandings(lid);
+        if (standingsRes?.result) {
+          const resObj = standingsRes.result as any;
+          const table: FootballStanding[] = Array.isArray(resObj)
+            ? resObj
+            : Array.isArray(resObj.total)
+              ? resObj.total
+              : [];
+          const match = table.find((s) => {
+            if (!s) return false;
+            const sTeam = s.standing_team || (s as any).team_name;
+            if (!sTeam) return false;
+            const sSlug = slugify(sTeam);
+            return (
+              sSlug === resolvedSlug ||
+              teamNamesMatch(sTeam, resolvedSlug) ||
+              (parsedTeamKey && String(s.team_key) === String(parsedTeamKey))
+            );
+          });
+          if (match && match.team_key) {
+            teamId = Number(match.team_key);
+            standing = match;
+            leagueId = lid;
+            const comp = ALL_COMPETITIONS.find((c) => c.id === lid);
+            if (comp) {
+              leagueName = comp.name;
+              leagueSlug = comp.slug;
+            }
+            // Fetch authentic team squad from AllSportsAPI using resolved team_key
+            const teamRes = await advancedFootballApi.getTeams({ teamId });
+            if (Array.isArray(teamRes?.result) && teamRes.result.length > 0) {
+              candidateTeam = teamRes.result[0];
+            }
+            break;
           }
         }
+      } catch (e) {
+        console.warn('[teamResolver] Error searching standings for league:', lid, e);
       }
-    } catch (e) {
-      console.warn('[teamResolver] Error resolving via standings:', e);
     }
   }
 
-  // 5. Name search with candidate squad verification (pick candidate with players)
+  // 5. Name search directly on AllSportsAPI with candidate squad verification
   if (!candidateTeam) {
     try {
-      const searchName = (localClub?.shortName || localClub?.name || resolvedSlug).replace(/-/g, ' ');
+      const searchName = resolvedSlug.replace(/-/g, ' ');
       const nameRes = await advancedFootballApi.getTeams({ teamName: searchName });
       if (Array.isArray(nameRes?.result) && nameRes.result.length > 0) {
         const validCandidates = nameRes.result.filter(
           (t) => t && t.team_name && !('cod' in (t as any))
         );
 
-        // Sort candidates: prefer candidate with players and coaches
+        // Sort candidates: prefer candidate with real players and coaches
         validCandidates.sort((a, b) => {
-          const aScore = (Array.isArray(a.players) ? a.players.length : 0) +
-                         (Array.isArray(a.coaches) ? a.coaches.length * 10 : 0);
-          const bScore = (Array.isArray(b.players) ? b.players.length : 0) +
-                         (Array.isArray(b.coaches) ? b.coaches.length * 10 : 0);
+          const aScore =
+            (Array.isArray(a.players) ? a.players.length : 0) +
+            (Array.isArray(a.coaches) ? a.coaches.length * 10 : 0);
+          const bScore =
+            (Array.isArray(b.players) ? b.players.length : 0) +
+            (Array.isArray(b.coaches) ? b.coaches.length * 10 : 0);
           return bScore - aScore;
         });
 
-        // Match by slug or take highest score candidate
         const exactMatch = validCandidates.find(
-          (t) =>
-            slugify(t.team_name) === resolvedSlug ||
-            (localClub && slugify(t.team_name) === slugify(localClub.name))
+          (t) => slugify(t.team_name) === resolvedSlug || teamNamesMatch(t.team_name, resolvedSlug)
         );
         candidateTeam = exactMatch || validCandidates[0] || null;
         if (candidateTeam?.team_key) {
@@ -611,18 +863,7 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
     }
   }
 
-  // 6. Final fallback to local registry
-  if (!candidateTeam && localClub) {
-    candidateTeam = {
-      team_key: String(teamId || localClub.id),
-      team_name: localClub.name,
-      team_logo: localClub.logo,
-      players: [],
-      coaches: localClub.manager ? [{ coach_name: localClub.manager, coach_country: 'International', coach_age: '' }] : [],
-    };
-    teamId = teamId || localClub.id;
-  }
-
+  // If no authentic team was returned from AllSportsAPI, return null (never fake candidate)
   if (!candidateTeam || !teamId) {
     return null;
   }
@@ -652,7 +893,7 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
   return {
     team: candidateTeam,
     teamKey: teamId,
-    clubMeta: localClub,
+    clubMeta: null,
     leagueId,
     leagueName,
     leagueSlug,

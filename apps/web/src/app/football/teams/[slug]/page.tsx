@@ -15,14 +15,7 @@ import {
 import { BackButton } from '@/components/BackButton';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import {
-  EntityService,
-  CLUBS_REGISTRY,
-  COACHES_REGISTRY,
-  PLAYERS_REGISTRY,
-  ClubMeta,
-  CoachMeta,
-} from '@/lib/entityService';
+
 import { resolveTeamLogo, resolveLeagueLogo } from '@/lib/football/logoUtils';
 import { PlayerAvatar } from '@/components/football/PlayerAvatar';
 import { resolveFootballTeam } from '@/lib/football/teamResolver';
@@ -117,7 +110,6 @@ export default function FootballTeamPage() {
   const [standing, setStanding] = useState<FootballStanding | null>(null);
   const [leagueName, setLeagueName] = useState('');
   const [leagueSlug, setLeagueSlug] = useState('');
-  const [clubMeta, setClubMeta] = useState<ClubMeta | null>(null);
   const [coachData, setCoachData] = useState<{
     name: string;
     slug?: string;
@@ -145,7 +137,6 @@ export default function FootballTeamPage() {
         const {
           team: teamData,
           teamKey: teamId,
-          clubMeta: localClub,
           leagueId: resolvedLeagueId,
           leagueName: resolvedLeagueName,
           leagueSlug: resolvedLeagueSlug,
@@ -154,7 +145,6 @@ export default function FootballTeamPage() {
 
         if (isMounted) {
           setTeam(teamData);
-          if (localClub) setClubMeta(localClub);
           if (resolvedLeagueName) setLeagueName(resolvedLeagueName);
           if (resolvedLeagueSlug) setLeagueSlug(resolvedLeagueSlug);
           if (resolvedStanding) setStanding(resolvedStanding);
@@ -183,34 +173,7 @@ export default function FootballTeamPage() {
           remotePlayers = playersRes.result;
         }
 
-        // Fallback for players from PLAYERS_REGISTRY if still empty
-        if (remotePlayers.length === 0 && localClub) {
-          const registryPlayers = Object.values(PLAYERS_REGISTRY).filter(
-            (p) => p.clubSlug === localClub.slug
-          );
-          if (registryPlayers.length > 0) {
-            remotePlayers = registryPlayers.map((p) => ({
-              player_key: p.id,
-              player_name: p.name,
-              player_number: String(p.number),
-              player_country: p.nationality,
-              player_type: p.position.includes('Goalkeeper')
-                ? 'Goalkeepers'
-                : p.position.includes('Back')
-                  ? 'Defenders'
-                  : p.position.includes('Mid')
-                    ? 'Midfielders'
-                    : 'Forwards',
-              player_age: String(p.age),
-              player_match_played: String(p.seasonStats.appearances || 0),
-              player_goals: String(p.seasonStats.goals || 0),
-              player_assists: String(p.seasonStats.assists || 0),
-              player_yellow_cards: String(p.seasonStats.yellowCards || 0),
-              player_red_cards: '0',
-              player_image: p.photo,
-            }));
-          }
-        }
+        
 
         // Process fixtures
         const sortedFixtures = [...remoteFixtures].sort(
@@ -290,11 +253,6 @@ export default function FootballTeamPage() {
           winRate?: number;
         } | null = null;
 
-        // Check local registry first
-        const coachMeta: CoachMeta | undefined = localClub
-          ? Object.values(COACHES_REGISTRY).find((c) => c.currentClubSlug === localClub.slug)
-          : undefined;
-
         const firstCoach = teamData.coaches && teamData.coaches.length > 0 ? teamData.coaches[0] : null;
         const coachName = firstCoach?.coach_name || firstCoach?.coache;
 
@@ -303,34 +261,7 @@ export default function FootballTeamPage() {
             name: coachName,
             slug: slugify(coachName),
             photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(coachName)}&background=0f172a&color=38bdf8&size=128&bold=true`,
-            nationality: firstCoach?.coach_country || firstCoach?.coache_country || localClub?.competitionName || 'International',
-            flag: '🌍',
-            since: (coachMeta as any)?.appointedDate,
-            winRate: coachMeta?.winPercentage ?? undefined,
-          };
-          if (coachMeta) {
-            if (coachMeta.photo) coachResolved.photo = coachMeta.photo;
-            if (coachMeta.countryFlag) coachResolved.flag = coachMeta.countryFlag;
-            if (coachMeta.nationality) coachResolved.nationality = coachMeta.nationality;
-          }
-        } else if (coachMeta) {
-          coachResolved = {
-            name: coachMeta.name,
-            slug: coachMeta.slug,
-            photo: coachMeta.photo,
-            nationality: coachMeta.nationality,
-            flag: coachMeta.countryFlag || '🌍',
-            since: (coachMeta as any)?.appointedDate,
-            winRate: coachMeta?.winPercentage ?? undefined,
-          };
-        } else if (localClub?.manager) {
-          coachResolved = {
-            name: localClub.manager,
-            photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              localClub.manager
-            )}&background=0f172a&color=38bdf8&size=128&bold=true`,
-            nationality:
-              (teamData as any).team_country || clubMeta?.competitionName || 'International',
+            nationality: firstCoach?.coach_country || firstCoach?.coache_country || (teamData as any)?.team_country || 'International',
             flag: '🌍',
           };
         }
@@ -431,9 +362,9 @@ export default function FootballTeamPage() {
       ga,
       pts,
       gd: gf - ga,
-      pos: clubMeta?.position ? String(clubMeta.position) : '-',
+      pos: '-',
     };
-  }, [standing, recentMatches, team, clubMeta]);
+  }, [standing, recentMatches, team]);
 
   // Performance metrics for Stats tab - purely computed from actual matches
   const performanceMetrics = useMemo(() => {
@@ -544,11 +475,9 @@ export default function FootballTeamPage() {
       .slice(0, 5);
   }, [squadByGroup]);
 
-  const displayLeagueName = leagueName || clubMeta?.competitionName;
+  const displayLeagueName = leagueName || 'Football';
   const displayLeagueSlug =
-    leagueSlug ||
-    clubMeta?.competitionSlug ||
-    (displayLeagueName ? slugify(displayLeagueName) : '');
+    leagueSlug || (displayLeagueName !== 'Football' ? slugify(displayLeagueName) : '');
 
   const breadcrumbItems: EntityBreadcrumbItem[] = useMemo(() => {
     const items: EntityBreadcrumbItem[] = [{ name: 'Football', url: '/football' }];
@@ -599,10 +528,10 @@ export default function FootballTeamPage() {
     );
   }
 
-  const stadium = clubMeta?.stadium || (team as any)?.venue || '';
-  const founded = clubMeta?.founded || (team as any)?.founded || '';
+  const stadium = (team as any)?.venue || '';
+  const founded = (team as any)?.founded || '';
   const capacity = (team as any)?.capacity || null;
-  const country = (team as any)?.team_country || clubMeta?.competitionName || '';
+  const country = (team as any)?.team_country || '';
 
   return (
     <div className="min-h-screen bg-[#070a1a] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
@@ -639,7 +568,7 @@ export default function FootballTeamPage() {
             <div className="flex-1">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">
-                  {leagueName || clubMeta?.competitionName || 'Football'}
+                  {leagueName || 'Football'}
                 </span>
                 {country && (
                   <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
