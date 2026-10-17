@@ -90,16 +90,6 @@ function normalizeMethodAndParams(
       delete params.id;
       delete params.match;
     }
-    // If date is passed (YYYY-MM-DD), set from and to
-    if (params.date) {
-      params.from = params.date;
-      params.to = params.date;
-      delete params.date;
-    } else if (!params.from && !params.to && !params.matchId) {
-      const today = new Date().toISOString().split('T')[0];
-      params.from = today;
-      params.to = today;
-    }
     if (params.league) {
       params.leagueId = params.league;
       delete params.league;
@@ -111,6 +101,26 @@ function normalizeMethodAndParams(
     if (params.country) {
       params.countryId = params.country;
       delete params.country;
+    }
+
+    // If date is passed (YYYY-MM-DD), set from and to
+    if (params.date) {
+      params.from = params.date;
+      params.to = params.date;
+      delete params.date;
+    } else if (!params.from && !params.to && !params.matchId) {
+      if (params.teamId) {
+        // Team fixtures: search rolling past and future window (±120 days) so recent & upcoming fixtures are retrieved
+        const now = new Date();
+        const past = new Date(now.getTime() - 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const future = new Date(now.getTime() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        params.from = past;
+        params.to = future;
+      } else {
+        const today = new Date().toISOString().split('T')[0];
+        params.from = today;
+        params.to = today;
+      }
     }
   } else if (m === 'comments' || m === 'comment') {
     normalizedMethod = 'Comments';

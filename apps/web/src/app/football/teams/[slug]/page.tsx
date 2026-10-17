@@ -165,9 +165,13 @@ export default function FootballTeamPage() {
         let remotePlayers: FootballPlayer[] = Array.isArray(teamData.players) ? teamData.players : [];
         let remoteFixtures: FootballEvent[] = [];
 
-        // Fetch fixtures and players (if squad was empty) in parallel
+        const now = new Date();
+        const fromDate = new Date(now.getTime() - 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const toDate = new Date(now.getTime() + 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        // Fetch fixtures and players (if squad was empty) in parallel with rolling date range
         const promises: Promise<any>[] = [
-          advancedFootballApi.getFixtures({ teamId }),
+          advancedFootballApi.getFixtures({ teamId, from: fromDate, to: toDate }),
         ];
         if (remotePlayers.length === 0) {
           promises.push(advancedFootballApi.getPlayers({ teamId }));
@@ -209,7 +213,6 @@ export default function FootballTeamPage() {
         }
 
         // Process fixtures
-        const now = new Date();
         const sortedFixtures = [...remoteFixtures].sort(
           (a, b) =>
             new Date(`${a.event_date} ${a.event_time || '00:00'}`).getTime() -
@@ -242,7 +245,7 @@ export default function FootballTeamPage() {
         // Standings lookup if not already resolved
         if (!resolvedStanding) {
           const refMatch = finished[0] || upcoming[0];
-          const targetLeagueKey = refMatch?.league_key || resolvedLeagueId;
+          const targetLeagueKey = resolvedLeagueId || refMatch?.league_key;
           if (targetLeagueKey) {
             if (refMatch?.league_name && isMounted) {
               setLeagueName(refMatch.league_name);
@@ -253,13 +256,21 @@ export default function FootballTeamPage() {
               if (standingsRes?.result) {
                 const resObj = standingsRes.result as any;
                 const table = Array.isArray(resObj) ? resObj : resObj.total || [];
-                const ts = table.find(
-                  (s: FootballStanding) =>
-                    s &&
-                    (String(s.team_key) === String(teamId) ||
-                      slugify(s.standing_team || (s as any).team_name || '') ===
-                        slugify(teamData.team_name))
-                );
+                const targetNameSlug = slugify(teamData.team_name);
+                const ts = table.find((s: FootballStanding) => {
+                  if (!s) return false;
+                  if (String(s.team_key) === String(teamId)) return true;
+                  const sTeamSlug = slugify(s.standing_team || (s as any).team_name || '');
+                  return (
+                    sTeamSlug === targetNameSlug ||
+                    sTeamSlug.includes(targetNameSlug) ||
+                    targetNameSlug.includes(sTeamSlug) ||
+                    ((targetNameSlug.includes('inter') || targetNameSlug === 'internazionale') &&
+                      (sTeamSlug.includes('inter') || sTeamSlug === 'internazionale')) ||
+                    ((targetNameSlug.includes('manchester-city') || targetNameSlug === 'man-city') &&
+                      (sTeamSlug.includes('manchester-city') || sTeamSlug === 'man-city'))
+                  );
+                });
                 if (ts && isMounted) setStanding(ts);
               }
             } catch (e) {
