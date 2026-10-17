@@ -15,7 +15,7 @@ import {
 import { EntityService, PlayerMeta, OfficialMeta, CoachMeta, ClubMeta } from '@/lib/entityService';
 import { type MainCategoryTab } from './FootballNavSwitcher';
 import { processFixture, getCanonicalCompetition } from '@/lib/football';
-import { footballRoutes, buildMatchSlug, slugify } from '@/lib/slugUtils';
+import { footballRoutes, buildMatchSlug, buildTeamSlug, slugify } from '@/lib/slugUtils';
 import { advancedFootballApi } from '@/services/advancedFootballApi';
 import { CompetitionGender } from '@goalmills/types';
 import { resolveLeagueLogo, resolveTeamLogo } from '@/lib/football/logoUtils';
@@ -428,7 +428,7 @@ export function FootballPageClient({
     if (dynamicClubs && dynamicClubs.length > 0) {
       return dynamicClubs.slice(0, 10).map((t) => ({
         name: t.team_name || 'Team',
-        slug: slugify(t.team_name || ''),
+        slug: buildTeamSlug(t.team_name || '', t.team_key),
         logo: t.team_logo || '',
         badge: '⚽',
         manager: '',
@@ -474,7 +474,7 @@ export function FootballPageClient({
             return {
               pos,
               team: r.standing_team || `Club ${pos}`,
-              slug: slugify(r.standing_team || ''),
+              slug: buildTeamSlug(r.standing_team || '', r.team_key),
               badge: '⚽',
               logo: resolveTeamLogo(r.standing_team, r.team_logo || r.standing_team_logo),
               p: parseInt(r.standing_P) || 0,

@@ -92,7 +92,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
       <div className="flex items-center justify-between relative z-10">
         {/* Home Team */}
         <Link
-          href={footballRoutes.teamFromName(teams.home.name)}
+          href={footballRoutes.teamFromName(teams.home.name, teams.home.id)}
           onClick={(e) => e.stopPropagation()}
           className="flex-1 flex flex-row items-center justify-start gap-2 group-hover:opacity-80 transition-opacity"
         >
@@ -156,7 +156,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
 
         {/* Away Team */}
         <Link
-          href={footballRoutes.teamFromName(teams.away.name)}
+          href={footballRoutes.teamFromName(teams.away.name, teams.away.id)}
           onClick={(e) => e.stopPropagation()}
           className="flex-1 flex flex-row items-center justify-end gap-2 group-hover:opacity-80 transition-opacity"
         >

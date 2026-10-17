@@ -133,6 +133,7 @@ export function FootballStandingsTable({
     if (viewType === 'total' && table && table.entries && table.entries.length > 0) {
       return table.entries.map((e, idx) => ({
         key: e.id || `entry-${idx}`,
+        teamId: e.id,
         rank: e.position,
         teamName: e.teamName,
         teamLogo: resolveTeamLogo(e.teamName, e.teamLogo),
@@ -156,6 +157,7 @@ export function FootballStandingsTable({
         const ga = parseInt(s.standing_A ?? (s as any).goalsAgainst ?? '0', 10);
         return {
           key: `${s.team_key}-${idx}-${viewType}`,
+          teamId: s.team_key,
           rank: parseInt(s.standing_place, 10) || idx + 1,
           teamName: s.standing_team,
           teamLogo: resolveTeamLogo(s.standing_team, logo),
@@ -293,7 +295,7 @@ export function FootballStandingsTable({
           </div>
         ) : (
           rows.map((row) => {
-            const teamUrl = footballRoutes.teamFromName(row.teamName);
+            const teamUrl = footballRoutes.teamFromName(row.teamName, (row as any).teamId);
 
             return (
               <div

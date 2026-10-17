@@ -302,7 +302,7 @@ export function GoalmillsFootballDashboard() {
                           className="inline-block"
                         >
                           <Link
-                            href={footballRoutes.teamFromName(m.homeTeam)}
+                            href={footballRoutes.teamFromName(m.homeTeam, m.home_team_key)}
                             onClick={(e) => e.stopPropagation()}
                             className="flex items-center gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                           >
@@ -353,7 +353,7 @@ export function GoalmillsFootballDashboard() {
                           className="inline-block text-right"
                         >
                           <Link
-                            href={footballRoutes.teamFromName(m.awayTeam)}
+                            href={footballRoutes.teamFromName(m.awayTeam, m.away_team_key)}
                             onClick={(e) => e.stopPropagation()}
                             className="flex items-center justify-end gap-1.5 sm:gap-3 min-w-0 hover:text-blue-400"
                           >
@@ -493,7 +493,7 @@ export function GoalmillsFootballDashboard() {
                     className="inline-block"
                   >
                     <Link
-                      href={footballRoutes.teamFromName(marqueeMatch.homeTeam)}
+                      href={footballRoutes.teamFromName(marqueeMatch.homeTeam, marqueeMatch.home_team_key)}
                       className="flex flex-col items-center gap-1 group/team hover:text-blue-400"
                     >
                       <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg transition-colors group-hover/team:border-blue-400">
@@ -535,7 +535,7 @@ export function GoalmillsFootballDashboard() {
                     className="inline-block"
                   >
                     <Link
-                      href={footballRoutes.teamFromName(marqueeMatch.awayTeam)}
+                      href={footballRoutes.teamFromName(marqueeMatch.awayTeam, marqueeMatch.away_team_key)}
                       className="flex flex-col items-center gap-1 group/team hover:text-blue-400"
                     >
                       <div className="w-12 h-12 rounded-2xl bg-slate-900/90 border border-white/15 p-2 flex items-center justify-center shadow-lg transition-colors group-hover/team:border-blue-400">

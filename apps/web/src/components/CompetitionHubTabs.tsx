@@ -336,7 +336,8 @@ export function CompetitionHubTabs({
                               e.preventDefault();
                               e.stopPropagation();
                               window.location.href = footballRoutes.teamFromName(
-                                match.event_home_team || ''
+                                match.event_home_team || '',
+                                match.home_team_key
                               );
                             }}
                           >
@@ -357,7 +358,8 @@ export function CompetitionHubTabs({
                               e.preventDefault();
                               e.stopPropagation();
                               window.location.href = footballRoutes.teamFromName(
-                                match.event_away_team || ''
+                                match.event_away_team || '',
+                                match.away_team_key
                               );
                             }}
                           >

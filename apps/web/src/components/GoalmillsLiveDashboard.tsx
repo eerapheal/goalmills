@@ -391,7 +391,7 @@ export function GoalmillsLiveDashboard({ onSelectTab }: { onSelectTab?: (tab: st
                         className="inline-block"
                       >
                         <Link
-                          href={footballRoutes.teamFromName(m.homeTeam)}
+                          href={footballRoutes.teamFromName(m.homeTeam, m.home_team_key)}
                           onClick={(e) => e.stopPropagation()}
                           className="flex items-center gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
                         >
@@ -439,7 +439,7 @@ export function GoalmillsLiveDashboard({ onSelectTab }: { onSelectTab?: (tab: st
                         className="inline-block text-right"
                       >
                         <Link
-                          href={footballRoutes.teamFromName(m.awayTeam)}
+                          href={footballRoutes.teamFromName(m.awayTeam, m.away_team_key)}
                           onClick={(e) => e.stopPropagation()}
                           className="flex items-center justify-end gap-1 sm:gap-2.5 min-w-0 hover:text-blue-400"
                         >

@@ -3,7 +3,7 @@ import { slugify, parseTeamSlug } from '../slugUtils';
 import { ClubMeta } from '../entityService';
 import { ALL_COMPETITIONS } from '../competitionCategories';
 import { PriorityClub } from '@goalmills/types';
-import type { FootballTeam, FootballStanding } from '@goalmills/types';
+import type { FootballTeam, FootballStanding, FootballEvent } from '@goalmills/types';
 
 export interface ResolvedTeam {
   teamId: string;
@@ -718,15 +718,17 @@ export interface ResolvedTeamData {
   leagueName?: string;
   leagueSlug?: string;
   standing?: FootballStanding | null;
+  liveMatch?: FootballEvent | null;
 }
 
 /**
  * Resolves a team and its full authentic data directly from AllSportsAPI:
- * 1. Checks numeric ID in URL (e.g. "manchester-city-80" -> 80)
- * 2. Checks KNOWN_PROVIDER_TEAM_KEYS map to get exact provider key
- * 3. Fetches team directly from AllSportsAPI met=Teams with squad and coaches
- * 4. Resolves league standings from AllSportsAPI met=Standings
- * 5. Falls back to direct teamName search on AllSportsAPI
+ * 1. Checks Livescore first (met=Livescore) - any team playing live is resolved immediately with active live match, key, logo, and league!
+ * 2. Checks numeric ID in URL (e.g. "everton-3073" -> 3073, "3073" -> 3073)
+ * 3. Checks KNOWN_PROVIDER_TEAM_KEYS map to get exact provider key
+ * 4. Fetches team directly from AllSportsAPI met=Teams with squad and coaches (preserving verified name even if provider returns null)
+ * 5. If missing or squad empty, queries rolling fixtures (met=Fixtures) to identify team, league, and lineups
+ * 6. Resolves league standings from AllSportsAPI met=Standings for ANY league
  * Under no circumstance does this synthesize fake or placeholder candidate data.
  */
 export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeamData | null> {
@@ -736,32 +738,99 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
   const resolvedSlug = (nameSlug || rawSlug).toLowerCase();
 
   let teamId: number | null = null;
+  let teamName = '';
+  let teamLogo = '';
+  let leagueId: number | undefined;
+  let leagueName: string | undefined;
+  let leagueSlug: string | undefined;
+  let liveMatch: FootballEvent | null = null;
+  let standing: FootballStanding | null = null;
   let candidateTeam: FootballTeam | null = null;
 
-  // 1. If known provider key exists for this name slug, prefer it
-  if (nameSlug && KNOWN_PROVIDER_TEAM_KEYS[nameSlug]) {
+  // 1. Initial ID check from slug
+  if (parsedTeamKey && !isNaN(Number(parsedTeamKey)) && Number(parsedTeamKey) > 0) {
+    teamId = Number(parsedTeamKey);
+  } else if (/^\d+$/.test(rawSlug)) {
+    teamId = Number(rawSlug);
+  } else if (nameSlug && KNOWN_PROVIDER_TEAM_KEYS[nameSlug]) {
     teamId = KNOWN_PROVIDER_TEAM_KEYS[nameSlug];
   } else if (KNOWN_PROVIDER_TEAM_KEYS[resolvedSlug]) {
     teamId = KNOWN_PROVIDER_TEAM_KEYS[resolvedSlug];
-  } else if (parsedTeamKey && !isNaN(Number(parsedTeamKey)) && Number(parsedTeamKey) > 0) {
-    teamId = Number(parsedTeamKey);
   }
 
-  // 2. Fetch team directly from AllSportsAPI by teamId
+  // 2. LIVESCORE-FIRST RESOLUTION:
+  // Query active live matches directly from AllSportsAPI (met=Livescore)
+  // If the team has an active live match, we instantly get authentic team name, key, logo, league, and live match data!
+  try {
+    const liveRes = await advancedFootballApi.getLivescore();
+    const liveMatches: FootballEvent[] = Array.isArray(liveRes?.result) ? liveRes.result : [];
+    if (liveMatches.length > 0) {
+      const matchInLive = liveMatches.find((m) => {
+        if (!m) return false;
+        if (
+          teamId &&
+          (String(m.home_team_key) === String(teamId) || String(m.away_team_key) === String(teamId))
+        ) {
+          return true;
+        }
+        const hSlug = slugify(m.event_home_team || '');
+        const aSlug = slugify(m.event_away_team || '');
+        return (
+          hSlug === resolvedSlug ||
+          aSlug === resolvedSlug ||
+          hSlug.includes(resolvedSlug) ||
+          aSlug.includes(resolvedSlug) ||
+          teamNamesMatch(m.event_home_team || '', resolvedSlug) ||
+          teamNamesMatch(m.event_away_team || '', resolvedSlug)
+        );
+      });
+
+      if (matchInLive) {
+        const isHome = teamId
+          ? String(matchInLive.home_team_key) === String(teamId)
+          : slugify(matchInLive.event_home_team || '').includes(resolvedSlug) ||
+            teamNamesMatch(matchInLive.event_home_team || '', resolvedSlug);
+
+        teamId = Number(isHome ? matchInLive.home_team_key : matchInLive.away_team_key) || teamId;
+        teamName = (isHome ? matchInLive.event_home_team : matchInLive.event_away_team) || '';
+        teamLogo = (isHome ? matchInLive.home_team_logo : matchInLive.away_team_logo) || '';
+        if (matchInLive.league_key) {
+          leagueId = Number(matchInLive.league_key);
+          leagueName = matchInLive.league_name;
+          leagueSlug = slugify(matchInLive.league_name || '');
+        }
+        liveMatch = matchInLive;
+      }
+    }
+  } catch (e) {
+    console.warn('[teamResolver] Livescore query error:', e);
+  }
+
+  // 3. Known league mapping fallback
+  if (teamId && !leagueId && KNOWN_TEAM_LEAGUES[teamId]) {
+    const knownLeague = KNOWN_TEAM_LEAGUES[teamId];
+    leagueId = knownLeague.leagueId;
+    leagueName = knownLeague.leagueName;
+    leagueSlug = knownLeague.leagueSlug;
+  }
+
+  // 4. Fetch team directly from AllSportsAPI by teamId (met=Teams)
   if (teamId) {
     try {
       const res = await advancedFootballApi.getTeams({ teamId });
       if (Array.isArray(res?.result) && res.result.length > 0) {
         const found = res.result[0];
-        if (found && found.team_name && !('cod' in (found as any))) {
-          if (!nameSlug || teamNamesMatch(found.team_name, nameSlug)) {
-            candidateTeam = found;
-          } else {
-            console.warn(
-              `[teamResolver] ID ${teamId} resolved to "${found.team_name}", which does not match "${nameSlug}". Rejecting candidate.`
-            );
-            teamId = null;
-          }
+        if (found && !('cod' in (found as any))) {
+          // Note: some teams return null team_name in met=Teams; preserve verified teamName or fallback
+          const verifiedName = found.team_name || teamName || resolvedSlug.replace(/-/g, ' ');
+          candidateTeam = {
+            ...found,
+            team_key: String(teamId),
+            team_name: verifiedName,
+            team_logo: found.team_logo || teamLogo || '',
+          };
+          if (!teamName) teamName = verifiedName;
+          if (!teamLogo && found.team_logo) teamLogo = found.team_logo;
         }
       }
     } catch (e) {
@@ -769,93 +838,100 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
     }
   }
 
-  // 3. Known league mapping for established teams
-  let leagueId: number | undefined;
-  let leagueName: string | undefined;
-  let leagueSlug: string | undefined;
+  // 5. If candidateTeam is still missing or league is unknown, search rolling fixtures (met=Fixtures)
+  if (!candidateTeam || !leagueId) {
+    try {
+      const now = new Date();
+      const from = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const to = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const fixRes = await advancedFootballApi.getFixtures(
+        teamId ? { teamId, from, to } : { from, to }
+      );
+      const fixList: FootballEvent[] = Array.isArray(fixRes?.result) ? fixRes.result : [];
 
-  if (teamId && KNOWN_TEAM_LEAGUES[teamId]) {
-    const knownLeague = KNOWN_TEAM_LEAGUES[teamId];
-    leagueId = knownLeague.leagueId;
-    leagueName = knownLeague.leagueName;
-    leagueSlug = knownLeague.leagueSlug;
-  }
+      const matchInFixtures = fixList.find((m) => {
+        if (!m) return false;
+        if (
+          teamId &&
+          (String(m.home_team_key) === String(teamId) || String(m.away_team_key) === String(teamId))
+        ) {
+          return true;
+        }
+        const hSlug = slugify(m.event_home_team || '');
+        const aSlug = slugify(m.event_away_team || '');
+        return (
+          hSlug === resolvedSlug ||
+          aSlug === resolvedSlug ||
+          hSlug.includes(resolvedSlug) ||
+          aSlug.includes(resolvedSlug) ||
+          teamNamesMatch(m.event_home_team || '', resolvedSlug) ||
+          teamNamesMatch(m.event_away_team || '', resolvedSlug)
+        );
+      });
 
-  // 4. If not resolved, check top competition standings dynamically from AllSportsAPI
-  let standing: FootballStanding | null = null;
-  if (!candidateTeam) {
-    const topLeagues = [152, 302, 207, 175, 168, 141]; // EPL, La Liga, Serie A, Bundesliga, Ligue 1
-    for (const lid of topLeagues) {
-      try {
-        const standingsRes = await advancedFootballApi.getStandings(lid);
-        if (standingsRes?.result) {
-          const resObj = standingsRes.result as any;
-          const table: FootballStanding[] = Array.isArray(resObj)
-            ? resObj
-            : Array.isArray(resObj.total)
-              ? resObj.total
-              : [];
-          const match = table.find((s) => {
-            if (!s) return false;
-            const sTeam = s.standing_team || (s as any).team_name;
-            if (!sTeam) return false;
-            const sSlug = slugify(sTeam);
-            return (
-              sSlug === resolvedSlug ||
-              teamNamesMatch(sTeam, resolvedSlug) ||
-              (parsedTeamKey && String(s.team_key) === String(parsedTeamKey))
-            );
-          });
-          if (match && match.team_key) {
-            teamId = Number(match.team_key);
-            standing = match;
-            leagueId = lid;
-            const comp = ALL_COMPETITIONS.find((c) => c.id === lid);
-            if (comp) {
-              leagueName = comp.name;
-              leagueSlug = comp.slug;
-            }
-            // Fetch authentic team squad from AllSportsAPI using resolved team_key
-            const teamRes = await advancedFootballApi.getTeams({ teamId });
-            if (Array.isArray(teamRes?.result) && teamRes.result.length > 0) {
-              candidateTeam = teamRes.result[0];
-            }
-            break;
+      if (matchInFixtures) {
+        const isHome = teamId
+          ? String(matchInFixtures.home_team_key) === String(teamId)
+          : slugify(matchInFixtures.event_home_team || '').includes(resolvedSlug) ||
+            teamNamesMatch(matchInFixtures.event_home_team || '', resolvedSlug);
+
+        teamId = Number(isHome ? matchInFixtures.home_team_key : matchInFixtures.away_team_key) || teamId;
+        if (!teamName) {
+          teamName = (isHome ? matchInFixtures.event_home_team : matchInFixtures.event_away_team) || '';
+        }
+        if (!teamLogo) {
+          teamLogo = (isHome ? matchInFixtures.home_team_logo : matchInFixtures.away_team_logo) || '';
+        }
+        if (!leagueId && matchInFixtures.league_key) {
+          leagueId = Number(matchInFixtures.league_key);
+          leagueName = matchInFixtures.league_name;
+          leagueSlug = slugify(matchInFixtures.league_name || '');
+        }
+
+        if (!candidateTeam && teamId) {
+          const tRes = await advancedFootballApi.getTeams({ teamId });
+          if (Array.isArray(tRes?.result) && tRes.result.length > 0) {
+            const found = tRes.result[0];
+            candidateTeam = {
+              ...found,
+              team_key: String(teamId),
+              team_name: found.team_name || teamName,
+              team_logo: found.team_logo || teamLogo,
+            };
           }
         }
-      } catch (e) {
-        console.warn('[teamResolver] Error searching standings for league:', lid, e);
       }
+    } catch (e) {
+      console.warn('[teamResolver] Error searching rolling fixtures:', e);
     }
   }
 
-  // 5. Name search directly on AllSportsAPI with candidate squad verification
+  // 6. Direct teamName search fallback on AllSportsAPI
   if (!candidateTeam) {
     try {
       const searchName = resolvedSlug.replace(/-/g, ' ');
       const nameRes = await advancedFootballApi.getTeams({ teamName: searchName });
       if (Array.isArray(nameRes?.result) && nameRes.result.length > 0) {
-        const validCandidates = nameRes.result.filter(
-          (t) => t && t.team_name && !('cod' in (t as any))
-        );
-
-        // Sort candidates: prefer candidate with real players and coaches
-        validCandidates.sort((a, b) => {
-          const aScore =
-            (Array.isArray(a.players) ? a.players.length : 0) +
-            (Array.isArray(a.coaches) ? a.coaches.length * 10 : 0);
-          const bScore =
-            (Array.isArray(b.players) ? b.players.length : 0) +
-            (Array.isArray(b.coaches) ? b.coaches.length * 10 : 0);
-          return bScore - aScore;
-        });
-
-        const exactMatch = validCandidates.find(
-          (t) => slugify(t.team_name) === resolvedSlug || teamNamesMatch(t.team_name, resolvedSlug)
-        );
-        candidateTeam = exactMatch || validCandidates[0] || null;
-        if (candidateTeam?.team_key) {
-          teamId = Number(candidateTeam.team_key);
+        const valid = nameRes.result.filter((t) => t && !('cod' in (t as any)));
+        if (valid.length > 0) {
+          valid.sort((a, b) => {
+            const aScore =
+              (Array.isArray(a.players) ? a.players.length : 0) +
+              (Array.isArray(a.coaches) ? a.coaches.length * 10 : 0);
+            const bScore =
+              (Array.isArray(b.players) ? b.players.length : 0) +
+              (Array.isArray(b.coaches) ? b.coaches.length * 10 : 0);
+            return bScore - aScore;
+          });
+          const exactMatch = valid.find(
+            (t) => slugify(t.team_name || '') === resolvedSlug || teamNamesMatch(t.team_name || '', resolvedSlug)
+          );
+          candidateTeam = exactMatch || valid[0];
+          if (candidateTeam?.team_key) {
+            teamId = Number(candidateTeam.team_key);
+            teamName = candidateTeam.team_name;
+            teamLogo = candidateTeam.team_logo || '';
+          }
         }
       }
     } catch (e) {
@@ -863,13 +939,23 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
     }
   }
 
-  // If no authentic team was returned from AllSportsAPI, return null (never fake candidate)
+  // 7. If teamId and teamName are verified from livescore/fixtures, construct valid candidateTeam
+  if (!candidateTeam && teamId && teamName) {
+    candidateTeam = {
+      team_key: String(teamId),
+      team_name: teamName,
+      team_logo: teamLogo || '',
+      players: [],
+      coaches: [],
+    };
+  }
+
   if (!candidateTeam || !teamId) {
     return null;
   }
 
-  // If standing was not fetched yet and we have a leagueId, attempt to fetch it now
-  if (!standing && leagueId) {
+  // 8. Standings lookup for ANY league where this team plays
+  if (leagueId) {
     try {
       const standingsRes = await advancedFootballApi.getStandings(leagueId);
       if (standingsRes?.result) {
@@ -883,11 +969,13 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
           (s) =>
             s &&
             (String(s.team_key) === String(teamId) ||
-              slugify(s.standing_team || (s as any).team_name || '') === resolvedSlug)
+              slugify(s.standing_team || (s as any).team_name || '') === slugify(candidateTeam?.team_name || ''))
         );
         if (match) standing = match;
       }
-    } catch {}
+    } catch (e) {
+      console.warn('[teamResolver] Error fetching standings for league:', leagueId, e);
+    }
   }
 
   return {
@@ -898,5 +986,6 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
     leagueName,
     leagueSlug,
     standing,
+    liveMatch,
   };
 }

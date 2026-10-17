@@ -103,6 +103,7 @@ export default function FootballTeamPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [team, setTeam] = useState<FootballTeam | null>(null);
+  const [liveMatch, setLiveMatch] = useState<FootballEvent | null>(null);
   const [players, setPlayers] = useState<FootballPlayer[]>([]);
   const [fixtures, setFixtures] = useState<FootballEvent[]>([]);
   const [recentMatches, setRecentMatches] = useState<FootballEvent[]>([]);
@@ -141,10 +142,12 @@ export default function FootballTeamPage() {
           leagueName: resolvedLeagueName,
           leagueSlug: resolvedLeagueSlug,
           standing: resolvedStanding,
+          liveMatch: resolvedLiveMatch,
         } = resolved;
 
         if (isMounted) {
           setTeam(teamData);
+          if (resolvedLiveMatch) setLiveMatch(resolvedLiveMatch);
           if (resolvedLeagueName) setLeagueName(resolvedLeagueName);
           if (resolvedLeagueSlug) setLeagueSlug(resolvedLeagueSlug);
           if (resolvedStanding) setStanding(resolvedStanding);
@@ -198,6 +201,52 @@ export default function FootballTeamPage() {
             new Date(`${m.event_date} ${m.event_time || '00:00'}`) >= now
         );
 
+        // If squad players list is still empty, dynamically extract from live match or recent match lineups!
+        if (remotePlayers.length === 0) {
+          const matchWithLineups = [resolvedLiveMatch, ...sortedFixtures].find(
+            (m) =>
+              m &&
+              m.lineups &&
+              (m.lineups.home_team?.starting_lineups?.length > 0 ||
+                m.lineups.away_team?.starting_lineups?.length > 0)
+          );
+          if (matchWithLineups) {
+            const isHome =
+              String(matchWithLineups.home_team_key) === String(teamId) ||
+              slugify(matchWithLineups.event_home_team || '').includes(slugify(teamData.team_name));
+            const side = isHome
+              ? matchWithLineups.lineups.home_team
+              : matchWithLineups.lineups.away_team;
+            const starting = side?.starting_lineups || [];
+            const subs = side?.substitutes || [];
+
+            if (starting.length > 0 || subs.length > 0) {
+              remotePlayers = [...starting, ...subs].map((p: any, idx: number) => ({
+                player_key: p.player_key || `${teamId}-p-${idx + 1}`,
+                player_id: String(p.player_key || `${teamId}-p-${idx + 1}`),
+                player_name: p.player || p.player_name || 'Player',
+                player_number: p.player_number || String(idx + 1),
+                player_type:
+                  p.player_position ||
+                  (idx === 0
+                    ? 'Goalkeeper'
+                    : idx < 5
+                      ? 'Defender'
+                      : idx < 9
+                        ? 'Midfielder'
+                        : 'Forward'),
+                player_country: (teamData as any)?.team_country || '',
+                player_age: '',
+                player_match_played: '1',
+                player_goals: '0',
+                player_yellow_cards: '0',
+                player_red_cards: '0',
+                player_image: '',
+              }));
+            }
+          }
+        }
+
         if (isMounted) {
           setPlayers(remotePlayers);
           setFixtures(sortedFixtures);
@@ -207,7 +256,7 @@ export default function FootballTeamPage() {
 
         // Standings lookup if not already resolved
         if (!resolvedStanding) {
-          const refMatch = finished[0] || upcoming[0];
+          const refMatch = finished[0] || upcoming[0] || resolvedLiveMatch;
           const targetLeagueKey = resolvedLeagueId || refMatch?.league_key;
           if (targetLeagueKey) {
             if (refMatch?.league_name && isMounted) {
@@ -227,11 +276,7 @@ export default function FootballTeamPage() {
                   return (
                     sTeamSlug === targetNameSlug ||
                     sTeamSlug.includes(targetNameSlug) ||
-                    targetNameSlug.includes(sTeamSlug) ||
-                    ((targetNameSlug.includes('inter') || targetNameSlug === 'internazionale') &&
-                      (sTeamSlug.includes('inter') || sTeamSlug === 'internazionale')) ||
-                    ((targetNameSlug.includes('manchester-city') || targetNameSlug === 'man-city') &&
-                      (sTeamSlug.includes('manchester-city') || sTeamSlug === 'man-city'))
+                    targetNameSlug.includes(sTeamSlug)
                   );
                 });
                 if (ts && isMounted) setStanding(ts);
@@ -264,9 +309,46 @@ export default function FootballTeamPage() {
             nationality: firstCoach?.coach_country || firstCoach?.coache_country || (teamData as any)?.team_country || 'International',
             flag: '🌍',
           };
+        } else if (resolvedLiveMatch?.lineups) {
+          const isHome =
+            String(resolvedLiveMatch.home_team_key) === String(teamId) ||
+            slugify(resolvedLiveMatch.event_home_team || '').includes(slugify(teamData.team_name));
+          const side = isHome ? resolvedLiveMatch.lineups.home_team : resolvedLiveMatch.lineups.away_team;
+          const lCoach = side?.coaches?.[0]?.coache || side?.coaches?.[0]?.coach_name;
+          if (lCoach) {
+            coachResolved = {
+              name: lCoach,
+              slug: slugify(lCoach),
+              photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(lCoach)}&background=0f172a&color=38bdf8&size=128&bold=true`,
+              nationality: (teamData as any)?.team_country || 'International',
+              flag: '🌍',
+            };
+          }
         }
 
         if (isMounted) setCoachData(coachResolved);
+
+        // Real-time live score polling
+        const pollInterval = setInterval(async () => {
+          try {
+            const liveRes = await advancedFootballApi.getLivescore();
+            const liveMatches: FootballEvent[] = Array.isArray(liveRes?.result) ? liveRes.result : [];
+            if (isMounted) {
+              const active = liveMatches.find(
+                (lm) =>
+                  String(lm.home_team_key) === String(teamId) ||
+                  String(lm.away_team_key) === String(teamId) ||
+                  slugify(lm.event_home_team || '').includes(slugify(teamData.team_name)) ||
+                  slugify(lm.event_away_team || '').includes(slugify(teamData.team_name))
+              );
+              setLiveMatch(active || null);
+            }
+          } catch {}
+        }, 20000);
+
+        return () => {
+          clearInterval(pollInterval);
+        };
       } catch (err) {
         console.error('Error loading team page:', err);
       } finally {
@@ -658,6 +740,77 @@ export default function FootballTeamPage() {
         {/* ── Overview Tab ── */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
+            {/* Live Match in Progress Banner */}
+            {liveMatch && (
+              <div className="bg-gradient-to-r from-rose-950/60 via-slate-900 to-rose-950/60 border border-rose-500/40 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping inline-block" />
+                    <span className="text-xs font-black text-rose-400 tracking-wider uppercase">
+                      Live Match in Progress
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-bold text-rose-300 bg-rose-500/20 px-2.5 py-0.5 rounded-full border border-rose-500/30">
+                    {liveMatch.event_status ? `${liveMatch.event_status}'` : 'LIVE'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded bg-slate-900/80 p-0.5 border border-white/10 flex items-center justify-center shrink-0">
+                      <Image
+                        src={resolveTeamLogo(liveMatch.event_home_team, liveMatch.home_team_logo)}
+                        alt={liveMatch.event_home_team}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="font-bold text-sm text-white truncate">
+                      {liveMatch.event_home_team}
+                    </span>
+                  </div>
+                  <div className="px-3.5 py-1.5 bg-slate-950/90 rounded-xl border border-rose-500/30 text-center">
+                    <span className="text-lg font-black text-white tabular-nums tracking-wider">
+                      {liveMatch.event_final_result ||
+                        liveMatch.event_ft_result ||
+                        `${(liveMatch as any).event_home_final_result ?? 0} - ${(liveMatch as any).event_away_final_result ?? 0}`}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-end gap-2.5 min-w-0 text-right">
+                    <span className="font-bold text-sm text-white truncate">
+                      {liveMatch.event_away_team}
+                    </span>
+                    <div className="w-8 h-8 rounded bg-slate-900/80 p-0.5 border border-white/10 flex items-center justify-center shrink-0">
+                      <Image
+                        src={resolveTeamLogo(liveMatch.event_away_team, liveMatch.away_team_logo)}
+                        alt={liveMatch.event_away_team}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-rose-500/20 flex items-center justify-between text-xs text-slate-400">
+                  <span className="font-medium">{liveMatch.league_name || 'Live Match'}</span>
+                  <Link
+                    href={footballRoutes.match(
+                      buildMatchSlug({
+                        home: liveMatch.event_home_team,
+                        away: liveMatch.event_away_team,
+                        comp: liveMatch.league_name,
+                        date: liveMatch.event_date,
+                        id: liveMatch.event_key,
+                      })
+                    )}
+                    className="text-rose-400 hover:text-rose-300 font-bold transition-colors flex items-center gap-1"
+                  >
+                    Match Center →
+                  </Link>
+                </div>
+              </div>
+            )}
+
             {/* Manager / Head Coach card */}
             {coachData && (
               <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 shadow-sm">
@@ -796,6 +949,86 @@ export default function FootballTeamPage() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {/* Recent & Upcoming Match Preview Card */}
+            {(recentMatches[0] || upcomingMatches[0]) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {recentMatches[0] && (
+                  <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                      <span className="font-black uppercase tracking-wider text-slate-300">
+                        Latest Result
+                      </span>
+                      <span>{recentMatches[0].event_date}</span>
+                    </div>
+                    <Link
+                      href={footballRoutes.match(
+                        buildMatchSlug({
+                          home: recentMatches[0].event_home_team,
+                          away: recentMatches[0].event_away_team,
+                          comp: recentMatches[0].league_name,
+                          date: recentMatches[0].event_date,
+                          id: recentMatches[0].event_key,
+                        })
+                      )}
+                      className="block hover:bg-white/5 p-2 rounded-xl transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-white truncate">
+                          {recentMatches[0].event_home_team}
+                        </span>
+                        <span className="font-black text-sm text-blue-400 px-2 py-0.5 bg-slate-900 rounded border border-white/10">
+                          {recentMatches[0].event_final_result || recentMatches[0].event_ft_result || 'FT'}
+                        </span>
+                        <span className="font-bold text-sm text-white truncate text-right">
+                          {recentMatches[0].event_away_team}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1 truncate">
+                        {recentMatches[0].league_name}
+                      </p>
+                    </Link>
+                  </div>
+                )}
+                {upcomingMatches[0] && (
+                  <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                      <span className="font-black uppercase tracking-wider text-slate-300">
+                        Next Fixture
+                      </span>
+                      <span>{upcomingMatches[0].event_date} {upcomingMatches[0].event_time || ''}</span>
+                    </div>
+                    <Link
+                      href={footballRoutes.match(
+                        buildMatchSlug({
+                          home: upcomingMatches[0].event_home_team,
+                          away: upcomingMatches[0].event_away_team,
+                          comp: upcomingMatches[0].league_name,
+                          date: upcomingMatches[0].event_date,
+                          id: upcomingMatches[0].event_key,
+                        })
+                      )}
+                      className="block hover:bg-white/5 p-2 rounded-xl transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-white truncate">
+                          {upcomingMatches[0].event_home_team}
+                        </span>
+                        <span className="text-xs font-bold text-amber-400 px-2 py-0.5 bg-amber-500/10 rounded border border-amber-500/20">
+                          VS
+                        </span>
+                        <span className="font-bold text-sm text-white truncate text-right">
+                          {upcomingMatches[0].event_away_team}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1 truncate">
+                        {upcomingMatches[0].league_name}
+                      </p>
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 

@@ -155,7 +155,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-3 relative z-10">
         {/* Home Team */}
         <Link
-          href={footballRoutes.teamFromName(event.event_home_team)}
+          href={footballRoutes.teamFromName(event.event_home_team, event.home_team_key)}
           onClick={(e) => e.stopPropagation()}
           className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 hover:text-blue-400 transition-colors"
         >
@@ -200,7 +200,7 @@ export function FootballMatchCard({ event, onPress, hideLeague = false }: Footba
 
         {/* Away Team */}
         <Link
-          href={footballRoutes.teamFromName(event.event_away_team)}
+          href={footballRoutes.teamFromName(event.event_away_team, event.away_team_key)}
           onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-end space-x-1.5 sm:space-x-2 min-w-0 text-right hover:text-blue-400 transition-colors"
         >

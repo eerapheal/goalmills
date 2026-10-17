@@ -889,7 +889,7 @@ function TableTab({
                   </td>
                   <td className="px-3 py-3 font-semibold text-white">
                     <Link
-                      href={footballRoutes.teamFromName(row.standing_team)}
+                      href={footballRoutes.teamFromName(row.standing_team, row.team_key)}
                       className="hover:text-blue-400 transition-colors flex items-center gap-2"
                     >
                       {row.standing_team}
