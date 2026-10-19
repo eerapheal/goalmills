@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Fixture } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, formatDate, formatTime } from '@goalmills/ui';
 import { getTopLeagueSlug, getLeagueShortName } from '../lib/football/topLeagues';
+import { buildTeamSlug } from '../lib/slugUtils';
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -39,8 +40,9 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
     }
   };
 
-  const handleTeamPress = (teamId: number) => {
-    router.push(`/home/football/teams/${teamId}`);
+  const handleTeamPress = (teamId: number, teamName?: string) => {
+    const target = teamName ? buildTeamSlug(teamName, teamId) : String(teamId);
+    router.push(`/home/football/teams/${target}`);
   };
 
   const handleLeaguePress = (leagueId: number) => {
@@ -91,7 +93,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
           style={[styles.teamContainer, styles.teamHome]}
           onPress={(e) => {
             e.stopPropagation();
-            handleTeamPress(teams.home.id);
+            handleTeamPress(teams.home.id, teams.home.name);
           }}
         >
           <Image source={{ uri: teams.home.logo }} style={styles.teamLogo} />
@@ -130,7 +132,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
           style={[styles.teamContainer, styles.teamAway]}
           onPress={(e) => {
             e.stopPropagation();
-            handleTeamPress(teams.away.id);
+            handleTeamPress(teams.away.id, teams.away.name);
           }}
         >
           <Text style={[styles.teamName, styles.textRight]} numberOfLines={2}>

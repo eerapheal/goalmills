@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { getLeagueShortName, getTopLeagueSlug } from '../lib/football/topLeagues';
+import { buildTeamSlug } from '../lib/slugUtils';
 
 export interface UnifiedMatchEvent {
   event_key: string | number;
@@ -156,7 +157,8 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
           onPress={(e) => {
             e.stopPropagation();
             if (event.home_team_key) {
-              router.push(`/home/football/teams/${String(event.home_team_key)}` as any);
+              const target = buildTeamSlug(event.event_home_team, event.home_team_key);
+              router.push(`/home/football/teams/${target}` as any);
             }
           }}
         >
@@ -196,7 +198,8 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
           onPress={(e) => {
             e.stopPropagation();
             if (event.away_team_key) {
-              router.push(`/home/football/teams/${String(event.away_team_key)}` as any);
+              const target = buildTeamSlug(event.event_away_team, event.away_team_key);
+              router.push(`/home/football/teams/${target}` as any);
             }
           }}
         >

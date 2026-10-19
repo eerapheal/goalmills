@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Standing } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
+import { buildTeamSlug } from '../lib/slugUtils';
 
 interface StandingsTableProps {
   standings: Standing[];
@@ -63,7 +64,10 @@ export function StandingsTable({ standings }: StandingsTableProps) {
           {/* Team */}
           <Pressable
             style={styles.teamCell}
-            onPress={() => router.push(`/home/football/teams/${standing.team.id}`)}
+            onPress={() => {
+              const target = buildTeamSlug(standing.team.name, standing.team.id);
+              router.push(`/home/football/teams/${target}`);
+            }}
           >
             <Image source={{ uri: standing.team.logo }} style={styles.teamLogo} />
             <Text style={styles.teamName} numberOfLines={1}>

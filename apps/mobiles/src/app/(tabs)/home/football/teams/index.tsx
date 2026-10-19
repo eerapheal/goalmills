@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballTeam } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
+import { buildTeamSlug } from '../../../../../lib/slugUtils';
 
 const FEATURED_LEAGUES = [
   { id: '152', name: 'Premier League', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
@@ -21,11 +22,17 @@ const FEATURED_LEAGUES = [
   { id: '207', name: 'Serie A', flag: '🇮🇹' },
   { id: '175', name: 'Bundesliga', flag: '🇩🇪' },
   { id: '168', name: 'Ligue 1', flag: '🇫🇷' },
+  { id: '248', name: 'NPFL', flag: '🇳🇬' },
   { id: '278', name: 'Saudi Pro', flag: '🇸🇦' },
   { id: '244', name: 'Eredivisie', flag: '🇳🇱' },
   { id: '266', name: 'Liga Portugal', flag: '🇵🇹' },
   { id: '322', name: 'Süper Lig', flag: '🇹🇷' },
   { id: '99', name: 'Brasileirão', flag: '🇧🇷' },
+  { id: '141', name: 'Egyptian Premier', flag: '🇪🇬' },
+  { id: '297', name: 'PSL', flag: '🇿🇦' },
+  { id: '344', name: 'Russian PL', flag: '🇷🇺' },
+  { id: '259', name: 'Ekstraklasa', flag: '🇵🇱' },
+  { id: '279', name: 'Scottish PL', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
 ];
 
 export default function FootballTeamsPage() {
@@ -136,7 +143,10 @@ export default function FootballTeamsPage() {
               <Pressable
                 key={team.team_key}
                 style={({ pressed }) => [styles.teamCard, pressed && styles.pressed]}
-                onPress={() => router.push(`/home/football/teams/${team.team_key}` as any)}
+                onPress={() => {
+                  const slug = buildTeamSlug(team.team_name, team.team_key);
+                  router.push(`/home/football/teams/${slug}` as any);
+                }}
               >
                 <View style={styles.logoWrap}>
                   {team.team_logo ? (

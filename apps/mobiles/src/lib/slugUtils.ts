@@ -71,12 +71,62 @@ export function resolveLeagueId(idOrSlug: string | number | undefined | null): n
 }
 
 /**
+ * Build a canonical dynamic team slug: e.g. "gks-katowice-5820" or "arsenal-141"
+ */
+export function buildTeamSlug(
+  team: { team_name?: string; team_key?: string | number } | string,
+  key?: string | number
+): string {
+  if (typeof team === 'string') {
+    const s = slugify(team);
+    return key ? `${s}-${key}` : s;
+  }
+  const s = slugify(team.team_name || '');
+  const k = team.team_key || key;
+  return k ? `${s}-${k}` : s;
+}
+
+export interface ParsedTeamSlug {
+  rawSlug: string;
+  teamKey: string;
+  nameSlug: string;
+}
+
+/**
+ * Parses team slug supporting:
+ * - "gks-katowice-5820" -> { rawSlug, teamKey: "5820", nameSlug: "gks-katowice" }
+ * - "manchester-city" -> { rawSlug, teamKey: "", nameSlug: "manchester-city" }
+ * - "5820" -> { rawSlug, teamKey: "5820", nameSlug: "" }
+ */
+export function parseTeamSlug(slug: string): ParsedTeamSlug {
+  if (!slug) return { rawSlug: '', teamKey: '', nameSlug: '' };
+  const s = String(slug).trim();
+  if (/^\d+$/.test(s)) {
+    return { rawSlug: s, teamKey: s, nameSlug: '' };
+  }
+  const match = s.match(/^(.*?)-(\d+)$/);
+  if (match) {
+    return { rawSlug: s, teamKey: match[2], nameSlug: match[1] };
+  }
+  return { rawSlug: s, teamKey: '', nameSlug: s };
+}
+
+/**
+ * Resolves a team identifier into a clean mobile route path.
+ */
+export function getTeamRoute(teamKeyOrSlug: string | number): string {
+  if (!teamKeyOrSlug) return '/home/football/teams';
+  const str = String(teamKeyOrSlug).trim();
+  return `/home/football/teams/${str}`;
+}
+
+/**
  * Mobile route helpers — Expo Router paths
  * All routes are relative to the (tabs)/home/football directory
  */
 export const mobileFootballRoutes = {
   match: (eventKey: string | number) => `/home/football/matches/${eventKey}`,
-  team: (teamKey: string | number) => `/home/football/teams/${teamKey}`,
+  team: (teamKeyOrSlug: string | number) => getTeamRoute(teamKeyOrSlug),
   player: (playerKey: string | number) => `/home/football/players/${playerKey}`,
   league: (leagueKeyOrSlug: string | number) => getLeagueRoute(leagueKeyOrSlug),
   coach: (coachSlug: string) => `/home/football/coaches/${coachSlug}`,
@@ -85,4 +135,5 @@ export const mobileFootballRoutes = {
   teamsList: () => '/home/football/teams',
   playersList: () => '/home/football/players',
 };
+
 

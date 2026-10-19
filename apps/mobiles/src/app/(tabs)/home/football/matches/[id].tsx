@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { TacticalPitch } from '../../../../../components/TacticalPitch';
 import { getTopLeagueSlug } from '../../../../../lib/football/topLeagues';
+import { buildTeamSlug } from '../../../../../lib/slugUtils';
 import {
   FootballEvent,
   FootballH2HResponse,
@@ -833,10 +834,12 @@ export default function MatchCenterScreen() {
             {/* Home Team */}
             <Pressable
               style={styles.teamSide}
-              onPress={() =>
-                fixture.home_team_key &&
-                router.push(`/(tabs)/home/football/teams/${fixture.home_team_key}` as any)
-              }
+              onPress={() => {
+                if (fixture.home_team_key) {
+                  const slug = buildTeamSlug(fixture.event_home_team, fixture.home_team_key);
+                  router.push(`/home/football/teams/${slug}` as any);
+                }
+              }}
             >
               {fixture.home_team_logo ? (
                 <Image source={{ uri: fixture.home_team_logo }} style={styles.teamLogo} />
@@ -881,10 +884,12 @@ export default function MatchCenterScreen() {
             {/* Away Team */}
             <Pressable
               style={[styles.teamSide, { alignItems: 'flex-end' }]}
-              onPress={() =>
-                fixture.away_team_key &&
-                router.push(`/(tabs)/home/football/teams/${fixture.away_team_key}` as any)
-              }
+              onPress={() => {
+                if (fixture.away_team_key) {
+                  const slug = buildTeamSlug(fixture.event_away_team, fixture.away_team_key);
+                  router.push(`/home/football/teams/${slug}` as any);
+                }
+              }}
             >
               {fixture.away_team_logo ? (
                 <Image source={{ uri: fixture.away_team_logo }} style={styles.teamLogo} />

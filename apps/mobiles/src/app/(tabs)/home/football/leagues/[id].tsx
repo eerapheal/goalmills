@@ -22,7 +22,7 @@ import {
 } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
-import { resolveLeagueId } from '../../../../../lib/slugUtils';
+import { resolveLeagueId, buildTeamSlug } from '../../../../../lib/slugUtils';
 import { getCanonicalCompetition } from '../../../../../lib/football/competitionRegistry';
 import { getLeagueShortName } from '../../../../../lib/football/topLeagues';
 
@@ -343,7 +343,8 @@ export default function LeagueDetailPage() {
                     style={[styles.standingsRow, index < 4 && styles.championsLeagueRow]}
                     onPress={() => {
                       if (standing.team_key) {
-                        router.push(`/home/football/teams/${standing.team_key}` as any);
+                        const slug = buildTeamSlug(standing.standing_team, standing.team_key);
+                        router.push(`/home/football/teams/${slug}` as any);
                       }
                     }}
                   >
@@ -657,9 +658,12 @@ export default function LeagueDetailPage() {
                   <Pressable
                     key={i}
                     style={styles.teamCard}
-                    onPress={() =>
-                      t.team_key && router.push(`/(tabs)/home/football/teams/${t.team_key}` as any)
-                    }
+                    onPress={() => {
+                      if (t.team_key) {
+                        const slug = buildTeamSlug(t.team_name, t.team_key);
+                        router.push(`/home/football/teams/${slug}` as any);
+                      }
+                    }}
                   >
                     {t.team_logo ? (
                       <Image source={{ uri: t.team_logo }} style={styles.teamCardLogo} />

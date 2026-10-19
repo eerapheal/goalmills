@@ -16,6 +16,7 @@ import { FootballPlayer, FootballEvent } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 import { UnifiedMatchEvent } from '../../../../../components/FootballMatchCard';
+import { buildTeamSlug } from '../../../../../lib/slugUtils';
 
 export default function PlayerDetailPage() {
   const router = useRouter();
@@ -239,10 +240,12 @@ export default function PlayerDetailPage() {
             {player.team_name && (
               <Pressable
                 style={styles.teamLink}
-                onPress={() =>
-                  player.team_key &&
-                  router.push(`/(tabs)/home/football/teams/${player.team_key}` as any)
-                }
+                onPress={() => {
+                  if (player.team_key) {
+                    const slug = buildTeamSlug(player.team_name || '', player.team_key);
+                    router.push(`/home/football/teams/${slug}` as any);
+                  }
+                }}
               >
                 <Text style={styles.teamLinkName}>{player.team_name}</Text>
                 <Ionicons name="chevron-forward" size={12} color="#3B82F6" />

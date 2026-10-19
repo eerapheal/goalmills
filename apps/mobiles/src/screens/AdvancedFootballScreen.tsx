@@ -26,6 +26,7 @@ import {
   FootballEvent,
 } from '@goalmills/types';
 import { getLeagueShortName, getLeagueRank, getTopLeagueSlug } from '../lib/football/topLeagues';
+import { buildTeamSlug } from '../lib/slugUtils';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
 
@@ -581,10 +582,12 @@ export function AdvancedFootballScreen() {
                       <Pressable
                         key={i}
                         style={styles.tableRow}
-                        onPress={() =>
-                          row.team_key &&
-                          router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)
-                        }
+                        onPress={() => {
+                          if (row.team_key) {
+                            const slug = buildTeamSlug(row.standing_team || (row as any).team_name, row.team_key);
+                            router.push(`/home/football/teams/${slug}` as any);
+                          }
+                        }}
                       >
                         <View
                           style={[

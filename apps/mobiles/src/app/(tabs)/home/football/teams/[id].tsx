@@ -17,6 +17,9 @@ import { advancedFootballApi } from '../../../../../services/advancedFootballApi
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 import { MatchOddsModal } from '../../../../../components/MatchOddsModal';
 import { UnifiedMatchEvent } from '../../../../../components/FootballMatchCard';
+import { resolveFootballTeam } from '../../../../../lib/football/teamResolver';
+import { getTopLeagueSlug } from '../../../../../lib/football/topLeagues';
+import { slugify, buildTeamSlug } from '../../../../../lib/slugUtils';
 
 type TeamTab = 'squad' | 'fixtures' | 'results' | 'table' | 'odds';
 
@@ -58,6 +61,9 @@ export default function TeamDetailPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TeamTab>('squad');
   const [team, setTeam] = useState<FootballTeam | null>(null);
+  const [leagueName, setLeagueName] = useState<string>('');
+  const [leagueSlug, setLeagueSlug] = useState<string>('');
+  const [leagueId, setLeagueId] = useState<number | undefined>(undefined);
   const [players, setPlayers] = useState<FootballPlayer[]>([]);
   const [allFixtures, setAllFixtures] = useState<FootballEvent[]>([]);
   const [standings, setStandings] = useState<FootballStanding[]>([]);
@@ -80,33 +86,108 @@ export default function TeamDetailPage() {
   const loadTeamData = async () => {
     try {
       setLoading(true);
-      const teamId = Number(id);
-      const today = new Date();
-      const currentYear = today.getFullYear();
-      const seasonStart = today.getMonth() < 6 ? currentYear - 1 : currentYear;
-      const fromDate = `${seasonStart}-07-01`;
-      const toDate = `${seasonStart + 1}-06-30`;
+      const rawId = String(id || '').trim();
+      const resolved = await resolveFootballTeam(rawId);
 
-      const [teamsRes, playersRes, fixturesRes] = await Promise.all([
-        advancedFootballApi.getTeams({ teamId }).catch(() => ({ result: [] })),
-        advancedFootballApi.getPlayers({ teamId }).catch(() => ({ result: [] })),
-        advancedFootballApi
-          .getFixtures({ from: fromDate, to: toDate, teamId })
-          .catch(() => ({ result: [] })),
-      ]);
+      if (resolved) {
+        setTeam(resolved.team);
+        if (resolved.leagueName) setLeagueName(resolved.leagueName);
+        if (resolved.leagueSlug) setLeagueSlug(resolved.leagueSlug);
+        if (resolved.leagueId) setLeagueId(resolved.leagueId);
 
-      setTeam(teamsRes.result[0] || null);
-      setPlayers(playersRes.result || []);
-      setAllFixtures((fixturesRes.result as FootballEvent[]) || []);
+        const teamKey = resolved.teamKey;
+        let squad = Array.isArray(resolved.team.players) ? resolved.team.players : [];
 
-      // League standings
-      if (fixturesRes.result?.[0]?.league_key) {
-        const leagueId = Number((fixturesRes.result as FootballEvent[])[0].league_key);
-        const standRes = await advancedFootballApi.getStandings(leagueId).catch(() => null);
-        if (standRes?.result) {
-          const res = standRes.result as any;
-          const table = Array.isArray(res) ? res : res.total || [];
-          setStandings(table);
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const seasonStart = today.getMonth() < 6 ? currentYear - 1 : currentYear;
+        const fromDate = `${seasonStart}-07-01`;
+        const toDate = `${seasonStart + 1}-06-30`;
+
+        const promises: Promise<any>[] = [
+          advancedFootballApi
+            .getFixtures({ from: fromDate, to: toDate, teamId: teamKey })
+            .catch(() => ({ result: [] })),
+        ];
+        if (squad.length === 0) {
+          promises.push(
+            advancedFootballApi.getPlayers({ teamId: teamKey }).catch(() => ({ result: [] }))
+          );
+        }
+
+        const [fixturesRes, playersRes] = await Promise.all(promises);
+        const rawFixtures = (fixturesRes?.result as FootballEvent[]) || [];
+        setAllFixtures(rawFixtures);
+
+        if (playersRes?.result && Array.isArray(playersRes.result) && playersRes.result.length > 0) {
+          squad = playersRes.result;
+        }
+        setPlayers(squad);
+
+        // Fetch standings using resolved.leagueId or fixture league_key
+        const activeLeagueId = resolved.leagueId || Number(rawFixtures[0]?.league_key);
+        if (activeLeagueId && !isNaN(activeLeagueId)) {
+          setLeagueId(activeLeagueId);
+          if (!resolved.leagueName && rawFixtures[0]?.league_name) {
+            const lName = rawFixtures[0].league_name;
+            const cName = rawFixtures[0].country_name;
+            const isGenericPL =
+              lName.toLowerCase() === 'premier league' && cName && cName.toLowerCase() !== 'england';
+            const disambiguated = isGenericPL ? `${cName} Premier League` : lName;
+            setLeagueName(disambiguated);
+            setLeagueSlug(getTopLeagueSlug(activeLeagueId) || slugify(disambiguated));
+          }
+          const standRes = await advancedFootballApi.getStandings(activeLeagueId).catch(() => null);
+          if (standRes?.result) {
+            const res = standRes.result as any;
+            const table = Array.isArray(res) ? res : res.total || [];
+            setStandings(table);
+          }
+        }
+      } else {
+        // Fallback for purely numeric or unresolvable ID
+        const numId = Number(id);
+        if (!isNaN(numId)) {
+          const today = new Date();
+          const currentYear = today.getFullYear();
+          const seasonStart = today.getMonth() < 6 ? currentYear - 1 : currentYear;
+          const fromDate = `${seasonStart}-07-01`;
+          const toDate = `${seasonStart + 1}-06-30`;
+
+          const [teamsRes, playersRes, fixturesRes] = await Promise.all([
+            advancedFootballApi.getTeams({ teamId: numId }).catch(() => ({ result: [] })),
+            advancedFootballApi.getPlayers({ teamId: numId }).catch(() => ({ result: [] })),
+            advancedFootballApi
+              .getFixtures({ from: fromDate, to: toDate, teamId: numId })
+              .catch(() => ({ result: [] })),
+          ]);
+
+          const foundTeam = teamsRes?.result?.[0] || null;
+          setTeam(foundTeam);
+          setPlayers(playersRes?.result || []);
+          const rawFixtures = (fixturesRes?.result as FootballEvent[]) || [];
+          setAllFixtures(rawFixtures);
+
+          if (rawFixtures[0]?.league_key) {
+            const actLgId = Number(rawFixtures[0].league_key);
+            setLeagueId(actLgId);
+            const lName = rawFixtures[0].league_name || '';
+            const cName = rawFixtures[0].country_name || '';
+            const isGenericPL =
+              lName.toLowerCase() === 'premier league' && cName && cName.toLowerCase() !== 'england';
+            const disambiguated = isGenericPL ? `${cName} Premier League` : lName;
+            setLeagueName(disambiguated);
+            setLeagueSlug(getTopLeagueSlug(actLgId) || slugify(disambiguated));
+
+            const standRes = await advancedFootballApi.getStandings(actLgId).catch(() => null);
+            if (standRes?.result) {
+              const res = standRes.result as any;
+              const table = Array.isArray(res) ? res : res.total || [];
+              setStandings(table);
+            }
+          }
+        } else {
+          setTeam(null);
         }
       }
     } catch (error) {
@@ -236,6 +317,24 @@ export default function TeamDetailPage() {
           )}
           <View style={styles.heroInfo}>
             <Text style={styles.teamName}>{team.team_name}</Text>
+            {/* Clickable League Pill */}
+            {leagueName ? (
+              <Pressable
+                style={styles.leaguePill}
+                onPress={() => {
+                  const target =
+                    leagueSlug || (leagueId ? getTopLeagueSlug(leagueId) || String(leagueId) : '');
+                  if (target) {
+                    router.push(`/(tabs)/home/football/leagues/${target}` as any);
+                  }
+                }}
+              >
+                <Text style={styles.leaguePillText} numberOfLines={1}>
+                  🏆 {leagueName}
+                </Text>
+                <Ionicons name="chevron-forward" size={11} color="#60A5FA" />
+              </Pressable>
+            ) : null}
             {/* Form row */}
             {formBadges.length > 0 && (
               <View style={styles.formRow}>
@@ -420,10 +519,12 @@ export default function TeamDetailPage() {
                     <Pressable
                       key={i}
                       style={[styles.tableRow, isMe && styles.tableRowHighlight]}
-                      onPress={() =>
-                        row.team_key &&
-                        router.push(`/(tabs)/home/football/teams/${row.team_key}` as any)
-                      }
+                      onPress={() => {
+                        if (row.team_key) {
+                          const slug = buildTeamSlug(row.standing_team, row.team_key);
+                          router.push(`/home/football/teams/${slug}` as any);
+                        }
+                      }}
                     >
                       <Text style={[styles.tableCell, styles.rankCol, { color: '#64748B' }]}>
                         {row.standing_place || i + 1}
@@ -580,6 +681,24 @@ const styles = StyleSheet.create({
   heroInfo: { flex: 1 },
   teamName: { fontSize: 20, fontWeight: '900', color: '#F8FAFC' },
   teamCountry: { fontSize: 12, color: '#64748B', marginTop: 2 },
+  leaguePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginTop: 4,
+    alignSelf: 'flex-start',
+    gap: 4,
+  },
+  leaguePillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#93C5FD',
+  },
   formRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
   formLabel: { fontSize: 10, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' },
   formDot: {
