@@ -29,7 +29,16 @@ function generateDeterministicFallback(
 ): CompetitionFormatConfig {
   const canonical = getCanonicalCompetition(competitionId);
   const compType = canonical?.competitionType;
-  const isCup = compType === 'CUP' || canonical?.name.toLowerCase().includes('cup');
+  const isTournament =
+    compType === 'WORLD_CUP' ||
+    compType === 'CONTINENTAL_NATIONAL' ||
+    compType === 'CONTINENTAL_CLUB' ||
+    /afcon|world[-_]cup|nations[-_]league|euro/i.test(canonical?.name || competitionId);
+
+  const isCup =
+    !isTournament &&
+    (compType === 'CUP' ||
+      /cup|pokal|copa|coppa|coupe|taça/i.test(canonical?.name || competitionId));
 
   if (compType === 'CUP' || isCup) {
     const stage: CompetitionStage = {

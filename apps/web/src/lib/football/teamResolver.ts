@@ -4,6 +4,7 @@ import { ClubMeta } from '../entityService';
 import { ALL_COMPETITIONS } from '../competitionCategories';
 import { PriorityClub } from '@goalmills/types';
 import type { FootballTeam, FootballStanding, FootballEvent } from '@goalmills/types';
+import { getTopLeagueSlug } from './topLeagues';
 
 export interface ResolvedTeam {
   teamId: string;
@@ -29,7 +30,7 @@ interface LocalPriorityClub {
 const KNOWN_PRIORITY_CLUBS: Record<string, LocalPriorityClub> = {
   arsenal: {
     id: 'arsenal',
-    name: 'Arsenal FC',
+    name: 'Arsenal',
     shortName: 'Arsenal',
     slug: 'arsenal',
     competitionCanonicalId: 'premier-league',
@@ -38,7 +39,7 @@ const KNOWN_PRIORITY_CLUBS: Record<string, LocalPriorityClub> = {
   },
   chelsea: {
     id: 'chelsea',
-    name: 'Chelsea FC',
+    name: 'Chelsea',
     shortName: 'Chelsea',
     slug: 'chelsea',
     competitionCanonicalId: 'premier-league',
@@ -47,7 +48,7 @@ const KNOWN_PRIORITY_CLUBS: Record<string, LocalPriorityClub> = {
   },
   liverpool: {
     id: 'liverpool',
-    name: 'Liverpool FC',
+    name: 'Liverpool',
     shortName: 'Liverpool',
     slug: 'liverpool',
     competitionCanonicalId: 'premier-league',
@@ -56,7 +57,7 @@ const KNOWN_PRIORITY_CLUBS: Record<string, LocalPriorityClub> = {
   },
   'manchester-city': {
     id: 'manchester-city',
-    name: 'Manchester City FC',
+    name: 'Manchester City',
     shortName: 'Man City',
     slug: 'manchester-city',
     competitionCanonicalId: 'premier-league',
@@ -65,7 +66,7 @@ const KNOWN_PRIORITY_CLUBS: Record<string, LocalPriorityClub> = {
   },
   'manchester-united': {
     id: 'manchester-united',
-    name: 'Manchester United FC',
+    name: 'Manchester United',
     shortName: 'Man United',
     slug: 'manchester-united',
     competitionCanonicalId: 'premier-league',
@@ -796,8 +797,12 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
         teamLogo = (isHome ? matchInLive.home_team_logo : matchInLive.away_team_logo) || '';
         if (matchInLive.league_key) {
           leagueId = Number(matchInLive.league_key);
-          leagueName = matchInLive.league_name;
-          leagueSlug = slugify(matchInLive.league_name || '');
+          const rawLName = matchInLive.league_name || '';
+          const cName = matchInLive.country_name || '';
+          const isGenericPL = rawLName.toLowerCase() === 'premier league' && cName && cName.toLowerCase() !== 'england';
+          const resolvedName = isGenericPL ? `${cName} Premier League` : rawLName;
+          leagueName = resolvedName;
+          leagueSlug = getTopLeagueSlug(leagueId) || slugify(resolvedName);
         }
         liveMatch = matchInLive;
       }
@@ -884,8 +889,12 @@ export async function resolveFootballTeam(rawSlug: string): Promise<ResolvedTeam
         }
         if (!leagueId && matchInFixtures.league_key) {
           leagueId = Number(matchInFixtures.league_key);
-          leagueName = matchInFixtures.league_name;
-          leagueSlug = slugify(matchInFixtures.league_name || '');
+          const rawLName = matchInFixtures.league_name || '';
+          const cName = matchInFixtures.country_name || '';
+          const isGenericPL = rawLName.toLowerCase() === 'premier league' && cName && cName.toLowerCase() !== 'england';
+          const resolvedName = isGenericPL ? `${cName} Premier League` : rawLName;
+          leagueName = resolvedName;
+          leagueSlug = getTopLeagueSlug(leagueId) || slugify(resolvedName);
         }
 
         if (!candidateTeam && teamId) {

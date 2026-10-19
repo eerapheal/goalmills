@@ -12,12 +12,13 @@ import {
   FootballEvent,
   CompetitionGender,
 } from '@goalmills/types';
-import { footballRoutes } from '@/lib/slugUtils';
+import { footballRoutes, slugify } from '@/lib/slugUtils';
 import {
   isFixtureInCompetition,
   resolveCompetitionForFixture,
   sortFootballEvents,
   getLeagueShortName,
+  getTopLeagueSlug,
 } from '@/lib/football';
 import { type MainCategoryTab } from './football/FootballNavSwitcher';
 import { PlayerAvatar } from './football/PlayerAvatar';
@@ -370,6 +371,7 @@ export function FootballScreen() {
         shortName?: string;
         logo?: string;
         league_key?: string | number;
+        slug?: string;
         priorityRank: number;
         matches: UnifiedWebMatchEvent[];
       };
@@ -382,11 +384,16 @@ export function FootballScreen() {
       const priority = getLeaguePriority(item.league_key);
 
       if (!groups[stageKey]) {
+        const isGenericPL = item.league_name?.toLowerCase() === 'premier league' && item.country_name?.toLowerCase() !== 'england';
+        const resolvedTitle = isGenericPL ? `${item.country_name} Premier League` : (resolved.competition?.name || item.league_name || 'Other Matches');
+        const resolvedSlug = resolved.competition?.slug || getTopLeagueSlug(item.league_key) || (item.league_name ? slugify(resolvedTitle) : '');
+
         groups[stageKey] = {
-          title: resolved.competition?.name || item.league_name || 'Other Matches',
+          title: resolvedTitle,
           shortName: resolved.competition?.shortName || getLeagueShortName(item.league_key, item.league_name, item.country_name),
           logo: resolved.competition?.logoUrl || item.league_logo,
           league_key: item.league_key,
+          slug: resolvedSlug,
           priorityRank: priority,
           matches: [],
         };
@@ -843,9 +850,9 @@ export function FootballScreen() {
                           {group.title}
                         </h3>
                       </div>
-                      {group.league_key && (
+                      {group.slug && (
                         <Link
-                          href={`/football/${group.league_key}`}
+                          href={`/football/${group.slug}`}
                           className="text-[11px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
                         >
                           <span>League Table</span>

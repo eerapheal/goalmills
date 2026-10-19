@@ -148,6 +148,8 @@ function MatchCard({ f }: { f: FixtureItem }) {
     away: f.away,
     comp: f.comp,
     competitionId: f.competitionId,
+    league_key: f.league_key,
+    country_name: f.countryCode,
     date: f.date,
     id: f.id,
   });
@@ -1586,6 +1588,8 @@ export function FootballPageClient({
                         away: f.away,
                         comp: f.comp,
                         competitionId: f.competitionId,
+                        league_key: f.league_key,
+                        country_name: f.countryCode,
                         date: f.date,
                         id: f.id,
                       })

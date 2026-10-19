@@ -48,6 +48,8 @@ export function getNewsSlug(item?: SlugIdentifiable | string | null): string {
   return item.slug || (item.title ? slugify(item.title) : '') || '';
 }
 
+import { getTopLeagueSlug } from './football/topLeagues';
+
 // ─── Football-Specific Slug Utilities ──────────────────────────────────────────
 
 /**
@@ -63,6 +65,9 @@ export interface MatchSlugParams {
   event_date?: string;
   date?: string;
   league_name?: string;
+  country_name?: string;
+  country?: string;
+  league_key?: string | number;
   comp?: string;
   competitionId?: string;
   event_key?: string | number;
@@ -100,8 +105,29 @@ export function buildMatchSlug(match: MatchSlugParams): string {
   if (compRaw.toLowerCase().includes('unresolved')) {
     compRaw = match.league_name || 'football';
   }
-  if (compRaw === 'ENG-PREMIER-LEAGUE' || compRaw.toLowerCase() === 'premier league') {
+
+  // If compRaw is purely numeric, look up known slug or fallback to league_name
+  if (/^\d+$/.test(compRaw)) {
+    const knownSlug = getTopLeagueSlug(compRaw);
+    if (knownSlug) {
+      compRaw = knownSlug;
+    } else if (match.league_name) {
+      compRaw = match.league_name;
+    }
+  }
+
+  const country = (match.country_name || match.country || '').trim().toLowerCase();
+  const leagueKey = match.league_key !== undefined ? String(match.league_key) : '';
+
+  // Disambiguate "Premier League" by country
+  if (
+    compRaw === 'ENG-PREMIER-LEAGUE' ||
+    (compRaw.toLowerCase() === 'premier league' &&
+      (country === 'england' || country === 'gb-eng' || leagueKey === '152' || !country))
+  ) {
     compRaw = 'English Premier League';
+  } else if (compRaw.toLowerCase() === 'premier league' && country && country !== 'england') {
+    compRaw = `${country} Premier League`;
   } else if (compRaw === 'ESP-LA-LIGA' || compRaw.toLowerCase() === 'la liga') {
     compRaw = 'Spanish La Liga';
   } else if (compRaw === 'ITA-SERIE-A' || compRaw.toLowerCase() === 'serie a') {
@@ -235,6 +261,17 @@ export function parseMatchSlug(slug: string): ParsedMatchSlug {
 
   const KNOWN_COMPS = [
     'english-premier-league',
+    'russian-premier-league',
+    'egyptian-premier-league',
+    'ukrainian-premier-league',
+    'belarusian-premier-league',
+    'ghana-premier-league',
+    'kenyan-premier-league',
+    'tanzania-premier-league',
+    'south-african-psl',
+    'npfl',
+    'ekstraklasa',
+    'scottish-premiership',
     'premier-league',
     'enslish-primier-leangue',
     'la-liga',
@@ -439,12 +476,7 @@ export function parseCoachSlug(slug: string): ParsedCoachSlug {
  */
 export const footballRoutes = {
   match: (slug: string) => `/football/matches/${slug}`,
-  matchFromEvent: (match: {
-    event_home_team?: string;
-    event_away_team?: string;
-    event_date?: string;
-    event_key?: string | number;
-  }) => `/football/matches/${buildMatchSlug(match)}`,
+  matchFromEvent: (match: MatchSlugParams) => `/football/matches/${buildMatchSlug(match)}`,
 
   team: (slug: string) => `/football/teams/${slug}`,
   teamFromName: (name: string, key?: string | number) =>

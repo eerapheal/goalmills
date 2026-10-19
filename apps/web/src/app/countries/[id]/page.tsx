@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { advancedFootballApi } from '../../../services/advancedFootballApi';
 import { FootballLeague, FootballCountry } from '@goalmills/types';
 import { BackButton } from '../../../components/BackButton';
+import { slugify } from '@/lib/slugUtils';
+import { getTopLeagueSlug } from '@/lib/football';
 
 export default function CountryPage() {
   const params = useParams();
@@ -113,27 +115,32 @@ export default function CountryPage() {
 
         {leagues.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {leagues.map((league) => (
-              <Link
-                href={`/football/${league.league_key}`}
-                key={league.league_key}
-                className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
-              >
-                <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
-                  <img
-                    src={league.league_logo}
-                    alt={league.league_name}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-bold text-text-primary text-lg group-hover:text-white transition-colors">
-                    {league.league_name}
-                  </h3>
-                  <p className="text-sm text-text-muted">{league.country_name}</p>
-                </div>
-              </Link>
-            ))}
+            {leagues.map((league) => {
+              const isGenericPL = league.league_name?.toLowerCase() === 'premier league' && league.country_name?.toLowerCase() !== 'england';
+              const resolvedName = isGenericPL ? `${league.country_name} Premier League` : league.league_name;
+              const leagueSlug = getTopLeagueSlug(league.league_key) || slugify(resolvedName);
+              return (
+                <Link
+                  href={`/football/${leagueSlug}`}
+                  key={league.league_key}
+                  className="glass-card p-4 rounded-xl flex items-center gap-4 hover:bg-surfaceHighlight/50 transition-all cursor-pointer group"
+                >
+                  <div className="w-16 h-16 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+                    <img
+                      src={league.league_logo}
+                      alt={resolvedName}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-text-primary text-lg group-hover:text-white transition-colors">
+                      {resolvedName}
+                    </h3>
+                    <p className="text-sm text-text-muted">{league.country_name}</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className="glass-card p-12 rounded-xl text-center">

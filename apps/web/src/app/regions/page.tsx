@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { advancedFootballApi } from '../../services/advancedFootballApi';
 import { League, FootballLeague } from '@goalmills/types';
 import { getLeagueRank } from '../../lib/utils';
+import { slugify } from '@/lib/slugUtils';
+import { getTopLeagueSlug } from '@/lib/football';
 
 export default function RegionsPage() {
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function RegionsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {leagues.map((league) => (
             <Link
-              href={`/football/${league.id}`}
+              href={`/football/${(league as any).slug || getTopLeagueSlug(league.id) || (league.name ? slugify(league.name) : league.id)}`}
               key={league.id}
               className="glass-card p-4 rounded-xl flex items-center gap-4 hover:scale-105 transition-transform duration-300 group"
             >

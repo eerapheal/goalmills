@@ -40,14 +40,18 @@ export function resolveCompetitionForFixture(
     typeof countryName === 'string' ? countryName : undefined
   );
 
-  if (resolution.competitionId && CANONICAL_COMPETITIONS[resolution.competitionId]) {
-    const canonical = CANONICAL_COMPETITIONS[resolution.competitionId];
-    return {
-      competition: canonical,
-      competitionId: canonical.id,
-      status: 'RESOLVED',
-      isResolved: true,
-    };
+  if (resolution.competitionId) {
+    const canonical =
+      CANONICAL_COMPETITIONS[resolution.competitionId] ||
+      getCanonicalCompetition(resolution.competitionId);
+    if (canonical) {
+      return {
+        competition: canonical,
+        competitionId: canonical.id,
+        status: 'RESOLVED',
+        isResolved: true,
+      };
+    }
   }
 
   return {

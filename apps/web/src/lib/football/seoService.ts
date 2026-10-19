@@ -6,21 +6,34 @@ import {
 } from '@goalmills/types';
 import {
   CANONICAL_COMPETITIONS,
+  CANONICAL_SLUG_TO_ID,
   getCanonicalCompetition,
   getAllCanonicalCompetitions,
 } from './competitionRegistry';
 import { CONFEDERATIONS, getAllConfederations } from './confederationRegistry';
 import { COUNTRIES_REGISTRY, getAllCountries, getCountry } from './countryRegistry';
+import { TOP_LEAGUES } from './topLeagues';
 
 const DEFAULT_BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || 'https://goalmills.com';
 
-/**
- * Resolves a competition by slug or canonical ID.
- */
 export function resolveCompetitionBySlug(slug: string): CanonicalCompetition | undefined {
   if (!slug) return undefined;
-  return getCanonicalCompetition(slug);
+  const clean = slug.trim().toLowerCase();
+  if (CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[slug.toUpperCase()]) {
+    return CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[slug.toUpperCase()];
+  }
+  const mappedId = CANONICAL_SLUG_TO_ID[clean];
+  if (mappedId && CANONICAL_COMPETITIONS[mappedId]) {
+    return CANONICAL_COMPETITIONS[mappedId];
+  }
+  const topMatch = TOP_LEAGUES.find(
+    (l) => l.slug === clean || String(l.id) === clean || l.slug.replace(/-/g, '_') === clean
+  );
+  if (topMatch) {
+    return getCanonicalCompetition(topMatch.slug);
+  }
+  return undefined;
 }
 
 /**

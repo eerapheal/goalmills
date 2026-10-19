@@ -169,7 +169,14 @@ export function separateProviderStandingsByGroup(
       (r.league_round && /group/i.test(r.league_round)) ||
       (r.stage_name && /group/i.test(r.stage_name) && !/group\s+stage$/i.test(r.stage_name))
   );
-  const isLeaguePhase = targetStage?.isLeaguePhase ?? false;
+  const isLeaguePhase =
+    (targetStage?.isLeaguePhase ?? false) ||
+    stageSlug === 'league-phase' ||
+    rawStandings.some(
+      (r) =>
+        /league\s*phase/i.test(r.league_round || r.stage_name || r.league_group || '') ||
+        /swiss/i.test(r.league_round || r.stage_name || '')
+    );
   const isGroupStage = (targetStage?.isGroupStage ?? false) || (!isLeaguePhase && hasDistinctGroupsInPayload);
 
   // 1. Single Domestic League Table (Premier League, La Liga, etc.)

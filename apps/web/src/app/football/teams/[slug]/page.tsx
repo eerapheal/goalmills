@@ -19,6 +19,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { resolveTeamLogo, resolveLeagueLogo } from '@/lib/football/logoUtils';
 import { PlayerAvatar } from '@/components/football/PlayerAvatar';
 import { resolveFootballTeam } from '@/lib/football/teamResolver';
+import { getTopLeagueSlug } from '@/lib/football/topLeagues';
 import type {
   EntityBreadcrumbItem,
   FootballTeam,
@@ -215,8 +216,8 @@ export default function FootballTeamPage() {
               String(matchWithLineups.home_team_key) === String(teamId) ||
               slugify(matchWithLineups.event_home_team || '').includes(slugify(teamData.team_name));
             const side = isHome
-              ? matchWithLineups.lineups.home_team
-              : matchWithLineups.lineups.away_team;
+              ? matchWithLineups.lineups?.home_team
+              : matchWithLineups.lineups?.away_team;
             const starting = side?.starting_lineups || [];
             const subs = side?.substitutes || [];
 
@@ -260,8 +261,13 @@ export default function FootballTeamPage() {
           const targetLeagueKey = resolvedLeagueId || refMatch?.league_key;
           if (targetLeagueKey) {
             if (refMatch?.league_name && isMounted) {
-              setLeagueName(refMatch.league_name);
-              setLeagueSlug(slugify(refMatch.league_name));
+              const rawLName = refMatch.league_name;
+              const cName = refMatch.country_name || '';
+              const isGenericPL = rawLName.toLowerCase() === 'premier league' && cName && cName.toLowerCase() !== 'england';
+              const resolvedName = isGenericPL ? `${cName} Premier League` : rawLName;
+              const resolvedSlug = getTopLeagueSlug(targetLeagueKey) || slugify(resolvedName);
+              setLeagueName(resolvedName);
+              setLeagueSlug(resolvedSlug);
             }
             try {
               const standingsRes = await advancedFootballApi.getStandings(Number(targetLeagueKey));
@@ -314,7 +320,7 @@ export default function FootballTeamPage() {
             String(resolvedLiveMatch.home_team_key) === String(teamId) ||
             slugify(resolvedLiveMatch.event_home_team || '').includes(slugify(teamData.team_name));
           const side = isHome ? resolvedLiveMatch.lineups.home_team : resolvedLiveMatch.lineups.away_team;
-          const lCoach = side?.coaches?.[0]?.coache || side?.coaches?.[0]?.coach_name;
+          const lCoach = (side?.coaches?.[0] as any)?.coache || (side?.coaches?.[0] as any)?.coach_name || (side?.coaches?.[0] as any)?.coache_name;
           if (lCoach) {
             coachResolved = {
               name: lCoach,

@@ -1220,25 +1220,46 @@ export default function FootballMatchPage() {
   }, [match]);
 
   // Resolve canonical competition / league info for breadcrumb & links
+  const disambiguatedLeagueName = useMemo(() => {
+    if (!match?.league_name) return '';
+    const raw = match.league_name.trim();
+    const country = (match.country_name || '').trim().toLowerCase();
+    if (raw.toLowerCase() === 'premier league' && country && country !== 'england') {
+      return `${match.country_name} Premier League`;
+    }
+    return raw;
+  }, [match?.league_name, match?.country_name]);
+
   const leagueCanonical = useMemo(() => {
     if (!match) return null;
     return (
       (match.league_key ? getCanonicalCompetition(String(match.league_key)) : undefined) ||
-      (parsedSlug.competitionSlug ? getCanonicalCompetition(parsedSlug.competitionSlug) : undefined) ||
-      (match.league_name ? getCanonicalCompetition(match.league_name) : undefined)
+      (disambiguatedLeagueName ? getCanonicalCompetition(disambiguatedLeagueName) : undefined) ||
+      (parsedSlug.competitionSlug && !/^\d+$/.test(parsedSlug.competitionSlug)
+        ? getCanonicalCompetition(parsedSlug.competitionSlug)
+        : undefined)
     );
-  }, [match, parsedSlug.competitionSlug]);
+  }, [match, disambiguatedLeagueName, parsedSlug.competitionSlug]);
 
   const leagueSlug = useMemo(() => {
-    return (
-      leagueCanonical?.slug ||
-      (match?.league_name ? slugify(match.league_name) : parsedSlug.competitionSlug || '')
-    );
-  }, [leagueCanonical, match?.league_name, parsedSlug.competitionSlug]);
+    if (leagueCanonical?.slug && !/^\d+$/.test(leagueCanonical.slug)) {
+      return leagueCanonical.slug;
+    }
+    if (disambiguatedLeagueName) {
+      return slugify(disambiguatedLeagueName);
+    }
+    if (parsedSlug.competitionSlug && !/^\d+$/.test(parsedSlug.competitionSlug)) {
+      return parsedSlug.competitionSlug;
+    }
+    return '';
+  }, [leagueCanonical, disambiguatedLeagueName, parsedSlug.competitionSlug]);
 
   const leagueName = useMemo(() => {
-    return leagueCanonical?.name || match?.league_name || 'Football League';
-  }, [leagueCanonical, match?.league_name]);
+    if (leagueCanonical?.name && !/^\d+$/.test(leagueCanonical.name)) {
+      return leagueCanonical.name;
+    }
+    return disambiguatedLeagueName || 'Football League';
+  }, [leagueCanonical, disambiguatedLeagueName]);
 
   // Construct canonical team page URLs
   const homeTeamUrl = useMemo(() => {
@@ -1398,7 +1419,7 @@ export default function FootballMatchPage() {
                 {match.league_logo && (
                   <img src={match.league_logo} alt="" className="w-4 h-4 object-contain" />
                 )}
-                <span>{match.league_name || leagueName}</span>
+                <span>{leagueName}</span>
                 {match.league_round && (
                   <span className="text-slate-500 group-hover:text-slate-400">• {match.league_round}</span>
                 )}

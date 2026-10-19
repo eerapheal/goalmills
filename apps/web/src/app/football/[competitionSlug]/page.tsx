@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import dbConnect from '@/lib/db';
@@ -85,6 +85,11 @@ export default async function CompetitionHubPage({
 
   if (!comp) {
     notFound();
+  }
+
+  // Redirect numeric IDs to canonical text slug (e.g. /football/259 -> /football/ekstraklasa)
+  if (/^\d+$/.test(competitionSlug) && comp.slug && comp.slug !== competitionSlug) {
+    permanentRedirect(`/football/${comp.slug}`);
   }
 
   // Look up extended competition metadata from ALL_COMPETITIONS

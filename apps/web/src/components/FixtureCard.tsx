@@ -4,7 +4,8 @@ import { Fixture } from '@goalmills/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { footballRoutes, buildMatchSlug } from '@/lib/slugUtils';
+import { footballRoutes, buildMatchSlug, slugify } from '@/lib/slugUtils';
+import { getTopLeagueSlug } from '@/lib/football';
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -62,7 +63,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
       <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5 relative z-10">
         <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-2">
           <Link
-            href={`/football/${league.id}`}
+            href={`/football/${(league as any).slug || getTopLeagueSlug(league.id) || (league.name ? slugify(league.name) : league.id)}`}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <Image
