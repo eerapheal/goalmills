@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
+import { getLeagueShortName, getTopLeagueSlug } from '../lib/football/topLeagues';
 
 export interface UnifiedMatchEvent {
   event_key: string | number;
@@ -104,7 +105,8 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
           onPress={(e) => {
             e.stopPropagation();
             if (event.league_key) {
-              router.push(`/home/football/leagues/${String(event.league_key)}` as any);
+              const target = getTopLeagueSlug(event.league_key) || String(event.league_key);
+              router.push(`/home/football/leagues/${target}` as any);
             }
           }}
         >
@@ -123,7 +125,14 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
             />
           )}
           <Text style={styles.leagueTitle} numberOfLines={1}>
-            {event.league_name || 'Football'}
+            {(() => {
+              const isGenericPL =
+                event.league_name?.toLowerCase() === 'premier league' &&
+                event.country_name?.toLowerCase() !== 'england';
+              return isGenericPL && event.country_name
+                ? `${event.country_name} PL`
+                : getLeagueShortName(event.league_key, event.league_name, event.country_name);
+            })()}
           </Text>
         </Pressable>
 

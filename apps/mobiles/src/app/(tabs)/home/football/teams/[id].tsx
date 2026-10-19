@@ -145,7 +145,7 @@ export default function TeamDetailPage() {
       allFixtures
         .filter(
           (f) =>
-            f.event_date >= now &&
+            Boolean(f.event_date && f.event_date >= now) &&
             (f.event_status === 'NS' ||
               f.event_status === 'Not Started' ||
               f.event_status === 'TBA')

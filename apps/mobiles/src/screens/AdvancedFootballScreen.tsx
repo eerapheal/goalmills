@@ -25,30 +25,38 @@ import {
   FootballProbability,
   FootballEvent,
 } from '@goalmills/types';
+import { getLeagueShortName, getLeagueRank, getTopLeagueSlug } from '../lib/football/topLeagues';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
 
 const MAJOR_LEAGUES = [
-  { id: '152', name: 'Premier League', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  { id: '3', name: 'Champions League', flag: '🇪🇺' },
-  { id: '302', name: 'La Liga', flag: '🇪🇸' },
+  { id: '152', name: 'EPL', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: '302', name: 'LaLiga', flag: '🇪🇸' },
   { id: '207', name: 'Serie A', flag: '🇮🇹' },
   { id: '175', name: 'Bundesliga', flag: '🇩🇪' },
   { id: '168', name: 'Ligue 1', flag: '🇫🇷' },
-  { id: '4', name: 'Europa League', flag: '🇪🇺' },
-  { id: '6', name: 'AFCON', flag: '🌍' },
+  { id: '3', name: 'UCL', flag: '🇪🇺' },
+  { id: '4', name: 'UEL', flag: '🇪🇺' },
+  { id: '683', name: 'UECL', flag: '🇪🇺' },
+  { id: '29', name: 'AFCON', flag: '🌍' },
+  { id: '346', name: 'CAF CL', flag: '🌍' },
+  { id: '248', name: 'NPFL', flag: '🇳🇬' },
   { id: '28', name: 'World Cup', flag: '🌐' },
-  { id: '1', name: 'EURO', flag: '🇪🇺' },
-  { id: '17', name: 'Copa América', flag: '🌎' },
-  { id: '5', name: 'Nations League', flag: '🇪🇺' },
-  { id: '146', name: 'FA Cup', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  { id: '19', name: 'CAF CL', flag: '🌍' },
-  { id: '13', name: 'Libertadores', flag: '🌎' },
-  { id: '278', name: 'Saudi Pro', flag: '🇸🇦' },
+  { id: '1', name: 'Euro', flag: '🇪🇺' },
+  { id: '18', name: 'Libertadores', flag: '🌎' },
   { id: '244', name: 'Eredivisie', flag: '🇳🇱' },
   { id: '266', name: 'Liga Portugal', flag: '🇵🇹' },
-  { id: '322', name: 'Süper Lig', flag: '🇹🇷' },
+  { id: '278', name: 'Saudi Pro', flag: '🇸🇦' },
+  { id: '332', name: 'MLS', flag: '🇺🇸' },
+  { id: '153', name: 'Championship', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { id: '146', name: 'FA Cup', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
   { id: '99', name: 'Brasileirão', flag: '🇧🇷' },
+  { id: '322', name: 'Süper Lig', flag: '🇹🇷' },
+  { id: '141', name: 'Egypt PL', flag: '🇪🇬' },
+  { id: '297', name: 'PSL', flag: '🇿🇦' },
+  { id: '344', name: 'Russian PL', flag: '🇷🇺' },
+  { id: '259', name: 'Ekstraklasa', flag: '🇵🇱' },
+  { id: '279', name: 'Scottish PL', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
 ];
 
 const adaptMatch = (f: FootballEvent): UnifiedMatchEvent => {
@@ -57,6 +65,13 @@ const adaptMatch = (f: FootballEvent): UnifiedMatchEvent => {
     (f.event_live as any) === 1 ||
     ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(f.event_status || '') ||
     !isNaN(Number(f.event_status));
+
+  const rawLeagueName = f.league_name || 'Football';
+  const country = (f.country_name || '').trim();
+  const isGenericPL =
+    rawLeagueName.toLowerCase() === 'premier league' && country.toLowerCase() !== 'england';
+  const disambiguatedLeagueName =
+    isGenericPL && country ? `${country} Premier League` : rawLeagueName;
 
   return {
     event_key: f.event_key,
@@ -72,7 +87,7 @@ const adaptMatch = (f: FootballEvent): UnifiedMatchEvent => {
     away_team_logo: f.away_team_logo,
     event_final_result: f.event_final_result,
     event_ft_result: f.event_ft_result,
-    league_name: f.league_name,
+    league_name: disambiguatedLeagueName,
     league_key: f.league_key,
     league_logo: f.league_logo,
     country_name: f.country_name,
@@ -231,18 +246,45 @@ export function AdvancedFootballScreen() {
     const groups: {
       [k: string]: {
         title: string;
+        shortName: string;
         logo?: string;
         league_key?: string | number;
+        slug?: string;
         data: UnifiedMatchEvent[];
       };
     } = {};
+
     filteredFixtures.forEach((item) => {
-      const key = item.league_name || 'Other';
-      if (!groups[key])
-        groups[key] = { title: key, logo: item.league_logo, league_key: item.league_key, data: [] };
-      groups[key].data.push(item);
+      const stageKey = item.league_key ? `league_${item.league_key}` : (item.league_name || 'other_matches');
+      const isGenericPL =
+        item.league_name?.toLowerCase() === 'premier league' &&
+        item.country_name?.toLowerCase() !== 'england';
+      const resolvedTitle =
+        isGenericPL && item.country_name
+          ? `${item.country_name} Premier League`
+          : (item.league_name || 'Other Matches');
+      const shortName = getLeagueShortName(item.league_key, item.league_name, item.country_name);
+      const slug = getTopLeagueSlug(item.league_key);
+
+      if (!groups[stageKey]) {
+        groups[stageKey] = {
+          title: resolvedTitle,
+          shortName,
+          logo: item.league_logo,
+          league_key: item.league_key,
+          slug,
+          data: [],
+        };
+      }
+      groups[stageKey].data.push(item);
     });
-    return Object.values(groups);
+
+    return Object.values(groups).sort((a, b) => {
+      const rankA = getLeagueRank(a.league_key);
+      const rankB = getLeagueRank(b.league_key);
+      if (rankA !== rankB) return rankA - rankB;
+      return a.title.localeCompare(b.title);
+    });
   }, [filteredFixtures]);
 
   const tabs: { id: FootballTab; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
@@ -282,7 +324,7 @@ export function AdvancedFootballScreen() {
           { label: 'Managers', icon: '🧑‍💼', path: '/home/football/coaches' },
           { label: 'Superstars', icon: '⭐', path: '/home/football/players' },
           { label: 'Clubs Hub', icon: '🛡️', path: '/home/football/teams' },
-          { label: '80+ Leagues', icon: '🏆', path: '/home/football/leagues' },
+          { label: '100+ Leagues', icon: '🏆', path: '/home/football/leagues' },
         ].map((f) => (
           <Pressable
             key={f.label}
@@ -446,29 +488,42 @@ export function AdvancedFootballScreen() {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F59E0B" />
               }
               ListHeaderComponent={renderScrollableHeader}
-              renderSectionHeader={({ section }) => (
-                <View style={styles.sectionHeader}>
-                  {section.logo ? (
-                    <Image source={{ uri: section.logo }} style={styles.sectionLogo} />
-                  ) : (
-                    <Text style={{ fontSize: 14 }}>🏆</Text>
-                  )}
-                  <Text style={styles.sectionTitle} numberOfLines={1}>
-                    {section.title}
-                  </Text>
-                  {section.league_key && (
+              renderSectionHeader={({ section }) => {
+                const targetSlugOrId =
+                  section.slug || getTopLeagueSlug(section.league_key) || section.league_key;
+                return (
+                  <View style={styles.sectionHeader}>
                     <Pressable
-                      onPress={() =>
-                        router.push(`/(tabs)/home/football/leagues/${section.league_key}` as any)
-                      }
-                      style={styles.sectionLink}
+                      style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+                      onPress={() => {
+                        if (targetSlugOrId) {
+                          router.push(`/(tabs)/home/football/leagues/${targetSlugOrId}` as any);
+                        }
+                      }}
                     >
-                      <Text style={styles.sectionLinkText}>Table</Text>
-                      <Ionicons name="chevron-forward" size={12} color="#3B82F6" />
+                      {section.logo ? (
+                        <Image source={{ uri: section.logo }} style={styles.sectionLogo} />
+                      ) : (
+                        <Text style={{ fontSize: 14 }}>🏆</Text>
+                      )}
+                      <Text style={styles.sectionTitle} numberOfLines={1}>
+                        {section.shortName || section.title}
+                      </Text>
                     </Pressable>
-                  )}
-                </View>
-              )}
+                    {targetSlugOrId && (
+                      <Pressable
+                        onPress={() =>
+                          router.push(`/(tabs)/home/football/leagues/${targetSlugOrId}` as any)
+                        }
+                        style={styles.sectionLink}
+                      >
+                        <Text style={styles.sectionLinkText}>Table</Text>
+                        <Ionicons name="chevron-forward" size={12} color="#3B82F6" />
+                      </Pressable>
+                    )}
+                  </View>
+                );
+              }}
               renderItem={({ item }) => <FootballMatchCard event={item} />}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>

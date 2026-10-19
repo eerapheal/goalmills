@@ -82,7 +82,7 @@ export default function FootballLeaguesPage() {
             {group.competitions.map((comp) => (
               <Pressable
                 key={comp.slug}
-                onPress={() => router.push(`/home/football/leagues/${comp.id}` as any)}
+                onPress={() => router.push(`/home/football/leagues/${comp.slug || comp.id}` as any)}
                 style={({ pressed }) => [
                   styles.competitionCard,
                   pressed && styles.competitionCardPressed,

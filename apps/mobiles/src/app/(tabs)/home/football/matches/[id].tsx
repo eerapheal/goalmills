@@ -17,6 +17,7 @@ import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { TacticalPitch } from '../../../../../components/TacticalPitch';
+import { getTopLeagueSlug } from '../../../../../lib/football/topLeagues';
 import {
   FootballEvent,
   FootballH2HResponse,
@@ -786,17 +787,46 @@ export default function MatchCenterScreen() {
           </Pressable>
 
           {/* Competition */}
-          <View style={styles.heroCompetition}>
-            {fixture.league_logo ? (
-              <Image source={{ uri: fixture.league_logo }} style={styles.leagueLogo} />
-            ) : (
-              <Text style={{ fontSize: 14 }}>🏆</Text>
-            )}
-            <Text style={styles.heroLeague} numberOfLines={1}>
-              {fixture.league_name}
-            </Text>
-            {fixture.league_round && <Text style={styles.heroRound}>• {fixture.league_round}</Text>}
-          </View>
+          {(() => {
+            const isGenericPL =
+              fixture.league_name?.toLowerCase() === 'premier league' &&
+              fixture.country_name?.toLowerCase() !== 'england';
+            const displayLeagueName =
+              isGenericPL && fixture.country_name
+                ? `${fixture.country_name} Premier League`
+                : (fixture.league_name || 'Football');
+            const leagueTarget =
+              getTopLeagueSlug(fixture.league_key) || fixture.league_key;
+
+            return (
+              <Pressable
+                style={styles.heroCompetition}
+                onPress={() => {
+                  if (leagueTarget) {
+                    router.push(`/(tabs)/home/football/leagues/${leagueTarget}` as any);
+                  }
+                }}
+              >
+                {fixture.league_logo ? (
+                  <Image source={{ uri: fixture.league_logo }} style={styles.leagueLogo} />
+                ) : (
+                  <Text style={{ fontSize: 14 }}>🏆</Text>
+                )}
+                <Text style={styles.heroLeague} numberOfLines={1}>
+                  {displayLeagueName}
+                </Text>
+                {fixture.league_round && (
+                  <Text style={styles.heroRound}>• {fixture.league_round}</Text>
+                )}
+                <Ionicons
+                  name="chevron-forward"
+                  size={12}
+                  color="#94A3B8"
+                  style={{ marginLeft: 4 }}
+                />
+              </Pressable>
+            );
+          })()}
 
           {/* Teams & Score */}
           <View style={styles.scoreGrid}>

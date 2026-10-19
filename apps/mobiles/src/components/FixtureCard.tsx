@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Pressable, Animated } from 'react-native
 import { useRouter } from 'expo-router';
 import { Fixture } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, formatDate, formatTime } from '@goalmills/ui';
+import { getTopLeagueSlug, getLeagueShortName } from '../lib/football/topLeagues';
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -34,16 +35,17 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
     if (onPress) {
       onPress();
     } else {
-      router.push(`/home/matches/${fixtureData.id}`);
+      router.push(`/home/football/matches/${fixtureData.id}`);
     }
   };
 
   const handleTeamPress = (teamId: number) => {
-    router.push(`/home/teams/${teamId}`);
+    router.push(`/home/football/teams/${teamId}`);
   };
 
   const handleLeaguePress = (leagueId: number) => {
-    router.push(`/home/leagues/${leagueId}`);
+    const target = getTopLeagueSlug(leagueId) || leagueId;
+    router.push(`/home/football/leagues/${target}`);
   };
 
   return (
@@ -66,7 +68,7 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
         >
           <Image source={{ uri: league.logo }} style={styles.leagueLogo} />
           <Text style={styles.leagueName} numberOfLines={1}>
-            {league.name}
+            {getLeagueShortName(league.id, league.name, league.country)}
           </Text>
         </Pressable>
         {isLive && (

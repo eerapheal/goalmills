@@ -18,6 +18,7 @@ import {
   mapStandingToStanding,
   mapVideoToHighlight,
 } from '../utils/footballAdapters';
+import { getLeagueRank } from '../lib/football/topLeagues';
 import { FixtureCard } from '../components/FixtureCard';
 import { StandingsTable } from '../components/StandingsTable';
 import { NewsCard } from '../components/NewsCard';
@@ -70,17 +71,25 @@ export function FootballScreen() {
           goalmillsApi.getVideos().catch(() => []),
         ]);
 
+      const sortByLeagueRank = (a: Fixture, b: Fixture) => {
+        const rankA = getLeagueRank(a.league.id);
+        const rankB = getLeagueRank(b.league.id);
+        if (rankA !== rankB) return rankA - rankB;
+        return (a.league.name || '').localeCompare(b.league.name || '');
+      };
+
       // Process Live
       if (liveRes.success) {
-        setLiveFixtures(liveRes.result.map(mapEventToFixture));
+        setLiveFixtures(liveRes.result.map(mapEventToFixture).sort(sortByLeagueRank));
       }
 
       // Process Upcoming
       if (upcomingRes.success) {
         const upcoming = upcomingRes.result
           .filter((e) => e.event_status === 'Not Started' || e.event_status === 'NS')
-          .slice(0, 15)
-          .map(mapEventToFixture);
+          .slice(0, 25)
+          .map(mapEventToFixture)
+          .sort(sortByLeagueRank);
         setUpcomingFixtures(upcoming);
       }
 
@@ -94,8 +103,9 @@ export function FootballScreen() {
               e.event_status === 'AET' ||
               e.event_status === 'AP'
           )
-          .slice(0, 15)
-          .map(mapEventToFixture);
+          .slice(0, 25)
+          .map(mapEventToFixture)
+          .sort(sortByLeagueRank);
         setFinishedFixtures(finished);
       }
 

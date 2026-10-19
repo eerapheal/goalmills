@@ -10,14 +10,23 @@ import {
   FootballLeague,
   League,
 } from '@goalmills/types';
+import { getLeagueShortName } from '../lib/football/topLeagues';
+
+// Helper to safely parse string/number to int with fallback
+const toInt = (val: string | number | undefined | null, fallback = 0): number => {
+  if (val === undefined || val === null) return fallback;
+  if (typeof val === 'number') return isNaN(val) ? fallback : Math.floor(val);
+  const parsed = parseInt(String(val), 10);
+  return isNaN(parsed) ? fallback : parsed;
+};
 
 // Helper to parse "3 - 1" to { home: 3, away: 1 }
-const parseScore = (scoreStr: string | null) => {
+const parseScore = (scoreStr?: string | null) => {
   if (!scoreStr) return { home: null, away: null };
   const parts = scoreStr.split('-').map((s) => s.trim());
   if (parts.length !== 2) return { home: null, away: null };
-  const h = parseInt(parts[0]);
-  const a = parseInt(parts[1]);
+  const h = parseInt(parts[0], 10);
+  const a = parseInt(parts[1], 10);
   return {
     home: isNaN(h) ? null : h,
     away: isNaN(a) ? null : a,
@@ -26,25 +35,37 @@ const parseScore = (scoreStr: string | null) => {
 
 export const mapEventToFixture = (event: FootballEvent): Fixture => {
   const goals = parseScore(event.event_final_result);
-  // Use halftime result if available, otherwise null
   const halftime = parseScore(event.event_halftime_result);
 
   // Determine status short code
+  const statusStr = event.event_status || 'Not Started';
   let statusShort = 'NS';
-  if (event.event_status === 'Finished') statusShort = 'FT';
-  else if (event.event_status === 'Not Started') statusShort = 'NS';
-  else if (event.event_status === 'Live') statusShort = 'LIVE';
-  else if (!isNaN(Number(event.event_status)))
+  if (statusStr === 'Finished') statusShort = 'FT';
+  else if (statusStr === 'Not Started') statusShort = 'NS';
+  else if (statusStr === 'Live') statusShort = 'LIVE';
+  else if (!isNaN(Number(statusStr)))
     statusShort = '2H'; // Assuming minutes means live
-  else statusShort = event.event_status.substring(0, 3).toUpperCase();
+  else statusShort = statusStr.substring(0, 3).toUpperCase();
+
+  const rawLeagueName = event.league_name || 'Football';
+  const country = (event.country_name || '').trim();
+  const isGenericPL =
+    rawLeagueName.toLowerCase() === 'premier league' && country.toLowerCase() !== 'england';
+  const disambiguatedLeagueName =
+    isGenericPL && country ? `${country} Premier League` : rawLeagueName;
+
+  const eventDate = event.event_date || '';
+  const eventTime = event.event_time || '00:00';
+  const isoDate = eventDate ? `${eventDate}T${eventTime}:00` : new Date().toISOString();
+  const timestamp = eventDate ? new Date(isoDate).getTime() / 1000 : 0;
 
   return {
     fixture: {
-      id: parseInt(event.event_key),
+      id: toInt(event.event_key),
       referee: event.event_referee || null,
       timezone: 'UTC',
-      date: `${event.event_date}T${event.event_time}:00`,
-      timestamp: new Date(`${event.event_date}T${event.event_time}:00`).getTime() / 1000,
+      date: isoDate,
+      timestamp,
       periods: { first: null, second: null },
       venue: {
         id: null,
@@ -52,30 +73,30 @@ export const mapEventToFixture = (event: FootballEvent): Fixture => {
         city: '',
       },
       status: {
-        long: event.event_status,
+        long: statusStr,
         short: statusShort,
         elapsed: event.event_live === '1' ? 45 : null,
       },
     },
     league: {
-      id: parseInt(event.league_key),
-      name: event.league_name,
-      country: event.country_name,
+      id: toInt(event.league_key),
+      name: disambiguatedLeagueName,
+      country: event.country_name || '',
       logo: event.league_logo || '',
       flag: event.country_logo,
-      season: parseInt(event.league_season), // extracting year
-      round: event.league_round,
+      season: toInt(event.league_season, new Date().getFullYear()),
+      round: event.league_round || '',
     },
     teams: {
       home: {
-        id: parseInt(event.home_team_key),
-        name: event.event_home_team,
+        id: toInt(event.home_team_key),
+        name: event.event_home_team || 'Home',
         logo: event.home_team_logo || '',
         winner: goals.home !== null && goals.away !== null ? goals.home > goals.away : undefined,
       },
       away: {
-        id: parseInt(event.away_team_key),
-        name: event.event_away_team,
+        id: toInt(event.away_team_key),
+        name: event.event_away_team || 'Away',
         logo: event.away_team_logo || '',
         winner: goals.home !== null && goals.away !== null ? goals.away > goals.home : undefined,
       },
@@ -116,8 +137,8 @@ export const mapVideoToHighlight = (video: FootballVideo): VideoHighlight => {
     id: video.event_key,
     title: video.video_title,
     thumbnail: thumbnail,
-    duration: 'Highlights', // Mock or generic
-    views: Math.floor(Math.random() * 50000) + 1000, // randomized views for mock feel
+    duration: 'Highlights',
+    views: Math.floor(Math.random() * 50000) + 1000,
     date: new Date().toISOString(),
     league: {
       name: 'Football',
@@ -180,37 +201,37 @@ export const mapInternalVideoToHighlight = (video: any): VideoHighlight => {
 
 export const mapStandingToStanding = (standing: FootballStanding): Standing => {
   return {
-    rank: parseInt(standing.standing_place),
+    rank: toInt(standing.standing_place),
     team: {
-      id: parseInt(standing.team_key),
+      id: toInt(standing.team_key),
       name: standing.standing_team,
       logo: standing.team_key ? `https://crests.football-data.org/${standing.team_key}.png` : '',
     },
-    points: parseInt(standing.standing_PTS),
-    goalsDiff: parseInt(standing.standing_GD),
+    points: toInt(standing.standing_PTS),
+    goalsDiff: toInt(standing.standing_GD),
     group: standing.league_round,
-    form: 'WWDLD', // Mock form
+    form: 'WWDLD',
     status: '',
     description: standing.standing_place_type || '',
     all: {
-      played: parseInt(standing.standing_P),
-      win: parseInt(standing.standing_W),
-      draw: parseInt(standing.standing_D),
-      lose: parseInt(standing.standing_L),
+      played: toInt(standing.standing_P),
+      win: toInt(standing.standing_W),
+      draw: toInt(standing.standing_D),
+      lose: toInt(standing.standing_L),
       goals: {
-        for: parseInt(standing.standing_F),
-        against: parseInt(standing.standing_A),
+        for: toInt(standing.standing_F),
+        against: toInt(standing.standing_A),
       },
     },
     home: {
-      played: parseInt(standing.standing_P) / 2, // Mock
+      played: toInt(standing.standing_P) / 2,
       win: 0,
       draw: 0,
       lose: 0,
       goals: { for: 0, against: 0 },
     },
     away: {
-      played: parseInt(standing.standing_P) / 2, // Mock
+      played: toInt(standing.standing_P) / 2,
       win: 0,
       draw: 0,
       lose: 0,
@@ -222,13 +243,13 @@ export const mapStandingToStanding = (standing: FootballStanding): Standing => {
 
 export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
   const events: MatchEvent[] = [];
-  const homeTeamId = parseInt(event.home_team_key);
-  const awayTeamId = parseInt(event.away_team_key);
+  const homeTeamId = toInt(event.home_team_key);
+  const awayTeamId = toInt(event.away_team_key);
 
   // Map Goals
   if (event.goalscorers) {
     event.goalscorers.forEach((g) => {
-      const time = parseInt(g.time.replace("'", ''));
+      const time = parseInt(g.time.replace("'", ''), 10) || 0;
       if (g.home_scorer) {
         events.push({
           time: { elapsed: time, extra: null },
@@ -257,8 +278,8 @@ export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
   // Map Cards
   if (event.cards) {
     event.cards.forEach((c) => {
-      const time = parseInt(c.time.replace("'", ''));
-      const cardType = c.card === 'yellow card' ? 'Card' : 'Card';
+      const time = parseInt(c.time.replace("'", ''), 10) || 0;
+      const cardType = 'Card';
       const detail = c.card === 'yellow card' ? 'Yellow Card' : 'Red Card';
 
       if (c.home_fault) {
@@ -292,7 +313,6 @@ export const mapEventToMatchEvents = (event: FootballEvent): MatchEvent[] => {
 export const mapLineupsToLineups = (event: FootballEvent): Lineup[] => {
   if (!event.lineups) return [];
 
-  // Helper to map team data
   const mapTeamLineup = (
     teamData: any,
     teamName: string,
@@ -303,27 +323,27 @@ export const mapLineupsToLineups = (event: FootballEvent): Lineup[] => {
     return {
       team: { id: teamId, name: teamName, logo: teamLogo, colors: null },
       formation: formation,
-      startXI: teamData.starting_lineups.map((p: any) => ({
+      startXI: (teamData?.starting_lineups || []).map((p: any) => ({
         player: {
-          id: parseInt(p.player_key) || 0,
+          id: toInt(p.player_key),
           name: p.player,
-          number: parseInt(p.player_number) || 0,
+          number: toInt(p.player_number),
           pos: p.player_position ? p.player_position.charAt(0) : '?',
           grid: null,
         },
       })),
-      substitutes: teamData.substitutes.map((p: any) => ({
+      substitutes: (teamData?.substitutes || []).map((p: any) => ({
         player: {
-          id: parseInt(p.player_key) || 0,
+          id: toInt(p.player_key),
           name: p.player,
-          number: parseInt(p.player_number) || 0,
+          number: toInt(p.player_number),
           pos: p.player_position ? p.player_position.charAt(0) : '?',
           grid: null,
         },
       })),
       coach: {
         id: 0,
-        name: teamData.coaches?.[0]?.coache || 'Unknown',
+        name: teamData?.coaches?.[0]?.coache || 'Unknown',
         photo: '',
       },
     };
@@ -332,14 +352,14 @@ export const mapLineupsToLineups = (event: FootballEvent): Lineup[] => {
   const homeLineup = mapTeamLineup(
     event.lineups.home_team,
     event.event_home_team,
-    parseInt(event.home_team_key),
+    toInt(event.home_team_key),
     event.home_team_logo || '',
     event.event_home_formation || ''
   );
   const awayLineup = mapTeamLineup(
     event.lineups.away_team,
     event.event_away_team,
-    parseInt(event.away_team_key),
+    toInt(event.away_team_key),
     event.away_team_logo || '',
     event.event_away_formation || ''
   );
@@ -348,12 +368,19 @@ export const mapLineupsToLineups = (event: FootballEvent): Lineup[] => {
 };
 
 export const mapLeagueToLeague = (league: FootballLeague): League => {
+  const rawLeagueName = league.league_name || 'Football';
+  const country = (league.country_name || '').trim();
+  const isGenericPL =
+    rawLeagueName.toLowerCase() === 'premier league' && country.toLowerCase() !== 'england';
+  const disambiguatedLeagueName =
+    isGenericPL && country ? `${country} Premier League` : rawLeagueName;
+
   return {
-    id: parseInt(league.league_key),
-    name: league.league_name,
+    id: toInt(league.league_key),
+    name: disambiguatedLeagueName,
     type: 'League',
     logo: league.league_logo,
-    country: league.country_name,
+    country: league.country_name || '',
     flag: league.country_logo,
   };
 };

@@ -63,7 +63,7 @@ export function StandingsTable({ standings }: StandingsTableProps) {
           {/* Team */}
           <Pressable
             style={styles.teamCell}
-            onPress={() => router.push(`/home/teams/${standing.team.id}`)}
+            onPress={() => router.push(`/home/football/teams/${standing.team.id}`)}
           >
             <Image source={{ uri: standing.team.logo }} style={styles.teamLogo} />
             <Text style={styles.teamName} numberOfLines={1}>

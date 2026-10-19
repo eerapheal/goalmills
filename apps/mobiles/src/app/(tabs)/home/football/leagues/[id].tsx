@@ -22,6 +22,9 @@ import {
 } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
+import { resolveLeagueId } from '../../../../../lib/slugUtils';
+import { getCanonicalCompetition } from '../../../../../lib/football/competitionRegistry';
+import { getLeagueShortName } from '../../../../../lib/football/topLeagues';
 
 type LeagueTab = 'fixtures' | 'results' | 'standings' | 'topscorers' | 'teams' | 'predictions';
 
@@ -50,31 +53,49 @@ export default function LeagueDetailPage() {
 
   const loadLeagueData = async () => {
     try {
-      const leagueId = Number(id);
+      const resolvedId = resolveLeagueId(id as string);
+      const leagueId = resolvedId ?? (!isNaN(Number(id)) ? Number(id) : NaN);
+      const canonical =
+        getCanonicalCompetition(String(id)) ||
+        (resolvedId ? getCanonicalCompetition(String(resolvedId)) : undefined);
+
       const today = new Date();
       const currentYear = today.getFullYear();
-      const currentMonth = today.getMonth(); // 0-11
 
       // Fetch a wider range to ensure we capture the full current/upcoming season regardless of league schedule type
       const fromDate = `${currentYear - 1}-01-01`;
       const toDate = `${currentYear + 2}-01-01`;
 
       const [leaguesRes, fixturesRes, standingsRes, topscorersRes, teamsRes] = await Promise.all([
-        advancedFootballApi.getLeagues(undefined, leagueId).catch(() => ({ result: [] })),
-        advancedFootballApi
-          .getFixtures({
-            from: fromDate,
-            to: toDate,
-            leagueId: leagueId,
-          })
-          .catch(() => ({ result: [] })),
-        advancedFootballApi.getStandings(leagueId).catch(() => ({ result: { total: [] } })),
-        advancedFootballApi.getTopscorers(leagueId).catch(() => ({ result: [] })),
-        advancedFootballApi.getTeams({ leagueId: leagueId }).catch(() => ({ result: [] })),
+        !isNaN(leagueId)
+          ? advancedFootballApi.getLeagues(undefined, leagueId).catch(() => ({ result: [] }))
+          : Promise.resolve({ result: [] }),
+        !isNaN(leagueId)
+          ? advancedFootballApi
+              .getFixtures({
+                from: fromDate,
+                to: toDate,
+                leagueId: leagueId,
+              })
+              .catch(() => ({ result: [] }))
+          : Promise.resolve({ result: [] }),
+        !isNaN(leagueId)
+          ? advancedFootballApi.getStandings(leagueId).catch(() => ({ result: { total: [] } }))
+          : Promise.resolve({ result: { total: [] } }),
+        !isNaN(leagueId)
+          ? advancedFootballApi.getTopscorers(leagueId).catch(() => ({ result: [] }))
+          : Promise.resolve({ result: [] }),
+        !isNaN(leagueId)
+          ? advancedFootballApi.getTeams({ leagueId: leagueId }).catch(() => ({ result: [] }))
+          : Promise.resolve({ result: [] }),
       ]);
 
       const leagues = leaguesRes.result || [];
-      let foundLeague = leagues.find((l) => String(l.league_key) === String(id));
+      let foundLeague = leagues.find(
+        (l) =>
+          String(l.league_key) === String(leagueId) ||
+          String(l.league_key) === String(id)
+      );
 
       let rawFixtures = fixturesRes.result || [];
 
@@ -82,25 +103,62 @@ export default function LeagueDetailPage() {
       if (rawFixtures.length > 0) {
         // Collect all unique seasons
         const seasons = Array.from(
-          new Set(rawFixtures.map((f) => f.league_season).filter((s) => s))
+          new Set(rawFixtures.map((f) => f.league_season).filter((s): s is string => Boolean(s)))
         );
         if (seasons.length > 0) {
           // Sort seasons descending
           seasons.sort((a, b) => {
-            return b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' });
+            return (b || '').localeCompare(a || '', undefined, { numeric: true, sensitivity: 'base' });
           });
-          latestSeason = seasons[0];
+          latestSeason = seasons[0] || null;
           console.log(`Mobile: Filtering league ${id} for latest season: ${latestSeason}`);
           rawFixtures = rawFixtures.filter((f) => f.league_season === latestSeason);
         }
       }
 
-      // If league not found in leagues list, try to get it from fixtures
+      // Disambiguate if found in API
+      if (foundLeague) {
+        const isGenericPL =
+          foundLeague.league_name?.toLowerCase() === 'premier league' &&
+          foundLeague.country_name?.toLowerCase() !== 'england';
+        if (isGenericPL && foundLeague.country_name) {
+          foundLeague = {
+            ...foundLeague,
+            league_name: `${foundLeague.country_name} Premier League`,
+          };
+        } else if (canonical?.name) {
+          foundLeague = {
+            ...foundLeague,
+            league_name: canonical.name,
+          };
+        }
+      }
+
+      // If league not found in leagues list, try canonical registry
+      if (!foundLeague && canonical) {
+        foundLeague = {
+          league_key: String(canonical.providerId || leagueId || id),
+          league_name: canonical.name,
+          league_logo: canonical.logoUrl || '',
+          country_key: canonical.countryCode || '',
+          country_name: canonical.countryName || '',
+          country_logo: canonical.countryFlagUrl || '',
+        } as FootballLeague;
+      }
+
+      // If still not found, try to get it from fixtures
       if (!foundLeague && rawFixtures.length > 0) {
         const firstFixture = rawFixtures[0];
+        const isGenericPL =
+          firstFixture.league_name?.toLowerCase() === 'premier league' &&
+          firstFixture.country_name?.toLowerCase() !== 'england';
+        const name =
+          isGenericPL && firstFixture.country_name
+            ? `${firstFixture.country_name} Premier League`
+            : firstFixture.league_name;
         foundLeague = {
-          league_key: String(id),
-          league_name: firstFixture.league_name,
+          league_key: String(leagueId || id),
+          league_name: name,
           league_logo: firstFixture.league_logo || '',
           country_key: firstFixture.event_country_key || '',
           country_name: firstFixture.country_name,

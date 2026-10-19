@@ -109,8 +109,8 @@ export default function StatsScreen() {
               matchId: String(m.event_key),
               homeTeam: m.event_home_team,
               awayTeam: m.event_away_team,
-              date: m.event_date,
-              time: m.event_time,
+              date: m.event_date || '',
+              time: m.event_time || '',
               odds: Array.isArray(matchOdds) ? matchOdds : [],
             };
           } catch {
