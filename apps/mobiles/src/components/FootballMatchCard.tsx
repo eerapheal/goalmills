@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '@goalmills/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { getLeagueShortName, getTopLeagueSlug } from '../lib/football/topLeagues';
-import { buildTeamSlug } from '../lib/slugUtils';
+import { buildTeamSlug, buildMatchSlug } from '../lib/slugUtils';
 
 export interface UnifiedMatchEvent {
   event_key: string | number;
@@ -95,7 +95,8 @@ export function FootballMatchCard({ event }: FootballMatchCardProps) {
       style={({ pressed }) => [styles.card, pressed && styles.pressed, isLive && styles.liveCard]}
       onPress={() => {
         if (event.event_key) {
-          router.push(`/home/football/matches/${String(event.event_key)}` as any);
+          const matchSlug = buildMatchSlug(event);
+          router.push(`/home/football/matches/${matchSlug}` as any);
         }
       }}
     >

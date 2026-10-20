@@ -22,7 +22,7 @@ import {
 } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
-import { resolveLeagueId, buildTeamSlug } from '../../../../../lib/slugUtils';
+import { resolveLeagueId, buildTeamSlug, buildMatchSlug } from '../../../../../lib/slugUtils';
 import { getCanonicalCompetition } from '../../../../../lib/football/competitionRegistry';
 import { getLeagueShortName } from '../../../../../lib/football/topLeagues';
 
@@ -706,10 +706,12 @@ export default function LeagueDetailPage() {
                   <Pressable
                     key={i}
                     style={styles.predCard}
-                    onPress={() =>
-                      item.event_key &&
-                      router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)
-                    }
+                    onPress={() => {
+                      if (item.event_key) {
+                        const slug = buildMatchSlug(item);
+                        router.push(`/home/football/matches/${slug}` as any);
+                      }
+                    }}
                   >
                     <View style={styles.predTeams}>
                       <Text style={styles.predHome} numberOfLines={1}>

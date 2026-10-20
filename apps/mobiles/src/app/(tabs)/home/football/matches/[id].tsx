@@ -18,7 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
 import { TacticalPitch } from '../../../../../components/TacticalPitch';
 import { getTopLeagueSlug } from '../../../../../lib/football/topLeagues';
-import { buildTeamSlug } from '../../../../../lib/slugUtils';
+import { buildTeamSlug, buildMatchSlug } from '../../../../../lib/slugUtils';
+import { resolveFootballMatch, loadMatchSecondaryData } from '../../../../../lib/football/matchResolver';
 import {
   FootballEvent,
   FootballH2HResponse,
@@ -76,60 +77,18 @@ export default function MatchCenterScreen() {
   const loadData = useCallback(async () => {
     if (!matchId) return;
     try {
-      const numMatchId = Number(matchId);
-      // Primary: Fixture with player stats
-      const fixRes = await advancedFootballApi.getFixtures({
-        matchId: numMatchId,
-        withPlayerStats: '1',
-      });
-      const fix = fixRes?.result?.[0] || null;
+      const { match: fix } = await resolveFootballMatch(matchId);
       setFixture(fix);
 
       if (fix) {
-        const homeKey = Number(fix.home_team_key);
-        const awayKey = Number(fix.away_team_key);
-        const leagueKey = Number(fix.league_key);
-
-        const [h2hRes, oddsRes, liveOddsRes, fullOddsRes, probRes, videoRes, standRes] =
-          await Promise.allSettled([
-            homeKey && awayKey
-              ? advancedFootballApi.getH2H(homeKey, awayKey)
-              : Promise.resolve(null),
-            advancedFootballApi.getOdds({ matchId: numMatchId }),
-            advancedFootballApi.getLiveOdds({ matchId: numMatchId }),
-            advancedFootballApi.getFullOdds({ matchId: numMatchId }),
-            advancedFootballApi.getProbabilities({ matchId: numMatchId }),
-            advancedFootballApi.getVideos(numMatchId),
-            leagueKey ? advancedFootballApi.getStandings(leagueKey) : Promise.resolve(null),
-          ]);
-
-        if (h2hRes.status === 'fulfilled' && h2hRes.value?.result) {
-          setH2h(h2hRes.value.result);
-        }
-        if (oddsRes.status === 'fulfilled' && oddsRes.value?.result) {
-          setOdds(oddsRes.value.result[matchId] || []);
-        }
-        if (liveOddsRes.status === 'fulfilled' && liveOddsRes.value?.result) {
-          setLiveOdds(liveOddsRes.value.result[matchId] || []);
-        }
-        if (fullOddsRes.status === 'fulfilled' && fullOddsRes.value?.result) {
-          setFullOdds(fullOddsRes.value.result[matchId] || null);
-        }
-        if (probRes.status === 'fulfilled' && probRes.value?.result) {
-          const prob =
-            probRes.value.result.find((p) => String(p.event_key) === matchId) ||
-            probRes.value.result[0] ||
-            null;
-          setProbability(prob);
-        }
-        if (videoRes.status === 'fulfilled' && videoRes.value?.result) {
-          setVideos(videoRes.value.result || []);
-        }
-        if (standRes.status === 'fulfilled' && standRes.value?.result) {
-          const res = standRes.value.result as any;
-          const table = Array.isArray(res) ? res : res.total || [];
-          setStandings(table);
-        }
+        const sec = await loadMatchSecondaryData(fix);
+        setH2h(sec.h2h);
+        setOdds(sec.odds);
+        setLiveOdds(sec.liveOdds);
+        setFullOdds(sec.fullOdds);
+        setProbability(sec.probability);
+        setVideos(sec.videos);
+        setStandings(sec.standings);
       }
     } catch (err) {
       console.error('[MatchCenter] Error:', err);
@@ -454,7 +413,10 @@ export default function MatchCenterScreen() {
             <Pressable
               key={i}
               style={styles.h2hRow}
-              onPress={() => router.push(`/(tabs)/home/football/matches/${m.event_key}` as any)}
+              onPress={() => {
+                const slug = buildMatchSlug(m);
+                router.push(`/home/football/matches/${slug}` as any);
+              }}
             >
               <Text style={styles.h2hDate} numberOfLines={1}>
                 {m.event_date} • {m.league_name}
@@ -703,7 +665,16 @@ export default function MatchCenterScreen() {
               row.standing_team === fixture.event_home_team ||
               row.standing_team === fixture.event_away_team;
             return (
-              <View key={i} style={[styles.tableRow, isCurrent && styles.tableRowHighlight]}>
+              <Pressable
+                key={i}
+                style={[styles.tableRow, isCurrent && styles.tableRowHighlight]}
+                onPress={() => {
+                  if (row.team_key) {
+                    const slug = buildTeamSlug(row.standing_team, row.team_key);
+                    router.push(`/home/football/teams/${slug}` as any);
+                  }
+                }}
+              >
                 <Text style={[styles.tableCell, styles.tableRank, { color: '#64748B' }]}>
                   {row.standing_place || i + 1}
                 </Text>
@@ -737,7 +708,7 @@ export default function MatchCenterScreen() {
                 >
                   {row.standing_PTS || 0}
                 </Text>
-              </View>
+              </Pressable>
             );
           })}
         </View>

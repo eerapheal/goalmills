@@ -22,7 +22,7 @@ import {
 } from '@goalmills/types';
 import { LiveNewsFlashTicker } from '../../../components/LiveNewsFlashTicker';
 import { MatchOddsModal } from '../../../components/MatchOddsModal';
-import { buildTeamSlug } from '../../../lib/slugUtils';
+import { buildTeamSlug, buildMatchSlug } from '../../../lib/slugUtils';
 
 type StatsTab = 'standings' | 'topscorers' | 'predictions' | 'odds';
 
@@ -389,10 +389,12 @@ export default function StatsScreen() {
                     <Pressable
                       key={idx}
                       style={styles.predCard}
-                      onPress={() =>
-                        item.event_key &&
-                        router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)
-                      }
+                      onPress={() => {
+                        if (item.event_key) {
+                          const slug = buildMatchSlug(item);
+                          router.push(`/home/football/matches/${slug}` as any);
+                        }
+                      }}
                     >
                       <View style={styles.predHeader}>
                         <Text style={styles.predLeague} numberOfLines={1}>

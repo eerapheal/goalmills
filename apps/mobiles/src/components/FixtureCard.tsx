@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Fixture } from '@goalmills/types';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, formatDate, formatTime } from '@goalmills/ui';
 import { getTopLeagueSlug, getLeagueShortName } from '../lib/football/topLeagues';
-import { buildTeamSlug } from '../lib/slugUtils';
+import { buildTeamSlug, buildMatchSlug } from '../lib/slugUtils';
 
 interface FixtureCardProps {
   fixture: Fixture;
@@ -36,7 +36,16 @@ export function FixtureCard({ fixture, onPress }: FixtureCardProps) {
     if (onPress) {
       onPress();
     } else {
-      router.push(`/home/football/matches/${fixtureData.id}`);
+      const slug = buildMatchSlug({
+        home: teams.home.name,
+        away: teams.away.name,
+        league_name: league.name,
+        country_name: league.country,
+        league_key: league.id,
+        event_date: fixtureData.date,
+        event_key: fixtureData.id,
+      });
+      router.push(`/home/football/matches/${slug}`);
     }
   };
 

@@ -26,7 +26,16 @@ import {
   FootballEvent,
 } from '@goalmills/types';
 import { getLeagueShortName, getLeagueRank, getTopLeagueSlug } from '../lib/football/topLeagues';
-import { buildTeamSlug } from '../lib/slugUtils';
+import { buildTeamSlug, buildMatchSlug } from '../lib/slugUtils';
+import {
+  FootballNavSwitcher,
+  MainCategoryTab,
+  AfricanFootballHeroSpotlight,
+  CompetitionDirectory,
+  MatchCardSkeleton,
+  StandingsTableSkeleton,
+  LeagueRibbonSkeleton,
+} from '../components/football';
 
 type FootballTab = 'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
 
@@ -105,6 +114,13 @@ export function AdvancedFootballScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [standingView, setStandingView] = useState<'total' | 'home' | 'away'>('total');
+
+  // Multi-dimensional filters (parity with web FootballNavSwitcher)
+  const [selectedCategory, setSelectedCategory] = useState<MainCategoryTab>('all');
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedGender, setSelectedGender] = useState<'all' | 'men' | 'women'>('all');
+  const [selectedAgeCategory, setSelectedAgeCategory] = useState<'all' | 'senior' | 'youth'>('all');
+  const [showDirectory, setShowDirectory] = useState(false);
 
   // Pulsing live dot animation
   const liveDotOpacity = useRef(new Animated.Value(1)).current;
@@ -231,6 +247,58 @@ export function AdvancedFootballScreen() {
       );
     }
 
+    // Confederation & Category Filters
+    const africanLeagueKeys = ['29', '346', '248', '141', '297', '347'];
+    const top5LeagueKeys = ['152', '302', '207', '175', '168'];
+    const uefaLeagueKeys = [
+      '3',
+      '4',
+      '683',
+      '1',
+      '152',
+      '302',
+      '207',
+      '175',
+      '168',
+      '244',
+      '266',
+      '322',
+      '259',
+      '279',
+    ];
+    const conmebolLeagueKeys = ['18', '99'];
+
+    if (selectedCategory === 'CAF') {
+      list = list.filter(
+        (f) =>
+          africanLeagueKeys.includes(String(f.league_key)) ||
+          /africa|nigeria|egypt|ghana|morocco|algeria|senegal|south africa/i.test(
+            f.country_name || ''
+          )
+      );
+    } else if (selectedCategory === 'top5') {
+      list = list.filter((f) => top5LeagueKeys.includes(String(f.league_key)));
+    } else if (selectedCategory === 'UEFA') {
+      list = list.filter((f) => uefaLeagueKeys.includes(String(f.league_key)));
+    } else if (selectedCategory === 'CONMEBOL') {
+      list = list.filter((f) => conmebolLeagueKeys.includes(String(f.league_key)));
+    }
+
+    if (selectedCountry) {
+      list = list.filter(
+        (f) =>
+          f.country_name?.toLowerCase().includes(selectedCountry.toLowerCase()) ||
+          (selectedCountry === 'GB-ENG' && /england/i.test(f.country_name || '')) ||
+          (selectedCountry === 'ES' && /spain/i.test(f.country_name || '')) ||
+          (selectedCountry === 'IT' && /italy/i.test(f.country_name || '')) ||
+          (selectedCountry === 'DE' && /germany/i.test(f.country_name || '')) ||
+          (selectedCountry === 'FR' && /france/i.test(f.country_name || '')) ||
+          (selectedCountry === 'NG' && /nigeria/i.test(f.country_name || '')) ||
+          (selectedCountry === 'EG' && /egypt/i.test(f.country_name || '')) ||
+          (selectedCountry === 'ZA' && /south africa/i.test(f.country_name || ''))
+      );
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -241,7 +309,7 @@ export function AdvancedFootballScreen() {
       );
     }
     return list;
-  }, [fixtures, activeTab, searchQuery]);
+  }, [fixtures, activeTab, searchQuery, selectedCategory, selectedCountry]);
 
   const sections = useMemo(() => {
     const groups: {
@@ -313,6 +381,28 @@ export function AdvancedFootballScreen() {
         onActionPress={() => setActiveTab(activeTab === 'live' ? 'upcoming' : 'live')}
       />
 
+      {/* ── Confederation & Demographic Navigation Switcher ── */}
+      <FootballNavSwitcher
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        selectedCountry={selectedCountry}
+        onCountryChange={setSelectedCountry}
+        selectedGender={selectedGender}
+        onGenderChange={setSelectedGender}
+        selectedAgeCategory={selectedAgeCategory}
+        onAgeCategoryChange={setSelectedAgeCategory}
+        onResetFilters={() => {
+          setSelectedCountry(null);
+          setSelectedGender('all');
+          setSelectedAgeCategory('all');
+        }}
+      />
+
+      {/* ── African Football Hero Spotlight ── */}
+      {(selectedCategory === 'CAF' || activeTab === 'live' || activeTab === 'upcoming') && (
+        <AfricanFootballHeroSpotlight />
+      )}
+
       {/* Football Hub Quick Navigation Ribbon */}
       <ScrollView
         horizontal
@@ -325,18 +415,35 @@ export function AdvancedFootballScreen() {
           { label: 'Managers', icon: '🧑‍💼', path: '/home/football/coaches' },
           { label: 'Superstars', icon: '⭐', path: '/home/football/players' },
           { label: 'Clubs Hub', icon: '🛡️', path: '/home/football/teams' },
-          { label: '100+ Leagues', icon: '🏆', path: '/home/football/leagues' },
+          {
+            label: showDirectory ? 'Hide Leagues' : '75+ Leagues',
+            icon: '🏆',
+            action: () => setShowDirectory(!showDirectory),
+          },
         ].map((f) => (
           <Pressable
             key={f.label}
-            onPress={() => router.push(f.path as any)}
-            style={styles.featurePill}
+            onPress={() => (f.action ? f.action() : router.push(f.path as any))}
+            style={[
+              styles.featurePill,
+              f.action && showDirectory && { borderColor: '#F59E0B', backgroundColor: 'rgba(245, 158, 11, 0.15)' },
+            ]}
           >
             <Text style={styles.featurePillEmoji}>{f.icon}</Text>
-            <Text style={styles.featurePillLabel}>{f.label}</Text>
+            <Text
+              style={[
+                styles.featurePillLabel,
+                f.action && showDirectory && { color: '#FBBF24', fontWeight: '800' },
+              ]}
+            >
+              {f.label}
+            </Text>
           </Pressable>
         ))}
       </ScrollView>
+
+      {/* ── 75+ Major Competitions Directory Dropdown ── */}
+      {showDirectory && <CompetitionDirectory />}
 
       {/* Competition Switcher */}
       {showLeaguePicker && (
@@ -468,15 +575,21 @@ export function AdvancedFootballScreen() {
         })}
       </ScrollView>
 
-      {/* ── SCROLLABLE CONTENT ── */}
+      {/* ── SCROLLABLE CONTENT WITH SHIMMER SKELETONS ── */}
       {loading && !refreshing ? (
-        <View style={styles.loaderContainer}>
-          <GoalmillsLoader
-            size="md"
-            label="Football Live"
-            sublabel="Syncing match data & league tables..."
-          />
-        </View>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 12 }}>
+          {renderScrollableHeader()}
+          <LeagueRibbonSkeleton />
+          {activeTab === 'standings' ? (
+            <StandingsTableSkeleton />
+          ) : (
+            <>
+              <MatchCardSkeleton />
+              <MatchCardSkeleton />
+              <MatchCardSkeleton />
+            </>
+          )}
+        </ScrollView>
       ) : (
         <>
           {/* Fixtures / Live / Results */}
@@ -573,69 +686,122 @@ export function AdvancedFootballScreen() {
                     </Text>
                   </View>
                 ) : (
-                  standings.map((row, i) => {
-                    const rank = Number(row.standing_place);
-                    const isUCL = rank <= 4;
-                    const isUEL = rank === 5 || rank === 6;
-                    const isRel = rank >= 18;
-                    return (
-                      <Pressable
-                        key={i}
-                        style={styles.tableRow}
-                        onPress={() => {
-                          if (row.team_key) {
-                            const slug = buildTeamSlug(row.standing_team || (row as any).team_name, row.team_key);
-                            router.push(`/home/football/teams/${slug}` as any);
-                          }
-                        }}
-                      >
-                        <View
+                  <>
+                    {standings.map((row, i) => {
+                      const rank = Number(row.standing_place);
+                      const isLeader = rank === 1;
+                      const isUCL = rank >= 1 && rank <= 4;
+                      const isUEL = rank === 5;
+                      const isUECL = rank === 6;
+                      const isRel =
+                        standings.length > 10
+                          ? rank >= standings.length - 2
+                          : rank >= 18;
+                      return (
+                        <Pressable
+                          key={i}
                           style={[
-                            styles.rankCell,
-                            isUCL && styles.rankUCL,
-                            isUEL && styles.rankUEL,
-                            isRel && styles.rankRel,
+                            styles.tableRow,
+                            isUCL && styles.tableRowUCL,
+                            isUEL && styles.tableRowUEL,
+                            isUECL && styles.tableRowUECL,
+                            isRel && styles.tableRowRel,
                           ]}
+                          onPress={() => {
+                            if (row.team_key) {
+                              const slug = buildTeamSlug(
+                                row.standing_team || (row as any).team_name,
+                                row.team_key
+                              );
+                              router.push(`/home/football/teams/${slug}` as any);
+                            }
+                          }}
                         >
-                          <Text style={styles.rankText}>{row.standing_place || i + 1}</Text>
-                        </View>
-                        <View style={styles.teamColContainer}>
-                          {(row as any).team_logo ? (
-                            <Image
-                              source={{ uri: (row as any).team_logo }}
-                              style={styles.tableTeamLogo}
-                              resizeMode="contain"
-                            />
-                          ) : null}
-                          <Text style={styles.teamNameText} numberOfLines={1}>
-                            {row.standing_team}
+                          <View
+                            style={[
+                              styles.rankCell,
+                              isLeader && styles.rankLeader,
+                              !isLeader && isUCL && styles.rankUCL,
+                              isUEL && styles.rankUEL,
+                              isUECL && styles.rankUECL,
+                              isRel && styles.rankRel,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.rankText,
+                                isLeader && { color: '#FBBF24', fontWeight: '900' },
+                                !isLeader && isUCL && { color: '#60A5FA' },
+                                isUEL && { color: '#FBBF24' },
+                                isUECL && { color: '#34D399' },
+                                isRel && { color: '#F87171' },
+                              ]}
+                            >
+                              {row.standing_place || i + 1}
+                            </Text>
+                          </View>
+                          <View style={styles.teamColContainer}>
+                            {(row as any).team_logo ? (
+                              <Image
+                                source={{ uri: (row as any).team_logo }}
+                                style={styles.tableTeamLogo}
+                                resizeMode="contain"
+                              />
+                            ) : null}
+                            <Text style={styles.teamNameText} numberOfLines={1}>
+                              {row.standing_team}
+                            </Text>
+                          </View>
+                          <Text style={[styles.tableCell, styles.numCol]}>
+                            {row.standing_P || 0}
                           </Text>
-                        </View>
-                        <Text style={[styles.tableCell, styles.numCol]}>{row.standing_P || 0}</Text>
-                        <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>
-                          {row.standing_W || 0}
-                        </Text>
-                        <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>
-                          {row.standing_D || 0}
-                        </Text>
-                        <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>
-                          {row.standing_L || 0}
-                        </Text>
-                        <Text style={[styles.tableCell, styles.numCol]}>
-                          {row.standing_GD || 0}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            styles.ptsCol,
-                            { fontWeight: '900', color: '#FBBF24' },
-                          ]}
-                        >
-                          {row.standing_PTS || 0}
-                        </Text>
-                      </Pressable>
-                    );
-                  })
+                          <Text style={[styles.tableCell, styles.numCol, { color: '#34D399' }]}>
+                            {row.standing_W || 0}
+                          </Text>
+                          <Text style={[styles.tableCell, styles.numCol, { color: '#94A3B8' }]}>
+                            {row.standing_D || 0}
+                          </Text>
+                          <Text style={[styles.tableCell, styles.numCol, { color: '#F87171' }]}>
+                            {row.standing_L || 0}
+                          </Text>
+                          <Text style={[styles.tableCell, styles.numCol]}>
+                            {row.standing_GD || 0}
+                          </Text>
+                          <View style={styles.ptsPillContainer}>
+                            <Text
+                              style={[
+                                styles.tableCell,
+                                styles.ptsCol,
+                                { fontWeight: '900', color: '#FBBF24' },
+                              ]}
+                            >
+                              {row.standing_PTS || 0}
+                            </Text>
+                          </View>
+                        </Pressable>
+                      );
+                    })}
+
+                    {/* Zone Qualification Legend */}
+                    <View style={styles.tableLegend}>
+                      <View style={styles.tableLegendItem}>
+                        <View style={[styles.tableLegendDot, { backgroundColor: '#3B82F6' }]} />
+                        <Text style={styles.tableLegendText}>1-4: UCL</Text>
+                      </View>
+                      <View style={styles.tableLegendItem}>
+                        <View style={[styles.tableLegendDot, { backgroundColor: '#F59E0B' }]} />
+                        <Text style={styles.tableLegendText}>5: UEL</Text>
+                      </View>
+                      <View style={styles.tableLegendItem}>
+                        <View style={[styles.tableLegendDot, { backgroundColor: '#10B981' }]} />
+                        <Text style={styles.tableLegendText}>6: UECL</Text>
+                      </View>
+                      <View style={styles.tableLegendItem}>
+                        <View style={[styles.tableLegendDot, { backgroundColor: '#EF4444' }]} />
+                        <Text style={styles.tableLegendText}>Relegation</Text>
+                      </View>
+                    </View>
+                  </>
                 )}
               </View>
             </ScrollView>
@@ -669,7 +835,15 @@ export function AdvancedFootballScreen() {
                     router.push(`/(tabs)/home/football/players/${item.player_key}` as any)
                   }
                 >
-                  <Text style={styles.scorerRank}>#{item.player_place || index + 1}</Text>
+                  <Text style={styles.scorerRank}>
+                    {index === 0
+                      ? '🥇'
+                      : index === 1
+                      ? '🥈'
+                      : index === 2
+                      ? '🥉'
+                      : `#${item.player_place || index + 1}`}
+                  </Text>
                   {item.player_image ? (
                     <Image source={{ uri: item.player_image }} style={styles.scorerPhoto} />
                   ) : (
@@ -719,10 +893,12 @@ export function AdvancedFootballScreen() {
                 return (
                   <Pressable
                     style={styles.predCard}
-                    onPress={() =>
-                      item.event_key &&
-                      router.push(`/(tabs)/home/football/matches/${item.event_key}` as any)
-                    }
+                    onPress={() => {
+                      if (item.event_key) {
+                        const slug = buildMatchSlug(item);
+                        router.push(`/home/football/matches/${slug}` as any);
+                      }
+                    }}
                   >
                     <View style={styles.predHeader}>
                       <Text style={styles.predLeague} numberOfLines={1}>
@@ -970,18 +1146,88 @@ const styles = StyleSheet.create({
   teamNameText: { flex: 1, fontSize: 12, fontWeight: '700', color: '#F1F5F9' },
   numCol: { width: 23, textAlign: 'center' },
   ptsCol: { width: 28, textAlign: 'center', fontSize: 11 },
+  ptsPillContainer: {
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderRadius: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.2)',
+  },
   rankCell: {
-    width: 20,
-    height: 20,
-    borderRadius: 5,
+    width: 22,
+    height: 22,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 4,
   },
-  rankUCL: { backgroundColor: 'rgba(59,130,246,0.22)' },
-  rankUEL: { backgroundColor: 'rgba(245,158,11,0.22)' },
-  rankRel: { backgroundColor: 'rgba(239,68,68,0.22)' },
-  rankText: { fontSize: 9.5, fontWeight: '900', color: '#94A3B8' },
+  tableRowUCL: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#3B82F6',
+  },
+  tableRowUEL: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#F59E0B',
+  },
+  tableRowUECL: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#10B981',
+  },
+  tableRowRel: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#EF4444',
+  },
+  rankLeader: {
+    backgroundColor: 'rgba(245, 158, 11, 0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.45)',
+  },
+  rankUCL: {
+    backgroundColor: 'rgba(59, 130, 246, 0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.35)',
+  },
+  rankUEL: {
+    backgroundColor: 'rgba(245, 158, 11, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  rankUECL: {
+    backgroundColor: 'rgba(16, 185, 129, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  rankRel: {
+    backgroundColor: 'rgba(239, 68, 68, 0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.35)',
+  },
+  rankText: { fontSize: 10, fontWeight: '900', color: '#94A3B8' },
+  tableLegend: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  tableLegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  tableLegendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 2,
+  },
+  tableLegendText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
 
   // Scorers
   scorerCard: {
