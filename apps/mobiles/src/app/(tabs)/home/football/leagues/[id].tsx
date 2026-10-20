@@ -25,6 +25,11 @@ import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 import { resolveLeagueId, buildTeamSlug, buildMatchSlug } from '../../../../../lib/slugUtils';
 import { getCanonicalCompetition } from '../../../../../lib/football/competitionRegistry';
 import { getLeagueShortName } from '../../../../../lib/football/topLeagues';
+import {
+  StandingsTableSkeleton,
+  MatchCardSkeleton,
+  LeagueRibbonSkeleton,
+} from '../../../../../components/football';
 
 type LeagueTab = 'fixtures' | 'results' | 'standings' | 'topscorers' | 'teams' | 'predictions';
 
@@ -293,11 +298,12 @@ export default function LeagueDetailPage() {
     }
   };
 
-  if (loading) {
+  if (loading && !refreshing) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.secondary} />
-        <Text style={styles.loadingText}>Loading league details...</Text>
+      <View style={{ flex: 1, backgroundColor: '#080E18', padding: 16 }}>
+        <LeagueRibbonSkeleton />
+        <StandingsTableSkeleton />
+        <MatchCardSkeleton />
       </View>
     );
   }
@@ -327,20 +333,33 @@ export default function LeagueDetailPage() {
                 <Text style={[styles.standingsHeaderText, styles.posCol]}>#</Text>
                 <Text style={[styles.standingsHeaderText, styles.teamCol]}>Team</Text>
                 <Text style={[styles.standingsHeaderText, styles.statCol]}>P</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>W</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>D</Text>
-                <Text style={[styles.standingsHeaderText, styles.statCol]}>L</Text>
+                <Text style={[styles.standingsHeaderText, styles.statCol, { color: '#34D399' }]}>W</Text>
+                <Text style={[styles.standingsHeaderText, styles.statCol, { color: '#94A3B8' }]}>D</Text>
+                <Text style={[styles.standingsHeaderText, styles.statCol, { color: '#F87171' }]}>L</Text>
                 <Text style={[styles.standingsHeaderText, styles.statCol]}>GD</Text>
-                <Text style={[styles.standingsHeaderText, styles.ptsCol]}>Pts</Text>
+                <Text style={[styles.standingsHeaderText, styles.ptsCol, { color: '#FBBF24' }]}>Pts</Text>
               </View>
 
               {/* Rows */}
               {group.teams.map((standing, index) => {
                 const teamLogo = getTeamLogo(standing.team_key);
+                const rank = Number(standing.standing_place) || index + 1;
+                const isLeader = rank === 1;
+                const isUCL = rank >= 1 && rank <= 4;
+                const isUEL = rank === 5;
+                const isUECL = rank === 6;
+                const isRel = group.teams.length > 10 ? rank >= group.teams.length - 2 : rank >= 18;
+
                 return (
                   <Pressable
                     key={`${group.name || 'group'}-${standing.team_key || 'unknown'}-${index}`}
-                    style={[styles.standingsRow, index < 4 && styles.championsLeagueRow]}
+                    style={[
+                      styles.standingsRow,
+                      isUCL && styles.championsLeagueRow,
+                      isUEL && styles.europaLeagueRow,
+                      isUECL && styles.conferenceLeagueRow,
+                      isRel && styles.relegationRow,
+                    ]}
                     onPress={() => {
                       if (standing.team_key) {
                         const slug = buildTeamSlug(standing.standing_team, standing.team_key);
@@ -348,13 +367,33 @@ export default function LeagueDetailPage() {
                       }
                     }}
                   >
-                    <Text style={[styles.standingsText, styles.posCol]}>
-                      {standing.standing_place}
-                    </Text>
+                    <View
+                      style={[
+                        styles.rankBadge,
+                        isLeader && styles.leaderBadge,
+                        !isLeader && isUCL && styles.uclBadge,
+                        isUEL && styles.uelBadge,
+                        isUECL && styles.ueclBadge,
+                        isRel && styles.relBadge,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.posColText,
+                          isLeader && { color: '#FBBF24', fontWeight: '900' },
+                          !isLeader && isUCL && { color: '#60A5FA' },
+                          isUEL && { color: '#FBBF24' },
+                          isUECL && { color: '#34D399' },
+                          isRel && { color: '#F87171' },
+                        ]}
+                      >
+                        {standing.standing_place}
+                      </Text>
+                    </View>
                     <View style={styles.teamColContainer}>
-                      {teamLogo && (
+                      {teamLogo ? (
                         <Image source={{ uri: teamLogo }} style={styles.standingsTeamLogo} />
-                      )}
+                      ) : null}
                       <Text style={[styles.standingsText, styles.teamColText]} numberOfLines={1}>
                         {standing.standing_team}
                       </Text>
@@ -362,24 +401,46 @@ export default function LeagueDetailPage() {
                     <Text style={[styles.standingsText, styles.statCol]}>
                       {standing.standing_P}
                     </Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>
+                    <Text style={[styles.standingsText, styles.statCol, { color: '#34D399' }]}>
                       {standing.standing_W}
                     </Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>
+                    <Text style={[styles.standingsText, styles.statCol, { color: '#94A3B8' }]}>
                       {standing.standing_D}
                     </Text>
-                    <Text style={[styles.standingsText, styles.statCol]}>
+                    <Text style={[styles.standingsText, styles.statCol, { color: '#F87171' }]}>
                       {standing.standing_L}
                     </Text>
                     <Text style={[styles.standingsText, styles.statCol]}>
                       {standing.standing_GD}
                     </Text>
-                    <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
-                      {standing.standing_PTS}
-                    </Text>
+                    <View style={styles.ptsPillContainer}>
+                      <Text style={[styles.standingsText, styles.ptsCol, styles.ptsValue]}>
+                        {standing.standing_PTS}
+                      </Text>
+                    </View>
                   </Pressable>
                 );
               })}
+
+              {/* Zone Legend */}
+              <View style={styles.zoneLegend}>
+                <View style={styles.zoneLegendItem}>
+                  <View style={[styles.zoneLegendDot, { backgroundColor: '#3B82F6' }]} />
+                  <Text style={styles.zoneLegendText}>1-4: UCL</Text>
+                </View>
+                <View style={styles.zoneLegendItem}>
+                  <View style={[styles.zoneLegendDot, { backgroundColor: '#F59E0B' }]} />
+                  <Text style={styles.zoneLegendText}>5: UEL</Text>
+                </View>
+                <View style={styles.zoneLegendItem}>
+                  <View style={[styles.zoneLegendDot, { backgroundColor: '#10B981' }]} />
+                  <Text style={styles.zoneLegendText}>6: UECL</Text>
+                </View>
+                <View style={styles.zoneLegendItem}>
+                  <View style={[styles.zoneLegendDot, { backgroundColor: '#EF4444' }]} />
+                  <Text style={styles.zoneLegendText}>Relegation</Text>
+                </View>
+              </View>
             </View>
           </View>
         ))}
@@ -888,10 +949,91 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255, 255, 255, 0.03)',
   },
   championsLeagueRow: {
-    borderLeftColor: COLORS.primary,
+    borderLeftWidth: 3,
+    borderLeftColor: '#3B82F6',
   },
   europaLeagueRow: {
-    borderLeftColor: COLORS.secondary,
+    borderLeftWidth: 3,
+    borderLeftColor: '#F59E0B',
+  },
+  conferenceLeagueRow: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#10B981',
+  },
+  relegationRow: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#EF4444',
+  },
+  rankBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
+  },
+  leaderBadge: {
+    backgroundColor: 'rgba(245, 158, 11, 0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.45)',
+  },
+  uclBadge: {
+    backgroundColor: 'rgba(59, 130, 246, 0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.35)',
+  },
+  uelBadge: {
+    backgroundColor: 'rgba(245, 158, 11, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  ueclBadge: {
+    backgroundColor: 'rgba(16, 185, 129, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  relBadge: {
+    backgroundColor: 'rgba(239, 68, 68, 0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.35)',
+  },
+  posColText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
+  ptsPillContainer: {
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderRadius: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.2)',
+  },
+  zoneLegend: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  zoneLegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  zoneLegendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 2,
+  },
+  zoneLegendText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#94A3B8',
   },
   standingsText: {
     fontSize: 11,

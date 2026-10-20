@@ -17,6 +17,10 @@ import { advancedFootballApi } from '../../../../../services/advancedFootballApi
 import { FootballMatchCard } from '../../../../../components/FootballMatchCard';
 import { UnifiedMatchEvent } from '../../../../../components/FootballMatchCard';
 import { buildTeamSlug } from '../../../../../lib/slugUtils';
+import {
+  PlayerCardSkeleton,
+  MatchCardSkeleton,
+} from '../../../../../components/football';
 
 export default function PlayerDetailPage() {
   const router = useRouter();
@@ -98,9 +102,10 @@ export default function PlayerDetailPage() {
 
   if (loading && !refreshing) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#F59E0B" />
-        <Text style={styles.loadingText}>Loading player profile...</Text>
+      <View style={{ flex: 1, backgroundColor: '#080E18', padding: 16 }}>
+        <PlayerCardSkeleton />
+        <MatchCardSkeleton />
+        <MatchCardSkeleton />
       </View>
     );
   }
