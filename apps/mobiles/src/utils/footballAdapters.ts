@@ -11,6 +11,7 @@ import {
   League,
 } from '@goalmills/types';
 import { getLeagueShortName } from '../lib/football/topLeagues';
+import { CANONICAL_COMPETITIONS, leagueLogo } from '../lib/football/competitionRegistry';
 
 // Helper to safely parse string/number to int with fallback
 const toInt = (val: string | number | undefined | null, fallback = 0): number => {
@@ -82,7 +83,13 @@ export const mapEventToFixture = (event: FootballEvent): Fixture => {
       id: toInt(event.league_key),
       name: disambiguatedLeagueName,
       country: event.country_name || '',
-      logo: event.league_logo || '',
+      logo:
+        event.league_logo && !event.league_logo.includes('allsportsapi.com/logo/logo_leagues')
+          ? event.league_logo
+          : CANONICAL_COMPETITIONS[String(event.league_key)]?.logoUrl ||
+            (CANONICAL_COMPETITIONS[String(event.league_key)]?.apiSportsId
+              ? leagueLogo(CANONICAL_COMPETITIONS[String(event.league_key)].apiSportsId!)
+              : event.league_logo || ''),
       flag: event.country_logo,
       season: toInt(event.league_season, new Date().getFullYear()),
       round: event.league_round || '',
@@ -375,11 +382,17 @@ export const mapLeagueToLeague = (league: FootballLeague): League => {
   const disambiguatedLeagueName =
     isGenericPL && country ? `${country} Premier League` : rawLeagueName;
 
+  const canon = CANONICAL_COMPETITIONS[String(league.league_key)];
+  const resolvedLogo =
+    league.league_logo && !league.league_logo.includes('allsportsapi.com/logo/logo_leagues')
+      ? league.league_logo
+      : canon?.logoUrl || (canon?.apiSportsId ? leagueLogo(canon.apiSportsId) : league.league_logo || '');
+
   return {
     id: toInt(league.league_key),
     name: disambiguatedLeagueName,
     type: 'League',
-    logo: league.league_logo,
+    logo: resolvedLogo,
     country: league.country_name || '',
     flag: league.country_logo,
   };

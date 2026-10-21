@@ -152,7 +152,7 @@ export async function detectStateTransitions(
   const transitions: MatchStateTransition[] = [];
 
   for (const match of liveMatches) {
-    const matchId = match.event_key;
+    const matchId = String(match.event_key);
     const currentState = detectMatchState(match);
     const previousState = await getMatchState(matchId);
 

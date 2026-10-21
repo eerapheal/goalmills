@@ -2036,6 +2036,79 @@ export const CANONICAL_ID_TO_SLUG: Record<string, string> = {
 };
 
 /**
+ * Map of AllSports provider ID and slugs to verified API-Sports CDN league IDs.
+ */
+export const TOP_LEAGUE_APISPORTS_IDS: Record<number | string, number> = {
+  // England
+  152: 39, 'premier-league': 39,
+  153: 40, 'championship': 40,
+  146: 45, 'fa-cup': 45,
+  147: 48, 'carabao-cup': 48,
+  // Spain
+  302: 140, 'la-liga': 140,
+  300: 143, 'copa-del-rey': 143,
+  // Italy
+  207: 135, 'serie-a': 135,
+  206: 137, 'coppa-italia': 137,
+  // Germany
+  175: 78, 'bundesliga': 78,
+  174: 81, 'dfb-pokal': 81,
+  // France
+  168: 61, 'ligue-1': 61,
+  166: 66, 'coupe-de-france': 66,
+  // European Continental
+  3: 2, 'champions-league': 2,
+  4: 3, 'europa-league': 3,
+  683: 848, 'conference-league': 848,
+  633: 5, 'uefa-nations-league': 5,
+  642: 531, 'uefa-super-cup': 531,
+  1: 4, 'uefa-euro': 4,
+  // Africa (CAF & Domestic)
+  29: 6, 6: 6, 'afcon': 6,
+  346: 12, 19: 12, 'caf-champions-league': 12,
+  390: 20, 20: 20, 'caf-confederation-cup': 20,
+  391: 533, 'caf-super-cup': 533,
+  480: 19, 'chan': 19,
+  619: 22, 'afcon-u20': 22,
+  10253: 23, 'afcon-u17': 23,
+  7547: 21, 'afcon-women': 21,
+  248: 234, 247: 234, 'npfl': 234,
+  141: 233, 178: 233, 'egyptian-premier-league': 233,
+  297: 288, 288: 288, 'south-african-psl': 288,
+  238: 200, 239: 200, 'botola-pro': 200,
+  177: 387, 198: 387, 'ghana-premier-league': 387, 'ghanaian-premier-league': 387,
+  // Global / FIFA / Other Continental
+  28: 1, 'fifa-world-cup': 1,
+  12614: 15, 'fifa-club-world-cup': 15,
+  18: 13, 'copa-libertadores': 13,
+  17: 9, 'copa-america': 9,
+  385: 11, 'copa-sudamericana': 11,
+  244: 88, 'eredivisie': 88,
+  266: 94, 'liga-portugal': 94,
+  278: 307, 'saudi-pro-league': 307,
+  332: 253, 'mls': 253,
+  99: 71, 'brasileirao': 71,
+  44: 128, 'liga-profesional': 128,
+  322: 203, 'turkish-super-lig': 203,
+  344: 235, 'russian-premier-league': 235,
+  259: 106, 'ekstraklasa': 106,
+  279: 179, 'scottish-premiership': 179,
+  325: 333, 'ukrainian-premier-league': 333,
+  63: 144, 'belgian-pro-league': 144,
+  312: 207, 'swiss-super-league': 207,
+  47: 218, 'austrian-bundesliga': 218,
+  136: 119, 'danish-superliga': 119,
+  179: 197, 'greek-super-league': 197,
+  262: 262, 'liga-mx': 262,
+  5: 16, 'concacaf-champions-cup': 16,
+  16: 17, 'afc-champions-league': 17,
+  201: 98, 'j1-league': 98,
+  209: 292, 'k-league-1': 292,
+  50: 188, 'a-league': 188,
+  188: 323, 'indian-super-league': 323,
+};
+
+/**
  * Dynamically builds a CanonicalCompetition object for any league reference.
  */
 export function buildCanonicalCompetition(ref: TopLeagueRef): CanonicalCompetition {
@@ -2048,12 +2121,13 @@ export function buildCanonicalCompetition(ref: TopLeagueRef): CanonicalCompetiti
   const countryCode = meta?.countryCode || 'GLOBAL';
   const countryName = meta?.countryName || 'International';
   const confed = meta?.confederationCode || 'FIFA';
+  const apiSportsId = TOP_LEAGUE_APISPORTS_IDS[ref.slug] || TOP_LEAGUE_APISPORTS_IDS[ref.id] || ref.id;
 
   return {
     id: uppercaseId,
     providerId: ref.id,
     providerName: 'allsportsapi',
-    apiSportsId: ref.id,
+    apiSportsId,
     slug: ref.slug,
     name,
     shortName,
@@ -2082,7 +2156,7 @@ export function buildCanonicalCompetition(ref: TopLeagueRef): CanonicalCompetiti
     isIndexable: true,
     priorityRank: rank,
     displayOrder: rank,
-    logoUrl: `https://apiv2.allsportsapi.com/logo/logo_leagues/${ref.id}_${ref.slug}.png`,
+    logoUrl: leagueLogo(apiSportsId),
     countryFlagUrl: countryCode && countryCode.length === 2 ? `https://media.api-sports.io/flags/${countryCode.toLowerCase()}.svg` : '/icon.png',
     canonicalSlug: ref.slug,
     qualifierLeagueId: meta?.qualifierLeagueId,

@@ -161,7 +161,7 @@ async function handleHalftimeTransition(
         imageAltText: `Half-Time: ${match.event_home_team} ${scores.home} - ${scores.away} ${match.event_away_team}`,
         postType: 'ht_scorecard',
         matchId,
-        leagueId: match.league_key,
+        leagueId: match.league_key !== undefined ? String(match.league_key) : undefined,
         leagueName: match.league_name,
         homeTeam: match.event_home_team,
         awayTeam: match.event_away_team,
@@ -252,7 +252,7 @@ async function handleFulltimeTransition(
         imageAltText: `Full-Time: ${match.event_home_team} ${scores.home} - ${scores.away} ${match.event_away_team}`,
         postType: 'ft_scorecard',
         matchId,
-        leagueId: match.league_key,
+        leagueId: match.league_key !== undefined ? String(match.league_key) : undefined,
         leagueName: match.league_name,
         homeTeam: match.event_home_team,
         awayTeam: match.event_away_team,
@@ -322,7 +322,7 @@ function extractStats(match: any) {
   return stats;
 }
 
-function getLeagueColor(leagueKey?: string): string {
+function getLeagueColor(leagueKey?: string | number): string {
   if (!leagueKey) return '#10b981';
   const found = Object.values(TOP_5_LEAGUES).find((l) => String(l.id) === String(leagueKey));
   return found?.color || '#10b981';

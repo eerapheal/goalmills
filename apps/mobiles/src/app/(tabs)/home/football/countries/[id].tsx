@@ -12,6 +12,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '@goalmills/ui';
 import { FootballCountry, FootballLeague } from '@goalmills/types';
 import { advancedFootballApi } from '../../../../../services/advancedFootballApi';
+import { CANONICAL_COMPETITIONS, leagueLogo } from '../../../../../lib/football/competitionRegistry';
 
 export default function CountryDetailPage() {
   const router = useRouter();
@@ -33,7 +34,18 @@ export default function CountryDetailPage() {
 
       const foundCountry = countriesRes.result.find((c) => c.country_key === id);
       setCountry(foundCountry || null);
-      setLeagues(leaguesRes.result);
+      const resolvedLeagues = (leaguesRes.result || []).map((league) => {
+        const canon = CANONICAL_COMPETITIONS[String(league.league_key)];
+        const logo =
+          league.league_logo && !league.league_logo.includes('allsportsapi.com/logo/logo_leagues')
+            ? league.league_logo
+            : canon?.logoUrl || (canon?.apiSportsId ? leagueLogo(canon.apiSportsId) : league.league_logo);
+        return {
+          ...league,
+          league_logo: logo,
+        };
+      });
+      setLeagues(resolvedLeagues);
     } catch (error) {
       console.error('Error loading country data:', error);
     } finally {

@@ -31,7 +31,7 @@ export const TOP_5_LEAGUES: Record<string, LeagueConfig> = {
     countryFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
     primaryColor: '#3d195b',
     secondaryColor: '#00ff85',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/152_premier-league.png',
+    logo: 'https://media.api-sports.io/football/leagues/39.png',
     hashtag: '#PremierLeague',
   },
   LA_LIGA: {
@@ -42,7 +42,7 @@ export const TOP_5_LEAGUES: Record<string, LeagueConfig> = {
     countryFlag: '🇪🇸',
     primaryColor: '#ee8707',
     secondaryColor: '#1a1a2e',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/302_la-liga.png',
+    logo: 'https://media.api-sports.io/football/leagues/140.png',
     hashtag: '#LaLiga',
   },
   SERIE_A: {
@@ -53,7 +53,7 @@ export const TOP_5_LEAGUES: Record<string, LeagueConfig> = {
     countryFlag: '🇮🇹',
     primaryColor: '#024494',
     secondaryColor: '#008fd5',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/207_serie-a.png',
+    logo: 'https://media.api-sports.io/football/leagues/135.png',
     hashtag: '#SerieA',
   },
   BUNDESLIGA: {
@@ -64,7 +64,7 @@ export const TOP_5_LEAGUES: Record<string, LeagueConfig> = {
     countryFlag: '🇩🇪',
     primaryColor: '#d20515',
     secondaryColor: '#000000',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/175_bundesliga.png',
+    logo: 'https://media.api-sports.io/football/leagues/78.png',
     hashtag: '#Bundesliga',
   },
   LIGUE_1: {
@@ -75,7 +75,7 @@ export const TOP_5_LEAGUES: Record<string, LeagueConfig> = {
     countryFlag: '🇫🇷',
     primaryColor: '#091c3e',
     secondaryColor: '#dae025',
-    logo: 'https://apiv2.allsportsapi.com/logo/logo_leagues/168_ligue-1.png',
+    logo: 'https://media.api-sports.io/football/leagues/61.png',
     hashtag: '#Ligue1',
   },
 };

@@ -13,15 +13,26 @@ import { slugify } from '../slugUtils';
  * 5. Dynamic styled SVG avatar badge
  */
 export function resolveLeagueLogo(leagueNameOrId?: string | number, fallbackUrl?: string): string {
-  if (fallbackUrl && fallbackUrl.startsWith('http')) {
+  // Reject 404-prone allsportsapi logo_leagues URLs
+  const isDeadAllSportsLogo = Boolean(fallbackUrl && fallbackUrl.includes('allsportsapi.com/logo/logo_leagues'));
+  if (fallbackUrl && fallbackUrl.startsWith('http') && !isDeadAllSportsLogo) {
     return fallbackUrl;
   }
 
-  if (!leagueNameOrId) {
-    return 'https://media.api-sports.io/football/leagues/152.png';
+  // If fallbackUrl was a dead allsports logo, extract id/slug from it if leagueNameOrId is not provided
+  let effectiveIdOrName = leagueNameOrId;
+  if (!effectiveIdOrName && isDeadAllSportsLogo && fallbackUrl) {
+    const match = fallbackUrl.match(/logo_leagues\/(\d+)(?:_([^.]+))?\.png/);
+    if (match) {
+      effectiveIdOrName = match[2] || match[1];
+    }
   }
 
-  const queryStr = String(leagueNameOrId).trim();
+  if (!effectiveIdOrName) {
+    return 'https://media.api-sports.io/football/leagues/39.png';
+  }
+
+  const queryStr = String(effectiveIdOrName).trim();
   const querySlug = slugify(queryStr);
   const queryNum = Number(queryStr);
 
@@ -42,20 +53,26 @@ export function resolveLeagueLogo(leagueNameOrId?: string | number, fallbackUrl?
   // 2. Check CANONICAL_COMPETITIONS (by providerId or slug)
   const canon =
     CANONICAL_COMPETITIONS[queryStr.toUpperCase()] ||
+    CANONICAL_COMPETITIONS[querySlug] ||
+    CANONICAL_COMPETITIONS[queryStr] ||
     CANONICAL_COMPETITIONS_LIST.find(
       (c) =>
         (c.providerId && Number(c.providerId) === queryNum) ||
         c.slug === querySlug ||
         slugify(c.name) === querySlug
     );
-  if (canon?.logoUrl) return canon.logoUrl;
+  if (canon?.logoUrl && !canon.logoUrl.includes('allsportsapi.com/logo/logo_leagues')) {
+    return canon.logoUrl;
+  }
 
   // 3. Check by apiSportsId as fallback
   if (!isNaN(queryNum) && queryNum > 0) {
     const byApiSportsId = ALL_COMPETITIONS.find((c) => c.apiSportsId === queryNum);
     if (byApiSportsId?.logo) return byApiSportsId.logo;
     const canonByApiSports = CANONICAL_COMPETITIONS_LIST.find((c) => c.apiSportsId === queryNum);
-    if (canonByApiSports?.logoUrl) return canonByApiSports.logoUrl;
+    if (canonByApiSports?.logoUrl && !canonByApiSports.logoUrl.includes('allsportsapi.com/logo/logo_leagues')) {
+      return canonByApiSports.logoUrl;
+    }
     return leagueLogo(queryNum);
   }
 

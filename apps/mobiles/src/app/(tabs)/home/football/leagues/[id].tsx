@@ -137,6 +137,13 @@ export default function LeagueDetailPage() {
             league_name: canonical.name,
           };
         }
+
+        if (canonical?.logoUrl && (!foundLeague.league_logo || foundLeague.league_logo.includes('allsportsapi.com/logo/logo_leagues'))) {
+          foundLeague = {
+            ...foundLeague,
+            league_logo: canonical.logoUrl,
+          };
+        }
       }
 
       // If league not found in leagues list, try canonical registry
@@ -161,10 +168,14 @@ export default function LeagueDetailPage() {
           isGenericPL && firstFixture.country_name
             ? `${firstFixture.country_name} Premier League`
             : firstFixture.league_name;
+        const fixtureLogo =
+          firstFixture.league_logo && !firstFixture.league_logo.includes('allsportsapi.com/logo/logo_leagues')
+            ? firstFixture.league_logo
+            : canonical?.logoUrl || '';
         foundLeague = {
           league_key: String(leagueId || id),
           league_name: name,
-          league_logo: firstFixture.league_logo || '',
+          league_logo: fixtureLogo,
           country_key: firstFixture.event_country_key || '',
           country_name: firstFixture.country_name,
           country_logo: firstFixture.country_logo || '',

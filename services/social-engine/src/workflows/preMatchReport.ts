@@ -68,7 +68,7 @@ export async function executePreMatchWorkflow(
       for (const match of matchingEvents.slice(0, 3)) {
         // Cap at top 3 marquee matches per league per cycle to avoid spamming
         result.matchesEvaluated++;
-        const matchId = match.event_key;
+        const matchId = String(match.event_key);
         const fixtureName = `${match.event_home_team} vs ${match.event_away_team}`;
 
         try {
@@ -88,7 +88,7 @@ export async function executePreMatchWorkflow(
             awayTeam: match.event_away_team,
             leagueName: league.name,
             leagueColor: league.color,
-            eventDate: match.event_date,
+            eventDate: match.event_date || '',
             eventTime: match.event_time ? match.event_time.slice(0, 5) : '15:00',
             venue: match.event_stadium || `${match.event_home_team} Stadium`,
           });
