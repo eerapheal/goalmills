@@ -43,6 +43,7 @@ import {
   getCompetitionSeasonOrCycle,
 } from '@/lib/football/leagueRanking';
 import { LeagueRibbonSkeleton, MatchCardSkeleton } from './football/FootballSkeletons';
+import { GoalmillsLoader } from './GoalmillsLoader';
 
 export type FootballTab =
   'live' | 'upcoming' | 'results' | 'standings' | 'topscorers' | 'predictions';
@@ -605,7 +606,15 @@ export function FootballScreen() {
               )}
 
               {/* Groups Rendering */}
-              {standings.length === 0 ? (
+              {loading ? (
+                <div className="py-16 flex items-center justify-center">
+                  <GoalmillsLoader
+                    size="md"
+                    label="Loading Standings Table"
+                    sublabel="Fetching live points, goal difference & rank..."
+                  />
+                </div>
+              ) : standings.length === 0 ? (
                 <div className="py-12 text-center text-slate-400 text-xs font-sans">
                   No standings telemetry available for this competition.
                 </div>
@@ -699,7 +708,15 @@ export function FootballScreen() {
                 <span>Golden Boot & Top Goal Scorers (2026/2027)</span>
               </h3>
 
-              {topscorers.length === 0 ? (
+              {loading ? (
+                <div className="py-16 flex items-center justify-center">
+                  <GoalmillsLoader
+                    size="md"
+                    label="Loading Top Scorers"
+                    sublabel="Fetching golden boot race & player telemetry..."
+                  />
+                </div>
+              ) : topscorers.length === 0 ? (
                 <p className="text-center text-xs text-slate-400 py-10">
                   No top scorer stats available for this competition.
                 </p>
@@ -819,7 +836,15 @@ export function FootballScreen() {
           {/* TAB: FIXTURES / LIVE / RESULTS */}
           {(activeTab === 'live' || activeTab === 'upcoming' || activeTab === 'results') && (
             <div className="space-y-6">
-              {leagueGroups.length === 0 ? (
+              {loading ? (
+                <div className="rounded-2xl border border-blue-500/20 bg-[#0A1424]/90 p-12 flex items-center justify-center shadow-xl">
+                  <GoalmillsLoader
+                    size="md"
+                    label="Syncing Football Matches"
+                    sublabel="Retrieving latest live scores & match schedules..."
+                  />
+                </div>
+              ) : leagueGroups.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-[#0B1526] p-12 text-center space-y-2">
                   <div className="text-4xl mb-2">⚽</div>
                   <h4 className="text-sm font-bold text-white">No Fixtures Found</h4>

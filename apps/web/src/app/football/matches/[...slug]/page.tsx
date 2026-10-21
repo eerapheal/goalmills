@@ -1294,7 +1294,15 @@ export default function FootballMatchPage() {
   }, [leagueSlug, leagueName, match, slug]);
 
   if (loading && !match) {
-    return null;
+    return (
+      <div className="min-h-screen bg-[#070a1a] pt-[120px] flex items-center justify-center p-6">
+        <GoalmillsLoader
+          size="lg"
+          label="GoalMills Match Centre"
+          sublabel="Loading live scores, lineups & match telemetry..."
+        />
+      </div>
+    );
   }
 
   if (error || !match) {

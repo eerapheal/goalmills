@@ -33,6 +33,7 @@ import {
   StandingsTableSkeleton,
   LeagueRibbonSkeleton,
 } from './FootballSkeletons';
+import { GoalmillsLoader } from '../GoalmillsLoader';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -865,9 +866,15 @@ export function FootballPageClient({
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 bg-[#0f172a] border border-[#1e293b] px-3.5 py-2.5 rounded-xl">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
-                <span>Live Feed: {lastSyncTime}</span>
+              <span className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 bg-[#0f172a] border border-[#1e293b] px-3.5 py-2 rounded-xl">
+                {isSyncing ? (
+                  <GoalmillsLoader size="sm" label="Syncing Feed..." />
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                    <span>Live Feed: {lastSyncTime}</span>
+                  </>
+                )}
               </span>
               <button
                 onClick={fetchLiveMatches}
@@ -1239,7 +1246,15 @@ export function FootballPageClient({
             {/* ── Fixtures Grid Tab ── */}
             {isFixtureTab && (
               <>
-                {currentFixtures.length > 0 ? (
+                {!initialSyncDone || (isSyncing && currentFixtures.length === 0) ? (
+                  <div className="bg-[#0f172a] border border-[#1e293b] rounded-2xl py-20 flex items-center justify-center shadow-xl">
+                    <GoalmillsLoader
+                      size="lg"
+                      label="GoalMills Match Centre"
+                      sublabel="Connecting to real-time football feeds & live scores..."
+                    />
+                  </div>
+                ) : currentFixtures.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {currentFixtures.map((f) => (
                       <MatchCard key={f.id} f={f} />
@@ -1307,7 +1322,17 @@ export function FootballPageClient({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#1e293b]">
-                        {filteredTableData.length > 0 ? (
+                        {tableLoading ? (
+                          <tr>
+                            <td colSpan={9} className="py-16 text-center">
+                              <GoalmillsLoader
+                                size="md"
+                                label="Loading League Standings"
+                                sublabel={`Synchronizing ${tableLeague || 'league'} table & goal difference...`}
+                              />
+                            </td>
+                          </tr>
+                        ) : filteredTableData.length > 0 ? (
                           filteredTableData.map((row) => (
                             <tr
                               key={row.pos}
@@ -1445,7 +1470,15 @@ export function FootballPageClient({
                 </div>
 
                 <div className="divide-y divide-[#1e293b]">
-                  {filteredScorersData.length > 0 ? (
+                  {scorersLoading ? (
+                    <div className="py-16 text-center flex items-center justify-center">
+                      <GoalmillsLoader
+                        size="md"
+                        label="Loading Golden Boot Standings"
+                        sublabel={`Retrieving top scorers for ${tableLeague || 'league'}...`}
+                      />
+                    </div>
+                  ) : filteredScorersData.length > 0 ? (
                     filteredScorersData.map((p) => (
                       <Link
                         key={p.rank}

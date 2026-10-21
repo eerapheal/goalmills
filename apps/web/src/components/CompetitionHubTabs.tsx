@@ -14,6 +14,7 @@ import {
   buildTournamentBracket,
 } from '@/lib/football';
 import { resolveTeamLogo } from '@/lib/football/logoUtils';
+import { GoalmillsLoader } from './GoalmillsLoader';
 import type {
   FootballStanding,
   FootballTopscorer,
@@ -285,7 +286,16 @@ export function CompetitionHubTabs({
       )}
 
       {/* Content */}
-      <>
+      {loading ? (
+        <div className="py-20 flex items-center justify-center">
+          <GoalmillsLoader
+            size="md"
+            label="Updating Competition Data"
+            sublabel="Fetching live table standings, fixtures & results..."
+          />
+        </div>
+      ) : (
+        <>
         {/* Live / Fixtures / Results */}
         {(activeTab === 'live' || activeTab === 'fixtures' || activeTab === 'results') && (
             <div className="space-y-3">
@@ -527,6 +537,7 @@ export function CompetitionHubTabs({
             </div>
           )}
         </>
+      )}
 
       {/* All Teams in Competition */}
       {validTeams.length > 0 && (

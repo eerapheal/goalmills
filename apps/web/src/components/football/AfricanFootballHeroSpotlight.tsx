@@ -267,31 +267,33 @@ export function AfricanFootballHeroSpotlight({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {players.slice(0, 6).map((star) => (
-            <Link
-              key={star.slug}
-              href={`/football/players/${star.slug}`}
-              className="group flex flex-col items-center text-center p-3 rounded-2xl bg-[#061224]/80 hover:bg-amber-500/10 border border-white/5 hover:border-amber-500/30 transition-all"
-            >
-              <div className="relative mb-2">
-                <img
-                  src={star.photo}
-                  alt={star.name}
-                  className="h-12 w-12 rounded-xl object-cover bg-slate-900 border border-white/10 group-hover:scale-105 transition-transform"
-                />
-                <span className="absolute -bottom-1 -right-1 text-xs">{star.countryFlag}</span>
-              </div>
-              <h5 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors truncate max-w-full">
-                {star.name}
-              </h5>
-              <span className="text-[10px] font-mono font-bold text-yellow-400">
-                {star.marketValue}
-              </span>
-              <span className="text-[9px] text-slate-400 truncate max-w-full">
-                {star.clubName ? star.clubName.split(' ')[0] : ''}
-              </span>
-            </Link>
-          ))}
+          {loading && players.length === 0
+            ? [...Array(6)].map((_, i) => <PlayerCardSkeleton key={i} />)
+            : players.slice(0, 6).map((star) => (
+                <Link
+                  key={star.slug}
+                  href={`/football/players/${star.slug}`}
+                  className="group flex flex-col items-center text-center p-3 rounded-2xl bg-[#061224]/80 hover:bg-amber-500/10 border border-white/5 hover:border-amber-500/30 transition-all"
+                >
+                  <div className="relative mb-2">
+                    <img
+                      src={star.photo}
+                      alt={star.name}
+                      className="h-12 w-12 rounded-xl object-cover bg-slate-900 border border-white/10 group-hover:scale-105 transition-transform"
+                    />
+                    <span className="absolute -bottom-1 -right-1 text-xs">{star.countryFlag}</span>
+                  </div>
+                  <h5 className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors truncate max-w-full">
+                    {star.name}
+                  </h5>
+                  <span className="text-[10px] font-mono font-bold text-yellow-400">
+                    {star.marketValue}
+                  </span>
+                  <span className="text-[9px] text-slate-400 truncate max-w-full">
+                    {star.clubName ? star.clubName.split(' ')[0] : ''}
+                  </span>
+                </Link>
+              ))}
         </div>
       </div>
 

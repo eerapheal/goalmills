@@ -360,7 +360,15 @@ export default function CoachDetailPage() {
   }, [rawSlug]);
 
   if (loading && !coachData) {
-    return null;
+    return (
+      <div className="min-h-screen bg-[#070a1a] pt-[120px] flex items-center justify-center p-6">
+        <GoalmillsLoader
+          size="lg"
+          label="GoalMills Manager Hub"
+          sublabel="Loading managerial tactics, trophy record & history..."
+        />
+      </div>
+    );
   }
 
   if (!coachData) {
