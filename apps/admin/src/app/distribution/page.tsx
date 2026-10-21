@@ -77,7 +77,7 @@ export default function ContentDistributionStudio() {
   const [engineStatus, setEngineStatus] = useState<SocialEngineStatusData | null>(null);
   const [platforms, setPlatforms] = useState<PlatformDetail[]>([]);
   const [engineBaseUrl, setEngineBaseUrl] = useState<string>(
-    process.env.NEXT_PUBLIC_SOCIAL_ENGINE_URL || 'https://goalmills-2.onrender.com'
+    process.env.NEXT_PUBLIC_SOCIAL_ENGINE_URL || 'https://goalmills-automation.onrender.com'
   );
   const [loading, setLoading] = useState(true);
   const [broadcasting, setBroadcasting] = useState(false);
@@ -396,13 +396,12 @@ export default function ContentDistributionStudio() {
 
       {feedback && (
         <div
-          className={`p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between border shadow-lg ${
-            feedback.type === 'success'
+          className={`p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between border shadow-lg ${feedback.type === 'success'
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
               : feedback.type === 'info'
                 ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
                 : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
-          }`}
+            }`}
         >
           <div className="flex items-center gap-2">
             {feedback.type === 'success' ? (
@@ -522,11 +521,10 @@ export default function ContentDistributionStudio() {
                   </div>
 
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      isConfigured
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${isConfigured
                         ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                         : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                    }`}
+                      }`}
                   >
                     {isConfigured ? 'Ready' : 'API Key Needed'}
                   </span>
@@ -748,11 +746,10 @@ export default function ContentDistributionStudio() {
                       key={ch.id}
                       type="button"
                       onClick={() => toggleChannel(ch.id)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition border flex items-center gap-2 ${
-                        isSelected
+                      className={`px-3 py-2 rounded-xl text-xs font-bold transition border flex items-center gap-2 ${isSelected
                           ? 'bg-purple-600 border-purple-500 text-white shadow-md shadow-purple-600/20'
                           : 'bg-slate-950 border-white/10 text-slate-400 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <span>{ch.icon}</span>
                       <span className="truncate">{ch.label}</span>
@@ -789,11 +786,10 @@ export default function ContentDistributionStudio() {
                 <button
                   key={tab}
                   onClick={() => setActiveFilter(tab)}
-                  className={`px-2 py-1 rounded-lg font-bold capitalize transition ${
-                    activeFilter === tab
+                  className={`px-2 py-1 rounded-lg font-bold capitalize transition ${activeFilter === tab
                       ? 'bg-purple-600 text-white'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                 >
                   {tab.replace('_', ' ')}
                 </button>
@@ -826,13 +822,12 @@ export default function ContentDistributionStudio() {
                     </div>
 
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        j.status === 'dispatched'
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${j.status === 'dispatched'
                           ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                           : j.status === 'pending_approval'
                             ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
                             : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
-                      }`}
+                        }`}
                     >
                       {j.status}
                     </span>

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     // If testing connection, try proxying to the social engine microservice
     if (testConnection) {
-      const engineUrl = process.env.SOCIAL_ENGINE_URL || 'https://goalmills-2.onrender.com';
+      const engineUrl = process.env.SOCIAL_ENGINE_URL || 'https://goalmills-automation.onrender.com';
       try {
         const testRes = await fetch(`${engineUrl}/api/test-platform/${platform}`, {
           method: 'POST',

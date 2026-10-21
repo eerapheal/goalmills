@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const engineUrl = process.env.SOCIAL_ENGINE_URL || 'https://goalmills-2.onrender.com';
+    const engineUrl = process.env.SOCIAL_ENGINE_URL || 'https://goalmills-automation.onrender.com';
 
     try {
       const response = await fetch(`${engineUrl}/api/trigger/${workflow}`, {

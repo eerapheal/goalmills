@@ -58,7 +58,7 @@ class SocialEngineClient {
     this.baseUrl =
       process.env.SOCIAL_ENGINE_URL ||
       process.env.NEXT_PUBLIC_SOCIAL_ENGINE_URL ||
-      'https://goalmills-2.onrender.com';
+      'https://goalmills-automation.onrender.com';
   }
 
   public getBaseUrl(): string {
