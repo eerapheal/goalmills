@@ -74,6 +74,7 @@ function resolveFlag(countryCode: string, confed: string): string {
   if (confed === 'CAF' || countryCode === 'CAF') return '🌍';
   if (confed === 'UEFA' || countryCode === 'EU') return '🇪🇺';
   if (confed === 'FIFA' || countryCode === 'FIFA') return '🌐';
+  if (confed === 'AFC' || countryCode === 'AFC') return '🌏';
   if (countryCode === 'GB-ENG' || countryCode === 'ENGLAND') return '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
   if (countryCode === 'ES') return '🇪🇸';
   if (countryCode === 'IT') return '🇮🇹';

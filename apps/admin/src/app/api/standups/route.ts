@@ -48,7 +48,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const standups = await Standup.find(query).sort({ meetingDate: -1, createdAt: -1 });
+    const sortQuery = Standup.find(query).sort({ meetingDate: -1, createdAt: -1 });
+    const standups = typeof sortQuery?.lean === 'function' ? await sortQuery.lean() : await sortQuery;
 
     return NextResponse.json({ success: true, count: standups.length, data: standups });
   } catch (error: any) {

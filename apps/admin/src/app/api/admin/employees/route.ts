@@ -60,7 +60,8 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    const employees = await Employee.find(query).sort({ createdAt: -1 });
+    const sortQuery = Employee.find(query).sort({ createdAt: -1 });
+    const employees = typeof sortQuery?.lean === 'function' ? await sortQuery.lean() : await sortQuery;
 
     // Enrich with training progress (completedDaysCount, isCertified, etc.)
     const empIds = employees.map((e) => e._id);

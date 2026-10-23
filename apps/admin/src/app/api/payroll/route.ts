@@ -49,7 +49,8 @@ export async function GET(req: NextRequest) {
       query.employeeId = myEmployee._id;
     }
 
-    let records = await Payroll.find(query).sort({ createdAt: -1 });
+    const sortQuery = Payroll.find(query).sort({ createdAt: -1 });
+    let records = typeof sortQuery?.lean === 'function' ? await sortQuery.lean() : await sortQuery;
 
     // If no payroll records exist and super admin is querying all, seed current period records
     if (records.length === 0 && canManageAll && !requestedEmployeeId) {

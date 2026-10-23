@@ -54,7 +54,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const reports = await DailyReport.find(query).sort({ reportDate: -1, createdAt: -1 });
+    const sortQuery = DailyReport.find(query).sort({ reportDate: -1, createdAt: -1 });
+    const reports = typeof sortQuery?.lean === 'function' ? await sortQuery.lean() : await sortQuery;
 
     return NextResponse.json({ success: true, count: reports.length, data: reports });
   } catch (error: any) {

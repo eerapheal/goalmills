@@ -92,6 +92,16 @@ EXACT_NAME_COUNTRY_MAP.set('south africa:::premier league', 'SOUTH_AFRICAN_PSL')
 EXACT_NAME_COUNTRY_MAP.set('africa:::caf champions league', 'CAF_CHAMPIONS_LEAGUE');
 EXACT_NAME_COUNTRY_MAP.set('africa:::caf confederation cup', 'CAF_CONFEDERATION_CUP');
 EXACT_NAME_COUNTRY_MAP.set('africa:::africa cup of nations', 'AFCON');
+EXACT_NAME_COUNTRY_MAP.set('*:::afc challenge league', 'AFC-CHALLENGE-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('intl:::afc challenge league', 'AFC-CHALLENGE-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('asia:::afc challenge league', 'AFC-CHALLENGE-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('*:::afc champions league', 'AFC-CHAMPIONS-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('intl:::afc champions league', 'AFC-CHAMPIONS-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('asia:::afc champions league', 'AFC-CHAMPIONS-LEAGUE');
+EXACT_NAME_COUNTRY_MAP.set('*:::afc champions league two', 'AFC-CHAMPIONS-LEAGUE-TWO');
+EXACT_NAME_COUNTRY_MAP.set('*:::afc cup', 'AFC-CHAMPIONS-LEAGUE-TWO');
+EXACT_NAME_COUNTRY_MAP.set('*:::afc asian cup', 'AFC-ASIAN-CUP');
+EXACT_NAME_COUNTRY_MAP.set('intl:::afc asian cup', 'AFC-ASIAN-CUP');
 
 export interface ProviderResolutionResult {
   competitionId: string | null;
@@ -135,11 +145,17 @@ export function resolveCompetitionFromProvider(
   // Step 2: Fallback to exact country + name matching (Never partial substring)
   if (leagueName) {
     const normCountry = (countryName || '').trim().toLowerCase();
-    const normName = leagueName.trim().toLowerCase();
+    const normName = leagueName.trim().toLowerCase().replace(/\s+/g, ' ');
+    const cleanNormName = normName
+      .replace(/\s*[-–—]\s*(group\s+stage|preliminary\s+(?:round|stage)|qualification|qualifying|play-?offs?|knockout\s+stage|final\s+stage|round\s+of\s+\d+|quarter-?finals?|semi-?finals?|finals?|regular\s+season)\b/gi, '')
+      .replace(/[ -](group[ -]stage|preliminary[ -]round|preliminary[ -]stage|qualification|play[ -]offs|knockout[ -]stage|final[ -]stage)$/gi, '')
+      .trim();
 
-    // Check country + name exact match
+    // Check country + name exact match (try raw, then cleaned)
     if (normCountry) {
-      const exactMatch = EXACT_NAME_COUNTRY_MAP.get(`${normCountry}:::${normName}`);
+      const exactMatch =
+        EXACT_NAME_COUNTRY_MAP.get(`${normCountry}:::${normName}`) ||
+        EXACT_NAME_COUNTRY_MAP.get(`${normCountry}:::${cleanNormName}`);
       if (exactMatch && (CANONICAL_COMPETITIONS[exactMatch] || getCanonicalCompetition(exactMatch))) {
         return {
           competitionId: exactMatch,
@@ -149,8 +165,10 @@ export function resolveCompetitionFromProvider(
       }
     }
 
-    // Check global unique exact name
-    const globalExactMatch = EXACT_NAME_COUNTRY_MAP.get(`*:::${normName}`);
+    // Check global unique exact name (try raw, then cleaned)
+    const globalExactMatch =
+      EXACT_NAME_COUNTRY_MAP.get(`*:::${normName}`) ||
+      EXACT_NAME_COUNTRY_MAP.get(`*:::${cleanNormName}`);
     if (globalExactMatch && (CANONICAL_COMPETITIONS[globalExactMatch] || getCanonicalCompetition(globalExactMatch))) {
       return {
         competitionId: globalExactMatch,

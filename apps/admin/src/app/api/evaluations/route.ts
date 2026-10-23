@@ -49,7 +49,8 @@ export async function GET(req: NextRequest) {
       query.employeeId = myEmployee._id;
     }
 
-    const evaluations = await PerformanceEvaluation.find(query).sort({ evaluationDate: -1 });
+    const sortQuery = PerformanceEvaluation.find(query).sort({ evaluationDate: -1 });
+    const evaluations = typeof sortQuery?.lean === 'function' ? await sortQuery.lean() : await sortQuery;
 
     return NextResponse.json({
       success: true,

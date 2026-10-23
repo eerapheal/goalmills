@@ -9,6 +9,7 @@ import {
   CompetitionStatus,
 } from '@goalmills/types';
 import { TOP_LEAGUES, TopLeagueRef, getLeagueRank, isTopLeague, UNRANKED } from './topLeagues';
+import { slugify } from '../slugUtils';
 
 export const LEAGUE_LOGO_BASE = 'https://media.api-sports.io/football/leagues';
 export const leagueLogo = (apiSportsId: number): string => `${LEAGUE_LOGO_BASE}/${apiSportsId}.png`;
@@ -1335,7 +1336,7 @@ const TOP_LEAGUES_META: Record<number, TopLeagueMeta> = {
   // AFC Champions League (Asia)
   16: {
     name: 'AFC Champions League',
-    shortName: 'ACL',
+    shortName: 'ACL Elite',
     countryCode: 'AFC',
     countryName: 'Asia',
     confederationCode: 'AFC',
@@ -1350,6 +1351,82 @@ const TOP_LEAGUES_META: Record<number, TopLeagueMeta> = {
     isSenior: true,
     isWomens: false,
     isMens: true,
+  },
+  // AFC Champions League Two (Asia)
+  11: {
+    name: 'AFC Champions League Two',
+    shortName: 'ACL Two',
+    countryCode: 'AFC',
+    countryName: 'Asia',
+    confederationCode: 'AFC',
+    competitionType: 'CONTINENTAL_CLUB',
+    level: 'CONFEDERATION',
+    tier: 2,
+    isDomestic: false,
+    isContinental: true,
+    isInternational: false,
+    isNationalTeam: false,
+    isYouth: false,
+    isSenior: true,
+    isWomens: false,
+    isMens: true,
+  },
+  // AFC Challenge League (Asia)
+  11699: {
+    name: 'AFC Challenge League',
+    shortName: 'AFC Challenge',
+    countryCode: 'AFC',
+    countryName: 'Asia',
+    confederationCode: 'AFC',
+    competitionType: 'CONTINENTAL_CLUB',
+    level: 'CONFEDERATION',
+    tier: 3,
+    isDomestic: false,
+    isContinental: true,
+    isInternational: false,
+    isNationalTeam: false,
+    isYouth: false,
+    isSenior: true,
+    isWomens: false,
+    isMens: true,
+  },
+  // AFC Asian Cup (Asia)
+  347: {
+    name: 'AFC Asian Cup',
+    shortName: 'Asian Cup',
+    countryCode: 'AFC',
+    countryName: 'Asia',
+    confederationCode: 'AFC',
+    competitionType: 'CONTINENTAL_NATIONAL',
+    level: 'CONFEDERATION',
+    tier: 1,
+    isDomestic: false,
+    isContinental: true,
+    isInternational: false,
+    isNationalTeam: true,
+    isYouth: false,
+    isSenior: true,
+    isWomens: false,
+    isMens: true,
+  },
+  // AFC Women's Champions League (Asia)
+  11708: {
+    name: "AFC Women's Champions League",
+    shortName: 'AWCL',
+    countryCode: 'AFC',
+    countryName: 'Asia',
+    confederationCode: 'AFC',
+    competitionType: 'CONTINENTAL_CLUB',
+    level: 'CONFEDERATION',
+    tier: 1,
+    isDomestic: false,
+    isContinental: true,
+    isInternational: false,
+    isNationalTeam: false,
+    isYouth: false,
+    isSenior: true,
+    isWomens: true,
+    isMens: false,
   },
   // J1 League (Japan)
   201: {
@@ -1995,6 +2072,11 @@ export const CANONICAL_SLUG_TO_ID: Record<string, string> = {
   'u21-euro': 'UEFA-U21-EURO',
   'world-cup': 'FIFA-WORLD-CUP',
   'fifa-world-cup': 'FIFA-WORLD-CUP',
+  'afc-challenge-league': 'AFC-CHALLENGE-LEAGUE',
+  'afc-champions-league': 'AFC-CHAMPIONS-LEAGUE',
+  'afc-champions-league-two': 'AFC-CHAMPIONS-LEAGUE-TWO',
+  'afc-asian-cup': 'AFC-ASIAN-CUP',
+  'afc-womens-champions-league': 'AFC-WOMENS-CHAMPIONS-LEAGUE',
 };
 
 export const CANONICAL_ID_TO_SLUG: Record<string, string> = {
@@ -2033,6 +2115,11 @@ export const CANONICAL_ID_TO_SLUG: Record<string, string> = {
   'UEFA-EURO': 'uefa-euro',
   'UEFA-U21-EURO': 'uefa-u21-euro',
   'FIFA-WORLD-CUP': 'world-cup',
+  'AFC-CHALLENGE-LEAGUE': 'afc-challenge-league',
+  'AFC-CHAMPIONS-LEAGUE': 'afc-champions-league',
+  'AFC-CHAMPIONS-LEAGUE-TWO': 'afc-champions-league-two',
+  'AFC-ASIAN-CUP': 'afc-asian-cup',
+  'AFC-WOMENS-CHAMPIONS-LEAGUE': 'afc-womens-champions-league',
 };
 
 /**
@@ -2102,6 +2189,10 @@ export const TOP_LEAGUE_APISPORTS_IDS: Record<number | string, number> = {
   262: 262, 'liga-mx': 262,
   5: 16, 'concacaf-champions-cup': 16,
   16: 17, 'afc-champions-league': 17,
+  11: 18, 'afc-champions-league-two': 18,
+  11699: 1082, 'afc-challenge-league': 1082,
+  347: 7, 'afc-asian-cup': 7,
+  11708: 1083, 'afc-womens-champions-league': 1083,
   201: 98, 'j1-league': 98,
   209: 292, 'k-league-1': 292,
   50: 188, 'a-league': 188,
@@ -2199,35 +2290,55 @@ export function getAllCanonicalCompetitions(): CanonicalCompetition[] {
  */
 export function getCanonicalCompetition(idOrSlug: string): CanonicalCompetition | undefined {
   if (!idOrSlug) return undefined;
-  const clean = idOrSlug.toLowerCase().trim();
+
+  let decoded = idOrSlug;
+  try {
+    decoded = decodeURIComponent(idOrSlug);
+  } catch {
+    decoded = idOrSlug;
+  }
+  const clean = decoded.toLowerCase().trim().replace(/\s+/g, ' ');
 
   // Guard: Quarantine sentinel IDs should never resolve to a valid canonical competition
   if (clean === 'goalmills-unresolved' || clean === 'unresolved' || clean === 'goalmills_unresolved') {
     return undefined;
   }
 
+  // Strip tournament stage suffixes e.g. " - Group Stage", " group stage", "-group-stage"
+  const cleanStripped = clean
+    .replace(/\s*[-–—]\s*(group\s+stage|preliminary\s+(?:round|stage)|qualification|qualifying|play-?offs?|knockout\s+stage|final\s+stage|round\s+of\s+\d+|quarter-?finals?|semi-?finals?|finals?|regular\s+season)\b/gi, '')
+    .replace(/[ -](group[ -]stage|preliminary[ -]round|preliminary[ -]stage|qualification|play[ -]offs|knockout[ -]stage|final[ -]stage)$/gi, '')
+    .trim();
+  const cleanSlug = slugify(cleanStripped || clean);
+
   // 1. Direct hit in pre-built top competitions
-  if (CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[idOrSlug.toUpperCase()]) {
-    return CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[idOrSlug.toUpperCase()];
+  if (CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[cleanSlug] || CANONICAL_COMPETITIONS[idOrSlug.toUpperCase()]) {
+    return CANONICAL_COMPETITIONS[clean] || CANONICAL_COMPETITIONS[cleanSlug] || CANONICAL_COMPETITIONS[idOrSlug.toUpperCase()];
   }
 
   // Check canonical ID aliases
-  const mappedSlug = CANONICAL_ID_TO_SLUG[idOrSlug.toUpperCase()] || CANONICAL_ID_TO_SLUG[clean.toUpperCase()];
+  const mappedSlug = CANONICAL_ID_TO_SLUG[idOrSlug.toUpperCase()] || CANONICAL_ID_TO_SLUG[cleanSlug.toUpperCase()];
   if (mappedSlug && (CANONICAL_COMPETITIONS[mappedSlug] || CANONICAL_COMPETITIONS[mappedSlug.toUpperCase()])) {
     return CANONICAL_COMPETITIONS[mappedSlug] || CANONICAL_COMPETITIONS[mappedSlug.toUpperCase()];
   }
-  const mappedId = CANONICAL_SLUG_TO_ID[clean];
+  const mappedId = CANONICAL_SLUG_TO_ID[clean] || CANONICAL_SLUG_TO_ID[cleanSlug];
   if (mappedId && CANONICAL_COMPETITIONS[mappedId]) {
     return CANONICAL_COMPETITIONS[mappedId];
   }
 
   // 2. Lookup in TOP_LEAGUES
   const topMatch = TOP_LEAGUES.find(
-    (l) => l.slug === clean || String(l.id) === clean || l.slug.replace(/-/g, '_') === clean || (mappedSlug && l.slug === mappedSlug)
+    (l) =>
+      l.slug === clean ||
+      l.slug === cleanSlug ||
+      String(l.id) === clean ||
+      l.slug.replace(/-/g, '_') === clean ||
+      (mappedSlug && l.slug === mappedSlug)
   );
   if (topMatch) {
     const built = buildCanonicalCompetition(topMatch);
     CANONICAL_COMPETITIONS[clean] = built;
+    CANONICAL_COMPETITIONS[cleanSlug] = built;
     CANONICAL_COMPETITIONS[built.id] = built;
     return built;
   }
@@ -2239,41 +2350,59 @@ export function getCanonicalCompetition(idOrSlug: string): CanonicalCompetition 
   }
 
   // 4. Fallback for unranked or dynamic competition slug (must be a valid text slug)
+  const isAfc = clean.includes('afc') || clean.includes('asian') || clean.includes('asia');
   const isEuro = clean.includes('euro');
   const isAfcon = clean.includes('afcon') || clean.includes('caf');
   const isWorldCup = clean.includes('world-cup');
   const isUcl = clean.includes('champions-league');
+  const isConcacaf = clean.includes('concacaf');
+  const isConmebol = clean.includes('conmebol') || clean.includes('libertadores') || clean.includes('sudamericana');
   const isYouth = clean.includes('u21') || clean.includes('u20') || clean.includes('u17') || clean.includes('u23') || clean.includes('youth');
   const isCup = clean.includes('cup') || clean.includes('pokal') || clean.includes('copa') || clean.includes('coppa') || clean.includes('coupe');
 
-  const slugName = clean.replace(/^(caf|uefa|fifa)[-_]/i, '').replace(/[-_]/g, ' ');
+  const slugName = (cleanStripped || clean).replace(/^(caf|uefa|fifa|afc|concacaf|conmebol)[-_ ]/i, '').replace(/[-_]/g, ' ');
   const formattedName = slugName
-    .split(' ')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => {
+      const upper = w.toUpperCase();
+      if (['AFC', 'CAF', 'UEFA', 'FIFA', 'CONCACAF', 'CONMEBOL', 'MLS', 'NPFL', 'PSL'].includes(upper)) {
+        return upper;
+      }
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
     .join(' ');
 
-  const dynamicCompId = CANONICAL_SLUG_TO_ID[clean] || clean.toUpperCase().replace(/[- ]/g, '_');
+  const finalName = isAfc && !formattedName.toLowerCase().startsWith('afc') && clean.includes('afc')
+    ? `AFC ${formattedName}`
+    : formattedName || 'Football League';
+
+  const dynamicCompId = CANONICAL_SLUG_TO_ID[cleanSlug] || cleanSlug.toUpperCase().replace(/[- ]/g, '_');
+
+  const countryCode = isAfcon ? 'CAF' : (isEuro ? 'EUR' : isAfc ? 'AFC' : isConcacaf ? 'CONCACAF' : isConmebol ? 'CONMEBOL' : 'GLOBAL');
+  const countryName = isAfcon ? 'Africa' : (isEuro ? 'Europe' : isAfc ? 'Asia' : isConcacaf ? 'North America' : isConmebol ? 'South America' : 'International');
+  const confedCode = isAfcon ? 'CAF' : (isEuro || isUcl ? 'UEFA' : isAfc ? 'AFC' : isConcacaf ? 'CONCACAF' : isConmebol ? 'CONMEBOL' : 'FIFA');
 
   const dynamicComp: CanonicalCompetition = {
     id: dynamicCompId,
     providerId: 0,
     providerName: 'allsportsapi',
-    slug: clean,
-    name: formattedName || 'Football League',
-    shortName: formattedName || 'League',
-    countryCode: isAfcon ? 'CAF' : (isEuro ? 'EUR' : 'GLOBAL'),
-    countryName: isAfcon ? 'Africa' : (isEuro ? 'Europe' : 'International'),
-    confederationCode: isAfcon ? 'CAF' : (isEuro || isUcl ? 'UEFA' : 'FIFA'),
+    slug: cleanSlug,
+    name: finalName,
+    shortName: finalName,
+    countryCode,
+    countryName,
+    confederationCode: confedCode,
     sport: 'football',
     gender: clean.includes('women') ? 'FEMALE' : 'MALE',
     ageCategory: clean.includes('u17') ? 'U17' : clean.includes('u21') ? 'U21' : clean.includes('u23') ? 'U23' : clean.includes('u20') ? 'U20' : 'SENIOR',
-    competitionType: isAfcon || isWorldCup || isEuro ? 'CONTINENTAL_NATIONAL' : (isCup ? 'CUP' : 'LEAGUE'),
-    level: 'DOMESTIC',
+    competitionType: isAfcon || isWorldCup || isEuro || (isAfc && clean.includes('cup')) ? 'CONTINENTAL_NATIONAL' : (isCup || (clean.includes('league') && (isUcl || isAfc)) ? 'CONTINENTAL_CLUB' : isCup ? 'CUP' : 'LEAGUE'),
+    level: isAfc || isAfcon || isEuro || isConcacaf || isConmebol ? 'CONFEDERATION' : 'DOMESTIC',
     tier: 2,
     season: '2026/2027',
     status: 'ACTIVE',
-    isDomestic: !isAfcon && !isWorldCup && !isEuro && !isUcl,
-    isContinental: isAfcon || isUcl || isEuro,
+    isDomestic: !isAfcon && !isWorldCup && !isEuro && !isUcl && !isAfc,
+    isContinental: isAfcon || isUcl || isEuro || isAfc,
     isInternational: isWorldCup,
     isNationalTeam: isAfcon || isWorldCup || isEuro || clean.includes('chan'),
     isYouth,
@@ -2285,13 +2414,14 @@ export function getCanonicalCompetition(idOrSlug: string): CanonicalCompetition 
     priorityRank: UNRANKED,
     displayOrder: UNRANKED,
     logoUrl: '/icon.png',
-    countryFlagUrl: '/icon.png',
-    canonicalSlug: clean,
+    countryFlagUrl: isAfc ? '🌏' : (isAfcon ? '🌍' : (isEuro ? '🇪🇺' : '/icon.png')),
+    canonicalSlug: cleanSlug,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: new Date().toISOString(),
   };
 
   CANONICAL_COMPETITIONS[clean] = dynamicComp;
+  CANONICAL_COMPETITIONS[cleanSlug] = dynamicComp;
   CANONICAL_COMPETITIONS[dynamicCompId] = dynamicComp;
   return dynamicComp;
 }

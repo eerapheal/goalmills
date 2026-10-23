@@ -658,12 +658,22 @@ export default function AdminDashboard() {
       fetch('/api/reports/daily?status=pending')
         .then((r) => r.json())
         .catch(() => ({ data: [] })),
+      fetch('/api/news?admin=true&limit=50')
+        .then((r) => r.json())
+        .catch(() => []),
     ])
-      .then(([empJson, repJson]) => {
+      .then(([empJson, repJson, newsJson]) => {
+        const todayStr = new Date().toDateString();
+        const newsArray = Array.isArray(newsJson) ? newsJson : newsJson?.news || [];
+        const countPublishedToday = newsArray.filter((n: any) => {
+          const dateVal = n.publishedAt || n.createdAt;
+          return dateVal && new Date(dateVal).toDateString() === todayStr;
+        }).length;
+
         setStats({
           employees: empJson.data?.length || 0,
           pendingReports: repJson.data?.length || 0,
-          publishedToday: 0,
+          publishedToday: countPublishedToday,
         });
       })
       .finally(() => setStatsLoading(false));
