@@ -360,7 +360,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
   });
 
   return (
-    <main className="min-h-screen bg-[#070B12] text-white selection:bg-blue-500/30 overflow-x-hidden pt-24 pb-20">
+    <article className="min-h-screen bg-[#070B12] text-white selection:bg-blue-500/30 overflow-x-hidden pt-24 pb-20">
       {/* Schema.org JSON-LD */}
       <script
         type="application/ld+json"
@@ -720,6 +720,6 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
           </aside>
         </div>
       </div>
-    </main>
+    </article>
   );
 }

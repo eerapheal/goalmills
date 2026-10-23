@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'Privacy Policy | GoalMills',
   description:
     'Official Privacy Policy for GoalMills Web and Mobile Application in compliance with Google Play Developer Policies and global privacy regulations.',
+  alternates: {
+    canonical: 'https://goalmills.com/privacy-policy',
+  },
 };
 
 export default function PrivacyPolicy() {

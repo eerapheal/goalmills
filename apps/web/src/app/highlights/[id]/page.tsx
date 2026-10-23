@@ -101,7 +101,7 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
   const shareUrl = `https://goalmills-web.vercel.app/highlights/${id}`;
 
   return (
-    <main className="min-h-screen bg-[#0B0F17] text-white selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[#0B0F17] text-white selection:bg-blue-500/30">
       {/* Background ambient lighting */}
       <div className="fixed top-0 left-1/3 h-[500px] w-[500px] bg-blue-600/5 blur-[140px] pointer-events-none -z-10" />
 
@@ -253,6 +253,6 @@ export default async function HighlightDetailPage({ params }: { params: Promise<
           </aside>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

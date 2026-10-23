@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { GoalmillsLoader } from '@/components/GoalmillsLoader';
 import { FiMail, FiCalendar, FiArrowRight, FiBookOpen, FiClock, FiX } from 'react-icons/fi';
 import Link from 'next/link';
@@ -32,9 +30,7 @@ export default function NewsletterArchivePage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <Header />
-
-      <main className="flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div className="flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         {/* Header Hero */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black uppercase tracking-wider">
@@ -192,9 +188,7 @@ export default function NewsletterArchivePage() {
             </div>
           </div>
         )}
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }

@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   title: 'Transfer Center: Confirmed Deals, Rumours & Market Intel | GoalMills',
   description:
     'Real-time sports transfer ecosystem: Done deals, advanced negotiations, verified rumours, Premier League & African player market movements, and tactical transfer fit analysis.',
+  alternates: {
+    canonical: 'https://goalmills.com/transfers',
+  },
 };
 
 export default async function TransfersPage() {

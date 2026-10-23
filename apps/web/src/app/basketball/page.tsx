@@ -28,8 +28,8 @@ export const metadata: Metadata = {
 
 export default function BasketballHubPage() {
   return (
-    <main className="min-h-screen bg-[#020617]">
+    <div className="min-h-screen bg-[#020617]">
       <BasketballPageClient />
-    </main>
+    </div>
   );
 }

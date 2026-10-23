@@ -4,6 +4,9 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms and Conditions | GoalMills',
   description: 'Terms and Conditions for using the GoalMills platform.',
+  alternates: {
+    canonical: 'https://goalmills.com/terms',
+  },
 };
 
 export default function TermsAndConditions() {

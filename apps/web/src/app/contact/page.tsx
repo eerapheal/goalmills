@@ -4,6 +4,9 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Contact Us | GoalMills Support',
   description: 'Get in touch with the GoalMills team for support, feedback, or business inquiries.',
+  alternates: {
+    canonical: 'https://goalmills.com/contact',
+  },
 };
 
 export default function ContactUs() {

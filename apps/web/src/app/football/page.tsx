@@ -31,12 +31,12 @@ export default function FootballPage() {
   const allCoaches = EntityService.getAllCoaches();
 
   return (
-    <main className="min-h-screen bg-[#020617]">
+    <div className="min-h-screen bg-[#020617]">
       <FootballPageClient
         initialPlayers={allPlayers}
         initialOfficials={allOfficials}
         initialCoaches={allCoaches}
       />
-    </main>
+    </div>
   );
 }

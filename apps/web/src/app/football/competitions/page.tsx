@@ -20,7 +20,7 @@ export default function CompetitionsDirectoryPage() {
   const uefaClubCount = ALL_COMPETITIONS.filter((c) => c.category === 'european-club').length;
 
   return (
-    <main className="min-h-screen bg-[#020617] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#020617] pt-[72px] pb-20 text-slate-100 selection:bg-blue-600 selection:text-white">
       {/* Hero Header */}
       <div className="relative border-b border-[#1e293b] bg-gradient-to-b from-[#09152a] via-[#060e1d] to-[#020617] overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-3xl pointer-events-none" />
@@ -84,6 +84,6 @@ export default function CompetitionsDirectoryPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <CompetitionDirectory compact={false} />
       </div>
-    </main>
+    </div>
   );
 }

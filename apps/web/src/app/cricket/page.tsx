@@ -30,8 +30,8 @@ export const metadata: Metadata = {
 
 export default function CricketHubPage() {
   return (
-    <main className="min-h-screen bg-[#020617]">
+    <div className="min-h-screen bg-[#020617]">
       <CricketPageClient />
-    </main>
+    </div>
   );
 }

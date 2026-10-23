@@ -1,12 +1,18 @@
 /** @type {import('next').NextConfig} */
 if (!process.env.NEXT_PRIVATE_WORKER_CONCURRENCY) {
-  process.env.NEXT_PRIVATE_WORKER_CONCURRENCY = '2';
+  process.env.NEXT_PRIVATE_WORKER_CONCURRENCY = '1';
+}
+if (!process.env.NODE_OPTIONS?.includes('--max-old-space-size')) {
+  process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} --max-old-space-size=4096`.trim();
 }
 
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@goalmills/ui', '@goalmills/types'],
   serverExternalPackages: ['ioredis', 'mongoose'],
+  experimental: {
+    webpackBuildWorker: false,
+  },
   typescript: {
     // Typecheck is strictly enforced in dedicated `pnpm typecheck` suite
     ignoreBuildErrors: true,

@@ -146,7 +146,7 @@ export default function NewsletterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070E1A] text-white selection:bg-amber-500 selection:text-slate-950 pt-[100px] sm:pt-[105px] pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-[#070E1A] text-white selection:bg-amber-500 selection:text-slate-950 pt-[100px] sm:pt-[105px] pb-24 relative overflow-hidden">
       {/* Ambient Radial Spotlights */}
       <div className="fixed top-0 left-1/4 h-[600px] w-[600px] bg-blue-600/10 blur-[160px] pointer-events-none -z-10" />
       <div className="fixed bottom-0 right-1/4 h-[600px] w-[600px] bg-amber-500/5 blur-[160px] pointer-events-none -z-10" />
@@ -464,6 +464,6 @@ export default function NewsletterPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
