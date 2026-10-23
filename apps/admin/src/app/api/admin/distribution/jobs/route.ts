@@ -19,7 +19,8 @@ export async function GET(req: NextRequest) {
     const filter: any = { tenantSlug };
     if (status && status !== 'all') filter.status = status;
 
-    const jobs = await SyndicationJobModel.find(filter).sort({ createdAt: -1 }).limit(50).lean();
+    const findQuery = SyndicationJobModel.find(filter).sort({ createdAt: -1 }).limit(50);
+    const jobs = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     return NextResponse.json({
       success: true,

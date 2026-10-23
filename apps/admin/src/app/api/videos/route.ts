@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const videos = await Video.find(query).sort({ createdAt: -1 }).limit(limit).lean();
+    const findQuery = Video.find(query).sort({ createdAt: -1 }).limit(limit);
+    const videos = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     // Cache results for 3 minutes
     await cacheSet(cacheKey, videos, 180);

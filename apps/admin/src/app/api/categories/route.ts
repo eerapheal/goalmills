@@ -112,12 +112,14 @@ const DEFAULT_CATEGORIES = [
 export async function GET() {
   await dbConnect();
   try {
-    let categories = await Category.find({}).sort({ order: 1, createdAt: 1 }).lean();
+    const findQuery = Category.find({}).sort({ order: 1, createdAt: 1 });
+    let categories = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     // Auto-seed default categories if collection is empty
     if (!categories || categories.length === 0) {
       await Category.insertMany(DEFAULT_CATEGORIES);
-      categories = await Category.find({}).sort({ order: 1, createdAt: 1 }).lean();
+      const reQuery = Category.find({}).sort({ order: 1, createdAt: 1 });
+      categories = typeof reQuery?.lean === 'function' ? await reQuery.lean() : await reQuery;
     }
 
     return NextResponse.json(categories);

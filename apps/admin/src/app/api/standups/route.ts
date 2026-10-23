@@ -78,9 +78,15 @@ export async function POST(req: NextRequest) {
     // Auto-populate active employees if attendees empty
     let attendees = body.attendees;
     if (!attendees || attendees.length === 0) {
-      const activeEmployees = await Employee.find({
+      const empQuery = Employee.find({
         status: { $in: ['training', 'probation', 'active'] },
       });
+      const selectedQuery = typeof (empQuery as any)?.select === 'function'
+        ? (empQuery as any).select('_id fullName')
+        : empQuery;
+      const activeEmployees = typeof (selectedQuery as any)?.lean === 'function'
+        ? await (selectedQuery as any).lean()
+        : await selectedQuery;
       attendees = activeEmployees.map((emp) => ({
         employeeId: emp._id,
         employeeName: emp.fullName,

@@ -62,10 +62,8 @@ export async function GET(req: NextRequest) {
     ]);
 
     // 3. Recent live stream events
-    const recentEvents = await AnalyticsEvent.find(baseFilter)
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .lean();
+    const findQuery = AnalyticsEvent.find(baseFilter).sort({ createdAt: -1 }).limit(10);
+    const recentEvents = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     const result: RealtimeAnalyticsSummary = {
       activeReaders5m: distinct5m.length || Math.floor(Math.random() * 8 + 14),

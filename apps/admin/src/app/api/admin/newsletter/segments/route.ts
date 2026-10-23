@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
       query.tenantSlug = tenant.tenantSlug;
     }
 
-    const segments = await NewsletterSegment.find(query).sort({ createdAt: -1 }).lean();
+    const findQuery = NewsletterSegment.find(query).sort({ createdAt: -1 });
+    const segments = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     return NextResponse.json({
       success: true,

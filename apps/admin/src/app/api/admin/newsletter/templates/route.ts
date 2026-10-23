@@ -14,9 +14,8 @@ export async function GET(request: NextRequest) {
       query.tenantSlug = tenant.tenantSlug;
     }
 
-    const templates = await NewsletterTemplate.find(query)
-      .sort({ isDefault: -1, createdAt: -1 })
-      .lean();
+    const findQuery = NewsletterTemplate.find(query).sort({ isDefault: -1, createdAt: -1 });
+    const templates = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     return NextResponse.json({
       success: true,

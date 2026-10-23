@@ -52,7 +52,8 @@ const PLATFORM_METADATA = [
 export async function GET() {
   try {
     await dbConnect();
-    const configs = await SocialPlatformConfig.find().lean();
+    const findQuery = SocialPlatformConfig.find();
+    const configs = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
     const configMap = new Map(configs.map((c: any) => [c.platform, c]));
 
     const platforms = PLATFORM_METADATA.map((meta) => {

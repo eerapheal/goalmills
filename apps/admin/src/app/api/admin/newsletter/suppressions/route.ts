@@ -25,8 +25,10 @@ export async function GET(req: NextRequest) {
       query.emailNormalized = { $regex: safe, $options: 'i' };
     }
 
+    const findQuery = EmailSuppression.find(query).sort({ createdAt: -1 }).limit(limit);
+
     const [suppressions, totalCount] = await Promise.all([
-      EmailSuppression.find(query).sort({ createdAt: -1 }).limit(limit),
+      typeof findQuery?.lean === 'function' ? findQuery.lean() : findQuery,
       EmailSuppression.countDocuments(),
     ]);
 

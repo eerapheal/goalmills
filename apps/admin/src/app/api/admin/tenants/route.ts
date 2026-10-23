@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const tenants = await Tenant.find(query).sort({ createdAt: -1 }).lean();
+    const findQuery = Tenant.find(query).sort({ createdAt: -1 });
+    const tenants = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     // Include the virtual default platform tenant if not found in DB
     const hasDefault = tenants.some((t: any) => t.slug === 'goalmills');

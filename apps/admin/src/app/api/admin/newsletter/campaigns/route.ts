@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       query.status = status;
     }
 
-    const campaigns = await NewsletterCampaign.find(query)
+    const findQuery = NewsletterCampaign.find(query)
       .populate({
         path: 'articleIds',
         select:
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
       })
       .sort({ createdAt: -1 })
       .limit(limit);
+    const campaigns = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     return NextResponse.json({ success: true, count: campaigns.length, data: campaigns });
   } catch (err: any) {

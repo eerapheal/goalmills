@@ -40,9 +40,15 @@ export async function DELETE(
     }
 
     // Find linked employees by userId or email
-    const employees = await Employee.find({
+    const empQuery = Employee.find({
       $or: [{ userId: user._id }, { email: user.email?.toLowerCase() }],
     });
+    const selectedQuery = typeof (empQuery as any)?.select === 'function'
+      ? (empQuery as any).select('_id')
+      : empQuery;
+    const employees = typeof (selectedQuery as any)?.lean === 'function'
+      ? await (selectedQuery as any).lean()
+      : await selectedQuery;
     const employeeIds = employees.map((e) => e._id);
 
     if (employeeIds.length > 0) {

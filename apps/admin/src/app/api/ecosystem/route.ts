@@ -49,7 +49,8 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const dbEntities = await EcosystemEntity.find(query).sort({ order: 1, createdAt: -1 }).lean();
+    const findQuery = EcosystemEntity.find(query).sort({ order: 1, createdAt: -1 });
+    const dbEntities = typeof findQuery?.lean === 'function' ? await findQuery.lean() : await findQuery;
 
     // Map built-in presets
     const builtInSports = DEFAULT_SPORTS.map((s) => ({

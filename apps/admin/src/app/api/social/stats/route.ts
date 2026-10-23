@@ -26,6 +26,8 @@ export async function GET() {
     const startOfWeek = new Date();
     startOfWeek.setDate(startOfWeek.getDate() - 7);
 
+    const configQuery = SocialPlatformConfig.find();
+
     const [
       totalPosts,
       postsToday,
@@ -45,7 +47,7 @@ export async function GET() {
       SocialPost.aggregate([
         { $group: { _id: '$postType', count: { $sum: 1 } } },
       ]),
-      SocialPlatformConfig.find().lean(),
+      typeof configQuery?.lean === 'function' ? configQuery.lean() : configQuery,
     ]);
 
     const successRate =

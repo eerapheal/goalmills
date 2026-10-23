@@ -35,10 +35,11 @@ export async function POST(req: NextRequest) {
 
     // 1. Process any pending scheduled campaigns whose time has arrived
     const now = new Date();
-    const dueScheduled = await NewsletterCampaign.find({
+    const schedQuery = NewsletterCampaign.find({
       status: 'scheduled',
       scheduledFor: { $lte: now },
     });
+    const dueScheduled = typeof schedQuery?.lean === 'function' ? await schedQuery.lean() : await schedQuery;
 
     const scheduledResults = [];
     for (const camp of dueScheduled) {

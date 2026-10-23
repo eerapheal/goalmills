@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
     const items: any[] = [];
 
     if (type === 'all' || type === 'news') {
-      const deletedNews = await News.find({
+      const q = News.find({
         $or: [{ status: 'trash' }, { isDeleted: true }],
       })
         .sort({ updatedAt: -1 })
-        .limit(50)
-        .lean();
+        .limit(50);
+      const deletedNews = typeof q?.lean === 'function' ? await q.lean() : await q;
 
       deletedNews.forEach((n: any) => {
         items.push({
@@ -39,12 +39,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'all' || type === 'video') {
-      const deletedVideos = await Video.find({
+      const q = Video.find({
         $or: [{ status: 'trash' }, { isDeleted: true }],
       })
         .sort({ updatedAt: -1 })
-        .limit(50)
-        .lean();
+        .limit(50);
+      const deletedVideos = typeof q?.lean === 'function' ? await q.lean() : await q;
 
       deletedVideos.forEach((v: any) => {
         items.push({
@@ -59,12 +59,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'all' || type === 'sponsorship') {
-      const deletedSponsors = await Sponsorship.find({
+      const q = Sponsorship.find({
         $or: [{ status: 'trash' }, { isDeleted: true }],
       })
         .sort({ updatedAt: -1 })
-        .limit(50)
-        .lean();
+        .limit(50);
+      const deletedSponsors = typeof q?.lean === 'function' ? await q.lean() : await q;
 
       deletedSponsors.forEach((s: any) => {
         items.push({

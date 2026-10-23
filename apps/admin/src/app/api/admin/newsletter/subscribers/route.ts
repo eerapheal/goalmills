@@ -44,9 +44,11 @@ export async function GET(req: NextRequest) {
     const activeFilter = { status: { $in: ACTIVE_STATUSES } };
     const unsubFilter = { status: { $in: INACTIVE_STATUSES } };
 
+    const subQuery = NewsletterSubscriber.find(query).sort({ createdAt: -1 }).limit(limit);
+
     const [subscribers, totalCount, dailyCount, weeklyCount, monthlyCount, unsubCount] =
       await Promise.all([
-        NewsletterSubscriber.find(query).sort({ createdAt: -1 }).limit(limit),
+        typeof subQuery?.lean === 'function' ? subQuery.lean() : subQuery,
         NewsletterSubscriber.countDocuments(activeFilter),
         NewsletterSubscriber.countDocuments({ ...activeFilter, frequency: 'daily' }),
         NewsletterSubscriber.countDocuments({ ...activeFilter, frequency: 'weekly' }),

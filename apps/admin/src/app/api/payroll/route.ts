@@ -54,9 +54,13 @@ export async function GET(req: NextRequest) {
 
     // If no payroll records exist and super admin is querying all, seed current period records
     if (records.length === 0 && canManageAll && !requestedEmployeeId) {
-      const employees = await Employee.find({
+      const empQuery = Employee.find({
         status: { $in: ['training', 'probation', 'active'] },
       });
+      const selectedQuery = typeof (empQuery as any)?.select === 'function'
+        ? (empQuery as any).select('_id fullName jobTitle status trainingAllowance currentSalary')
+        : empQuery;
+      const employees = typeof (selectedQuery as any)?.lean === 'function' ? await (selectedQuery as any).lean() : await selectedQuery;
       const created = [];
       for (const emp of employees) {
         const isTraining = emp.status === 'training';

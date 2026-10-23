@@ -29,8 +29,10 @@ export async function GET(req: NextRequest) {
       query.status = status;
     }
 
+    const findQuery = DeadLetterEvent.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
     const [events, total] = await Promise.all([
-      DeadLetterEvent.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      typeof findQuery?.lean === 'function' ? findQuery.lean() : findQuery,
       DeadLetterEvent.countDocuments(query),
     ]);
 
