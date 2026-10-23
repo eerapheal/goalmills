@@ -105,6 +105,10 @@ export function buildMatchSlug(match: MatchSlugParams): string {
   if (compRaw.toLowerCase().includes('unresolved')) {
     compRaw = match.league_name || 'football';
   }
+  // Strip stage/round suffixes like " - Group Stage", " - Preliminary Stage", etc.
+  compRaw = compRaw
+    .replace(/\s*[-–—]\s*(Group\s+Stage|Preliminary\s+(?:Round|Stage)|Qualification|Qualifying|Play-?offs?|Knockout\s+Stage|Final\s+Stage|Round\s+of\s+\d+|Quarter-?finals?|Semi-?finals?|Finals?|Regular\s+Season)\b/gi, '')
+    .trim();
 
   // If compRaw is purely numeric, look up known slug or fallback to league_name
   if (/^\d+$/.test(compRaw)) {
@@ -289,6 +293,11 @@ export function parseMatchSlug(slug: string): ParsedMatchSlug {
     'caf-champions-league',
     'afcon',
     'africa-cup-of-nations',
+    'afc-challenge-league',
+    'afc-champions-league',
+    'afc-champions-league-two',
+    'afc-asian-cup',
+    'afc-womens-champions-league',
     'fa-cup',
     'carabao-cup',
     'copa-del-rey',

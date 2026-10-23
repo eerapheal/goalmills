@@ -83,6 +83,10 @@ export const TOP_LEAGUES: readonly TopLeagueRef[] = [
   { id: 659, slug: 'canadian-premier-league' },
   { id: 5, slug: 'concacaf-champions-cup' },
   { id: 16, slug: 'afc-champions-league' },
+  { id: 11, slug: 'afc-champions-league-two' },
+  { id: 11699, slug: 'afc-challenge-league' },
+  { id: 347, slug: 'afc-asian-cup' },
+  { id: 11708, slug: 'afc-womens-champions-league' },
   { id: 201, slug: 'j1-league' },
   { id: 209, slug: 'k-league-1' },
   { id: 50, slug: 'a-league' },
@@ -219,7 +223,11 @@ export const LEAGUE_SHORT_NAMES: Record<number, string> = {
   140: 'LigaPro EC',
   659: 'CPL',
   5: 'CONCACAF CC',
-  16: 'ACL',
+  16: 'ACL Elite',
+  11: 'ACL Two',
+  11699: 'AFC Challenge',
+  347: 'Asian Cup',
+  11708: 'AWCL',
   201: 'J1 League',
   209: 'K League 1',
   50: 'A-League',
@@ -252,6 +260,8 @@ export const LEAGUE_SHORT_NAMES: Record<number, string> = {
   341: 'Cymru Prem',
   160: 'Veikkausliiga',
 };
+
+const STAGE_SUFFIX_PATTERN = /\s*[-–—]\s*(Regular Season|Relegation Round|Championship Round|Group\s+[A-Z0-9]+|Group Stage|Preliminary (?:Round|Stage)|Qualification|Qualifying|Play-?offs?|Knockout Stage|Final Stage|Round of \d+|Quarter-?finals?|Semi-?finals?|Finals?)\b/gi;
 
 /**
  * Returns a concise, standardized short form for a league (e.g. "EPL" for Premier League, "LaLiga", "UCL", etc.).
@@ -290,11 +300,11 @@ export function getLeagueShortName(
     if (country) {
       return `${country.charAt(0).toUpperCase() + country.slice(1)} PL`;
     }
-    return name.replace(/\s*-\s*(Regular Season|Relegation Round|Championship Round|Group\s+[A-Z0-9])/gi, '').trim() || 'Football League';
+    return name.replace(STAGE_SUFFIX_PATTERN, '').trim() || 'Football League';
   }
 
   if (name) {
-    return name.replace(/\s*-\s*(Regular Season|Relegation Round|Championship Round|Group\s+[A-Z0-9])/gi, '').trim();
+    return name.replace(STAGE_SUFFIX_PATTERN, '').trim();
   }
 
   return 'Football League';

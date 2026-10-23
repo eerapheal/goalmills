@@ -32,7 +32,11 @@ export function resolveLeagueLogo(leagueNameOrId?: string | number, fallbackUrl?
     return 'https://media.api-sports.io/football/leagues/39.png';
   }
 
-  const queryStr = String(effectiveIdOrName).trim();
+  const rawStr = String(effectiveIdOrName).trim();
+  const cleanedStr = rawStr
+    .replace(/\s*[-–—]\s*(Group\s+Stage|Preliminary\s+(?:Round|Stage)|Qualification|Qualifying|Play-?offs?|Knockout\s+Stage|Final\s+Stage|Round\s+of\s+\d+|Quarter-?finals?|Semi-?finals?|Finals?|Regular\s+Season)\b/gi, '')
+    .trim();
+  const queryStr = cleanedStr || rawStr;
   const querySlug = slugify(queryStr);
   const queryNum = Number(queryStr);
 

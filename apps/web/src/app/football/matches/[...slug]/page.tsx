@@ -1222,7 +1222,11 @@ export default function FootballMatchPage() {
   // Resolve canonical competition / league info for breadcrumb & links
   const disambiguatedLeagueName = useMemo(() => {
     if (!match?.league_name) return '';
-    const raw = match.league_name.trim();
+    let raw = match.league_name.trim();
+    // Strip tournament stage suffixes e.g. " - Group Stage", " - Preliminary Stage"
+    raw = raw
+      .replace(/\s*[-–—]\s*(Group\s+Stage|Preliminary\s+(?:Round|Stage)|Qualification|Qualifying|Play-?offs?|Knockout\s+Stage|Final\s+Stage|Round\s+of\s+\d+|Quarter-?finals?|Semi-?finals?|Finals?|Regular\s+Season)\b/gi, '')
+      .trim();
     const country = (match.country_name || '').trim().toLowerCase();
     if (raw.toLowerCase() === 'premier league' && country && country !== 'england') {
       return `${match.country_name} Premier League`;
@@ -1243,13 +1247,13 @@ export default function FootballMatchPage() {
 
   const leagueSlug = useMemo(() => {
     if (leagueCanonical?.slug && !/^\d+$/.test(leagueCanonical.slug)) {
-      return leagueCanonical.slug;
+      return slugify(leagueCanonical.slug);
     }
     if (disambiguatedLeagueName) {
       return slugify(disambiguatedLeagueName);
     }
     if (parsedSlug.competitionSlug && !/^\d+$/.test(parsedSlug.competitionSlug)) {
-      return parsedSlug.competitionSlug;
+      return slugify(parsedSlug.competitionSlug);
     }
     return '';
   }, [leagueCanonical, disambiguatedLeagueName, parsedSlug.competitionSlug]);

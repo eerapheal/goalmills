@@ -31,8 +31,15 @@ function resolveCompetition(slug: string): {
   comp: CompetitionMeta | null;
   canonicalComp: ReturnType<typeof getCanonicalCompetition> | null;
 } {
-  const canonicalComp = getCanonicalCompetition(slug);
-  const legacyComp = EntityService.getCompetition(slug);
+  let decoded = slug;
+  try {
+    decoded = decodeURIComponent(slug).trim();
+  } catch {
+    decoded = slug.trim();
+  }
+
+  const canonicalComp = getCanonicalCompetition(decoded);
+  const legacyComp = EntityService.getCompetition(canonicalComp?.slug || decoded);
 
   if (legacyComp) {
     return { comp: legacyComp, canonicalComp: canonicalComp || null };
@@ -62,7 +69,11 @@ export async function generateMetadata({
   params: Promise<{ competitionSlug: string }>;
 }): Promise<Metadata> {
   const { competitionSlug } = await params;
-  const { comp } = resolveCompetition(competitionSlug);
+  let decoded = competitionSlug;
+  try {
+    decoded = decodeURIComponent(competitionSlug).trim();
+  } catch {}
+  const { comp } = resolveCompetition(decoded);
 
   if (!comp) return { title: 'Competition Table | GoalMills' };
 
@@ -87,14 +98,18 @@ export default async function CompetitionTablePage({
   params: Promise<{ competitionSlug: string }>;
 }) {
   const { competitionSlug } = await params;
-  const { comp, canonicalComp } = resolveCompetition(competitionSlug);
+  let decoded = competitionSlug;
+  try {
+    decoded = decodeURIComponent(competitionSlug).trim();
+  } catch {}
+  const { comp, canonicalComp } = resolveCompetition(decoded);
 
   if (!comp) {
     notFound();
   }
 
-  // Redirect numeric IDs to canonical text slug (e.g. /football/259/table -> /football/ekstraklasa/table)
-  if (/^\d+$/.test(competitionSlug) && comp.slug && comp.slug !== competitionSlug) {
+  // Redirect non-canonical slugs, encoded URLs, and numeric IDs to canonical text slug (e.g. /football/259/table -> /football/ekstraklasa/table)
+  if (comp.slug && comp.slug !== competitionSlug) {
     permanentRedirect(`/football/${comp.slug}/table`);
   }
 
